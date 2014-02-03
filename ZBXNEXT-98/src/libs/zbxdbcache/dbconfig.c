@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -463,22 +463,54 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 	return ZBX_NO_POLLER;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_item_nextcheck_seed                                          *
+ *                                                                            *
+ * Purpose: get the seed value to be used for item nextcheck calculations     *
+ *                                                                            *
+ * Parameters: item - [IN] the item                                           *
+ *                                                                            *
+ * Return value: the seed for nextcheck calculations                          *
+ *                                                                            *
+ * Comments: The seed value is used to spread multiple item nextchecks over   *
+ *           the item delay period to even the system load.                   *
+ *           Items with the same delay period and seed value will have the    *
+ *           same nextcheck values.                                           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
+{
+	switch (item->poller_type)
+	{
+		case ZBX_POLLER_TYPE_JAVA:
+		case ZBX_POLLER_TYPE_PINGER:
+			/* Java and pinger pollers can process multiple items at the same time.     */
+			/* To take advantage of that we must schedule items with the same interface */
+			/* to be processed at the same time.                                        */
+			return item->interfaceid;
+		default:
+			/* by default just try to spread all item processing over the delay period  */
+			return item->itemid;
+	}
+}
+
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 {
 	int	nextcheck;
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-				config->config->refresh_unsupported, NULL, now, NULL);
+		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+				config->config->refresh_unsupported, NULL, now);
 	}
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
-		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-				item->delay, flexitem ? flexitem->delay_flex : NULL, now, NULL);
+		nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+				item->delay, NULL != flexitem ? flexitem->delay_flex : NULL, now);
 	}
 
 	return nextcheck;
@@ -897,6 +929,9 @@ static void	DCsync_items(DB_RESULT result)
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
 			item->data_expected_from = now;
+
+			item->location = ZBX_LOC_NOWHERE;
+			item->poller_type = ZBX_NO_POLLER;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -922,37 +957,6 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		if (0 == found)
-		{
-			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
-			item->state = (unsigned char)atoi(row[20]);
-			old_nextcheck = 0;
-
-			if (ITEM_STATE_NOTSUPPORTED == item->state)
-			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, config->config->refresh_unsupported, NULL, now, NULL);
-			}
-			else
-			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, delay, row[16], now, NULL);
-			}
-		}
-		else
-		{
-			old_nextcheck = item->nextcheck;
-
-			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
-			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, delay, row[16], now, NULL);
-			}
-		}
-
-		item->delay = delay;
-
 		old_poller_type = item->poller_type;
 		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
 
@@ -963,6 +967,35 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 		}
+
+		if (0 == found)
+		{
+			item->state = (unsigned char)atoi(row[20]);
+			old_nextcheck = 0;
+
+			if (ITEM_STATE_NOTSUPPORTED == item->state)
+			{
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
+						item->type, config->config->refresh_unsupported, NULL, now);
+			}
+			else
+			{
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
+						item->type, delay, row[16], now);
+			}
+		}
+		else
+		{
+			old_nextcheck = item->nextcheck;
+
+			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
+			{
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item),
+						item->type, delay, row[16], now);
+			}
+		}
+
+		item->delay = delay;
 
 		/* SNMP items */
 
@@ -1018,8 +1051,8 @@ static void	DCsync_items(DB_RESULT result)
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
 					ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						item->delay, flexitem->delay_flex, now, NULL);
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+						item->delay, flexitem->delay_flex, now);
 			}
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
@@ -1031,8 +1064,8 @@ static void	DCsync_items(DB_RESULT result)
 
 			if (ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						item->delay, NULL, now, NULL);
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+						item->delay, NULL, now);
 			}
 		}
 
@@ -3010,6 +3043,27 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	__config_pinger_nextcheck_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
+	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
+
+	if (i1->nextcheck < i2->nextcheck)
+		return -1;
+	if (i1->nextcheck > i2->nextcheck)
+		return +1;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+	if (i1->interfaceid > i2->interfaceid)
+		return +1;
+
+	return 0;
+}
+
 static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
 {
 	const ZBX_DC_JMXITEM	*j1;
@@ -3176,23 +3230,34 @@ void	init_configuration_cache()
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
-		if (ZBX_POLLER_TYPE_JAVA != i)
+		switch (i)
 		{
-			zbx_binary_heap_create_ext(&config->queues[i],
-					__config_nextcheck_compare,
-					ZBX_BINARY_HEAP_OPTION_DIRECT,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+			case ZBX_POLLER_TYPE_JAVA:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_java_elem_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
+			case ZBX_POLLER_TYPE_PINGER:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_pinger_nextcheck_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
+			default:
+				zbx_binary_heap_create_ext(&config->queues[i],
+						__config_nextcheck_compare,
+						ZBX_BINARY_HEAP_OPTION_DIRECT,
+						__config_mem_malloc_func,
+						__config_mem_realloc_func,
+						__config_mem_free_func);
+				break;
 		}
 	}
-
-	zbx_binary_heap_create_ext(&config->queues[ZBX_POLLER_TYPE_JAVA],
-			__config_java_elem_compare,
-			ZBX_BINARY_HEAP_OPTION_DIRECT,
-			__config_mem_malloc_func,
-			__config_mem_realloc_func,
-			__config_mem_free_func);
 
 	zbx_binary_heap_create_ext(&config->pqueue,
 					__config_proxy_compare,
@@ -5257,7 +5322,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  * Parameters: items - [OUT] the copy of item history                         *
  *             ids   - [IN] a vector of item ids to get the history for       *
  *                                                                            *
- * Comments: The hahset must be created by the caller like:                   *
+ * Comments: The hashset must be created by the caller like:                  *
  *            zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,   *
  *                               ZBX_DEFAULT_UINT64_COMPARE_FUNC)             *
  *                                                                            *
@@ -5354,7 +5419,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  *             to    - [IN] the maximum delay time in seconds or -1 if there  *
  *                          is no maximum limit                               *
  *                                                                            *
- * Return value: the number of delayed items,                                 *
+ * Return value: the number of delayed items                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)

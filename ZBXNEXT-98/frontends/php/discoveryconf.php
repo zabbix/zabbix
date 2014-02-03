@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 					$itemKey = new CItemKey($check['value']);
 
 					if (!$itemKey->isValid()) {
-						$ajaxResponse->error(_s('Incorrect key: "%1$s".', $itemKey->getError()));
+						$ajaxResponse->error(_s('Invalid key "%1$s": %2$s.', $check['value'], $itemKey->getError()));
 					}
 					break;
 			}
@@ -224,7 +224,7 @@ if (isset($_REQUEST['form'])) {
 	else {
 		$data['drule']['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$data['drule']['name'] = get_request('name', '');
-		$data['drule']['iprange'] = get_request('iprange', '192.168.0.1-255');
+		$data['drule']['iprange'] = get_request('iprange', '192.168.0.1-254');
 		$data['drule']['delay'] = get_request('delay', SEC_PER_HOUR);
 		$data['drule']['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 		$data['drule']['dchecks'] = get_request('dchecks', array());

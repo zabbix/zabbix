@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,18 +31,27 @@ $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
 $configTypeRadioButton = array(
-	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL, $this->data['config'] == ZBX_AUTH_INTERNAL, 'submit()'),
+	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
+		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
+		'submit()'
+	),
 	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
-	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP, $this->data['config'] == ZBX_AUTH_LDAP, 'submit()'),
+	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP,
+		($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP),
+		'submit()'
+	),
 	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
-	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP, $this->data['config'] == ZBX_AUTH_HTTP, 'submit()'),
-	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP),
+	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP,
+		($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP),
+		'submit()'
+	),
+	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
 );
 $authenticationFormList->addRow(_('Default authentication'), new CDiv($configTypeRadioButton, 'jqueryinputset'));
 
 // append LDAP fields to form list
-if ($this->data['config'] == ZBX_AUTH_LDAP) {
-	if (!empty($this->data['user_list'])) {
+if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
+	if ($this->data['user_list']) {
 		$userComboBox = new CComboBox('user', $this->data['user']);
 		foreach ($this->data['user_list'] as $user) {
 			if (check_perm2login($user['userid']) && check_perm2system($user['userid'])) {
@@ -54,20 +63,58 @@ if ($this->data['config'] == ZBX_AUTH_LDAP) {
 		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes');
 	}
 
-	$authenticationFormList->addRow(_('LDAP host'), new CTextBox('ldap_host', $this->data['config_data']['ldap_host'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$authenticationFormList->addRow(_('Port'), new CNumericBox('ldap_port', $this->data['config_data']['ldap_port'], 5));
-	$authenticationFormList->addRow(_('Base DN'), new CTextBox('ldap_base_dn',$this->data['config_data']['ldap_base_dn'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$authenticationFormList->addRow(_('Search attribute'), new CTextBox('ldap_search_attribute', !empty($this->data['config_data']['ldap_search_attribute']) ? $this->data['config_data']['ldap_search_attribute'] : 'uid', ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128));
-	$authenticationFormList->addRow(_('Bind DN'), new CTextBox('ldap_bind_dn', $this->data['config_data']['ldap_bind_dn'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$authenticationFormList->addRow(_('Bind password'), new CPassBox('ldap_bind_password', $this->data['config_data']['ldap_bind_password'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$authenticationFormList->addRow(
+		_('LDAP host'),
+		new CTextBox('ldap_host', $this->data['config']['ldap_host'], ZBX_TEXTBOX_STANDARD_SIZE)
+	);
+	$authenticationFormList->addRow(
+		_('Port'),
+		new CNumericBox('ldap_port', $this->data['config']['ldap_port'], 5)
+	);
+	$authenticationFormList->addRow(
+		_('Base DN'),
+		new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+	);
+	$authenticationFormList->addRow(
+		_('Search attribute'),
+		new CTextBox(
+			'ldap_search_attribute',
+			(zbx_empty($this->data['config']['ldap_search_attribute']) && $this->data['form_refresh'] == 0)
+				? 'uid'
+				: $this->data['config']['ldap_search_attribute'],
+			ZBX_TEXTBOX_STANDARD_SIZE,
+			'no',
+			128
+		)
+	);
+	$authenticationFormList->addRow(
+		_('Bind DN'),
+		new CTextBox('ldap_bind_dn', $this->data['config']['ldap_bind_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+	);
+
+	// bind password
+	if (isset($this->data['change_bind_password']) || zbx_empty($this->data['config']['ldap_bind_password'])) {
+		$authenticationForm->addVar('change_bind_password', 1);
+		$authenticationFormList->addRow(
+			_('Bind password'),
+			new CPassBox('ldap_bind_password', null, ZBX_TEXTBOX_SMALL_SIZE)
+		);
+	}
+	else {
+		$authenticationFormList->addRow(
+			_('Bind password'),
+			new CSubmit('change_bind_password', _('Change password'), null, 'formlist')
+		);
+	}
+
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', $this->data['user_password'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', null, ZBX_TEXTBOX_SMALL_SIZE));
 }
 
 // append form list to tab
 $authenticationTab = new CTabView();
-$authenticationTab->addTab('authenticationTab', $this->data['tab_title'], $authenticationFormList);
+$authenticationTab->addTab('authenticationTab', $this->data['title'], $authenticationFormList);
 
 // append tab to form
 $authenticationForm->addItem($authenticationTab);
@@ -75,16 +122,17 @@ $authenticationForm->addItem($authenticationTab);
 // create save button
 $saveButton = new CSubmit('save', _('Save'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (Confirm("'._('Switching authentication method will reset all except this session! Continue?').'")) { jQuery("#authenticationForm").submit(); return true; } else { return false; }');
+	$saveButton->addAction('onclick', 'javascript: '.
+		'if (Confirm("'._('Switching authentication method will reset all except this session! Continue?').'")) {'.
+			'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
+	);
 }
-else {
-	if ($this->data['config'] != ZBX_AUTH_LDAP) {
-		$saveButton->setAttribute('disabled', 'true');
-	}
+elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
+	$saveButton->setAttribute('disabled', 'true');
 }
 
 // append buttons to form
-if ($this->data['config'] == ZBX_AUTH_LDAP) {
+if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	$authenticationForm->addItem(makeFormFooter($saveButton, new CSubmit('test', _('Test'))));
 }
 else {

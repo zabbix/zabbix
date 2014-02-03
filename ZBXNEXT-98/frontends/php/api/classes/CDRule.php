@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -308,7 +308,10 @@ class CDRule extends CZBXAPI {
 
 					$itemKey = new CItemKey($dCheck['key_']);
 					if (!$itemKey->isValid()) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid key "%1$s": %2$s.',
+							$dCheck['key_'],
+							$itemKey->getError()
+						));
 					}
 					break;
 				case SVC_SNMPv1:

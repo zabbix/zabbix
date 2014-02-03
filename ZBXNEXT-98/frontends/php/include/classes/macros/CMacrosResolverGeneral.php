@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ class CMacrosResolverGeneral {
 	const PATTERN_MACRO_PARAM = '[1-9]?';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_INTERFACE = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
-	const PATTERN_INTERFACE_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
+	const PATTERN_INTERFACE_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|HOST\.PORT)([1-9]?)}';
+	const PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
 	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
 	const PATTERN_ITEM_NUMBER = '\$[1-9]';
 	const PATTERN_ITEM_MACROS = '{(HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
@@ -214,15 +215,22 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get interface macros.
 	 *
-	 * @param array $macros
-	 * @param array $macroValues
+	 * @param array	$macros
+	 * @param array	$macroValues
+	 * @param bool	$port
 	 *
 	 * @return array
 	 */
-	protected function getIpMacros(array $macros, array $macroValues) {
+	protected function getIpMacros(array $macros, array $macroValues, $port) {
 		if ($macros) {
+			if ($port) {
+				$selectPort = ',n.port';
+			}
+			else {
+				$selectPort = null;
+			}
 			$dbInterfaces = DBselect(
-				'SELECT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
+				'SELECT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.$selectPort.
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN interface n ON i.hostid=n.hostid'.
@@ -253,6 +261,9 @@ class CMacrosResolverGeneral {
 							break;
 						case 'HOST.CONN':
 							$replace = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+							break;
+						case 'HOST.PORT':
+							$replace = $interface['port'];
 							break;
 					}
 

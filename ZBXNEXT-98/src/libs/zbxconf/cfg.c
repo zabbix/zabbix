@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,10 +175,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					case TYPE_INT:
 						if (FAIL == str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
-
-						/* usability: 2G converts to 0x7fffffff (2GB - 1 byte) */
-						if ((zbx_uint64_t)2 * ZBX_GIBIBYTE == var)
-							var--;
 
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
 							goto incorrect_config;

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-17 23:54+0200\n"
-"PO-Revision-Date: 2013-12-09 22:11+0300\n"
+"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"PO-Revision-Date: 2014-01-27 08:40+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386619872.0\n"
+"X-POOTLE-MTIME: 1390804805.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -37,7 +37,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d jour"
 msgstr[1] "%1$d jours"
 
-#: include/blocks.inc.php:1039
+#: include/blocks.inc.php:1041
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -119,7 +119,7 @@ msgstr "(pas de proxy)"
 msgid "(with warnings)"
 msgstr "(avec avertissements)"
 
-#: include/blocks.inc.php:1515
+#: include/blocks.inc.php:1517
 msgid "-"
 msgstr "-"
 
@@ -239,7 +239,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "Compte bloqué pendant %s secondes"
 
 #: events.php:584 events.php:597 include/actions.inc.php:256
-#: include/blocks.inc.php:921 include/blocks.inc.php:1488
+#: include/blocks.inc.php:923 include/blocks.inc.php:1490
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1013
 msgid "Ack"
@@ -339,14 +339,14 @@ msgstr "Action supprimée"
 #: actionconf.php:345
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Action désactivée"
+msgstr[1] "Actions désactivées"
 
 #: actionconf.php:344
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Action activée"
+msgstr[1] "Actions activées"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -356,8 +356,8 @@ msgstr "Opérations d'action"
 msgid "Action updated"
 msgstr "Action mise à jour"
 
-#: events.php:585 events.php:598 include/blocks.inc.php:922
-#: include/blocks.inc.php:1489 include/events.inc.php:205
+#: events.php:585 events.php:598 include/blocks.inc.php:924
+#: include/blocks.inc.php:1491 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -387,9 +387,9 @@ msgstr "Actif depuis"
 msgid "Active till"
 msgstr "Actif jusqu'à"
 
-#: include/blocks.inc.php:1207 include/blocks.inc.php:1213
-#: include/blocks.inc.php:1331 include/blocks.inc.php:1376
-#: include/blocks.inc.php:1382 include/reports.inc.php:122
+#: include/blocks.inc.php:1209 include/blocks.inc.php:1215
+#: include/blocks.inc.php:1333 include/blocks.inc.php:1378
+#: include/blocks.inc.php:1384 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -511,7 +511,7 @@ msgstr "Administration"
 msgid "Advanced labels"
 msgstr "Étiquettes avancés"
 
-#: include/blocks.inc.php:919 include/blocks.inc.php:1486
+#: include/blocks.inc.php:921 include/blocks.inc.php:1488
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -560,9 +560,9 @@ msgstr "Identifiant"
 msgid "Align icons"
 msgstr "Aligner les icônes"
 
-#: include/blocks.inc.php:1309 include/blocks.inc.php:1318
-#: include/blocks.inc.php:1364 include/blocks.inc.php:1448
-#: include/blocks.inc.php:1457 include/nodes.inc.php:174
+#: include/blocks.inc.php:1311 include/blocks.inc.php:1320
+#: include/blocks.inc.php:1366 include/blocks.inc.php:1450
+#: include/blocks.inc.php:1459 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -646,12 +646,12 @@ msgstr "Erreur application."
 msgid "Application updated"
 msgstr "Application modifiée"
 
-#: api/classes/CItemGeneral.php:391
+#: api/classes/CItemGeneral.php:397
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "L'application avec l'ID \"%1$s\" n'est pas disponible sur \"%2$s\"."
 
-#: hosts.php:805 hosts.php:895 include/forms.inc.php:902
+#: hosts.php:808 hosts.php:898 include/forms.inc.php:902
 #: include/html.inc.php:401 include/html.inc.php:405
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:433
@@ -809,15 +809,15 @@ msgstr "Algorithme d'authentification"
 msgid "Authentication method"
 msgstr "Méthode d'authentification"
 
-#: authentication.php:160 authentication.php:161
+#: authentication.php:188 authentication.php:190
 msgid "Authentication method changed to HTTP"
 msgstr "Méthode d'authentification changée en HTTP"
 
-#: authentication.php:122 authentication.php:123
+#: authentication.php:139
 msgid "Authentication method changed to LDAP"
 msgstr "Méthode d'authentification changée en LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Méthode d'authentification changée en Zabbix interne"
 
@@ -874,7 +874,7 @@ msgstr "Correspondance d'icône automatique"
 msgid "Automatic icon selection"
 msgstr "Sélection automatique d'icône"
 
-#: hosts.php:814
+#: hosts.php:817
 msgid "Availability"
 msgstr "Disponibilité"
 
@@ -933,8 +933,8 @@ msgstr "Image de fond"
 msgid "Bar reports"
 msgstr "Rapports graphiques en barres"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "DN de base"
 
@@ -942,22 +942,23 @@ msgstr "DN de base"
 msgid "Basic authentication"
 msgstr "Authentification simple"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "DN de lien"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Mot de passe de lien"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "ET bit à bit de la dernière (plus récente) valeur T et du mask = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "ET bit à bit de la dernière (plus récente) valeur T et du mask n'est PAS N"
 
 #: include/classes/core/ZBase.php:235
 msgid "Black & Blue"
@@ -1051,7 +1052,7 @@ msgstr "CONFIGURATION DES GROUPES D’HÔTES"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr "CONFIGURATION DES PROTOTYPES D'HÔTES"
 
-#: hosts.php:645 hosts.php:710 hosts.php:758
+#: hosts.php:648 hosts.php:713 hosts.php:761
 msgid "CONFIGURATION OF HOSTS"
 msgstr "CONFIGURATION DES HÔTES"
 
@@ -1267,7 +1268,7 @@ msgstr "Annuler"
 msgid "Cannot acknowledge event"
 msgstr "Impossible d'acquitter l'événement"
 
-#: api/classes/CGraph.php:721
+#: api/classes/CGraph.php:721 api/classes/CGraph.php:735
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Impossible d'ajouter un élément non-numérique \"%1$s\" au graphique \"%2$s\"."
@@ -1294,7 +1295,7 @@ msgstr "Impossible d'ajouter une condition d'action"
 msgid "Cannot add application"
 msgstr "Impossible d'ajouter l'application"
 
-#: api/classes/CTrigger.php:1409
+#: api/classes/CTrigger.php:1406
 msgid "Cannot add dependency from a host to a template."
 msgstr "Impossible d'ajouter une dépendance d'un hôte à un modèle."
 
@@ -1319,7 +1320,7 @@ msgstr "Impossible d'ajouter le prototype de graphique"
 msgid "Cannot add group"
 msgstr "Impossible d'ajouter le groupe"
 
-#: hosts.php:375
+#: hosts.php:378
 msgid "Cannot add host"
 msgstr "Impossible d'ajouter l'hôte"
 
@@ -1443,15 +1444,19 @@ msgstr "Impossible d'ajouter une table de correspondance"
 msgid "Cannot add web scenario"
 msgstr "Impossible d'ajouter le scénario web"
 
-#: authentication.php:165
+#: authentication.php:152
+msgid "Cannot change authentication"
+msgstr "Impossible de changer l'authentification"
+
+#: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
 msgstr "Impossible de changer la méthode d'authentification en HTTP"
 
-#: authentication.php:127
+#: authentication.php:124 authentication.php:151
 msgid "Cannot change authentication method to LDAP"
 msgstr "Impossible de changer la méthode d'authentification en LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Impossible de changer la méthode d'authentification en Zabbix interne"
 
@@ -1459,19 +1464,19 @@ msgstr "Impossible de changer la méthode d'authentification en Zabbix interne"
 msgid "Cannot clear history"
 msgstr "Impossible de nettoyer l'historique"
 
-#: api/classes/CDiscoveryRule.php:952
+#: api/classes/CDiscoveryRule.php:953
 msgid "Cannot clone graph prototypes."
 msgstr "Impossible de cloner les prototypes de graphiques."
 
-#: api/classes/CDiscoveryRule.php:1000
+#: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
 msgstr "Impossible de cloner des prototypes d'hôtes."
 
-#: api/classes/CDiscoveryRule.php:836
+#: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
 msgstr "Impossible de cloner les prototypes d'éléments."
 
-#: api/classes/CDiscoveryRule.php:593
+#: api/classes/CDiscoveryRule.php:594
 msgid "Cannot clone trigger prototypes."
 msgstr "Impossible de cloner les prototypes de déclencheurs."
 
@@ -1501,11 +1506,11 @@ msgstr "Impossible de créer un prototype d'hôte sur un hôte découvert \"%1$s
 msgid "Cannot create another database connection."
 msgstr "Impossible de créer une autre connexion base de donnée."
 
-#: api/classes/CTrigger.php:1443
+#: api/classes/CTrigger.php:1440
 msgid "Cannot create circular dependencies."
 msgstr "Impossible de créer des dépendances circulaires."
 
-#: api/classes/CTrigger.php:1415
+#: api/classes/CTrigger.php:1412
 msgid "Cannot create dependency on trigger itself."
 msgstr "Impossible de créer une dépendance sur le déclencheur lui-même."
 
@@ -1543,7 +1548,7 @@ msgstr "Impossible de créer un nouvel élément"
 msgid "Cannot create screen."
 msgstr "Impossible de créer l'écran."
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Impossible de supprimer l'utilisateur interne Zabbix \"%1$s\", essayez de désactiver cet utilisateur."
@@ -1556,11 +1561,11 @@ msgstr "Impossible de supprimer l'action"
 msgid "Cannot delete application"
 msgstr "Impossible de supprimer l'application"
 
-#: api/classes/CTrigger.php:1069
+#: api/classes/CTrigger.php:1066
 msgid "Cannot delete dependency"
 msgstr "Impossible de supprimer la dépendance"
 
-#: api/classes/CDiscoveryRule.php:400 discoveryconf.php:159
+#: api/classes/CDiscoveryRule.php:401 discoveryconf.php:159
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
 msgstr "Impossible de supprimer la règle de découverte"
@@ -1573,7 +1578,7 @@ msgstr "Impossible d'effacer les règles de découverte"
 msgid "Cannot delete graph"
 msgstr "Impossible de supprimer le graphique"
 
-#: api/classes/CItemPrototype.php:550 graphs.php:273
+#: api/classes/CItemPrototype.php:551 graphs.php:273
 msgid "Cannot delete graph prototype"
 msgstr "Impossible de supprimer le prototype de graphique"
 
@@ -1581,7 +1586,7 @@ msgstr "Impossible de supprimer le prototype de graphique"
 msgid "Cannot delete graph prototypes"
 msgstr "Impossible de supprimer les prototypes de graphiques"
 
-#: api/classes/CItem.php:728
+#: api/classes/CItem.php:729
 msgid "Cannot delete graph."
 msgstr "Impossible de supprimer le graphique."
 
@@ -1597,7 +1602,7 @@ msgstr "Impossible de supprimer des graphiques créés par la découverte de bas
 msgid "Cannot delete group"
 msgstr "Impossible de supprimer le groupe"
 
-#: hosts.php:575 hosts.php:592
+#: hosts.php:578 hosts.php:595
 msgid "Cannot delete host"
 msgstr "Impossible de supprimer l'hôte"
 
@@ -1605,7 +1610,7 @@ msgstr "Impossible de supprimer l'hôte"
 msgid "Cannot delete host group."
 msgstr "Impossible de supprimer le groupe d'hôtes."
 
-#: api/classes/CDiscoveryRule.php:412
+#: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
 msgstr "Impossible de supprimer un prototype d'hôte."
 
@@ -1635,13 +1640,13 @@ msgstr "Impossible de supprimer le prototype d'élément"
 
 #: disc_prototypes.php:340
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "Impossible d'effacer les prototypes d'élément"
 
 #: items.php:767
 msgid "Cannot delete items"
 msgstr "Impossible de supprimer les éléments"
 
-#: api/classes/CItemPrototype.php:567
+#: api/classes/CItemPrototype.php:568
 msgid "Cannot delete items created by low level discovery."
 msgstr "Impossible de supprimer des éléments créés par la découverte de bas niveau."
 
@@ -1713,7 +1718,7 @@ msgstr "Impossible de supprimer le modèle"
 msgid "Cannot delete templated application."
 msgstr "Impossible de supprimer une application provenant d'un modèle."
 
-#: api/classes/CGraph.php:560 api/classes/CGraphPrototype.php:577
+#: api/classes/CGraph.php:561 api/classes/CGraphPrototype.php:577
 msgid "Cannot delete templated graphs."
 msgstr "Impossible de supprimer des graphiques provenant d'un modèle."
 
@@ -1721,19 +1726,19 @@ msgstr "Impossible de supprimer des graphiques provenant d'un modèle."
 msgid "Cannot delete templated host prototype."
 msgstr "Impossible de supprimer un prototype d'hôte provenant d'un modèle."
 
-#: api/classes/CItem.php:692
+#: api/classes/CItem.php:693
 msgid "Cannot delete templated item."
 msgstr "Impossible de supprimer un élément provenant d'un modèle."
 
-#: api/classes/CItemPrototype.php:511
+#: api/classes/CItemPrototype.php:512
 msgid "Cannot delete templated items"
 msgstr "Impossible de supprimer des éléments de provenant de modèles."
 
-#: api/classes/CDiscoveryRule.php:360
+#: api/classes/CDiscoveryRule.php:361
 msgid "Cannot delete templated items."
 msgstr "Impossible de supprimer des éléments provenant d'un modèle."
 
-#: api/classes/CTrigger.php:1882 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1877 api/classes/CTriggerPrototype.php:674
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Impossible de supprimer le déclencheur d'un modèle \"%1$s:%2$s\"."
@@ -1747,15 +1752,15 @@ msgstr "Impossible de supprimer le scénario web \"%1$s\" provenant d'un modèle
 msgid "Cannot delete trigger"
 msgstr "Impossible de supprimer le déclencheur"
 
-#: api/classes/CItemPrototype.php:582 trigger_prototypes.php:181
+#: api/classes/CItemPrototype.php:583 trigger_prototypes.php:181
 msgid "Cannot delete trigger prototype"
 msgstr "Impossible de supprimer le prototype de déclencheur"
 
 #: trigger_prototypes.php:256
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "Impossible d'effacer les prototypes de déclencheur"
 
-#: api/classes/CItem.php:744
+#: api/classes/CItem.php:745
 msgid "Cannot delete trigger."
 msgstr "Impossible de supprimer le déclencheur."
 
@@ -1786,76 +1791,74 @@ msgstr "Impossible de supprimer le scénario web"
 #: actionconf.php:348
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver l'action"
+msgstr[1] "Impossible de désactiver les actions"
 
 #: discoveryconf.php:188
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver la règle de découverte"
+msgstr[1] "Impossible de désactiver les règles de découverte"
 
 #: host_discovery.php:286
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver les règles de découverte"
+msgstr[1] "Impossible de désactiver les règles de découverte"
 
-#: hostgroups.php:231 hosts.php:621 proxies.php:183
+#: hostgroups.php:231 hosts.php:624 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver l'hôte"
+msgstr[1] "Impossible de désactiver les hôtes"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le prototype d'hôte"
+msgstr[1] "Impossible de désactiver les prototypes d'hôte"
 
 #: applications.php:211 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver l'élément"
+msgstr[1] "Impossible de désactiver les éléments"
 
 #: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le prototype d'élément"
+msgstr[1] "Impossible de désactiver les prototypes d'élément"
 
 #: media_types.php:166
-#, fuzzy
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Impossible de désactiver le type de média"
-msgstr[1] "Impossible de désactiver le type de média"
+msgstr[1] "Impossible de désactiver les types de média"
 
 #: triggers.php:276
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le déclencheur"
+msgstr[1] "Impossible de désactiver les déclencheurs"
 
 #: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le prototype de déclencheur"
+msgstr[1] "Impossible de désactiver les prototypes de déclencheur"
 
 #: usergrps.php:343
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver le groupe d'utilisateurs"
+msgstr[1] "Impossible de désactiver les groupes d'utilisateurs"
 
 #: httpconf.php:297
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Impossible de désactiver le scénario web"
-msgstr[1] "Impossible de désactiver le scénario web"
+msgstr[1] "Impossible de désactiver les scénarios web"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -1868,75 +1871,74 @@ msgstr "Impossible d'afficher plus d'un élément de type \"Somme de graphique\"
 #: actionconf.php:347
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer l'action"
+msgstr[1] "Impossible d'activer les actions"
 
 #: discoveryconf.php:187
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer la règle de découverte"
+msgstr[1] "Impossible d'activer les règles de découverte"
 
 #: host_discovery.php:285
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer les règles de découverte"
+msgstr[1] "Impossible d'activer les règles de découverte"
 
-#: hostgroups.php:230 hosts.php:620 proxies.php:182
+#: hostgroups.php:230 hosts.php:623 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer l'hôte"
+msgstr[1] "Impossible d'activer les hôtes"
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le prototype d'hôte"
+msgstr[1] "Impossible d'activer les prototypes d'hôtes"
 
 #: applications.php:210 items.php:681
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer l'élément"
+msgstr[1] "Impossible d'activer les éléments"
 
 #: disc_prototypes.php:328
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le prototype d'élément"
+msgstr[1] "Impossible d'activer les prototypes d'éléments"
 
 #: media_types.php:165
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Impossible d'activer le type de média"
-msgstr[1] "Impossible d'activer le type de média"
+msgstr[1] "Impossible d'activer les types de média"
 
 #: triggers.php:275
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le déclencheur"
+msgstr[1] "Impossible d'activer les déclencheurs"
 
 #: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le prototype de déclencheur"
+msgstr[1] "Impossible d'activer les prototypes de déclencheur"
 
 #: usergrps.php:342
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le groupe d'utilisateurs"
+msgstr[1] "Impossible d'activer les groupes d'utilisateurs"
 
 #: httpconf.php:296
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer le scénario web"
+msgstr[1] "Impossible d'activer les scénarios web"
 
 #: include/classes/import/CXmlImport18.php:677
 #: include/classes/import/importers/CMapImporter.php:188
@@ -1952,7 +1954,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver le graphique \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:724
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver le groupe \"%1$s\" utilisé dans la carte \"%2$s\"."
@@ -1964,7 +1966,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver le groupe \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:735
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver l'hôte \"%1$s\" utilisé dans la carte \"%2$s\"."
@@ -1975,26 +1977,26 @@ msgstr "Impossible de trouver l'hôte \"%1$s\" utilisé dans la carte \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver l'hôte \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:759
+#: include/classes/import/CConfigurationImport.php:763
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver le groupe d'hôtes \"%1$s\" pour le prototype d'hôte \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
-#: api/classes/CDiscoveryRule.php:748 api/classes/CDiscoveryRule.php:824
-#: api/classes/CItemGeneral.php:101 include/items.inc.php:344
+#: api/classes/CDiscoveryRule.php:749 api/classes/CDiscoveryRule.php:825
+#: api/classes/CItemGeneral.php:100 include/items.inc.php:344
 #: include/items.inc.php:395
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Impossible de trouver l'interface de l'hôte sur \"%1$s\" pour la clé d'élément \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:922
-#: include/classes/import/CConfigurationImport.php:1030
+#: include/classes/import/CConfigurationImport.php:926
+#: include/classes/import/CConfigurationImport.php:1038
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Impossible de trouver l'hôte ou le modèle \"%1$s\" utilisé dans le graphique \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:768
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver l'icône \"%1$s\" utilisée dans la carte \"%2$s\"."
@@ -2004,25 +2006,25 @@ msgstr "Impossible de trouver l'icône \"%1$s\" utilisée dans la carte \"%2$s\"
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver la correspondance d'icône \"%1$s\" utilisée dans la carte \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1018
+#: include/classes/import/CConfigurationImport.php:1022
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé en tant que maximum de l'axe Y pour le graphique \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:907
+#: include/classes/import/CConfigurationImport.php:911
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé en tant que maximum de l'axe Y pour le prototype de graphique \"%3$s\" de la règle de découverte \"%4$s\" sur \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1000
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé en tant que minimum de l'axe Y pour le graphique \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:887
+#: include/classes/import/CConfigurationImport.php:891
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé comme minimum de l'axe Y pour le prototype de graphique \"%3$s\" de la règle de découverte \"%4$s\" sur \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:521
 #: include/classes/import/CXmlImport18.php:1676
@@ -2036,7 +2038,7 @@ msgstr "Impossible de trouver l'élément \"%1$s\" utilisé dans l'écran \"%2$s
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans la carte exportée \"%2$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans la carte \"%2$s\"."
@@ -2057,28 +2059,28 @@ msgstr "Impossible de trouver les objets nommés"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver l'écran \"%1$s\" utilisée dans l'écran \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:778
+#: include/classes/import/CConfigurationImport.php:782
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Impossible de trouver le modèle \"%1$s\" pour le prototype d'hôte \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
 #: include/classes/import/CXmlImport18.php:746
 #: include/classes/import/CXmlImport18.php:789
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver le déclencheur \"%1$s\" utilisé dans la carte \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:593
+#: include/classes/import/CConfigurationImport.php:597
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Impossible de trouver la correspondance de valeur \"%1$s\" utilisée pour l'élément \"%2$s\" sur \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:734
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Impossible de trouver la correspondance de valeur \"%1$s\" utilisée pour le prototype d'élément \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
 #: srv_status.php:168
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -2092,7 +2094,7 @@ msgstr "Impossible de formater l'arbre."
 msgid "Cannot have empty visible template name"
 msgstr "Impossible d'avoir un nom visible de modèle vide"
 
-#: api/classes/CTrigger.php:1102 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1099 api/classes/CTrigger.php:1238
 #: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2106,7 +2108,7 @@ msgstr[0] "Impossible d'importer l'écran \"%1$s\" : le sous-écran \"%2$s\" n'e
 msgstr[1] "Impossible d'importer l'écran \"%1$s\" : les sous-écrans \"%2$s\" n'existent pas."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Impossible d'importer le modèle \"%1$s\", le modèle lié \"%2$s\" n'existe pas."
@@ -2124,6 +2126,10 @@ msgstr "Impossible d'ajouter le média utilisateur."
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "Impossible de lier le modèle"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -2195,12 +2201,12 @@ msgstr "Impossible d'enregistrer une règle de découverte sans vérifications."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Impossible d'envoyer une commande, veuillez vérifier la connexion avec le serveur Zabbix \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:243
+#: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour l'élément \"%2$s\"."
 
-#: api/classes/CTrigger.php:662
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour le déclencheur \"%2$s\"."
@@ -2278,12 +2284,12 @@ msgstr "Impossible de délier le déclencheur \"%s\", il a des éléments du mod
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr "Impossible de mettre à jour \"%1$s\" pour un hôte découvert."
 
-#: api/classes/CItemGeneral.php:176
+#: api/classes/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered item."
 msgstr "Impossible de mettre à jour \"%1$s\" pour un élément découvert."
 
-#: api/classes/CTrigger.php:634
+#: api/classes/CTrigger.php:631
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr "Impossible de mettre à jour \"%1$s\" pour un déclencheur découvert."
@@ -2291,14 +2297,14 @@ msgstr "Impossible de mettre à jour \"%1$s\" pour un déclencheur découvert."
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Impossible de mettre à jour \"%1$s\" pour l'action \"%2$s\"."
 
-#: api/classes/CItemGeneral.php:207
+#: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Impossible de mettre à jour \"%1$s\" pour l'élément \"%2$s\"."
 
-#: api/classes/CTrigger.php:662
+#: api/classes/CTrigger.php:659
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Impossible de mettre à jour \"%1$s\" pour le déclencheur \"%2$s\"."
@@ -2326,7 +2332,7 @@ msgstr "Impossible de mettre à jour la valeur \"templateid\" pour l'écran \"%1
 #: api/classes/CTemplateScreen.php:617
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "Impossible de mettre à jour \"templateid\" pour l'écran modèle \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:576
 #, c-format
@@ -2379,7 +2385,7 @@ msgstr "Impossible de mettre à jour le graphique"
 
 #: graphs.php:224
 msgid "Cannot update graph prototype"
-msgstr ""
+msgstr "Impossible de mettre à jour le prototype de graphique"
 
 #: hostgroups.php:125 usergrps.php:180
 msgid "Cannot update group"
@@ -2395,7 +2401,7 @@ msgstr "Impossible de mettre à jour le groupe."
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Impossible de mettre à jour les groupes pour l'hôte découvert \"%1$s\"."
 
-#: hosts.php:363
+#: hosts.php:366
 msgid "Cannot update host"
 msgstr "Impossible de mettre à jour l'hôte"
 
@@ -2403,7 +2409,7 @@ msgstr "Impossible de mettre à jour l'hôte"
 msgid "Cannot update host prototype"
 msgstr "Impossible de mettre à jour le prototype d'hôte"
 
-#: hosts.php:352
+#: hosts.php:355
 msgid "Cannot update hosts"
 msgstr "Impossible de mettre à jour les hôtes"
 
@@ -2430,7 +2436,7 @@ msgstr "Impossible de mettre à jour l'élément"
 
 #: disc_prototypes.php:301
 msgid "Cannot update item prototype"
-msgstr ""
+msgstr "Impossible de mettre à jour le prototype d'élément"
 
 #: items.php:660
 msgid "Cannot update items"
@@ -2517,11 +2523,11 @@ msgstr "Impossible de mettre à jour le déclencheur"
 
 #: trigger_prototypes.php:163
 msgid "Cannot update trigger prototype"
-msgstr ""
+msgstr "Impossible de mettre à jour le prototype de déclencheur"
 
 #: trigger_prototypes.php:209
 msgid "Cannot update trigger prototypes"
-msgstr ""
+msgstr "Impossible de mettre à jour les prototypes de déclencheurs"
 
 #: profile.php:173 users.php:205 users.php:263 users.php:287
 msgid "Cannot update user"
@@ -2558,11 +2564,11 @@ msgstr "Sensible à la casse"
 
 #: include/classes/items/CHelpItems.php:785
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
-msgstr ""
+msgstr "Capture tous les traps SNMP d'une adresse qui correspond à l'expression rationnelle. L'expression rationnelle par défaut est une chaîne vide."
 
 #: include/classes/items/CHelpItems.php:781
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
-msgstr ""
+msgstr "Capture tous les traps SNMP qui ne sont capturés par aucun des éléments snmptrap[] d'une adresse correspondant à l'interface."
 
 #: include/views/configuration.screen.constructor.edit.php:590
 msgid "Center"
@@ -2580,6 +2586,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Variation"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:70
 #: include/views/administration.users.edit.php:68
 msgid "Change password"
@@ -2606,7 +2613,7 @@ msgstr "Châssis"
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:431
 msgid "Chassis info - returns full info by default"
-msgstr ""
+msgstr "Information du châssis - retourne l'intégralité des informations par défaut"
 
 #: include/views/js/configuration.discovery.edit.js.php:536
 msgid "Check already exists."
@@ -2620,32 +2627,32 @@ msgstr "Vérifiez l'expression à partir de \"%1$s\"."
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:511
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
-msgstr ""
+msgstr "Vérifie si le fichier existe. 0 - le fichier n'existe pas, 1 - le fichier existe."
 
 #: include/classes/items/CHelpItems.php:583
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr ""
+msgstr "Vérifie si le service est disponible. 0 - le service est arrêté, 1 - le service fonctionne. Si <ip> manque, l'adresse IP ou le nom DNS est pris de la définition d'hôte. Si <port> manque, le port par défaut du service est utilisé."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:379
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
-msgstr ""
+msgstr "Vérifie si le service est disponible. 0 - le service est arrêté, 1 - le service fonctionne. Si l'adresse IP manque, 127.0.0.1 est utilisé. Si le numéro de port manque, le port par défaut du service est utilisé. Exemple : net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:375
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
-msgstr ""
+msgstr "Vérifie la performance du service \"service\". 0 - le service est arrêté, sec - nombre de secondes passées pour la connexion au service. Si l'adresse IP manque, 127.0.0.1 est utilisé. Si le numéro de port manque, le port par défaut du service est utilisé."
 
 #: include/classes/items/CHelpItems.php:579
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr ""
+msgstr "Vérifie la performance du service \"service\". 0 - le service est arrêté, sec - nombre de secondes passées pour la connexion au service. Si <ip> manque, l'adresse IP ou le nom DNS est pris de la définition d'hôte. Si <port> manque, le port par défaut du service est utilisé."
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:311
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
-msgstr ""
+msgstr "Vérifie l'accessibilité de l'agent. Retourne toujours 1. Peut être utilisé comme ping TCP."
 
-#: api/classes/CItemGeneral.php:283
+#: api/classes/CItemGeneral.php:282
 msgid "Check the key, please. Default example was passed."
 msgstr "Veuillez vérifier la clé. L'exemple par défaut a été utilisé."
 
@@ -2656,7 +2663,7 @@ msgstr "Vérifiez le type"
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:371
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
-msgstr ""
+msgstr "Vérifie s'il est possible d'effectuer une connexion TCP au numéro de port. 0 - impossible de se connecte, 1 - posible de se connecter. L'adresse IP est optionnelle. Si l'adresse manque, 127.0.0.1 est utilisé. Exemple : net.tcp.port[,80]"
 
 #: include/views/configuration.discovery.edit.php:63
 #: include/views/configuration.discovery.list.php:44
@@ -2666,18 +2673,18 @@ msgstr "Vérifications"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:343
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
-msgstr ""
+msgstr "Vérifie si le service DNS est actif. 0 - le DNS ne fonctione pa (le serveur n'a pas répondu ou la résolution DNS a échoué), 1 - le DNS fonctionne."
 
 #: include/classes/items/CHelpItems.php:567
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
-msgstr ""
+msgstr "Vérifie si le serveur est accessible par un ping ICMP. 0 - échec du ping ICMP, 1 - ping effectué avec succès. Un processus zabbix_server effectue les pings ICMP une fois toutes les \"PingerFrequency\" secondes."
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:367
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
-msgstr ""
+msgstr "Vérifie si le port est en écoute. 0 - port pas en écoute, 1 - le port est en écoute."
 
-#: api/classes/CDRule.php:407
+#: api/classes/CDRule.php:410
 msgid "Checks should be unique."
 msgstr "Les vérifications doivent être uniques."
 
@@ -2876,7 +2883,7 @@ msgstr "Configuration"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
-msgstr ""
+msgstr "Statistiques du cache de configuration. Cache - tampon (modes: plibre, total, utilisé, libre)."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -2932,7 +2939,7 @@ msgstr "Configuration des hôtes"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
-msgstr ""
+msgstr "Configuration du nettoyage automatique"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
@@ -3122,7 +3129,7 @@ msgstr "Nom de contexte"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:419
 msgid "Context switches."
-msgstr ""
+msgstr "Changements de contextes."
 
 #: include/hosts.inc.php:260
 msgid "Contract number"
@@ -3143,7 +3150,7 @@ msgstr "Copier"
 msgid "Copy selected to ..."
 msgstr "Copier les éléments sélectionnés sur ..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Connexion correcte \"%s\"."
@@ -3189,7 +3196,7 @@ msgstr "Créer un graphique (sélectionner l'hôte d'abord)"
 msgid "Create graph prototype"
 msgstr "Créer un prototype de graphique"
 
-#: hosts.php:753
+#: hosts.php:756
 msgid "Create host"
 msgstr "Créer un hôte"
 
@@ -3295,7 +3302,7 @@ msgstr "Créer une table de correspondance"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "Créée : Application \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:615
+#: api/classes/CDiscoveryRule.php:616
 #, c-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Créée : Règle de découverte \"%1$s\" sur \"%2$s\"."
@@ -3305,17 +3312,17 @@ msgstr "Créée : Règle de découverte \"%1$s\" sur \"%2$s\"."
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Créé : prototype d'hôte \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CItem.php:591
+#: api/classes/CItem.php:592
 #, c-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Créé : Élément \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:409
+#: api/classes/CItemPrototype.php:410
 #, c-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Créé : Prototype d'élément \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CTrigger.php:1136
+#: api/classes/CTrigger.php:1133
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Créé : Déclencheur \"%1$s\" sur \"%2$s\"."
@@ -3337,7 +3344,7 @@ msgstr "Critique"
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:463
 msgid "Current OS - returns full info by default"
-msgstr ""
+msgstr "Système d'exploitation actuel - retourne les informations complètes par défaut"
 
 #: popup_trexpr.php:365
 msgid "Current date is < N"
@@ -3430,7 +3437,7 @@ msgstr "Diapositives personnalisées"
 msgid "Czech (cs_CZ)"
 msgstr "Tchèque (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1343
+#: include/classes/graphdraw/CLineGraphDraw.php:1344
 msgid "D"
 msgstr "D"
 
@@ -3465,7 +3472,7 @@ msgstr "DÉCOUVERT"
 msgid "DM"
 msgstr "DM"
 
-#: events.php:503 events.php:512 hosts.php:771
+#: events.php:503 events.php:512 hosts.php:774
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -3527,10 +3534,10 @@ msgstr "Données"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
-msgstr ""
+msgstr "Statistiques du cache de données. Cache - values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free) ou text (modes: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2483
-#: include/classes/graphdraw/CPieGraphDraw.php:729
+#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Données de %1$s. Générées en %2$s sec."
@@ -3545,7 +3552,7 @@ msgstr "Aperçu données"
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/administration.general.housekeeper.edit.php:156
 msgid "Data storage period (in days)"
-msgstr ""
+msgstr "Période de stockage des données (en jours)"
 
 #: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
@@ -3703,7 +3710,7 @@ msgstr "Décimal"
 msgid "Default"
 msgstr "Défaut"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Authentification par défaut"
 
@@ -3786,7 +3793,7 @@ msgstr "Supprimer l'expression ?"
 
 #: include/views/configuration.graph.edit.php:306
 msgid "Delete graph prototype?"
-msgstr ""
+msgstr "Supprimer le prototype de graphique ?"
 
 #: include/views/configuration.graph.edit.php:306
 msgid "Delete graph?"
@@ -3806,7 +3813,7 @@ msgstr "Supprimer la correspondance d'icône ?"
 
 #: include/views/configuration.item.edit.php:512
 msgid "Delete item prototype?"
-msgstr ""
+msgstr "Supprimer le prototype d'élément ?"
 
 #: include/views/configuration.item.edit.php:512
 msgid "Delete item?"
@@ -3848,7 +3855,7 @@ msgstr "Supprimer l'écran ?"
 msgid "Delete script?"
 msgstr "Supprimer script ?"
 
-#: hosts.php:1015 include/reports.inc.php:114 include/reports.inc.php:211
+#: hosts.php:1018 include/reports.inc.php:114 include/reports.inc.php:211
 #: include/reports.inc.php:257
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3902,7 +3909,7 @@ msgstr "Spprimer les éléments sélectionnés ?"
 
 #: include/views/configuration.graph.list.php:161
 msgid "Delete selected graph prototypes?"
-msgstr ""
+msgstr "Supprimer les prototypes de graphiques sélectionnés ?"
 
 #: include/views/configuration.graph.list.php:161
 msgid "Delete selected graphs?"
@@ -3933,7 +3940,7 @@ msgstr "Supprimer les prototypes d'hôtes sélectionnés ?"
 msgid "Delete selected host?"
 msgstr "Supprimer hôte sélectionné ?"
 
-#: hosts.php:1016
+#: hosts.php:1019
 msgid "Delete selected hosts?"
 msgstr "Suppression des hôtes sélectionnés ?"
 
@@ -3943,7 +3950,7 @@ msgstr "Supprimer l'image sélectionnée ?"
 
 #: include/views/configuration.item.prototype.list.php:121
 msgid "Delete selected item prototypes?"
-msgstr ""
+msgstr "Supprimer les prototypes d'éléments sélectionnés ?"
 
 #: include/views/configuration.item.list.php:292
 msgid "Delete selected items?"
@@ -3995,7 +4002,7 @@ msgstr "Supprimer les modèles sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:288
 msgid "Delete selected trigger prototypes?"
-msgstr ""
+msgstr "Supprimer les prototypes de déclencheurs sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:288
 msgid "Delete selected triggers?"
@@ -4042,7 +4049,7 @@ msgstr "Supprimer le service sélectionné ?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger prototype?"
-msgstr ""
+msgstr "Supprimer le prototypé de déclencheur ?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger?"
@@ -4057,12 +4064,12 @@ msgstr "Supprimé"
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
 msgstr "Supprimée : Application \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:422
+#: api/classes/CDiscoveryRule.php:423
 #, c-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Supprimée : Règle de découverte \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CGraph.php:594
+#: api/classes/CGraph.php:595
 #, c-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Supprimé : Graphique \"%1$s\" sur \"%2$s\"."
@@ -4077,12 +4084,12 @@ msgstr "Supprimé : Hôte \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Supprimé : Prototype d'hôte \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CItem.php:783
+#: api/classes/CItem.php:784
 #, c-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Supprimé : Élément \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:594
+#: api/classes/CItemPrototype.php:595
 #, c-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Supprimé : Prototype d'élément \"%1$s\" sur \"%2$s\"."
@@ -4097,7 +4104,7 @@ msgstr "Supprimé : Proxy \"%1$s\"."
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Supprimé : Modèle \"%1$s\"."
 
-#: api/classes/CTrigger.php:856
+#: api/classes/CTrigger.php:853
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Supprimé : Déclencheur \"%1$s\" sur \"%2$s\"."
@@ -4186,17 +4193,17 @@ msgstr "Equipement"
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:407
 msgid "Device interrupts."
-msgstr ""
+msgstr "Interruptions des périphériques."
 
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:439
 msgid "Device list - lists PCI devices by default"
-msgstr ""
+msgstr "Liste de périphériques - liste les périphériques PCI par défaut"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:495
 msgid "Device read statistics."
-msgstr ""
+msgstr "Statistiques de lecture du périphérique."
 
 #: discoveryconf.php:41 include/views/configuration.discovery.edit.php:69
 msgid "Device uniqueness criteria"
@@ -4205,7 +4212,7 @@ msgstr "Critère d'unicité de l'équipement"
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:499
 msgid "Device write statistics."
-msgstr ""
+msgstr "Statistiques d'écriture du périphérique."
 
 #: popup_trexpr.php:175
 msgid "Difference between MAX and MIN value of a period T is < N"
@@ -4250,7 +4257,7 @@ msgstr "La différence entre la dernière valeur et la précédente n'est PAS N"
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:395
 msgid "Different information about specific process(es)"
-msgstr ""
+msgstr "Informations à propos de processus spécifique(s)"
 
 #: include/views/configuration.screen.list.php:53
 msgid "Dimension (cols x rows)"
@@ -4272,7 +4279,7 @@ msgstr "Désactiver le mode debug des groupes sélectionnés ?"
 msgid "Disable host"
 msgstr "Désactiver hôte"
 
-#: hosts.php:936 hosts.php:949
+#: hosts.php:939 hosts.php:952
 msgid "Disable host?"
 msgstr "Désactiver l'hôte ?"
 
@@ -4284,7 +4291,7 @@ msgstr "Désactiver les hôtes dans les groupes d'hôtes sélectionnés ?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Désactiver les hôtes surveillés par les proxies sélectionnés ?"
 
-#: hosts.php:1012 include/views/administration.mediatypes.list.php:117
+#: hosts.php:1015 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:108
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
@@ -4325,13 +4332,13 @@ msgstr "Désactiver les groupes sélectionnés ?"
 msgid "Disable selected host prototypes?"
 msgstr "Désactiver les prototypes d'hôtes sélectionnés ?"
 
-#: hosts.php:1013
+#: hosts.php:1016
 msgid "Disable selected hosts?"
 msgstr "Désactiver les hôtes sélectionnés ?"
 
 #: include/views/configuration.item.prototype.list.php:117
 msgid "Disable selected item prototypes?"
-msgstr ""
+msgstr "Désactiver les prototypes d'éléments sélectionnés ?"
 
 #: include/views/configuration.item.list.php:278
 msgid "Disable selected items?"
@@ -4343,7 +4350,7 @@ msgstr "Désactiver les types de média sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected trigger prototypes?"
-msgstr ""
+msgstr "Désactiver les prototypes de déclencheurs sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected triggers?"
@@ -4388,7 +4395,7 @@ msgstr "Découvert par"
 msgid "Discovered device"
 msgstr "Equipement découvert"
 
-#: events.php:297 hosts.php:809 hosts.php:903 include/html.inc.php:391
+#: events.php:297 hosts.php:812 hosts.php:906 include/html.inc.php:391
 #: include/menu.inc.php:77 include/menu.inc.php:209
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:229
@@ -4425,29 +4432,29 @@ msgid "Discovery object"
 msgstr "Objet de découverte"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1178 include/forms.inc.php:1131
+#: include/blocks.inc.php:1180 include/forms.inc.php:1131
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
 msgstr "Règle de découverte"
 
-#: api/classes/CDiscoveryRule.php:41
-#, c-format
-msgid "Discovery rule \"%1$s\" already exists on \"%2$s\""
-msgstr "La règle de découverte \"%1$s\" existe déjà sur \"%2$s\""
-
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "La règle de découverte \"%1$s\" existe déjà sur \"%2$s\""
 
-#: api/classes/CDiscoveryRule.php:667
+#: api/classes/CDiscoveryRule.php:41
+#, c-format
+msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
+msgstr "La règle de découverte \"%1$s\" existe déjà sur \"%2$s\"."
+
+#: api/classes/CDiscoveryRule.php:668
 #, c-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "La règle de découverte \"%1$s:%2$s\" a une durée de vie incorrecte : \"%3$s\". (min: %4$d, max: %5$d, macro utilisateur autorisée)"
 
-#: api/classes/CDRule.php:447 api/classes/CDRule.php:516
+#: api/classes/CDRule.php:450 api/classes/CDRule.php:519
 #, c-format
 msgid "Discovery rule \"%s\" already exists."
 msgstr "La règle de découverte \"%s\" existe déjà."
@@ -4463,14 +4470,14 @@ msgstr "Règle de découverte supprimée"
 #: discoveryconf.php:185 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Règle de découverte désactivée"
+msgstr[1] "Règles de découverte désactivées"
 
 #: discoveryconf.php:184 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Règle de découverte activée"
+msgstr[1] "Règles de découverte activées"
 
 #: discoveryconf.php:134 host_discovery.php:259
 msgid "Discovery rule updated"
@@ -4531,7 +4538,7 @@ msgstr "Terminé"
 msgid "Dot"
 msgstr "Point"
 
-#: include/blocks.inc.php:1180
+#: include/blocks.inc.php:1182
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Arrêté"
@@ -4582,7 +4589,7 @@ msgstr "Première entrée du menu déroulant \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Mémorisation de la sélection \"%1$s\" du menu déroulant."
 
-#: api/classes/CTrigger.php:1585
+#: api/classes/CTrigger.php:1582
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dépendances dupliquées dans le déclencheur \"%1$s\"."
@@ -4730,17 +4737,17 @@ msgid "Empty host."
 msgstr "Hôte vide."
 
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
-#: api/classes/CDiscoveryRule.php:339 api/classes/CDRule.php:614
-#: api/classes/CGraph.php:540 api/classes/CGraphPrototype.php:558
+#: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
+#: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
-#: api/classes/CItem.php:671 api/classes/CItemPrototype.php:489
+#: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:624
-#: api/classes/CTrigger.php:880 api/classes/CTrigger.php:944
-#: api/classes/CTrigger.php:1034 api/classes/CTriggerPrototype.php:652
+#: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
+#: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
 #: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
 msgid "Empty input parameter."
@@ -4817,7 +4824,7 @@ msgstr "Activer les acquittements d'événements"
 msgid "Enable host"
 msgstr "Activer hôte"
 
-#: hosts.php:943
+#: hosts.php:946
 msgid "Enable host?"
 msgstr "Activer l'hôte ?"
 
@@ -4832,9 +4839,9 @@ msgstr "Activer les hôtes surveillés par les proxies sélectionnés ?"
 #: include/views/administration.general.housekeeper.edit.php:124
 #: include/views/administration.general.housekeeper.edit.php:145
 msgid "Enable internal housekeeping"
-msgstr ""
+msgstr "Activer le nettoyage automatique interne"
 
-#: hosts.php:1009 include/views/administration.mediatypes.list.php:113
+#: hosts.php:1012 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:104
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
@@ -4875,13 +4882,13 @@ msgstr "Activer les groupes sélectionnés ?"
 msgid "Enable selected host prototypes?"
 msgstr "Activer les prototypes d'hôtes sélectionnés ?"
 
-#: hosts.php:1010 include/views/configuration.hostgroups.list.php:162
+#: hosts.php:1013 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
 msgstr "Activer les hôtes sélectionnés ?"
 
 #: include/views/configuration.item.prototype.list.php:113
 msgid "Enable selected item prototypes?"
-msgstr ""
+msgstr "Activer les prototypes d'éléments sélectionnés ?"
 
 #: include/views/configuration.item.list.php:274
 msgid "Enable selected items?"
@@ -4893,7 +4900,7 @@ msgstr "Activer les types de média sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected trigger prototypes?"
-msgstr ""
+msgstr "Activer les prototypes de déclencheurs sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected triggers?"
@@ -5048,7 +5055,7 @@ msgstr "Erreur d'exécution SQL [%1$s] dans [%2$s]."
 msgid "Execute on"
 msgstr "Exécuter sur"
 
-#: include/items.inc.php:1286 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1289 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Script exécuté"
 
@@ -5078,7 +5085,7 @@ msgstr "Expiré"
 msgid "Exploded"
 msgstr "Explosé"
 
-#: hosts.php:1007 include/views/configuration.screen.list.php:70
+#: hosts.php:1010 include/views/configuration.screen.list.php:70
 #: include/views/configuration.sysmap.list.php:63 templates.php:643
 msgid "Export selected"
 msgstr "Export sélectionné"
@@ -5159,7 +5166,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Échec"
 
-#: include/actions.inc.php:1075 include/blocks.inc.php:1091
+#: include/actions.inc.php:1075 include/blocks.inc.php:1093
 msgid "Failed"
 msgstr "Échoué"
 
@@ -5171,15 +5178,15 @@ msgstr "Échec de la mise à jour du modèle"
 msgid "Failure Audit"
 msgstr "Audit d'échec"
 
-#: dashboard.php:311 include/blocks.inc.php:1200
+#: dashboard.php:311 include/blocks.inc.php:1202
 msgid "Favourite graphs"
 msgstr "Graphiques favoris"
 
-#: dashboard.php:339 include/blocks.inc.php:1329
+#: dashboard.php:339 include/blocks.inc.php:1331
 msgid "Favourite maps"
 msgstr "Cartes favorites"
 
-#: dashboard.php:325 include/blocks.inc.php:1374
+#: dashboard.php:325 include/blocks.inc.php:1376
 msgid "Favourite screens"
 msgstr "Écrans favoris"
 
@@ -5245,7 +5252,7 @@ msgstr "Le champ \"%1$s\" n'est pas une chaîne."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Le champ \"%1$s\" doit être manquant."
 
-#: api/classes/CDRule.php:376
+#: api/classes/CDRule.php:379
 msgid "Field \"druleid\" is required."
 msgstr "Le champ \"druleid\" est obligatoire."
 
@@ -5253,7 +5260,7 @@ msgstr "Le champ \"druleid\" est obligatoire."
 msgid "Field \"host\" is mandatory"
 msgstr "Champ \"hôte\" est obligatoire"
 
-#: api/classes/CDRule.php:383
+#: api/classes/CDRule.php:386
 msgid "Field \"name\" is required."
 msgstr "Le champ \"nom\" est obligatoire."
 
@@ -5274,13 +5281,13 @@ msgstr "Le fichier fourni à la vue n'existe pas. Essayé de trouver \"%s\"."
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:531
 msgid "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
-msgstr ""
+msgstr "Information de temps sur le fichier. Nombre de secondes. Le mode est optionnel. Si le mode n'est pas indiqué, la date de modification est utilisée."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
 msgstr "Région remplie"
 
-#: events.php:356 hosts.php:776 include/classes/class.cwidget.php:130
+#: events.php:356 hosts.php:779 include/classes/class.cwidget.php:130
 #: include/forms.inc.php:627
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -5311,12 +5318,12 @@ msgstr "Rechercher la chaîne V dans la dernière (plus récente) valeur. N n'es
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:523
 msgid "Find string in a file. 0 - expression not found, 1 - found"
-msgstr ""
+msgstr "Trouver une chaîne dans un fichier. 0 - expression non trouvée, 1 - trouvée"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:519
 msgid "Find string in a file. Matched string"
-msgstr ""
+msgstr "Trouver une chaîne dans un fichier. Chaîne correspondante"
 
 #: include/setup.inc.php:121
 msgid "Finish"
@@ -5353,7 +5360,7 @@ msgstr "Intervalles flexibles"
 msgid "For guest, password must be empty"
 msgstr "Pour guest, le mot de passe doit être vide"
 
-#: include/items.inc.php:1290 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1293 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Formule"
 
@@ -5421,7 +5428,7 @@ msgstr "G"
 #: include/views/monitoring.charts.php:32
 #: include/views/monitoring.charts.php:41
 msgid "GRAPHS"
-msgstr ""
+msgstr "GRAPHIQUES"
 
 #: include/views/administration.mediatypes.edit.php:62
 #: include/views/administration.mediatypes.list.php:61
@@ -5457,17 +5464,17 @@ msgstr "Allemand (de_DE)"
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:547
 msgid "Get content of WEB page. Default path is /"
-msgstr ""
+msgstr "Obtenir le contenu de la page web. Le chemin par défaut est /"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:507
 msgid "Get contents of a given file."
-msgstr ""
+msgstr "Obtenir le contenu d'un fichier donné."
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:555
 msgid "Get first occurence of regexp in WEB page. Default path is /"
-msgstr ""
+msgstr "Obtenir la première occurrence de l'expression rationnelle dans la page web. Le chemin par défaut est /"
 
 #: include/page_header.php:205
 msgid "Get support"
@@ -5499,7 +5506,7 @@ msgstr "Script global"
 msgid "Global scripts"
 msgstr "Scripts globaux"
 
-#: hosts.php:1018
+#: hosts.php:1021
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:116
@@ -5541,7 +5548,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Ligne en gradiant"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1207
+#: include/audit.inc.php:29 include/blocks.inc.php:1209
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:403 latest.php:575
@@ -5549,34 +5556,34 @@ msgstr "Ligne en gradiant"
 msgid "Graph"
 msgstr "Graphique"
 
-#: api/classes/CGraph.php:447 api/classes/CGraphPrototype.php:463
+#: api/classes/CGraph.php:448 api/classes/CGraphPrototype.php:463
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Le graphique \"%1$s\" existe déjà sur \"%2$s\" (hérité d'un autre modèle)."
 
-#: api/classes/CGraph.php:468 api/classes/CGraph.php:475
+#: api/classes/CGraph.php:469 api/classes/CGraph.php:476
 #: api/classes/CGraphPrototype.php:485 api/classes/CGraphPrototype.php:492
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Le graphique \"%1$s\" existe déjà sur \"%2$s\" (les éléments ne sont pas identiques)."
 
-#: api/classes/CGraph.php:426 api/classes/CGraphPrototype.php:441
+#: api/classes/CGraph.php:427 api/classes/CGraphPrototype.php:441
 #: include/graphs.inc.php:365
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Le graphique \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: api/classes/CGraph.php:400 api/classes/CGraphPrototype.php:407
+#: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:407
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire sur \"%2$s\" (valeur Ymax de l'élément)."
 
-#: api/classes/CGraph.php:408 api/classes/CGraphPrototype.php:416
+#: api/classes/CGraph.php:409 api/classes/CGraphPrototype.php:416
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire sur \"%2$s\" (valeur Ymin de l'élément)."
 
-#: api/classes/CGraph.php:394 api/classes/CGraphPrototype.php:401
+#: api/classes/CGraph.php:395 api/classes/CGraphPrototype.php:401
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire sur \"%2$s\"."
@@ -5633,11 +5640,11 @@ msgstr "Prototype de graphique \"%s\" supprimé."
 
 #: graphs.php:230
 msgid "Graph prototype added"
-msgstr ""
+msgstr "Prototype de graphique ajouté"
 
 #: graphs.php:273
 msgid "Graph prototype deleted"
-msgstr ""
+msgstr "Prototype de graphique effacé"
 
 #: api/classes/CGraphPrototype.php:710 api/classes/CGraphPrototype.php:771
 msgid "Graph prototype must have at least one prototype."
@@ -5645,7 +5652,7 @@ msgstr "Le prototype de graphique doit avoir au moins un prototype."
 
 #: graphs.php:224
 msgid "Graph prototype updated"
-msgstr ""
+msgstr "Prototype de graphique mis à jour"
 
 #: include/html.inc.php:464 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:120
@@ -5656,7 +5663,7 @@ msgstr "Prototypes de graphiques"
 
 #: graphs.php:293
 msgid "Graph prototypes deleted"
-msgstr ""
+msgstr "Prototypes de graphiques effacés"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
@@ -5676,17 +5683,17 @@ msgstr "Type de graphique"
 msgid "Graph updated"
 msgstr "Graphique mis à jour"
 
-#: api/classes/CGraphGeneral.php:745
+#: api/classes/CGraphGeneral.php:749
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Un graphique nommé \"%1$s\" existe déjà parmi les graphiques ou prototypes de graphiques."
 
-#: api/classes/CGraph.php:429 api/classes/CGraph.php:450
+#: api/classes/CGraph.php:430 api/classes/CGraph.php:451
 #: api/classes/CGraphPrototype.php:445 api/classes/CGraphPrototype.php:466
 msgid "Graph with same name but other type exist."
 msgstr "Un graphique avec le même nom mais un autre type existe déjà."
 
-#: dashboard.php:312 hosts.php:808 hosts.php:901 include/blocks.inc.php:1309
+#: dashboard.php:312 hosts.php:811 hosts.php:904 include/blocks.inc.php:1311
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5718,7 +5725,7 @@ msgstr "Grec (el_GR)"
 msgid "Grid"
 msgstr "Grille"
 
-#: events.php:285 hostinventoriesoverview.php:83 hosts.php:761 httpmon.php:72
+#: events.php:285 hostinventoriesoverview.php:83 hosts.php:764 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -5822,15 +5829,15 @@ msgstr "Groupes en maintenance"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1349
-#: include/classes/graphdraw/CLineGraphDraw.php:1408
+#: include/classes/graphdraw/CLineGraphDraw.php:1350
+#: include/classes/graphdraw/CLineGraphDraw.php:1409
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
 
 #: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1037
-#: include/blocks.inc.php:1136 include/blocks.inc.php:1194
+#: include/blocks.inc.php:786 include/blocks.inc.php:1039
+#: include/blocks.inc.php:1138 include/blocks.inc.php:1196
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -5859,12 +5866,12 @@ msgid "HOST ISSUES"
 msgstr "PROBLÈMES D'HÔTE"
 
 #: include/discovery.inc.php:60
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:170
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:190
+#: authentication.php:222
 msgid "HTTP authentication"
 msgstr "Authentification HTTP"
 
@@ -5926,7 +5933,7 @@ msgstr "Cacher les scénarios désactivés"
 
 #: include/views/configuration.triggers.list.php:63
 msgid "Hide disabled trigger prototypes"
-msgstr ""
+msgstr "Cacher les prototypes de déclencheurs désactivés"
 
 #: include/views/configuration.triggers.list.php:81
 msgid "Hide disabled triggers"
@@ -5969,12 +5976,12 @@ msgstr "Le nettoyage de l'historique prend du temps. Continuer ?"
 
 #: adm.housekeeper.php:59
 msgid "History data storage period"
-msgstr ""
+msgstr "Période de stockage des données d'historique"
 
 #: adm.housekeeper.php:112
 #, c-format
 msgid "History data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Période de stockage des données d'historique (en jours) \"%1$s\"."
 
 #: include/screens.inc.php:31
 msgid "History of actions"
@@ -5986,12 +5993,12 @@ msgstr "Historique des événements"
 
 #: disc_prototypes.php:115 items.php:54
 msgid "History storage period"
-msgstr ""
+msgstr "Période de stockage de l'historique"
 
 #: include/views/configuration.item.edit.php:376
 #: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
-msgstr ""
+msgstr "Période de stockage de l'historique (en jours)"
 
 #: include/views/configuration.screen.constructor.edit.php:550
 msgid "Horizontal"
@@ -6004,8 +6011,8 @@ msgstr "Alignement horizontal"
 #: events.php:289 events.php:528 events.php:579 events.php:592 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:602 include/blocks.inc.php:649
-#: include/blocks.inc.php:905 include/blocks.inc.php:916
-#: include/blocks.inc.php:1484 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:907 include/blocks.inc.php:918
+#: include/blocks.inc.php:1486 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6070,7 +6077,7 @@ msgstr "IP hôte"
 msgid "Host access"
 msgstr "Accès hôte"
 
-#: hosts.php:374
+#: hosts.php:377
 msgid "Host added"
 msgstr "Hôte ajouté"
 
@@ -6083,25 +6090,25 @@ msgstr "Un hôte ne peut pas avoir plus d'une interface par défaut du même typ
 msgid "Host count"
 msgstr "Nombre d'hôtes"
 
-#: hosts.php:575 hosts.php:592
+#: hosts.php:578 hosts.php:595
 msgid "Host deleted"
 msgstr "Hôte supprimé"
 
-#: hostgroups.php:228 hosts.php:618 proxies.php:180
+#: hostgroups.php:228 hosts.php:621 proxies.php:180
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Hôte désactivé"
+msgstr[1] "Hôtes désactivés"
 
-#: hostgroups.php:227 hosts.php:617 proxies.php:179
+#: hostgroups.php:227 hosts.php:620 proxies.php:179
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Hôte activé"
+msgstr[1] "Hôtes désactivés"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
-#: include/blocks.inc.php:1089 include/forms.inc.php:517
+#: include/blocks.inc.php:1091 include/forms.inc.php:517
 #: include/maps.inc.php:25 include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
@@ -6239,14 +6246,14 @@ msgstr "Prototype d'hôte supprimé"
 #: host_prototypes.php:233
 msgid "Host prototype disabled"
 msgid_plural "Host prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototype d'hôte désactivé"
+msgstr[1] "Prototypes d'hôtes désactivés"
 
 #: host_prototypes.php:232
 msgid "Host prototype enabled"
 msgid_plural "Host prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototype d'hôte activé"
+msgstr[1] "Prototypes d'hôtes activés"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
@@ -6310,31 +6317,31 @@ msgstr "Temps de l'hôte"
 msgid "Host update failed."
 msgstr "Échec de la mise à jour de l'hôte."
 
-#: hosts.php:362
+#: hosts.php:365
 msgid "Host updated"
 msgstr "Hôte mis à jour"
 
 #: api/classes/CTemplate.php:899
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Un hôte avec le même nom \"%1$s\" existe déjà."
 
 #: api/classes/CHost.php:809
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr "Hôte ayant le même nom \"%s\" existe déjà."
+msgstr "Un hôte ayant le même nom visible \"%1$s\" existe déjà."
 
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:866
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Un hôte avec le même nom visible \"%1$s\" existe déjà."
 
 #: api/classes/CHost.php:815
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Un hôte ayant le même nom visible \"%s\" existe déjà."
 
-#: hostinventoriesoverview.php:85 hosts.php:763 include/forms.inc.php:220
+#: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:220
 #: include/forms.inc.php:897 include/items.inc.php:692
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
@@ -6380,7 +6387,7 @@ msgstr "Informations hôtes"
 msgid "Hosts location"
 msgstr "Localisation des hôtes"
 
-#: hosts.php:345
+#: hosts.php:348
 msgid "Hosts updated"
 msgstr "Hôtes mis à jour"
 
@@ -6399,7 +6406,7 @@ msgstr "Heures"
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
 msgid "Housekeeping"
-msgstr ""
+msgstr "Nettoyage automatique"
 
 #: include/locales.inc.php:61
 msgid "Hungarian (hu_HU)"
@@ -6421,7 +6428,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:772
+#: events.php:502 events.php:511 hosts.php:775
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6515,12 +6522,12 @@ msgstr "Service"
 
 #: adm.housekeeper.php:47
 msgid "IT service data storage period"
-msgstr ""
+msgstr "Période de stockage des données de services"
 
 #: adm.housekeeper.php:109
 #, c-format
 msgid "IT service data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Période de stockage des données de services (en jours) \"%1$s\"."
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
@@ -6732,7 +6739,7 @@ msgstr "Les images de toutes les cartes seront mises à jour !"
 msgid "Immediately"
 msgstr "Immédiatement"
 
-#: hosts.php:754 include/views/configuration.screen.list.php:33
+#: hosts.php:757 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
 #: templates.php:466
@@ -6775,7 +6782,7 @@ msgstr "Dans le groupe"
 msgid "In groups"
 msgstr "Dans les groupes"
 
-#: hosts.php:928 include/html.inc.php:369
+#: hosts.php:931 include/html.inc.php:369
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -6808,12 +6815,12 @@ msgstr "Valeur de type d'étiquette %1$s incorrecte pour la carte \"%2$s\"."
 msgid "Incorrect IP range \"%s\"."
 msgstr "Plage d'adresses IP \"%s\" incorrecte."
 
-#: api/classes/CDRule.php:321
+#: api/classes/CDRule.php:324
 #: include/views/js/configuration.discovery.edit.js.php:568
 msgid "Incorrect SNMP OID."
 msgstr "OID SNMP incorrect."
 
-#: api/classes/CDRule.php:317
+#: api/classes/CDRule.php:320
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "Communauté SNMP incorrecte."
@@ -6963,7 +6970,7 @@ msgstr "Arguments incorrects passés à la fonction"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
 #: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:536
-#: api/classes/CItemGeneral.php:198
+#: api/classes/CItemGeneral.php:197
 msgid "Incorrect arguments passed to function."
 msgstr "Arguments incorrects passés à la fonction."
 
@@ -6971,12 +6978,12 @@ msgstr "Arguments incorrects passés à la fonction."
 msgid "Incorrect arguments passed to method."
 msgstr "Arguments incorrects passés à la méthode."
 
-#: api/classes/CDRule.php:350
+#: api/classes/CDRule.php:353
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour la règle de découverte \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:372
+#: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour l'élément \"%1$s\"."
@@ -6993,7 +7000,7 @@ msgstr "Caractères incorrects dans le nom du Nœud."
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr ""
+msgstr "Caractères incorrects utilisés pour le nom de modèle \"%1$s\""
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
@@ -7013,7 +7020,7 @@ msgstr "Caractères incorrects utilisés pour le nom de proxy \"%1$s\"."
 #: api/classes/CTemplate.php:907
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "Caractères incorrects utilisés pour le nom de modèle \"%1$s\"."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
@@ -7046,7 +7053,7 @@ msgstr "Nom ou valeur incorrecte du champ \"%1$s\" dans l'instruction \"where\" 
 msgid "Incorrect fields for sysmap."
 msgstr "Champs incorrects pour sysmap."
 
-#: api/classes/CTrigger.php:667
+#: api/classes/CTrigger.php:664
 msgid "Incorrect fields for trigger."
 msgstr "Champs incorrects pour le déclencheur."
 
@@ -7054,12 +7061,12 @@ msgstr "Champs incorrects pour le déclencheur."
 msgid "Incorrect file upload."
 msgstr "Téléversement de fichier incorrect."
 
-#: api/classes/CItemGeneral.php:828
+#: api/classes/CItemGeneral.php:840
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Intervalle flexible \"%1$s\" incorrect."
 
-#: api/classes/CItemGeneral.php:817
+#: api/classes/CItemGeneral.php:829
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervalle flexible dans l'élément \"%1$s\" incorrect. L'intervalle flexiblet doit être une chaîne."
@@ -7072,7 +7079,7 @@ msgstr "Fonction incorrecte utilisée"
 #: api/classes/CScreenItem.php:607
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID de grapihque incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
@@ -7086,12 +7093,12 @@ msgstr "Prototypes de groupes incorrects pour le prototype d'hôte \"%1$s\"."
 #: api/classes/CScreenItem.php:588
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID d'hôte incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: api/classes/CScreenItem.php:569
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID de groupe d'hôtes incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
@@ -7116,7 +7123,7 @@ msgstr "Index d'image incorrect."
 
 #: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
 msgid "Incorrect input parameters."
-msgstr ""
+msgstr "Paramètres d'entrée incorrects."
 
 #: api/classes/CHostInterface.php:643
 #, c-format
@@ -7141,13 +7148,13 @@ msgstr "Champ d'inventaire \"%s\" incorrect."
 #: api/classes/CScreenItem.php:627
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID d'élément incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
 msgstr "Élément incorrect pour la valeur de l'axe."
 
-#: api/classes/CTrigger.php:735 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:732 include/triggers.inc.php:1040
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Clé d'élément \"%1$s\" incorrecte pour l'expression du déclencheur sur \"%2$s\"."
@@ -7160,12 +7167,6 @@ msgstr "Type de valeur d'élément \"%1$s\" incorrect fourni pour la fonction de
 #: api/classes/CDRule.php:306
 msgid "Incorrect key."
 msgstr "Clé incorrecte."
-
-#: api/classes/CDRule.php:311 api/classes/CItemGeneral.php:289
-#: discoveryconf.php:97
-#, c-format
-msgid "Incorrect key: \"%1$s\"."
-msgstr "Clé incorrecte : \"%1$s\"."
 
 #: include/forms.inc.php:1302 items.php:888
 msgid "Incorrect list of items."
@@ -7206,7 +7207,7 @@ msgstr "Semaine de période de maintenance incorrecte"
 #: api/classes/CScreenItem.php:646
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID de carte incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: api/classes/CMap.php:412
 #, c-format
@@ -7248,7 +7249,7 @@ msgstr "Paramètre incorrect pour l'icône de la carte \"%s\"."
 #: api/classes/CAction.php:650
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr ""
+msgstr "Paramètres incorrects pour la méthode de mise à jour d'action \"%1$s\"."
 
 #: api/classes/CAction.php:804
 msgid "Incorrect parameters for condition."
@@ -7280,12 +7281,12 @@ msgstr "Service parent incorrect."
 msgid "Incorrect port range."
 msgstr "Intervalle de ports incorrect."
 
-#: api/classes/CDRule.php:359
+#: api/classes/CDRule.php:362
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour la règle de découverte \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:381
+#: api/classes/CItemGeneral.php:387
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour l'élément \"%1$s\"."
@@ -7306,7 +7307,7 @@ msgstr "Réponse incorrecte reçue du serveur Zabbix \"%1$s\"."
 #: api/classes/CScreenItem.php:678
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "ID d'écran incorrect \"%1$s\" fourni pour l'élément d'écran."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7346,16 +7347,6 @@ msgstr "État incorrect pour le service \"%1$s\"."
 #: api/classes/CDRule.php:265
 msgid "Incorrect status."
 msgstr "État incorrect."
-
-#: api/classes/CItemKey.php:222
-#, c-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Syntaxe incorrecte près de \"%1$s\" à la position \"%2$s\""
-
-#: api/classes/CItemKey.php:166
-#, c-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Syntaxe incorrecte près de \"%1$s\"."
 
 #: api/classes/CUser.php:352
 #, c-format
@@ -7397,12 +7388,12 @@ msgstr "Expression du déclencheur incorrecte."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Expression du déclencheur incorrecte. L'hôte \"%1$s\" n'existe pas ou vous n'y avez pas accès."
 
-#: api/classes/CTrigger.php:715
+#: api/classes/CTrigger.php:712
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Expression du déclencheur incorrecte. L'hôte \"%s\" n'existe pas ou vous n'y avez pas accès."
 
-#: api/classes/CTrigger.php:721
+#: api/classes/CTrigger.php:718
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Expression du déclencheur incorrecte. Les éléments de l'expression du déclencheur ne peuvent pas appartenir à un modèle et un hôte simultanément."
 
@@ -7417,12 +7408,6 @@ msgstr "Fonction de déclencheur \"%1$s\" fournie dans l'expression incorrecte."
 #: include/func.inc.php:1176
 msgid "Incorrect type of asort_by_key."
 msgstr "Type d'asort_by_key incorrect."
-
-#: api/classes/CItemKey.php:178 api/classes/CItemKey.php:214
-#: api/classes/CItemKey.php:256
-#, c-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Utilisation des crochets incorrecte. \"%1$s\" trouvé après le crochet fermant."
 
 #: include/perm.inc.php:151
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -7499,7 +7484,7 @@ msgstr "Élément pour la valeur y minimale pour le graphique \"%1$s\" incorrect
 msgid "Indonesian (id_ID)"
 msgstr "Indonésien (id_ID)"
 
-#: include/blocks.inc.php:920 include/blocks.inc.php:1487
+#: include/blocks.inc.php:922 include/blocks.inc.php:1489
 #: include/classes/class.cformlist.php:72 tr_status.php:371
 msgid "Info"
 msgstr "Info"
@@ -7525,7 +7510,7 @@ msgstr "Installation"
 msgid "Installer name"
 msgstr "Nom de l'installeur"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:811
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:814
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "Interface"
@@ -7554,7 +7539,7 @@ msgstr "L'interface avec l'IP \"%1$s\" ne peut pas avoir de nom DNS vide avec la
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "L'interface avec l'IP \"%1$s\" ne peut pas avoir de nom DNS vide."
 
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgctxt "authentication"
 msgid "Internal"
 msgstr "Interne"
@@ -7575,7 +7560,7 @@ msgstr "Erreur JSON-RPC interne."
 
 #: include/views/administration.general.housekeeper.edit.php:48
 msgid "Internal data storage period (in days)"
-msgstr ""
+msgstr "Période de stockage des données internes (en jours)"
 
 #: api/rpc/class.cjsonrpc.php:201
 msgid "Internal error."
@@ -7583,12 +7568,12 @@ msgstr "Erreur interne."
 
 #: adm.housekeeper.php:37
 msgid "Internal event and alert data storage period"
-msgstr ""
+msgstr "Période de stockage des données d'événements et alertes internes"
 
 #: adm.housekeeper.php:106
 #, c-format
 msgid "Internal event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Période de stockage des données d'événements et alertes internes (en jours) \"%1$s\"."
 
 #: include/views/configuration.httpconf.edit.php:94
 msgid "Internet Explorer"
@@ -7635,10 +7620,25 @@ msgstr "Quatrième paramètre invalide."
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Identifiant d'hôte (hostid) invalide pour la macro \"%1$s\"."
 
-#: api/classes/CItemKey.php:80 api/classes/CItemKey.php:99
-#: api/classes/CItemKey.php:270
-msgid "Invalid item key format."
-msgstr "Format de clé d'élément invalide."
+#: api/classes/CDiscoveryRule.php:42
+#, c-format
+msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
+msgstr "Clé \"%1$s\" invalide pour la règle de découverte \"%2$s\" sur \"%3$s\": %4$s."
+
+#: api/classes/CItem.php:39
+#, c-format
+msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
+msgstr "Clé \"%1$s\" invalide pour l'élément \"%2$s\" sur \"%3$s\": %4$s."
+
+#: api/classes/CItemPrototype.php:39
+#, c-format
+msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
+msgstr "Clé \"%1$s\" invalide pour le prototype d'élément \"%2$s\" sur \"%3$s\": %4$s."
+
+#: api/classes/CDRule.php:311 discoveryconf.php:97
+#, c-format
+msgid "Invalid key \"%1$s\": %2$s."
+msgstr "Clé \"%1$s\" invalide : %2$s."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7701,7 +7701,7 @@ msgstr "Inventaire"
 #: api/classes/CHost.php:1306
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr ""
+msgstr "Inventaire désactivé pour l'hôte \"%1$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -7715,8 +7715,8 @@ msgstr "Mode d'inventaire"
 msgid "Is online?"
 msgstr "Est connecté ?"
 
-#: include/blocks.inc.php:907 include/blocks.inc.php:917
-#: include/blocks.inc.php:1485
+#: include/blocks.inc.php:909 include/blocks.inc.php:919
+#: include/blocks.inc.php:1487
 msgid "Issue"
 msgstr "Problème"
 
@@ -7745,12 +7745,7 @@ msgstr "Italien (it_IT)"
 msgid "Item"
 msgstr "Élément"
 
-#: api/classes/CItemGeneral.php:100
-#, c-format
-msgid "Item \"%1$s\" already exists on \"%2$s\""
-msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\"."
-
-#: api/classes/CItemGeneral.php:99 api/classes/CItem.php:37
+#: api/classes/CItem.php:37
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\", hérité depuis un autre modèle."
@@ -7758,9 +7753,9 @@ msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\", hérité depuis un autr
 #: api/classes/CItem.php:38
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: api/classes/CItem.php:959
+#: api/classes/CItem.php:960
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "L'élément \"%1$s\" ne peut pas remplir le champ d'inventair numéro \"%2$d\" manquant. Les choix sont : de 0 (ne pas remplir) à %3$d."
@@ -7775,7 +7770,7 @@ msgstr "L'élément \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "L'élément \"%1$s\" n'existe pas."
 
-#: include/classes/import/CConfigurationImport.php:578
+#: include/classes/import/CConfigurationImport.php:582
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
@@ -7786,7 +7781,7 @@ msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Élément \"%1$s\" sauté - règle utilisateur."
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:369
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "L'élément \"%1$s:%2$s\" a un port invalide : \"%3$s\"."
@@ -7806,14 +7801,14 @@ msgstr "Élément dans un état \"non supporté\""
 #: applications.php:208 items.php:679
 msgid "Item disabled"
 msgid_plural "Items disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Élément désactivé"
+msgstr[1] "Éléments désactivés"
 
 #: applications.php:207 items.php:678
 msgid "Item enabled"
 msgid_plural "Items enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Élément activé"
+msgstr[1] "Éléments activés"
 
 #: include/actions.inc.php:1153
 msgid "Item in \"normal\" state"
@@ -7827,23 +7822,23 @@ msgstr "Élément dans un état \"non supporté\""
 msgid "Item prototype"
 msgstr "Prototype de l'élément"
 
-#: api/classes/CItemPrototype.php:38
-#, c-format
-msgid "Item prototype \"%1$s\" already exists on \"%2$s\""
-msgstr ""
-
 #: api/classes/CItemPrototype.php:37
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Le prototype d\"élément \"%1$s\" existe déjà sur \"%2$s\", hérité d'un autre modèle."
+
+#: api/classes/CItemPrototype.php:38
+#, c-format
+msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
+msgstr "Le prototype d\"élément \"%1$s\" existe déjà sur \"%2$s\"."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
-msgstr ""
+msgstr "Prototype d'élément ajouté"
 
 #: disc_prototypes.php:206
 msgid "Item prototype deleted"
-msgstr ""
+msgstr "Prototype d'élément supprimé"
 
 #: disc_prototypes.php:326
 msgid "Item prototype disabled"
@@ -7854,12 +7849,12 @@ msgstr[1] ""
 #: disc_prototypes.php:325
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototype d'élément activé"
+msgstr[1] "Prototypes d'éléments activés"
 
 #: disc_prototypes.php:301
 msgid "Item prototype updated"
-msgstr ""
+msgstr "Prototype d'élément mis à jour"
 
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:106
@@ -7870,7 +7865,7 @@ msgstr "Prototypes d'éléments"
 
 #: disc_prototypes.php:340
 msgid "Item prototypes deleted"
-msgstr ""
+msgstr "Prototypes d'éléments effacés"
 
 #: include/views/configuration.item.prototype.list.php:32
 msgid "Item prototypes of"
@@ -7880,55 +7875,55 @@ msgstr "Prototypes d'éléments de"
 msgid "Item updated"
 msgstr "Élément mis à jour"
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:266
 msgid "Item uses host interface from non-parent host."
 msgstr "L'élément utilise une interface d'un hôte non-parent."
 
-#: api/classes/CItemGeneral.php:270
+#: api/classes/CItemGeneral.php:269
 msgid "Item uses incorrect interface type."
 msgstr "L'élément utilise un type d'interface incorrect."
 
-#: api/classes/CItemGeneral.php:321
+#: api/classes/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "L'élément ne sera pas rafraichi. Veuillez saisir une période de mise à jour valide."
 
-#: api/classes/CItemGeneral.php:434
+#: api/classes/CItemGeneral.php:440
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme règle de découverte."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément créé d'un prototype d'élément."
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme prototype d'élément."
 
-#: api/classes/CItemGeneral.php:431
+#: api/classes/CItemGeneral.php:437
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément."
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément inconnu."
 
-#: api/classes/CItemGeneral.php:794
+#: api/classes/CItemGeneral.php:806
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:695
-#: api/classes/managers/CHttpTestManager.php:826
+#: api/classes/managers/CHttpTestManager.php:709
+#: api/classes/managers/CHttpTestManager.php:840
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà."
 
-#: hosts.php:806 hosts.php:897 include/html.inc.php:425
+#: hosts.php:809 hosts.php:900 include/html.inc.php:425
 #: include/html.inc.php:429 include/items.inc.php:675
 #: include/reports.inc.php:120 include/reports.inc.php:263
 #: include/views/configuration.application.list.php:99
@@ -8057,14 +8052,10 @@ msgstr "Période de conservation des ressources perdues (en jours)"
 msgid "Key"
 msgstr "Clé"
 
-#: api/classes/CItemGeneral.php:300
+#: api/classes/CItemGeneral.php:306
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "La clé \"%1$s\" ne correspond pas à <grpmax|grpmin|grpsum|grpavg>[\"Groupe(s) d'hôtes\", \"Clé\", \"<last|min|max|avg|sum|count>\", \"paramètre\"]."
-
-#: api/classes/CItemKey.php:54
-msgid "Key cannot be empty."
-msgstr "La clé ne peut pas être vide."
 
 #: include/views/configuration.action.edit.php:763
 #: include/views/js/configuration.item.edit.js.php:135
@@ -8088,25 +8079,29 @@ msgid "LATEST DATA"
 msgstr "DERNIÈRES DONNÉES"
 
 #: include/discovery.inc.php:57
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:175
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:187
+#: authentication.php:219
 msgid "LDAP authentication"
 msgstr "Authentification LDAP"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:140
+msgid "LDAP authentication changed"
+msgstr "Authentification LDAP modifiée"
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "Hôte LDAP"
 
-#: authentication.php:140
+#: authentication.php:159
 msgid "LDAP login successful"
 msgstr "Connexion LDAP réussie"
 
-#: authentication.php:140
+#: authentication.php:159
 msgid "LDAP login was not successful"
 msgstr "Connexion LDAP échouée"
 
@@ -8183,7 +8178,7 @@ msgstr "365 derniers jours"
 msgid "Last 7 days"
 msgstr "7 derniers jours"
 
-#: include/blocks.inc.php:918 tr_status.php:372
+#: include/blocks.inc.php:920 tr_status.php:372
 msgid "Last change"
 msgstr "Dernier changement"
 
@@ -8232,7 +8227,7 @@ msgstr "Derniers événements"
 
 #: jsLoader.php:207
 msgid "Latest values"
-msgstr ""
+msgstr "Dernières valeurs"
 
 #: include/locales.inc.php:66
 msgid "Latvian (lv_LV)"
@@ -8294,7 +8289,7 @@ msgstr "Le nom de lien devrait être unique pour la carte \"%s\"."
 #: include/views/configuration.host.prototype.edit.php:250
 #: include/views/configuration.template.edit.php:431
 msgid "Link new templates"
-msgstr ""
+msgstr "Lier de nouveaux modèles"
 
 #: api/classes/CMap.php:502
 #, c-format
@@ -8354,7 +8349,7 @@ msgstr "La liste est vide"
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:355
 msgid "List of network interfaces. Text value."
-msgstr ""
+msgstr "Liste des interfaces réseau. Valeur textuelle."
 
 #: include/locales.inc.php:67
 msgid "Lithuanian (lt_LT)"
@@ -8432,7 +8427,7 @@ msgstr "Connecté en tant que"
 #: auditlogs.php:143 include/func.inc.php:2096 include/func.inc.php:2113
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:61
 msgid "Login"
 msgstr "Connexion"
@@ -8441,13 +8436,22 @@ msgstr "Connexion"
 msgid "Login as Guest"
 msgstr "Connexion en tant qu'Invité"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Connexion échouée \"%s\"."
 
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:119
+msgid "Login name or password is incorrect!"
+msgstr "Nom d'utilisateur ou mot de passe incorrect !"
+
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876 authentication.php:109 authentication.php:137
+#: api/classes/CUser.php:876
 msgid "Login name or password is incorrect."
 msgstr "Nom ou mot de passe incorrect."
 
@@ -8468,7 +8472,7 @@ msgstr "Perdu"
 
 #: include/actions.inc.php:1155
 msgid "Low-level discovery rule in \"normal\" state"
-msgstr ""
+msgstr "Règle de découverte bas niveau en état \"normal\""
 
 #: include/actions.inc.php:1154
 msgid "Low-level discovery rule in \"not supported\" state"
@@ -8626,11 +8630,11 @@ msgstr "Type de maintenance"
 msgid "Maintenance updated"
 msgstr "Maintenance modifiée"
 
-#: include/blocks.inc.php:949 tr_status.php:660
+#: include/blocks.inc.php:951 tr_status.php:660
 msgid "Maintenance with data collection"
 msgstr "Maintenance avec collecte de données"
 
-#: include/blocks.inc.php:948 tr_status.php:659
+#: include/blocks.inc.php:950 tr_status.php:659
 msgid "Maintenance without data collection"
 msgstr "Maintenance sans collecte de données"
 
@@ -8648,7 +8652,7 @@ msgstr "Manuel"
 msgid "Manual Logout"
 msgstr "Déconnexion manuelle"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1331
+#: include/audit.inc.php:40 include/blocks.inc.php:1333
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8708,7 +8712,7 @@ msgstr "La vauleur de correspondance \"%1$s\" n'est pas unique."
 msgid "Mappings"
 msgstr "Correspondances"
 
-#: dashboard.php:340 include/blocks.inc.php:1364 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1366 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:80
@@ -8740,7 +8744,7 @@ msgstr "Marquer les éléments sélectionnés"
 msgid "Mask"
 msgstr "Masque"
 
-#: hosts.php:1008 include/views/configuration.item.list.php:281
+#: hosts.php:1011 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.triggers.list.php:278
 msgid "Mass update"
@@ -8891,11 +8895,10 @@ msgstr[0] "Type média désactivé"
 msgstr[1] "Type média désactivé"
 
 #: media_types.php:162
-#, fuzzy
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
-msgstr[0] "Type média activé"
-msgstr[1] "Type média activé"
+msgstr[0] "Type de média activé"
+msgstr[1] "Types de média activés"
 
 #: media_types.php:121
 msgid "Media type updated"
@@ -8986,17 +8989,17 @@ msgstr "Minimiser"
 #: include/classes/class.frontendsetup.php:117
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
-msgstr ""
+msgstr "La limite de mémoire PHP minimum requise est %s (configuration option \"memory_limit\")."
 
 #: include/classes/class.frontendsetup.php:151
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
-msgstr ""
+msgstr "La taille de fichier téléversé PHP minimum requise est %s (configuration option \"upload_max_filesize\")."
 
 #: include/classes/class.frontendsetup.php:99
 #, c-format
 msgid "Minimum required PHP version is %s."
-msgstr ""
+msgstr "La valeur de PHP minimale requise est %s."
 
 #: include/classes/class.frontendsetup.php:168
 #, c-format
@@ -9015,7 +9018,7 @@ msgstr ""
 
 #: include/views/monitoring.maps.php:40
 msgid "Minimum severity"
-msgstr ""
+msgstr "Sévérité minimale"
 
 #: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:417
 #, c-format
@@ -9026,7 +9029,7 @@ msgstr[1] ""
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:310
 msgid "Minimum trigger severity"
-msgstr ""
+msgstr "Sévérité de déclencheur minimale"
 
 #: popup_trexpr.php:279
 msgid "Minimum value for period T is < N"
@@ -9067,7 +9070,7 @@ msgstr ""
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:590
+#: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:594
 msgid "Missing \"itemid\" field for item."
 msgstr "Champ \"itemid\" manquant pour l'élément."
 
@@ -9121,7 +9124,7 @@ msgstr "Lun"
 msgid "Monday"
 msgstr "Lundi"
 
-#: hosts.php:932 include/html.inc.php:372
+#: hosts.php:935 include/html.inc.php:372
 #: include/views/configuration.host.edit.php:409
 #: include/views/configuration.host.massupdate.php:149
 #: include/views/configuration.host.prototype.edit.php:159
@@ -9166,13 +9169,13 @@ msgstr "Mensuel"
 
 #: include/classes/class.cmultiselect.php:52 jsLoader.php:193
 msgid "More matches found..."
-msgstr ""
+msgstr "D'autres correspondances ont été trouvées..."
 
 #: queue.php:107 queue.php:155
 msgid "More than 10 minutes"
 msgstr "Plus de 10 minutes"
 
-#: api/classes/CGraphGeneral.php:757
+#: api/classes/CGraphGeneral.php:761
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Plus d'un graphique nommé \"%1$s\" dans l'hôte."
@@ -9220,7 +9223,7 @@ msgstr "Authentification NTLM"
 
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
-#: graphs.php:41 host_discovery.php:41 hosts.php:770 hosts.php:804
+#: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:602
 #: include/hosts.inc.php:115 include/reports.inc.php:174
 #: include/setup.inc.php:384
@@ -9297,11 +9300,11 @@ msgstr "Nom"
 #: api/classes/CHostPrototype.php:223
 #, c-format
 msgid "Name for group prototype \"%1$s\" must contain macros."
-msgstr ""
+msgstr "Le nom pour le prototype de groupe \"%1$s\" doit contenir des macros."
 
 #: include/views/administration.general.housekeeper.edit.php:52
 msgid "Network discovery data storage period (in days)"
-msgstr ""
+msgstr "Période de stockage des données de découverte réseau (en jours)"
 
 #: adm.housekeeper.php:40
 msgid "Network discovery event and alert data storage period"
@@ -9459,18 +9462,18 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:351
-msgid "No SNMP OID specified."
-msgstr ""
-
 #: api/classes/CItemGeneral.php:357
+msgid "No SNMP OID specified."
+msgstr "Pas d'OID SNMP spécifié."
+
+#: api/classes/CItemGeneral.php:363
 msgid "No SNMP community specified."
-msgstr ""
+msgstr "Aucune communauté SNMP spécifiée."
 
 #: include/views/configuration.host.edit.php:347
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
-msgstr ""
+msgstr "Aucune interface SNMP trouvée."
 
 #: api/classes/CScreenItem.php:527
 msgid "No URL provided for screen element."
@@ -9497,7 +9500,7 @@ msgstr "Aucune action trouvée."
 #: include/views/configuration.host.edit.php:333
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
-msgstr ""
+msgstr "Aucune interface d'agent trouvée."
 
 #: include/hosts.inc.php:588
 #, c-format
@@ -9507,7 +9510,7 @@ msgstr "Aucune application avec l'ID \"%1$s\"."
 #: include/views/configuration.application.list.php:57
 #: include/views/configuration.httpconf.edit.php:69 popup.php:1015
 msgid "No applications found."
-msgstr ""
+msgstr "Aucune application trouvée."
 
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
@@ -9524,7 +9527,7 @@ msgstr "Aucun type d'authentification spécifiée pour la commande d'opération 
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:328
+#: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié."
 
@@ -9572,14 +9575,14 @@ msgstr "Pas de détails"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discovered devices found."
-msgstr ""
+msgstr "Aucun périphérique découvert trouvé."
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
 msgstr ""
 
-#: api/classes/CDiscoveryRule.php:443
+#: api/classes/CDiscoveryRule.php:444
 msgid "No discovery rule IDs given."
 msgstr "Aucun identifiant de règle de découverte fourni."
 
@@ -9597,11 +9600,11 @@ msgstr "Aucun élément sélectionné !"
 msgid "No errors found."
 msgstr "Aucune erreur trouvée."
 
-#: include/blocks.inc.php:994 include/blocks.inc.php:1506 tr_status.php:729
+#: include/blocks.inc.php:996 include/blocks.inc.php:1508 tr_status.php:729
 msgid "No events"
 msgstr "Aucun événement"
 
-#: events.php:370 include/blocks.inc.php:913
+#: events.php:370 include/blocks.inc.php:915
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
 msgstr ""
@@ -9639,12 +9642,12 @@ msgstr ""
 
 #: include/blocks.inc.php:28
 msgid "No graphs added."
-msgstr ""
+msgstr "Aucun graphique ajouté."
 
 #: include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:77 popup.php:1072
 msgid "No graphs found."
-msgstr ""
+msgstr "Aucun graphique trouvé."
 
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
@@ -9662,13 +9665,13 @@ msgstr "Aucun groupe pour le modèle"
 #: api/classes/CTemplate.php:460
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr ""
+msgstr "Aucun groupe pour le modèle \"%1$s\"."
 
 #: api/classes/CHost.php:1443
 msgid "No host ID given."
-msgstr ""
+msgstr "Aucun ID d'hôte donné."
 
-#: api/classes/CDiscoveryRule.php:446
+#: api/classes/CDiscoveryRule.php:447
 msgid "No host IDs given."
 msgstr "Aucun identifiant d'hôte fourni."
 
@@ -9679,7 +9682,7 @@ msgstr "Aucun hôte fourni pour la macro \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:240
 msgid "No host group ID for group prototype."
-msgstr ""
+msgstr "Aucun ID de gropue d'hôte pour le prototype de groupe."
 
 #: api/classes/CScreenItem.php:465
 msgid "No host group ID provided for screen element."
@@ -9689,7 +9692,7 @@ msgstr "Aucun identifiant de groupe d'hôtes fourni pour l'élément d'écran."
 #: include/views/configuration.hostgroups.list.php:56 popup_right.php:74
 #: search.php:276
 msgid "No host groups found."
-msgstr ""
+msgstr "Aucun groupe d'hôte trouvé."
 
 #: include/hosts.inc.php:493
 #, c-format
@@ -9698,17 +9701,17 @@ msgstr "Aucun groupe d'hôtes avec l'identifiant (groupid) \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes found."
-msgstr ""
+msgstr "Aucun prototype d'hôte trouvé."
 
 #: include/hosts.inc.php:536
-#, fuzzy, c-format
+#, c-format
 msgid "No host with hostid \"%s\"."
-msgstr "Pas de hôte avec hostid \"%s\"."
+msgstr "Pas d'hôte avec l'hostid \"%s\"."
 
-#: hostinventoriesoverview.php:88 hosts.php:800
+#: hostinventoriesoverview.php:88 hosts.php:803
 #: include/views/inventory.host.list.php:74 search.php:128
 msgid "No hosts found."
-msgstr ""
+msgstr "Aucun hôte trouvé."
 
 #: api/classes/CMapElement.php:70
 #, c-format
@@ -9733,7 +9736,7 @@ msgstr ""
 msgid "No interface found"
 msgstr "Aucune interface trouvée"
 
-#: api/classes/CItemGeneral.php:264
+#: api/classes/CItemGeneral.php:263
 msgid "No interface found."
 msgstr "Aucune interface trouvée."
 
@@ -9780,15 +9783,15 @@ msgstr ""
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
-msgstr ""
+msgstr "Aucune macro trouvée."
 
 #: include/views/configuration.maintenance.edit.php:98
 msgid "No maintenance periods defined."
-msgstr ""
+msgstr "Aucune période de maintenance définie."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance periods found."
-msgstr ""
+msgstr "Aucune période de maintenance trouvée."
 
 #: api/classes/CScreenItem.php:509
 msgid "No map ID provided for screen element."
@@ -9796,35 +9799,35 @@ msgstr "Aucun identifiant de carte fourni pour l'élément d'écran."
 
 #: include/blocks.inc.php:160
 msgid "No maps added."
-msgstr ""
+msgstr "Aucune carte ajoutée."
 
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1173
 msgid "No maps found."
-msgstr ""
+msgstr "Aucune carte trouvée."
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
-msgstr ""
+msgstr "Aucune correspondance trouvée"
 
 #: include/views/administration.users.edit.php:162
 msgid "No media found."
-msgstr ""
+msgstr "Aucun média trouvé."
 
 #: include/views/administration.mediatypes.list.php:36
 msgid "No media types found."
-msgstr ""
+msgstr "Aucun type de média trouvé."
 
 #: report4.php:73
 msgid "No notifications found."
-msgstr ""
+msgstr "Aucune notification trouvée."
 
 #: include/views/configuration.action.edit.php:334
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:949
-#: include/classes/import/CConfigurationImport.php:1056
+#: include/classes/import/CConfigurationImport.php:953
+#: include/classes/import/CConfigurationImport.php:1067
 #: include/classes/import/CXmlImport18.php:1549
 #, c-format
 msgid "No permission for graph \"%1$s\"."
@@ -9869,18 +9872,18 @@ msgstr "Aucune permission pour la carte \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Aucune permission pour l'écran \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "Aucune permission pour l'accès au système."
 
 #: api/classes/CAction.php:639 api/classes/CAction.php:1288
 #: api/classes/CApplication.php:328 api/classes/CApplication.php:335
 #: api/classes/CApplication.php:441 api/classes/CApplication.php:514
-#: api/classes/CApplication.php:527 api/classes/CDiscoveryRule.php:357
-#: api/classes/CDiscoveryRule.php:451 api/classes/CDiscoveryRule.php:456
-#: api/classes/CDRule.php:248 api/classes/CDRule.php:786
+#: api/classes/CApplication.php:527 api/classes/CDiscoveryRule.php:358
+#: api/classes/CDiscoveryRule.php:452 api/classes/CDiscoveryRule.php:457
+#: api/classes/CDRule.php:248 api/classes/CDRule.php:789
 #: api/classes/CEvent.php:735 api/classes/CGraphGeneral.php:65
-#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:711
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:707
 #: api/classes/CGraphPrototype.php:692 api/classes/CGraphPrototype.php:752
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
 #: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
@@ -9894,9 +9897,9 @@ msgstr "Aucune permission pour l'accès au système."
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:243 api/classes/CImage.php:357
-#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:182
-#: api/classes/CItemGeneral.php:235 api/classes/CItem.php:689
-#: api/classes/CItemPrototype.php:508 api/classes/CMaintenance.php:320
+#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:181
+#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
+#: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
 #: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:60
@@ -9908,11 +9911,11 @@ msgstr "Aucune permission pour l'accès au système."
 #: api/classes/CScreen.php:573 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:573
 #: api/classes/CTemplateScreen.php:606 api/classes/CTemplateScreen.php:658
-#: api/classes/CTemplateScreen.php:664 api/classes/CTrigger.php:639
-#: api/classes/CTrigger.php:963 api/classes/CTrigger.php:984
-#: api/classes/CTrigger.php:1861 api/classes/CTriggerPrototype.php:566
+#: api/classes/CTemplateScreen.php:664 api/classes/CTrigger.php:636
+#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
+#: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
 #: include/func.inc.php:2070
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
@@ -9922,7 +9925,7 @@ msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé privée spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:336
+#: api/classes/CItemGeneral.php:342
 msgid "No private key file specified."
 msgstr "Aucun fichier de clé privée spécifié."
 
@@ -9943,7 +9946,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé publique spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:339
 msgid "No public key file specified."
 msgstr "Aucun fichier de clé publique spécifié."
 
@@ -9997,7 +10000,7 @@ msgstr ""
 
 #: api/classes/CProxy.php:227
 msgid "No status for proxy."
-msgstr ""
+msgstr "Aucun état pour le proxy."
 
 #: triggers.php:312
 msgid "No target selected"
@@ -10009,14 +10012,14 @@ msgstr "Aucune cible sélectionnée."
 
 #: search.php:391 templates.php:481
 msgid "No templates found."
-msgstr ""
+msgstr "Aucun modèle trouvé."
 
 #: include/views/configuration.host.edit.php:642
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:233
 #: include/views/configuration.template.edit.php:385
 msgid "No templates linked."
-msgstr ""
+msgstr "Aucun modèle lié."
 
 #: include/views/configuration.services.edit.php:127
 msgid "No times defined. Work 24x7."
@@ -10043,16 +10046,16 @@ msgstr "Aucun déclencheur trouvé."
 
 #: api/classes/CUser.php:579
 msgid "No user ID given."
-msgstr ""
+msgstr "Aucun ID d'utilisateur fourni."
 
 #: include/views/administration.usergroups.list.php:42 popup.php:554
 #: popup_usrgrp.php:89
 msgid "No user groups found."
-msgstr ""
+msgstr "Aucun groupe d'utilisateurs trouvé."
 
 #: include/views/administration.users.list.php:51 popup.php:612
 msgid "No users found."
-msgstr ""
+msgstr "Aucun utilisateur trouvé."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
@@ -10065,16 +10068,16 @@ msgstr ""
 msgid "No values found."
 msgstr "Aucune valeur trouvée."
 
-#: httpmon.php:84 include/blocks.inc.php:1086
+#: httpmon.php:84 include/blocks.inc.php:1088
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
-msgstr ""
+msgstr "Aucun scénario web trouvé."
 
-#: events.php:578 events.php:591 hosts.php:803 httpmon.php:86
+#: events.php:578 events.php:591 hosts.php:806 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:195 include/blocks.inc.php:385
-#: include/blocks.inc.php:915 include/blocks.inc.php:1088
-#: include/blocks.inc.php:1177 include/blocks.inc.php:1483
+#: include/blocks.inc.php:917 include/blocks.inc.php:1090
+#: include/blocks.inc.php:1179 include/blocks.inc.php:1485
 #: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
 #: include/triggers.inc.php:1636
 #: include/views/administration.general.iconmap.list.php:24
@@ -10159,7 +10162,7 @@ msgstr "Non acquitté"
 msgid "Not Templated items"
 msgstr "Éléments hors modèle"
 
-#: api/classes/CTrigger.php:1488
+#: api/classes/CTrigger.php:1485
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Tous les modèles ne sont pas liés à \"%s\"."
@@ -10185,7 +10188,7 @@ msgstr "Non classé"
 msgid "Not connected"
 msgstr "Non connecté"
 
-#: hosts.php:941 include/html.inc.php:376
+#: hosts.php:944 include/html.inc.php:376
 #: include/views/configuration.host.edit.php:410
 #: include/views/configuration.host.massupdate.php:150
 #: include/views/configuration.host.prototype.edit.php:160
@@ -10238,7 +10241,7 @@ msgstr "Maintenant"
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:415
 msgid "Number of available proccessors."
-msgstr ""
+msgstr "Nombre de processeurs disponibles."
 
 #: include/blocks.inc.php:740 include/blocks.inc.php:742
 msgid "Number of hosts (monitored/not monitored/templates)"
@@ -10328,15 +10331,15 @@ msgstr "Le nombre de valeurs V remontées avec succès (qui respectent l'opérat
 
 #: include/blocks.inc.php:758
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
-msgstr ""
+msgstr "Nombre de déclencheurs (activés/désactivés) [problème/ok]"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "Number of triggers in Zabbix database."
-msgstr ""
+msgstr "Nombre de déclencheurs dans la base de données Zabbix."
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Number of unsupported items in Zabbix database."
-msgstr ""
+msgstr "Nombre d'éléments non supportés dans la base de données Zabbix."
 
 #: include/blocks.inc.php:768
 msgid "Number of users (online)"
@@ -10345,27 +10348,27 @@ msgstr "Nombre d'utilisateurs"
 #: include/classes/items/CHelpItems.php:237
 #: include/classes/items/CHelpItems.php:491
 msgid "Number of users connected. Command who is used on agent side."
-msgstr ""
+msgstr "Nombre d'utilisateurs connectés. La commande who est utilisée sur l'agent."
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Number of values stored in table HISTORY."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table HISTORY."
 
 #: include/classes/items/CHelpItems.php:799
 msgid "Number of values stored in table HISTORY_LOG."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table HISTORY_LOG."
 
 #: include/classes/items/CHelpItems.php:803
 msgid "Number of values stored in table HISTORY_STR."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table HISTORY_STR."
 
 #: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY_TEXT."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table HISTORY_TEXT."
 
 #: include/classes/items/CHelpItems.php:811
 msgid "Number of values stored in table HISTORY_UINT."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table HISTORY_UINT."
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Number of values stored in table TRENDS."
@@ -10472,7 +10475,7 @@ msgstr "Octobre"
 msgid "Off"
 msgstr "Inactif"
 
-#: include/actions.inc.php:1072 include/blocks.inc.php:1090
+#: include/actions.inc.php:1072 include/blocks.inc.php:1092
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:401
 #: report3.php:83
@@ -10567,7 +10570,7 @@ msgstr "Seuls des caractères sont autorisés."
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Seuls les éléments assignés à des hôtes activés sont comptés"
 
-#: api/classes/CDRule.php:368
+#: api/classes/CDRule.php:371
 msgid "Only one check can be unique."
 msgstr "Une seule vérification peut être unique."
 
@@ -10740,16 +10743,16 @@ msgstr ""
 
 #: include/views/administration.general.housekeeper.edit.php:132
 msgid "Override item history period"
-msgstr ""
+msgstr "Surcharger la période d'historique de l'élément"
 
 #: include/views/administration.general.housekeeper.edit.php:153
 msgid "Override item trend period"
-msgstr ""
+msgstr "Surcharger la période de tendances de l'élément"
 
 #: include/views/configuration.item.edit.php:371
 #: include/views/configuration.item.edit.php:392
 msgid "Overriden by global housekeeping settings"
-msgstr ""
+msgstr "Surchargé par les paramètres de nettoyage automatique globaux"
 
 #: include/menu.inc.php:38 include/menu.inc.php:108
 #: include/views/inventory.host.view.php:258
@@ -10776,7 +10779,7 @@ msgstr "bcmath pour PHP"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
-msgstr ""
+msgstr "L'extension PHP bcmath est manquante (paramètre de configuration de PHP --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:497
 msgid "PHP ctype"
@@ -10784,7 +10787,7 @@ msgstr "ctype pour PHP"
 
 #: include/classes/class.frontendsetup.php:501
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
-msgstr ""
+msgstr "L'extension PHP ctype est manquante (paramètre de configuration de PHP --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:221
 msgid "PHP databases support"
@@ -10804,11 +10807,11 @@ msgstr "Le support FreeType est manquant dans PHP gd"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
-msgstr ""
+msgstr "Le support de FreeType par PHP gd est manquant."
 
 #: include/classes/class.frontendsetup.php:394
 msgid "PHP gd JPEG image support missing."
-msgstr ""
+msgstr "Le support des images JPEG par PHP gd est manquant."
 
 #: include/classes/class.frontendsetup.php:390
 msgid "PHP gd JPEG support"
@@ -10816,7 +10819,7 @@ msgstr "Support JPEG pour PHP gd"
 
 #: include/classes/class.frontendsetup.php:369
 msgid "PHP gd PNG image support missing."
-msgstr ""
+msgstr "Le support des images PNG par PHP gd est manquant."
 
 #: include/classes/class.frontendsetup.php:365
 msgid "PHP gd PNG support"
@@ -10824,7 +10827,7 @@ msgstr "Support PNG pour PHP gd"
 
 #: include/classes/class.frontendsetup.php:346
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
-msgstr ""
+msgstr "L'extension PHP gd est manquante (paramètre de configuration de PHP --enable-gd)"
 
 #: include/classes/class.frontendsetup.php:548
 msgid "PHP gettext"
@@ -10975,7 +10978,7 @@ msgstr "Déclencheurs parents"
 
 #: include/views/configuration.httpconf.edit.php:51
 msgid "Parent web scenarios"
-msgstr ""
+msgstr "Scénarios web parents"
 
 #: api/classes/CImage.php:284
 #, c-format
@@ -10983,7 +10986,6 @@ msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Erreur d'analyse SQL [%1$s] dans [%2$s]."
 
 #: api/rpc/class.cjsonrpc.php:181
-#, fuzzy
 msgid "Parse error"
 msgstr "Erreur d'analyse"
 
@@ -11124,9 +11126,9 @@ msgstr "Polonais (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Remplit le champ d'inventaire d'hôte"
 
-#: authentication.php:37 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:773 include/forms.inc.php:493 include/setup.inc.php:379
-#: include/views/administration.authentication.edit.php:58
+#: authentication.php:40 disc_prototypes.php:82 host_discovery.php:79
+#: hosts.php:776 include/forms.inc.php:493 include/setup.inc.php:379
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:57
@@ -11457,9 +11459,8 @@ msgid "Refresh unsupported items (in sec) \"%1$s\"."
 msgstr "Rafraîchissement des éléments non supportés (en sec) \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:346
-#, fuzzy
 msgid "Regexp"
-msgstr "Regexp"
+msgstr "Expression rationnelle"
 
 #: include/audit.inc.php:47
 msgid "Regular expression"
@@ -11491,11 +11492,10 @@ msgid "Regular expression added"
 msgstr "Expression rationnelle ajoutée"
 
 #: adm.regexps.php:172
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
-msgstr[0] "Expression régulière supprimée"
-msgstr[1] "Expression régulière supprimée"
+msgstr[0] "Expression rationnelle supprimée"
+msgstr[1] "Expressions rationnelles supprimées"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
@@ -11521,10 +11521,10 @@ msgstr "Me rappeler toutes les 30 jours"
 msgid "Remote command"
 msgstr "Commande à distance"
 
-#: include/blocks.inc.php:1220 include/blocks.inc.php:1309
-#: include/blocks.inc.php:1318 include/blocks.inc.php:1336
-#: include/blocks.inc.php:1364 include/blocks.inc.php:1387
-#: include/blocks.inc.php:1448 include/blocks.inc.php:1457
+#: include/blocks.inc.php:1222 include/blocks.inc.php:1311
+#: include/blocks.inc.php:1320 include/blocks.inc.php:1338
+#: include/blocks.inc.php:1366 include/blocks.inc.php:1389
+#: include/blocks.inc.php:1450 include/blocks.inc.php:1459
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -11606,7 +11606,7 @@ msgstr "Remplacer"
 
 #: include/views/configuration.item.massupdate.php:490
 msgid "Replace applications"
-msgstr ""
+msgstr "Remplacer les applications"
 
 #: include/views/configuration.triggers.massupdate.php:132
 msgid "Replace depenencies"
@@ -11662,7 +11662,7 @@ msgstr "Performance requise (vps)"
 
 #: include/classes/items/CHelpItems.php:855
 msgid "Required performance of the Zabbix server, in new values per second expected."
-msgstr ""
+msgstr "Performances du serveur Zabbix requises, en nouvelles valeurs attendues par seconde."
 
 #: include/blocks.inc.php:769
 msgid "Required server performance, new values per second"
@@ -11676,7 +11676,7 @@ msgstr "Code d'état requis"
 msgid "Required string"
 msgstr "Chaîne requise"
 
-#: events.php:357 hosts.php:781 include/forms.inc.php:632
+#: events.php:357 hosts.php:784 include/forms.inc.php:632
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -11910,7 +11910,7 @@ msgstr "SERVEUR"
 #: include/views/configuration.item.massupdate.php:142
 #: include/views/js/configuration.discovery.edit.js.php:78
 msgid "SHA"
-msgstr ""
+msgstr "SHA"
 
 #: report3.php:83 srv_status.php:142
 msgid "SLA"
@@ -11978,7 +11978,7 @@ msgstr "Interfaces SNMP"
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
-#: api/classes/CItemGeneral.php:345
+#: api/classes/CItemGeneral.php:351
 msgid "SNMP trap key is invalid."
 msgstr "La clé du trap SNMP est invalide."
 
@@ -12002,9 +12002,9 @@ msgstr "agent SNMPv3"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Comptes SQL : %s (sélections : %s | exécutions : %s)"
 
-#: include/items.inc.php:1288 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1291 include/views/configuration.item.edit.php:199
 msgid "SQL query"
-msgstr ""
+msgstr "Requête SQL"
 
 #: include/classes/db/DB.php:718
 #, c-format
@@ -12056,7 +12056,7 @@ msgstr "Sam"
 msgid "Saturday"
 msgstr "Samedi"
 
-#: acknow.php:221 include/views/administration.authentication.edit.php:76
+#: acknow.php:221 include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:169
 #: include/views/administration.general.iconmap.edit.php:149
@@ -12144,7 +12144,7 @@ msgstr "Planification"
 msgid "Scheduled check"
 msgstr ""
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1376
+#: include/audit.inc.php:41 include/blocks.inc.php:1378
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12224,7 +12224,7 @@ msgstr "Un écran doit contenir au moins une ligne et une colonne."
 msgid "Screen updated"
 msgstr "Écran mis à jour"
 
-#: dashboard.php:326 include/blocks.inc.php:1448 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1450 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:372
@@ -12297,8 +12297,8 @@ msgstr "Scripts"
 msgid "Search"
 msgstr "Recherche"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Attribut recherché"
 
@@ -12563,7 +12563,7 @@ msgstr "Services"
 msgid "Services form a circular dependency."
 msgstr "Les services forment une dépendance circulaire."
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "Session terminée, veuillez vous reconnecter."
 
@@ -12703,11 +12703,11 @@ msgstr "Simple"
 msgid "Simple check"
 msgstr "Vérification simple"
 
-#: include/blocks.inc.php:1213 include/screens.inc.php:38
+#: include/blocks.inc.php:1215 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Graphique simple"
 
-#: include/blocks.inc.php:1318 jsLoader.php:114
+#: include/blocks.inc.php:1320 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Graphiques simples"
 
@@ -12766,7 +12766,7 @@ msgstr "Copie du graphique \"%1$s\" sur l'hôte \"%2$s\" sautée."
 msgid "Slide"
 msgstr "Diapositive"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1382
+#: include/audit.inc.php:45 include/blocks.inc.php:1384
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Diaporama"
@@ -12803,7 +12803,7 @@ msgstr "Diaporama mis à jour"
 msgid "Slide shows"
 msgstr "Diaporamas"
 
-#: include/blocks.inc.php:1457
+#: include/blocks.inc.php:1459
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Diapositives"
@@ -12918,7 +12918,7 @@ msgstr "État"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:813
+#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:816
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -13116,7 +13116,7 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Changer de méthode d'authentification va réinitialiser toutes les sessions sauf celle-ci ! Continuer ?"
 
@@ -13313,7 +13313,7 @@ msgstr "Un modèle avec le même nom visible \"%s\" existe déjà."
 msgid "Templated items"
 msgstr "Éléments en modèle"
 
-#: hosts.php:812 include/menu.inc.php:164
+#: hosts.php:815 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:703
 #: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.massupdate.php:293
@@ -13334,14 +13334,14 @@ msgstr "Les modèles \"%1$s\" sont déliés de l'hôte \"%2$s\"."
 msgid "Tera"
 msgstr "Téra"
 
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/administration.general.regularexpressions.edit.php:81
 #: include/views/configuration.triggers.edit.php:215 tr_testexpr.php:25
 #: tr_testexpr.php:120 tr_testexpr.php:176
 msgid "Test"
 msgstr "Test"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Tester l'authentification"
 
@@ -13440,7 +13440,7 @@ msgstr ""
 msgid "Theme"
 msgstr "Thème"
 
-#: authentication.php:150
+#: authentication.php:171
 #, c-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
@@ -13496,7 +13496,7 @@ msgstr "À"
 #: events.php:501 events.php:510 events.php:577 events.php:590
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
-#: include/actions.inc.php:925 include/blocks.inc.php:909
+#: include/actions.inc.php:925 include/blocks.inc.php:911
 #: include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:43
@@ -13649,7 +13649,7 @@ msgid "Trends"
 msgstr "Tendances"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:477
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -13668,8 +13668,8 @@ msgstr "Déclencheur"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Le déclencheur \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1094
-#: include/classes/import/CConfigurationImport.php:1130
+#: include/classes/import/CConfigurationImport.php:1105
+#: include/classes/import/CConfigurationImport.php:1141
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe pas."
@@ -13680,7 +13680,7 @@ msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe 
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Déclencheur \"%1$s\" sauté - règle utilisateur."
 
-#: api/classes/CTrigger.php:1627
+#: api/classes/CTrigger.php:1624
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Le déclencheur \"%s\" appartient à des modèles avec des liens différents."
@@ -13689,7 +13689,7 @@ msgstr "Le déclencheur \"%s\" appartient à des modèles avec des liens différ
 msgid "Trigger added"
 msgstr "Déclencheur ajouté"
 
-#: api/classes/CTrigger.php:1531
+#: api/classes/CTrigger.php:1528
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -13738,7 +13738,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr "Condition de l'expression du déclencheur"
 
-#: api/classes/CTrigger.php:695 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "L'expression du déclencheur doit contenir au moins une référence hôte:clé."
 
@@ -13848,7 +13848,7 @@ msgstr "Déclencheur mis à jour"
 msgid "Trigger value"
 msgstr "Valeur du déclencheur"
 
-#: hosts.php:807 hosts.php:899 include/forms.inc.php:593
+#: hosts.php:810 hosts.php:902 include/forms.inc.php:593
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
 #: include/triggers.inc.php:1262
 #: include/views/configuration.action.list.php:33
@@ -13927,7 +13927,7 @@ msgstr "Turc (tr_TR)"
 msgid "Two elements should be selected"
 msgstr "Deux éléments doivent être sélectionnés"
 
-#: api/classes/CItem.php:1020
+#: api/classes/CItem.php:1021
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Deux éléments (\"%1$s\" et \"%2$s\") ne peuvent pas remplir un champ d'inventaire d'hôte \"%3$s\", cela mènerait à un conflit."
@@ -13993,11 +13993,11 @@ msgstr "Type de calcul"
 msgid "Type of information"
 msgstr "Type d'information"
 
-#: api/classes/CItemGeneral.php:313
+#: api/classes/CItemGeneral.php:319
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Le type d'information doit être \"Journal\" pour une clé journal."
 
-#: api/classes/CItemGeneral.php:308
+#: api/classes/CItemGeneral.php:314
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Le type d'information doit être \"Numérique (flottant)\" pour les éléments agrégés."
 
@@ -14110,14 +14110,14 @@ msgid "Units"
 msgstr "Unités"
 
 #: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:948 httpdetails.php:163 httpmon.php:156
+#: events.php:539 hosts.php:951 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
 #: include/actions.inc.php:201 include/actions.inc.php:209
 #: include/actions.inc.php:223 include/actions.inc.php:234
 #: include/actions.inc.php:265 include/actions.inc.php:654
-#: include/actions.inc.php:1167 include/blocks.inc.php:1092
+#: include/actions.inc.php:1167 include/blocks.inc.php:1094
 #: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:132
 #: include/discovery.inc.php:169 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
@@ -14268,7 +14268,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/blocks.inc.php:1179
+#: include/blocks.inc.php:1181
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Fonctionne"
@@ -14314,8 +14314,8 @@ msgid "Updated status of host"
 msgstr "État de l'hôte mis à jour"
 
 #: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1037
-#: include/blocks.inc.php:1136 include/blocks.inc.php:1194
+#: include/blocks.inc.php:786 include/blocks.inc.php:1039
+#: include/blocks.inc.php:1138 include/blocks.inc.php:1196
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14326,7 +14326,7 @@ msgstr "Mis à jour : %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "Mise à jour : Application \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CDiscoveryRule.php:643
+#: api/classes/CDiscoveryRule.php:644
 #, c-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Mise à jour : Règle de découverte \"%1$s\" sur \"%2$s\"."
@@ -14336,17 +14336,17 @@ msgstr "Mise à jour : Règle de découverte \"%1$s\" sur \"%2$s\"."
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:643
+#: api/classes/CItem.php:644
 #, c-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Mis à jour : Élément \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CItemPrototype.php:459
+#: api/classes/CItemPrototype.php:460
 #, c-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Mis à jour : Prototype d'élément \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/CTrigger.php:1280
+#: api/classes/CTrigger.php:1277
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Mis à jour : Déclencheur \"%1$s\" sur \"%2$s\"."
@@ -14356,7 +14356,7 @@ msgstr "Mis à jour : Déclencheur \"%1$s\" sur \"%2$s\"."
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Mis à jour : Prototype de déclencheur \"%1$s\" sur \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:249
+#: api/classes/managers/CHttpTestManager.php:263
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -14503,7 +14503,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
 
@@ -14528,7 +14528,8 @@ msgstr "Nom d'utilisateur"
 msgid "User name does not match with DB"
 msgstr "Le nom d'utilisateur ne correspond pas avec la base de données"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Mot de passe de l'utilisateur"
 
@@ -14765,7 +14766,7 @@ msgstr ""
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/blocks.inc.php:728 include/classes/graphdraw/CPieGraphDraw.php:326
+#: include/blocks.inc.php:728 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
 #: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
@@ -14866,7 +14867,7 @@ msgstr "La table de correspondance doit avoir au moins une correspondance."
 msgid "Value of any performance counter, where \"counter\" parameter is the counter path and \"interval\" parameter is a number of last seconds, for which the agent returns an average value."
 msgstr ""
 
-#: include/classes/graphdraw/CPieGraphDraw.php:341
+#: include/classes/graphdraw/CPieGraphDraw.php:342
 #, c-format
 msgid "Value: no data"
 msgstr "Valeur : pas de donnée"
@@ -14940,7 +14941,7 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Nous sommes désolés, le nombre maximal d'éléments à mémoriser a été atteint."
 
-#: hosts.php:810 hosts.php:905 include/menu.inc.php:42
+#: hosts.php:813 hosts.php:908 include/menu.inc.php:42
 #: include/views/inventory.host.view.php:206
 #: include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:240 search.php:139 search.php:145
@@ -14954,8 +14955,8 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Supervision Web"
 
-#: api/classes/managers/CHttpTestManager.php:368
-#: api/classes/managers/CHttpTestManager.php:376
+#: api/classes/managers/CHttpTestManager.php:382
+#: api/classes/managers/CHttpTestManager.php:390
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
@@ -15321,7 +15322,7 @@ msgstr "Vous n'avez pas spécifié les cibles pour la commande d'opération d'ac
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Vous n'avez pas spécifié les cibles pour le script global d'opération de l'action \"%s\"."
 
-#: api/classes/CGraph.php:556 api/classes/CGraphPrototype.php:574
+#: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
 #: api/classes/CHost.php:1385 api/classes/CHttpTest.php:504
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
@@ -15417,7 +15418,7 @@ msgstr "Zabbix a reçu une requête incorrecte."
 msgid "Zabbix internal"
 msgstr "Zabbix interne"
 
-#: authentication.php:184
+#: authentication.php:216
 msgid "Zabbix internal authentication"
 msgstr "Authentification Zabbix interne"
 
@@ -15505,7 +15506,7 @@ msgid "agent"
 msgstr "agent"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1824
+#: include/classes/graphdraw/CLineGraphDraw.php:1825
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15556,9 +15557,9 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1828
-#: include/classes/graphdraw/CPieGraphDraw.php:319 include/graphs.inc.php:95
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
+#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
 msgid "avg"
@@ -15583,7 +15584,7 @@ msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
 #: acknow.php:210 events.php:269 httpdetails.php:116 httpmon.php:140
-#: include/acknow.inc.php:54 include/blocks.inc.php:1013
+#: include/acknow.inc.php:54 include/blocks.inc.php:1015
 #: include/classes/screens/CScreenEvents.php:58
 #: include/classes/screens/CScreenPlainText.php:97 include/events.inc.php:183
 #: include/events.inc.php:256 include/events.inc.php:309
@@ -15602,14 +15603,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1346
-#: include/classes/graphdraw/CLineGraphDraw.php:1399
+#: include/classes/graphdraw/CLineGraphDraw.php:1347
+#: include/classes/graphdraw/CLineGraphDraw.php:1400
 msgid "d.m"
 msgstr "d/m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1368
-#: include/classes/graphdraw/CLineGraphDraw.php:1383
-#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1384
+#: include/classes/graphdraw/CLineGraphDraw.php:1403
 msgid "d.m H:i"
 msgstr "d/m H:i"
 
@@ -15717,6 +15718,11 @@ msgstr "image"
 msgid "in"
 msgstr "dans"
 
+#: api/classes/CItemKey.php:76
+#, c-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr ""
+
 #: include/events.inc.php:37
 msgctxt "event source"
 msgid "internal"
@@ -15730,13 +15736,17 @@ msgstr "est"
 msgid "item"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1804
-#: include/classes/graphdraw/CPieGraphDraw.php:314 include/graphs.inc.php:92
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr ""
+
+#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "dernier"
 
-#: hosts.php:770 hosts.php:771 hosts.php:772 include/actions.inc.php:29
+#: hosts.php:773 hosts.php:774 hosts.php:775 include/actions.inc.php:29
 #: include/forms.inc.php:472 include/forms.inc.php:479
 #: include/forms.inc.php:486 include/forms.inc.php:493
 #: include/forms.inc.php:602 include/forms.inc.php:617
@@ -15770,17 +15780,17 @@ msgstr "maintenance"
 msgid "map"
 msgstr "carte"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1821
-#: include/classes/graphdraw/CPieGraphDraw.php:310 include/graphs.inc.php:90
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
-#: include/classes/graphdraw/CLineGraphDraw.php:1818
-#: include/classes/graphdraw/CPieGraphDraw.php:306 include/graphs.inc.php:88
+#: include/classes/graphdraw/CLineGraphDraw.php:1806
+#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
 msgid "min"
@@ -15801,7 +15811,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "doit être un utilisateur LDAP correct"
 
@@ -15809,8 +15819,8 @@ msgstr "doit être un utilisateur LDAP correct"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1899
-#: include/classes/graphdraw/CPieGraphDraw.php:342
+#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
 msgstr "pas de donnée"
@@ -15961,6 +15971,10 @@ msgstr "déclencheur"
 
 #: include/classes/class.cmultiselect.php:53 jsLoader.php:194
 msgid "type here to search"
+msgstr ""
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
 msgstr ""
 
 #: include/classes/class.frontendsetup.php:199

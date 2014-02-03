@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ abstract class CItemGeneral extends CZBXAPI {
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	const ERROR_EXISTS = 'exists';
 	const ERROR_NO_INTERFACE = 'noInterface';
+	const ERROR_INVALID_KEY = 'invalidKey';
 
 	protected $fieldRules;
 
@@ -96,8 +97,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		);
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_EXISTS_TEMPLATE => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s"'),
 			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
 		));
 	}
@@ -286,7 +285,14 @@ abstract class CItemGeneral extends CZBXAPI {
 			// key
 			$itemKey = new CItemKey($fullItem['key_']);
 			if (!$itemKey->isValid()) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), array(
+						$fullItem['key_'],
+						$fullItem['name'],
+						$host['name'],
+						$itemKey->getError()
+					))
+				);
 			}
 
 			// parameters
@@ -315,8 +321,8 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				$res = calculateItemNextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
-				if ($res['delay'] == SEC_PER_YEAR) {
+				$res = calculateItemNextcheck(0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
+				if ($res == ZBX_JAN_2038) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Item will not be refreshed. Please enter a correct update interval.'));
 				}
@@ -691,7 +697,7 @@ abstract class CItemGeneral extends CZBXAPI {
 						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
+							_params($this->getErrorMsg(self::ERROR_EXISTS), array($parentItem['key_'], $host['host']))
 						);
 					}
 				}
@@ -704,7 +710,10 @@ abstract class CItemGeneral extends CZBXAPI {
 
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
+							_params($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), array(
+								$parentItem['key_'],
+								$host['host']
+							))
 						);
 					}
 				}
@@ -721,7 +730,10 @@ abstract class CItemGeneral extends CZBXAPI {
 					elseif ($interface !== false) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_s($this->getErrorMsg(self::ERROR_NO_INTERFACE), $host['host'], $parentItem['key_'])
+							_params($this->getErrorMsg(self::ERROR_NO_INTERFACE), array(
+								$host['host'],
+								$parentItem['key_']
+							))
 						);
 					}
 				}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
+		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
@@ -286,8 +287,8 @@ class CPieGraphDraw extends CGraphDraw {
 		$max_name_len = 0;
 
 		for ($i = 0; $i < $this->num; $i++) {
-			if (zbx_strlen($this->items[$i]['host']) > $max_host_len) {
-				$max_host_len = zbx_strlen($this->items[$i]['host']);
+			if (zbx_strlen($this->items[$i]['hostname']) > $max_host_len) {
+				$max_host_len = zbx_strlen($this->items[$i]['hostname']);
 			}
 			if (zbx_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
 				$max_name_len = zbx_strlen($this->items[$i]['name_expanded']);
@@ -332,7 +333,7 @@ class CPieGraphDraw extends CGraphDraw {
 				);
 
 				$str = sprintf('%s: %s [%s] ',
-					str_pad($this->items[$i]['host'], $max_host_len, ' '),
+					str_pad($this->items[$i]['hostname'], $max_host_len, ' '),
 					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' '),
 					$fncRealName
 				);
@@ -340,7 +341,7 @@ class CPieGraphDraw extends CGraphDraw {
 			else {
 				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
-					str_pad($this->items[$i]['host'], $max_host_len, ' '),
+					str_pad($this->items[$i]['hostname'], $max_host_len, ' '),
 					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' ')
 				);
 			}

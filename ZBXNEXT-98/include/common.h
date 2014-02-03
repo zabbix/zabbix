@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,10 +143,10 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
-#define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
-#define ZBX_FLAG_DISCOVERY_RULE		0x01	/* low-level discovery rule */
-#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02	/* low-level discovery host, item, trigger or graph prototypes */
-#define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00
+#define ZBX_FLAG_DISCOVERY_RULE		0x01
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
+#define ZBX_FLAG_DISCOVERY_CREATED	0x04
 
 typedef enum
 {
@@ -271,10 +271,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_STORE_AS_IS			0
 #define ITEM_STORE_SPEED_PER_SECOND		1
 #define ITEM_STORE_SIMPLE_CHANGE		2
-
-/* object types for operations */
-#define OPERATION_OBJECT_USER			0
-#define OPERATION_OBJECT_GROUP			1
 
 /* condition evaluation types */
 #define ACTION_EVAL_TYPE_AND_OR			0
@@ -852,8 +848,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
-int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now, int *effective_delay);
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
@@ -886,6 +881,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK		(7 * SEC_PER_DAY)
 #define SEC_PER_MONTH		(30 * SEC_PER_DAY)
 #define SEC_PER_YEAR		(365 * SEC_PER_DAY)
+#define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
@@ -954,6 +950,7 @@ int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *par
 int	is_ip6(const char *ip);
 #endif
 int	is_ip4(const char *ip);
+int	is_ip(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
 
