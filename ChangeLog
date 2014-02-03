@@ -775,6 +775,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7703] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
