@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:24+0200\n"
-"PO-Revision-Date: 2014-01-14 15:37+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-28 13:29+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1389706664.0\n"
+"X-POOTLE-MTIME: 1390908544.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1252,7 +1252,7 @@ msgstr "Impossibile aggiungere mappa dei valori"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Impossibile modificare l'autenticazione"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1703,6 +1703,10 @@ msgstr "Impossibile inserire supporto utente."
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Impossibile collegare template"
+
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -2536,7 +2540,7 @@ msgstr "Copia"
 msgid "Copy selected to ..."
 msgstr "Copia selezionati su ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login corretto \"%s\"."
@@ -6843,7 +6847,7 @@ msgstr "Autenticazione LDAP"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Modificata autenticazione LDAP"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7174,14 +7178,19 @@ msgstr "Accedi"
 msgid "Login as Guest"
 msgstr "Accedi come Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login fallito \"%s\"."
 
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nome login o password non corretta!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -8414,7 +8423,7 @@ msgstr "Nessun permesso per la mappa \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Nessun permesso per la schermata \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Nessun permesso per l'accesso al sistema."
 
@@ -10913,7 +10922,7 @@ msgstr "Servizi"
 msgid "Services form a circular dependency."
 msgstr "I servizi formano una dipendenza circolare."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sessione terminata, rieffettua il login, per favore."
 
@@ -13633,7 +13642,7 @@ msgstr "in"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "Sintassi non corretta in \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13641,7 +13650,7 @@ msgstr "è"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "La key non e' definita"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13869,7 +13878,7 @@ msgstr "trigger"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "unexpected end of key"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

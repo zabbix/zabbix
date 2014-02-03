@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
-"PO-Revision-Date: 2013-12-02 21:08+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-28 11:00+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386011322.0\n"
+"X-POOTLE-MTIME: 1390899606.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1100,7 +1100,7 @@ msgstr "Nie je možné pripojiť šablónu"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr "Nie je možné odstrániť skupinu"
+msgstr "Nie je možné zmazať skupinu"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
@@ -1258,7 +1258,7 @@ msgstr "Nie je možné pridať mapu hodnôt"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Nie je možné zmeniť autentifikáciu"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1714,6 +1714,10 @@ msgstr "Nie je možné vložiť médium používateľa."
 msgid "Cannot link template"
 msgstr "Nie je možné nalinkovať šablónu"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
@@ -1756,7 +1760,7 @@ msgstr "Nie je možné vykonať update príkaz nad tabuľkou \"%1$s\" bez where 
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr "Nie je možné odstrániť makro."
+msgstr "Nie je možné zmazať makro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
@@ -2546,7 +2550,7 @@ msgstr "Kopírovať"
 msgid "Copy selected to ..."
 msgstr "Kopírovať označené do ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Správny login \"%s\"."
@@ -6855,7 +6859,7 @@ msgstr "LDAP autentifikácia"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP autentifikácia zmenená"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7187,14 +7191,19 @@ msgstr "Prihlásiť"
 msgid "Login as Guest"
 msgstr "Prihlásiť ako Hosť"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Prihlásenie zlyhalo \"%s\"."
 
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nesprávne prihlasovacie meno alebo heslo!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -8430,7 +8439,7 @@ msgstr "Žiadne oprávnenia pre mapu \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Žiadne oprávnenia pre obrazovku \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
@@ -9944,11 +9953,11 @@ msgstr "Vzdialený príkaz"
 #: include/views/js/configuration.sysmaps.js.php:420
 #: include/views/js/configuration.sysmaps.js.php:429
 msgid "Remove"
-msgstr "Odstrániť"
+msgstr "Zmazať"
 
 #: sysmap.php:146
 msgid "Remove element"
-msgstr "Odstrániť element"
+msgstr "Zmazať element"
 
 #: slides.php:76
 msgid "Remove from"
@@ -9973,11 +9982,11 @@ msgstr "Zmazať host"
 
 #: sysmap.php:152
 msgid "Remove link"
-msgstr "Odstrániť linku"
+msgstr "Zmazať linku"
 
 #: include/views/monitoring.history.php:98
 msgid "Remove selected"
-msgstr "Odstrániť označené"
+msgstr "Zmazať označené"
 
 #: include/views/configuration.host.massupdate.php:115
 #: include/views/configuration.triggers.edit.php:118
@@ -10930,7 +10939,7 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -12250,7 +12259,7 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/nodes.inc.php:320
 msgid "Unable to remove local node."
-msgstr "Nie je možné odstrániť lokálny uzol."
+msgstr "Nie je možné zmazať lokálny uzol."
 
 #: include/profiles.inc.php:228
 msgid "Unable to select configuration."
@@ -13655,7 +13664,7 @@ msgstr "v"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "nesprávna syntax pri \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13663,7 +13672,7 @@ msgstr "je"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "kľúč je prázdny"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13891,7 +13900,7 @@ msgstr "spúšťač"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "neočakávaný koniec kľúča"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

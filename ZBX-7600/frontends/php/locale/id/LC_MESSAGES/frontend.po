@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 01:48+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -1693,6 +1693,10 @@ msgstr "Tidak bisa memasukkan media pengguna."
 msgid "Cannot link template"
 msgstr "Tidak dapat menghubungkan template"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Tidak bisa logout."
@@ -2524,7 +2528,7 @@ msgstr "Salin"
 msgid "Copy selected to ..."
 msgstr "Salin yang dipilih ke ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login yang bernar \"%s\"."
@@ -7160,10 +7164,15 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login sebagai Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login gagal \"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8397,7 +8406,7 @@ msgstr "Tidak ada izin untuk peta \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Tidak ada izin untuk layar \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Tidak ada izin untuk akses sistem."
 
@@ -10895,7 +10904,7 @@ msgstr "Service"
 msgid "Services form a circular dependency."
 msgstr "Form service dependensi melingkar."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sesi dimatikan, mohon login kembali."
 

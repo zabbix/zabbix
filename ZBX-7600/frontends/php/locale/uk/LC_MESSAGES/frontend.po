@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 02:24+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-11-05 16:28+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1722,6 +1722,10 @@ msgstr "Не вдалось вставити метод повідомлення
 msgid "Cannot link template"
 msgstr "Не вдалося приєднати шаблон"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
@@ -2554,7 +2558,7 @@ msgstr "Копіювати"
 msgid "Copy selected to ..."
 msgstr "Копіювати вибране в ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Коректний вхід \"%s\"."
@@ -7196,10 +7200,15 @@ msgstr "Вхід в систему"
 msgid "Login as Guest"
 msgstr "Увійти як Гість"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Помилка входу \"%s\"."
+
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -8442,7 +8451,7 @@ msgstr "Немає прав доступу до карти мережі \"%1$s\"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Немає прав доступу до комплексного екрану \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
@@ -10943,7 +10952,7 @@ msgstr "Послуги"
 msgid "Services form a circular dependency."
 msgstr "Послуги утворюють кільцеву залежність."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Сесія завершилась, будь-ласка повторно увійдіть в систему."
 
