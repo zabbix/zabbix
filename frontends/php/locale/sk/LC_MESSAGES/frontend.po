@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-02 01:37+0200\n"
+"POT-Creation-Date: 2014-02-03 16:26+0200\n"
 "PO-Revision-Date: 2014-01-28 10:57+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -30,7 +30,7 @@ msgstr "\"Ukáž OK spúšťače\" musí byť nastavené na \"0\" alebo akékoľ
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"Blikanie spúšťača pri zmene stavu\" musí byť \"0\" alebo kladné celé číslo."
 
-#: include/func.inc.php:459
+#: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -235,7 +235,7 @@ msgstr "Akceptovateľná SLA"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: include/func.inc.php:2082
+#: include/func.inc.php:2088
 msgid "Access denied."
 msgstr "Prístup zamietnutý."
 
@@ -684,12 +684,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "Budúca"
 
-#: include/func.inc.php:246
+#: include/func.inc.php:252
 msgid "Apr"
 msgstr "Apr"
 
 #: include/forms.inc.php:1695 include/func.inc.php:132
-#: include/func.inc.php:263 jsLoader.php:121
+#: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "Apríl"
 
@@ -794,12 +794,12 @@ msgstr "Perióda uloženia audit údajov (v dňoch) \"%1$s\"."
 msgid "Audit logs"
 msgstr "Logy auditu"
 
-#: include/func.inc.php:250
+#: include/func.inc.php:256
 msgid "Aug"
 msgstr "Aug"
 
 #: include/forms.inc.php:1687 include/func.inc.php:136
-#: include/func.inc.php:267 jsLoader.php:125
+#: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "August"
 
@@ -925,7 +925,7 @@ msgstr "Priemerná hodnota za čas T NIE JE N"
 msgid "Axis side"
 msgstr "Umiestnenie osi"
 
-#: include/func.inc.php:427
+#: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
 msgstr "B"
@@ -3600,7 +3600,7 @@ msgstr "Dátový typ"
 msgid "Database file"
 msgstr "Databázový súbor"
 
-#: include/setup.inc.php:283 setup.php:38
+#: include/setup.inc.php:283
 msgid "Database host"
 msgstr "Databázový server"
 
@@ -3720,12 +3720,12 @@ msgstr "Ladiaci režim"
 msgid "Debug mode updated"
 msgstr "Ladiaci režim aktualizovaný"
 
-#: include/func.inc.php:254
+#: include/func.inc.php:260
 msgid "Dec"
 msgstr "Dec"
 
 #: include/forms.inc.php:1707 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:129
+#: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "December"
 
@@ -4211,7 +4211,7 @@ msgid "Description"
 msgstr "Poznámka"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2202
+#: include/func.inc.php:2208
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4544,7 +4544,7 @@ msgstr "Stav zisťovania"
 msgid "Display OK triggers for"
 msgstr "Zobrazovať spúšťače v stave OK po dobu"
 
-#: include/func.inc.php:1886
+#: include/func.inc.php:1892
 msgid "Displaying"
 msgstr "Zobrazujem"
 
@@ -4691,12 +4691,12 @@ msgstr "Holandsky (nl_NL)"
 msgid "Dynamic item"
 msgstr "Dynamická položka"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2169
+#: include/func.inc.php:2175
 msgid "ERROR"
 msgstr "CHYBA"
 
@@ -5070,7 +5070,7 @@ msgstr "Každý deň(dni)"
 msgid "Every week(s)"
 msgstr "Každý týždeň(e)"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgid "Exa"
 msgstr "Exa"
 
@@ -5234,12 +5234,12 @@ msgstr "Obľúbené obrazovky"
 msgid "Favourites"
 msgstr "Obľúbené"
 
-#: include/func.inc.php:244
+#: include/func.inc.php:250
 msgid "Feb"
 msgstr "Feb"
 
 #: include/forms.inc.php:1685 include/func.inc.php:130
-#: include/func.inc.php:261 jsLoader.php:119
+#: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "Február"
 
@@ -5377,7 +5377,7 @@ msgstr "Fínsky (fi_FI)"
 msgid "First"
 msgstr "Prvý"
 
-#: include/func.inc.php:1831
+#: include/func.inc.php:1837
 msgctxt "page navigation"
 msgid "First"
 msgstr "Prvá"
@@ -5412,12 +5412,12 @@ msgstr "Štvrtý"
 msgid "French (fr_FR)"
 msgstr "Francúzsky (fr_FR)"
 
-#: include/func.inc.php:224
+#: include/func.inc.php:230
 msgid "Fri"
 msgstr "Pi"
 
 #: include/forms.inc.php:1670 include/forms.inc.php:1738
-#: include/func.inc.php:152 include/func.inc.php:236
+#: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Piatok"
 
@@ -5460,7 +5460,7 @@ msgstr "Celá obrazovka"
 msgid "Function"
 msgstr "Funkcia"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgctxt "Giga short"
 msgid "G"
 msgstr "G"
@@ -5526,7 +5526,7 @@ msgstr "Získať podporu"
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr "Získať čas načítania úplnej web stránky. Predvolená cesta je /"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgid "Giga"
 msgstr "Giga"
 
@@ -5576,7 +5576,7 @@ msgstr "Vykonať"
 msgid "Go to"
 msgstr "Choď na"
 
-#: include/func.inc.php:2100
+#: include/func.inc.php:2106
 msgid "Go to dashboard"
 msgstr "Choď na konzolu"
 
@@ -6722,7 +6722,7 @@ msgstr "Ikony"
 msgid "Identical expression already exists"
 msgstr "Identický výraz už existuje"
 
-#: include/func.inc.php:2090 include/func.inc.php:2110
+#: include/func.inc.php:2096 include/func.inc.php:2116
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Pokiaľ si myslíte, že táto správa je zlá, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
 
@@ -7449,7 +7449,7 @@ msgstr "Neplatný výraz spúšťača. Elementy výrazu spúšťača by nemali p
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "Neplatná funkcia spúšťača \"%1$s\" pre výraz."
 
-#: include/func.inc.php:1176
+#: include/func.inc.php:1182
 msgid "Incorrect type of asort_by_key."
 msgstr "Neplatný typ asort_by_key."
 
@@ -8050,12 +8050,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "Jabber účet"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:249
 msgid "Jan"
 msgstr "Jan"
 
 #: include/forms.inc.php:1680 include/func.inc.php:129
-#: include/func.inc.php:260 jsLoader.php:118
+#: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "Január"
 
@@ -8063,25 +8063,25 @@ msgstr "Január"
 msgid "Japanese (ja_JP)"
 msgstr "Japonsky (ja_JP)"
 
-#: include/func.inc.php:249
+#: include/func.inc.php:255
 msgid "Jul"
 msgstr "Júl"
 
 #: include/forms.inc.php:1682 include/func.inc.php:135
-#: include/func.inc.php:266 jsLoader.php:124
+#: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "Júl"
 
-#: include/func.inc.php:248
+#: include/func.inc.php:254
 msgid "Jun"
 msgstr "Jún"
 
 #: include/forms.inc.php:1705 include/func.inc.php:134
-#: include/func.inc.php:265 jsLoader.php:123
+#: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "Jún"
 
-#: include/func.inc.php:434 include/func.inc.php:670
+#: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
 msgid "K"
 msgstr "K"
@@ -8114,7 +8114,7 @@ msgstr "Fráza kľúča"
 msgid "Keyword"
 msgstr "Kľúčové slovo"
 
-#: include/func.inc.php:670
+#: include/func.inc.php:676
 msgid "Kilo"
 msgstr "Kilo"
 
@@ -8182,7 +8182,7 @@ msgstr "Jazyk"
 msgid "Last"
 msgstr "Posledný"
 
-#: include/func.inc.php:1871
+#: include/func.inc.php:1877
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Posledná"
@@ -8473,7 +8473,7 @@ msgstr "Logovať aj nenastavené SNMP trapy"
 msgid "Logged in as"
 msgstr "Prihlásený ako"
 
-#: auditlogs.php:143 include/func.inc.php:2096 include/func.inc.php:2113
+#: auditlogs.php:143 include/func.inc.php:2102 include/func.inc.php:2119
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8527,7 +8527,7 @@ msgstr "Nízko úrovňové zisťovacie pravidlo v \"normal\" stave"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Nízko úrovňové zisťovacie pravidlo v \"not supported\" stave"
 
-#: include/func.inc.php:430 include/func.inc.php:671
+#: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
 msgid "M"
 msgstr "M"
@@ -8768,12 +8768,12 @@ msgstr "Mapovanie"
 msgid "Maps"
 msgstr "Mapy"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:251
 msgid "Mar"
 msgstr "Mar"
 
 #: include/forms.inc.php:1690 include/func.inc.php:131
-#: include/func.inc.php:262 jsLoader.php:120
+#: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "Marec"
 
@@ -8833,7 +8833,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maximálny počet zobrazovaných udalostí spúšťača"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Maximize"
 msgstr "Maximalizovať"
 
@@ -8909,11 +8909,11 @@ msgstr[1] "Maximálna zobrazovaná dĺžka mena hostu je %1$d znakov, \"%2$s\" m
 msgstr[2] "Maximálna zobrazovaná dĺžka mena hostu je %1$d znakov, \"%2$s\" má %3$d znakov."
 
 #: include/forms.inc.php:1700 include/func.inc.php:133
-#: include/func.inc.php:264 jsLoader.php:122
+#: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "Máj"
 
-#: include/func.inc.php:247
+#: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
 msgstr "Máj"
@@ -8969,7 +8969,7 @@ msgstr "Typy médií"
 msgid "Media types used by action \"%s\"."
 msgstr "Typy médií používané akciou \"%s\"."
 
-#: include/func.inc.php:671
+#: include/func.inc.php:677
 msgid "Mega"
 msgstr "Mega"
 
@@ -9037,7 +9037,7 @@ msgid "Middle"
 msgstr "Stred"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Minimize"
 msgstr "Minimimalizovať"
 
@@ -9171,12 +9171,12 @@ msgstr "Režim"
 msgid "Model"
 msgstr "Model"
 
-#: include/func.inc.php:220
+#: include/func.inc.php:226
 msgid "Mon"
 msgstr "Po"
 
 #: include/forms.inc.php:1666 include/forms.inc.php:1734
-#: include/func.inc.php:148 include/func.inc.php:232
+#: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Pondelok"
 
@@ -9397,7 +9397,7 @@ msgstr "Sieťová mapa bola aktualizovaná"
 msgid "Network maps"
 msgstr "Sieťové mapy"
 
-#: httpmon.php:155 include/func.inc.php:214
+#: httpmon.php:155 include/func.inc.php:220
 msgid "Never"
 msgstr "Nikdy"
 
@@ -9461,13 +9461,13 @@ msgstr "Nový čas služby"
 msgid "Next"
 msgstr "Nasledujúce"
 
-#: include/func.inc.php:1864
+#: include/func.inc.php:1870
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Nasledujúce"
 
 #: events.php:763 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2423 include/triggers.inc.php:1646
+#: include/func.inc.php:2429 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9972,7 +9972,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
 #: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
-#: include/func.inc.php:2070
+#: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -10281,12 +10281,12 @@ msgstr "Report hlásení"
 msgid "Notifications"
 msgstr "Hlásenia"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:259
 msgid "Nov"
 msgstr "Nov"
 
 #: include/forms.inc.php:1702 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:128
+#: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "November"
 
@@ -10513,7 +10513,7 @@ msgstr "OSTATNÉ KONFIGURAČNÉ PARAMETRE"
 msgid "OVERVIEW"
 msgstr "PREHĽAD"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:258
 msgid "Oct"
 msgstr "Okt"
 
@@ -10522,7 +10522,7 @@ msgid "Octal"
 msgstr "Osmičkový"
 
 #: include/forms.inc.php:1697 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:127
+#: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "Október"
 
@@ -10820,7 +10820,7 @@ msgstr "Prehľad"
 msgid "Overview by proxy"
 msgstr "Prehľad podľa proxy"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgctxt "Peta short"
 msgid "P"
 msgstr "P"
@@ -11133,7 +11133,7 @@ msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k 
 msgid "Persian (fa_IR)"
 msgstr "Persky (fa_IR)"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgid "Peta"
 msgstr "Peta"
 
@@ -11237,7 +11237,7 @@ msgstr "Náhľad"
 msgid "Previous"
 msgstr "Predchádzajúce"
 
-#: include/func.inc.php:1837
+#: include/func.inc.php:1843
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Predchádzajúca"
@@ -11497,11 +11497,11 @@ msgstr "Predmet správy po zotavení"
 msgid "Refresh (in seconds)"
 msgstr "Obnoviť (v sekundách)"
 
-#: include/func.inc.php:1945
+#: include/func.inc.php:1951
 msgid "Refresh time in seconds"
 msgstr "Obnovovací čas v sekundách"
 
-#: include/func.inc.php:1949
+#: include/func.inc.php:1955
 msgid "Refresh time multiplier"
 msgstr "Násobok obnovovacieho času"
 
@@ -12104,12 +12104,12 @@ msgstr "STAV ZABBIXU"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:225
+#: include/func.inc.php:231
 msgid "Sat"
 msgstr "So"
 
 #: include/forms.inc.php:1671 include/forms.inc.php:1739
-#: include/func.inc.php:153 include/func.inc.php:237
+#: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Sobota"
 
@@ -12517,7 +12517,7 @@ msgstr "Poslať používateľom"
 msgid "Sent"
 msgstr "Poslať"
 
-#: include/func.inc.php:251
+#: include/func.inc.php:257
 msgid "Sep"
 msgstr "Sep"
 
@@ -12527,7 +12527,7 @@ msgid "Separated"
 msgstr "Oddelene"
 
 #: include/forms.inc.php:1692 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:126
+#: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "September"
 
@@ -13136,12 +13136,12 @@ msgstr "Súčet hodnôt v periode T je > N"
 msgid "Sum of values of a period T is NOT N"
 msgstr "Súčet hodnôt v periode T NIE JE N"
 
-#: include/func.inc.php:219
+#: include/func.inc.php:225
 msgid "Sun"
 msgstr "Ne"
 
 #: include/forms.inc.php:1672 include/forms.inc.php:1740
-#: include/func.inc.php:155 include/func.inc.php:231
+#: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Nedeľa"
 
@@ -13199,7 +13199,7 @@ msgstr "Stav systému"
 msgid "System uptime in seconds."
 msgstr "Systémový čas prevádzky v sekundách."
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgctxt "Tera short"
 msgid "T"
 msgstr "T"
@@ -13387,7 +13387,7 @@ msgstr "Šablóny"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Šablóny \"%1$s\" odpojené od hostov \"%2$s\"."
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgid "Tera"
 msgstr "Tera"
 
@@ -13536,12 +13536,12 @@ msgstr "Tento týždeň"
 msgid "This year"
 msgstr "Tento rok"
 
-#: include/func.inc.php:223
+#: include/func.inc.php:229
 msgid "Thu"
 msgstr "Št"
 
 #: include/forms.inc.php:1669 include/forms.inc.php:1737
-#: include/func.inc.php:151 include/func.inc.php:235
+#: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Štvrtok"
 
@@ -13974,12 +13974,12 @@ msgstr "Skrátené"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "Pokus o čítanie nedostupnej vlastnosti \"%s\"."
 
-#: include/func.inc.php:221
+#: include/func.inc.php:227
 msgid "Tue"
 msgstr "Ut"
 
 #: include/forms.inc.php:1667 include/forms.inc.php:1735
-#: include/func.inc.php:149 include/func.inc.php:233
+#: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Utorok"
 
@@ -14123,7 +14123,7 @@ msgstr "USA (160 znakov)"
 msgid "USER PROFILE"
 msgstr "POUŽÍVATEĽSKÝ PROFIL"
 
-#: include/func.inc.php:2605
+#: include/func.inc.php:2611
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15075,12 +15075,12 @@ msgstr "Číslo kroku web scenára nemôže byť menšie ako 1."
 msgid "Web scenarios"
 msgstr "Web scenáre"
 
-#: include/func.inc.php:222
+#: include/func.inc.php:228
 msgid "Wed"
 msgstr "St"
 
 #: include/forms.inc.php:1668 include/forms.inc.php:1736
-#: include/func.inc.php:150 include/func.inc.php:234
+#: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Streda"
 
@@ -15277,7 +15277,7 @@ msgstr "XML súbor obsahuje varovania %1$s:"
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgctxt "Yotta short"
 msgid "Y"
 msgstr "Y"
@@ -15327,7 +15327,7 @@ msgstr "d.m.Y"
 msgid "Y.m.d H:i"
 msgstr "d.m.Y H:i"
 
-#: include/func.inc.php:598 include/translateDefines.inc.php:47
+#: include/func.inc.php:604 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "d.m.Y H:i:s"
 
@@ -15343,14 +15343,14 @@ msgstr "Ročne"
 
 #: events.php:763 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2423
+#: include/events.inc.php:383 include/func.inc.php:2429
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "Áno"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -15363,7 +15363,7 @@ msgstr "Nemôžete si vybrať niektoré jazyky pretože locales pre ne nie sú n
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Nie je Vám dovolené meniť privilégiá pre používateľa \"%s\"."
 
-#: include/func.inc.php:2106
+#: include/func.inc.php:2112
 msgid "You are not logged in."
 msgstr "Nie ste prihlásený."
 
@@ -15414,15 +15414,15 @@ msgstr "Nemáte oprávnenia na aktualizáciu iných používateľov."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Nemáte oprávnenia na aktulizáciu používateľa alebo používateľ neexistuje."
 
-#: include/func.inc.php:2088
+#: include/func.inc.php:2094
 msgid "You have no permissions to access this page."
 msgstr "Nemáte oprávnenia k prístupu k tejto stránke."
 
-#: include/func.inc.php:2108
+#: include/func.inc.php:2114
 msgid "You must login to view this page."
 msgstr "Musíte byť prihlásený pre zobrazenie tejto stránky."
 
-#: include/func.inc.php:2084
+#: include/func.inc.php:2090
 msgid "Your are logged in as"
 msgstr "Ste prihlásený ako"
 
@@ -15430,7 +15430,7 @@ msgstr "Ste prihlásený ako"
 msgid "Your setup is not configured for distributed monitoring."
 msgstr "Vaše nastavenie nie je nastavené pre distribuované monitorovanie."
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgctxt "Zetta short"
 msgid "Z"
 msgstr "Z"
@@ -15545,7 +15545,7 @@ msgstr "Port Zabbix servera"
 msgid "Zabbix trapper"
 msgstr "Zabbix trapper"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgid "Zetta"
 msgstr "Zetta"
 
@@ -15632,7 +15632,7 @@ msgstr "automaticky registrovaný host"
 msgid "avg"
 msgstr "priemer"
 
-#: include/func.inc.php:558 jsLoader.php:97
+#: include/func.inc.php:564 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -15745,7 +15745,7 @@ msgstr "vykonané"
 msgid "fixed"
 msgstr "pevný"
 
-#: include/func.inc.php:1896
+#: include/func.inc.php:1902
 msgid "found"
 msgstr "nájdených"
 
@@ -15755,7 +15755,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globálne nastavenia údržby"
 
-#: include/func.inc.php:559 jsLoader.php:98
+#: include/func.inc.php:565 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -15825,12 +15825,12 @@ msgstr "obsahuje"
 msgid "low-level discovery rule"
 msgstr "nízko úrovňové zisťovacie pravidlo"
 
-#: include/func.inc.php:560
+#: include/func.inc.php:566
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:557 jsLoader.php:96
+#: include/func.inc.php:563 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -15873,7 +15873,7 @@ msgstr "minimálne 60 sekúnd"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:562
+#: include/func.inc.php:568
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -15920,7 +15920,7 @@ msgid "now"
 msgstr "teraz"
 
 #: include/blocks.inc.php:362 include/blocks.inc.php:706
-#: include/func.inc.php:1893
+#: include/func.inc.php:1899
 msgid "of"
 msgstr "z"
 
@@ -15989,7 +15989,7 @@ msgstr "koreň"
 msgid "running"
 msgstr "beží"
 
-#: include/func.inc.php:561
+#: include/func.inc.php:567
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -16027,7 +16027,7 @@ msgstr "zobraziť párovanie hodnôt"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "šablóna ID \"%1$s\" je použitá %2$s krát"
 
-#: include/func.inc.php:1889
+#: include/func.inc.php:1895
 msgid "to"
 msgstr "do"
 
@@ -16058,7 +16058,7 @@ msgstr "hodnota"
 msgid "via"
 msgstr "cez"
 
-#: include/func.inc.php:556 jsLoader.php:95
+#: include/func.inc.php:562 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
 msgstr "r"
