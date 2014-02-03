@@ -286,11 +286,15 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 		if (0 == info->allow_oom)
 		{
 			if (NULL == chunk)
+			{
 				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
 						counter, size, skip_min, skip_max);
+			}
 			else if (counter >= 100)
-				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u size %u",
-						counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u"
+						" size %u", counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+			}
 		}
 	}
 
@@ -493,7 +497,8 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 	{
 		info->free_size += 4 * MEM_SIZE_FIELD;
 
-		prev_chunk = (char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) - MEM_SIZE_FIELD;
+		prev_chunk = (char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) -
+				MEM_SIZE_FIELD;
 
 		chunk_size += 4 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk) + CHUNK_SIZE(next_chunk);
 
@@ -508,7 +513,8 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 	{
 		info->free_size += 2 * MEM_SIZE_FIELD;
 
-		prev_chunk = (void *)((char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) - MEM_SIZE_FIELD);
+		prev_chunk = (void *)((char *)chunk - MEM_SIZE_FIELD - CHUNK_SIZE((char *)chunk - MEM_SIZE_FIELD) -
+				MEM_SIZE_FIELD);
 
 		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk);
 
@@ -591,7 +597,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 
 	(*info)->buckets = ALIGNPTR(base);
 	memset((*info)->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
-	size -= ((char **)(*info)->buckets + MEM_BUCKET_COUNT) - (char **)base;
+	size -= (char *)((*info)->buckets + MEM_BUCKET_COUNT) - (char *)base;
 	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
 
 	zbx_strlcpy(base, descr, size);
@@ -625,7 +631,8 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 	(*info)->lo_bound = ALIGN8(base);
 	(*info)->hi_bound = ALIGN8((char *)base + size - 8);
 
-	(*info)->total_size = (zbx_uint64_t)((char *)((*info)->hi_bound) - (char *)((*info)->lo_bound) - 2 * MEM_SIZE_FIELD);
+	(*info)->total_size = (zbx_uint64_t)((char *)((*info)->hi_bound) - (char *)((*info)->lo_bound) -
+			2 * MEM_SIZE_FIELD);
 
 	index = mem_bucket_by_size((*info)->total_size);
 	(*info)->buckets[index] = (*info)->lo_bound;
@@ -677,8 +684,8 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 
 	if (0 == size || size > MEM_MAX_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T ")",
-				file, line, __function_name, (zbx_fs_size_t)size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
+				")", file, line, __function_name, (zbx_fs_size_t)size);
 		exit(FAIL);
 	}
 
@@ -711,8 +718,8 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 
 	if (0 == size || size > MEM_MAX_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T ")",
-				file, line, __function_name, (zbx_fs_size_t)size);
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
+				")", file, line, __function_name, (zbx_fs_size_t)size);
 		exit(FAIL);
 	}
 
