@@ -479,7 +479,11 @@ int	main(int argc, char **argv)
 				}
 			}
 
-			if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
+			if ('\0' != *p && '"' != *p)
+			{
+				zbx_strlcpy(key_value, p, sizeof(key_value));
+			}
+			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
 				ret = FAIL;
