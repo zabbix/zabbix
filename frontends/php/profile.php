@@ -126,12 +126,7 @@ elseif (isset($_REQUEST['save'])) {
 		$user['passwd'] = get_request('password1');
 		$user['url'] = get_request('url');
 		$user['autologin'] = get_request('autologin', 0);
-		if (!hasRequest('autologout_visible')) {
-			$user['autologout'] = 0;
-		}
-		else {
-			$user['autologout'] = getRequest('autologout');
-		}
+		$user['autologout'] = hasRequest('autologout_visible') ? getRequest('autologout') : 0;
 		$user['lang'] = get_request('lang');
 		$user['theme'] = get_request('theme');
 		$user['refresh'] = get_request('refresh');
