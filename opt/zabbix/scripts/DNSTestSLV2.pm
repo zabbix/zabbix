@@ -478,10 +478,10 @@ sub send_value
 
     my $sender = Zabbix::Sender->new({
         'server' => $config->{'slv'}->{'zserver'},
-        'port' => $config->{'slv'}->{'zport'}
-				     });
+        'port' => $config->{'slv'}->{'zport'},
+	'retries' => 1 });
 
-    $sender->send($hostname, $key, "$value", "$timestamp");
+    fail("cannot send value $value with clock:$timestamp to $hostname:$key") if (not defined($sender->send($hostname, $key, "$value", "$timestamp")));
 }
 
 # Get name server details (name, IP) from item key.
@@ -826,28 +826,28 @@ sub dbg
 {
     return unless (defined($OPTS{'debug'}));
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [DBG] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [DBG] ', @_, "\n"));
 }
 
 sub info
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [INF] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
 }
 
 sub warn
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [WRN] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
 }
 
 sub fail
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [ERR] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
 
     exit FAIL;
 }
@@ -904,7 +904,7 @@ sub usage
     print("    --test     run the script in test mode, this means:\n");
     print("               - skip checks if need to recalculate value\n");
     print("               - do not send the value to the server\n");
-    print("               - print the output to stdout instead of logging it\n");
+    print("               - print the output to stdout instead of logging it (implies --stdout)\n");
     exit(FAIL);
 }
 
@@ -918,6 +918,7 @@ sub __log
 
     if (defined($OPTS{'test'}) or
 	defined($OPTS{'stdout'}) or
+	not defined($tld) or
 	not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
@@ -933,9 +934,9 @@ sub __log
 
     my $file = $config->{'slv'}->{'logdir'} . '/' . $tld . '-' . $script . '.log';
 
-    open $OUTFILE, '>>', $file or fail("cannot open $file: $!");
+    open $OUTFILE, '>>', $file or die("cannot open $file: $!");
 
-    print {$OUTFILE} $msg or fail("cannot write to $file: $!");
+    print {$OUTFILE} $msg or die("cannot write to $file: $!");
 
     close $OUTFILE or fail("cannot close $file: $!");
 }
