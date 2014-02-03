@@ -46,15 +46,6 @@ int	__zbx_open(const char *pathname, int flags)
 }
 #endif
 
-zbx_offset_t	zbx_lseek(int fd, zbx_offset_t offset, int whence)
-{
-#if defined(_WINDOWS)
-	return _lseeki64(fd, offset, whence);
-#else
-	return lseek(fd, offset, whence);
-#endif
-}
-
 static void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
 {
 	/* default is single-byte character set */
@@ -133,7 +124,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	int		nbytes;
 	zbx_offset_t	offset;
 
-	offset = zbx_lseek(fd, (zbx_offset_t)0, SEEK_CUR);
+	offset = zbx_lseek(fd, 0, SEEK_CUR);
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
@@ -256,7 +247,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 			goto out;
 		}
 
-		offset = zbx_lseek(fd, (zbx_offset_t)0, SEEK_CUR);
+		offset = zbx_lseek(fd, 0, SEEK_CUR);
 
 		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
 
@@ -401,7 +392,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
-					if ((zbx_offset_t)0 <= zbx_lseek(fd, (zbx_offset_t)*lastlogsize, SEEK_SET))
+					if ((zbx_offset_t)0 <= zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
 						ret = SUCCEED;
 						break;

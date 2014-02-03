@@ -687,7 +687,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
 		l_size = 0;
 
-	if ((zbx_offset_t)-1 != zbx_lseek(f, (zbx_offset_t)l_size, SEEK_SET))
+	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
 	{
 		if (SUCCEED == zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, regexps_num,
 				pattern, p_count, s_count, process_value, server, port, hostname, key))

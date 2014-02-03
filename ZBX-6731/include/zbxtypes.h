@@ -76,6 +76,7 @@
 #endif
 
 typedef __int64	zbx_offset_t;
+#define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
 
 #else	/* _WINDOWS */
 
@@ -114,6 +115,7 @@ typedef __int64	zbx_offset_t;
 #endif
 
 typedef off_t	zbx_offset_t;
+#define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
 
 #endif	/* _WINDOWS */
 
