@@ -75,9 +75,6 @@
 #	define PATH_SEPARATOR	'\\'
 #endif
 
-typedef __int64	zbx_offset_t;
-#define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
-
 #else	/* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
@@ -113,9 +110,6 @@ typedef __int64	zbx_offset_t;
 #ifndef PATH_SEPARATOR
 #	define PATH_SEPARATOR	'/'
 #endif
-
-typedef off_t	zbx_offset_t;
-#define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
 
 #endif	/* _WINDOWS */
 
