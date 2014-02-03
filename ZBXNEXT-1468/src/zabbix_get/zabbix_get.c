@@ -28,7 +28,7 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix get";
 const char	syslog_app_name[] = "zabbix_get";
-#if !define(_WINDOWS)
+#if !defined(_WINDOWS)
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-t <seconds>] [-I <IP address>] -k <key>";
 #else
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
