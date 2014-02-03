@@ -7,7 +7,6 @@ A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian,
 
 Bug fixes:
 ..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 ..F....... [ZBX-7684] improved displaying of script execution page (Eduard)
 ...G...... [ZBX-7668] fixed sending empty values when reading from a file with zabbix_sender (Juris)
 ........S. [ZBX-7571] fixed incorrect processing of \177 (U+007F) control character in json (igors)
@@ -27,6 +26,8 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 ...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ........S. [ZBX-7653] correctly expand ITEM.LOG.* macros when retrieving eventlog specific attributes for log,logrt items (wiper)
 .......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
 ..F....... [ZBX-7639] fixed error when trying to replace host groups and add a new host group at the same time in the host mass update form (Pavels)
@@ -44,6 +45,7 @@ A......... [ZBX-7660] fixed host.get returning the "templates" property even if 
 ..F....... [ZBX-7590] fixed displaying functional macros in graph names when host visible name is not empty (Ivo)
 A......... [ZBX-7591] fixed deleting web scenario steps on template linked to host (Ivo)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
+..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
 ..F....... [ZBX-7518] fixed graph scrollbar overflow when clicking period "All" and with no page refresh option (Ivo)
 A......... [ZBX-7578] fixed graph item validation (Eduard)
 ..F....... [ZBX-7616] fixed green background color for "New group" field in host edit form (Ivo)
