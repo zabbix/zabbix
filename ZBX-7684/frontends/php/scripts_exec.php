@@ -30,54 +30,50 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
-	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
-	'execute' =>	array(T_ZBX_INT, O_OPT, P_ACT, IN('0,1'),	null)
+	'hostid' =>		array(T_ZBX_INT, O_OPT, P_ACT, DB_ID, null),
+	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_ACT, DB_ID, null)
 );
 check_fields($fields);
 
 ob_flush();
 flush();
-ob_end_flush();
 
-if (hasRequest('execute')) {
-	$scriptId = getRequest('scriptid');
-	$hostId = getRequest('hostid');
+$scriptId = getRequest('scriptid');
+$hostId = getRequest('hostid');
 
-	$data = array(
-		'message' => '',
-		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
-	);
+$data = array(
+	'message' => '',
+	'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
+);
 
-	$result = API::Script()->execute(array(
-		'hostid' => $hostId,
-		'scriptid' => $scriptId
-	));
+$result = API::Script()->execute(array(
+	'hostid' => $hostId,
+	'scriptid' => $scriptId
+));
 
-	$isErrorExist = false;
+$isErrorExist = false;
 
-	if (!$result) {
-		$isErrorExist = true;
-	}
-	elseif ($result['response'] == 'failed') {
-		error($result['value']);
-
-		$isErrorExist = true;
-	}
-	else {
-		$data['message'] = $result['value'];
-	}
-
-	if ($isErrorExist) {
-		show_error_message(
-			_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
-		);
-	}
-
-	// render view
-	$scriptView = new CView('general.script.execute', $data);
-	$scriptView->render();
-	$scriptView->show();
+if (!$result) {
+	$isErrorExist = true;
 }
+elseif ($result['response'] == 'failed') {
+	error($result['value']);
+
+	$isErrorExist = true;
+}
+else {
+	$data['message'] = $result['value'];
+}
+
+if ($isErrorExist) {
+	show_error_message(
+		_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
+	);
+}
+
+// render view
+$scriptView = new CView('general.script.execute', $data);
+$scriptView->render();
+$scriptView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
