@@ -574,7 +574,7 @@ static int	get_values(unsigned char poller_type)
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -627,7 +627,7 @@ static int	get_values(unsigned char poller_type)
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = NOTSUPPORTED;
+					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
 				break;
@@ -685,6 +685,8 @@ static int	get_values(unsigned char poller_type)
 			case AGENT_ERROR:
 				activate_host(&items[i], &timespec);
 				break;
+			case CONFIG_ERROR:
+				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 				deactivate_host(&items[i], &timespec, results[i].msg);
@@ -701,7 +703,7 @@ static int	get_values(unsigned char poller_type)
 					items[i].state, NULL);
 			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
 		}
-		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
