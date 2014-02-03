@@ -35,7 +35,7 @@ if ($count < $cfg_minonline)
 {
     info("success ($count probes are online, min - $cfg_minonline)");
     send_value($tld, $cfg_key_out, $value_ts, UP);
-    exit(SUCCESS);
+    slv_exit(SUCCESS);
 }
 
 my $hostids_ref = probes2tldhostids($tld, $probes_ref);
@@ -48,7 +48,7 @@ if ($count < $cfg_minonline)
 {
     info("success ($count online probes have results, min - $cfg_minonline)");
     send_value($tld, $cfg_key_out, $value_ts, UP);
-    exit(SUCCESS);
+    slv_exit(SUCCESS);
 }
 
 my $success_probes = 0;
@@ -76,7 +76,7 @@ $test_result = UP if ($success_probes * 100 / scalar(@$items_ref) > SLV_UNAVAILA
 info($test_result == UP ? "success" : "fail");
 send_value($tld, $cfg_key_out, $value_ts, $test_result);
 
-exit(SUCCESS);
+slv_exit(SUCCESS);
 
 # SUCCESS - no values or at least one successful value
 # FAIL - all values unsuccessful

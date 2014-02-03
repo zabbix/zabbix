@@ -33,7 +33,7 @@ db_connect();
 
 process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value);
 
-exit(SUCCESS);
+slv_exit(SUCCESS);
 
 sub check_item_value
 {

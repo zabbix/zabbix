@@ -9,6 +9,7 @@ use Exporter qw(import);
 use DateTime;
 use Zabbix;
 use Sender;
+use File::Pid;
 
 use constant SUCCESS => 0;
 use constant FAIL => 1;
@@ -52,7 +53,7 @@ our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
 		minutes_last_month get_probes get_online_probes probes2tldhostids send_value get_ns_from_key
 		is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly get_item_values
 		exit_if_lastclock get_down_count
-		dbg info warn fail exit_if_running trim parse_opts);
+		dbg info warn fail slv_exit exit_if_running trim parse_opts);
 
 my $probe_group_name = 'Probes';
 my $probe_key_manual = 'probe.status[manual]';
@@ -63,6 +64,10 @@ my $config = undef;
 
 my $avail_shift_back = 2; # minutes
 my $rollweek_shift_back = 3; # minutes
+
+# make sure only one copy of script runs (unless in test mode)
+my $pidfile;
+my $pid_dir = '/tmp';
 
 sub zapi_connect
 {
@@ -822,6 +827,34 @@ sub get_down_count
     return $count;
 }
 
+sub slv_exit
+{
+    my $rv = shift;
+
+    if (defined($pidfile))
+    {
+	$pidfile->remove() or warn("cannot unlink pid file ", $pidfile->file());
+    }
+
+    exit($rv);
+}
+
+sub exit_if_running
+{
+    return if (defined($OPTS{'test'}) or not defined($tld));
+
+    $pidfile = __get_pidfile();
+
+    fail("cannot lock script ", __script(), ":", $tld) unless (defined($pidfile));
+
+    if (my $pid = $pidfile->running())
+    {
+	fail("already running (pid:$pid)");
+    }
+
+    $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file());
+}
+
 sub dbg
 {
     return unless (defined($OPTS{'debug'}));
@@ -850,33 +883,6 @@ sub fail
     __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
 
     exit FAIL;
-}
-
-sub exit_if_running
-{
-    return if (defined($OPTS{'test'}));
-
-    my $script = __script();
-    my $cmd = "pgrep -fl \"/$script.* $tld( |\$)\" | grep -v -- --test";
-
-    $cmd =~ s/\./\\./g;
-
-    my ($stdout, $stderr) = capture_exec($cmd);
-    $stdout = trim($stdout);
-    $stderr = trim($stderr);
-
-    my @stdout_lines = split("\n", $stdout);
-    my $numproc = scalar(@stdout_lines);
-
-    dbg("stdout:'$stdout' stderr:'$stderr' cmd:'$cmd' numproc:$numproc ARGV:'", join(" ", @ARGV), "'");
-
-    fail("cannot check if script is running, command \"$cmd\" failed ($stderr)") unless ($stderr eq "" and $numproc > 0);
-
-    unless ($numproc == 1) # mind myself
-    {
-	info("already running");
-	exit(SUCCESS);
-    }
 }
 
 sub trim
@@ -1269,6 +1275,17 @@ sub __script
     $script =~ s,.*/([^/]*)$,$1,;
 
     return $script;
+}
+
+sub __get_pidfile
+{
+    return unless (defined($tld));
+
+    my $filename = $pid_dir . '/' . __script() . '-' . $tld . '.pid';
+
+    print("creating file $filename\n");
+
+    return File::Pid->new({ file => $filename });
 }
 
 sub __ts

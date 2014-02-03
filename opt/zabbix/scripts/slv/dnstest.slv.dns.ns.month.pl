@@ -75,7 +75,7 @@ foreach my $item (@items)
     send_value($tld, $key_out, $value_ts, $perc);
 }
 
-exit(SUCCESS);
+slv_exit(SUCCESS);
 
 sub get_up_count
 {
