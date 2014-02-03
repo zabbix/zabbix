@@ -164,7 +164,7 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 				len += 2;
 				break;
 			default:
-				if ((u_char)*sptr < 32)
+				if (0 != iscntrl(*sptr))
 					len += 6;
 				else
 					len++;
@@ -222,7 +222,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = 't';
 				break;
 			default:
-				if ((u_char)*sptr < 32)
+				if (0 != iscntrl(*sptr))
 				{
 					*p++ = '\\';
 					*p++ = 'u';
