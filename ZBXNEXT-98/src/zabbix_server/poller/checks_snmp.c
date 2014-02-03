@@ -1013,8 +1013,18 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 
 int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 {
-	const char		*__function_name = "get_value_snmp";
+	int	errcode = SUCCEED;
 
+	get_values_snmp(item, value, &errcode, 1);
+
+	return errcode;
+}
+
+void	get_values_snmp(DC_ITEM *items, AGENT_RESULT *values, int *errcodes, int num)
+{
+	const char		*__function_name = "get_values_snmp";
+
+	/*
 	struct snmp_session	*ss;
 	char			method[8], oid_translated[MAX_STRING_LEN], oid_index[MAX_STRING_LEN],
 				oid_full[MAX_STRING_LEN], index_value[MAX_STRING_LEN], err[MAX_STRING_LEN], *pl;
@@ -1156,6 +1166,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+	*/
 }
 
 #endif	/* HAVE_SNMP */

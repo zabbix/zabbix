@@ -40,6 +40,10 @@ static int	sync_in_progress = 0;
 #define ZBX_LOC_QUEUE	1
 #define ZBX_LOC_POLLER	2
 
+#define ZBX_SNMP_OID_TYPE_NORMAL	0
+#define ZBX_SNMP_OID_TYPE_DYNAMIC	1
+#define ZBX_SNMP_OID_TYPE_MACRO		2
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -117,6 +121,7 @@ typedef struct
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	unsigned char	snmp_oid_type;
 }
 ZBX_DC_SNMPITEM;
 
@@ -1004,7 +1009,6 @@ static void	DCsync_items(DB_RESULT result)
 			snmpitem = DCfind_id(&config->snmpitems, itemid, sizeof(ZBX_DC_SNMPITEM), &found);
 
 			DCstrpool_replace(found, &snmpitem->snmp_community, row[7]);
-			DCstrpool_replace(found, &snmpitem->snmp_oid, row[8]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_securityname, row[10]);
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
@@ -1012,6 +1016,16 @@ static void	DCsync_items(DB_RESULT result)
 			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[28]);
 			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[29]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_contextname, row[30]);
+
+			if (SUCCEED == DCstrpool_replace(found, &snmpitem->snmp_oid, row[8]))
+			{
+				if (NULL != strchr(snmpitem->snmp_oid, '{'))
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+				else if (NULL != strchr(snmpitem->snmp_oid, '['))
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
+				else
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
+			}
 		}
 		else if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
@@ -2507,7 +2521,6 @@ static void	DCsync_expressions(DB_RESULT result)
  * Purpose: Executes SQL select statement used to synchronize configuration   *
  *          data with DCsync_config()                                         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static DB_RESULT	DCsync_config_select()
 {
@@ -3027,7 +3040,33 @@ static int	__config_interface_addr_compare(const void *d1, const void *d2)
 	return (interface_addr_1->addr == interface_addr_2->addr ? 0 : strcmp(interface_addr_1->addr, interface_addr_2->addr));
 }
 
-static int	__config_nextcheck_compare(const void *d1, const void *d2)
+static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
+{
+	const ZBX_DC_SNMPITEM	*s1;
+	const ZBX_DC_SNMPITEM	*s2;
+
+	if (i1->interfaceid < i2->interfaceid)
+		return -1;
+	if (i1->interfaceid > i2->interfaceid)
+		return +1;
+
+	if (i1->port < i2->port)
+		return -1;
+	if (i1->port > i2->port)
+		return +1;
+
+	if (i1->type < i2->type)
+		return -1;
+	if (i1->type > i2->type)
+		return +1;
+
+	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
+	s2 = zbx_hashset_search(&config->snmpitems, &i2->itemid);
+
+	return memcmp(&s1->snmp_community, &s2->snmp_community, sizeof(ZBX_DC_SNMPITEM) - sizeof(zbx_uint64_t));
+}
+
+static int	__config_heap_elem_compare(const void *d1, const void *d2)
 {
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
@@ -3040,10 +3079,23 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 	if (i1->nextcheck > i2->nextcheck)
 		return +1;
 
-	return 0;
+	if (SUCCEED != is_snmp_type(i1->type))
+	{
+		if (SUCCEED != is_snmp_type(i2->type))
+			return 0;
+
+		return -1;
+	}
+	else
+	{
+		if (SUCCEED != is_snmp_type(i2->type))
+			return +1;
+
+		return __config_snmp_item_compare(i1, i2);
+	}
 }
 
-static int	__config_pinger_nextcheck_compare(const void *d1, const void *d2)
+static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 {
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
@@ -3068,11 +3120,6 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 {
 	const ZBX_DC_JMXITEM	*j1;
 	const ZBX_DC_JMXITEM	*j2;
-
-	if (i1->nextcheck < i2->nextcheck)
-		return -1;
-	if (i1->nextcheck > i2->nextcheck)
-		return +1;
 
 	if (i1->interfaceid < i2->interfaceid)
 		return -1;
@@ -3100,7 +3147,15 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	return __config_java_item_compare((const ZBX_DC_ITEM *)e1->data, (const ZBX_DC_ITEM *)e2->data);
+	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
+	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
+
+	if (i1->nextcheck < i2->nextcheck)
+		return -1;
+	if (i1->nextcheck > i2->nextcheck)
+		return +1;
+
+	return __config_java_item_compare(i1, i2);
 }
 
 static int	__config_proxy_compare(const void *d1, const void *d2)
@@ -3242,7 +3297,7 @@ void	init_configuration_cache()
 				break;
 			case ZBX_POLLER_TYPE_PINGER:
 				zbx_binary_heap_create_ext(&config->queues[i],
-						__config_pinger_nextcheck_compare,
+						__config_pinger_elem_compare,
 						ZBX_BINARY_HEAP_OPTION_DIRECT,
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
@@ -3250,7 +3305,7 @@ void	init_configuration_cache()
 				break;
 			default:
 				zbx_binary_heap_create_ext(&config->queues[i],
-						__config_nextcheck_compare,
+						__config_heap_elem_compare,
 						ZBX_BINARY_HEAP_OPTION_DIRECT,
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
@@ -3315,14 +3370,14 @@ void	free_configuration_cache()
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
- * Comments: !! SQL statement must be synced with DCsync_configuration()!!    *
+ * Comments: !! SQL statement must be synced with DCsync_configuration() !!   *
  *                                                                            *
  ******************************************************************************/
 void	DCload_config()
 {
-	const char		*__function_name = "DCload_config";
+	const char	*__function_name = "DCload_config";
 
-	DB_RESULT		result;
+	DB_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4264,9 +4319,19 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (dc_item->nextcheck > now)
 			break;
 
-		if (ZBX_POLLER_TYPE_JAVA == poller_type)
-			if (0 != num && 0 != __config_java_item_compare(dc_item_prev, dc_item))
-				break;
+		if (0 != num)
+		{
+			if (SUCCEED == is_snmp_type(dc_item_prev->type))
+			{
+				if (0 != __config_snmp_item_compare(dc_item_prev, dc_item))
+					break;
+			}
+			else if (ITEM_TYPE_JMX == dc_item_prev->type)
+			{
+				if (0 != __config_java_item_compare(dc_item_prev, dc_item))
+					break;
+			}
+		}
 
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
@@ -4335,6 +4400,19 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		DCget_host(&items[num].host, dc_host);
 		DCget_item(&items[num], dc_item);
 		num++;
+
+		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type))
+		{
+			ZBX_DC_SNMPITEM	*snmpitem;
+
+			snmpitem = zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
+
+			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
+					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
+			{
+				max_items = MAX_BUNCH_ITEMS;
+			}
+		}
 	}
 
 	UNLOCK_CACHE;

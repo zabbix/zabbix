@@ -657,7 +657,11 @@ static int	get_values(unsigned char poller_type)
 		if (SUCCEED == errcodes[0])
 			errcodes[0] = get_value(&items[0], &results[0]);
 	}
-	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+	else if (SUCCEED == is_snmp_type(items[0].type))
+	{
+		get_values_snmp(items, results, errcodes, num);
+	}
+	else if (ITEM_TYPE_JMX == items[0].type)
 	{
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
