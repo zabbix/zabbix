@@ -288,7 +288,13 @@ static void	zbx_validate_config(void)
 {
 	if (NULL == CONFIG_HOSTNAME)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
 		exit(EXIT_FAILURE);
 	}
 
@@ -299,16 +305,16 @@ static void	zbx_validate_config(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(EXIT_FAILURE);
-	}
-
 	/* make sure active or passive check is enabled */
 	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -455,6 +461,8 @@ static void	zbx_load_config(int requirement)
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
@@ -832,7 +840,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
 	exit(SUCCEED);
 }

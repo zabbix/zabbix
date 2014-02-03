@@ -539,17 +539,6 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
 	return false;
 }
 
-function get_hosts_by_templateid($templateids) {
-	zbx_value2array($templateids);
-
-	return DBselect(
-		'SELECT h.*'.
-		' FROM hosts h,hosts_templates ht'.
-		' WHERE h.hostid=ht.hostid'.
-			' AND '.dbConditionInt('ht.templateid', $templateids)
-	);
-}
-
 function updateHostStatus($hostids, $status) {
 	zbx_value2array($hostids);
 
@@ -695,40 +684,6 @@ function getHostPrototypeSourceParentIds(array $hostPrototypeIds, array $templat
 }
 
 /**
- * Check collisions between templates.
- * $param int|array $templateid_list
- */
-function validate_templates($templateid_list) {
-	if (is_numeric($templateid_list)) {
-		return true;
-	}
-	if (!is_array($templateid_list)) {
-		return false;
-	}
-	if (count($templateid_list) < 2) {
-		return true;
-	}
-
-	$result = true;
-
-	$res = DBselect(
-		'SELECT key_,COUNT(*) AS cnt'.
-		' FROM items'.
-		' WHERE '.dbConditionInt('hostid', $templateid_list).
-		' GROUP BY key_'.
-		' ORDER BY cnt DESC'
-	);
-	while ($db_cnt = DBfetch($res)) {
-		if ($db_cnt['cnt'] > 1) {
-			$result &= false;
-			error(_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($db_cnt['key_'])));
-		}
-	}
-
-	return $result;
-}
-
-/**
  * Get host ids of hosts which $groupids can be unlinked from.
  * if $hostids is passed, function will check only these hosts.
  *
@@ -797,18 +752,4 @@ function isTemplate($hostId) {
 	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 
 	return ($dbHost && $dbHost['status'] == HOST_STATUS_TEMPLATE);
-}
-
-function isTemplateInHost($hosts) {
-	if ($hosts) {
-		$hosts = zbx_toArray($hosts);
-
-		foreach ($hosts as $host) {
-			if (!empty($host['templateid'])) {
-				return $host['templateid'];
-			}
-		}
-	}
-
-	return 0;
 }

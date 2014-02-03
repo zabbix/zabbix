@@ -274,23 +274,5 @@ CDate.prototype = {
 		this.calcTZdiff(arg);
 		this.serverDate.setTime(arg - this.tzDiff * 1000);
 		this.clientDate.setTime(arg);
-	},
-
-	debug: function(fnc_name, id) {
-		if (this.debug_status) {
-			var str = 'CDate.' + fnc_name;
-			if (typeof(id) != 'undefined') {
-				str += ' :' + id;
-			}
-			if (this.debug_prev == str) {
-				return true;
-			}
-
-			this.debug_info += str;
-			if (this.debug_status == 2) {
-				SDI(str);
-			}
-			this.debug_prev = str;
-		}
 	}
 }

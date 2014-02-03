@@ -207,8 +207,14 @@ function dowHrMinToSec($dow, $hr, $min) {
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
-	if (is_null($value)) {
+	$prefix = '';
+
+	if ($value === null) {
 		$value = time();
+	}
+	elseif ($value > ZBX_MAX_DATE) {
+		$prefix = '> ';
+		$value = ZBX_MAX_DATE;
 	}
 	elseif (!$value) {
 		return _('Never');
@@ -279,11 +285,11 @@ function zbx_date2str($format, $value = null) {
 		'M' => $months[date('n', $value)]
 	);
 
-	$output = '';
-	$part = '';
+	$output = $part = '';
 	$length = zbx_strlen($format);
+
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -297,7 +303,7 @@ function zbx_date2str($format, $value = null) {
 
 	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
 
-	return $output;
+	return $prefix.$output;
 }
 
 // calculate and convert timestamp to string representation
@@ -1083,52 +1089,6 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
 	}
 }
 
-function zbx_strrpos($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strrpos($haystack, $needle);
-	}
-	else {
-		return strrpos($haystack, $needle);
-	}
-}
-
-function zbx_substr_replace($string, $replacement, $start, $length = null) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$string_length = mb_strlen($string);
-
-		if ($start < 0) {
-			$start = max(0, $string_length + $start);
-		}
-		elseif ($start > $string_length) {
-			$start = $string_length;
-		}
-
-		if ($length < 0) {
-			$length = max(0, $string_length - $start + $length);
-		}
-		elseif ($length === null || $length > $string_length) {
-			$length = $string_length;
-		}
-
-		if (($start + $length) > $string_length) {
-			$length = $string_length - $start;
-		}
-
-		return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, $string_length - $start - $length);
-	}
-	else {
-		return substr_replace($string, $replacement, $start, $length);
-	}
-}
-
-function str_replace_first($search, $replace, $subject) {
-	$pos = zbx_strpos($subject, $search);
-	if ($pos !== false) {
-		$subject = zbx_substr_replace($subject, $replace, $pos, zbx_strlen($search));
-	}
-	return $subject;
-}
-
 /************* SELECT *************/
 function selectByPattern(&$table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
@@ -1292,30 +1252,6 @@ function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	return $rs;
 }
 
-function unsetExcept(&$array, $allowedFields) {
-	foreach ($array as $key => $value) {
-		if (!isset($allowedFields[$key])) {
-			unset($array[$key]);
-		}
-	}
-}
-
-function zbx_implodeHash($glue1, $glue2, $hash) {
-	if (is_null($glue2)) {
-		$glue2 = $glue1;
-	}
-
-	$str = '';
-	foreach ($hash as $key => $value) {
-		if (!empty($str)) {
-			$str .= $glue2;
-		}
-		$str .= $key.$glue1.$value;
-	}
-
-	return $str;
-}
-
 // preserve keys
 function zbx_array_merge() {
 	$args = func_get_args();
@@ -1340,17 +1276,6 @@ function uint_in_array($needle, $haystack) {
 	}
 
 	return false;
-}
-
-function zbx_uint_array_intersect(&$array1, &$array2) {
-	$result = array();
-	foreach ($array1 as $key => $value) {
-		if (uint_in_array($value, $array2)) {
-			$result[$key] = $value;
-		}
-	}
-
-	return $result;
 }
 
 function str_in_array($needle, $haystack, $strict = false) {
@@ -1604,26 +1529,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	else {
 		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 	}
-}
-
-/**
- * Check if two arrays have same values.
- *
- * @param array $a
- * @param array $b
- * @param bool $strict
- *
- * @return bool
- */
-function array_equal(array $a, array $b, $strict=false) {
-	if (count($a) !== count($b)) {
-		return false;
-	}
-
-	sort($a);
-	sort($b);
-
-	return $strict ? $a === $b : $a == $b;
 }
 
 /*************** PAGE SORTING ******************/
@@ -1902,67 +1807,6 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 	return $table;
 }
 
-/************* DYNAMIC REFRESH *************/
-function add_doll_objects($ref_tab, $pmid = 'mainpage') {
-	$upd_script = array();
-	foreach ($ref_tab as $id => $doll) {
-		$upd_script[$doll['id']] = format_doll_init($doll);
-	}
-	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).', '.zbx_jsvalue($upd_script).');');
-}
-
-function format_doll_init($doll) {
-	$args = array(
-		'frequency' => 60,
-		'url' => '',
-		'counter' => 0,
-		'darken' => 0,
-		'params' => array()
-	);
-	foreach ($args as $key => $def) {
-		if (isset($doll[$key])) {
-			$obj[$key] = $doll[$key];
-		}
-		else {
-			$obj[$key] = $def;
-		}
-	}
-	$obj['url'] .= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
-	$obj['params']['favobj'] = 'hat';
-	$obj['params']['favref'] = $doll['id'];
-	$obj['params']['favaction'] = 'refresh';
-
-	return $obj;
-}
-
-function get_update_doll_script($pmasterid, $dollid, $key, $value = '') {
-	return 'PMasters['.zbx_jsvalue($pmasterid).'].dolls['.zbx_jsvalue($dollid).'].'.$key.'('.zbx_jsvalue($value).');';
-}
-
-function make_refresh_menu($pmid, $dollid, $cur_interval, $params = null, &$menu, &$submenu, $menu_type = 1) {
-	if ($menu_type == 1) {
-		$intervals = array('10' => 10, '30' => 30, '60' => 60, '120' => 120, '600' => 600, '900' => 900);
-		$title = _('Refresh time in seconds');
-	}
-	elseif ($menu_type == 2) {
-		$intervals = array('x0.25' => 0.25, 'x0.5' => 0.5, 'x1' => 1, 'x1.5' => 1.5, 'x2' => 2, 'x3' => 3, 'x4' => 4, 'x5' => 5);
-		$title = _('Refresh time multiplier');
-	}
-
-	$menu['menu_'.$dollid][] = array($title, null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
-
-	foreach ($intervals as $key => $value) {
-		$menu['menu_'.$dollid][] = array(
-			$key,
-			'javascript: setRefreshRate('.zbx_jsvalue($pmid).', '.zbx_jsvalue($dollid).', '.$value.', '.zbx_jsvalue($params).');'.
-			'void(0);',
-			null,
-			array('outer' => ($value == $cur_interval) ? 'pum_b_submenu' : 'pum_o_submenu', 'inner' => array('pum_i_submenu')
-		));
-	}
-	$submenu['menu_'.$dollid][] = array();
-}
-
 /************* MATH *************/
 function bcfloor($number) {
 	if (strpos($number, '.') !== false) {
@@ -1994,37 +1838,6 @@ function bcceil($number) {
 	}
 
 	return $number == '-0' ? '0' : $number;
-}
-
-function bcround($number, $precision = 0) {
-	if (strpos($number, '.') !== false) {
-		if ($number[0] != '-') {
-			$number = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-		}
-		else {
-			$number = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-		}
-	}
-	elseif ($precision != 0) {
-		$number .= '.' . str_repeat('0', $precision);
-	}
-
-	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
-	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
-
-	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
-}
-
-/**
- * Calculates the modulus for float numbers.
- *
- * @param string $number
- * @param string $modulus
- *
- * @return string
- */
-function bcfmod($number, $modulus) {
-	return bcsub($number, bcmul($modulus, bcfloor(bcdiv($number, $modulus))));
 }
 
 /**
@@ -2641,162 +2454,6 @@ function clearCookies($clear = false, $id = null) {
 	if ($clear) {
 		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
 	}
-}
-
-/**
- * Prepare data for host menu popup.
- *
- * @param array  $host						host data
- * @param string $host['hostid']			host id
- * @param array  $host['screens']			host screens (optional)
- * @param array  $scripts					host scripts (optional)
- * @param string $scripts[]['name']			script name
- * @param string $scripts[]['scriptid']		script id
- * @param string $scripts[]['confirmation']	confirmation text
- * @param bool   $hasGoTo					"Go to" block in popup
- *
- * @return array
- */
-function getMenuPopupHost(array $host, array $scripts = null, $hasGoTo = true) {
-	$data = array(
-		'type' => 'host',
-		'hostid' => $host['hostid'],
-		'hasScreens' => (isset($host['screens']) && $host['screens']),
-		'hasGoTo' => $hasGoTo
-	);
-
-	if ($scripts) {
-		CArrayHelper::sort($scripts, array('name'));
-
-		foreach (array_values($scripts) as $script) {
-			$data['scripts'][] = array(
-				'name' => $script['name'],
-				'scriptid' => $script['scriptid'],
-				'confirmation' => $script['confirmation']
-			);
-		}
-	}
-
-	return $data;
-}
-
-/**
- * Prepare data for map menu popup.
- *
- * @param string $hostId					host id
- * @param array  $scripts					host scripts (optional)
- * @param string $scripts[]['name']			script name
- * @param string $scripts[]['scriptid']		script id
- * @param string $scripts[]['confirmation']	confirmation text
- * @param array  $gotos						goto links (optional)
- * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
- * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
- * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)
- * @param array  $gotos['events']			link to events page with url parameters ("name" => "value") (optional)
- * @param array  $urls						local and global map urls (optional)
- * @param string $urls[]['name']			url name
- * @param string $urls[]['url']				url
- *
- * @return array
- */
-function getMenuPopupMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
-	$data = array(
-		'type' => 'map'
-	);
-
-	if ($scripts) {
-		CArrayHelper::sort($scripts, array('name'));
-
-		$data['hostid'] = $hostId;
-
-		foreach (array_values($scripts) as $script) {
-			$data['scripts'][] = array(
-				'name' => $script['name'],
-				'scriptid' => $script['scriptid'],
-				'confirmation' => $script['confirmation']
-			);
-		}
-	}
-
-	if ($gotos) {
-		$data['gotos'] = $gotos;
-	}
-
-	if ($urls) {
-		foreach ($urls as $url) {
-			$data['urls'][] = array(
-				'label' => $url['name'],
-				'url' => $url['url']
-			);
-		}
-	}
-
-	return $data;
-}
-
-/**
- * Prepare data for item history menu popup.
- *
- * @param array $item				item data
- * @param int   $item['itemid']		item id
- * @param int   $item['value_type']	item value type
- *
- * @return array
- */
-function getMenuPopupHistory(array $item) {
-	return array(
-		'type' => 'history',
-		'itemid' => $item['itemid'],
-		'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
-	);
-}
-
-/**
- * Prepare data for trigger menu popup.
- *
- * @param array  $trigger						trigger data
- * @param string $trigger['triggerid']			trigger id
- * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
- * @param array  $trigger['hosts']				hosts, used by trigger expression
- * @param string $trigger['hosts'][]['hostid']	host id
- * @param string $trigger['url']				url
- * @param array  $items							trigger items (optional)
- * @param string $items[]['name']				item name
- * @param array  $items[]['params']				item url parameters ("name" => "value")
- * @param array  $acknowledge					acknowledge link parameters (optional)
- * @param string $acknowledge['eventid']		event id
- * @param string $acknowledge['screenid']		screen id (optional)
- * @param string $acknowledge['backurl']		return url (optional)
- * @param string $eventTime						event navigation time parameter (optional)
- *
- * @return array
- */
-function getMenuPopupTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
-	if ($items) {
-		CArrayHelper::sort($items, array('name'));
-	}
-
-	$data = array(
-		'type' => 'trigger',
-		'triggerid' => $trigger['triggerid'],
-		'items' => $items,
-		'acknowledge' => $acknowledge,
-		'eventTime' => $eventTime,
-		'configuration' => null,
-		'url' => resolveTriggerUrl($trigger)
-	);
-
-	if ((CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
-			&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$host = reset($trigger['hosts']);
-
-		$data['configuration'] = array(
-			'hostid' => $host['hostid'],
-			'switchNode' => id2nodeid($trigger['triggerid'])
-		);
-	}
-
-	return $data;
 }
 
 /**

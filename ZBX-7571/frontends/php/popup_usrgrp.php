@@ -17,20 +17,18 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-	require_once dirname(__FILE__).'/include/config.inc.php';
-	require_once dirname(__FILE__).'/include/users.inc.php';
 
-	$page['title'] = _('User groups');
-	$page['file'] = 'popup_usrgrp.php';
 
-	define('ZBX_PAGE_NO_MENU', 1);
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+
+$page['title'] = _('User groups');
+$page['file'] = 'popup_usrgrp.php';
+
+define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm'=>		array(T_ZBX_STR, O_MAND,	P_SYS,	NOT_EMPTY,	NULL),
@@ -44,8 +42,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // destination form
 	$dstfrm	= get_request('dstfrm',	0);
 	$new_groups = get_request('new_groups', array());
-?>
-<?php
+
 	show_table_header(_('User groups'));
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -107,9 +104,5 @@ if(form){
 
 	$form->addItem($table);
 	$form->show();
-?>
-<?php
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

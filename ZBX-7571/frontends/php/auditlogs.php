@@ -46,9 +46,8 @@ $fields = array(
 	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
@@ -56,10 +55,10 @@ check_fields($fields);
 /*
  * Ajax
  */
+if (hasRequest('filterState')) {
+	CProfile::update('web.auditlogs.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.auditlogs.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
 		if (isset($_REQUEST['favid'])) {
@@ -69,7 +68,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*

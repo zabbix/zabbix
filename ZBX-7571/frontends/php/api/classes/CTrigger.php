@@ -101,7 +101,7 @@ class CTrigger extends CTriggerGeneral {
 			'expandDescription'				=> null,
 			'expandComment'					=> null,
 			'expandExpression'				=> null,
-			'output'						=> API_OUTPUT_REFER,
+			'output'						=> API_OUTPUT_EXTEND,
 			'selectGroups'					=> null,
 			'selectHosts'					=> null,
 			'selectItems'					=> null,
@@ -147,7 +147,6 @@ class CTrigger extends CTriggerGeneral {
 
 			sort($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -178,7 +177,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
@@ -201,7 +199,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['select']['itemid'] = 'f.itemid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
@@ -215,7 +212,6 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['a'] = dbConditionInt('ia.applicationid', $options['applicationids']);
@@ -383,7 +379,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// group
 		if (!is_null($options['group'])) {
-			$sqlParts['select']['name'] = 'g.name';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -397,7 +392,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// host
 		if (!is_null($options['host'])) {
-			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
@@ -451,25 +445,8 @@ class CTrigger extends CTriggerGeneral {
 			return count($triggers);
 		}
 
-		$triggerids = array_keys($triggers);
-		sort($triggerids);
-
 		foreach ($triggers as $trigger) {
-			if (!isset($result[$trigger['triggerid']])) {
-				$result[$trigger['triggerid']] = array();
-			}
-
-			$result[$trigger['triggerid']] += $trigger;
-		}
-
-		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
-			$options['selectGroups'] = API_OUTPUT_REFER;
-		}
-		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
-			$options['selectHosts'] = API_OUTPUT_REFER;
-		}
-		if ($options['itemids'] !== null && $options['selectItems'] === null) {
-			$options['selectItems'] = array('itemid');
+			$result[$trigger['triggerid']] = $trigger;
 		}
 
 		if ($result) {
@@ -619,8 +596,7 @@ class CTrigger extends CTriggerGeneral {
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
-				'preservekeys' => true,
-				'selectDependencies' => API_OUTPUT_REFER
+				'preservekeys' => true
 			));
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
@@ -1144,7 +1120,7 @@ class CTrigger extends CTriggerGeneral {
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
-			'selectDependencies' => API_OUTPUT_REFER,
+			'selectDependencies' => array('triggerid'),
 			'preservekeys' => true,
 			'nopermissions' => true
 		));
@@ -1327,7 +1303,7 @@ class CTrigger extends CTriggerGeneral {
 			'hostids' => $templateIds,
 			'preservekeys' => true,
 			'output' => array('triggerid'),
-			'selectDependencies' => API_OUTPUT_REFER
+			'selectDependencies' => array('triggerid')
 		));
 
 		if ($parentTriggers) {
@@ -1337,7 +1313,6 @@ class CTrigger extends CTriggerGeneral {
 				'nopermissions' => true,
 				'preservekeys' => true,
 				'output' => array('triggerid', 'templateid'),
-				'selectDependencies' => API_OUTPUT_REFER,
 				'selectHosts' => array('hostid')
 			));
 
@@ -1595,9 +1570,9 @@ class CTrigger extends CTriggerGeneral {
 		$expressionData->parse($trigger['expression']);
 
 		$templatesData = API::Template()->get(array(
-			'output' => API_OUTPUT_REFER,
-			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
+			'output' => array('templateid'),
+			'selectHosts' => array('hostid'),
+			'selectTemplates' => array('templateid'),
 			'filter' => array('host' => $expressionData->getHosts()),
 			'nopermissions' => true,
 			'preservekeys' => true
@@ -1814,8 +1789,6 @@ class CTrigger extends CTriggerGeneral {
 			if (isset($sqlParts['select']['hostname'])) {
 				$sqlParts['select']['hostname'] = 'h.name as hostname';
 			}
-
-			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
 		return $sqlParts;

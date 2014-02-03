@@ -85,7 +85,7 @@ class CDHost extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
 			'selectDServices'			=> null,
 			'countOutput'				=> null,
@@ -125,7 +125,6 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 
-			$sqlParts['select']['druleid'] = 'dh.druleid';
 			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -142,7 +141,6 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['select']['dserviceids'] = 'ds.dserviceid';
 			$sqlParts['from']['dservices'] = 'dservices ds';
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
@@ -190,12 +188,8 @@ class CDHost extends CZBXAPI {
 				else
 					$result = $dhost['rowscount'];
 			}
-			else{
-				if (!isset($result[$dhost['dhostid']])) {
-					$result[$dhost['dhostid']]= array();
-				}
-
-				$result[$dhost['dhostid']] += $dhost;
+			else {
+				$result[$dhost['dhostid']] = $dhost;
 			}
 		}
 
@@ -273,7 +267,7 @@ class CDHost extends CZBXAPI {
 		if (!is_null($options['selectDServices'])) {
 			if ($options['selectDServices'] != API_OUTPUT_COUNT) {
 				$dservices = API::DService()->get(array(
-					'output' => $this->outputExtend('dservices', array('dserviceid', 'dhostid'), $options['selectDServices']),
+					'output' => $this->outputExtend($options['selectDServices'], array('dserviceid', 'dhostid')),
 					'nodeids' => $options['nodeids'],
 					'dhostids' => $dhostIds,
 					'preservekeys' => true

@@ -140,52 +140,6 @@ function BR() {
 	return new CTag('br', 'no');
 }
 
-function create_hat($caption, $items, $addicons = null, $id = null, $state = null) {
-	if (is_null($id)) {
-		list($usec, $sec) = explode(' ', microtime());
-		$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
-	}
-	$td_l = new CCol(SPACE);
-	$td_l->setAttribute('width', '100%');
-
-	$icons_row = array($td_l);
-	if (!is_null($addicons)) {
-		if (!is_array($addicons)) {
-			$addicons = array($addicons);
-		}
-		foreach ($addicons as $value) {
-			$icons_row[] = $value;
-		}
-	}
-
-	if (!is_null($state)) {
-		$icon = new CIcon(_('Show').'/'._('Hide'), $state ? 'arrowup' : 'arrowdown', "change_hat_state(this,'".$id."');");
-		$icon->setAttribute('id', $id.'_icon');
-		$icons_row[] = $icon;
-	}
-	else {
-		$state = true;
-	}
-
-	$icon_tab = new CTable();
-	$icon_tab->setAttribute('width', '100%');
-	$icon_tab->addRow($icons_row);
-
-	$table = new CTable();
-	$table->setAttribute('width', '100%');
-	$table->setCellPadding(0);
-	$table->setCellSpacing(0);
-	$table->addRow(get_table_header($caption, $icon_tab));
-
-	$div = new CDiv($items);
-	$div->setAttribute('id', $id);
-	if (!$state) {
-		$div->setAttribute('style', 'display: none;');
-	}
-	$table->addRow($div);
-	return $table;
-}
-
 function get_table_header($columnLeft, $columnRights = SPACE) {
 	$rights = array();
 
@@ -214,14 +168,14 @@ function show_table_header($columnLeft, $columnRights = SPACE){
 	$table->show();
 }
 
-function get_icon($name, $params = array()) {
-	switch ($name) {
+function get_icon($type, $params = array()) {
+	switch ($type) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
 					'iconminus',
-					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", 0);'
+					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");'
 				);
 			}
 			else {
@@ -232,24 +186,24 @@ function get_icon($name, $params = array()) {
 				);
 			}
 			$icon->setAttribute('id', 'addrm_fav');
-			break;
+
+			return $icon;
+
 		case 'fullscreen':
 			$url = new Curl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
-			$icon = new CIcon(
-				$_REQUEST['fullscreen'] ? _('Normal view') : _('Fullscreen'),
+
+			return new CIcon(
+				$params['fullscreen'] ? _('Normal view') : _('Fullscreen'),
 				'fullscreen',
 				"document.location = '".$url->getUrl()."';"
 			);
-			break;
-		case 'menu':
-			$icon = new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event, "'.$params['menu'].'");');
-			break;
+
 		case 'reset':
-			$icon = new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
-			break;
+			return new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
 	}
-	return $icon;
+
+	return null;
 }
 
 /**

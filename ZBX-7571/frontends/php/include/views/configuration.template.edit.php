@@ -65,6 +65,7 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 
 	// get template hosts from db
 	$hosts_linked_to = API::Host()->get(array(
+		'output' => array('hostid'),
 		'templateids' => $templateid,
 		'editable' => true,
 		'templated_hosts' => true
@@ -390,10 +391,12 @@ $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 $ignoredTemplates = array();
 foreach ($this->data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
+	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
+	$templateLink->setTarget('_blank');
 
 	$linkedTemplateTable->addRow(
 		array(
-			$template['name'],
+			$templateLink,
 			array(
 				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
 				SPACE,
