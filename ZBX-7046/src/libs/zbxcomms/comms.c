@@ -1090,18 +1090,10 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 		goto out;
 	}
 
-	switch (((struct sockaddr *)&sa)->sa_family)
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
-		case AF_INET:
-			inet_ntop(AF_INET, &(((struct sockaddr_in *)&sa)->sin_addr), host, sizeof(host));
-			break;
-#if defined(HAVE_IPV6)
-		case AF_INET6:
-			inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)&sa)->sin6_addr), host, sizeof(host));
-			break;
-#endif
-		default:
-			error_message = "Unrecognized address family";
+		error_message = strerror_from_system(zbx_sock_last_error());
+		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
 	}
 out:
 	if (NULL != error_message)
@@ -1284,7 +1276,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(struct sockaddr), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+	if (0 == zbx_getnameinfo((struct sockaddr *)&name, sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
 		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 	else
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
@@ -1292,4 +1284,46 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 #endif
 	return	FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_getnameinfo                                                  *
+ *                                                                            *
+ * Purpose: Wrapper for getnameinfo() library call. Calls getnameinfo() with  *
+ * 	    the correct parameters.                                           *
+ *                                                                            *
+ * Parameters:	sa - socket address structure                                 *
+ *		hbuf - returned hostname buffer                               *
+ *		hlen - length of hostname buffer                              *
+ *		sbuf - returned service name buffer                           *
+ *		slen - length of service name buffer                          *
+ *		flags - flags (see `man getnameinfo(3)' for details)          *
+ *                                                                            *
+ * Return value: 0 on success, any of the EAI_ errors described in            *
+ * 		 getnameinfo(3) on failure.                                   *
+ *                                                                            *
+ ******************************************************************************/
+
+int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, size_t hlen, char *sbuf, size_t slen, int flags)
+{
+	switch()
+	{
+#if defined(HAVE_IPV6)
+	case AF_INET6:
+	{
+		const struct sockaddr_in6 *sin6 = (const struct sockaddr_in6 *)sa;
+
+		return getnameinfo(&(sin6->sin6_addr), sizeof(sin6->sin6_addr), hbuf, hlen, sbuf, slen, flags);
+	}
+#endif
+	case AF_INET:
+	{
+		const struct sockaddr_in *sin = (const struct sockaddr_in *)sa;
+
+		return getnameinfo(&(sin->sin_addr), sizeof(sin->sin_addr), hbuf, hlen, sbuf, slen, flags);
+	}
+	default:
+		return EAI_FAMILY;
+	}
 }
