@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7726] fixed max frontend available date displaying (Eduard)
 .......PS. [ZBX-7690] fixed cache for dynamic SNMP indexes not being used (asaveljevs)
 ..F....... [ZBX-7610] fixed not being able to configure an empty database host in the setup (Pavels)
 ....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
