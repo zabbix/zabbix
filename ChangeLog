@@ -19,7 +19,6 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-........S. [ZBX-7571] fixed incorrect processing of \177 (U+007F) control character in json (igors)
 A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
 ....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
 ....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
