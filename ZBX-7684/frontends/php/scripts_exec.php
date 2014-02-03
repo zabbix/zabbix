@@ -38,6 +38,7 @@ check_fields($fields);
 
 ob_flush();
 flush();
+ob_end_flush();
 
 if (hasRequest('execute')) {
 	$scriptId = getRequest('scriptid');
