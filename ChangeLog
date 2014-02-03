@@ -2,7 +2,6 @@
 Changes for 2.3.0
 
 New features:
-...G...... [ZBX-7668] fixed sending empty values when reading from a file with zabbix_sender (Juris)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
 ........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] fixed frontend messages mute/unmute (Eduard)
