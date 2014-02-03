@@ -565,7 +565,7 @@ static zbx_hash_t	vc_strpool_hash_func(const void *data)
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -1174,9 +1174,8 @@ static void	vc_item_reset_cache(zbx_vc_item_t *item)
 {
 	vch_item_free_cache(item);
 
-	/* reset all item data except itemid and value_type which are the first members in zbx_vc_item_t structure */
-	memset((char *)&(item->state), 0,
-			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
+	/* reset all item data except the zbx_vc_item_t structure members before 'state' - itemid and value_type */
+	memset((char *)&(item->state), 0, sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
 }
 
 /******************************************************************************

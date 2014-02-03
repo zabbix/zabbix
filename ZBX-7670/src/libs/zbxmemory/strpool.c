@@ -47,7 +47,7 @@ static zbx_hash_t	__strpool_hash_func(const void *data)
 
 static int	__strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 ZBX_MEM_FUNC_IMPL(__strpool, strpool.mem_info);
