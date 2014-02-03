@@ -557,6 +557,17 @@ ZABBIX.apps.map = (function($) {
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
+				// application selection pop up
+				$('#application-select').click(function() {
+					var data = $('elementNameHost').multiSelect.getData();
+
+					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
+						+ '&with_applications=1&dstfrm=selementForm'
+						+ ((data.length > 0) ? '&hostid='+ data[0].id : ''),
+						450, 450
+					);
+				});
+
 				// mass update form
 				$('#massClose').click(function() {
 					that.clearSelection();
@@ -830,7 +841,8 @@ ZABBIX.apps.map = (function($) {
 					y: 0,
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
-					use_iconmap: '1'
+					use_iconmap: '1',
+					application: ''
 				};
 			}
 			else {
@@ -890,7 +902,8 @@ ZABBIX.apps.map = (function($) {
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
+						'application'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -1207,6 +1220,18 @@ ZABBIX.apps.map = (function($) {
 							{
 								elementType: '3',
 								subtypeHostGroupElements: 'checked'
+							}
+						]
+					},
+					{
+						action: 'show',
+						value: '#application-select-row',
+						cond: [
+							{
+								elementType: '0'
+							},
+							{
+								elementType: '3'
 							}
 						]
 					}
