@@ -39,6 +39,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 ..F....... [ZBX-7684] improved displaying of script execution page (Eduard)
 ...G...... [ZBX-7668] fixed sending empty values when reading from a file with zabbix_sender (Juris)
@@ -808,6 +809,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
