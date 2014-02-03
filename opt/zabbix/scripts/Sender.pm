@@ -94,7 +94,7 @@ sub _init_hostname {
 has 'zabbix_template_1_8' => (
     'is'      => 'ro',
     'isa'     => 'Str',
-    'default' => "a4 b c4 c4 a*",
+    'default' => "a4 b C4 C4 a*",
 );
 
 
