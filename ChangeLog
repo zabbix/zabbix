@@ -12,6 +12,7 @@ New features:
 A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7743] changed user language field for optional (Eduard)
 A......... [ZBX-7693] fixed user media validation (Eduard)
 ..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ..F....... [ZBX-7684] improved displaying of script execution page (Eduard)
