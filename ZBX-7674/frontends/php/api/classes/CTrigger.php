@@ -1304,11 +1304,11 @@ class CTrigger extends CTriggerGeneral {
 		));
 
 		// unlink triggers from IT services
-		foreach ($triggerIds as $triggerId) {
-			DBexecute(
-				'UPDATE services SET triggerid=NULL,showsla='.SERVICE_SHOW_SLA_OFF.' WHERE triggerid='.zbx_dbstr($triggerId)
-			);
+		DBexecute(
+			'UPDATE services SET triggerid=NULL,showsla='.SERVICE_SHOW_SLA_OFF.' WHERE '.dbConditionInt('triggerid', $triggerIds)
+		);
 
+		foreach ($triggerIds as $triggerId) {
 			updateServices($triggerId, SERVICE_STATUS_OK);
 		}
 
