@@ -13,8 +13,7 @@ my $cfg_key_out = 'dnstest.slv.dns.ns.month[';
 parse_opts();
 exit_if_running();
 
-my $config = get_dnstest_config();
-set_slv_config($config);
+set_slv_config(get_dnstest_config());
 
 my ($from, $till, $value_ts) = get_month_bounds();
 
@@ -22,7 +21,7 @@ zapi_connect();
 
 my $interval = $till + 1 - $from;
 
-exit_if_lastclock($tld, $cfg_key_out, $value_ts, $interval);
+slv_exit(SUCCESS) if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
 
 info("from:$from till:$till value_ts:$value_ts");
 

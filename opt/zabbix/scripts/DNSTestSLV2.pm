@@ -47,12 +47,12 @@ our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
 		get_macro_dns_udp_delay get_macro_dns_tcp_delay get_macro_rdds_delay
 		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids
-		get_macro_epp_rtt get_itemid_by_item get_rollweek_data get_lastclock
+		get_macro_epp_rtt get_itemid_by_item get_rollweek_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_probes get_online_probes probes2tldhostids send_value get_ns_from_key
 		is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly get_item_values
-		exit_if_lastclock get_down_count
+		check_lastclock get_down_count
 		dbg info warn fail slv_exit exit_if_running trim parse_opts);
 
 my $probe_group_name = 'Probes';
@@ -486,7 +486,7 @@ sub send_value
         'port' => $config->{'slv'}->{'zport'},
 	'retries' => 1 });
 
-    fail("cannot send value $value with clock:$timestamp to $hostname:$key") if (not defined($sender->send($hostname, $key, "$value", "$timestamp")));
+    fail("cannot send value:$value clock:$timestamp ($hostname:$key)") if (not defined($sender->send($hostname, $key, "$value", "$timestamp")));
 }
 
 # Get name server details (name, IP) from item key.
@@ -695,7 +695,7 @@ sub process_slv_ns_avail
     {
 	info("success ($count probes are online, min - $cfg_minonline)");
 	send_value($tld, $_, $value_ts, UP) foreach (@out_keys);
-	exit SUCCESS;
+	return;
     }
 
     my $all_ns_items_ref = get_all_ns_items($nss_ref, $cfg_key_in, $tld);
@@ -730,7 +730,7 @@ sub process_slv_ns_avail
 
 	my $success_perc = $success_results * 100 / $count;
 	my $test_result = $success_perc > $unavail_limit ? UP : DOWN;
-	info("$out_key: ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
+	info("$ns ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
 	send_value($tld, $out_key, $value_ts, $test_result);
     }
 }
@@ -784,21 +784,21 @@ sub get_item_values
     return \%result;
 }
 
-sub exit_if_lastclock
+sub check_lastclock
 {
     my $lastclock = shift;
     my $value_ts = shift;
     my $interval = shift;
 
-    return if (defined($OPTS{'test'}));
+    return SUCCESS if (defined($OPTS{'test'}));
 
     if ($lastclock + $interval > $value_ts)
     {
 	dbg("lastclock:$lastclock value calculation not needed");
-	exit(SUCCESS);
+	return FAIL;
     }
 
-    info("lastclock:$lastclock value_ts:$value_ts interval:$interval");
+    return SUCCESS;
 }
 
 sub get_down_count
@@ -841,11 +841,11 @@ sub slv_exit
 
 sub exit_if_running
 {
-    return if (defined($OPTS{'test'}) or not defined($tld));
+    return if (defined($OPTS{'test'}));
 
     $pidfile = __get_pidfile();
 
-    fail("cannot lock script ", __script(), ":", $tld) unless (defined($pidfile));
+    fail("cannot lock script", (defined($tld) ? " $tld" : '')) unless (defined($pidfile));
 
     if (my $pid = $pidfile->running())
     {
@@ -882,7 +882,7 @@ sub fail
 
     __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
 
-    exit FAIL;
+    exit(FAIL);
 }
 
 sub trim
@@ -897,8 +897,8 @@ sub trim
 
 sub parse_opts
 {
-    usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!") and defined($ARGV[0]));
-    $tld = $ARGV[0];
+    usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!"));
+    $tld = $ARGV[0] if (defined($ARGV[0]));
 }
 
 sub usage
@@ -924,7 +924,6 @@ sub __log
 
     if (defined($OPTS{'test'}) or
 	defined($OPTS{'stdout'}) or
-	not defined($tld) or
 	not defined($config) or
 	not defined($config->{'slv'}) or
 	not defined($config->{'slv'}->{'logdir'}))
@@ -938,7 +937,7 @@ sub __log
     my $script = __script();
     $script =~ s,\.pl$,,;
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $tld . '-' . $script . '.log';
+    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : "") . $script . '.log';
 
     open $OUTFILE, '>>', $file or die("cannot open $file: $!");
 
@@ -1051,6 +1050,46 @@ sub get_lastclock
     fail("cannot find item by key/pattern '$key' at host '$host'") unless (scalar(@$arr_ref) == 1);
 
     return $arr_ref->[0]->[0];
+}
+
+sub get_tlds
+{
+    my $service = shift;
+
+    my $res;
+
+    unless (defined($service))
+    {
+	$res = db_select(
+	    "select h.host".
+	    " from hosts h,hosts_groups hg,groups g".
+	    " where h.hostid=hg.hostid".
+		" and hg.groupid=g.groupid".
+		" and g.name='TLDs'".
+		" and h.status=0");
+    }
+    else
+    {
+	$res = db_select(
+	    "select h.host".
+	    " from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+	    " where h.hostid=hg.hostid".
+	    	"and hg.groupid=g.groupid".
+	    	" and h2.name=concat('Template ', h.host)".
+	    	" and g.name='TLDs'".
+	    	" and h2.hostid=hm.hostid".
+	    	" and hm.macro='{$DNSTEST.TLD.".uc($service).".ENABLED}'".
+	    	" and hm.value!=0".
+	    	" and h.status=0");
+    }
+
+    my @tlds;
+    while (my @row = $res->fetchrow_array)
+    {
+	push(@tlds, $row[0]);
+    }
+
+    return \@tlds;
 }
 
 # organize values from all hosts grouped by name server and return "name server"->values hash
@@ -1279,11 +1318,7 @@ sub __script
 
 sub __get_pidfile
 {
-    return unless (defined($tld));
-
-    my $filename = $pid_dir . '/' . __script() . '-' . $tld . '.pid';
-
-    print("creating file $filename\n");
+    my $filename = $pid_dir . '/' . __script() . (defined($tld) ? "-$tld" : "") . '.pid';
 
     return File::Pid->new({ file => $filename });
 }

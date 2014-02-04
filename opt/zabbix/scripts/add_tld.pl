@@ -1571,19 +1571,11 @@ sub create_cron_items {
 
     my $slv_file;
     while (($slv_file = readdir DIR)) {
-	# do not process update time items if EPP is disabled
-	next if ($slv_file =~ /dnstest\.slv\..*\.upd\..*\.pl$/ and !defined($OPTS{'epp-server'}));
-
-	if (($slv_file =~ /dnstest\.slv\.dns\..*\.pl$/) or
-	    ($slv_file =~ /dnstest\.slv\.dnssec\..*\.pl$/ and defined($OPTS{'dnssec'})) or
-	    ($slv_file =~ /dnstest\.slv\.rdds\..*\.pl$/ and defined($OPTS{'rdds43-servers'})) or
-	    ($slv_file =~ /dnstest\.slv\.epp\..*\.pl$/ and defined($OPTS{'epp-server'}))) {
-	    if ($slv_file =~ /dnstest\.slv\..*\.month\.pl$/) {
-		# check monthly data once a day
-		system("echo '0 0 * * * root $slv_path/$slv_file $tld' > /etc/cron.d/tld-$tld-$slv_file");
-	    } else {
-		system("echo '* * * * * root $slv_path/$slv_file $tld' > /etc/cron.d/tld-$tld-$slv_file");
-	    }
+	if ($slv_file =~ /dnstest\.slv\..*\.month\.pl$/) {
+	    # check monthly data once a day
+	    system("echo '0 0 * * * root $slv_path/$slv_file $tld' > /etc/cron.d/tld-$tld-$slv_file");
+	} else {
+	    system("echo '* * * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
 	}
     }
 }

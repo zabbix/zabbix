@@ -14,8 +14,7 @@ my $cfg_dnssec_ec = -204; 	# DNSSEC error
 parse_opts();
 exit_if_running();
 
-my $config = get_dnstest_config();
-set_slv_config($config);
+set_slv_config(get_dnstest_config());
 
 my ($from, $till, $value_ts) = get_minute_bounds();
 info("from:$from till:$till value_ts:$value_ts");
@@ -25,47 +24,56 @@ db_connect();
 my $cfg_minonline = get_macro_dns_probe_online();
 
 my $probes_ref = get_online_probes($from, $till, undef);
-my $count = scalar(@$probes_ref);
-if ($count < $cfg_minonline)
+my $online_probes = scalar(@$probes_ref);
+
+my $tlds_ref = get_tlds();
+
+foreach (@$tlds_ref)
 {
-    info("success ($count probes are online, min - $cfg_minonline)");
-    send_value($tld, $cfg_key_out, $value_ts, UP);
-    slv_exit(SUCCESS);
+    $tld = $_;
+
+    if ($online_probes < $cfg_minonline)
+    {
+	info("success ($count probes are online, min - $cfg_minonline)");
+	send_value($tld, $cfg_key_out, $value_ts, UP);
+	next;
+    }
+
+    my $hostids_ref = probes2tldhostids($tld, $probes_ref);
+
+    my $items = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
+
+    my $values_ref = get_values_by_items($items);
+
+    if (scalar(@$values_ref) == 0)
+    {
+	warn("no values found in the database");
+	next;
+    }
+
+    info("  itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
+
+    my $probes_with_values = get_probes_count($items, $values_ref);
+    if ($probes_with_values < $cfg_minonline)
+    {
+	info("success ($probes_with_values online probes have results, min - $cfg_minonline)");
+	send_value($tld, $cfg_key_out, $value_ts, UP);
+	next;
+    }
+
+    my $success_values = scalar(@$values_ref);
+    foreach (@$values_ref)
+    {
+	$success_values-- if ($cfg_dnssec_ec == $_->[1]);
+    }
+
+    my $test_result = DOWN;
+    $test_result = UP if ($success_values * 100 / scalar(@$values_ref) > SLV_UNAVAILABILITY_LIMIT);
+
+    info(($test_result == UP ? "success" : "fail"), " (dnssec success: $success_values)");
+    send_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
 
-my $hostids_ref = probes2tldhostids($tld, $probes_ref);
-
-my $items = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
-
-my $values_ref = get_values_by_items($items);
-
-if (scalar(@$values_ref) == 0)
-{
-    warn("no values found");
-    slv_exit(FAIL);
-}
-
-info("itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
-
-$count = get_probes_count($items, $values_ref);
-if ($count < $cfg_minonline)
-{
-    info("success ($count online probes have results, min - $cfg_minonline)");
-    send_value($tld, $cfg_key_out, $value_ts, UP);
-    slv_exit(SUCCESS);
-}
-
-my $success_values = scalar(@$values_ref);
-foreach (@$values_ref)
-{
-    $success_values-- if ($cfg_dnssec_ec == $_->[1]);
-}
-
-my $test_result = DOWN;
-$test_result = UP if ($success_values * 100 / scalar(@$values_ref) > SLV_UNAVAILABILITY_LIMIT);
-
-info(($test_result == UP ? "success" : "fail"), " (dnssec success: $success_values)");
-send_value($tld, $cfg_key_out, $value_ts, $test_result);
 slv_exit(SUCCESS);
 
 sub get_values_by_items
