@@ -224,7 +224,7 @@ if (isset($_REQUEST['form'])) {
 	else {
 		$data['drule']['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$data['drule']['name'] = get_request('name', '');
-		$data['drule']['iprange'] = get_request('iprange', '192.168.0.1-255');
+		$data['drule']['iprange'] = get_request('iprange', '192.168.0.1-254');
 		$data['drule']['delay'] = get_request('delay', SEC_PER_HOUR);
 		$data['drule']['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 		$data['drule']['dchecks'] = get_request('dchecks', array());

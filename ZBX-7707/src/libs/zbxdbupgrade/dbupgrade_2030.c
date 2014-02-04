@@ -123,6 +123,13 @@ static int	DBpatch_2030010(void)
 	return DBdrop_table("trigger_discovery_tmp");
 }
 
+static int	DBpatch_2030011(void)
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -140,5 +147,6 @@ DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
 DBPATCH_ADD(2030009, 0, 1)
 DBPATCH_ADD(2030010, 0, 1)
+DBPATCH_ADD(2030011, 2020001, 1)
 
 DBPATCH_END()
