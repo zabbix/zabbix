@@ -44,7 +44,7 @@ $themes[] = THEME_DEFAULT;
 $fields = array(
 	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})'),
+	'lang' =>				array(T_ZBX_STR, O_OPT, null, null, null),
 	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
@@ -127,12 +127,15 @@ elseif (isset($_REQUEST['save'])) {
 		$user['url'] = get_request('url');
 		$user['autologin'] = get_request('autologin', 0);
 		$user['autologout'] = hasRequest('autologout_visible') ? getRequest('autologout') : 0;
-		$user['lang'] = get_request('lang');
 		$user['theme'] = get_request('theme');
 		$user['refresh'] = get_request('refresh');
 		$user['rows_per_page'] = get_request('rows_per_page');
 		$user['user_groups'] = null;
 		$user['user_medias'] = get_request('user_medias', array());
+
+		if (hasRequest('lang')) {
+			$user['lang'] = getRequest('lang');
+		}
 
 		$messages = get_request('messages', array());
 		if (!isset($messages['enabled'])) {
