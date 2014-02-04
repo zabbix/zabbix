@@ -44,7 +44,7 @@ $themes[] = THEME_DEFAULT;
 $fields = array(
 	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})'),
+	'lang' =>				array(T_ZBX_STR, O_OPT, null, null, null),
 	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
