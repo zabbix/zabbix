@@ -1,6 +1,7 @@
 Changes for 2.2.2rc2
 
 Bug fixes:
+........S. [ZBX-7711] fixed memory leak in vmware collector (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.2rc1
