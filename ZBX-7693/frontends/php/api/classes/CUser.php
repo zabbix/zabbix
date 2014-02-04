@@ -767,7 +767,7 @@ class CUser extends CZBXAPI {
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
-		$userIds = zbx_objectValues($users, 'userid');
+		$userIds = array_keys(array_flip((zbx_objectValues($users, 'userid'))));
 
 		$dbMedia = API::UserMedia()->get(array(
 			'output' => array('mediaid'),
@@ -788,11 +788,9 @@ class CUser extends CZBXAPI {
 		}
 
 		foreach ($dbMedia as $dbMediaItem) {
-			if (isset($mediaToUpdate[$dbMediaItem['mediaid']])) {
-				continue;
+			if (!isset($mediaToUpdate[$dbMediaItem['mediaid']])) {
+				$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
 			}
-
-			$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
 		}
 
 		// create
@@ -863,18 +861,21 @@ class CUser extends CZBXAPI {
 
 		// validate media permissions
 		$mediaIds = array();
+
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
 				$mediaIds[$mediaItem['mediaid']] = $mediaItem['mediaid'];
 			}
 		}
+
 		if ($mediaIds) {
-			$count = API::UserMedia()->get(array(
+			$dbUserMediaCount = API::UserMedia()->get(array(
 				'countOutput' => true,
 				'mediaids' => $mediaIds,
 				'editable' => true
 			));
-			if ($count != count($mediaIds)) {
+
+			if ($dbUserMediaCount != count($mediaIds)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -887,14 +888,14 @@ class CUser extends CZBXAPI {
 			'active' => null,
 			'severity' => null
 		);
+
+		$timePeriodValidator = new CTimePeriodValidator();
+
 		foreach ($media as $mediaItem) {
 			if (!check_db_fields($mediaDBfields, $mediaItem)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
-		}
 
-		$timePeriodValidator = new CTimePeriodValidator();
-		foreach ($media as $mediaItem) {
 			if (!$timePeriodValidator->validate($mediaItem['period'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 			}
@@ -927,13 +928,13 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
-		$dbMediaCount = API::UserMedia()->get(array(
+		$dbUserMediaCount = API::UserMedia()->get(array(
 			'countOutput' => true,
 			'mediaids' => $mediaIds,
 			'editable' => true
 		));
 
-		if (count($mediaIds) != $dbMediaCount) {
+		if (count($mediaIds) != $dbUserMediaCount) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
