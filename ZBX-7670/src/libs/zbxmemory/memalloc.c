@@ -591,7 +591,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 	*info = ALIGN8(base);
 	(*info)->shm_id = shm_id;
 	(*info)->orig_size = size;
-	size -= (*info + 1) - (zbx_mem_info_t *)base;
+	size -= (char *)(*info + 1) - (char *)base;
 
 	base = (void *)(*info + 1);
 

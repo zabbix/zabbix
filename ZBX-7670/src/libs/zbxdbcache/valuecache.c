@@ -1172,11 +1172,15 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
  ******************************************************************************/
 static void	vc_item_reset_cache(zbx_vc_item_t *item)
 {
+	zbx_uint64_t	itemid = item->itemid;
+	unsigned char	type = item->value_type;
+
 	vch_item_free_cache(item);
 
-	/* reset all item data except the zbx_vc_item_t structure members before 'state' - itemid and value_type */
-	memset((char *)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
-			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
+	memset(item, 0, sizeof(*item));
+
+	item->itemid = itemid;
+	item->value_type = type;
 }
 
 /******************************************************************************
