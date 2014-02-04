@@ -965,6 +965,11 @@ define('PROBE_EPP_IP',				'dnstest.epp.ip[{$DNSTEST.TLD}]');
 define('PROBE_EPP_UPDATE',			'dnstest.epp.rtt[{$DNSTEST.TLD},update]');
 define('PROBE_EPP_INFO',			'dnstest.epp.rtt[{$DNSTEST.TLD},info]');
 define('PROBE_EPP_LOGIN',			'dnstest.epp.rtt[{$DNSTEST.TLD},login]');
+define('PROBE_RDDS43_IP',			'dnstest.rdds.43.ip[{$DNSTEST.TLD}]');
+define('PROBE_RDDS43_RTT',			'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]');
+define('PROBE_RDDS43_UPD',			'dnstest.rdds.43.upd[{$DNSTEST.TLD}]');
+define('PROBE_RDDS80_IP',			'dnstest.rdds.80.ip[{$DNSTEST.TLD}]');
+define('PROBE_RDDS80_RTT',			'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]');
 
 // DNS TEST NS names
 define('NS_NO_RESULT',	0);

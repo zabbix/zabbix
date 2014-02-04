@@ -274,12 +274,14 @@ if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_DNS_UDP_ITEM_RTT.'%').') OR i.key_='.zbx_dbstr(PROBE_DNS_UDP_ITEM).')';
 }
 elseif ($data['type'] == DNSTEST_RDDS) {
-	$probeItemKey = ' AND i.key_ LIKE ('.zbx_dbstr(PROBE_RDDS_ITEM.'%').')';
+	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_RDDS_ITEM.'%').')'.
+	' OR '.dbConditionString('i.key_',
+		array(PROBE_RDDS43_IP, PROBE_RDDS43_RTT, PROBE_RDDS43_UPD, PROBE_RDDS80_IP, PROBE_RDDS80_RTT)).
+	')';
 }
 else {
 	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_EPP_RESULT.'%').')'.
-		' OR i.key_='.zbx_dbstr(PROBE_EPP_IP).' OR i.key_='.zbx_dbstr(PROBE_EPP_UPDATE).''.
-		' OR i.key_='.zbx_dbstr(PROBE_EPP_INFO).' OR i.key_='.zbx_dbstr(PROBE_EPP_LOGIN).')';
+	' OR '.dbConditionString('i.key_', array(PROBE_EPP_IP, PROBE_EPP_UPDATE, PROBE_EPP_INFO, PROBE_EPP_LOGIN)).')';
 }
 
 // get items
@@ -294,17 +296,15 @@ $nsArray = array();
 
 // get items value
 while ($item = DBfetch($items)) {
-	if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC || $data['type'] == DNSTEST_EPP) {
-		$itemValue = API::History()->get(array(
-			'itemids' => $item['itemid'],
-			'time_from' => $testTimeFrom,
-			'time_till' => $testTimeTill,
-			'history' => $item['value_type'],
-			'output' => API_OUTPUT_EXTEND
-		));
+	$itemValue = API::History()->get(array(
+		'itemids' => $item['itemid'],
+		'time_from' => $testTimeFrom,
+		'time_till' => $testTimeTill,
+		'history' => $item['value_type'],
+		'output' => API_OUTPUT_EXTEND
+	));
 
-		$itemValue = reset($itemValue);
-	}
+	$itemValue = reset($itemValue);
 
 	if ($data['type'] == DNSTEST_DNS && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 		preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
@@ -349,20 +349,27 @@ while ($item = DBfetch($items)) {
 		$hosts[$item['hostid']]['value']['total']++;
 	}
 	elseif ($data['type'] == DNSTEST_RDDS) {
-		$itemValue = DBfetch(DBselect(DBaddLimit(
-			'SELECT h.value'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.$item['itemid'].
-				' AND h.clock>='.$testTimeFrom.
-				' AND h.clock<='.$testTimeTill.
-			' ORDER BY h.clock DESC',
-			1
-		)));
-
-		if (!$itemValue) {
-			$itemValue['value'] = null;
+		if ($item['key_'] == PROBE_RDDS43_IP) {
+			$hosts[$item['hostid']]['rdds43']['ip'] = $itemValue['value'];
 		}
-		$hosts[$item['hostid']]['value'] = $itemValue['value'];
+		elseif ($item['key_'] == PROBE_RDDS43_RTT) {
+			$hosts[$item['hostid']]['rdds43']['rtt'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		elseif ($item['key_'] == PROBE_RDDS43_UPD) {
+			$hosts[$item['hostid']]['rdds43']['upd'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		elseif ($item['key_'] == PROBE_RDDS80_IP) {
+			$hosts[$item['hostid']]['rdds80']['ip'] = $itemValue['value'];
+		}
+		elseif ($item['key_'] == PROBE_RDDS80_RTT) {
+			$hosts[$item['hostid']]['rdds80']['rtt'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		else {
+			$hosts[$item['hostid']]['value'] = $itemValue['value'];
+		}
 	}
 	elseif ($data['type'] == DNSTEST_EPP) {
 		if ($item['key_'] == PROBE_EPP_IP) {

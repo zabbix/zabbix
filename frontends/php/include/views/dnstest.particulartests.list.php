@@ -36,7 +36,12 @@ elseif ($this->data['type'] == DNSTEST_RDDS) {
 		_('Probe ID'),
 		_('Row result'),
 		_('RDDS43'),
-		_('RDDS80')
+		_('RDDS43 IP'),
+		_('RDDS43 RTT'),
+		_('RDDS43 UPD'),
+		_('RDDS80'),
+		_('RDDS80 IP'),
+		_('RDDS80 RTT'),
 	);
 }
 else {
@@ -168,7 +173,12 @@ foreach ($this->data['probes'] as $probe) {
 			$probe['name'],
 			$rdds,
 			$rdds43,
-			$rdds80
+			(isset($probe['rdds43']['ip']) && $probe['rdds43']['ip']) ? $probe['rdds43']['ip'] : '-',
+			(isset($probe['rdds43']['rtt']) && $probe['rdds43']['rtt']) ? $probe['rdds43']['rtt'] : '-',
+			(isset($probe['rdds43']['upd']) && $probe['rdds43']['upd']) ? $probe['rdds43']['upd'] : '-',
+			$rdds80,
+			(isset($probe['rdds80']['ip']) && $probe['rdds80']['ip']) ? $probe['rdds80']['ip'] : '-',
+			(isset($probe['rdds80']['rtt']) && $probe['rdds80']['rtt']) ? $probe['rdds80']['rtt'] : '-'
 		);
 	}
 	else {
