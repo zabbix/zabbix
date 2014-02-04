@@ -56,6 +56,10 @@ $fields = array(
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EMAIL,
 		_('SMTP email')
 	),
+	'remedy_mapping' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_REMEDY,
+		_('Services mapping')
+	),
 	'exec_path' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&{type}=='.MEDIA_TYPE_EXEC,
 		_('Script name')
@@ -141,7 +145,12 @@ if (isset($_REQUEST['save'])) {
 	$mediaType = array(
 		'type' => getRequest('type'),
 		'description' => getRequest('description'),
+		'smtp_server' => getRequest('smtp_server'),
+		'smtp_helo' => getRequest('smtp_helo'),
 		'smtp_email' => getRequest('smtp_email'),
+		'exec_path' => getRequest('exec_path'),
+		'username' => getRequest('username'),
+		'passwd' => '',
 		'gsm_modem' => getRequest('gsm_modem'),
 		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
@@ -150,6 +159,7 @@ if (isset($_REQUEST['save'])) {
 		case MEDIA_TYPE_REMEDY:
 			$mediaType['smtp_server'] = getRequest('remedy_url');
 			$mediaType['smtp_helo'] = getRequest('remedy_proxy');
+			$mediaType['smtp_email'] = getRequest('remedy_mapping');
 			$mediaType['exec_path'] = getRequest('remedy_company');
 			$mediaType['username'] = getRequest('username');
 			$mediaType['passwd'] = getRequest('password');
@@ -158,6 +168,7 @@ if (isset($_REQUEST['save'])) {
 		case MEDIA_TYPE_JABBER:
 			$mediaType['smtp_server'] = '';
 			$mediaType['smtp_helo'] = '';
+			$mediaType['smtp_email'] = '';
 			$mediaType['exec_path'] = '';
 			$mediaType['username'] = getRequest('jabber_identifier');
 			$mediaType['passwd'] = getRequest('password');
@@ -166,17 +177,10 @@ if (isset($_REQUEST['save'])) {
 		case MEDIA_TYPE_EZ_TEXTING:
 			$mediaType['smtp_server'] = '';
 			$mediaType['smtp_helo'] = '';
+			$mediaType['smtp_email'] = '';
 			$mediaType['exec_path'] = getRequest('msg_txt_limit');
 			$mediaType['username'] = getRequest('ez_username');
 			$mediaType['passwd'] = getRequest('password');
-			break;
-
-		default:
-			$mediaType['smtp_server'] = getRequest('smtp_server');
-			$mediaType['smtp_helo'] = getRequest('smtp_helo');
-			$mediaType['exec_path'] = getRequest('exec_path');
-			$mediaType['username'] = getRequest('username');
-			$mediaType['passwd'] = '';
 	}
 
 	if ($mediaTypeId) {
@@ -267,10 +271,11 @@ if (!empty($_REQUEST['form'])) {
 		$data['description'] = $mediaType['description'];
 		$data['smtp_server'] = ($data['type'] == MEDIA_TYPE_EMAIL) ? $mediaType['smtp_server'] : 'localhost';
 		$data['smtp_helo'] = ($data['type'] == MEDIA_TYPE_EMAIL) ? $mediaType['smtp_helo'] : 'localhost';
-		$data['smtp_email'] = $mediaType['smtp_email'] ? $mediaType['smtp_email'] : 'zabbix@localhost';
+		$data['smtp_email'] = ($data['type'] == MEDIA_TYPE_EMAIL) ? $mediaType['smtp_email'] : 'zabbix@localhost';
 		$data['remedy_url'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['smtp_server'] : 'localhost';
 		$data['remedy_proxy'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['smtp_helo'] : '';
 		$data['remedy_company'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['exec_path'] : '';
+		$data['remedy_mapping'] = ($data['type'] == MEDIA_TYPE_REMEDY) ? $mediaType['smtp_email'] : '';
 		$data['exec_path'] = ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? '' : $mediaType['exec_path'];
 		$data['msg_txt_limit'] = $mediaType['exec_path'];
 		$data['gsm_modem'] = $mediaType['gsm_modem'] ? $mediaType['gsm_modem'] : '/dev/ttyS0';
@@ -289,6 +294,7 @@ if (!empty($_REQUEST['form'])) {
 		$data['remedy_url'] = getRequest('remedy_url', 'localhost');
 		$data['remedy_proxy'] = getRequest('remedy_proxy', '');
 		$data['remedy_company'] = getRequest('remedy_company', '');
+		$data['remedy_mapping'] = getRequest('remedy_mapping', '');
 		$data['exec_path'] = getRequest('exec_path', '');
 		$data['msg_txt_limit'] = getRequest('msg_txt_limit', '');
 		$data['gsm_modem'] = getRequest('gsm_modem', '/dev/ttyS0');

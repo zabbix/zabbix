@@ -122,6 +122,10 @@ $mediaTypeFormList->addRow(_('Company name'),
 	new CTextBox('remedy_company', $this->data['remedy_company'], ZBX_TEXTBOX_STANDARD_SIZE), false,
 	'row_remedy_company'
 );
+$mediaTypeFormList->addRow(_('Services mapping'),
+	new CTextBox('remedy_mapping', $this->data['remedy_mapping'], ZBX_TEXTBOX_STANDARD_SIZE), false,
+	'row_remedy_mapping'
+);
 
 $mediaTypeFormList->addRow(_('Enabled'),
 	new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $this->data['status'], null, MEDIA_TYPE_STATUS_ACTIVE)
@@ -176,6 +180,8 @@ zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'remedy_prox
 zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'row_remedy_proxy');
 zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'remedy_company');
 zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'row_remedy_company');
+zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'remedy_mapping');
+zbx_subarray_push($this->data['typeVisibility'], MEDIA_TYPE_REMEDY, 'row_remedy_mapping');
 
 require_once dirname(__FILE__).'/js/administration.mediatypes.edit.js.php';
 
