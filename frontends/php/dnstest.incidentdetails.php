@@ -119,16 +119,13 @@ $slvItem = $slvItems ? reset($slvItems) : null;
 $mainEvent = API::Event()->get(array(
 	'eventids' => $data['eventid'],
 	'selectTriggers' => API_OUTPUT_REFER,
-	'select_acknowledges' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND
 ));
 
 if ($mainEvent) {
 	$mainEvent = reset($mainEvent);
 	$eventTrigger = reset($mainEvent['triggers']);
-	$acknowledge = reset($mainEvent['acknowledges']);
 
-	$data['ticket'] = $acknowledge['message'];
 	$mainEventFromTime = $mainEvent['clock'];
 
 	// get host with calculated items

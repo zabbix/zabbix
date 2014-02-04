@@ -315,7 +315,6 @@ if ($host || $data['filter_search']) {
 			$events = API::Event()->get(array(
 				'triggerids' => $triggerIds,
 				'selectTriggers' => API_OUTPUT_REFER,
-				'select_acknowledges' => API_OUTPUT_EXTEND,
 				'time_from' => $filterTimeFrom,
 				'time_till' => $filterTimeTill,
 				'output' => API_OUTPUT_EXTEND,
@@ -328,7 +327,6 @@ if ($host || $data['filter_search']) {
 				$newEvents = API::Event()->get(array(
 					'eventids' => $newEventIds,
 					'selectTriggers' => API_OUTPUT_REFER,
-					'select_acknowledges' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND
 				));
 
@@ -343,7 +341,6 @@ if ($host || $data['filter_search']) {
 			// data generation
 			foreach ($events as $event) {
 				$getHistory = false;
-				$event['acknowledges'] = reset($event['acknowledges']);
 
 				if ($event['value'] == TRIGGER_VALUE_TRUE) {
 					if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
@@ -463,16 +460,14 @@ if ($host || $data['filter_search']) {
 						'objectid' => $event['objectid'],
 						'status' => TRIGGER_VALUE_TRUE,
 						'startTime' => $event['clock'],
-						'false_positive' => $event['false_positive'],
-						'ticket' => $event['acknowledges']['message']
+						'false_positive' => $event['false_positive']
 					);
 				}
 				else {
 					if (isset($incidents[$i])) {
 						$incidents[$i] = array(
 							'status' => TRIGGER_VALUE_FALSE,
-							'endTime' => $event['clock'],
-							'ticket' => $event['acknowledges']['message']
+							'endTime' => $event['clock']
 						);
 					}
 					else {
@@ -527,8 +522,7 @@ if ($host || $data['filter_search']) {
 									$filterTimeTill,
 									$addEvent['clock'],
 									$event['clock']
-								),
-								'ticket' => $event['acknowledges']['message']
+								)
 							);
 						}
 					}

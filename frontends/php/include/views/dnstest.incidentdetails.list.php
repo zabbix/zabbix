@@ -204,16 +204,7 @@ $detailsTable->setHeader($headers);
 
 foreach ($this->data['tests'] as $test) {
 	if (isset($test['startEvent']) && $test['startEvent']) {
-		if (isset($this->data['ticket'])) {
-			$ticketParts = explode(SALES_FORCE_PATTERN, $this->data['ticket']);
-			$ticketLink = new CLink($this->data['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
-			$ticketLink->setTarget('_blank');
-
-			$startEndIncident = new CSpan(array(_('Start time'), BR(), $ticketLink));
-		}
-		else {
-			$startEndIncident = _('Start time');
-		}
+		$startEndIncident = _('Start time');
 	}
 	elseif (isset($test['endEvent']) && $test['endEvent']) {
 		$startEndIncident = _('Resolved');

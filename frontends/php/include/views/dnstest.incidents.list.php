@@ -195,8 +195,7 @@ $headers = array(
 	_('Start time'),
 	_('End Time'),
 	_('Failed tests within incident'),
-	_('Total number of tests'),
-	_('Service ticket')
+	_('Total number of tests')
 );
 $noData = _('No incidents found.');
 
@@ -222,15 +221,6 @@ if (isset($this->data['tld'])) {
 				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
 			}
 
-			if ($event['ticket']) {
-				$ticketParts = explode(SALES_FORCE_PATTERN, $event['ticket']);
-				$ticketLink = new CLink($event['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
-				$ticketLink->setTarget('_blank');
-			}
-			else {
-				$ticketLink = SPACE;
-			}
-
 			$row = array(
 				new CLink(
 					$event['eventid'],
@@ -243,8 +233,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				$ticketLink
+				$event['incidentTotalTests']
 			);
 
 			$dnsTable->addRow($row);
@@ -305,15 +294,6 @@ if (isset($this->data['tld'])) {
 				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
 			}
 
-			if ($event['ticket']) {
-				$ticketParts = explode(SALES_FORCE_PATTERN, $event['ticket']);
-				$ticketLink = new CLink($event['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
-				$ticketLink->setTarget('_blank');
-			}
-			else {
-				$ticketLink = SPACE;
-			}
-
 			$row = array(
 				new CLink(
 					$event['eventid'],
@@ -326,8 +306,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				$ticketLink
+				$event['incidentTotalTests']
 			);
 
 			$dnssecTable->addRow($row);
@@ -388,15 +367,6 @@ if (isset($this->data['tld'])) {
 				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
 			}
 
-			if ($event['ticket']) {
-				$ticketParts = explode(SALES_FORCE_PATTERN, $event['ticket']);
-				$ticketLink = new CLink($event['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
-				$ticketLink->setTarget('_blank');
-			}
-			else {
-				$ticketLink = SPACE;
-			}
-
 			$row = array(
 				new CLink(
 					$event['eventid'],
@@ -409,8 +379,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				$ticketLink
+				$event['incidentTotalTests']
 			);
 
 			$rddsTable->addRow($row);
@@ -470,15 +439,6 @@ if (isset($this->data['tld'])) {
 				$incidentStatus = $event['status'] ? _('Active') : _('Resolved');
 			}
 
-			if ($event['ticket']) {
-				$ticketParts = explode(SALES_FORCE_PATTERN, $event['ticket']);
-				$ticketLink = new CLink($event['ticket'], SALES_FORCE_LINK.$ticketParts[1], null, null, true);
-				$ticketLink->setTarget('_blank');
-			}
-			else {
-				$ticketLink = SPACE;
-			}
-
 			$row = array(
 				new CLink(
 					$event['eventid'],
@@ -491,8 +451,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				$ticketLink
+				$event['incidentTotalTests']
 			);
 
 			$eppTable->addRow($row);

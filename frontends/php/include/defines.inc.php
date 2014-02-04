@@ -993,10 +993,6 @@ define('MONTHLY_REPORTS_EPP_UPDATE',		'dnstest.slv.epp.rtt.update.month');
 // DNS TEST "dnstest" host name
 define('DNSTEST_HOST',	'dnstest');
 
-// DNS TEST SalesForce ticket system
-define('SALES_FORCE_PATTERN',	' #');
-define('SALES_FORCE_LINK',		'https://eu2.salesforce.com/');
-
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
