@@ -1078,7 +1078,7 @@ sub get_tlds
 	    	" and h2.name=concat('Template ', h.host)".
 	    	" and g.name='TLDs'".
 	    	" and h2.hostid=hm.hostid".
-	    	" and hm.macro='{$DNSTEST.TLD.".uc($service).".ENABLED}'".
+	    	" and hm.macro='{\$DNSTEST.TLD.".uc($service).".ENABLED}'".
 	    	" and hm.value!=0".
 	    	" and h.status=0");
     }
