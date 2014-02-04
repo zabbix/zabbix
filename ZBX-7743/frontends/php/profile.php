@@ -126,12 +126,15 @@ elseif (isset($_REQUEST['save'])) {
 		$user['url'] = get_request('url');
 		$user['autologin'] = get_request('autologin', 0);
 		$user['autologout'] = get_request('autologout', 0);
-		$user['lang'] = get_request('lang');
 		$user['theme'] = get_request('theme');
 		$user['refresh'] = get_request('refresh');
 		$user['rows_per_page'] = get_request('rows_per_page');
 		$user['user_groups'] = null;
 		$user['user_medias'] = get_request('user_medias', array());
+
+		if (hasRequest('lang')) {
+			$user['lang'] = getRequest('lang');
+		}
 
 		$messages = get_request('messages', array());
 		if (!isset($messages['enabled'])) {
