@@ -1381,7 +1381,6 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 
 	xpath = zbx_dsprintf(xpath, "//*[local-name()='value']/*[local-name()='id']"
 			"[*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']", counterid);
-	zabbix_log(LOG_LEVEL_WARNING, "%s() zbx_dsprintf() '%s'", __function_name, xpath);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
 		goto clean;
@@ -1416,7 +1415,6 @@ clean:
 		xmlXPathFreeObject(xpathObj);
 
 	zbx_free(xpath);
-	zabbix_log(LOG_LEVEL_WARNING, "%s() zbx_free()", __function_name);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
