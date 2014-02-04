@@ -163,6 +163,8 @@ create_macro('{$INCIDENT.DNSSEC.FAIL}', 3, undef);
 create_macro('{$INCIDENT.DNSSEC.RECOVER}', 3, undef);
 create_macro('{$INCIDENT.RDDS.FAIL}', 2, undef);
 create_macro('{$INCIDENT.RDDS.RECOVER}', 2, undef);
+create_macro('{$INCIDENT.EPP.FAIL}', 2, undef);
+create_macro('{$INCIDENT.EPP.RECOVER}', 2, undef);
 
 create_macro('{$DNSTEST.SLV.DNS.UDP.RTT}', 99, undef);
 create_macro('{$DNSTEST.SLV.DNS.TCP.RTT}', 99, undef);
