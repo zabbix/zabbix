@@ -677,7 +677,7 @@ class CUser extends CZBXAPI {
 		$media = zbx_toArray($data['medias']);
 
 		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create media for other users.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$mediaDBfields = array(
@@ -735,7 +735,7 @@ class CUser extends CZBXAPI {
 									zbx_dbstr($mediaItem['period']).')';
 
 				if (!DBexecute($sql)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user media.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('DBerror'));
 				}
 
 				$mediaIds[] = $mediaId;
@@ -788,10 +788,8 @@ class CUser extends CZBXAPI {
 		}
 
 		foreach ($dbMedia as $dbMediaItem) {
-			foreach ($media as $mediaItem) {
-				if (isset($mediaItem['mediaid']) && bccomp($mediaItem['mediaid'], $dbMediaItem['mediaid']) == 0) {
-					continue 2;
-				}
+			if (isset($mediaToUpdate[$dbMediaItem['mediaid']])) {
+				continue;
 			}
 
 			$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
@@ -858,71 +856,48 @@ class CUser extends CZBXAPI {
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
-		$dbMedia = API::UserMedia()->get(array(
-			'output' => array('mediaid'),
-			'userids' => zbx_objectValues($users, 'userid'),
-			'editable' => true,
-			'preservekeys' => true
-		));
+		// validate user permissions
+		if (!$this->isWritable(zbx_objectValues($users, 'userid'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
-
+		// validate media permissions
+		$mediaIds = array();
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
-				if (!isset($dbMedia[$mediaItem['mediaid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to update other user media.'));
-				}
-
-				$mediaToUpdate[$mediaItem['mediaid']] = $mediaItem;
-			}
-			else {
-				$mediaToCreate[] = $mediaItem;
+				$mediaIds[$mediaItem['mediaid']] = $mediaItem['mediaid'];
 			}
 		}
-
-		foreach ($dbMedia as $dbMediaItem) {
-			foreach ($media as $mediaItem) {
-				if (isset($mediaItem['mediaid']) && bccomp($mediaItem['mediaid'], $dbMediaItem['mediaid']) == 0) {
-					continue 2;
-				}
-			}
-
-			$mediaToDelete[$dbMediaItem['mediaid']] = $dbMediaItem['mediaid'];
-		}
-
-		if ($mediaToCreate) {
-			$this->validateAddMedia(array(
-				'users' => $users,
-				'medias' => $mediaToCreate
+		if ($mediaIds) {
+			$count = API::UserMedia()->get(array(
+				'countOutput' => true,
+				'mediaids' => $mediaIds,
+				'editable' => true
 			));
-		}
-
-		if ($mediaToUpdate) {
-			$mediaDBfields = array(
-				'period' => null,
-				'mediatypeid' => null,
-				'sendto' => null,
-				'active' => null,
-				'severity' => null
-			);
-
-			foreach ($mediaToUpdate as $media) {
-				if (!check_db_fields($mediaDBfields, $media)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-				}
-			}
-
-			$timePeriodValidator = new CTimePeriodValidator();
-
-			foreach ($mediaToUpdate as $media) {
-				if (!$timePeriodValidator->validate($media['period'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
-				}
+			if ($count != count($mediaIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		if ($mediaToDelete) {
-			$this->validateDeleteMedia($mediaToDelete);
+		// validate media parameters
+		$mediaDBfields = array(
+			'period' => null,
+			'mediatypeid' => null,
+			'sendto' => null,
+			'active' => null,
+			'severity' => null
+		);
+		foreach ($media as $mediaItem) {
+			if (!check_db_fields($mediaDBfields, $mediaItem)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
+		$timePeriodValidator = new CTimePeriodValidator();
+		foreach ($media as $mediaItem) {
+			if (!$timePeriodValidator->validate($mediaItem['period'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
+			}
 		}
 	}
 
