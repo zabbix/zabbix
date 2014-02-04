@@ -443,19 +443,117 @@ table.requirements tr td.header { font-weight: bold; }
 table.requirements tr td { white-space: nowrap; padding-left: 5px; padding-right: 15px; background-color: #FFFFFF; }
 table.requirements input { width: 150px; }
 table.requirements input#port { width: 50px; }
-table.requirements select { width: 152px; }
+table.requirements select { width: 150px; }
 
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; text-align: center; }
+table.filter tr.item-list-row { height: 26px; }
 table.filter tr td { line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px; }
 table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
-table.filter .text { height: 16px; margin-bottom: 1px; }
-table.filter .filter-select-button { height: 20px; vertical-align: bottom; margin-bottom: 1px; }
-table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
-table.filter .host-inventories .select,
-table.filter .host-inventories .text { vertical-align: middle; }
-table.filter tr.item-list-row { height: 26px; }
+table.filter .text { height: 16px; line-height: 16px; }
+table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
+table.filter .select {
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+	vertical-align: middle;
+	margin-bottom: 1px;
+	padding: 2px 2px 2px 0;
+	height: 14px;
+}
+
+/* All borwsers - fix 1px offset for filter select boxes in Host Inventories */
+table.filter tr.host-inventories select {
+	position: relative;
+	top: -1px;
+}
+
+/* All borwsers - fix 1px offset for labels and selects in Audit logs */
+table.filter tr.audit-logs-row td:nth-child(2) strong,
+table.filter tr.audit-logs-row td:nth-child(3) strong {
+	position: relative;
+	top: 1px;
+}
+
+/* Safari */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	/* fix label and input field position in Host Inventories */
+	::-i-block.chrome,
+	table.filter tr.host-inventories td strong,
+	table.filter tr.host-inventories .text {
+		position: relative;
+		top: 1px;
+	}
+
+	/* fix label position in Audit log */
+	::-i-block.chrome,
+	table.filter tr.audit-logs-row td:nth-child(2) strong,
+	table.filter tr.audit-logs-row td:nth-child(3) strong {
+		position: relative;
+		top: 2px;
+	}
+
+	/* fix installation wide select box */
+	::-i-block.chrome, table.requirements select {
+		width: 125px;
+	}
+}
+
+/* Opera - reposition select boxes */
+opera:-o-prefocus,
+table.filter tr.audit-logs-row td:nth-child(2) strong,
+table.filter tr.audit-logs-row td:nth-child(3) strong {
+	position: relative;
+	top: 0;
+}
+
+/* Opera - fix select boxes in Host inventories */
+opera:-o-prefocus, table.filter tr.host-inventories select {
+	position: relative;
+	top: 0 !important;
+}
+
+/* IE8 */
+@media all\0 {
+	/* reposition text inside textbox for Configuration > Items	*/
+	table.filter tr.item-list-row td .text {
+		line-height: 16px !important;
+	}
+
+	/* overrride for multiselect */
+	table.filter tr.item-list-row td div.multiselect .text {
+		line-height: 12px !important;
+	}
+
+	/* since nth-child is not supported adjust position for selecs in Audit Logs so they align to its label */
+	table.filter tr.audit-logs-row select {
+		position: relative;
+		top: -1px;
+	}
+}
+
+/* IE9 - fix select position for Host Inventories */
+:root table.filter tr.host-inventories select {
+	position: relative;
+	top: -1px;
+}
+
+/* IE9 - fix select position for Audit Logs */
+:root table.filter tr.audit-logs-row select {
+	position: relative;
+	top: 0;
+}
+
+/* IE10 and IE 11 */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+	/* fix select box position in Audit logs */
+	table.filter tr.audit-logs-row select {
+		margin-top: 1px;
+	}
+
+	/* IE 11 not possible to position label in Host inventories separately. should be moved -1px */
+}
 
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }

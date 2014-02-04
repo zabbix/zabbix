@@ -57,11 +57,13 @@ $filterTable->addRow(array(
 		SPACE,
 		new CTextBox('alias', $this->data['alias'], 20),
 		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button')
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button'
+		)
 	),
 	array(bold(_('Action')), SPACE, $actionComboBox),
 	array(bold(_('Resource')), SPACE, $resourceComboBox)
-));
+), 'audit-logs-row');
+
 $filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 $filterButton->useJQueryStyle('main');
 $resetButton = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();');
