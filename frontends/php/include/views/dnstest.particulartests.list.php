@@ -31,11 +31,22 @@ if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC)
 		_('Row result')
 	);
 }
+elseif ($this->data['type'] == DNSTEST_RDDS) {
+	$headers = array(
+		_('Probe ID'),
+		_('Row result'),
+		_('RDDS43'),
+		_('RDDS80')
+	);
+}
 else {
 	$headers = array(
 		_('Probe ID'),
-		_('RDDS43'),
-		_('RDDS80')
+		_('Row result'),
+		_('IP'),
+		_('Login'),
+		_('Update'),
+		_('Info')
 	);
 }
 
@@ -52,13 +63,18 @@ foreach ($this->data['probes'] as $probe) {
 		if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC) {
 			$link = new CSpan(_('Offline'), 'red');
 		}
-		else {
+		elseif ($this->data['type'] == DNSTEST_RDDS) {
+			$rdds = new CSpan(_('Offline'), 'red');
 			$rdds43 = new CSpan(_('Offline'), 'red');
 			$rdds80 = new CSpan(_('Offline'), 'red');
+		}
+		else {
+			$epp = new CSpan(_('Offline'), 'red');
 		}
 	}
 	else {
 		if ($this->data['type'] == DNSTEST_DNS) {
+			// DNS
 			if (isset($probe['value'])) {
 				if ($probe['value']) {
 					$status = new CSpan(_('Up'), 'green');
@@ -77,6 +93,7 @@ foreach ($this->data['probes'] as $probe) {
 			}
 		}
 		elseif ($this->data['type'] == DNSTEST_DNSSEC) {
+			// DNSSEC
 			if (isset($probe['value']['ok'])) {
 				$values = array();
 				if ($probe['value']['ok']) {
@@ -99,25 +116,43 @@ foreach ($this->data['probes'] as $probe) {
 			}
 		}
 		elseif ($this->data['type'] == DNSTEST_RDDS) {
+			// RDDS
 			if (!isset($probe['value']) || $probe['value'] === null) {
 				$rdds43 = _('No result');
 				$rdds80 = _('No result');
+				$rdds = _('No result');
 			}
 			elseif ($probe['value'] == 0) {
 				$rdds43 = new CSpan(_('Down'), 'red');
 				$rdds80 = new CSpan(_('Down'), 'red');
+				$rdds = new CSpan(_('Down'), 'red');
 			}
 			elseif ($probe['value'] == 1) {
 				$rdds43 = new CSpan(_('Up'), 'green');
 				$rdds80 = new CSpan(_('Up'), 'green');
+				$rdds = new CSpan(_('Up'), 'green');
 			}
 			elseif ($probe['value'] == 2) {
 				$rdds43 = new CSpan(_('Up'), 'green');
 				$rdds80 = new CSpan(_('Down'), 'red');
+				$rdds = new CSpan(_('Down'), 'red');
 			}
 			elseif ($probe['value'] == 3) {
 				$rdds43 = new CSpan(_('Down'), 'green');
 				$rdds80 = new CSpan(_('Up'), 'red');
+				$rdds = new CSpan(_('Down'), 'red');
+			}
+		}
+		else {
+			// EPP
+			if (!isset($probe['value']) || $probe['value'] === null) {
+				$epp = _('No result');
+			}
+			elseif ($probe['value'] == 0) {
+				$epp = new CSpan(_('Down'), 'red');
+			}
+			elseif ($probe['value'] == 1) {
+				$epp = new CSpan(_('Up'), 'green');
 			}
 		}
 	}
@@ -128,11 +163,22 @@ foreach ($this->data['probes'] as $probe) {
 			$link
 		);
 	}
+	elseif ($this->data['type'] == DNSTEST_RDDS) {
+		$row = array(
+			$probe['name'],
+			$rdds,
+			$rdds43,
+			$rdds80
+		);
+	}
 	else {
 		$row = array(
 			$probe['name'],
-			$rdds43,
-			$rdds80
+			$epp,
+			(isset($probe['ip']) && $probe['ip']) ? $probe['ip'] : '-',
+			(isset($probe['login']) && $probe['login']) ? $probe['login'] : '-',
+			(isset($probe['update']) && $probe['update']) ? $probe['update'] : '-',
+			(isset($probe['info']) && $probe['info']) ? $probe['info'] : '-'
 		);
 	}
 

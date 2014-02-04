@@ -960,6 +960,11 @@ define('PROBE_STATUS_MANUAL',		'dnstest.probe.status[manual]');
 define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
 define('PROBE_DNS_UDP_ITEM_RTT',	'dnstest.dns.udp.rtt[');
 define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
+define('PROBE_EPP_RESULT',			'dnstest.epp[');
+define('PROBE_EPP_IP',				'dnstest.epp.ip[{$DNSTEST.TLD}]');
+define('PROBE_EPP_UPDATE',			'dnstest.epp.rtt[{$DNSTEST.TLD},update]');
+define('PROBE_EPP_INFO',			'dnstest.epp.rtt[{$DNSTEST.TLD},info]');
+define('PROBE_EPP_LOGIN',			'dnstest.epp.rtt[{$DNSTEST.TLD},login]');
 
 // DNS TEST NS names
 define('NS_NO_RESULT',	0);

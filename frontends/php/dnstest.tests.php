@@ -232,8 +232,6 @@ if ($items) {
 		}
 
 		if (isset($incidentsData[$i]) && $incidentsData[$i]) {
-			unset($data['rdds']['events'][$i]['status']);
-
 			$incidentsData[$i] = array_merge($incidentsData[$i], $incidents[$i]);
 		}
 		else {

@@ -182,7 +182,7 @@ $probeItems = API::Item()->get(array(
 ));
 
 $totalNs = array();
-$positiveNs = array();
+$negativeNs = array();
 foreach ($probeItems as $probeItem) {
 	preg_match('/^[^\[]+\[([^\]]+)]$/', $probeItem['key_'], $matches);
 	$nsValues = explode(',', $matches[1]);
@@ -209,13 +209,13 @@ foreach ($probeItems as $probeItem) {
 
 	$totalNs[$nsValues[1]] = true;
 
-	if (($itemValue['value'] > 0 && $itemValue['value'] <= $dnsUdpRtt) || $itemValue['value'] === null) {
-		$positiveNs[$nsValues[1]] = true;
+	if (($itemValue['value'] < 0 || $itemValue['value'] > $dnsUdpRtt) && $itemValue['value'] !== null) {
+		$negativeNs[$nsValues[1]] = true;
 	}
 }
 
 $data['totalNs'] = count($totalNs);
-$data['positiveNs'] = count($positiveNs);
+$data['positiveNs'] = count($totalNs) - count($negativeNs);
 
 if ($data['tld'] && $data['slvItem'] && $data['probe']) {
 	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);

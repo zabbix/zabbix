@@ -273,13 +273,18 @@ foreach ($hosts as $host) {
 if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
 	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_DNS_UDP_ITEM_RTT.'%').') OR i.key_='.zbx_dbstr(PROBE_DNS_UDP_ITEM).')';
 }
-else {
+elseif ($data['type'] == DNSTEST_RDDS) {
 	$probeItemKey = ' AND i.key_ LIKE ('.zbx_dbstr(PROBE_RDDS_ITEM.'%').')';
+}
+else {
+	$probeItemKey = ' AND (i.key_ LIKE ('.zbx_dbstr(PROBE_EPP_RESULT.'%').')'.
+		' OR i.key_='.zbx_dbstr(PROBE_EPP_IP).' OR i.key_='.zbx_dbstr(PROBE_EPP_UPDATE).''.
+		' OR i.key_='.zbx_dbstr(PROBE_EPP_INFO).' OR i.key_='.zbx_dbstr(PROBE_EPP_LOGIN).')';
 }
 
 // get items
 $items = DBselect(
-	'SELECT i.itemid,i.key_,i.hostid,i.value_type'.
+	'SELECT i.itemid,i.key_,i.hostid,i.value_type,i.valuemapid,i.units'.
 	' FROM items i'.
 	' WHERE '.dbConditionInt('i.hostid', $hostIds).
 		$probeItemKey
@@ -289,7 +294,7 @@ $nsArray = array();
 
 // get items value
 while ($item = DBfetch($items)) {
-	if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
+	if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC || $data['type'] == DNSTEST_EPP) {
 		$itemValue = API::History()->get(array(
 			'itemids' => $item['itemid'],
 			'time_from' => $testTimeFrom,
@@ -359,6 +364,26 @@ while ($item = DBfetch($items)) {
 		}
 		$hosts[$item['hostid']]['value'] = $itemValue['value'];
 	}
+	elseif ($data['type'] == DNSTEST_EPP) {
+		if ($item['key_'] == PROBE_EPP_IP) {
+			$hosts[$item['hostid']]['ip'] = $itemValue['value'];
+		}
+		elseif ($item['key_'] == PROBE_EPP_UPDATE) {
+			$hosts[$item['hostid']]['update'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		elseif ($item['key_'] == PROBE_EPP_INFO) {
+			$hosts[$item['hostid']]['info'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		elseif ($item['key_'] == PROBE_EPP_LOGIN) {
+			$hosts[$item['hostid']]['login'] = $itemValue['value']
+				? applyValueMap(convert_units($itemValue['value'], $item['units']), $item['valuemapid']) : null;
+		}
+		else {
+			$hosts[$item['hostid']]['value'] = $itemValue['value'];
+		}
+	}
 }
 
 if ($data['type'] == DNSTEST_DNS) {
@@ -413,7 +438,7 @@ foreach ($hosts as $host) {
 	foreach ($data['probes'] as $hostId => $probe) {
 		if (zbx_strtoupper($host['host']) == zbx_strtoupper($data['tld']['host'].' '.$probe['host'])
 				&& isset($host['value'])) {
-			$data['probes'][$hostId]['value'] = $host['value'];
+			$data['probes'][$hostId] = $host;
 			break;
 		}
 	}
