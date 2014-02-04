@@ -4611,8 +4611,8 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 		{
 			case SUCCEED:
 			case NOTSUPPORTED:
-			case CONFIG_ERROR:
 			case AGENT_ERROR:
+			case CONFIG_ERROR:
 				DCrequeue_reachable_item(dc_item, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:

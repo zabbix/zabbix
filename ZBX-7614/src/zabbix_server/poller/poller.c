@@ -593,7 +593,7 @@ static int	get_values(unsigned char poller_type)
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
-					errcodes[i] = NETWORK_ERROR;
+					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
 				break;
@@ -685,11 +685,12 @@ static int	get_values(unsigned char poller_type)
 			case AGENT_ERROR:
 				activate_host(&items[i], &timespec);
 				break;
-			case CONFIG_ERROR:
-				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 				deactivate_host(&items[i], &timespec, results[i].msg);
+				break;
+			case CONFIG_ERROR:
+				/* nothing to do */
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
