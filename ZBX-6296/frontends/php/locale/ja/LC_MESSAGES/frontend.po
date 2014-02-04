@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 03:04+0200\n"
-"PO-Revision-Date: 2014-01-05 13:09+0300\n"
+"POT-Creation-Date: 2014-02-03 16:26+0200\n"
+"PO-Revision-Date: 2014-01-29 02:05+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388920174.0\n"
+"X-POOTLE-MTIME: 1390953918.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -30,7 +30,7 @@ msgstr "\"復旧トリガーの表示期間\"は\"0\"かそれ以上の整数を
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"トリガー変化時の点滅期間\"は\"0\"かそれ以上の整数を設定してください。"
 
-#: include/func.inc.php:459
+#: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -223,7 +223,7 @@ msgstr "SLAの許容値"
 msgid "Access denied!"
 msgstr "アクセスは拒否されました！"
 
-#: include/func.inc.php:2082
+#: include/func.inc.php:2088
 msgid "Access denied."
 msgstr "アクセスは拒否されました。"
 
@@ -668,12 +668,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "メンテナンス待ち"
 
-#: include/func.inc.php:246
+#: include/func.inc.php:252
 msgid "Apr"
 msgstr "4月"
 
 #: include/forms.inc.php:1695 include/func.inc.php:132
-#: include/func.inc.php:263 jsLoader.php:121
+#: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "4月"
 
@@ -774,12 +774,12 @@ msgstr "監査データの保存期間 (日) \"%1$s\""
 msgid "Audit logs"
 msgstr "監査ログ"
 
-#: include/func.inc.php:250
+#: include/func.inc.php:256
 msgid "Aug"
 msgstr "8月"
 
 #: include/forms.inc.php:1687 include/func.inc.php:136
-#: include/func.inc.php:267 jsLoader.php:125
+#: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "8月"
 
@@ -905,7 +905,7 @@ msgstr "期間Tの値の平均値 NOT N"
 msgid "Axis side"
 msgstr "軸の位置"
 
-#: include/func.inc.php:427
+#: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
 msgstr "B"
@@ -1436,7 +1436,7 @@ msgstr "Webシナリオを追加できません"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "認証方式を変更できません"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -1538,7 +1538,7 @@ msgstr "新しい要素を作成できません"
 msgid "Cannot create screen."
 msgstr "スクリーンを作成できません。"
 
-#: api/classes/CUser.php:1201
+#: api/classes/CUser.php:1216
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbixユーザー\"%1$s\"を削除できません。ユーザーを無効に設定してください。"
@@ -2089,6 +2089,10 @@ msgstr "ユーザーメディアを追加できません"
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
+
+#: api/classes/CUser.php:921
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:846
 msgid "Cannot logout."
@@ -3107,7 +3111,7 @@ msgstr "コピー"
 msgid "Copy selected to ..."
 msgstr "選択をコピー..."
 
-#: api/classes/CUser.php:951
+#: api/classes/CUser.php:966
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "ユーザー\"%s\"のログイン"
@@ -3520,7 +3524,7 @@ msgstr "データの形式"
 msgid "Database file"
 msgstr "データベースファイル"
 
-#: include/setup.inc.php:283 setup.php:38
+#: include/setup.inc.php:283
 msgid "Database host"
 msgstr "データベースホスト"
 
@@ -3640,12 +3644,12 @@ msgstr "デバッグモード"
 msgid "Debug mode updated"
 msgstr "デバッグモードを更新しました"
 
-#: include/func.inc.php:254
+#: include/func.inc.php:260
 msgid "Dec"
 msgstr "12月"
 
 #: include/forms.inc.php:1707 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:129
+#: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "12月"
 
@@ -4129,7 +4133,7 @@ msgid "Description"
 msgstr "説明"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2202
+#: include/func.inc.php:2208
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4403,7 +4407,7 @@ msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在しま�
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -4458,7 +4462,7 @@ msgstr "ディスカバリのステータス"
 msgid "Display OK triggers for"
 msgstr "復旧トリガーの表示期間"
 
-#: include/func.inc.php:1886
+#: include/func.inc.php:1892
 msgid "Displaying"
 msgstr "Displaying"
 
@@ -4605,12 +4609,12 @@ msgstr "オランダ語 (nl_NL)"
 msgid "Dynamic item"
 msgstr "ダイナミックアイテム"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2169
+#: include/func.inc.php:2175
 msgid "ERROR"
 msgstr "エラー"
 
@@ -4984,7 +4988,7 @@ msgstr "繰返し間隔(日)"
 msgid "Every week(s)"
 msgstr "繰返し間隔(週)"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgid "Exa"
 msgstr "エクサ"
 
@@ -5148,12 +5152,12 @@ msgstr "お気に入りのスクリーン"
 msgid "Favourites"
 msgstr "お気に入り"
 
-#: include/func.inc.php:244
+#: include/func.inc.php:250
 msgid "Feb"
 msgstr "2月"
 
 #: include/forms.inc.php:1685 include/func.inc.php:130
-#: include/func.inc.php:261 jsLoader.php:119
+#: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "2月"
 
@@ -5291,10 +5295,10 @@ msgstr "フィンランド語 (fi_FI)"
 msgid "First"
 msgstr "第1週"
 
-#: include/func.inc.php:1831
+#: include/func.inc.php:1837
 msgctxt "page navigation"
 msgid "First"
-msgstr "第1週"
+msgstr "最初"
 
 #: include/views/js/configuration.sysmaps.js.php:42
 msgid "Fit to map"
@@ -5326,12 +5330,12 @@ msgstr "第4週"
 msgid "French (fr_FR)"
 msgstr "フランス語 (fr_FR)"
 
-#: include/func.inc.php:224
+#: include/func.inc.php:230
 msgid "Fri"
 msgstr "金"
 
 #: include/forms.inc.php:1670 include/forms.inc.php:1738
-#: include/func.inc.php:152 include/func.inc.php:236
+#: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "金曜"
 
@@ -5374,7 +5378,7 @@ msgstr "フルスクリーン"
 msgid "Function"
 msgstr "関数"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgctxt "Giga short"
 msgid "G"
 msgstr "G"
@@ -5440,7 +5444,7 @@ msgstr "サポート"
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr "Webページ全体の読み込み時間を取得。デフォルトのpathは /"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgid "Giga"
 msgstr "ギガ"
 
@@ -5490,7 +5494,7 @@ msgstr "実行"
 msgid "Go to"
 msgstr "次のページへ移動"
 
-#: include/func.inc.php:2100
+#: include/func.inc.php:2106
 msgid "Go to dashboard"
 msgstr "ダッシュボードへ移動"
 
@@ -6628,7 +6632,7 @@ msgstr "アイコン"
 msgid "Identical expression already exists"
 msgstr "同じ設定の正規表現がすでに存在します"
 
-#: include/func.inc.php:2090 include/func.inc.php:2110
+#: include/func.inc.php:2096 include/func.inc.php:2116
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "このメッセージが間違っている場合は、必要な権限を得るために管理者に問い合わせてください"
 
@@ -7355,7 +7359,7 @@ msgstr "トリガー条件式が正しくありません。トリガー条件式
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "条件式のトリガー関数\"%1$s\"が正しくありません。"
 
-#: include/func.inc.php:1176
+#: include/func.inc.php:1182
 msgid "Incorrect type of asort_by_key."
 msgstr "asort_by_keyのタイプが正しくありません。"
 
@@ -7573,22 +7577,22 @@ msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのディスカバリルール\"%2$s\"のアイテムキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテム\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CDRule.php:311 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "キー\"%1$s\": %2$sが正しくありません。"
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7778,7 +7782,7 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -7948,12 +7952,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "JabberID"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:249
 msgid "Jan"
 msgstr "1月"
 
 #: include/forms.inc.php:1680 include/func.inc.php:129
-#: include/func.inc.php:260 jsLoader.php:118
+#: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "1月"
 
@@ -7961,25 +7965,25 @@ msgstr "1月"
 msgid "Japanese (ja_JP)"
 msgstr "日本語 (ja_JP)"
 
-#: include/func.inc.php:249
+#: include/func.inc.php:255
 msgid "Jul"
 msgstr "7月"
 
 #: include/forms.inc.php:1682 include/func.inc.php:135
-#: include/func.inc.php:266 jsLoader.php:124
+#: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "7月"
 
-#: include/func.inc.php:248
+#: include/func.inc.php:254
 msgid "Jun"
 msgstr "6月"
 
 #: include/forms.inc.php:1705 include/func.inc.php:134
-#: include/func.inc.php:265 jsLoader.php:123
+#: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "6月"
 
-#: include/func.inc.php:434 include/func.inc.php:670
+#: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
 msgid "K"
 msgstr "K"
@@ -8012,7 +8016,7 @@ msgstr "キーのパスフレーズ"
 msgid "Keyword"
 msgstr "キーワード"
 
-#: include/func.inc.php:670
+#: include/func.inc.php:676
 msgid "Kilo"
 msgstr "キロ"
 
@@ -8036,7 +8040,7 @@ msgstr "LDAP認証"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP認証を変更しました"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8080,10 +8084,10 @@ msgstr "言語"
 msgid "Last"
 msgstr "最新"
 
-#: include/func.inc.php:1871
+#: include/func.inc.php:1877
 msgctxt "page navigation"
 msgid "Last"
-msgstr "最新"
+msgstr "最後"
 
 #: dashboard.php:397
 #, c-format
@@ -8369,7 +8373,7 @@ msgstr "マッチしないSNMPトラップをログに記録"
 msgid "Logged in as"
 msgstr "次のユーザーでログイン"
 
-#: auditlogs.php:143 include/func.inc.php:2096 include/func.inc.php:2113
+#: auditlogs.php:143 include/func.inc.php:2102 include/func.inc.php:2119
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8381,14 +8385,19 @@ msgstr "ログイン"
 msgid "Login as Guest"
 msgstr "ゲストとしてログイン"
 
-#: api/classes/CUser.php:943
+#: api/classes/CUser.php:958
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "ログイン失敗\"%s\""
 
+#: api/classes/CUser.php:926
+#, c-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "ログイン名かパスワードが間違っています!"
 
 #: api/classes/CUser.php:811 api/classes/CUser.php:829
 #: api/classes/CUser.php:876
@@ -8418,7 +8427,7 @@ msgstr "ローレベルディスカバリが\"通常\"の状態"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "ローレベルディスカバリが\"取得不可\"の状態"
 
-#: include/func.inc.php:430 include/func.inc.php:671
+#: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
 msgid "M"
 msgstr "M"
@@ -8659,12 +8668,12 @@ msgstr "マッピング"
 msgid "Maps"
 msgstr "マップ"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:251
 msgid "Mar"
 msgstr "3月"
 
 #: include/forms.inc.php:1690 include/func.inc.php:131
-#: include/func.inc.php:262 jsLoader.php:120
+#: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "3月"
 
@@ -8724,7 +8733,7 @@ msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8790,11 +8799,11 @@ msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %
 msgstr[0] "ホストの表示名の最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
 #: include/forms.inc.php:1700 include/func.inc.php:133
-#: include/func.inc.php:264 jsLoader.php:122
+#: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "5月"
 
-#: include/func.inc.php:247
+#: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
 msgstr "5月"
@@ -8846,7 +8855,7 @@ msgstr "メディアタイプ"
 msgid "Media types used by action \"%s\"."
 msgstr "メディアタイプはアクション\"%s\"に利用されています。"
 
-#: include/func.inc.php:671
+#: include/func.inc.php:677
 msgid "Mega"
 msgstr "メガ"
 
@@ -8914,7 +8923,7 @@ msgid "Middle"
 msgstr "中央"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Minimize"
 msgstr "最小化"
 
@@ -9046,12 +9055,12 @@ msgstr "モード"
 msgid "Model"
 msgstr "モデル"
 
-#: include/func.inc.php:220
+#: include/func.inc.php:226
 msgid "Mon"
 msgstr "月"
 
 #: include/forms.inc.php:1666 include/forms.inc.php:1734
-#: include/func.inc.php:148 include/func.inc.php:232
+#: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "月曜"
 
@@ -9272,7 +9281,7 @@ msgstr "ネットワークマップを更新しました"
 msgid "Network maps"
 msgstr "ネットワークマップ"
 
-#: httpmon.php:155 include/func.inc.php:214
+#: httpmon.php:155 include/func.inc.php:220
 msgid "Never"
 msgstr "未監視"
 
@@ -9336,13 +9345,13 @@ msgstr "新規サービスタイム"
 msgid "Next"
 msgstr "次へ"
 
-#: include/func.inc.php:1864
+#: include/func.inc.php:1870
 msgctxt "page navigation"
 msgid "Next"
 msgstr "次へ"
 
 #: events.php:763 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2423 include/triggers.inc.php:1646
+#: include/func.inc.php:2429 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9803,7 +9812,7 @@ msgstr "マップ\"%1$s\"への権限がありません。"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"への権限がありません。"
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1000
+#: api/classes/CUser.php:890 api/classes/CUser.php:1015
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -9846,8 +9855,8 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1168
-#: include/func.inc.php:2070
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
+#: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "対象が存在しないか、アクセス権がありません！"
 
@@ -10156,12 +10165,12 @@ msgstr "通知レポート"
 msgid "Notifications"
 msgstr "通知レポート"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:259
 msgid "Nov"
 msgstr "11月"
 
 #: include/forms.inc.php:1702 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:128
+#: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "11月"
 
@@ -10388,7 +10397,7 @@ msgstr "その他の設定パラメータ"
 msgid "OVERVIEW"
 msgstr "概要"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:258
 msgid "Oct"
 msgstr "10月"
 
@@ -10397,7 +10406,7 @@ msgid "Octal"
 msgstr "8進数"
 
 #: include/forms.inc.php:1697 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:127
+#: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "10月"
 
@@ -10695,7 +10704,7 @@ msgstr "概要"
 msgid "Overview by proxy"
 msgstr "プロキシごとの概要"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgctxt "Peta short"
 msgid "P"
 msgstr "P"
@@ -11008,7 +11017,7 @@ msgstr "権限はユーザーグループにのみ割り当てることができ
 msgid "Persian (fa_IR)"
 msgstr "ペルシャ語 (fa_IR)"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgid "Peta"
 msgstr "ペタ"
 
@@ -11112,7 +11121,7 @@ msgstr "プレビュー"
 msgid "Previous"
 msgstr "前"
 
-#: include/func.inc.php:1837
+#: include/func.inc.php:1843
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "前"
@@ -11372,11 +11381,11 @@ msgstr "復旧通知の件名"
 msgid "Refresh (in seconds)"
 msgstr "更新(秒)"
 
-#: include/func.inc.php:1945
+#: include/func.inc.php:1951
 msgid "Refresh time in seconds"
 msgstr "リフレッシュ間隔"
 
-#: include/func.inc.php:1949
+#: include/func.inc.php:1955
 msgid "Refresh time multiplier"
 msgstr "リフレッシュ間隔の乗数"
 
@@ -11977,12 +11986,12 @@ msgstr "Zabbixサーバーの状態"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:225
+#: include/func.inc.php:231
 msgid "Sat"
 msgstr "土"
 
 #: include/forms.inc.php:1671 include/forms.inc.php:1739
-#: include/func.inc.php:153 include/func.inc.php:237
+#: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "土曜"
 
@@ -12390,7 +12399,7 @@ msgstr "ユーザーに送信"
 msgid "Sent"
 msgstr "送信済"
 
-#: include/func.inc.php:251
+#: include/func.inc.php:257
 msgid "Sep"
 msgstr "9月"
 
@@ -12400,7 +12409,7 @@ msgid "Separated"
 msgstr "障害数と未対応数を表示"
 
 #: include/forms.inc.php:1692 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:126
+#: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "9月"
 
@@ -12493,7 +12502,7 @@ msgstr "サービス"
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
-#: api/classes/CUser.php:994
+#: api/classes/CUser.php:1009
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
@@ -13009,12 +13018,12 @@ msgstr "期間Tの値の合計値 > N"
 msgid "Sum of values of a period T is NOT N"
 msgstr "期間Tの値の合計値 NOT N"
 
-#: include/func.inc.php:219
+#: include/func.inc.php:225
 msgid "Sun"
 msgstr "日"
 
 #: include/forms.inc.php:1672 include/forms.inc.php:1740
-#: include/func.inc.php:155 include/func.inc.php:231
+#: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "日曜"
 
@@ -13072,7 +13081,7 @@ msgstr "システムステータス"
 msgid "System uptime in seconds."
 msgstr "システムの稼働秒数。"
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgctxt "Tera short"
 msgid "T"
 msgstr "T"
@@ -13260,7 +13269,7 @@ msgstr "テンプレート"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除しました。"
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgid "Tera"
 msgstr "テラ"
 
@@ -13403,12 +13412,12 @@ msgstr "今週"
 msgid "This year"
 msgstr "今年"
 
-#: include/func.inc.php:223
+#: include/func.inc.php:229
 msgid "Thu"
 msgstr "木"
 
 #: include/forms.inc.php:1669 include/forms.inc.php:1737
-#: include/func.inc.php:151 include/func.inc.php:235
+#: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "木曜"
 
@@ -13833,12 +13842,12 @@ msgstr "Truncated"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "アクセスできないプロパティ\"%s\"を参照しようとしています。"
 
-#: include/func.inc.php:221
+#: include/func.inc.php:227
 msgid "Tue"
 msgstr "火"
 
 #: include/forms.inc.php:1667 include/forms.inc.php:1735
-#: include/func.inc.php:149 include/func.inc.php:233
+#: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "火曜"
 
@@ -13982,7 +13991,7 @@ msgstr "USA (160文字)"
 msgid "USER PROFILE"
 msgstr "ユーザープロファイル"
 
-#: include/func.inc.php:2605
+#: include/func.inc.php:2611
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14423,7 +14432,7 @@ msgstr "データベース停止メッセージ\"%1$s\"の送信先グループ�
 msgid "User groups"
 msgstr "ユーザーグループ"
 
-#: api/classes/CUser.php:1181
+#: api/classes/CUser.php:1196
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
 
@@ -14926,12 +14935,12 @@ msgstr "Webシナリオのステップ数は1以下にはできません。"
 msgid "Web scenarios"
 msgstr "Webシナリオ"
 
-#: include/func.inc.php:222
+#: include/func.inc.php:228
 msgid "Wed"
 msgstr "水"
 
 #: include/forms.inc.php:1668 include/forms.inc.php:1736
-#: include/func.inc.php:150 include/func.inc.php:234
+#: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "水曜"
 
@@ -15128,7 +15137,7 @@ msgstr "XMLファイルにワーニングが含まれています %1$s"
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgctxt "Yotta short"
 msgid "Y"
 msgstr "Y"
@@ -15178,7 +15187,7 @@ msgstr "Y/m/d"
 msgid "Y.m.d H:i"
 msgstr "Y/m/d H:i"
 
-#: include/func.inc.php:598 include/translateDefines.inc.php:47
+#: include/func.inc.php:604 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "Y/m/d H:i:s"
 
@@ -15194,14 +15203,14 @@ msgstr "毎年"
 
 #: events.php:763 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2423
+#: include/events.inc.php:383 include/func.inc.php:2429
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "はい"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgid "Yotta"
 msgstr "ヨタ"
 
@@ -15214,7 +15223,7 @@ msgstr "Webサーバーにロケールがインストールされていないた
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "ユーザー\"%s\"の権限変更は許可されていません。"
 
-#: include/func.inc.php:2106
+#: include/func.inc.php:2112
 msgid "You are not logged in."
 msgstr "ログインしていません"
 
@@ -15265,15 +15274,15 @@ msgstr "他のユーザーを更新する権限がありません。"
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "ユーザーを更新する権限がないか、ユーザーが存在しません。"
 
-#: include/func.inc.php:2088
+#: include/func.inc.php:2094
 msgid "You have no permissions to access this page."
 msgstr "このページを表示する権限がありません。"
 
-#: include/func.inc.php:2108
+#: include/func.inc.php:2114
 msgid "You must login to view this page."
 msgstr "このページを表示するためにはログインする必要があります"
 
-#: include/func.inc.php:2084
+#: include/func.inc.php:2090
 msgid "Your are logged in as"
 msgstr "次のユーザーでログイン"
 
@@ -15281,7 +15290,7 @@ msgstr "次のユーザーでログイン"
 msgid "Your setup is not configured for distributed monitoring."
 msgstr "分散監視用に設定されていません。"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgctxt "Zetta short"
 msgid "Z"
 msgstr "Z"
@@ -15396,7 +15405,7 @@ msgstr "Zabbixサーバーのポート"
 msgid "Zabbix trapper"
 msgstr "Zabbixトラッパー"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgid "Zetta"
 msgstr "ゼタ"
 
@@ -15483,7 +15492,7 @@ msgstr "自動登録ホスト"
 msgid "avg"
 msgstr "平均"
 
-#: include/func.inc.php:558 jsLoader.php:97
+#: include/func.inc.php:564 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -15596,7 +15605,7 @@ msgstr "実行"
 msgid "fixed"
 msgstr "fixed"
 
-#: include/func.inc.php:1896
+#: include/func.inc.php:1902
 msgid "found"
 msgstr "found"
 
@@ -15606,7 +15615,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "グローバルなデータの保存期間設定"
 
-#: include/func.inc.php:559 jsLoader.php:98
+#: include/func.inc.php:565 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -15639,7 +15648,7 @@ msgstr "期間中"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15656,7 +15665,7 @@ msgstr "アイテム"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "キーが設定されていません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1805
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -15676,12 +15685,12 @@ msgstr "含まれる"
 msgid "low-level discovery rule"
 msgstr "ローレベルディスカバリルール"
 
-#: include/func.inc.php:560
+#: include/func.inc.php:566
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:557 jsLoader.php:96
+#: include/func.inc.php:563 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -15724,7 +15733,7 @@ msgstr "最小60秒"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:562
+#: include/func.inc.php:568
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -15771,7 +15780,7 @@ msgid "now"
 msgstr "現在"
 
 #: include/blocks.inc.php:362 include/blocks.inc.php:706
-#: include/func.inc.php:1893
+#: include/func.inc.php:1899
 msgid "of"
 msgstr "of"
 
@@ -15840,7 +15849,7 @@ msgstr "ルート"
 msgid "running"
 msgstr "実行中"
 
-#: include/func.inc.php:561
+#: include/func.inc.php:567
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -15878,7 +15887,7 @@ msgstr "値のマッピングの表示"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "テンプレートID\"%1$s\"が%2$s回利用されています"
 
-#: include/func.inc.php:1889
+#: include/func.inc.php:1895
 msgid "to"
 msgstr "to"
 
@@ -15893,7 +15902,7 @@ msgstr "検索文字列を入力"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "キーの末尾が間違っています"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337
@@ -15909,7 +15918,7 @@ msgstr "値"
 msgid "via"
 msgstr "via"
 
-#: include/func.inc.php:556 jsLoader.php:95
+#: include/func.inc.php:562 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
 msgstr "y"
