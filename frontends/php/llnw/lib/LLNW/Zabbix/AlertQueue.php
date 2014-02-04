@@ -136,12 +136,12 @@ class AlertQueue
         }
 
         $query = "INSERT INTO $table_name (created, data, host, item, item_key, `trigger`, log) VALUES (";
-        $query .= "created = NOW(), ";
+        $query .= "UNIX_TIMESTAMP(), ";
         $query .= "'".addslashes($data)."', ";
         $query .= "'".addslashes($host)."', ";
-        $query .= "'".addslashes($item)."', ";
+        $query .= "'".addslashes(json_encode($item))."', ";
         $query .= "'".addslashes($item_key)."', ";
-        $query .= "'".addslashes($trigger)."', ";
+        $query .= "'".addslashes(json_encode($trigger))."', ";
         $query .= "'');";
         if (!$ldb->query($query)) {
             dbug("Error: DB error: ".$ldb->last_error);
