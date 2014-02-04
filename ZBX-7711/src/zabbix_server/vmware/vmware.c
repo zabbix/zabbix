@@ -1415,6 +1415,8 @@ out:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
+	zbx_free(xpath);
+
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
