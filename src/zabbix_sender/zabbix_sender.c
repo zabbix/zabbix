@@ -438,8 +438,6 @@ int	main(int argc, char **argv)
 
 			total_count++; /* also used as inputline */
 
-			zbx_rtrim(in_line, "\r\n");
-
 			p = in_line;
 
 			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
@@ -479,6 +477,8 @@ int	main(int argc, char **argv)
 				}
 			}
 
+			zbx_rtrim(p, "\r\n");
+
 			if ('\0' != *p && '"' != *p)
 			{
 				zbx_strlcpy(key_value, p, sizeof(key_value));
@@ -489,8 +489,12 @@ int	main(int argc, char **argv)
 				ret = FAIL;
 				break;
 			}
-
-			zbx_rtrim(key_value, "\r\n");
+			else if ('\0' != *p)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "[line %d] Too many parameters", total_count);
+				ret = FAIL;
+				break;
+			}
 
 			zbx_json_addobject(&sentdval_args.json, NULL);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
