@@ -45,13 +45,37 @@ int	__zbx_open(const char *pathname, int flags)
 }
 #endif
 
-/*
- * Reads in at most one less than size characters from a file descriptor and stores them into the buffer pointed to by s.
- * Reading stops after a newline. If a newline is read, it is stored into the buffer.
- *
- * On success, the number of bytes read is returned (zero indicates end of file).
- * On error, -1 is returned, and errno is set appropriately.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_read                                                         *
+ *                                                                            *
+ * Purpose: Read one text line from a file descriptor into buffer             *
+ *                                                                            *
+ * Parameters: fd       - [IN] file descriptor to read from                   *
+ *             buf      - [IN] buffer to read into                            *
+ *             count    - [IN] buffer size in bytes                           *
+ *             encoding - [IN] pointer a to text string describing encoding.  *
+ *                        The following encodings are recognized:             *
+ *                          "UNICODE"                                         *
+ *                          "UNICODEBIG"                                      *
+ *                          "UNICODEFFFE"                                     *
+ *                          "UNICODELITTLE"                                   *
+ *                          "UTF-16"   "UTF16"                                *
+ *                          "UTF-16BE" "UTF16BE"                              *
+ *                          "UTF-16LE" "UTF16LE"                              *
+ *                          "UTF-32"   "UTF32"                                *
+ *                          "UTF-32BE" "UTF32BE"                              *
+ *                          "UTF-32LE" "UTF32LE".                             *
+ *                        "" (empty string) means a single-byte character set.*
+ *                                                                            *
+ * Return value: On success, the number of bytes read is returned (0 (zero)   *
+ *               indicates end of file).                                      *
+ *               On error, -1 is returned and errno is set appropriately.     *
+ *                                                                            *
+ * Comments: Reading stops after a newline. If the newline is read, it is     *
+ *           stored into the buffer.                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
 	size_t		i, szbyte;
@@ -109,7 +133,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	for (i = 0; i + szbyte <= (size_t)nbytes; i += szbyte)
+	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
@@ -119,8 +143,10 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
-			if (i + szbyte < (size_t)nbytes && 0 == memcmp(&buf[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */
+			/* CR+LF (Windows) ? */
+			if (i < (size_t)nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
 				i += szbyte;
+
 			i += szbyte;
 			break;
 		}
