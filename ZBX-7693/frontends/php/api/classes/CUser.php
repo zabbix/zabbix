@@ -959,7 +959,7 @@ class CUser extends CZBXAPI {
 		));
 
 		if (count($mediaIds) != $dbMediaCount) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to delete other user media.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -970,7 +970,7 @@ class CUser extends CZBXAPI {
 	 */
 	public function deleteMediaReal($mediaIds) {
 		if (!DBexecute('DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaIds))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
 		}
 	}
 
