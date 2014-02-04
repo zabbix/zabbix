@@ -228,6 +228,7 @@
 		// add flexible interval
 		jQuery('#add_delay_flex').click(function() {
 			var addDelayFlex = jQuery('<input>', {
+				type: 'hidden',
 				name: 'add_delay_flex',
 				value: 'add'
 			});
