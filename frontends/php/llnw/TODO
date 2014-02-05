@@ -1,0 +1,9 @@
+refactor auth to use Zabbix internal mechanism
+refactor toolbox.php to llnw.php lib
+determine what get-ack-info.php, squelch-json.php, and squelch-mgr.php are...
+re: internal Zabbix auth - legacy support key: sjE4i by checking and then assigning an API user for lookup
+integrate https://github.llnw.net/cchristensen/service-app-report
+Create F-Vagrant branch for vagrant setup/dev
+doc legacy/deprecate tasks; remove key based custom API access: edge_scripts, ...?
+Remove global config dependencies
+Consider using monolog instead of pear/log

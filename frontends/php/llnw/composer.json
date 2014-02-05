@@ -1,11 +1,48 @@
 {
+    "authors": [
+        {
+            "name": "Mark Broyles",
+            "email": "mbroyles@llnw.com"
+        },
+        {
+            "name": "Chris Christensen",
+            "email": "cchristensen@llnw.com"
+        },
+        {
+            "name": "Brian Gallew",
+            "email": "bgallew@llnw.com"
+        },
+        {
+            "name": "Chris Larsen",
+            "email": "clarsen@llnw.com"
+        }
+    ],
     "repositories": [
         {
             "type": "pear",
             "url": "http://pear.php.net"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/christianchristensen/PhpZabbixApi.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/jv2222/ezSQL.git"
         }
     ],
     "require": {
-        "pear-pear/Log": "*"
+        "confirmitsolutionsgmbh/phpzabbixapi": "dev-composer",
+        "jsonrpc/jsonrpc": "*",
+        "jv2222/ezSQL": "dev-master",
+        "pear-pear/PHP_CodeSniffer": "*",
+        "pear-pear/Log": "*",
+        "silex/silex": "*",
+        "symfony/config": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "LLNW\\Zabbix\\": "lib/"
+        }
     }
 }
