@@ -597,7 +597,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		ret = send_list_of_active_checks(sock, s);
 		return ret;
 	}
-	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* request for last IDs */
+	else if (0 == strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23)) /* request for last IDs */
 	{
 		send_history_last_id(sock, s);
 		return ret;
@@ -657,8 +657,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		if ('<' == *s)	/* XML protocol */
 		{
 			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
-					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp),
-					source, sizeof(source),	severity, sizeof(severity));
+					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
+					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
 			av.value	= value_dec;
 			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
@@ -697,7 +697,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		process_mass_data(sock, 0, &av, 1, NULL);
 
 		alarm(CONFIG_TIMEOUT);
-		if (SUCCEED != zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK"))
+		if (SUCCEED != zbx_tcp_send_raw(sock, "OK")
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		alarm(0);
 
