@@ -32,7 +32,6 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
-#include "zbxregexp.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -175,6 +174,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			active_metrics[i].key = strdup(key);
 			active_metrics[i].lastlogsize = lastlogsize;
 			active_metrics[i].mtime = mtime;
+			active_metrics[i].big_rec = 0;
 		}
 
 		/* replace metric */
@@ -198,6 +198,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	active_metrics[i].mtime = mtime;
 	/* can skip existing log[] and eventlog[] data */
 	active_metrics[i].skip_old_data = active_metrics[i].lastlogsize ? 0 : 1;
+	active_metrics[i].big_rec = 0;
 
 	/* move to the last metric */
 	i++;
@@ -720,7 +721,11 @@ ret:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: ATTENTION! This function's address and pointers to arguments     *
+ *           are used when calling process_log() and process_logrt(). If you  *
+ *           ever change this process_value() arguments or return value do    *
+ *           not forget to synchronize changes with process_log() and         *
+ *           process_logrt() implementations and their callers.               *
  *                                                                            *
  ******************************************************************************/
 static int	process_value(
@@ -830,7 +835,7 @@ out:
 static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
-	register int	i, s_count, p_count;
+	int		i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
 	char		*value = NULL, *item_value = NULL;
@@ -880,7 +885,6 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			do
 			{
-				/* simple try realization */
 				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
 						params, sizeof(params)))
 				{
@@ -919,58 +923,18 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 != get_param(params, 6, output_template, sizeof(output_template)))
 					*output_template = '\0';
 
-				s_count = 0;
-				p_count = 0;
-				lastlogsize = active_metrics[i].lastlogsize;
+				/* do not flood Zabbix server if file grows too fast */
+				s_count = maxlines_persec * active_metrics[i].refresh;
 
-				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding,
-						active_metrics[i].skip_old_data)))
-				{
-					active_metrics[i].skip_old_data = 0;
+				/* do not flood local system if file grows too fast */
+				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
-					/* End of file. The file could become empty, must save `lastlogsize'. */
-					if (NULL == value)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						break;
-					}
-
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
-					{
-						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, item_value, &lastlogsize,
-								NULL, NULL, NULL, NULL,	NULL, 1);
-
-						zbx_free(item_value);
-
-						s_count++;
-					}
-					p_count++;
-
-					zbx_free(value);
-
-					if (SUCCEED == send_err)
-						active_metrics[i].lastlogsize = lastlogsize;
-					else
-					{
-						/* buffer is full, stop processing active checks */
-						/* till the buffer is cleared */
-						lastlogsize = active_metrics[i].lastlogsize;
-						goto ret;
-					}
-
-					/* do not flood Zabbix server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
-						break;
-
-					/* do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;
-				} /* while processing a log */
-
+				ret = process_log(filename, &active_metrics[i].lastlogsize,
+						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
+						&regexps, pattern, output_template, &p_count, &s_count, process_value,
+						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}
-			while (0); /* simple try realization */
+			while (0);
 
 			if (FAIL == ret)
 			{
