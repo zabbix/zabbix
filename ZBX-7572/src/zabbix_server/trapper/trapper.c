@@ -504,7 +504,95 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	datalen = strlen(s);
 	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len " ZBX_FS_SIZE_T, s, (zbx_fs_size_t)datalen);
 
-	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
+	if ('{' == *s)	/* JSON protocol */
+	{
+		if (SUCCEED != zbx_json_open(s, &jp))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid JSON object");
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
+		{
+			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				{
+					send_proxyconfig(sock, &jp);
+				}
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
+							" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
+					recv_proxyconfig(sock, &jp);
+				}
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
+				{
+					/* This is a misconfiguration: the proxy is configured in active mode */
+					/* but server sends requests to it as to a proxy in passive mode. To  */
+					/* prevent logging of this problem for every request we report it     */
+					/* only when the server sends configuration to the proxy and ignore   */
+					/* it for other requests.                                             */
+					active_passive_misconfig(sock);
+				}
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
+				0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			{
+				recv_agenthistory(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_proxyhistory(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_proxyhistory(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_discovery_data(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_discovery_data(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_areg_data(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_areg_data(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_proxy_heartbeat(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+			{
+				ret = send_list_of_active_checks_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_host_availability(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_host_availability(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
+			{
+				ret = node_process_command(sock, s, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					ret = recv_getqueue(sock, &jp);
+			}
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
+		}
+		return ret;
+	}
+	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s);
 	}
@@ -563,88 +651,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
 			alarm(0);
 
-			return ret;
-		}
-		else if (SUCCEED == zbx_json_open(s, &jp))	/* JSON protocol */
-		{
-			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
-			{
-				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-					{
-						send_proxyconfig(sock, &jp);
-					}
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
-								" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
-						recv_proxyconfig(sock, &jp);
-					}
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
-					{
-						/* This is a misconfiguration: the proxy is configured in active mode */
-						/* but server sends requests to it as to a proxy in passive mode. To  */
-						/* prevent logging of this problem for every request we report it     */
-						/* only when the server sends configuration to the proxy and ignore   */
-						/* it for other requests.                                             */
-						active_passive_misconfig(sock);
-					}
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
-				{
-					recv_agenthistory(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_proxyhistory(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_proxyhistory(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_discovery_data(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_discovery_data(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_areg_data(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_areg_data(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_proxy_heartbeat(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
-				{
-					ret = send_list_of_active_checks_json(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_host_availability(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_host_availability(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
-				{
-					ret = node_process_command(sock, s, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						ret = recv_getqueue(sock, &jp);
-				}
-				else
-					zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
-			}
 			return ret;
 		}
 		else if ('<' == *s)	/* XML protocol */
