@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-02 00:59+0200\n"
-"PO-Revision-Date: 2014-01-28 11:00+0300\n"
+"PO-Revision-Date: 2014-02-02 16:12+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1390899606.0\n"
+"X-POOTLE-MTIME: 1391350320.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1716,7 +1716,7 @@ msgstr "Nie je možné nalinkovať šablónu"
 
 #: api/classes/CUser.php:956
 msgid "Cannot login."
-msgstr ""
+msgstr "Nie je možné Vás prihlásiť."
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -7199,7 +7199,7 @@ msgstr "Prihlásenie zlyhalo \"%s\"."
 #: api/classes/CUser.php:961
 #, php-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Prihlasovacie meno \"%1$s\" sa nezhoduje s menom \"%2$s\" použitým v HTTP autentifikácii."
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
