@@ -784,16 +784,21 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-			zbx_free_config();
-
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
+			else
+			{
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+			}
+
+			zbx_free_config();
 
 			ret = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
