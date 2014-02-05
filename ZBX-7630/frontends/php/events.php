@@ -347,7 +347,9 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 					'&srcfld2=description'.
 					'&real_hosts=1'.
 					'&monitored_hosts=1'.
-					'&with_monitored_triggers=1");',
+					'&with_monitored_triggers=1'.
+					(($_REQUEST['hostid'] > 0) ? '&only_hostid='.$_REQUEST['hostid'] : '').
+					'");',
 				'T'
 			)
 		), 'form_row_r')
