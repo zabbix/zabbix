@@ -417,7 +417,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get entries from '%s' directory: %s", directory, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
+				zbx_strerror(errno));
 		zbx_free(directory);
 		zbx_free(format);
 		zbx_free(find_wpath);
@@ -432,7 +433,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 		}
 		else if (0 == regexec(&re, file_name_utf8, (size_t)0, NULL, 0))
 		{
@@ -461,7 +462,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process or read entry '%s'", logfile_candidate);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 		}
 		else if (0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
 		{
