@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -557,7 +557,8 @@ end:
 	return strval_dyn;
 }
 
-static int	zbx_snmp_set_result(const struct variable_list *var, const DC_ITEM *item, AGENT_RESULT *value)
+static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char value_type, unsigned char data_type,
+		AGENT_RESULT *value)
 {
 	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
@@ -574,13 +575,8 @@ static int	zbx_snmp_set_result(const struct variable_list *var, const DC_ITEM *i
 		}
 		else
 		{
-			if (NULL != item)
-			{
-				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
-					ret = NOTSUPPORTED;
-			}
-			else
-				SET_STR_RESULT(value, zbx_strdup(NULL, strval_dyn));
+			if (SUCCEED != set_result_type(value, value_type, data_type, strval_dyn))
+				ret = NOTSUPPORTED;
 
 			zbx_free(strval_dyn);
 		}
@@ -800,7 +796,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 
 					init_result(&snmp_value);
 
-					if (SUCCEED == zbx_snmp_set_result(var, NULL, &snmp_value) &&
+					if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_value) &&
 							NULL != GET_STR_RESULT(&snmp_value))
 					{
 						if (NULL != search)
@@ -881,7 +877,8 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char *snmp_oid, AGENT_RESULT *value)
+static int	zbx_snmp_get_value(struct snmp_session *ss, unsigned char value_type, unsigned char data_type,
+		const DC_INTERFACE *interface, const char *snmp_oid, AGENT_RESULT *value)
 {
 	const char		*__function_name = "zbx_snmp_get_value";
 
@@ -927,13 +924,13 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, DC_ITEM *item, const char
 			ret = NOTSUPPORTED;
 		}
 		else
-			ret = zbx_snmp_set_result(var, item, value);
+			ret = zbx_snmp_set_result(var, value_type, data_type, value);
 	}
 	else
 	{
 		char	err[MAX_STRING_LEN];
 
-		ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, err);
+		ret = zbx_get_snmp_response_error(ss, interface, status, response, err);
 		SET_MSG_RESULT(value, zbx_strdup(NULL, err));
 	}
 
@@ -1059,7 +1056,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 			case 0:
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() standard processing", __function_name);
 				zbx_snmp_translate(oid_translated, item->snmp_oid, sizeof(oid_translated));
-				ret = zbx_snmp_get_value(ss, item, oid_translated, value);
+				ret = zbx_snmp_get_value(ss, item->value_type, item->data_type, &item->interface,
+						oid_translated, value);
 				break;
 			case 3:
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() special processing", __function_name);
@@ -1093,7 +1091,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 					zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
 
-					ret = zbx_snmp_get_value(ss, item, oid_full, &current_index_value);
+					ret = zbx_snmp_get_value(ss, ITEM_VALUE_TYPE_STR, 0, &item->interface, oid_full,
+							&current_index_value);
 
 					if (SUCCEED == ret && (NULL == GET_STR_RESULT(&current_index_value) ||
 							0 != strcmp(current_index_value.str, index_value)))
@@ -1138,7 +1137,8 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					*pl = '[';
 
 					zbx_snprintf(oid_full, sizeof(oid_full), "%s.%s", oid_translated, idx);
-					ret = zbx_snmp_get_value(ss, item, oid_full, value);
+					ret = zbx_snmp_get_value(ss, item->value_type, item->data_type,
+							&item->interface, oid_full, value);
 				}
 
 				zbx_free(idx);

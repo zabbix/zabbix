@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,19 +31,20 @@ class CUserGroup extends CZBXAPI {
 	protected $sortColumns = array('usrgrpid', 'name');
 
 	/**
-	 * Get UserGroups
+	 * Get user groups.
 	 *
-	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
-	 * @param array $options['usrgrpids'] UserGroup IDs
-	 * @param array $options['userids'] User IDs
-	 * @param boolean $options['status']
-	 * @param boolean $options['with_gui_access']
-	 * @param boolean $options['selectUsers']
-	 * @param int $options['count']
+	 * @param array  $options
+	 * @param array  $options['nodeids']
+	 * @param array  $options['usrgrpids']
+	 * @param array  $options['userids']
+	 * @param bool   $options['status']
+	 * @param bool   $options['with_gui_access']
+	 * @param bool   $options['selectUsers']
+	 * @param int    $options['count']
 	 * @param string $options['pattern']
-	 * @param int $options['limit'] limit selection
+	 * @param int    $options['limit']
 	 * @param string $options['order']
+	 *
 	 * @return array
 	 */
 	public function get($options = array()) {
@@ -84,18 +85,18 @@ class CUserGroup extends CZBXAPI {
 
 		$options = zbx_array_merge($defOptions, $options);
 
-		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-			$sqlParts['where'][] = 'g.usrgrpid IN ('.
-				'SELECT uug.usrgrpid'.
-				' FROM users_groups uug'.
-				' WHERE uug.userid='.self::$userData['userid'].
+		// permissions
+		if ($userType != USER_TYPE_SUPER_ADMIN) {
+			if ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$sqlParts['where'][] = 'g.usrgrpid IN ('.
+					'SELECT uug.usrgrpid'.
+					' FROM users_groups uug'.
+					' WHERE uug.userid='.self::$userData['userid'].
 				')';
-		}
-		elseif (!is_null($options['editable']) && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
-			return array();
+			}
+			else {
+				return array();
+			}
 		}
 
 		// usrgrpids
@@ -177,6 +178,7 @@ class CUserGroup extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -231,10 +233,8 @@ class CUserGroup extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function create($usrgrps) {
-
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can add user groups.'));
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
@@ -284,9 +284,8 @@ class CUserGroup extends CZBXAPI {
 	 * @return int[] array['usrgrpids'] returns passed group ids
 	 */
 	public function update($usrgrps) {
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
@@ -309,9 +308,8 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	public function massAdd($data) {
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can add user groups.'));
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
@@ -405,9 +403,8 @@ class CUserGroup extends CZBXAPI {
 	 * @return int[] array['usrgrpids'] returns passed user group ids
 	 */
 	public function massUpdate($data) {
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
@@ -451,7 +448,6 @@ class CUserGroup extends CZBXAPI {
 		// check that user do not add himself to a disabled user group
 		// insert and delete user-userGroup links
 		if (isset($data['userids'])) {
-
 			$userids = zbx_toArray($data['userids']);
 
 			// check whether user tries to add himself to a disabled user group
@@ -517,7 +513,6 @@ class CUserGroup extends CZBXAPI {
 		// update permissions to right-userGroup links
 		// unlink rights from user groups (permissions)
 		if (isset($data['rights'])) {
-
 			$rights = zbx_toArray($data['rights']);
 
 			// get already linked rights
@@ -585,79 +580,123 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Delete UserGroups.
+	 * Delete user groups.
 	 *
-	 * @param array $usrgrpids
-	 * @return boolean
+	 * @param array $userGroupIds
+	 *
+	 * @return array
 	 */
-	public function delete($usrgrpids) {
+	public function delete(array $userGroupIds) {
+		$this->validateDelete($userGroupIds);
 
-		$usrgrpids = zbx_toArray($usrgrpids);
-		$dbUsrgrps = $this->get(array(
-			'output' => array('usrgrpid', 'name'),
-			'usrgrpids' => $usrgrpids,
-			'preservekeys' => true
-		));
+		$operationIds = $delelteOperationIds = array();
 
-		if (empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		$dbOperations = DBselect(
+			'SELECT DISTINCT om.operationid'.
+			' FROM opmessage_grp om'.
+			' WHERE '.dbConditionInt('om.usrgrpid', $userGroupIds)
+		);
+		while ($dbOperation = DBfetch($dbOperations)) {
+			$operationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
+		}
 
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			// GETTEXT: API exception
+		$dbOperations = DBselect(
+			'SELECT DISTINCT o.operationid'.
+			' FROM operations o'.
+			' WHERE '.dbConditionInt('o.operationid', $operationIds).
+				' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)'
+		);
+		while ($dbOperation = DBfetch($dbOperations)) {
+			$delelteOperationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
+		}
+
+		DB::delete('opmessage_grp', array('usrgrpid' => $userGroupIds));
+		DB::delete('operations', array('operationid' => $delelteOperationIds));
+		DB::delete('rights', array('groupid' => $userGroupIds));
+		DB::delete('users_groups', array('usrgrpid' => $userGroupIds));
+		DB::delete('usrgrp', array('usrgrpid' => $userGroupIds));
+
+		return array('usrgrpids' => $userGroupIds);
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException
+	 *
+	 * @param array $userGroupIds
+	 */
+	protected function validateDelete(array $userGroupIds) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 		}
 
-		// check, if this user group is used in one of the scripts. If so, it cannot be deleted
+		if (!$userGroupIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$dbUserGroups = $this->get(array(
+			'output' => array('usrgrpid', 'name'),
+			'usrgrpids' => $userGroupIds,
+			'preservekeys' => true
+		));
+
+		// check if user group is used in scripts
 		$dbScripts = API::Script()->get(array(
 			'output' => array('scriptid', 'name', 'usrgrpid'),
-			'usrgrpids' => $usrgrpids,
+			'usrgrpids' => $userGroupIds,
 			'nopermissions' => true
 		));
-		if (!empty($dbScripts)) {
-			foreach ($dbScripts as $snum => $script) {
-				if ($script['usrgrpid'] == 0) continue;
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
+		foreach ($dbScripts as $dbScript) {
+			if ($dbScript['usrgrpid'] == 0) {
+				continue;
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'User group "%1$s" is used in script "%2$s".',
+				$dbUserGroups[$dbScript['usrgrpid']]['name'],
+				$dbScript['name']
+			));
+		}
+
+		// check if user group is used in config
+		$config = select_config();
+
+		if (isset($dbUserGroups[$config['alert_usrgrpid']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'User group "%1$s" is used in configuration for database down messages.',
+				$dbUserGroups[$config['alert_usrgrpid']]['name']
+			));
+		}
+
+		// check if user group is used in users with 1 user group
+		$dbUsers = API::User()->get(array(
+			'output' => array('userid', 'usrgrpid', 'alias'),
+			'usrgrpids' => $userGroupIds,
+			'selectUsrgrps' => array('usrgrpid')
+		));
+
+		foreach ($dbUsers as $dbUser) {
+			if (count($dbUser['usrgrps']) == 1) {
+				$dbGroup = reset($dbUser['usrgrps']);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'User group "%1$s" is the only group that user "%2$s" belongs to.',
+					$dbUserGroups[$dbGroup['usrgrpid']]['name'],
+					$dbUser['alias']
+				));
 			}
 		}
-
-		// check, if this user group is used in the config. If so, it cannot be deleted
-		$config = select_config();
-		if (isset($dbUsrgrps[$config['alert_usrgrpid']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group [%s] is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
-		}
-
-		// delete action operation msg
-		$operationids = array();
-		$sql = 'SELECT DISTINCT om.operationid'.
-			' FROM opmessage_grp om'.
-			' WHERE '.dbConditionInt('om.usrgrpid', $usrgrpids);
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations))
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-
-		DB::delete('opmessage_grp', array('usrgrpid'=>$usrgrpids));
-
-		// delete empty operations
-		$delOperationids = array();
-		$sql = 'SELECT DISTINCT o.operationid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
-			' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)';
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations))
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-
-		DB::delete('operations', array('operationid'=>$delOperationids));
-		DB::delete('rights', array('groupid'=>$usrgrpids));
-		DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));
-		DB::delete('usrgrp', array('usrgrpid'=>$usrgrpids));
-
-		return array('usrgrpids' => $usrgrpids);
 	}
 
 	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -671,8 +710,12 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -692,13 +735,15 @@ class CUserGroup extends CZBXAPI {
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
-			$users = API::User()->get(array(
+
+			$dbUsers = API::User()->get(array(
 				'output' => $options['selectUsers'],
 				'userids' => $relationMap->getRelatedIds(),
-				'getAccess' => $options['selectUsers'] == API_OUTPUT_EXTEND ? true : null,
+				'getAccess' => ($options['selectUsers'] == API_OUTPUT_EXTEND) ? true : null,
 				'preservekeys' => true
 			));
-			$result = $relationMap->mapMany($result, $users, 'users');
+
+			$result = $relationMap->mapMany($result, $dbUsers, 'users');
 		}
 
 		return $result;

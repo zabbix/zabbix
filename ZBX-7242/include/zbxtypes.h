@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,11 +127,15 @@
 #define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
+#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
+
 #define ZBX_CONST_STRING(str) ""str
 
-typedef struct {
+typedef struct
+{
 	zbx_uint64_t	lo;
 	zbx_uint64_t	hi;
-} zbx_uint128_t;
+}
+zbx_uint128_t;
 
 #endif

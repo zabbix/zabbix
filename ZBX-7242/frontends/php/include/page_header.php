@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
 			" if (this.state == 'none') { this.state = 'block'; }".
 			" else { this.state = 'none'; }".
-			" showHideByName('zbx_gebug_info', this.state);";
+			" showHideByName('zbx_debug_info', this.state);";
 		$debug->setAttribute('onclick', 'javascript: '.$d_script);
 		array_push($page_header_r_col, $debug, '|');
 	}

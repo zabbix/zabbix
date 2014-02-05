@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2173,3 +2173,117 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 	zbx_free(sql);
 }
+
+#ifdef HAVE_POSTGRESQL
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbytea_escape                                                   *
+ *                                                                            *
+ * Purpose: converts from binary string to the null terminated escaped string *
+ *                                                                            *
+ * Transformations:                                                           *
+ *      <= 0x1f || '\'' || '\\' || >= 0x7f -> \\ooo (ooo is an octal number)  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      input - null terminated hexadecimal string                            *
+ *      output - pointer to buffer                                            *
+ *      olen - size of returned buffer                                        *
+ *                                                                            *
+ ******************************************************************************/
+size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
+{
+	const u_char	*i = input;
+	char		*o;
+	size_t		len = 1;	/* '\0' */
+
+	while (i - input < ilen)
+	{
+		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
+		{
+			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
+				len++;
+			len += 4;
+		}
+		else
+			len++;
+		i++;
+	}
+
+	if (*olen < len)
+	{
+		*olen = len;
+		*output = zbx_realloc(*output, *olen);
+	}
+	o = *output;
+	i = input;
+
+	while (i - input < ilen)
+	{
+		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
+		{
+			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
+				*o++ = '\\';
+			*o++ = '\\';
+			*o++ = ((*i >> 6) & 0x7) + 0x30;
+			*o++ = ((*i >> 3) & 0x7) + 0x30;
+			*o++ = (*i & 0x7) + 0x30;
+		}
+		else
+			*o++ = *i;
+		i++;
+	}
+	*o = '\0';
+
+	return len - 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbytea_unescape                                                 *
+ *                                                                            *
+ * Purpose: converts the null terminated string into binary buffer            *
+ *                                                                            *
+ * Transformations:                                                           *
+ *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
+ *      \\   == \                                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      io - [IN/OUT] null terminated string / binary data                    *
+ *                                                                            *
+ * Return value: length of the binary buffer                                  *
+ *                                                                            *
+ ******************************************************************************/
+size_t	DBbytea_unescape(u_char *io)
+{
+	const u_char	*i = io;
+	u_char		*o = io;
+
+	while ('\0' != *i)
+	{
+		switch (*i)
+		{
+			case '\\':
+				i++;
+				if ('\\' == *i)
+				{
+					*o++ = *i++;
+				}
+				else
+				{
+					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
+					{
+						*o = (*i++ - 0x30) << 6;
+						*o += (*i++ - 0x30) << 3;
+						*o++ += *i++ - 0x30;
+					}
+				}
+				break;
+
+			default:
+				*o++ = *i++;
+		}
+	}
+
+	return o - io;
+}
+#endif

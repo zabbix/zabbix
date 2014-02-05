@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -453,9 +453,6 @@ class CTrigger extends CTriggerGeneral {
 			return count($triggers);
 		}
 
-		$triggerids = array_keys($triggers);
-		sort($triggerids);
-
 		foreach ($triggers as $trigger) {
 			if (!isset($result[$trigger['triggerid']])) {
 				$result[$trigger['triggerid']] = array();
@@ -482,9 +479,8 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
-
 		// expandComment
-		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 		}
 
@@ -1826,8 +1822,6 @@ class CTrigger extends CTriggerGeneral {
 			if (isset($sqlParts['select']['hostname'])) {
 				$sqlParts['select']['hostname'] = 'h.name as hostname';
 			}
-
-			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
 		return $sqlParts;

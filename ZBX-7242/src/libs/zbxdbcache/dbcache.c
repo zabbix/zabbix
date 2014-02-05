@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,8 +55,7 @@ extern unsigned char	daemon_type;
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern int		CONFIG_NODE_NOHISTORY;
 
-static int		ZBX_HISTORY_SIZE = 0;
-int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
+static int		ZBX_HISTORY_SIZE = 0;	/* must be greater than ZBX_SYNC_MAX */
 
 #define ZBX_IDS_SIZE	10
 
@@ -148,7 +147,8 @@ typedef struct
 	int		history_gap_num;
 	int		text_free;
 	int		trends_num;
-	int		itemids_alloc, itemids_num;
+	int		itemids_alloc;
+	int		itemids_num;
 	zbx_timespec_t	last_ts;
 }
 ZBX_DC_CACHE;
@@ -1072,7 +1072,7 @@ notsupported:
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
-			/* supported is handled in DBlld_process_discovery_rule()      */
+			/* supported is handled in lld_process_discovery_rule()        */
 			add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, 0, 0);
 
@@ -2204,6 +2204,10 @@ int	DCsync_history(int sync_type)
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
 	time_t			now = 0;
+	int			candidate_num;
+	int			indices[ZBX_SYNC_MAX];
+	zbx_uint64_t		itemids[ZBX_SYNC_MAX];
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_first:%d history_num:%d",
 			__function_name, cache->history_first, cache->history_num);
@@ -2221,6 +2225,9 @@ int	DCsync_history(int sync_type)
 	if (NULL == history)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
+	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
+
 	syncs = cache->history_num / ZBX_SYNC_MAX;
 	max_delay = (int)time(NULL) - CONFIG_HISTSYNCER_FREQUENCY;
 
@@ -2228,10 +2235,10 @@ int	DCsync_history(int sync_type)
 	{
 		LOCK_CACHE;
 
-		history_num = 0;
+		candidate_num = 0;
 		skipped_clock = 0;
 
-		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > history_num;)
+		for (n = cache->history_num, f = cache->history_first; 0 < n && ZBX_SYNC_MAX > candidate_num;)
 		{
 			int	num;
 
@@ -2266,13 +2273,43 @@ int	DCsync_history(int sync_type)
 					continue;
 				}
 				else if (1 < num && 0 == skipped_clock)
+				{
 					skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
+				}
 
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
 						&cache->itemids_num, cache->history[f].itemid, 0);
 			}
 			else
 				num = 1;
+
+			indices[candidate_num] = f;
+			itemids[candidate_num] = cache->history[f].itemid;
+
+			candidate_num++;
+
+			f += num;
+			n -= num;
+		}
+
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			DCconfig_lock_triggers_by_itemids(itemids, candidate_num, &triggerids);
+
+		history_num = 0;
+
+		for (i = 0; i < candidate_num; i++)
+		{
+			f = indices[i];
+
+			if (0 == itemids[i])
+			{
+				if (0 == skipped_clock || skipped_clock > cache->history[f].ts.sec)
+					skipped_clock = cache->history[f].ts.sec;
+
+				uint64_array_remove(cache->itemids, &cache->itemids_num, &cache->history[f].itemid, 1);
+
+				continue;
+			}
 
 			memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
 
@@ -2317,8 +2354,6 @@ int	DCsync_history(int sync_type)
 			}
 
 			history_num++;
-			n -= num;
-			f += num;
 		}
 
 		if (ZBX_HISTORY_SIZE <= (f = cache->history_first + cache->history_num))
@@ -2368,6 +2403,8 @@ int	DCsync_history(int sync_type)
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 		{
+			DCconfig_unlock_triggers(&triggerids);
+
 			LOCK_CACHE;
 
 			for (i = 0; i < history_num; i ++)
@@ -2406,6 +2443,8 @@ int	DCsync_history(int sync_type)
 		}
 	}
 	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
+
+	zbx_vector_uint64_destroy(&triggerids);
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
@@ -3021,7 +3060,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
-			DBlld_process_discovery_rule(itemid, value->text, ts);
+			lld_process_discovery_rule(itemid, value->text, ts);
 		else
 			dc_local_add_history_lld(itemid, ts, value->text);
 

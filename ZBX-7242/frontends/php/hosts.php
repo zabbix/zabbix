@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,6 +247,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new or existing host groups
+		$newHostGroupIds = array();
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
@@ -254,7 +255,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$existGroups[] = $newGroup;
+						$newHostGroupIds[] = $newGroup;
 					}
 				}
 
@@ -263,22 +264,24 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						throw new Exception();
 					}
 
-					$existGroups = isset($existGroups)
-						? array_merge($existGroups, $createdGroups['groupids']) : $createdGroups['groupids'];
+					$newHostGroupIds = $newHostGroupIds
+						? array_merge($newHostGroupIds, $createdGroups['groupids'])
+						: $createdGroups['groupids'];
 				}
 			}
 			else {
-				$existGroups = $_REQUEST['new_groups'];
+				$newHostGroupIds = getRequest('new_groups');
 			}
 		}
 
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
-				$replaceHostGroupsIds = isset($existGroups)
-					? array_unique(array_merge($_REQUEST['groups'], $existGroups)) : $_REQUEST['groups'];
+				$replaceHostGroupsIds = $newHostGroupIds
+					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
+					: $_REQUEST['groups'];
 			}
-			elseif (isset($existGroups)) {
-				$replaceHostGroupsIds = $existGroups;
+			elseif ($newHostGroupIds) {
+				$replaceHostGroupsIds = $newHostGroupIds;
 			}
 
 			if (isset($replaceHostGroupsIds)) {
@@ -292,9 +295,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				$hosts['groups'] = array();
 			}
 		}
-		elseif (isset($existGroups)) {
-			$existGroups = API::HostGroup()->get(array(
-				'groupids' => $existGroups,
+		elseif ($newHostGroupIds) {
+			$newHostGroups = API::HostGroup()->get(array(
+				'groupids' => $newHostGroupIds,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -326,8 +329,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
-			$add['groups'] = $existGroups;
+		if ($newHostGroupIds && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = zbx_toObject($newHostGroupIds, 'groupid');
 		}
 
 		if ($add) {

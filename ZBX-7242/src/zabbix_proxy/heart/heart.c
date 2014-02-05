@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ static int	send_heartbeat(void)
 	zbx_sock_t	sock;
 	struct zbx_json	j;
 	int		ret = SUCCEED;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -58,12 +59,13 @@ static int	send_heartbeat(void)
 	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
 		return FAIL;
 
-	if (FAIL == put_data_to_server(&sock, &j))
+	if (SUCCEED != put_data_to_server(&sock, &j, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Heartbeat message failed");
+		zabbix_log(LOG_LEVEL_WARNING, "sending heartbeat message to server failed: %s", error);
 		ret = FAIL;
 	}
 
+	zbx_free(error);
 	disconnect_server(&sock);
 
 	return ret;

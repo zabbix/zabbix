@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,17 +45,20 @@ static PHP_MUTEX		sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
-static const char	*zbx_oci_error(sword status)
+static const char	*zbx_oci_error(sword status, sb4 *err)
 {
 	static char	errbuf[512];
-	sb4		errcode = 0;
+	sb4		errcode, *perrcode;
+
+	perrcode = (NULL == err ? &errcode : err);
 
 	errbuf[0] = '\0';
+	*perrcode = 0;
 
 	switch (status)
 	{
 		case OCI_SUCCESS_WITH_INFO:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, perrcode,
 					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
 			break;
 		case OCI_NEED_DATA:
@@ -65,7 +68,7 @@ static const char	*zbx_oci_error(sword status)
 			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
 			break;
 		case OCI_ERROR:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, perrcode,
 					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
 			break;
 		case OCI_INVALID_HANDLE:
@@ -83,6 +86,46 @@ static const char	*zbx_oci_error(sword status)
 
 	return errbuf;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: OCI_handle_sql_error                                             *
+ *                                                                            *
+ * Purpose: handles Oracle prepare/bind/execute/select operation error        *
+ *                                                                            *
+ * Parameters: zerrcode   - [IN] the Zabbix errorcode for the failed database *
+ *                               operation                                    *
+ *             oci_error  - [IN] the return code from failed Oracle operation *
+ *             sql        - [IN] the failed sql statement (can be NULL)       *
+ *                                                                            *
+ * Return value: ZBX_DB_DOWN - database connection is down                    *
+ *               ZBX_DB_FAIL - otherwise                                      *
+ *                                                                            *
+ * Comments: This function logs the error description and checks the          *
+ *           database connection status.                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
+{
+	sb4	errcode;
+	int	ret = ZBX_DB_DOWN;
+
+	zabbix_errlog(zerrcode, oci_error, zbx_oci_error(oci_error, &errcode), sql);
+
+	/* after ORA-02396 (and consequent ORA-01012) errors the OCI_SERVER_NORMAL server status is still returned */
+	switch (errcode)
+	{
+		case 1012:	/* ORA-01012: not logged on */
+		case 2396:	/* ORA-02396: exceeded maximum idle time */
+			goto out;
+	}
+
+	if (OCI_SERVER_NORMAL == OCI_DBserver_status())
+		ret = ZBX_DB_FAIL;
+out:
+	return ret;
+}
+
 #endif	/* HAVE_ORACLE */
 
 /******************************************************************************
@@ -91,7 +134,7 @@ static const char	*zbx_oci_error(sword status)
  *                                                                            *
  * Purpose: connect to the database                                           *
  *                                                                            *
- * Return value: ZBX_DB_OK - succefully connected                             *
+ * Return value: ZBX_DB_OK - successfully connected                           *
  *               ZBX_DB_DOWN - database is down                               *
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
@@ -252,7 +295,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (OCI_SUCCESS != err)
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
 			ret = ZBX_DB_FAIL;
 		}
 	}
@@ -278,7 +321,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (OCI_SUCCESS != err)
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
 			ret = ZBX_DB_DOWN;
 		}
 	}
@@ -291,7 +334,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		if (OCI_SUCCESS != err)
 		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err, NULL));
 			ret = ZBX_DB_DOWN;
 		}
 	}
@@ -323,15 +366,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		if (NULL != (row = DBfetch(result)))
 			ZBX_PG_BYTEAOID = atoi(row[0]);
 		DBfree_result(result);
-	}
 
-#ifdef HAVE_FUNCTION_PQSERVERVERSION
-	ZBX_PG_SVERSION = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
-#endif
+		ZBX_PG_SVERSION = PQserverVersion(conn);
+		zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 
-	if (80100 <= ZBX_PG_SVERSION)
-	{
 		/* disable "nonstandard use of \' in a string literal" warning */
 		DBexecute("set escape_string_warning to off");
 
@@ -339,12 +377,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		if (NULL != (row = DBfetch(result)))
 			ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
 		DBfree_result(result);
-	}
 
-	if (90000 <= ZBX_PG_SVERSION)
-	{
-		/* change the output format for values of type bytea from hex (the default) to escape */
-		DBexecute("set bytea_output=escape");
+		if (90000 <= ZBX_PG_SVERSION)
+		{
+			/* change the output format for values of type bytea from hex (the default) to escape */
+			DBexecute("set bytea_output=escape");
+		}
 	}
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -733,12 +771,8 @@ int	zbx_db_statement_prepare(const char *sql)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
-	/* Oracle */
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
-	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
@@ -760,7 +794,6 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 		return ZBX_DB_FAIL;
 	}
 
-	/* Oracle */
 	switch (type)
 	{
 		case ZBX_TYPE_ID:
@@ -779,10 +812,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
-		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err));
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
@@ -797,9 +827,9 @@ int	zbx_db_statement_execute()
 {
 	const char	*__function_name = "zbx_db_statement_execute";
 
-	sword		err;
-	ub4		nrows;
-	int		ret;
+	sword	err;
+	ub4	nrows;
+	int	ret;
 
 	if (1 == txn_error)
 	{
@@ -809,10 +839,7 @@ int	zbx_db_statement_execute()
 	}
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(&nrows)))
-	{
-		zabbix_errlog(ERR_Z3007, err, zbx_oci_error(err));
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
 	else
 		ret = (int)nrows;
 
@@ -969,10 +996,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
+		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
+
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
 
@@ -1241,7 +1266,7 @@ error:
 		OCIParam	*parmdp = NULL;
 		OCIDefine	*defnp = NULL;
 		ub4		char_semantics;
-		ub2		col_width = 0, data_type;
+		ub2		col_width = 0, data_type = 0;
 
 		/* request a parameter descriptor in the select-list */
 		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp, (void **)&parmdp, (ub4)counter);
@@ -1287,6 +1312,9 @@ error:
 					/* retrieve the column width in characters */
 					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+					/* adjust for UTF-8 */
+					col_width *= 4;
 				}
 				else
 				{
@@ -1317,11 +1345,12 @@ error:
 error:
 	if (OCI_SUCCESS != err)
 	{
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
+		int	server_status;
 
+		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
 		OCI_DBfree_result(result);
 
-		result = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
@@ -1464,7 +1493,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			/* In this case the function returns OCI_INVALID_HANDLE. */
 			if (OCI_INVALID_HANDLE != rc2)
 			{
-				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
 				return NULL;
 			}
 			else
@@ -1472,7 +1501,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		}
 		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
 		{
-			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+			zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
 			return NULL;
 		}
 
@@ -1488,7 +1517,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 					(ub4)1, (dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
 					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
 			{
-				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2));
+				zabbix_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL));
 				return NULL;
 			}
 		}
@@ -1502,12 +1531,14 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
 			&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 	{
-		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc));
+		zabbix_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL));
 		return NULL;
 	}
 
 	switch (errcode)
 	{
+		case 1012:	/* ORA-01012: not logged on */
+		case 2396:	/* ORA-02396: exceeded maximum idle time */
 		case 3113:	/* ORA-03113: end-of-file on communication channel */
 		case 3114:	/* ORA-03114: not connected to ORACLE */
 			zabbix_errlog(ERR_Z3006, errcode, errbuf);
@@ -1543,7 +1574,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_pg_unescape_bytea((u_char *)result->values[i]);
+					DBbytea_unescape((u_char *)result->values[i]);
 			}
 		}
 	}
@@ -1716,10 +1747,9 @@ ub4	OCI_DBserver_status()
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
 
 	if (OCI_SUCCESS != err)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
-	}
 
 	return server_status;
 }
+
 #endif	/* HAVE_ORACLE */

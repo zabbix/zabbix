@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -562,7 +562,7 @@ jQuery(function($) {
 	};
 
 	/**
-	 * Closing menu after delay with check is menu was reactived by mouse over action.
+	 * Closing menu after delay.
 	 *
 	 * @param object menuPopup
 	 * @param int    delay

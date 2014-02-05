@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1308,18 +1308,18 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), "noname.xml", NULL, 0)))
-		return;
+		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"//*[local-name()='hardware']/"
 			"*[local-name()='device'][*[local-name()='macAddress']]", xpathCtx)))
 	{
-		goto out;
+		goto clean;
 	}
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto out;
+		goto clean;
 
 	nodeset = xpathObj->nodesetval;
 
@@ -1340,14 +1340,14 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 		zbx_free(key);
 	}
-out:
+clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
 }
 
@@ -1362,7 +1362,6 @@ out:
  *             counterid - [IN] the performance counter id                    *
  *                                                                            *
  ******************************************************************************/
-
 static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t counterid)
 {
 	const char	*__function_name = "wmware_vm_get_devices_by_counterid";
@@ -1376,7 +1375,7 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (doc = xmlReadMemory(vm->stats, strlen(vm->stats), "noname.xml", NULL, 0)))
-		return;
+		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
@@ -1384,10 +1383,10 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 			"[*[local-name()='counterId']/text()='" ZBX_FS_UI64 "']", counterid);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-		goto out;
+		goto clean;
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto out;
+		goto clean;
 
 	nodeset = xpathObj->nodesetval;
 
@@ -1411,14 +1410,16 @@ static void	wmware_vm_get_devices_by_counterid(zbx_vmware_vm_t *vm, zbx_uint64_t
 
 		zbx_free(instance);
 	}
-out:
+clean:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
+
+	zbx_free(xpath);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nics);
 }
 
@@ -3049,7 +3050,6 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-
 out:
 	return ret;
 }

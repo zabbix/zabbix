@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -235,10 +235,12 @@ elseif (isset($_REQUEST['save'])) {
 		'filter' => $filter
 	);
 
-	if (isset($_REQUEST['itemid'])) {
+	if (hasRequest('itemid')) {
+		$itemId = getRequest('itemid');
+
 		DBstart();
 
-		$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
+		$dbItem = get_item_by_itemid_limited($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -249,14 +251,8 @@ elseif (isset($_REQUEST['save'])) {
 			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		// unset fields without changes
-		foreach ($item as $field => $value) {
-			if ($item[$field] == $db_item[$field]) {
-				unset($item[$field]);
-			}
-		}
-
-		$item['itemid'] = $_REQUEST['itemid'];
+		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+		$item['itemid'] = $itemId;
 
 		$result = API::DiscoveryRule()->update($item);
 		$result = DBend($result);
@@ -314,8 +310,10 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'hostid' => get_request('hostid', 0),
-		'host' => $host
+		'host' => $host,
+		'showErrorColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
 	);
+
 	$sortfield = getPageSortField('name');
 
 	// discoveries
@@ -331,12 +329,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	// determine, show or not column of errors
-	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
-	if (!empty($data['discoveries'])) {
-		order_result($data['discoveries'], $sortfield, getPageSortOrder());
-	}
+	order_result($data['discoveries'], $sortfield, getPageSortOrder());
 
 	// paging
 	$data['paging'] = getPagingLine($data['discoveries'], array('itemid'), array('hostid' => get_request('hostid')));

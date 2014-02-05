@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -560,12 +560,12 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -770,7 +770,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (source_item != item && item->last_accessed < timestamp)
+		if (0 == item->refcount && source_item != item && item->last_accessed < timestamp)
 		{
 			freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
 			zbx_hashset_iter_remove(&iter);
@@ -810,6 +810,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	for (i = 0; i < items.values_num && freed < space; i++)
 	{
 		item = items.values[i].item;
+
 		freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
 		zbx_hashset_remove(&vc_cache->items, item);
 	}
@@ -1009,7 +1010,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	(*(uint32_t *)ptr)++;
 
-	return ptr + REFCOUNT_FIELD_SIZE;
+	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
 /******************************************************************************
@@ -1171,11 +1172,15 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
  ******************************************************************************/
 static void	vc_item_reset_cache(zbx_vc_item_t *item)
 {
+	zbx_uint64_t	itemid = item->itemid;
+	unsigned char	type = item->value_type;
+
 	vch_item_free_cache(item);
 
-	/* reset all item data except itemid and value_type which are the first members in zbx_vc_item_t structure */
-	memset((void*)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
-			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
+	memset(item, 0, sizeof(*item));
+
+	item->itemid = itemid;
+	item->value_type = type;
 }
 
 /******************************************************************************
@@ -1248,6 +1253,49 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vc_item_addref                                                   *
+ *                                                                            *
+ * Purpose: increment item reference counter                                  *
+ *                                                                            *
+ * Parameters: item     - [IN] the item                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_addref(zbx_vc_item_t *item)
+{
+	item->refcount++;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_item_release                                                  *
+ *                                                                            *
+ * Purpose: decrement item reference counter                                  *
+ *                                                                            *
+ * Parameters: item     - [IN] the item                                       *
+ *                                                                            *
+ * Comments: if the resulting reference counter is 0, then this function      *
+ *           processes pending item operations                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_release(zbx_vc_item_t *item)
+{
+	if (0 == (--item->refcount))
+	{
+		if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+		{
+			vc_remove_item(item);
+			return;
+		}
+
+		if (0 != (item->state & ZBX_ITEM_STATE_CLEAN_PENDING))
+			vch_item_clean_cache(item);
+
+		item->state = 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vc_add_item                                                      *
  *                                                                            *
  * Purpose: adds a new item to the cache with the requested history data      *
@@ -1305,6 +1353,8 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 				if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 					goto out;
 
+				vc_item_addref(item);
+
 				vch_init(item, values, seconds, count, timestamp, ts);
 			}
 		}
@@ -1313,49 +1363,6 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 	}
 out:
 	return item;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_item_addref                                                   *
- *                                                                            *
- * Purpose: increment item reference counter                                  *
- *                                                                            *
- * Parameters: item     - [IN] the item                                       *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_addref(zbx_vc_item_t *item)
-{
-	item->refcount++;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_item_release                                                  *
- *                                                                            *
- * Purpose: decrement item reference counter                                  *
- *                                                                            *
- * Parameters: item     - [IN] the item                                       *
- *                                                                            *
- * Comments: if the resulting reference counter is 0, then this function      *
- *           processes pending item operations                                *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_release(zbx_vc_item_t *item)
-{
-	if (0 == (--item->refcount))
-	{
-		if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
-		{
-			vc_remove_item(item);
-			return;
-		}
-
-		if (0 != (item->state & ZBX_ITEM_STATE_CLEAN_PENDING))
-			vch_item_clean_cache(item);
-
-		item->state = 0;
-	}
 }
 
 /******************************************************************************************************************
@@ -2856,8 +2863,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	{
 		int	i, start = 0;
 
-		if (NULL != (item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values)))
-			vc_item_addref(item);
+		item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values);
 
 		/* The values vector contains cache data sorted in ascending order, which  */
 		/* might be larger than requested number of values for timeshift and count */
@@ -2996,8 +3002,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 		zbx_vector_history_record_create(&values);
 
-		if (NULL != (item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values)))
-			vc_item_addref(item);
+		item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values);
 
 		/* the values vector contains cache data sorted in ascending order - */
 		/* find the target value inside this vector                          */
