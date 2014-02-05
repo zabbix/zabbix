@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
-"PO-Revision-Date: 2013-11-12 15:53+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-28 13:29+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384264426.0\n"
+"X-POOTLE-MTIME: 1390908544.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -67,8 +67,8 @@ msgstr[1] "Registrati %1$s tentativi di accesso fallito. L'ultimo tentativo fall
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d di %1$d problemi visualizzati"
+msgstr[1] "%2$d di %1$d problemi visualizzati"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
@@ -457,7 +457,7 @@ msgstr "Aggiungi ai gruppi host"
 msgid "Added"
 msgstr "Aggiunto"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Ulteriori parametri"
 
@@ -723,15 +723,15 @@ msgstr "Algoritmo di autenticazione"
 msgid "Authentication method"
 msgstr "Metodo di autenticazione"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "Metodo di autenticazione cambiato in HTTP"
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "Metodo di autenticazione cambiato in LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Metodo di autenticazione cambiato in interna Zabbix"
 
@@ -824,8 +824,8 @@ msgstr "Immagine di sfondo"
 msgid "Bar reports"
 msgstr "Report a barre"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "DN base"
 
@@ -833,12 +833,13 @@ msgstr "DN base"
 msgid "Basic authentication"
 msgstr "Autenticazione semplice"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Associa DN"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Associa password"
 
@@ -1249,15 +1250,19 @@ msgstr "Impossibile aggiungere utenti."
 msgid "Cannot add value map"
 msgstr "Impossibile aggiungere mappa dei valori"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr "Impossibile modificare l'autenticazione"
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "Impossibile cambiare metodo di autenticazione in HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "Impossibile cambiare metodo di autenticazione in LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Impossibile cambiare metodo di autenticazione in interna Zabbix"
 
@@ -1565,7 +1570,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare grafico \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella mappa \"%2$s\"."
@@ -1577,7 +1582,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella schermata \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare host \"%1$s\" utilizzato nella mappa \"%2$s\"."
@@ -1602,7 +1607,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Impossibile trovare host o template \"%1$s\" utilizzato nel grafico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare icona \"%1$s\" utilizzata nella mappa \"%2$s\"."
@@ -1624,7 +1629,7 @@ msgstr "Impossibile trovare item \"%1$s\" utilizzato nella schermata \"%2$s\"."
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa esportata \"%2$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa \"%2$s\"."
@@ -1647,8 +1652,8 @@ msgstr "Impossibile trovare schermata \"%1$s\" utilizzata nella schermata \"%2$s
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossibile trovare trigger \"%1$s\" utilizzato nella mappa \"%2$s\"."
@@ -1698,6 +1703,10 @@ msgstr "Impossibile inserire supporto utente."
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Impossibile collegare template"
+
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -2048,6 +2057,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Variazione"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2530,7 +2540,7 @@ msgstr "Copia"
 msgid "Copy selected to ..."
 msgstr "Copia selezionati su ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login corretto \"%s\"."
@@ -3092,7 +3102,7 @@ msgstr "Decimale"
 msgid "Default"
 msgstr "Default"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Autenticazione predefinita"
 
@@ -4327,7 +4337,7 @@ msgstr "Esegui errore SQL [%1$s] in [%2$s]."
 msgid "Execute on"
 msgstr "Esegui su"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Script eseguito"
 
@@ -4576,7 +4586,7 @@ msgstr "Intervalli flessibili"
 msgid "For guest, password must be empty"
 msgstr "Per l'account guest, la password deve essere vuota"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Formula"
 
@@ -5011,12 +5021,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "PANORAMICA INVENTARIO HOST"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "Autenticazione HTTP"
 
@@ -6234,16 +6244,6 @@ msgstr "Stato del servizio \"%1$s\" errato."
 msgid "Incorrect status."
 msgstr "Stato errato."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Sintassi errata vicino \"%1$s\" alla posizione \"%2$s\""
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Sintassi errata vicino \"%1$s\"."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6302,12 +6302,6 @@ msgstr "Fornita funzione trigger \"%1$s\" errata nell'espressione."
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "Tipo di asort_by_key errato."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Utilizzo errato dei simboli di parentesi. \"%1$s\" trovato dopo la parentesi finale."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6420,7 +6414,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "L'interfaccia con IP \"%1$s\" non può avere nome DNS vuoto."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "Interno"
 
@@ -6468,11 +6462,6 @@ msgstr "Data \"%s\" non valida."
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Parametro hostid non valido per la macro \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "Formato della chiave item non valido."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6825,10 +6814,6 @@ msgstr "Chiave"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "La chiave \"%1$s\" non corrisponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "La chiave non può esser vuota."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6851,25 +6836,29 @@ msgid "LATEST DATA"
 msgstr "ULTIMI DATI"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "Autenticazione LDAP"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr "Modificata autenticazione LDAP"
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "Host LDAP"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "Login LDAP riuscito"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "Il login LDAP è fallito"
 
@@ -7180,7 +7169,7 @@ msgstr "Connesso come"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "Accedi"
@@ -7189,14 +7178,19 @@ msgstr "Accedi"
 msgid "Login as Guest"
 msgstr "Accedi come Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login fallito \"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
-msgstr "Nome o password login errati"
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
+msgstr "Nome login o password non corretta!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -8429,7 +8423,7 @@ msgstr "Nessun permesso per la mappa \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Nessun permesso per la schermata \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Nessun permesso per l'accesso al sistema."
 
@@ -9524,9 +9518,9 @@ msgstr "Polacco (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Popola campo inventario host"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -10413,7 +10407,7 @@ msgstr "Sabato"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
 #: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10658,8 +10652,8 @@ msgstr "Script"
 msgid "Search"
 msgstr "Cerca"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Cerca attributo"
 
@@ -10928,7 +10922,7 @@ msgstr "Servizi"
 msgid "Services form a circular dependency."
 msgstr "I servizi formano una dipendenza circolare."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sessione terminata, rieffettua il login, per favore."
 
@@ -11452,7 +11446,7 @@ msgstr "Cognome"
 msgid "Swedish (sv_SE)"
 msgstr "Svedese (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Il cambio del metodo di autenticazione ripristinerà tutto eccetto questa sessione! Continuare?"
 
@@ -11648,13 +11642,13 @@ msgid "Tera"
 msgstr "Tera"
 
 #: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "Test"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Autenticazione di test"
 
@@ -11711,7 +11705,7 @@ msgstr "La procedura remota richiesta non esiste / non è disponibile"
 msgid "Theme"
 msgstr "Tema"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
@@ -12643,7 +12637,8 @@ msgstr "Nome utente"
 msgid "User name does not match with DB"
 msgstr "Il nome utente non corrisponde con il DB"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Password utente"
 
@@ -13362,7 +13357,7 @@ msgstr "Zabbix ha ricevuto una richiesta errata."
 msgid "Zabbix internal"
 msgstr "Interna Zabbix"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Autenticazione interna Zabbix"
 
@@ -13644,9 +13639,18 @@ msgstr "immagine"
 msgid "in"
 msgstr "in"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr "Sintassi non corretta in \"%1$s\""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "è"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr "La key non e' definita"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13724,7 +13728,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "deve essere un utente LDAP valido"
 
@@ -13871,6 +13875,10 @@ msgstr "a"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "trigger"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr "unexpected end of key"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

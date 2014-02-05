@@ -1,9 +1,15 @@
 Changes for 2.0.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
+....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
+...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
+........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
+........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
@@ -13,7 +19,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
@@ -671,7 +677,7 @@ A......... [ZBX-5208] fixed host.update only accepting arrays of interfaces and 
 ..F....... [ZBX-5179] fixed filter layout on low resolution screens (Pavels)
 ..F....... [ZBX-3853] changed several message strings (Pavels)
 A......... [ZBX-5213] fixed usergroup.massupdate failing when updating only permissions or users (Pavels)
-..F....... [ZBX-5145] fixed PosgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
+..F....... [ZBX-5145] fixed PostgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
 ..F....... [ZBX-5065] fixed inability to delete a service with soft linked dependencies (Toms)
 A.F....... [ZBX-5065] added circularity check for IT services (Toms)
 ..F....... [ZBX-2501] fixed subnodes not opening when parent node is opened in IT services (Toms)
@@ -1471,6 +1477,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc1
 
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-7643] fixed graph copying (Eduard)
 A......... [ZBX-3702] fixed drule.get selectDChecks parameter not returning any results; thanks to Sergey Sireskin (Pavels)

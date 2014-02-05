@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-02 21:54+0200\n"
-"PO-Revision-Date: 2013-12-02 21:08+0300\n"
+"POT-Creation-Date: 2014-02-02 00:59+0200\n"
+"PO-Revision-Date: 2014-01-28 11:00+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386011322.0\n"
+"X-POOTLE-MTIME: 1390899606.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -463,7 +463,7 @@ msgstr "Pridať do skupín"
 msgid "Added"
 msgstr "Pridané"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Ďaľšie parametre"
 
@@ -729,15 +729,15 @@ msgstr "Autentifikačný algoritmus"
 msgid "Authentication method"
 msgstr "Metóda autentifikácie"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "Metóda autentifikácie bola zmenená na HTTP"
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "Metóda autentifikácie bola zmenená na LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Metóda autentifikácie bola zmenená na Zabbix internal"
 
@@ -830,8 +830,8 @@ msgstr "Obrázok pozadia"
 msgid "Bar reports"
 msgstr "Stĺpcové grafy"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "Koreňový DN"
 
@@ -839,12 +839,13 @@ msgstr "Koreňový DN"
 msgid "Basic authentication"
 msgstr "Základné prihlasovanie"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Bind DN"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Bind heslo"
 
@@ -1099,7 +1100,7 @@ msgstr "Nie je možné pripojiť šablónu"
 
 #: api/classes/CTemplate.php:1421
 msgid "Can't remove group"
-msgstr "Nie je možné odstrániť skupinu"
+msgstr "Nie je možné zmazať skupinu"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
@@ -1255,15 +1256,19 @@ msgstr "Nie je možné pridávať používateľov."
 msgid "Cannot add value map"
 msgstr "Nie je možné pridať mapu hodnôt"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr "Nie je možné zmeniť autentifikáciu"
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "Nie je možné zmeniť metódu prihlasovania na HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "Nie je možné zmeniť metódu prihlasovania na LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Nie je možné zmeniť metódu prihlasovania na Zabbix-internal"
 
@@ -1573,7 +1578,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Graf \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Skupina \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
@@ -1585,7 +1590,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Skupina \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
@@ -1610,7 +1615,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Nemôžem nájsť hosta alebo šablónu \"%1$s\" použitú v grafe \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Ikona \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
@@ -1632,7 +1637,7 @@ msgstr "Položka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Položka \"%1$s\" použitá v exportovanej mape \"%2$s\" nebola nájdená."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
@@ -1655,8 +1660,8 @@ msgstr "Obrazovka \"%1$s\" použitá v obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Spúšťač \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
@@ -1709,6 +1714,10 @@ msgstr "Nie je možné vložiť médium používateľa."
 msgid "Cannot link template"
 msgstr "Nie je možné nalinkovať šablónu"
 
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
+
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
@@ -1751,7 +1760,7 @@ msgstr "Nie je možné vykonať update príkaz nad tabuľkou \"%1$s\" bez where 
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr "Nie je možné odstrániť makro."
+msgstr "Nie je možné zmazať makro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
@@ -2058,6 +2067,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Zmena"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2540,7 +2550,7 @@ msgstr "Kopírovať"
 msgid "Copy selected to ..."
 msgstr "Kopírovať označené do ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Správny login \"%s\"."
@@ -3103,7 +3113,7 @@ msgstr "Desiatkový"
 msgid "Default"
 msgstr "Predvolený"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Predvolená autentifikácia"
 
@@ -4339,7 +4349,7 @@ msgstr "SQL chyba pri spustení [%1$s] v [%2$s]."
 msgid "Execute on"
 msgstr "Vykonávať na"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Vykonaný skript"
 
@@ -4588,7 +4598,7 @@ msgstr "Flexibilné intervaly"
 msgid "For guest, password must be empty"
 msgstr "Heslo používateľa guest musí byť prázdne"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Vzorec"
 
@@ -5023,12 +5033,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "PREHĽAD INVENTÁRA HOSTU"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "HTTP autentifikácia"
 
@@ -6246,16 +6256,6 @@ msgstr "Neplatný stav pre službu \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Neplatný stav."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Nesprávna syntax blízko \"%1$s\" na pozícii \"%2$s\""
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Nesprávna syntax blízko \"%1$s\"."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6314,12 +6314,6 @@ msgstr "Neplatná funkcia spúšťača \"%1$s\" pre výraz."
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "Neplatný typ asort_by_key."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Neplatné použitie zátvoriek. \"%1$s\" najdená po koncovej zátvorke."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6432,7 +6426,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "Rozhranie s IP \"%1$s\" nemôže mať prázdne DNS meno."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "Interná"
 
@@ -6480,11 +6474,6 @@ msgstr "Neplatný dátum \"%s\"."
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Neplatné hostid pre makro \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "Neplatný formát kľúča položky."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6837,10 +6826,6 @@ msgstr "Kľúč"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Kľúč \"%1$s\" nevybral <grpmax|grpmin|grpsum|grpavg>[\"Skupina(y)\", \"Kľúč položky\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "Kľúč nemôže byť prázdny."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6863,25 +6848,29 @@ msgid "LATEST DATA"
 msgstr "POSLEDNÉ ÚDAJE"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "LDAP autentifikácia"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr "LDAP autentifikácia zmenená"
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "LDAP server"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "LDAP prihlásenie úspešné"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "LDAP prihlásenie neúspešné"
 
@@ -7193,7 +7182,7 @@ msgstr "Prihlásený ako"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "Prihlásiť"
@@ -7202,14 +7191,19 @@ msgstr "Prihlásiť"
 msgid "Login as Guest"
 msgstr "Prihlásiť ako Hosť"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Prihlásenie zlyhalo \"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
-msgstr "Nesprávne prihlasovacie meno alebo heslo"
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
+msgstr "Nesprávne prihlasovacie meno alebo heslo!"
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -8445,7 +8439,7 @@ msgstr "Žiadne oprávnenia pre mapu \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Žiadne oprávnenia pre obrazovku \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
@@ -9540,9 +9534,9 @@ msgstr "Polsky (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Vypĺňa polia hostovho inventára"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -9959,11 +9953,11 @@ msgstr "Vzdialený príkaz"
 #: include/views/js/configuration.sysmaps.js.php:420
 #: include/views/js/configuration.sysmaps.js.php:429
 msgid "Remove"
-msgstr "Odstrániť"
+msgstr "Zmazať"
 
 #: sysmap.php:146
 msgid "Remove element"
-msgstr "Odstrániť element"
+msgstr "Zmazať element"
 
 #: slides.php:76
 msgid "Remove from"
@@ -9988,11 +9982,11 @@ msgstr "Zmazať host"
 
 #: sysmap.php:152
 msgid "Remove link"
-msgstr "Odstrániť linku"
+msgstr "Zmazať linku"
 
 #: include/views/monitoring.history.php:98
 msgid "Remove selected"
-msgstr "Odstrániť označené"
+msgstr "Zmazať označené"
 
 #: include/views/configuration.host.massupdate.php:115
 #: include/views/configuration.triggers.edit.php:118
@@ -10430,7 +10424,7 @@ msgstr "Sobota"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
 #: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10675,8 +10669,8 @@ msgstr "Skripty"
 msgid "Search"
 msgstr "Hľadať"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Hľadaný atribút"
 
@@ -10945,7 +10939,7 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -11469,7 +11463,7 @@ msgstr "Priezvisko"
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých sedeni okrem Vásho! Pokračovať?"
 
@@ -11665,13 +11659,13 @@ msgid "Tera"
 msgstr "Tera"
 
 #: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "Test"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Test autentifikácie"
 
@@ -11730,7 +11724,7 @@ msgstr "Požadovaná vzdialená procedúra neexistuje / nie je dostupná"
 msgid "Theme"
 msgstr "Téma"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
@@ -12265,7 +12259,7 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/nodes.inc.php:320
 msgid "Unable to remove local node."
-msgstr "Nie je možné odstrániť lokálny uzol."
+msgstr "Nie je možné zmazať lokálny uzol."
 
 #: include/profiles.inc.php:228
 msgid "Unable to select configuration."
@@ -12663,7 +12657,8 @@ msgstr "Používateľské meno"
 msgid "User name does not match with DB"
 msgstr "Používateľské meno nesúhlasí s údajmi v databáze"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Heslo používateľa"
 
@@ -13384,7 +13379,7 @@ msgstr "Zabbix prijal neplatnú požiadavku."
 msgid "Zabbix internal"
 msgstr "Zabbix interne"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Zabbix interná autentifikácia"
 
@@ -13666,9 +13661,18 @@ msgstr "obrázok"
 msgid "in"
 msgstr "v"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr "nesprávna syntax pri \"%1$s\""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "je"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr "kľúč je prázdny"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13746,7 +13750,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "musí byť platný LDAP používateľ"
 
@@ -13893,6 +13897,10 @@ msgstr "do"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "spúšťač"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr "neočakávaný koniec kľúča"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

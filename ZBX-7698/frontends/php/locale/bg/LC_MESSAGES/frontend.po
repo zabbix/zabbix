@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -456,7 +456,7 @@ msgstr "Добави към хост групи"
 msgid "Added"
 msgstr "Добавено"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Допълнителни параметри"
 
@@ -722,15 +722,15 @@ msgstr "Алгоритъм за автентификация"
 msgid "Authentication method"
 msgstr "Метод на автентификация"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "Метод на автентификация променено на HTTP"
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "Метод на автентификация променено на LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Метод на автентификация променено на Zabbix вътрешен"
 
@@ -824,8 +824,8 @@ msgstr "Фоново изображение"
 msgid "Bar reports"
 msgstr "Бар доклади"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "База данни за търсене (Base DN)"
 
@@ -833,12 +833,13 @@ msgstr "База данни за търсене (Base DN)"
 msgid "Basic authentication"
 msgstr "Основна автентификация"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Име на връзката (Bind DN)"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr " Парола за връзката (Bind password)"
 
@@ -1250,15 +1251,19 @@ msgstr "Не може да се добавят потребители."
 msgid "Cannot add value map"
 msgstr "Не може да се добави стойност на реализациите"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr ""
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "Не може да се промени метода на автентификация на HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "Не може да се промени метода на автентификация на LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не може да се промени метода на автентификация на Zabbix вътрешен"
 
@@ -1568,7 +1573,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери графиката \"%1$s\" използвана в екран \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в карта \"%2$s\"."
@@ -1580,7 +1585,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не може да се намери групата \"%1$s\" използвана в екран \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери хоста \"%1$s\" използван в карта \"%2$s\"."
@@ -1605,7 +1610,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери иконата  \"%1$s\" използвана в карта \"%2$s\"."
@@ -1627,7 +1632,7 @@ msgstr "Не може да се намери елемент на данните 
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в изнесената карта \"%2$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери картата \"%1$s\" използвана в карта \"%2$s\"."
@@ -1650,8 +1655,8 @@ msgstr "Не може да се намери екрана \"%1$s\" използ�
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери тригера \"%1$s\" използван в карта \"%2$s\"."
@@ -1701,6 +1706,10 @@ msgstr "Не може да вмъкне потребителско уведом�
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
+
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -2053,6 +2062,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Промяна"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2537,7 +2547,7 @@ msgstr "Копирай"
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Неправилен вход \"%s\"."
@@ -3100,7 +3110,7 @@ msgstr "Десетичен"
 msgid "Default"
 msgstr "По подразбиране"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Автентификация по подразбиране"
 
@@ -4336,7 +4346,7 @@ msgstr "Грешка при изпълнение на SQL [%1$s] в [%2$s]."
 msgid "Execute on"
 msgstr "Изпълнение на"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Изпълнение на скрипт"
 
@@ -4585,7 +4595,7 @@ msgstr "Гъвкави интервали"
 msgid "For guest, password must be empty"
 msgstr "За гостите, паролата трябва да бъде празна"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Формула"
 
@@ -5020,12 +5030,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "ПРЕГЛЕД НА ИНВЕНТАРНИТЕ ДАННИ ЗА ХОСТ"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "HTTP автентикация"
 
@@ -6250,16 +6260,6 @@ msgstr "Неправилно състояние за услуга  \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Неправилно състояние."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Неправилен синтаксис около \"%1$s\" в позиция \"%2$s\""
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Неправилен синтаксис около \"%1$s\"."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6318,12 +6318,6 @@ msgstr "В израза е зададена неправилна тригер ф
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "Неправилен тип asort_by_key."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Неправилно използване на скоби. \"%1$s\" намираща се след последната скоба."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6436,7 +6430,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "В интерфейс с IP \"%1$s\" не може да бъде празно DNS името."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "Вътрешен"
 
@@ -6484,11 +6478,6 @@ msgstr "Невалидна дата \"%s\"."
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Невалидно id на хост за макро \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "Невалиден формат за ключ на елемент на данните."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6841,10 +6830,6 @@ msgstr "Ключ"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не съвпада с <grpmax|grpmin|grpsum|grpavg>[\"Хост група(и)\", \"Ключ елемент на данните\", \"<last|min|max|avg|sum|count>\", \"параметри\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "Ключът не може да бъде празен."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6867,25 +6852,29 @@ msgid "LATEST DATA"
 msgstr "ПОСЛЕДНИ ДАННИ"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "LDAP автентификация"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr ""
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "LDAP хост"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "Успешно влизане чрез LDAP"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "Неуспешно влизане чрез LDAP"
 
@@ -7196,7 +7185,7 @@ msgstr "Влезли сте като"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "Вход в системата"
@@ -7205,14 +7194,19 @@ msgstr "Вход в системата"
 msgid "Login as Guest"
 msgstr "Вход като гост"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Неуспешно влизане \"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
-msgstr "Неправилно въведено потребителско име или парола."
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
+msgstr ""
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -8448,7 +8442,7 @@ msgstr "Нямате право на достъп до карта на мреж�
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Нямате право на достъп до системата."
 
@@ -9545,9 +9539,9 @@ msgstr "Полски (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Попълнете полето: данни за инвентаризация на хост"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -10437,7 +10431,7 @@ msgstr "Събота"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
 #: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10682,8 +10676,8 @@ msgstr "Скриптове"
 msgid "Search"
 msgstr "Търсене"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Търсене на атрибут"
 
@@ -10952,7 +10946,7 @@ msgstr "Услуги"
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Сесията е прекратена, моля влезте повторно в системата."
 
@@ -11476,7 +11470,7 @@ msgstr "Фамилия"
 msgid "Swedish (sv_SE)"
 msgstr "Шведски (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Превключването на метода за автентификация ще възстанови всичко по подразбиране, с изключение на тази сесия! Искате ли да продължите?"
 
@@ -11672,13 +11666,13 @@ msgid "Tera"
 msgstr "Тера"
 
 #: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "Тест"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Тест на автентификация"
 
@@ -11735,7 +11729,7 @@ msgstr "Исканата дистанционна процедурата не с
 msgid "Theme"
 msgstr "Тема"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
@@ -12668,7 +12662,8 @@ msgstr "Потребителско име"
 msgid "User name does not match with DB"
 msgstr "Потребителско име не съответства на БД"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Потребителска парола"
 
@@ -13388,7 +13383,7 @@ msgstr "Zabbix получи невалидна заявка."
 msgid "Zabbix internal"
 msgstr "Вътрешен Zabbix"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Вътрешена автентификация Zabbix"
 
@@ -13670,9 +13665,18 @@ msgstr "изображение"
 msgid "in"
 msgstr "в"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr ""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "е"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr ""
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13750,7 +13754,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "милисекунда"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "трябва да бъде валиден LDAP потребител"
 
@@ -13898,6 +13902,10 @@ msgstr "до"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "тригер"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

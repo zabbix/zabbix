@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -449,7 +449,7 @@ msgstr "Tambahkan ke grup host"
 msgid "Added"
 msgstr "Menambahkan"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Paramater tambahan"
 
@@ -715,15 +715,15 @@ msgstr "Algoritma otentikasi"
 msgid "Authentication method"
 msgstr "Metode otentikasi"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "Metode otentikasi diubah ke HTTP "
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "Metode otentikasi diubah ke LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Metode otentikasi diubah ke internal Zabbix"
 
@@ -816,8 +816,8 @@ msgstr "Gambar latar belakang"
 msgid "Bar reports"
 msgstr "Grafik laporan"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "Base DN"
 
@@ -825,12 +825,13 @@ msgstr "Base DN"
 msgid "Basic authentication"
 msgstr "Otentikasi dasar"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Bind DN"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Bind password"
 
@@ -1241,15 +1242,19 @@ msgstr "Tidak dapat menambah user."
 msgid "Cannot add value map"
 msgstr "Tidak dapat menambah nilai peta"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr ""
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "Tidak dapat mengganti metode otentikasi ke HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "Tidak dapat mengganti metode otentikasi ke LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Tidak dapat mengganti metode otentikasi ke Zabbix internal"
 
@@ -1556,7 +1561,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grrafik \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan di peta \"%2$s\"."
@@ -1568,7 +1573,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan di peta \"%2$s\"."
@@ -1593,7 +1598,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan ikon \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -1615,7 +1620,7 @@ msgstr "Tidak dapat menemukan item \"%1$s\" yang digunakan pada layar \"%2$s\"."
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -1638,8 +1643,8 @@ msgstr "Tidak dapat menemukan layar \"%1$s\" yang digunakan pada layar \"%2$s\".
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan trigger \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -1687,6 +1692,10 @@ msgstr "Tidak bisa memasukkan media pengguna."
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Tidak dapat menghubungkan template"
+
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -2037,6 +2046,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Ubah"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2518,7 +2528,7 @@ msgstr "Salin"
 msgid "Copy selected to ..."
 msgstr "Salin yang dipilih ke ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Login yang bernar \"%s\"."
@@ -3080,7 +3090,7 @@ msgstr "Desimal"
 msgid "Default"
 msgstr "Standar"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Standar otentikasi"
 
@@ -4314,7 +4324,7 @@ msgstr "Jalankan error SQL [%1$s] pada [%2$s]."
 msgid "Execute on"
 msgstr "Jalankan saat"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Skrip yang dijalankan"
 
@@ -4563,7 +4573,7 @@ msgstr "Fleksibel interval"
 msgid "For guest, password must be empty"
 msgstr "Untuk guest, password harus kosong"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Rumus"
 
@@ -4998,12 +5008,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "RANGKUMAN INVETARIS HOST"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "Otentikasi HTTP"
 
@@ -6221,16 +6231,6 @@ msgstr "Kesalahan status untuk service \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Kesalahan status."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Kesalahan sintak dekat \"%1$s\" pada posisi \"%2$s\""
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Kesalahan sintak dekat \"%1$s\"."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6289,12 +6289,6 @@ msgstr "Kesalahan fungsi trigger \"%1$s\" disediakan dalam ekspresi."
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "Kesalahan tipe dari asort_by_key."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Kesalahan penggunaan simbol braket. \"%1$s\" ditemukan setelah braket akhir."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6407,7 +6401,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "Interface dengan IP \"%1$s\" nama DNS tidak boleh kosong."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "Internal"
 
@@ -6455,11 +6449,6 @@ msgstr ""
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Hostid tidak sah untuk makro \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "Format key item tidak sah."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6812,10 +6801,6 @@ msgstr "Kunci"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "Kunci tidak boleh kosong."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6838,25 +6823,29 @@ msgid "LATEST DATA"
 msgstr "DATA TERBARU"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "Otentikasi LDAP"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr ""
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "Host LDAP"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "Login LDAP berhasil"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "Login LDAP gagal"
 
@@ -7166,7 +7155,7 @@ msgstr "Masuk sebagai"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "Login"
@@ -7175,13 +7164,18 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login sebagai Guest"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Login gagal \"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
 msgstr ""
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
@@ -8412,7 +8406,7 @@ msgstr "Tidak ada izin untuk peta \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Tidak ada izin untuk layar \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Tidak ada izin untuk akses sistem."
 
@@ -9507,9 +9501,9 @@ msgstr "Polish (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Mengisi field inventaris host"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -10395,7 +10389,7 @@ msgstr "Sabtu"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
 #: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10640,8 +10634,8 @@ msgstr "Skrip"
 msgid "Search"
 msgstr "Cari"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Cari atribut"
 
@@ -10910,7 +10904,7 @@ msgstr "Service"
 msgid "Services form a circular dependency."
 msgstr "Form service dependensi melingkar."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Sesi dimatikan, mohon login kembali."
 
@@ -11434,7 +11428,7 @@ msgstr "Nama keluarga"
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?"
 
@@ -11630,13 +11624,13 @@ msgid "Tera"
 msgstr "Tera"
 
 #: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "Tes"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Tes otentikasi"
 
@@ -11691,7 +11685,7 @@ msgstr "Remote-procedure yang diminta tidak ada / tidak tersedia"
 msgid "Theme"
 msgstr "Theme"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
@@ -12622,7 +12616,8 @@ msgstr "Nama user"
 msgid "User name does not match with DB"
 msgstr "Nama user tidak cocok dengan DB"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Password user"
 
@@ -13339,7 +13334,7 @@ msgstr "Zabbix menerima permintaan yang tidak benar."
 msgid "Zabbix internal"
 msgstr "Internal Zabbix"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Otentikasi internal Zabbix"
 
@@ -13621,9 +13616,18 @@ msgstr "gambar"
 msgid "in"
 msgstr "dalam"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr ""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "adalah"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr ""
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13701,7 +13705,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "harus user LDAP yang valid"
 
@@ -13848,6 +13852,10 @@ msgstr "ke"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "trigger"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
+"POT-Creation-Date: 2014-01-31 11:59+0200\n"
 "PO-Revision-Date: 2013-11-05 16:28+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -10,7 +10,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 1 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 2 : 3);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1383661707.0\n"
@@ -35,16 +35,18 @@ msgstr "\"Мигання тригера при зміні статусу\" ма�
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
 msgstr[0] "%1$d день, "
-msgstr[1] "%1$d дні, "
-msgstr[2] "%1$d днів, "
+msgstr[1] "%1$d день, "
+msgstr[2] "%1$d дні, "
+msgstr[3] "%1$d днів, "
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d сценарій"
-msgstr[1] "%1$d сценарії"
-msgstr[2] "%1$d сценаріїв"
+msgstr[1] "%1$d сценарій"
+msgstr[2] "%1$d сценарії"
+msgstr[3] "%1$d сценаріїв"
 
 #: chart4.php:90 chart5.php:83
 #, php-format
@@ -56,32 +58,36 @@ msgstr "%1$s (рік %2$s)"
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s елемент даних"
-msgstr[1] "%1$s елемента даних"
-msgstr[2] "%1$s елементів даних"
+msgstr[1] "%1$s елемент даних"
+msgstr[2] "%1$s елемента даних"
+msgstr[3] "%1$s елементів даних"
 
 #: include/page_header.php:481
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgstr[0] "Зафіксовано %1$s невдалу спробу входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
-msgstr[1] "Зафіксовано %1$s невдалі спроби входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
-msgstr[2] "Зафіксовано %1$s невдалих спроб входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
+msgstr[1] "Зафіксовано %1$s невдалу спробу входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
+msgstr[2] "Зафіксовано %1$s невдалі спроби входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
+msgstr[3] "Зафіксовано %1$s невдалих спроб входу в систему. Остання невдала спроба була з %2$s %3$s в %4$s."
 
 #: include/blocks.inc.php:984
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
 msgstr[0] "%2$d із %1$d проблеми відображено"
-msgstr[1] "%2$d із %1$d проблем відображено"
+msgstr[1] "%2$d із %1$d проблеми відображено"
 msgstr[2] "%2$d із %1$d проблем відображено"
+msgstr[3] "%2$d із %1$d проблем відображено"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] "%d пристрій"
-msgstr[1] "%d пристрої"
-msgstr[2] "%d пристроїв"
+msgstr[1] "%d пристрій"
+msgstr[2] "%d пристрої"
+msgstr[3] "%d пристроїв"
 
 #: include/views/configuration.action.edit.php:429
 msgid "(0 - infinitely)"
@@ -463,7 +469,7 @@ msgstr "Додати до груп вузлів мережі"
 msgid "Added"
 msgstr "Додано"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "Додаткові параметри"
 
@@ -729,15 +735,15 @@ msgstr "Алгоритм аутентифікації"
 msgid "Authentication method"
 msgstr "Метод аутентифікації"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "Метод аутентифікації змінено на HTTP"
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "Метод аутентифікації змінено на LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "Метод аутентифікації змінено на Zabbix внутрішній"
 
@@ -830,8 +836,8 @@ msgstr "Фонове зображення"
 msgid "Bar reports"
 msgstr "Гістограмні звіти"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "База для пошуку (BaseDN)"
 
@@ -839,12 +845,13 @@ msgstr "База для пошуку (BaseDN)"
 msgid "Basic authentication"
 msgstr "Звичайна аутентифікація"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Ім'я для підключення (BindDN)"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Пароль підключення (Bind password)"
 
@@ -1255,15 +1262,19 @@ msgstr "Не вдалося додати користувачів."
 msgid "Cannot add value map"
 msgstr "Не вдалося додати перетворення значення"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr ""
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "Не вдалося змінити метод аутентифікації на HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "Не вдалося змінити метод аутентифікації на LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не вдалося змінити метод аутентифікації на внутрішній Zabbix"
 
@@ -1452,8 +1463,9 @@ msgstr "Не вдалося видалити проксі"
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не вдалося видалити регулярний вираз"
-msgstr[1] "Не вдалося видалити регулярні вирази"
+msgstr[1] "Не вдалося видалити регулярний вираз"
 msgstr[2] "Не вдалося видалити регулярні вирази"
+msgstr[3] "Не вдалося видалити регулярні вирази"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
@@ -1572,7 +1584,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти графік \"%1$s\" використовуваний в комплексному екрані \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалося знайти групу \"%1$s\" використовувану в карті мережі \"%2$s\"."
@@ -1584,7 +1596,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не вдалося знайти групу \"%1$s\" використовувану в комплексному екрані \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалося знайти вузел мережі \"%1$s\" використовуваний в карті мережі \"%2$s\"."
@@ -1609,7 +1621,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Не вдалося знайти вузел мережі чи шаблон \"%1$s\" використовуваний на графіку \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти іконку \"%1$s\" використовувану в карті мережі \"%2$s\"."
@@ -1631,7 +1643,7 @@ msgstr "Не вдалося знайти елемент даних \"%1$s\" ви
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не вдалося знайти карту мережі \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти карту мережі \"%1$s\" використовувану в карті мережі \"%2$s\"."
@@ -1654,8 +1666,8 @@ msgstr "Не вдалося знайти комплексний екран \"%1$
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не вдалось знайти тригер \"%1$s\" використовуваний в карті мережі \"%2$s\"."
@@ -1684,16 +1696,18 @@ msgstr "Не вдалося розкрити вираз \"%s\"."
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
 msgstr[0] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглий комплексний екран \"%3$s\" не існує."
-msgstr[1] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглі комплексні екрани \"%3$s\" не існують."
+msgstr[1] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглий комплексний екран \"%3$s\" не існує."
 msgstr[2] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглі комплексні екрани \"%3$s\" не існують."
+msgstr[3] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглі комплексні екрани \"%3$s\" не існують."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
 msgstr[0] "Не вдалося імпортувати шаблон \"%2$s\", з'єднаний з неіснуючим шаблоном \"%3$s\"."
-msgstr[1] "Не вдалося імпортувати шаблон \"%2$s\", з'єднаний з неіснуючими шаблонами \"%3$s\"."
+msgstr[1] "Не вдалося імпортувати шаблон \"%2$s\", з'єднаний з неіснуючим шаблоном \"%3$s\"."
 msgstr[2] "Не вдалося імпортувати шаблон \"%2$s\", з'єднаний з неіснуючими шаблонами \"%3$s\"."
+msgstr[3] "Не вдалося імпортувати шаблон \"%2$s\", з'єднаний з неіснуючими шаблонами \"%3$s\"."
 
 #: include/classes/class.cview.php:113
 #, php-format
@@ -1707,6 +1721,10 @@ msgstr "Не вдалось вставити метод повідомлення
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
 msgstr "Не вдалося приєднати шаблон"
+
+#: api/classes/CUser.php:956
+msgid "Cannot login."
+msgstr ""
 
 #: api/classes/CUser.php:881
 msgid "Cannot logout."
@@ -2057,6 +2075,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "Зміна"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2539,7 +2558,7 @@ msgstr "Копіювати"
 msgid "Copy selected to ..."
 msgstr "Копіювати вибране в ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1001
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Коректний вхід \"%s\"."
@@ -3101,7 +3120,7 @@ msgstr "Десятковий"
 msgid "Default"
 msgstr "По замовчуванню"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "Аутентифікація по замовчуванню"
 
@@ -3389,8 +3408,9 @@ msgstr "Видалити вибрані перетворення значень?
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Видалити вибране перетворення значення? Воно використовується в %d елементі даних!"
-msgstr[1] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
+msgstr[1] "Видалити вибране перетворення значення? Воно використовується в %d елементі даних!"
 msgstr[2] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
+msgstr[3] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
 
 #: templates.php:616
 msgid "Delete selected with linked elements"
@@ -4337,7 +4357,7 @@ msgstr "Помилка виконання SQL [%1$s] у [%2$s]."
 msgid "Execute on"
 msgstr "Виконати на"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "Скрипт для виконання"
 
@@ -4586,7 +4606,7 @@ msgstr "Гнучкі інтервали"
 msgid "For guest, password must be empty"
 msgstr "Для Гостя пароль повинен бути пустим"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "Формула"
 
@@ -5021,12 +5041,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "ОГЛЯД ІНВЕНТАРНИХ ДАНИХ ВУЗЛА МЕРЕЖІ"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "HTTP аутентифікація"
 
@@ -6244,16 +6264,6 @@ msgstr "Некоректний стан для послуги \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Некоректний статус."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "Некоректний синтаксис поруч з \"%1$s\" в позиції \"%2$s\""
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "Некоректний синтаксис поруч з \"%1$s\"."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6312,12 +6322,6 @@ msgstr "У виразі вказано некоректну функцію тр�
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "Некоректний тип asort_by_key."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "Некоректне використання дужок. \"%1$s\" знайдено після останньої дужки."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6430,7 +6434,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "У інтерфейсу з IP адресою \"%1$s\" не може бути пусте DNS ім'я."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "Внутрішня"
 
@@ -6478,11 +6482,6 @@ msgstr "Помилкова дата \"%s\"."
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Помилковий hostid для макросу \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "Помилковий формат ключа елемента даних."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6835,10 +6834,6 @@ msgstr "Ключ"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не співпадає з <grpmax|grpmin|grpsum|grpavg>[\"Група вузлів мережі\", \"Ключ елемента даних\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "Ключ не може бути пустим."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6861,25 +6856,29 @@ msgid "LATEST DATA"
 msgstr "ОСТАННІ ДАНІ"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "LDAP аутентифікація"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr ""
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "Хост LDAP"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "Вдалий вхід через LDAP"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "Невдалий вхід через LDAP"
 
@@ -6922,8 +6921,9 @@ msgstr "Остання"
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
 msgstr[0] "Остання %1$d подія"
-msgstr[1] "Останні %1$d події"
-msgstr[2] "Останні %1$d подій"
+msgstr[1] "Остання %1$d подія"
+msgstr[2] "Останні %1$d події"
+msgstr[3] "Останні %1$d подій"
 
 #: popup_trexpr.php:222
 msgid "Last (most recent) T value is < N"
@@ -7191,7 +7191,7 @@ msgstr "Підключено до системи як"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "Вхід в систему"
@@ -7200,14 +7200,19 @@ msgstr "Вхід в систему"
 msgid "Login as Guest"
 msgstr "Увійти як Гість"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:993
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "Помилка входу \"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
-msgstr "Ім'я користувача або пароль некоректні"
+#: api/classes/CUser.php:961
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
+msgstr ""
+
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
+msgstr ""
 
 #: api/classes/CUser.php:846 api/classes/CUser.php:864
 #: api/classes/CUser.php:911
@@ -7528,16 +7533,18 @@ msgstr "Розгорнути"
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символ."
-msgstr[1] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символи."
-msgstr[2] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символів."
+msgstr[1] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символ."
+msgstr[2] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символи."
+msgstr[3] "Максимальна довжина псевдоніму складає %2$d символи, \"%3$s\" містить %1$d символів."
 
 #: api/classes/CHost.php:1347
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символ."
-msgstr[1] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символи."
-msgstr[2] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символів."
+msgstr[1] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символ."
+msgstr[2] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символи."
+msgstr[3] "Максимальна довжина імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символів."
 
 #: popup_trexpr.php:242
 msgid "Maximum value for period T is < N"
@@ -7560,8 +7567,9 @@ msgstr "Максимальне значення за період T НЕ є N"
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символ."
-msgstr[1] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символи."
-msgstr[2] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символів."
+msgstr[1] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символ."
+msgstr[2] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символи."
+msgstr[3] "Максимальна довжина видимого імені вузла мережі складає %2$d символи, \"%3$s\" містить %1$d символів."
 
 #: include/forms.inc.php:1561 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:118
@@ -8443,7 +8451,7 @@ msgstr "Немає прав доступу до карти мережі \"%1$s\"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Немає прав доступу до комплексного екрану \"%1$s\"."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:925 api/classes/CUser.php:1050
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
@@ -9538,9 +9546,9 @@ msgstr "Польська (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Заповнює поле інвентарних даних вузла мережі"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -9888,8 +9896,9 @@ msgstr "Регулярний вираз додано"
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Регулярний вираз видалено"
-msgstr[1] "Регулярні вирази видалено"
+msgstr[1] "Регулярний вираз видалено"
 msgstr[2] "Регулярні вирази видалено"
+msgstr[3] "Регулярні вирази видалено"
 
 #: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
@@ -10428,7 +10437,7 @@ msgstr "Субота"
 
 #: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
 #: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10673,8 +10682,8 @@ msgstr "Скрипти"
 msgid "Search"
 msgstr "Пошук"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "Атрибут пошуку"
 
@@ -10943,7 +10952,7 @@ msgstr "Послуги"
 msgid "Services form a circular dependency."
 msgstr "Послуги утворюють кільцеву залежність."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1044
 msgid "Session terminated, re-login, please."
 msgstr "Сесія завершилась, будь-ласка повторно увійдіть в систему."
 
@@ -11467,7 +11476,7 @@ msgstr "Прізвище"
 msgid "Swedish (sv_SE)"
 msgstr "Шведська (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Переключення методу аутентифікації скине всі сесії за виключенням цієї! Продовжити?"
 
@@ -11663,13 +11672,13 @@ msgid "Tera"
 msgstr "Тера"
 
 #: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "Тест"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "Тест аутентифікації"
 
@@ -11696,16 +11705,18 @@ msgstr "Текст (одне поле)"
 msgid "The image is used in icon map %2$s."
 msgid_plural "The image is used in icon maps %2$s."
 msgstr[0] "Зображення використовується в призначенні іконки %2$s."
-msgstr[1] "Зображення використовується в призначеннях іконок %2$s."
+msgstr[1] "Зображення використовується в призначенні іконки %2$s."
 msgstr[2] "Зображення використовується в призначеннях іконок %2$s."
+msgstr[3] "Зображення використовується в призначеннях іконок %2$s."
 
 #: api/classes/CImage.php:562
 #, php-format
 msgid "The image is used in map %2$s."
 msgid_plural "The image is used in maps %2$s."
 msgstr[0] "Зображення використовується в карті мережі %2$s."
-msgstr[1] "Зображення використовується в картах мережі %2$s."
+msgstr[1] "Зображення використовується в карті мережі %2$s."
 msgstr[2] "Зображення використовується в картах мережі %2$s."
+msgstr[3] "Зображення використовується в картах мережі %2$s."
 
 #: include/views/configuration.item.list.php:100
 #, php-format
@@ -11728,13 +11739,14 @@ msgstr "Запитувана віддалена процедура не існу
 msgid "Theme"
 msgstr "Тема інтерфейсу"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "Існує \"%1$d\" група з Внутрішнім доступом до GUI."
-msgstr[1] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
-msgstr[2] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
+msgstr[1] "Існує \"%1$d\" група з Внутрішнім доступом до GUI."
+msgstr[2] "Існує \"%1$d\" групи з Внутрішнім доступом до GUI."
+msgstr[3] "Існує \"%1$d\" груп з Внутрішнім доступом до GUI."
 
 #: include/forms.inc.php:1599 include/maintenances.inc.php:105
 msgid "Third"
@@ -12661,7 +12673,8 @@ msgstr "Ім'я користувача"
 msgid "User name does not match with DB"
 msgstr "Ім'я користувача не співпадає з БД"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "Пароль користувача"
 
@@ -12928,16 +12941,18 @@ msgstr "Попередження. Некоректне значення для �
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
 msgstr[0] "Попередження. Максимальний період часу для відображення %1$s день."
-msgstr[1] "Попередження. Максимальний період часу для відображення %1$s дні."
-msgstr[2] "Попередження. Максимальний період часу для відображення %1$s днів."
+msgstr[1] "Попередження. Максимальний період часу для відображення %1$s день."
+msgstr[2] "Попередження. Максимальний період часу для відображення %1$s дні."
+msgstr[3] "Попередження. Максимальний період часу для відображення %1$s днів."
 
 #: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
 msgstr[0] "Попередження. Мінімальний період часу для відображення %1$s година."
-msgstr[1] "Попередження. Мінімальний період часу для відображення %1$s години."
-msgstr[2] "Попередження. Мінімальний період часу для відображення %1$s годин."
+msgstr[1] "Попередження. Мінімальний період часу для відображення %1$s година."
+msgstr[2] "Попередження. Мінімальний період часу для відображення %1$s години."
+msgstr[3] "Попередження. Мінімальний період часу для відображення %1$s годин."
 
 #: jsLoader.php:169
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -13382,7 +13397,7 @@ msgstr "Zabbix отримав некоректний запит."
 msgid "Zabbix internal"
 msgstr "Zabbix внутрішні"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Внутрішня аутентифікація Zabbix"
 
@@ -13664,9 +13679,18 @@ msgstr "картинка"
 msgid "in"
 msgstr "в"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr ""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "є"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr ""
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13744,7 +13768,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "мс"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "має бути дійсним користувачем LDAP"
 
@@ -13891,6 +13915,10 @@ msgstr "до"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "тригер"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376
