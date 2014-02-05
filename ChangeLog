@@ -1,7 +1,6 @@
 Changes for 2.2.2rc2
 
 Bug fixes:
-...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
 ..F....... [ZBX-6296] fixed macros in item names not being resolved in simple graph titles (Eduard)
 ..F....... [ZBX-7743] fixed not being able to save the user or profile form if PHP gettext is unavailable (Eduard)
 A......... [ZBX-7693] fixed user media validation (Eduard)

@@ -560,12 +560,12 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -1010,7 +1010,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	(*(uint32_t *)ptr)++;
 
-	return (char *)ptr + REFCOUNT_FIELD_SIZE;
+	return ptr + REFCOUNT_FIELD_SIZE;
 }
 
 /******************************************************************************
@@ -1172,15 +1172,11 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
  ******************************************************************************/
 static void	vc_item_reset_cache(zbx_vc_item_t *item)
 {
-	zbx_uint64_t	itemid = item->itemid;
-	unsigned char	type = item->value_type;
-
 	vch_item_free_cache(item);
 
-	memset(item, 0, sizeof(*item));
-
-	item->itemid = itemid;
-	item->value_type = type;
+	/* reset all item data except itemid and value_type which are the first members in zbx_vc_item_t structure */
+	memset((void*)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
+			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
 }
 
 /******************************************************************************
