@@ -121,12 +121,12 @@ use constant APP_SLV_PARTTEST => 'SLV particular test';
 my $config = get_dnstest_config();
 my $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, user => $config->{'zapi'}->{'user'}, password => $config->{'zapi'}->{'password'}});
 
+create_cron_items();
+exit if (defined($OPTS{'only-cron'}));
+
 my $proxies = get_proxies_list();
 
 pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
-
-create_cron_items();
-exit if (defined($OPTS{'only-cron'}));
 
 create_macro('{$DNSTEST.IP4.MIN.SERVERS}', 4, undef);
 create_macro('{$DNSTEST.IP6.MIN.SERVERS}', 4, undef);
@@ -1571,6 +1571,8 @@ sub create_cron_items {
 
     my $slv_file;
     while (($slv_file = readdir DIR)) {
+	next if ($slv_file =~ /^\.$/ or $slv_file =~ /^\.\.$/);
+
 	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
 	    # check monthly data once a day
 	    system("echo '0 0 * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
