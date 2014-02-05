@@ -145,12 +145,6 @@ if (isset($_REQUEST['save'])) {
 	$mediaType = array(
 		'type' => getRequest('type'),
 		'description' => getRequest('description'),
-		'smtp_server' => getRequest('smtp_server'),
-		'smtp_helo' => getRequest('smtp_helo'),
-		'smtp_email' => getRequest('smtp_email'),
-		'exec_path' => getRequest('exec_path'),
-		'username' => getRequest('username'),
-		'passwd' => '',
 		'gsm_modem' => getRequest('gsm_modem'),
 		'status' => getRequest('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
@@ -181,6 +175,15 @@ if (isset($_REQUEST['save'])) {
 			$mediaType['exec_path'] = getRequest('msg_txt_limit');
 			$mediaType['username'] = getRequest('ez_username');
 			$mediaType['passwd'] = getRequest('password');
+			break;
+
+		default:
+			$mediaType['smtp_server'] = getRequest('smtp_server');
+			$mediaType['smtp_helo'] = getRequest('smtp_helo');
+			$mediaType['smtp_email'] = getRequest('smtp_email');
+			$mediaType['exec_path'] = getRequest('exec_path');
+			$mediaType['username'] = getRequest('username');
+			$mediaType['passwd'] = '';
 	}
 
 	if ($mediaTypeId) {
