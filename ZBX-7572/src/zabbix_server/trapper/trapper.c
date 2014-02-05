@@ -697,7 +697,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		process_mass_data(sock, 0, &av, 1, NULL);
 
 		alarm(CONFIG_TIMEOUT);
-		if (SUCCEED != zbx_tcp_send_raw(sock, "OK")
+		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		alarm(0);
 
