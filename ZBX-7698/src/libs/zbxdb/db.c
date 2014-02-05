@@ -245,7 +245,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set current schema='%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
@@ -602,8 +602,6 @@ void	zbx_db_close()
  *                                                                            *
  * Purpose: start transaction                                                 *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
@@ -650,8 +648,6 @@ int	zbx_db_begin()
  * Function: zbx_db_commit                                                    *
  *                                                                            *
  * Purpose: commit transaction                                                *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -704,8 +700,6 @@ int	zbx_db_commit()
  * Function: zbx_db_rollback                                                  *
  *                                                                            *
  * Purpose: rollback transaction                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -1901,5 +1895,261 @@ ub4	OCI_DBserver_status()
 
 	return server_status;
 }
-
 #endif	/* HAVE_ORACLE */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_escape_string_len                                     *
+ *                                                                            *
+ * Return value: return length in bytes of escaped string                     *
+ *               with terminating '\0'                                        *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_escape_string'                         *
+ *           and 'zbx_db_dyn_escape_string_len'                               *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_db_get_escape_string_len(const char *src)
+{
+	const char	*s;
+	size_t		len = 1;	/* '\0' */
+
+	for (s = src; NULL != s && '\0' != *s; s++)
+	{
+		if ('\r' == *s)
+			continue;
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+			len++;
+
+		len++;
+	}
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_escape_string                                             *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_get_escape_string_len'                 *
+ *           and 'zbx_db_dyn_escape_string_len'                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
+{
+	const char	*s;
+	char		*d;
+#if defined(HAVE_MYSQL)
+#	define ZBX_DB_ESC_CH	'\\'
+#elif !defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_ESC_CH	'\''
+#endif
+	assert(dst);
+
+	len--;	/* '\0' */
+
+	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
+	{
+		if ('\r' == *s)
+			continue;
+
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+		{
+			if (2 > len)
+				break;
+#if defined(HAVE_POSTGRESQL)
+			*d++ = *s;
+#else
+			*d++ = ZBX_DB_ESC_CH;
+#endif
+			len--;
+		}
+		*d++ = *s;
+		len--;
+	}
+	*d = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string                                         *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string(const char *src)
+{
+	size_t	len;
+	char	*dst = NULL;
+
+	len = zbx_db_get_escape_string_len(src);
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string_len                                     *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
+{
+	const char	*s;
+	char		*dst = NULL;
+	size_t		len = 1;	/* '\0' */
+
+	max_src_len++;
+
+	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
+	{
+		if ('\r' == *s)
+			continue;
+
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
+			break;
+
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+			len++;
+
+		len++;
+	}
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_escape_like_pattern_len                               *
+ *                                                                            *
+ * Return value: return length of escaped LIKE pattern with terminating '\0'  *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_escape_like_pattern'                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_db_get_escape_like_pattern_len(const char *src)
+{
+	int		len;
+	const char	*s;
+
+	len = zbx_db_get_escape_string_len(src) - 1; /* minus '\0' */
+
+	for (s = src; s && *s; s++)
+	{
+		len += (*s == '_' || *s == '%' || *s == ZBX_SQL_LIKE_ESCAPE_CHAR);
+		len += 1;
+	}
+
+	len++; /* '\0' */
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_escape_like_pattern                                       *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_get_escape_like_pattern_len'           *
+ *                                                                            *
+ *           For instance, we wish to find string a_b%c\d'e!f in our database *
+ *           using '!' as escape character. Our queries then become:          *
+ *                                                                            *
+ *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (IBM DB2, Oracle, SQLite3) *
+ *                                                                            *
+ *           Using backslash as escape character in LIKE would be too much    *
+ *           trouble, because escaping backslashes would have to be escaped   *
+ *           as well, like so:                                                *
+ *                                                                            *
+ *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
+ *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (IBM DB2, Oracle, SQLite3) *
+ *                                                                            *
+ *           Hence '!' instead of backslash.                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_escape_like_pattern(const char *src, char *dst, int len)
+{
+	char		*d;
+	char		*tmp = NULL;
+	const char	*t;
+
+	assert(dst);
+
+	tmp = zbx_malloc(tmp, len);
+
+	zbx_db_escape_string(src, tmp, len);
+
+	len--; /* '\0' */
+
+	for (t = tmp, d = dst; t && *t && len; t++)
+	{
+		if (*t == '_' || *t == '%' || *t == ZBX_SQL_LIKE_ESCAPE_CHAR)
+		{
+			if (len <= 1)
+				break;
+			*d++ = ZBX_SQL_LIKE_ESCAPE_CHAR;
+			len--;
+		}
+		*d++ = *t;
+		len--;
+	}
+
+	*d = '\0';
+
+	zbx_free(tmp);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_like_pattern                                   *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_like_pattern(const char *src)
+{
+	int	len;
+	char	*dst = NULL;
+
+	len = zbx_db_get_escape_like_pattern_len(src);
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_like_pattern(src, dst, len);
+
+	return dst;
+}
+
+
