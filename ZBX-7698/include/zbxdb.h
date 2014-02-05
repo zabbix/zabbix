@@ -161,7 +161,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 void	zbx_create_sqlite3_mutex(const char *dbname);
 void	zbx_remove_sqlite3_mutex();
 #endif
-void	zbx_db_init(char *dbname);
+void	zbx_db_init(const char *dbname, const char *const db_schema);
 void    zbx_db_close();
 
 int	zbx_db_begin();

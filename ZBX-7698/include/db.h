@@ -36,7 +36,6 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum
 {
@@ -601,8 +600,8 @@ void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
 
 #ifdef HAVE_POSTGRESQL
-size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	DBbytea_unescape(u_char *io);
+#	define DBbytea_escape	zbx_db_bytea_escape
+size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
 
 #endif
