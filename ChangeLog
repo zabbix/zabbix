@@ -18,6 +18,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
 ..F....... [ZBX-7707] fixed "Auto-logout" field to show submitted incorrect value (Ivo)
 A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
 ....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
@@ -35,6 +36,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.2rc2
 
 Bug fixes:
+...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
 ..F....... [ZBX-6296] fixed macros in item names not being resolved in simple graph titles (Eduard)
 ..F....... [ZBX-7743] fixed not being able to save the user or profile form if PHP gettext is unavailable (Eduard)
 A......... [ZBX-7693] fixed user media validation (Eduard)
