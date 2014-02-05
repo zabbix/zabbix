@@ -140,7 +140,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
 
-	for (j = 0; j < num; j++)	/* locate first supported item */
+	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
 		if (SUCCEED == errcodes[j])
 			break;
