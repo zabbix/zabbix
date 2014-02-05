@@ -20,7 +20,6 @@
 	</td>
 </tr>
 </script>
-
 <script type="text/javascript">
 	function removeSlide(obj) {
 		var step = obj.getAttribute('remove_slide');
@@ -104,31 +103,51 @@
 		createPlaceholders();
 	}
 
-	function initSortable() {
-		jQuery(document).ready(function() {
-			jQuery('#slideTable').sortable({
-				disabled: (jQuery('#slideTable tr.sortable').length <= 1),
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				cursor: 'move',
-				handle: 'span.ui-icon-arrowthick-2-n-s',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				update: recalculateSortOrder,
-				helper: function(e, ui) {
-					ui.children().each(function() {
-						jQuery(this).width(jQuery(this).width());
-					});
+	jQuery(function($) {
+		var slideTable = $('#slideTable'),
+			slideTableWidth = slideTable.width(),
+			slideTableColumns = $('#slideTable .header').find('td'),
+			slideTableColumnWidths = new Array();
 
-					return ui;
-				},
-				start: function(e, ui) {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-				}
-			});
+		slideTableColumns.each(function() {
+			slideTableColumnWidths.push($(this).width());
 		});
-	}
 
-	initSortable();
+		slideTable.sortable({
+			disabled: (slideTable.find('tr.sortable').length <= 1),
+			items: 'tbody tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			handle: 'span.ui-icon-arrowthick-2-n-s',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			update: recalculateSortOrder,
+			create: function (e, ui) {
+				// force not to change table width
+				slideTable.width(slideTableWidth);
+			},
+			helper: function(e, ui) {
+				ui.children().each(function() {
+					jQuery(this).width(jQuery(this).width());
+				});
+
+				// when dragging element on safari, it jumps out of the table
+				if (SF) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 4) + 'px');
+				}
+
+				slideTableColumns.each(function(index) {
+					$(this).width(slideTableColumnWidths[index]);
+				});
+
+				return ui;
+			},
+			start: function(e, ui) {
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+			}
+		});
+	});
+
 	createPlaceholders();
 </script>

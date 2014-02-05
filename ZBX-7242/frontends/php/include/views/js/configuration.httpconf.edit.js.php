@@ -89,14 +89,17 @@
 	}
 
 	jQuery(function($) {
-		'use strict';
+		var stepTable = $('#httpStepTable'),
+			stepTableWidth = stepTable.width(),
+			stepTableColumns = $('#httpStepTable .header').find('td'),
+			stepTableColumnWidths = new Array();
 
-		if ($.browser['safari']) {
-			var tableWidth = $('#httpStepTable').width();
-		}
+		stepTableColumns.each(function() {
+			stepTableColumnWidths.push($(this).width());
+		});
 
-		$('#httpStepTable').sortable({
-			disabled: ($('#httpStepTable').find('tr.sortable').length <= 1),
+		stepTable.sortable({
+			disabled: (stepTable.find('tr.sortable').length <= 1),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -104,6 +107,10 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
+			create: function (e, ui) {
+				// force not to change table width
+				stepTable.width(stepTableWidth);
+			},
 			helper: function(e, ui) {
 				ui.children().each(function() {
 					var td = $(this);
@@ -111,16 +118,19 @@
 				});
 
 				// when dragging element on safari, it jumps out of the table
-				if ($.browser['safari']) {
+				if (SF) {
 					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2)+'px');
-					// don't allow to change with of whole table
-					$('#httpStepTable').css('width', tableWidth + 'px');
+					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
+
+				stepTableColumns.each(function(index) {
+					$(this).width(stepTableColumnWidths[index]);
+				});
 
 				return ui;
 			},
 			start: function(e, ui) {
+				// fix placeholder not to change height while object is beeing dragged
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});

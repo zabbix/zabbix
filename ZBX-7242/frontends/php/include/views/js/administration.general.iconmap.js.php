@@ -1,7 +1,5 @@
 <script type="text/javascript">
-	jQuery(document).ready(function($) {
-		'use strict';
-
+	jQuery(function($) {
 		var iconMapTable = $('#iconMapTable'),
 			addMappindButton = $('#addMapping');
 
@@ -25,8 +23,15 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					jQuery(this).width(jQuery(this).width());
+					$(this).width($(this).width());
 				});
+
+				// when dragging element on safari, it jumps out of the table
+				if (SF) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 4) + 'px');
+				}
+
 				return ui;
 			},
 			start: function(e, ui) {
