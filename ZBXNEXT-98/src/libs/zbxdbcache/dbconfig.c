@@ -112,8 +112,8 @@ ZBX_DC_ITEM_HK;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*snmp_community;
 	const char	*snmp_oid;
+	const char	*snmp_community;
 	const char	*snmpv3_securityname;
 	const char	*snmpv3_authpassphrase;
 	const char	*snmpv3_privpassphrase;
@@ -3073,7 +3073,7 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
 	s2 = zbx_hashset_search(&config->snmpitems, &i2->itemid);
 
-	return memcmp(&s1->snmp_community, &s2->snmp_community, sizeof(ZBX_DC_SNMPITEM) - sizeof(zbx_uint64_t));
+	return memcmp(&s1->snmp_community, &s2->snmp_community, 5 * ZBX_PTR_SIZE + 4 * sizeof(unsigned char));
 }
 
 static int	__config_heap_elem_compare(const void *d1, const void *d2)
