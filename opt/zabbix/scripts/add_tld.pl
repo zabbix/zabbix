@@ -89,6 +89,7 @@ my $args = GetOptions(\%OPTS,
 		      "ns-servers-v4=s",
 		      "ns-servers-v6=s",
 		      "rdds-ns-string=s",
+		      "only-cron!",
 		      "verbose!",
 		      "quiet!",
 		      "help|?");
@@ -123,6 +124,9 @@ my $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, user => $config->
 my $proxies = get_proxies_list();
 
 pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
+
+create_cron_items();
+exit if (defined($OPTS{'only-cron'}));
 
 create_macro('{$DNSTEST.IP4.MIN.SERVERS}', 4, undef);
 create_macro('{$DNSTEST.IP6.MIN.SERVERS}', 4, undef);
@@ -274,8 +278,6 @@ foreach my $proxyid (sort keys %{$proxies}) {
 }
 
 create_probe_status_host($probes_mon_groupid);
-
-create_cron_items($OPTS{'tld'});
 
 ########### FUNCTIONS ###############
 
@@ -1561,8 +1563,6 @@ sub pfail {
 }
 
 sub create_cron_items {
-    my $tld = shift;
-
     my $slv_path = $config->{'slv'}->{'path'};
 
     my $rv = opendir DIR, $slv_path;
@@ -1571,9 +1571,9 @@ sub create_cron_items {
 
     my $slv_file;
     while (($slv_file = readdir DIR)) {
-	if ($slv_file =~ /dnstest\.slv\..*\.month\.pl$/) {
+	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
 	    # check monthly data once a day
-	    system("echo '0 0 * * * root $slv_path/$slv_file $tld' > /etc/cron.d/tld-$tld-$slv_file");
+	    system("echo '0 0 * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
 	} else {
 	    system("echo '* * * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
 	}
@@ -1622,6 +1622,8 @@ Other options
 		(default: "$cfg_default_rdds_ns_string")
         --rdds-test-prefix=STRING
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
+        --only-cron
+		only create cron jobs and exit
         --help
                 display this message
 EOF
