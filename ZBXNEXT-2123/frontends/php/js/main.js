@@ -978,3 +978,89 @@ function createPlaceholders() {
 		});
 	}
 }
+
+(function($) {
+	/**
+	 * Creates a table with dynamic add/remove row buttons.
+	 *
+	 * Supported options:
+	 * - template		- row template selector
+	 * - row			- element row selector
+	 * - add			- add row button selector
+	 * - remove			- remove row button selector
+	 * - dataCallback	- function to generate the data passed to the template
+	 *
+	 * Triggered events:
+	 * - rowremove.elementTable 	- after removing a row (triggered before tableupdate.elementTable)
+	 * - tableupdate.elementTable 	- after adding or removing a row
+	 *
+	 * @param options
+	 */
+	$.fn.elementTable = function(options) {
+		var options = $.extend({
+			template: '',
+			row: '.form_row',
+			add: '.element-table-add',
+			remove: '.element-table-remove',
+			dataCallback: function(data) {
+				return {};
+			}
+		}, options)
+
+		return this.each(function() {
+			var table = $(this);
+
+			table.data('elementTable', {
+				counter: $(options.row, table).length
+			});
+
+			// add buttons
+			table.on('click', options.add, function() {
+				// add the new row before the row with the "Add" button
+				addRow(table, $(this).closest('tr'), options);
+			});
+
+			// remove buttons
+			table.on('click', options.remove, function() {
+				// remove the parent row
+				removeRow(table, $(this).closest(options.row), options);
+			});
+		});
+	};
+
+	/**
+	 * Adds a row before the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} beforeRow
+	 * @param {object} options
+	 */
+	function addRow(table, beforeRow, options) {
+		var data = {
+			rowNum: table.data('elementTable').counter
+		};
+		data = $.extend(data, options.dataCallback(data));
+
+		var template = new Template($(options.template).html());
+		beforeRow.before(template.evaluate(data));
+		table.data('elementTable').counter++;
+
+		createPlaceholders();
+
+		table.trigger('tableupdate.elementTable', options);
+	}
+
+	/**
+	 * Removes the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} row
+	 * @param {object} options
+	 */
+	function removeRow(table, row, options) {
+		row.remove();
+
+		table.trigger('rowremove.elementTable', options);
+		table.trigger('tableupdate.elementTable', options);
+	}
+}(jQuery));

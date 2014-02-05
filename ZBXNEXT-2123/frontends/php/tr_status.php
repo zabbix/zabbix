@@ -51,6 +51,8 @@ $fields = array(
 	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null),
 	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
@@ -98,6 +100,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
+// reset filter
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_details'] = 0;
 	$_REQUEST['show_maintenance'] = 1;
@@ -108,6 +111,62 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['txt_select'] = '';
 	$_REQUEST['status_change'] = 0;
 	$_REQUEST['status_change_days'] = 14;
+
+	CProfile::delete('web.tr_status.filter.application');
+
+	// reset inventory filters
+	$i = 0;
+	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.tr_status.filter.inventory.field', $i);
+		CProfile::delete('web.tr_status.filter.inventory.value', $i);
+
+		$i++;
+	}
+}
+// update filter in profiles
+elseif (hasRequest('filter_set')) {
+	if (getRequest('application') !== '') {
+		CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
+	}
+	else {
+		CProfile::delete('web.tr_status.filter.application');
+	}
+
+	// update host inventory filter
+	$i = 0;
+	foreach (getRequest('inventory', array()) as $field) {
+		if ($field['value'] === '') {
+			continue;
+		}
+
+		CProfile::update('web.tr_status.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
+		CProfile::update('web.tr_status.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
+
+		$i++;
+	}
+
+	// delete remaining old values
+	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.tr_status.filter.inventory.field', $i);
+		CProfile::delete('web.tr_status.filter.inventory.value', $i);
+
+		$i++;
+	}
+}
+
+// fetch filter from profiles
+$filter = array(
+	'application' => CProfile::get('web.tr_status.filter.application', ''),
+	'inventory' => array()
+);
+$i = 0;
+while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
+	$filter['inventory'][] = array(
+		'field' => CProfile::get('web.tr_status.filter.inventory.field', null, $i),
+		'value' => CProfile::get('web.tr_status.filter.inventory.value', null, $i)
+	);
+
+	$i++;
 }
 
 // show triggers
@@ -251,7 +310,7 @@ $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
 $ackStatus = $_REQUEST['ack_status'];
 
-$triggerWidget = new CWidget();
+$triggerWidget = new CWidget(null, 'trigger-mon');
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
@@ -321,6 +380,45 @@ $daysSpan->addStyle('vertical-align: middle;');
 $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+$filterForm->addRow(_('Filter by application'), array(
+	new CTextBox('application', $filter['application'], 40),
+	new CButton('application_name', _('Select'),
+		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
+			'&dstfrm='.$filterForm->getName().'");',
+		'filter-button'
+	)
+));
+
+// inventory filter
+$inventoryFilters = $filter['inventory'];
+if (!$inventoryFilters) {
+	$inventoryFilters = array(
+		array('field' => '', 'value' => '')
+	);
+}
+$inventoryFields = array();
+foreach (getHostInventories() as $inventory) {
+	$inventoryFields[$inventory['db_field']] = $inventory['title'];
+}
+
+$inventoryFilterTable = new CTable();
+$inventoryFilterTable->setAttribute('id', 'inventory-filter');
+$i = 0;
+foreach ($inventoryFilters as $field) {
+	$inventoryFilterTable->addRow(array(
+		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
+		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
+		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
+	), 'form_row');
+
+	$i++;
+}
+$inventoryFilterTable->addRow(
+	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+);
+$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+
+// maintenance filter
 $filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
 
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
@@ -382,8 +480,8 @@ $sortfield = getPageSortField('description');
 $sortorder = getPageSortOrder();
 $options = array(
 	'nodeids' => get_current_nodeid(),
-	'monitored' => true,
 	'output' => array('triggerid', $sortfield),
+	'monitored' => true,
 	'skipDependent' => true,
 	'limit' => $config['search_limit'] + 1
 );
@@ -398,6 +496,31 @@ if ($pageFilter->hostsSelected) {
 }
 else {
 	$options['hostids'] = array();
+}
+
+// inventory filter
+if ($filter['inventory']) {
+	$inventoryFilter = array();
+	foreach ($filter['inventory'] as $field) {
+		$inventoryFilter[$field['field']][] = $field['value'];
+	}
+
+	$hosts = API::Host()->get(array(
+		'output' => array('hostid'),
+		'hostids' => isset($options['hostids']) ? $options['hostids'] : null,
+		'searchInventory' => $inventoryFilter
+	));
+	$options['hostids'] = zbx_objectValues($hosts, 'hostid');
+}
+
+// application filter
+if ($filter['application'] !== '') {
+	$applications = API::Application()->get(array(
+		'output' => array('applicationid'),
+		'hostids' => isset($options['hostids']) ? $options['hostids'] : null,
+		'search' => array('name' => $filter['application'])
+	));
+	$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 }
 
 if (!zbx_empty($_REQUEST['txt_select'])) {
@@ -864,5 +987,7 @@ $triggerWidget->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
+
+require_once dirname(__FILE__).'/include/views/js/monitoring.triggers.js.php';
 
 require_once dirname(__FILE__).'/include/page_footer.php';
