@@ -361,10 +361,10 @@ sub db_select
     dbg($query);
 
     my $res = $dbh->prepare($query)
-	or fail("cannot prepare $query: $dbh->errstr");
+	or fail("cannot prepare [$query]: ", $dbh->errstr);
 
     my $rv = $res->execute()
-	or fail("cannot execute the query: $res->errstr");
+	or fail("cannot execute [$query]: ", $res->errstr);
 
     return $res;
 }
