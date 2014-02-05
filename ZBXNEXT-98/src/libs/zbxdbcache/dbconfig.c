@@ -490,12 +490,17 @@ static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 	{
 		case ZBX_POLLER_TYPE_JAVA:
 		case ZBX_POLLER_TYPE_PINGER:
-			/* Java and pinger pollers can process multiple items at the same time.     */
-			/* To take advantage of that we must schedule items with the same interface */
-			/* to be processed at the same time.                                        */
+			/* Java and pinger pollers can process multiple items at the same time. To   */
+			/* take advantage of that we must schedule items with the same interface to  */
+			/* be processed at the same time.                                            */
 			return item->interfaceid;
+		case ZBX_POLLER_TYPE_NORMAL:
+			/* SNMP items, processed by normal pollers, also support multiple processing */
+			if (SUCCEED == is_snmp_type(item->type))
+				return item->interfaceid;
+			/* break; is not missing here */
 		default:
-			/* by default just try to spread all item processing over the delay period  */
+			/* by default just try to spread all item processing over the delay period   */
 			return item->itemid;
 	}
 }
@@ -3060,6 +3065,11 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	if (i1->type > i2->type)
 		return +1;
 
+	if (i1->flags < i2->flags)
+		return -1;
+	if (i1->flags > i2->flags)
+		return +1;
+
 	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
 	s2 = zbx_hashset_search(&config->snmpitems, &i2->itemid);
 
@@ -4401,7 +4411,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		DCget_item(&items[num], dc_item);
 		num++;
 
-		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type))
+		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && SUCCEED == is_snmp_type(dc_item->type) &&
+				0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
 		{
 			ZBX_DC_SNMPITEM	*snmpitem;
 
