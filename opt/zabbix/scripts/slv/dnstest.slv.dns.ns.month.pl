@@ -17,61 +17,35 @@ set_slv_config(get_dnstest_config());
 
 my ($from, $till, $value_ts) = get_month_bounds();
 
-zapi_connect();
-
 my $interval = $till + 1 - $from;
 
-slv_exit(SUCCESS) if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
-
-info("from:$from till:$till value_ts:$value_ts");
-
-# First we need to get the list of items where the values should be saved.
-my $result = $zabbix->get('item', {output => ['key_'], host => $tld, startSearch => 1, search => {key_ => $cfg_key_out}});
-
-my @out_keys;
-if ('ARRAY' eq ref($result))
-{
-    push(@out_keys, $_->{'key_'}) foreach (@$result);
-}
-elsif (defined($result->{'itemid'}))
-{
-    push(@out_keys, $result);
-}
-else
-{
-    fail("no output items at host $tld ($cfg_key_out.*)");
-}
-
-$result = $zabbix->get('item', {output => ['key_'], host => $tld, startSearch => 1, search => {key_ => $cfg_key_in}});
-
-my @items;
-if ('ARRAY' eq ref($result))
-{
-    push(@items, $_) foreach (@$result);
-}
-elsif (defined($result->{'itemid'}))
-{
-    push(@items, $result);
-}
-else
-{
-    fail("no input items at host $tld ($cfg_key_in.*))");
-}
+my $total_values = minutes_last_month();
 
 db_connect();
 
-my $total_values = minutes_last_month();
-foreach my $item (@items)
+my $tlds_ref = get_tlds();
+
+foreach (@$tlds_ref)
 {
-    my $itemid = $item->{'itemid'};
-    my $key = $item->{'key_'};
-    my $key_out = $cfg_key_out . get_ns_from_key($key). "]";
-    my $up_count = get_up_count($itemid);
+    $tld = $_;
 
-    my $perc = sprintf("%.3f", $up_count * 100 / $total_values);
+    next if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
 
-    info("$key_out: up:$up_count perc:$perc");
-    send_value($tld, $key_out, $value_ts, $perc);
+    my $items_ref = get_tld_items($tld, $cfg_key_in);
+
+    foreach my $item (@$items_ref)
+    {
+	my $itemid = $item->[0];
+	my $key = $item->[1];
+
+	my $key_out = $cfg_key_out . get_ns_from_key($key). "]";
+	my $up_count = get_up_count($itemid);
+
+	my $perc = sprintf("%.3f", $up_count * 100 / $total_values);
+
+	info("$key_out: up:$up_count perc:$perc");
+	send_value($tld, $key_out, $value_ts, $perc);
+    }
 }
 
 slv_exit(SUCCESS);

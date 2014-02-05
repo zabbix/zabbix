@@ -19,18 +19,21 @@ my ($from, $till, $value_ts) = get_month_bounds();
 
 my $interval = $till + 1 - $from;
 
-zapi_connect();
-
-slv_exit(SUCCESS) if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
-
-info("from:$from till:$till value_ts:$value_ts");
-
-my $cfg_max_value = zapi_get_macro_epp_rtt('info');
-my $cfg_delay = zapi_get_macro_epp_delay();
-
 db_connect();
 
-process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_INFO_ERROR, MAX_INFO_ERROR);
+my $cfg_max_value = get_macro_epp_rtt('info');
+my $cfg_delay = get_macro_epp_delay();
+
+my $tlds_ref = get_tlds();
+
+foreach (@$tlds_ref)
+{
+    $tld = $_;
+
+    next if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
+
+    process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_INFO_ERROR, MAX_INFO_ERROR);
+}
 
 slv_exit(SUCCESS);
 

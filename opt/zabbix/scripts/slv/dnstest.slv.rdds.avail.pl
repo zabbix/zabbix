@@ -5,7 +5,7 @@
 use lib '/opt/zabbix/scripts';
 
 use DNSTest;
-use DNSTestSLV2;
+use DNSTestSLV;
 
 my $cfg_key_in = 'dnstest.rdds[{$DNSTEST.TLD}';
 my $cfg_key_out = 'dnstest.slv.rdds.avail';

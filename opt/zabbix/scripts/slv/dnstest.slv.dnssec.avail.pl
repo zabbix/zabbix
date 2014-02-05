@@ -5,7 +5,7 @@
 use lib '/opt/zabbix/scripts';
 
 use DNSTest;
-use DNSTestSLV2;
+use DNSTestSLV;
 
 my $cfg_key_in = 'dnstest.dns.udp.rtt[';
 my $cfg_key_out = 'dnstest.slv.dnssec.avail';

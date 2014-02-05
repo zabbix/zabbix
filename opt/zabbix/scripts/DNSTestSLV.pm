@@ -8,13 +8,17 @@ use Getopt::Long;
 use Exporter qw(import);
 use DateTime;
 use Zabbix;
+use Sender;
+use File::Pid;
 
 use constant SUCCESS => 0;
 use constant FAIL => 1;
 use constant UP => 1;
 use constant DOWN => 0;
+use constant SLV_UNAVAILABILITY_LIMIT => 49;
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
+use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 use constant MIN_LOGIN_ERROR => -205;
 use constant MAX_LOGIN_ERROR => -203;
 use constant MIN_UPDATE_ERROR => -208;
@@ -24,30 +28,31 @@ use constant MAX_INFO_ERROR => -209;
 
 use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
-use constant API_OUTPUT_REFER => 'refer';
+use constant EVENT_OBJECT_TRIGGER => 0;
+use constant EVENT_SOURCE_TRIGGERS => 0;
+use constant API_OUTPUT_REFER => 'refer'; # TODO: OBSOLETE AFTER API
 use constant TRIGGER_VALUE_TRUE => 1;
 
 use constant RTT_LIMIT_MULTIPLIER => 5;
 
-our ($zabbix, $result, $dbh, $tld);
+our ($result, $dbh, $tld);
 
 our %OPTS; # command-line options
 
-our @EXPORT = qw($zabbix $result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RTT_LIMIT_MULTIPLIER
-		zapi_connect zapi_get_macro_minns zapi_get_macro_dns_probe_online
-		zapi_get_macro_rdds_probe_online zapi_get_macro_dns_rollweek_sla zapi_get_macro_rdds_rollweek_sla
-		zapi_get_macro_dns_udp_rtt zapi_get_macro_dns_tcp_rtt zapi_get_macro_rdds_rtt
-		zapi_get_macro_dns_udp_delay zapi_get_macro_dns_tcp_delay zapi_get_macro_rdds_delay
-		zapi_get_macro_epp_delay zapi_get_macro_epp_probe_online zapi_get_macro_epp_rollweek_sla
-		zapi_get_macro_dns_update_time zapi_get_macro_rdds_update_time zapi_get_items_by_hostids
-		zapi_get_macro_epp_rtt
+our @EXPORT = qw($result $dbh $tld %OPTS
+		SUCCESS FAIL UP DOWN RDDS_UP RTT_LIMIT_MULTIPLIER SLV_UNAVAILABILITY_LIMIT
+		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
+		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt get_macro_dns_tcp_rtt get_macro_rdds_rtt
+		get_macro_dns_udp_delay get_macro_dns_tcp_delay get_macro_rdds_delay
+		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
+		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
+		get_macro_epp_rtt get_rollweek_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
-		minutes_last_month get_probes get_online_probes probes2tldhostids send_value get_ns_from_key
+		minutes_last_month get_online_probes probes2tldhostids send_value get_ns_from_key
 		is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly get_item_values
-		exit_if_lastclock get_down_count
-		dbg info warn fail exit_if_running trim parse_opts);
+		check_lastclock get_down_count
+		dbg info warn fail slv_exit exit_if_running trim parse_opts);
 
 my $probe_group_name = 'Probes';
 my $probe_key_manual = 'probe.status[manual]';
@@ -59,143 +64,294 @@ my $config = undef;
 my $avail_shift_back = 2; # minutes
 my $rollweek_shift_back = 3; # minutes
 
-sub zapi_connect
+# make sure only one copy of script runs (unless in test mode)
+my $pidfile;
+my $pid_dir = '/tmp';
+
+sub get_macro_minns
 {
-    $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, 'user' => $config->{'zapi'}->{'user'}, 'password' => $config->{'zapi'}->{'password'}});
+    return __get_macro('{$DNSTEST.DNS.AVAIL.MINNS}');
 }
 
-sub zapi_get_macro_minns
+sub get_macro_dns_probe_online
 {
-    return get_macro('{$DNSTEST.DNS.AVAIL.MINNS}');
+    return __get_macro('{$DNSTEST.DNS.PROBE.ONLINE}');
 }
 
-sub zapi_get_macro_dns_probe_online
+sub get_macro_rdds_probe_online
 {
-    return get_macro('{$DNSTEST.DNS.PROBE.ONLINE}');
+    return __get_macro('{$DNSTEST.RDDS.PROBE.ONLINE}');
 }
 
-sub zapi_get_macro_rdds_probe_online
+sub get_macro_dns_rollweek_sla
 {
-    return get_macro('{$DNSTEST.RDDS.PROBE.ONLINE}');
+    return __get_macro('{$DNSTEST.DNS.ROLLWEEK.SLA}');
 }
 
-sub zapi_get_macro_dns_rollweek_sla
+sub get_macro_rdds_rollweek_sla
 {
-    return get_macro('{$DNSTEST.DNS.ROLLWEEK.SLA}');
+    return __get_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}');
 }
 
-sub zapi_get_macro_rdds_rollweek_sla
+sub get_macro_dns_udp_rtt
 {
-    return get_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}');
+    return __get_macro('{$DNSTEST.DNS.UDP.RTT}');
 }
 
-sub zapi_get_macro_dns_udp_rtt
+sub get_macro_dns_tcp_rtt
 {
-    return get_macro('{$DNSTEST.DNS.UDP.RTT}');
+    return __get_macro('{$DNSTEST.DNS.TCP.RTT}');
 }
 
-sub zapi_get_macro_dns_tcp_rtt
+sub get_macro_rdds_rtt
 {
-    return get_macro('{$DNSTEST.DNS.TCP.RTT}');
+    return __get_macro('{$DNSTEST.RDDS.RTT}');
 }
 
-sub zapi_get_macro_rdds_rtt
+sub get_macro_dns_udp_delay
 {
-    return get_macro('{$DNSTEST.RDDS.RTT}');
+    return __get_macro('{$DNSTEST.DNS.UDP.DELAY}');
 }
 
-sub zapi_get_macro_dns_udp_delay
+sub get_macro_dns_tcp_delay
 {
-    return get_macro('{$DNSTEST.DNS.UDP.DELAY}');
+    return __get_macro('{$DNSTEST.DNS.TCP.DELAY}');
 }
 
-sub zapi_get_macro_dns_tcp_delay
+sub get_macro_rdds_delay
 {
-    return get_macro('{$DNSTEST.DNS.TCP.DELAY}');
+    return __get_macro('{$DNSTEST.RDDS.DELAY}');
 }
 
-sub zapi_get_macro_rdds_delay
+sub get_macro_dns_update_time
 {
-    return get_macro('{$DNSTEST.RDDS.DELAY}');
+    return __get_macro('{$DNSTEST.DNS.UPDATE.TIME}');
 }
 
-sub zapi_get_macro_dns_update_time
+sub get_macro_rdds_update_time
 {
-    return get_macro('{$DNSTEST.DNS.UPDATE.TIME}');
+    return __get_macro('{$DNSTEST.RDDS.UPDATE.TIME}');
 }
 
-sub zapi_get_macro_rdds_update_time
+sub get_macro_epp_probe_online
 {
-    return get_macro('{$DNSTEST.RDDS.UPDATE.TIME}');
+    return __get_macro('{$DNSTEST.EPP.PROBE.ONLINE}');
 }
 
-sub zapi_get_macro_epp_probe_online
+sub get_macro_epp_delay
 {
-    return get_macro('{$DNSTEST.EPP.PROBE.ONLINE}');
+    return __get_macro('{$DNSTEST.EPP.DELAY}');
 }
 
-sub zapi_get_macro_epp_delay
+sub get_macro_epp_rollweek_sla
 {
-    return get_macro('{$DNSTEST.EPP.DELAY}');
+    return __get_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}');
 }
 
-sub zapi_get_macro_epp_rollweek_sla
+sub get_macro_epp_rtt
 {
-    return get_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}');
+    return __get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT}');
 }
 
-sub zapi_get_macro_epp_rtt
+sub get_rollweek_data
 {
-    return get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT}');
+    my $host = shift;
+    my $cfg_key_in = shift;
+    my $cfg_key_out = shift;
+
+    my $res;
+
+    if ("[" eq substr($cfg_key_out, -1))
+    {
+	$res = db_select(
+	    "select i.key_,i.itemid,i.lastclock".
+	    " from items i,hosts h".
+	    " where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+	    	" and (i.key_='$cfg_key_in' or i.key_ like '$cfg_key_out%')");
+    }
+    else
+    {
+	$res = db_select(
+	    "select i.key_,i.itemid,i.lastclock".
+	    " from items i,hosts h".
+	    " where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+	    	" and i.key_ in ('$cfg_key_in','$cfg_key_out')");
+    }
+
+    my $arr_ref = $res->fetchall_arrayref();
+
+    my $rows = scalar(@$arr_ref);
+
+    fail("cannot find items by key/pattern '$cfg_key_in' and '$cfg_key_out' at host '$host'") if ($rows < 2);
+
+    my $itemid_in = undef;
+    my $itemid_out = undef;
+    my $lastclock = undef;
+
+    foreach (@$arr_ref)
+    {
+	my $row = $_;
+
+	if ($row->[0] eq $cfg_key_in)
+	{
+	    $itemid_in = $row->[1];
+	}
+	else
+	{
+	    $itemid_out = $row->[1];
+	    $lastclock = $row->[2];
+	}
+
+	last if (defined($itemid_in) and defined($itemid_out));
+    }
+
+    fail("cannot find itemids by key/pattern '$cfg_key_in' and '$cfg_key_out' at host '$host'")
+	unless (defined($itemid_in) and defined($itemid_out));
+
+    return ($itemid_in, $itemid_out, $lastclock);
 }
 
-sub zapi_get_items_by_hostids
+sub get_lastclock
+{
+    my $host = shift;
+    my $key = shift;
+
+    my $res;
+
+    if ("[" eq substr($key, -1))
+    {
+	$res = db_select(
+	    "select i.lastclock".
+	    " from items i,hosts h".
+	    " where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+	    	" and i.key_ like '$key%')");
+    }
+    else
+    {
+	$res = db_select(
+	    "select i.lastclock".
+	    " from items i,hosts h".
+	    " where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+	    	" and i.key_='$key'");
+    }
+
+    my $arr_ref = $res->fetchall_arrayref();
+
+    fail("cannot find item by key/pattern '$key' at host '$host'") unless (scalar(@$arr_ref) == 1);
+
+    return $arr_ref->[0]->[0];
+}
+
+sub get_tlds
+{
+    my $service = shift;
+
+    my $res;
+
+    unless (defined($service))
+    {
+	$res = db_select(
+	    "select h.host".
+	    " from hosts h,hosts_groups hg,groups g".
+	    " where h.hostid=hg.hostid".
+		" and hg.groupid=g.groupid".
+		" and g.name='TLDs'".
+		" and h.status=0");
+    }
+    else
+    {
+	$res = db_select(
+	    "select h.host".
+	    " from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+	    " where h.hostid=hg.hostid".
+	    	"and hg.groupid=g.groupid".
+	    	" and h2.name=concat('Template ', h.host)".
+	    	" and g.name='TLDs'".
+	    	" and h2.hostid=hm.hostid".
+	    	" and hm.macro='{\$DNSTEST.TLD.".uc($service).".ENABLED}'".
+	    	" and hm.value!=0".
+	    	" and h.status=0");
+    }
+
+    my @tlds;
+    while (my @row = $res->fetchrow_array)
+    {
+	push(@tlds, $row[0]);
+    }
+
+    return \@tlds;
+}
+
+sub get_items_by_hostids
 {
     my $hostids_ref = shift;
     my $cfg_key = shift;
     my $complete = shift;
 
-    dbg("hostids: ", join(', ', @$hostids_ref));
+    my $hostids = join(',', @$hostids_ref);
+    dbg("hostids: $hostids");
 
-    my $result;
+    my $res;
     if ($complete)
     {
-	$result = $zabbix->get('item', {hostids => $hostids_ref, output => 'extend', filter => {key_ => $cfg_key}});
+	$res = db_select("select itemid,hostid from items where hostid in ($hostids) and key_='$cfg_key'");
     }
     else
     {
-	$result = $zabbix->get('item', {hostids => $hostids_ref, output => 'extend', startSearch => 1, search => {key_ => $cfg_key}});
+	$res = db_select("select itemid,hostid from items where hostid in ($hostids) and key_ like '$cfg_key%'");
     }
 
     my @items;
-    if ('ARRAY' eq ref($result))
+    while (my @row = $res->fetchrow_array)
     {
-	push(@items, $_) foreach (@$result);
+	my %hash;
+	$hash{'itemid'} = $row[0];
+	$hash{'hostid'} = $row[1];
+	push(@items, \%hash);
     }
-    elsif (defined($result->{'itemid'}))
+
+    if (scalar(@items) == 0)
     {
-	push(@items, $result);
+	fail("no input items ($cfg_key) found on hostids ($hostids)") if ($complete);
+	fail("no input items ($cfg_key*) found on hostids ($hostids)");
     }
-    else
+
+    return \@items;
+}
+
+sub get_tld_items
+{
+    my $tld = shift;
+    my $cfg_key = shift;
+
+    my $res = db_select(
+	"select i.itemid,i.key_".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+		" and h.host='$tld'".
+		" and i.key_ like '$cfg_key%'");
+
+    my @items;
+    while (my @row = $res->fetchrow_array)
     {
-	if ($complete)
-	{
-	    fail("no input items ($cfg_key)");
-	}
-	else
-	{
-	    fail("no input items ($cfg_key*)");
-	}
+	push(@items, \@row);
     }
+
+    fail("no items matching '$cfg_key*' at host $tld found in the database") if (scalar(@items) == 0);
 
     return \@items;
 }
 
 sub db_connect
 {
-    $dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
-			$config->{'db'}->{'user'},
-			$config->{'db'}->{'password'});
+    fail("cannot connect to database")
+	unless(defined($dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
+					   $config->{'db'}->{'user'},
+					   $config->{'db'}->{'password'})));
 }
 
 sub db_select
@@ -292,25 +448,6 @@ sub minutes_last_month
     return ($till - $from) / 60;
 }
 
-# Returns a reference to hash probes (host name => hostid).
-sub get_probes
-{
-    my $res = db_select(
-	"select h.host,h.hostid" .
-	" from hosts h, hosts_groups hg, groups g" .
-	" where h.hostid=hg.hostid" .
-		" and hg.groupid=g.groupid" .
-		" and g.name='$probe_group_name'");
-
-    my (%result, @row);
-    while (@row = $res->fetchrow_array)
-    {
-	$result{$row[0]} = $row[1];
-    }
-
-    return \%result;
-}
-
 # Returns a reference to an array of probe names which are online from/till. The algorithm goes like this:
 #
 # for each manual probe status item
@@ -333,7 +470,7 @@ sub get_online_probes
     my $till = shift;
     my $all_probes_ref = shift;
 
-    $all_probes_ref = get_probes() unless ($all_probes_ref);
+    $all_probes_ref = __get_probes() unless ($all_probes_ref);
 
     my (@result, @row, $sql, $host, $hostid, $res, $probe_down, $no_values);
     foreach my $host (keys(%$all_probes_ref))
@@ -341,11 +478,11 @@ sub get_online_probes
 	$hostid = $all_probes_ref->{$host};
 
 	$res = db_select(
-	    "select h.value" .
-	    " from history_uint h,items i" .
-	    " where h.itemid=i.itemid" .
-	    	" and i.key_='$probe_key_manual'" .
-	    	" and i.hostid=$hostid" .
+	    "select h.value".
+	    " from history_uint h,items i".
+	    " where h.itemid=i.itemid".
+	    	" and i.key_='$probe_key_manual'".
+	    	" and i.hostid=$hostid".
 	    	" and h.clock between $from and $till");
 
 	$probe_down = 0;
@@ -366,21 +503,13 @@ sub get_online_probes
 
 	if ($no_values == 1)
 	{
-	    # We did not get any values between $from and $till, consider the latest value.
+	    # We did not get any values between $from and $till, consider the last value.
 
-	    $res = db_select(
-		"select h.value" .
-		" from history_uint h,items i" .
-		" where h.itemid=i.itemid" .
-			" and i.key_='$probe_key_manual'" .
-			" and i.hostid=$hostid" .
-			" and h.clock<$from" .
-		" order by clock desc" .
-		" limit 1");
+	    $res = db_select("select lastvalue from items where key_='$probe_key_manual' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
-		if ($row[0] == DOWN)
+		if (defined($row[0]) and $row[0] == DOWN)
 		{
 		    dbg("  $host ($hostid) down (manual: latest)");
 		    next;
@@ -393,11 +522,11 @@ sub get_online_probes
 	# Probe is considered manually up, check automatic status.
 
 	$res = db_select(
-	    "select h.value" .
-	    " from history_uint h,items i" .
-	    " where h.itemid=i.itemid" .
-	    	" and i.key_ like '$probe_key_automatic'" .
-	    	" and i.hostid=$hostid" .
+	    "select h.value".
+	    " from history_uint h,items i".
+	    " where h.itemid=i.itemid".
+	    	" and i.key_ like '$probe_key_automatic'".
+	    	" and i.hostid=$hostid".
 	    	" and h.clock between $from and $till");
 
 	$probe_down = 0;
@@ -420,19 +549,11 @@ sub get_online_probes
         {
 	    # We did not get any values between $from and $till, consider the latest value.
 
-	    $res = db_select(
-                "select h.value" .
-                " from history_uint h,items i" .
-                " where h.itemid=i.itemid" .
-                        " and i.key_ like '$probe_key_automatic'" .
-                        " and i.hostid=$hostid" .
-                        " and h.clock<$from" .
-                " order by clock desc" .
-                " limit 1");
+	    $res = db_select("select lastvalue from items where key_='$probe_key_automatic' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
-		if ($row[0] == DOWN)
+		if (defined($row[0]) and $row[0] == DOWN)
 		{
 		    dbg("  $host ($hostid) down (automatic: latest)");
 		    next;
@@ -490,20 +611,14 @@ sub send_value
     my $timestamp = shift;
     my $value = shift;
 
-    return if (defined($OPTS{test}));
+    return if (defined($OPTS{'test'}));
 
-    fail('zabbix sender ('.$config->{'slv'}->{'sender'}.') not found') unless (defined($config->{'slv'}->{'sender'})
-									       and -x $config->{'slv'}->{'sender'});
+    my $sender = Zabbix::Sender->new({
+        'server' => $config->{'slv'}->{'zserver'},
+        'port' => $config->{'slv'}->{'zport'},
+	'retries' => 1 });
 
-    my @cmd = ("echo \\\"$hostname\\\" \\\"$key\\\" \\\"$timestamp\\\" \\\"$value\\\" | ".
-	       $config->{'slv'}->{'sender'}." -T -z ".$config->{'slv'}->{'zserver'}." -i -");
-
-    my ($stdout, $stderr) = capture_exec(@cmd);
-
-    my @lines = split("\n", $stdout);
-    info($_) foreach (@lines);
-    @lines = split("\n", $stderr);
-    info($_) foreach (@lines);
+    fail("cannot send value:$value clock:$timestamp ($hostname:$key)") if (not defined($sender->send($hostname, $key, "$value", "$timestamp")));
 }
 
 # Get name server details (name, IP) from item key.
@@ -556,7 +671,7 @@ sub process_slv_ns_monthly
     my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
-    my $nss_ref = get_nss($tld, $cfg_key_out);
+    my $nss_ref = __get_nss($tld, $cfg_key_out);
 
     # %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
     # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
@@ -573,9 +688,9 @@ sub process_slv_ns_monthly
 	$successful_values{$ns} = 0;
     }
 
-    my $probes_ref = get_probes();
+    my $probes_ref = __get_probes();
 
-    my $all_ns_items_ref = get_all_ns_items($nss_ref, $cfg_key_in);
+    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
 
     my $cur_from = $from;
     my ($interval, $cur_till);
@@ -591,9 +706,9 @@ sub process_slv_ns_monthly
 
 	my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
-	my $items_ref = get_online_items($hostids_ref, $all_ns_items_ref);
+	my $items_ref = __get_online_items($hostids_ref, $all_ns_items_ref);
 
-	my $values_ref = get_ns_values($items_ref, $cur_from, $cur_till, $all_ns_items_ref);
+	my $values_ref = __get_ns_values($items_ref, $cur_from, $cur_till, $all_ns_items_ref);
 
 	foreach my $ns (keys(%$values_ref))
 	{
@@ -638,9 +753,9 @@ sub process_slv_monthly
     my $min_error = shift;       # min error that relates to this item
     my $max_error = shift;       # max error that relates to this item
 
-    my $probes_ref = get_probes();
+    my $probes_ref = __get_probes();
 
-    my $all_items_ref = get_all_items($cfg_key_in);
+    my $all_items_ref = __get_all_items($cfg_key_in);
 
     my $cur_from = $from;
     my ($interval, $cur_till);
@@ -659,7 +774,7 @@ sub process_slv_monthly
 
 	my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
-	my $online_items_ref = get_online_items($hostids_ref, $all_items_ref);
+	my $online_items_ref = __get_online_items($hostids_ref, $all_items_ref);
 
 	my $values_ref = get_dbl_values($online_items_ref, $cur_from, $cur_till);
 
@@ -698,10 +813,10 @@ sub process_slv_ns_avail
     my $till = shift;
     my $value_ts = shift;
     my $cfg_minonline = shift;
-    my $max_fail_perc = shift;
+    my $unavail_limit = shift;
     my $check_value_ref = shift;
 
-    my $nss_ref = get_nss($tld, $cfg_key_out);
+    my $nss_ref = __get_nss($tld, $cfg_key_out);
 
     my @out_keys;
     push(@out_keys, $cfg_key_out . $_ . ']') foreach (@$nss_ref);
@@ -712,16 +827,16 @@ sub process_slv_ns_avail
     {
 	info("success ($count probes are online, min - $cfg_minonline)");
 	send_value($tld, $_, $value_ts, UP) foreach (@out_keys);
-	exit SUCCESS;
+	return;
     }
 
-    my $all_ns_items_ref = get_all_ns_items($nss_ref, $cfg_key_in);
+    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
 
     my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
-    my $online_items_ref = get_online_items($hostids_ref, $all_ns_items_ref);
+    my $online_items_ref = __get_online_items($hostids_ref, $all_ns_items_ref);
 
-    my $values_ref = get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
+    my $values_ref = __get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
 
     warn("no values found in the database") if (scalar(keys(%$values_ref)) == 0);
 
@@ -746,8 +861,8 @@ sub process_slv_ns_avail
 	}
 
 	my $success_perc = $success_results * 100 / $count;
-	my $test_result = $success_perc > $max_fail_perc ? UP : DOWN;
-	info("$out_key: ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
+	my $test_result = $success_perc > $unavail_limit ? UP : DOWN;
+	info("$ns ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
 	send_value($tld, $out_key, $value_ts, $test_result);
     }
 }
@@ -801,47 +916,21 @@ sub get_item_values
     return \%result;
 }
 
-sub exit_if_lastclock
+sub check_lastclock
 {
-    my $tld = shift;
-    my $cfg_key_out = shift;
+    my $lastclock = shift;
     my $value_ts = shift;
     my $interval = shift;
 
-    return if (defined($OPTS{test}));
-
-    my ($result, $lastclock);
-
-    if ("[" eq substr($cfg_key_out, -1))
-    {
-	$result = $zabbix->get('item', {host => $tld, output => ['lastclock'], sartSearch => 1, search => {key_ => $cfg_key_out}});
-
-	if ('ARRAY' eq ref($result))
-	{
-	    $lastclock = $result->[0]->{'lastclock'};
-	}
-	elsif (defined($result->{'lastclock'}))
-	{
-	    $lastclock = $result->{'lastclock'};
-	}
-	else
-	{
-	    fail("cannot find items at host $tld ($cfg_key_out)");
-	}
-    }
-    else
-    {
-	$result = $zabbix->get('item', {host => $tld, output => ['lastclock'], filter => {key_ => $cfg_key_out}});
-	$lastclock = $result->{'lastclock'} || 0;
-    }
+    return SUCCESS if (defined($OPTS{'test'}));
 
     if ($lastclock + $interval > $value_ts)
     {
 	dbg("lastclock:$lastclock value calculation not needed");
-	exit(SUCCESS);
+	return FAIL;
     }
 
-    info("lastclock:$lastclock value_ts:$value_ts interval:$interval");
+    return SUCCESS;
 }
 
 sub get_down_count
@@ -870,61 +959,62 @@ sub get_down_count
     return $count;
 }
 
+sub slv_exit
+{
+    my $rv = shift;
+
+    if (defined($pidfile))
+    {
+	$pidfile->remove() or warn("cannot unlink pid file ", $pidfile->file());
+    }
+
+    exit($rv);
+}
+
+sub exit_if_running
+{
+    return if (defined($OPTS{'test'}));
+
+    $pidfile = __get_pidfile();
+
+    fail("cannot lock script", (defined($tld) ? " $tld" : '')) unless (defined($pidfile));
+
+    if (my $pid = $pidfile->running())
+    {
+	fail("already running (pid:$pid)");
+    }
+
+    $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file());
+}
+
 sub dbg
 {
-    return unless (defined($OPTS{debug}));
+    return unless (defined($OPTS{'debug'}));
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [DBG] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [DBG] ', @_, "\n"));
 }
 
 sub info
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [INF] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
 }
 
 sub warn
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [WRN] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
 }
 
 sub fail
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), ' ', $tld, '] [ERR] ', @_, "\n"));
+    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
 
-    exit FAIL;
-}
-
-sub exit_if_running
-{
-    return if (defined($OPTS{test}));
-
-    my $script = __script();
-    my $cmd = "pgrep -fl \"/$script.* $tld( |\$)\" | grep -v -- --test";
-
-    $cmd =~ s/\./\\./g;
-
-    my ($stdout, $stderr) = capture_exec($cmd);
-    $stdout = trim($stdout);
-    $stderr = trim($stderr);
-
-    my @stdout_lines = split("\n", $stdout);
-    my $numproc = scalar(@stdout_lines);
-
-    dbg("stdout:'$stdout' stderr:'$stderr' cmd:'$cmd' numproc:$numproc ARGV:'", join(" ", @ARGV), "'");
-
-    fail("cannot check if script is running, command \"$cmd\" failed ($stderr)") unless ($stderr eq "" and $numproc > 0);
-
-    unless ($numproc == 1) # mind myself
-    {
-	info("already running");
-	exit(SUCCESS);
-    }
+    exit(FAIL);
 }
 
 sub trim
@@ -939,8 +1029,8 @@ sub trim
 
 sub parse_opts
 {
-    usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!") and defined($ARGV[0]));
-    $tld = $ARGV[0];
+    usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!"));
+    $tld = $ARGV[0] if (defined($ARGV[0]));
 }
 
 sub usage
@@ -952,7 +1042,7 @@ sub usage
     print("    --test     run the script in test mode, this means:\n");
     print("               - skip checks if need to recalculate value\n");
     print("               - do not send the value to the server\n");
-    print("               - print the output to stdout instead of logging it\n");
+    print("               - print the output to stdout instead of logging it (implies --stdout)\n");
     exit(FAIL);
 }
 
@@ -979,24 +1069,26 @@ sub __log
     my $script = __script();
     $script =~ s,\.pl$,,;
 
-    my $file = $config->{'slv'}->{'logdir'} . '/' . $tld . '-' . $script . '.log';
+    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : "") . $script . '.log';
 
-    open $OUTFILE, '>>', $file or fail("cannot open $file: $!");
+    open $OUTFILE, '>>', $file or die("cannot open $file: $!");
 
-    print {$OUTFILE} $msg or fail("cannot write to $file: $!");
+    print {$OUTFILE} $msg or die("cannot write to $file: $!");
 
     close $OUTFILE or fail("cannot close $file: $!");
 }
 
-sub get_macro
+sub __get_macro
 {
     my $m = shift;
 
-    $result = $zabbix->get('usermacro', {globalmacro => 1, output => 'extend', filter => {macro => $m}});
+    my $res = db_select("select value from globalmacro where macro='$m'");
 
-    fail("cannot get value of macro '$m'") unless ($result->{'value'});
+    my $arr_ref = $res->fetchall_arrayref();
 
-    return $result->{'value'};
+    fail("cannot find macro '$m'") unless (1 == scalar(@$arr_ref));
+
+    return $arr_ref->[0]->[0];
 }
 
 # organize values from all hosts grouped by name server and return "name server"->values hash
@@ -1010,7 +1102,7 @@ sub get_macro
 #          -102
 #          304
 #    ];
-sub get_ns_values
+sub __get_ns_values
 {
     my $items_ref = shift;
     my $from = shift;
@@ -1096,7 +1188,7 @@ sub get_dbl_values
     return \@result;
 }
 
-sub get_online_items
+sub __get_online_items
 {
     my $hostids_ref = shift;
     my $all_items = shift;
@@ -1125,41 +1217,32 @@ sub get_online_items
 # hostid2
 #   ...
 # ...
-sub get_all_ns_items
+sub __get_all_ns_items
 {
     my $nss_ref = shift; # array reference of name servers ("name,IP")
     my $cfg_key_in = shift;
+    my $tld = shift;
 
     my @keys;
-    push(@keys, $cfg_key_in . $_ . ']') foreach (@$nss_ref);
+    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$nss_ref);
 
-    my $result = $zabbix->get('item', {output => ['hostid', 'key_'], templated => 0, filter => {key_ => \@keys}});
+    my $keys_str = join(',', @keys);
+
+    my $res = db_select(
+	"select h.hostid,i.itemid,i.key_,h.host ".
+	"from items i,hosts h ".
+	"where i.hostid=h.hostid".
+		" and h.host like '$tld %'".
+		" and i.templateid is not null".
+		" and i.key_ in ($keys_str)");
 
     my %all_ns_items;
-
-    if ('ARRAY' eq ref($result))
+    while (my @row = $res->fetchrow_array)
     {
-	foreach (@$result)
-	{
-	    my $hostid = $_->{'hostid'};
-	    my $itemid = $_->{'itemid'};
-	    my $ns = get_ns_from_key($_->{'key_'});
+	$all_ns_items{$row[0]}{$row[1]} = get_ns_from_key($row[2]);
+    }
 
-	    $all_ns_items{$hostid}{$itemid} = $ns;
-	}
-    }
-    elsif (defined($result->{'key_'}))
-    {
-	my $hostid = $result->{'hostid'};
-	my $itemid = $result->{'itemid'};
-	my $ns = get_ns_from_key($result->{'key_'});
-
-	$all_ns_items{$hostid}{$itemid} = $ns;
-    }
-    else
-    {
-        fail("no input items found (searched for: " . join(', ', @keys) . ")");
-    }
+    fail("cannot find items (searched for: $keys_str)") if (scalar(keys(%all_ns_items)) == 0);
 
     return \%all_ns_items;
 }
@@ -1171,60 +1254,43 @@ sub get_all_ns_items
 # hostid2
 #   32419 => ''
 # ...
-sub get_all_items
+sub __get_all_items
 {
     my $key = shift;
 
-    my $result = $zabbix->get('item', {output => ['hostid', 'key_'], templated => 0, filter => {key_ => $key}});
+    my $res = db_select(
+	"select h.hostid,i.itemid".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+		" and i.templateid is null".
+		" and i.key_='$key'");
 
     my %all_items;
-
-    if ('ARRAY' eq ref($result))
+    while (my @row = $res->fetchrow_array)
     {
-	foreach (@$result)
-	{
-	    my $hostid = $_->{'hostid'};
-	    my $itemid = $_->{'itemid'};
+	$all_items{$row[0]}{$row[1]} = '';
+    }
 
-	    $all_items{$hostid}{$itemid} = '';
-	}
-    }
-    elsif (defined($result->{'key_'}))
-    {
-	my $hostid = $result->{'hostid'};
-	my $itemid = $result->{'itemid'};
-
-	$all_items{$hostid}{$itemid} = '';
-    }
-    else
-    {
-        fail("no input items found (searched for: $key)");
-    }
+    fail("no items matching '$key' found in the database") if (scalar(keys(%all_items)) == 0);
 
     return \%all_items;
 }
 
 # get array of key nameservers ('i.ns.se.,130.239.5.114', ...)
-sub get_nss
+sub __get_nss
 {
     my $tld = shift;
     my $cfg_key_out = shift;
 
-    my $result = $zabbix->get('item', {output => ['key_'], host => $tld, startSearch => 1, search => {key_ => $cfg_key_out}});
+    my $res = db_select("select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$tld' and i.key_ like '$cfg_key_out%'");
 
     my @nss;
-    if ('ARRAY' eq ref($result))
+    while (my @row = $res->fetchrow_array)
     {
-	push(@nss, get_ns_from_key($_->{'key_'})) foreach (@$result);
+	push(@nss, get_ns_from_key($row[0]));
     }
-    elsif (defined($result->{'key_'}))
-    {
-	push(@nss, get_ns_from_key($result->{'key_'}));
-    }
-    else
-    {
-	fail("no output items at host $tld ($cfg_key_out.*)");
-    }
+
+    fail("cannot find items '$cfg_key_out*' on host '$tld'") if (scalar(@nss) == 0);
 
     return \@nss;
 }
@@ -1236,6 +1302,13 @@ sub __script
     $script =~ s,.*/([^/]*)$,$1,;
 
     return $script;
+}
+
+sub __get_pidfile
+{
+    my $filename = $pid_dir . '/' . __script() . (defined($tld) ? "-$tld" : "") . '.pid';
+
+    return File::Pid->new({ file => $filename });
 }
 
 sub __ts
@@ -1262,55 +1335,82 @@ sub get_eventtimes
     my $from = shift;
     my $till = shift;
 
-    my $result = $zabbix->get('trigger', {'itemids' => $itemid, 'output' => ['triggerid'], 'filter' => {'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED}});
+    my $res = db_select(
+	"select distinct t.triggerid".
+	" from triggers t,functions f".
+	" where t.triggerid=f.triggerid".
+		" and f.itemid=$itemid".
+		" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
-    if ('ARRAY' eq ref($result))
-    {
-	fail("item $itemid has more than one not classified triggers");
-    }
+    my $arr_ref = $res->fetchall_arrayref();
 
-    if (!defined($result->{'triggerid'}))
-    {
-	fail("item $itemid has no not classified triggers");
-    }
+    my $rows = scalar(@$arr_ref);
 
-    my $triggerid = $result->{'triggerid'};
+    fail("item $itemid must have one not classified trigger") if ($rows != 1);
+
+    my $triggerid = $arr_ref->[0]->[0];
 
     my @eventtimes;
 
     # select events, where time_from < filter_from and value = TRIGGER_VALUE_TRUE
-    my $res = db_select("select clock,value from events where objectid=$triggerid and clock<$from and value_changed=".TRIGGER_VALUE_CHANGED_YES." order by clock desc limit 1");
+    $res = db_select(
+	"select clock,value".
+	" from events".
+	" where object=".EVENT_OBJECT_TRIGGER.
+		" and source=".EVENT_SOURCE_TRIGGERS.
+		" and objectid=$triggerid".
+		" and clock<$from".
+		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
+	" order by clock desc".
+	" limit 1");
 
     while (my @row = $res->fetchrow_array)
     {
 	my $clock = $row[0];
 	my $value = $row[1];
 
+	# we cannot add 'value=TRIGGER_VALUE_TRUE' to the SQL query as this way
+	# we might ignore the latest value with value not TRIGGER_VALUE_TRUE
 	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE);
     }
 
-    $result = $zabbix->get('event',
-			   {'triggerids' => [$triggerid],
-			    'selectTriggers' => API_OUTPUT_REFER,
-			    'time_from' => $from,
-			    'time_till' => $till,
-			    'output' => 'extend',
-			    'filter' => {'value_changed' => TRIGGER_VALUE_CHANGED_YES}});
+    $res = db_select(
+	"select clock from events".
+	" where object=".EVENT_OBJECT_TRIGGER.
+		" and source=".EVENT_SOURCE_TRIGGERS.
+		" and objectid=$triggerid".
+		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
+		" and clock between $from and $till");
 
-    my @unsorted_eventtimes;
-    if ('ARRAY' eq ref($result))
+    my (@unsorted_eventtimes, @row);
+    while (@row = $res->fetchrow_array)
     {
-	push(@unsorted_eventtimes, $_->{'clock'}) foreach (@$result);
-    }
-    elsif (defined($result->{'clock'}))
-    {
-	push(@unsorted_eventtimes, $result->{'clock'});
+	push(@unsorted_eventtimes, $row[0]);
     }
 
     push(@eventtimes, $_) foreach (sort(@unsorted_eventtimes));
     push(@eventtimes, $till) if ((scalar(@eventtimes) % 2) != 0);
 
     return \@eventtimes;
+}
+
+# Returns a reference to hash probes (host name => hostid).
+sub __get_probes
+{
+    my $res = db_select(
+	"select h.host,h.hostid".
+	" from hosts h, hosts_groups hg, groups g".
+	" where h.hostid=hg.hostid".
+		" and hg.groupid=g.groupid".
+		" and g.name='$probe_group_name'");
+
+    my (%result, @row);
+    while (@row = $res->fetchrow_array)
+    {
+	$result{$row[0]} = $row[1];
+    }
+
+    return \%result;
 }
 
 1;
