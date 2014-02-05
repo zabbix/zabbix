@@ -1633,6 +1633,8 @@ exit(1);
 sub validate_input {
     my $msg = "";
 
+    return if (defined($OPTS{'only-cron'}));
+
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
