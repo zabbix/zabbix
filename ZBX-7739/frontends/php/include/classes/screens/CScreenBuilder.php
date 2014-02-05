@@ -289,8 +289,7 @@ class CScreenBuilder {
 
 		// create screen table
 		$screenTable = new CTable();
-		$screenTable->setAttribute(
-			'class',
+		$screenTable->setAttribute('class',
 			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen_view' : 'screen_edit'
 		);
 		$screenTable->setAttribute('id', 'iframe');
