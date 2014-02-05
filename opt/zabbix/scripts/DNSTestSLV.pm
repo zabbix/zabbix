@@ -268,7 +268,7 @@ sub get_tlds
 	    "select h.host".
 	    " from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
 	    " where h.hostid=hg.hostid".
-	    	"and hg.groupid=g.groupid".
+	    	" and hg.groupid=g.groupid".
 	    	" and h2.name=concat('Template ', h.host)".
 	    	" and g.name='TLDs'".
 	    	" and h2.hostid=hm.hostid".
