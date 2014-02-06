@@ -14,11 +14,13 @@ Absolute path should be specified.
 .IP "-p, --print"
 Print known items and exit. For each item either generic defaults are used, or specific defaults for testing are supplied. These defaults are listed in square brackets as item key parameters.
 Returned values are enclosed in square brackets and prefixed with the type of the returned value, separated by a pipe character.
-For user parameters type is always \fBt\fR, as the agent can not determine all possible return values. Returned value types are:
+For user parameters type is always \fBt\fR, as the agent can not determine all possible return values.
+Items, displayed as working, are not guaranteed to work from the Zabbix server or zabbix_get when querying a running agent daemon as permissions or environment may be different.
+Returned value types are:
 .RS 4
 .TP 4
 d
-Decimal or double - number with decimal part.
+Number with a decimal part.
 .RE
 .RE
 .RS 4
