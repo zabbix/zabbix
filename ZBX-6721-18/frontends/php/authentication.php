@@ -47,8 +47,8 @@ include_once('include/page_header.php');
 
 		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),			NULL),
 
-		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
-		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
+		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type})&&isset({save}) || isset({test}))'),
+		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type})&&isset({save}) || isset({test}))'),
 
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -285,7 +285,7 @@ include_once('include/page_header.php');
 			$frmAuth->addRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password'));
 		}
 		else {
-			$frmAuth->addRow(_('Bind password'), new CButton('change_bind_password', _('Change password')));
+			$frmAuth->addRow(S_BIND_PASSWORD, new CButton('change_bind_password', S_CHANGE_PASSWORD));
 		}
 
 		$action = "javascript: if(confirm('".S_SWITCHING_LDAP."')) return true; else return false;";
