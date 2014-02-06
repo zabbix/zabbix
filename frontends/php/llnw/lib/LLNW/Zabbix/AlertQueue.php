@@ -44,7 +44,6 @@ class AlertQueue
         }
 
         // unescape the quotes in the JSON
-        $item = str_replace("\\\"", "\"", $item);
         $item = json_decode($item, true);
         if ($item == null) {
             dbug("Error: Unable to parse item JSON");
@@ -93,7 +92,6 @@ class AlertQueue
         }
 
         // unescape the quotes in the JSON
-        $trigger = str_replace("\\\"", "\"", $trigger);
         $trigger = json_decode($trigger, true);
         if ($trigger == null) {
             dbug("Error: Unable to parse trigger JSON");
