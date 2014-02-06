@@ -964,6 +964,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, unsigned char *skip_o
 	{
 		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' logsize has not changed",
+				__function_name, filename);
 		return SUCCEED;
 	}
 
@@ -1004,6 +1006,9 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, unsigned char *skip_o
 	}
 
 	close(f);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64,
+			__function_name, filename, *lastlogsize);
 
 	return ret;
 }
