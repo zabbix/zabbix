@@ -35,6 +35,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.2rc3
 
 Bug fixes:
+........S. [ZBX-7758] fixed server crash when processing low-level discovery triggers prototypes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.2rc2
