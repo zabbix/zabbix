@@ -1,6 +1,7 @@
 Changes for 2.0.11rc2
 
 Bug fixes:
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.11rc1
