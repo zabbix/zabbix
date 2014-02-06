@@ -2306,6 +2306,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.20rc2
 
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 
 Changes for 1.8.20rc1
 
