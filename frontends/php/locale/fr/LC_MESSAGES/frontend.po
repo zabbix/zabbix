@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:20+0200\n"
-"PO-Revision-Date: 2014-01-27 08:40+0300\n"
+"POT-Creation-Date: 2014-02-06 13:21+0200\n"
+"PO-Revision-Date: 2014-02-03 09:00+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1390804805.0\n"
+"X-POOTLE-MTIME: 1391410834.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -165,7 +165,7 @@ msgstr "500 dernières valeurs"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sous-menu/Sous-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -2129,7 +2129,7 @@ msgstr "Impossible de lier le modèle"
 
 #: api/classes/CUser.php:1099
 msgid "Cannot login."
-msgstr ""
+msgstr "Impossible de se connecter."
 
 #: api/classes/CUser.php:1021
 msgid "Cannot logout."
@@ -5484,7 +5484,7 @@ msgstr "Accès support"
 #: include/classes/items/CHelpItems.php:551
 #: include/classes/items/CHelpItems.php:775
 msgid "Get timing of loading full WEB page. Default path is /"
-msgstr ""
+msgstr "Temps de chargement d'une page WEB complète. Le chemin par défaut est /"
 
 #: include/func.inc.php:678
 msgid "Giga"
@@ -7845,8 +7845,8 @@ msgstr "Prototype d'élément supprimé"
 #: disc_prototypes.php:326
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Prototype d'élément désactivé"
+msgstr[1] "Prototypes d'éléments désactivés"
 
 #: disc_prototypes.php:325
 msgid "Item prototype enabled"
@@ -8446,7 +8446,7 @@ msgstr "Connexion échouée \"%s\"."
 #: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "L'identifiant \"%1$s\" ne correspond pas au nom \"%2$s\" utilisé pour l'authentification HTTP."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -8478,7 +8478,7 @@ msgstr "Règle de découverte bas niveau en état \"normal\""
 
 #: include/actions.inc.php:1154
 msgid "Low-level discovery rule in \"not supported\" state"
-msgstr ""
+msgstr "Règle de découverte bas niveau dans l'état \"non supporté\""
 
 #: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
@@ -8497,7 +8497,7 @@ msgstr "M Y"
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:443
 msgid "MAC address - lists all MAC addresses with interface names by default"
-msgstr ""
+msgstr "Adresse MAC - liste toutes les adresses MAC avec le nom d'interface par défaut"
 
 #: include/hosts.inc.php:160 include/views/inventory.host.list.php:84
 msgid "MAC address A"
@@ -8819,19 +8819,19 @@ msgstr "Nombre maximal d'intervalles flexibles ajouté"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:323
 msgid "Maximum number of opened files supported by OS."
-msgstr ""
+msgstr "Nombre maximum de fichiers ouverts supporté par le SE."
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:327
 msgid "Maximum number of processes supported by OS."
-msgstr ""
+msgstr "Nombre maximum de processus supporté par le SE."
 
 #: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:424
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La période maximale à afficher est %1$s jour."
+msgstr[1] "La période maximale à afficher est %1$s jours."
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8853,8 +8853,8 @@ msgstr "La valeur maximale pour la période T n'est PAS N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La taille maximale du nom d'hôte est de %1$d caractères, \"%2$s\" fait %3$d caractère."
+msgstr[1] "La taille maximale du nom d'hôte est de %1$d caractères, \"%2$s\" fait %3$d caractères."
 
 #: include/forms.inc.php:1700 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
@@ -8890,11 +8890,10 @@ msgid "Media type deleted"
 msgstr "Type média supprimé"
 
 #: media_types.php:163
-#, fuzzy
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
-msgstr[0] "Type média désactivé"
-msgstr[1] "Type média désactivé"
+msgstr[0] "Type de média désactivé"
+msgstr[1] "Types de média désactivés"
 
 #: media_types.php:162
 msgid "Media type enabled"
@@ -8933,7 +8932,7 @@ msgstr "Limite mémoire : %s"
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:387
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
-msgstr ""
+msgstr "Mémoire utilisée par un processus. <name> nom du processus (par défaut: tous les processus). <user> nom d'utilisateur (par défaut: tous les utilisateurs). <mode> valeurs possibles: avg, max, min, sum (défaut). <cmdline> filtrer par ligne de commande (supporte les regex). Exemple: proc.mem[,root]."
 
 #: include/html.inc.php:246 include/views/configuration.item.list.php:236
 #: include/views/monitoring.slides.php:50
@@ -9001,22 +9000,22 @@ msgstr "La taille de fichier téléversé PHP minimum requise est %s (configurat
 #: include/classes/class.frontendsetup.php:99
 #, c-format
 msgid "Minimum required PHP version is %s."
-msgstr "La valeur de PHP minimale requise est %s."
+msgstr "La version de PHP minimale requise est %s."
 
 #: include/classes/class.frontendsetup.php:168
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "La limite de temps d'exécution des scripts PHP minimale requise est %s (option de configuration \"max_execution_time\")."
 
 #: include/classes/class.frontendsetup.php:185
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "La limite de temps d'analyse des scripts PHP minimale requise est %s (option de configuration \"max_input_time\")."
 
 #: include/classes/class.frontendsetup.php:134
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "La taille minimale des \"post\" PHP requise est %s (option de configuration \"post_max_size\")."
 
 #: include/views/monitoring.maps.php:40
 msgid "Minimum severity"
@@ -9026,8 +9025,8 @@ msgstr "Sévérité minimale"
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La période minimale à afficher est %1$s heure."
+msgstr[1] "La période minimale à afficher est %1$s heures."
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:310
 msgid "Minimum trigger severity"
@@ -9056,21 +9055,21 @@ msgstr "Minutes"
 #: api/classes/CAction.php:575
 #, c-format
 msgid "Missing \"%1$s\" field for action condition."
-msgstr ""
+msgstr "Le champ \"%1$s\" manque dans la condition d'action."
 
 #: include/reports.inc.php:489
 #, c-format
 msgid "Missing \"%1$s\" field for item."
-msgstr ""
+msgstr "Le champ \"%1$s\" manque dans l'élément."
 
 #: include/reports.inc.php:587
 #, c-format
 msgid "Missing \"%1$s\" field for period."
-msgstr ""
+msgstr "Le champ \"%1$s\" manque dans la période."
 
 #: api/classes/CGraphGeneral.php:75
 msgid "Missing \"gitemid\" field for item."
-msgstr ""
+msgstr "Le champ \"gitemid\" manque dans l'élément."
 
 #: api/classes/CGraphGeneral.php:474 api/classes/CGraphGeneral.php:594
 msgid "Missing \"itemid\" field for item."
@@ -9078,7 +9077,7 @@ msgstr "Champ \"itemid\" manquant pour l'élément."
 
 #: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
-msgstr ""
+msgstr "Le champ \"nom\" manque dans le prototype de graphique."
 
 #: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
@@ -9098,7 +9097,7 @@ msgstr "Éléments manquants pour le graphique \"%1$s\"."
 #: api/classes/CGraphPrototype.php:40
 #, c-format
 msgid "Missing items for graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Les éléments sont manquants dans le prototype de graphique \"%1$s\"."
 
 #: include/graphs.inc.php:332
 #, c-format
@@ -9149,15 +9148,15 @@ msgstr "Surveillance"
 
 #: include/classes/items/CHelpItems.php:319
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
-msgstr ""
+msgstr "Supervision des journaux d'événements de Windows. pattern, severity, eventid - expression rationnelles"
 
 #: include/classes/items/CHelpItems.php:335
 msgid "Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression"
-msgstr ""
+msgstr "Supervision de fichiers de journalisation avec rotation. fileformat - [chemin][regexp], pattern - expression rationnelle"
 
 #: include/classes/items/CHelpItems.php:331
 msgid "Monitoring of log file. pattern - regular expression"
-msgstr ""
+msgstr "Supervision de fichier de journalisation. pattern - expression rationnelle"
 
 #: include/forms.inc.php:1709 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
@@ -9423,22 +9422,22 @@ msgstr "Non"
 #: api/classes/CGraphPrototype.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph prototype."
-msgstr ""
+msgstr "\"%1$s\" non fourni dans le prototype de graphique."
 
 #: api/classes/CGraph.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph."
-msgstr ""
+msgstr "\"%1$s\" non fourni dans le graphique."
 
 #: api/classes/CHostPrototype.php:457
 #, c-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr ""
+msgstr "\"%1$s\" non fourni dans le prototype d'hôte."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "\"%2$s\" non fourni dans le prototype d'hôte \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1568
 #, c-format
@@ -9730,7 +9729,7 @@ msgstr "Aucune image"
 
 #: include/views/administration.general.image.list.php:36
 msgid "No images found."
-msgstr ""
+msgstr "Aucune image trouvée."
 
 #: include/views/configuration.item.edit.php:112
 #: include/views/configuration.item.massupdate.php:77
@@ -9745,7 +9744,7 @@ msgstr "Aucune interface trouvée."
 #: api/classes/CProxy.php:258 api/classes/CProxy.php:264
 #, c-format
 msgid "No interface provided for proxy \"%s\"."
-msgstr ""
+msgstr "Aucune interface fournie pour le proxy \"%s\"."
 
 #: api/classes/CHost.php:705 api/classes/CHost.php:723
 #, c-format
@@ -9758,11 +9757,11 @@ msgstr "Aucun identifiant d'élément fourni pour l'élément d'écran."
 
 #: popup.php:677
 msgid "No item keys found."
-msgstr ""
+msgstr "Aucune clé d'élément trouvée."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:921
 msgid "No item prototypes found."
-msgstr ""
+msgstr "Aucun prototype d'élément trouvé."
 
 #: include/items.inc.php:499
 #, c-format
@@ -9781,7 +9780,7 @@ msgstr "Aucun élément défini."
 #: include/items.inc.php:666 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:810
 msgid "No items found."
-msgstr ""
+msgstr "Aucun élément trouvé."
 
 #: include/views/common.macros.php:26
 msgid "No macros found."
@@ -9826,7 +9825,7 @@ msgstr "Aucune notification trouvée."
 
 #: include/views/configuration.action.edit.php:334
 msgid "No operations defined."
-msgstr ""
+msgstr "Aucune opération définie."
 
 #: include/classes/import/CConfigurationImport.php:953
 #: include/classes/import/CConfigurationImport.php:1067
@@ -9935,7 +9934,7 @@ msgstr "Aucun fichier de clé privée spécifié."
 
 #: include/views/administration.proxy.list.php:42 popup.php:1440
 msgid "No proxies found."
-msgstr ""
+msgstr "Aucun proxy trouvé."
 
 #: include/views/configuration.discovery.edit.php:44
 msgid "No proxy"
@@ -9943,7 +9942,7 @@ msgstr "Aucun proxy"
 
 #: api/classes/CProxy.php:420
 msgid "No proxy ID given."
-msgstr ""
+msgstr "Aucun ID de proxy fourni."
 
 #: api/classes/CAction.php:1363
 #, c-format
@@ -9960,7 +9959,7 @@ msgstr "Aucun destinataire pour le message d'opération d'action."
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
-msgstr ""
+msgstr "Aucune expression rationnelle trouvée."
 
 #: include/classes/screens/CScreenBuilder.php:293
 msgid "No rows in screen."
@@ -10063,7 +10062,7 @@ msgstr "Aucun utilisateur trouvé."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
-msgstr ""
+msgstr "Aucune correspondance de valeur trouvée."
 
 #: include/classes/screens/CScreenHistory.php:161
 #: include/classes/screens/CScreenHistory.php:267
@@ -10254,7 +10253,7 @@ msgstr "Nombre d'hôtes (surveillés/non surveillés/modèles)"
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:535
 msgid "Number of inodes for a given volume. If mode is missing total is used."
-msgstr ""
+msgstr "Nombre d'i-nœuds dans un volume donné. Si le mode n'est pas indiqué, le total est utilisé."
 
 #: include/blocks.inc.php:749
 msgid "Number of items (monitored/disabled/not supported)"
@@ -10262,19 +10261,19 @@ msgstr "Nombre d'éléments (surveillés/non surveillés/non supportés)"
 
 #: include/classes/items/CHelpItems.php:823
 msgid "Number of items in Zabbix database."
-msgstr ""
+msgstr "Nombre d'éléments dans la base de données de Zabbix."
 
 #: include/classes/items/CHelpItems.php:843
 msgid "Number of items in proxy history that are not yet sent to the server"
-msgstr ""
+msgstr "Nombre d'éléments dans l'historique du proxy qui ne sont pas encore envoyés au serveur"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
-msgstr ""
+msgstr "Nombre d'éléments dans la file d'attente qui sont en retard de \"from\" à \"to\" secondes, inclus."
 
 #: include/classes/items/CHelpItems.php:819
 msgid "Number of monitored hosts"
-msgstr ""
+msgstr "Nombre d'hôtes supervisés"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:391
