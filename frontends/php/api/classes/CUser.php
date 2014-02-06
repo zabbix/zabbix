@@ -735,7 +735,7 @@ class CUser extends CZBXAPI {
 									zbx_dbstr($mediaItem['period']).')';
 
 				if (!DBexecute($sql)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('DBerror'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user media.'));
 				}
 
 				$mediaIds[] = $mediaId;
