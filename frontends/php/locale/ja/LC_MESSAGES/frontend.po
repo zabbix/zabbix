@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:34+0200\n"
-"PO-Revision-Date: 2014-01-15 06:27+0300\n"
+"POT-Creation-Date: 2014-02-06 13:49+0200\n"
+"PO-Revision-Date: 2014-02-03 04:30+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1389760023.0\n"
+"X-POOTLE-MTIME: 1391394612.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -66,13 +66,13 @@ msgstr[0] "%1$s日"
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s分"
 
 #: jsLoader.php:215 jsLoader.php:216
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s秒"
 
 #: include/page_header.php:446
 #, c-format
@@ -446,7 +446,7 @@ msgstr "追加"
 
 #: jsLoader.php:178
 msgid "Add child"
-msgstr ""
+msgstr "子を追加"
 
 #: acknow.php:220
 msgid "Add comment by"
@@ -1445,7 +1445,7 @@ msgstr "Webシナリオを追加できません"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "認証方式を変更できません"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -2101,7 +2101,7 @@ msgstr "テンプレートをリンクできません"
 
 #: api/classes/CUser.php:1049
 msgid "Cannot login."
-msgstr ""
+msgstr "ログインできません。"
 
 #: api/classes/CUser.php:971
 msgid "Cannot logout."
@@ -4003,7 +4003,7 @@ msgstr "選択したテンプレートとリンクされた要素を削除"
 #: jsLoader.php:182
 #, c-format
 msgid "Delete service \"%1$s\"?"
-msgstr ""
+msgstr "サービス\"%1$s\"を削除しますか？"
 
 #: include/views/configuration.slideconf.edit.php:117
 msgid "Delete slide show?"
@@ -4235,7 +4235,7 @@ msgstr "無効"
 
 #: include/views/administration.usergroups.list.php:149
 msgid "Disable debug mode"
-msgstr ""
+msgstr "デバッグモードを無効"
 
 #: include/views/administration.usergroups.list.php:150
 msgid "Disable debug mode in selected groups?"
@@ -4413,7 +4413,7 @@ msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在しま�
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: api/classes/CDiscoveryRule.php:648
 #, c-format
@@ -4770,7 +4770,7 @@ msgstr "確認を有効"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Enable debug mode"
-msgstr ""
+msgstr "デバッグモードを有効"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Enable debug mode in selected groups?"
@@ -5151,11 +5151,11 @@ msgstr "お気に入りのスクリーン"
 
 #: jsLoader.php:190
 msgid "Favourite simple graphs"
-msgstr ""
+msgstr "お気に入りのシンプルグラフ"
 
 #: jsLoader.php:191
 msgid "Favourite slide shows"
-msgstr ""
+msgstr "お気に入りのスライドショー"
 
 #: include/views/monitoring.slides.php:44 slides.php:150 slides.php:158
 msgid "Favourites"
@@ -6007,7 +6007,6 @@ msgstr "横位置"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:363 report2.php:399 report5.php:59 tr_status.php:258
 #: tr_status.php:375
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
