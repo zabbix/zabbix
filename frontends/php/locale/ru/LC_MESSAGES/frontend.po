@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:34+0200\n"
-"PO-Revision-Date: 2013-11-16 11:09+0300\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2014-02-06 13:49+0200\n"
+"PO-Revision-Date: 2014-02-01 22:57+0300\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384592953.0\n"
+"X-POOTLE-MTIME: 1391288271.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -74,17 +74,17 @@ msgstr[2] "%1$s дней"
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s минута"
+msgstr[1] "%1$s минуты"
+msgstr[2] "%1$s минут"
 
 #: jsLoader.php:215 jsLoader.php:216
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s секунда"
+msgstr[1] "%1$s секунды"
+msgstr[2] "%1$s секунд"
 
 #: include/page_header.php:446
 #, c-format
@@ -139,7 +139,7 @@ msgstr "(без прокси)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(с предупреждениями)"
 
 #: include/blocks.inc.php:1348
 msgid "-"
@@ -361,16 +361,16 @@ msgstr "Действие удалено"
 #: actionconf.php:342
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Действие деактивировано"
+msgstr[1] "Действий деактивировано"
+msgstr[2] "Действия деактивированы"
 
 #: actionconf.php:341
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Действие активировано"
+msgstr[1] "Действий активировано"
+msgstr[2] "Действия активированы"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -466,7 +466,7 @@ msgstr "Добавить"
 
 #: jsLoader.php:178
 msgid "Add child"
-msgstr ""
+msgstr "Добавить потомка"
 
 #: acknow.php:220
 msgid "Add comment by"
@@ -6094,7 +6094,6 @@ msgstr "Выравнивание по горизонтали"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:363 report2.php:399 report5.php:59 tr_status.php:258
 #: tr_status.php:375
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Узел сети"

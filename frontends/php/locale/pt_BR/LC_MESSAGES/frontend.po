@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:34+0200\n"
-"PO-Revision-Date: 2013-12-10 12:53+0300\n"
+"POT-Creation-Date: 2014-02-06 13:49+0200\n"
+"PO-Revision-Date: 2014-02-02 00:37+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1386672833.0\n"
+"X-POOTLE-MTIME: 1391294261.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -70,15 +70,15 @@ msgstr[1] "%1$s dias"
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s minuto"
+msgstr[1] "%1$s minutos"
 
 #: jsLoader.php:215 jsLoader.php:216
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s segundo"
+msgstr[1] "%1$s segundos"
 
 #: include/page_header.php:446
 #, c-format
@@ -353,14 +353,14 @@ msgstr "Ação excluída"
 #: actionconf.php:342
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ação desativada"
+msgstr[1] "Ações desativadas"
 
 #: actionconf.php:341
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ação ativada"
+msgstr[1] "Ações ativadas"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -456,7 +456,7 @@ msgstr "Adicionar"
 
 #: jsLoader.php:178
 msgid "Add child"
-msgstr ""
+msgstr "Adicionar filho"
 
 #: acknow.php:220
 msgid "Add comment by"
@@ -1459,7 +1459,7 @@ msgstr "Não foi possível adicionar a apresentação de slides"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Não foi possível mudar a autenticação"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -1804,44 +1804,45 @@ msgstr "Não foi possível excluir o cenário web"
 #: actionconf.php:345
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar a ação"
+msgstr[1] "Não foi possível desativar as ações"
 
 #: discoveryconf.php:188
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar a regra de descoberta"
+msgstr[1] "Não foi possível desativar as regras de descoberta"
 
+# Very similar: https://www.zabbix.org/pootle/pt_BR/Zabbix-trunk/translate.html#unit=381180
 #: host_discovery.php:282
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar as regras de descoberta"
+msgstr[1] "Não foi possível desativar as regras de descoberta"
 
 #: hostgroups.php:231 hosts.php:621 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o host"
+msgstr[1] "Não foi possível desativar os hosts"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o protótipo de host"
+msgstr[1] "Não foi possível desativar os protótipos de host"
 
 #: applications.php:211 items.php:677
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o item"
+msgstr[1] "Não foi possível desativar os itens"
 
 #: disc_prototypes.php:324
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o protótipo de item"
+msgstr[1] "Não foi possível desativar os protótipos de itens"
 
 #: media_types.php:166
 #, fuzzy
@@ -1853,20 +1854,20 @@ msgstr[1] "Não foi possível desabilitar o tipo de media"
 #: triggers.php:276
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar a trigger"
+msgstr[1] "Não foi possível desativar as triggers"
 
 #: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o protótipo de trigger"
+msgstr[1] "Não foi possível desativar os protótipos de trigger"
 
 #: usergrps.php:343
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desativar o grupo de usuários"
+msgstr[1] "Não foi possível desativar os grupos de usuários"
 
 #: httpconf.php:297
 #, fuzzy
@@ -1886,14 +1887,14 @@ msgstr "Não é possível exibir mais de um item com o tipo \"Soma do gráfico\"
 #: actionconf.php:344
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível ativar a ação"
+msgstr[1] "Não foi possível ativar as ações"
 
 #: discoveryconf.php:187
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível ativar a regra de descoberta"
+msgstr[1] "Não foi possível ativar as regras de descoberta"
 
 #: host_discovery.php:281
 msgid "Cannot enable discovery rules"
@@ -2313,7 +2314,7 @@ msgstr "Não é possível atualizar \"%1$s\" para uma trigger descoberta."
 #: api/classes/CAction.php:648
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%1$s\" para a ação \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -2348,7 +2349,7 @@ msgstr "Não foi possível atualizar o \"templateid\" para a tela \"%1$s\"."
 #: api/classes/CTemplateScreen.php:606
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o \"templateid\" para o template de tela \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:529
 #, c-format
@@ -4050,7 +4051,7 @@ msgstr "Remover selecionado e elementos associados"
 #: jsLoader.php:182
 #, c-format
 msgid "Delete service \"%1$s\"?"
-msgstr ""
+msgstr "Excluir o serviço \"%1$s\"?"
 
 #: include/views/configuration.slideconf.edit.php:117
 msgid "Delete slide show?"
@@ -4282,7 +4283,7 @@ msgstr "Desativar"
 
 #: include/views/administration.usergroups.list.php:149
 msgid "Disable debug mode"
-msgstr ""
+msgstr "Desabilitar o modo de depuração"
 
 #: include/views/administration.usergroups.list.php:150
 msgid "Disable debug mode in selected groups?"
@@ -4460,7 +4461,7 @@ msgstr "A autobusca \"%1$s\" já existe em \"%2$s\", importada de outro template
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "A regra de descoberta \"%1$s\" já existe em \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:648
 #, c-format
@@ -4483,14 +4484,14 @@ msgstr "A regra de autobusca excluída"
 #: discoveryconf.php:185 host_discovery.php:279
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Regra de descoberta desativada"
+msgstr[1] "Regras de descoberta desativadas"
 
 #: discoveryconf.php:184 host_discovery.php:278
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Regra de descoberta ativada"
+msgstr[1] "Regras de descoberta ativadas"
 
 #: discoveryconf.php:134 host_discovery.php:255
 msgid "Discovery rule updated"
@@ -4819,7 +4820,7 @@ msgstr "Habilitar configuração"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Enable debug mode"
-msgstr ""
+msgstr "Ativar modo de debug"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Enable debug mode in selected groups?"
@@ -5200,7 +5201,7 @@ msgstr "Telas favoritas"
 
 #: jsLoader.php:190
 msgid "Favourite simple graphs"
-msgstr ""
+msgstr "Gráficos simples favoritos"
 
 #: jsLoader.php:191
 msgid "Favourite slide shows"
@@ -6056,7 +6057,6 @@ msgstr "Alinhamento horizontal"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:363 report2.php:399 report5.php:59 tr_status.php:258
 #: tr_status.php:375
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
@@ -7087,7 +7087,7 @@ msgstr "Usada função incorreta"
 #: api/classes/CScreenItem.php:608
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de gráfico \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
@@ -7101,12 +7101,12 @@ msgstr "Protótipos de grupo inválidos para o protótipo de host \"%1$s\"."
 #: api/classes/CScreenItem.php:589
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de host \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: api/classes/CScreenItem.php:570
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de grupo \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
@@ -7131,7 +7131,7 @@ msgstr "Índice de imagem inválido."
 
 #: api/classes/CScreen.php:366 api/classes/CTemplateScreen.php:538
 msgid "Incorrect input parameters."
-msgstr ""
+msgstr "Parâmetros de entrada incorretos."
 
 #: api/classes/CHostInterface.php:628
 #, c-format
@@ -7156,7 +7156,7 @@ msgstr "O campo de inventário \"%s\" é inválido."
 #: api/classes/CScreenItem.php:628
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de item \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: api/classes/CGraphGeneral.php:314
 msgid "Incorrect item for axis value."
@@ -7215,7 +7215,7 @@ msgstr "Semana de manutenção inválida"
 #: api/classes/CScreenItem.php:647
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de mapa \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: api/classes/CMap.php:408
 #, c-format
@@ -7257,7 +7257,7 @@ msgstr "Foi informado um parâmetro inválido para o mapeamento de ícones \"%s\
 #: api/classes/CAction.php:632
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr ""
+msgstr "Parâmetros incorretos para ação de atualização no método \"%1$s\"."
 
 #: api/classes/CAction.php:786
 msgid "Incorrect parameters for condition."
@@ -7315,7 +7315,7 @@ msgstr "Foi recebida uma resposta inválida do servidor Zabbix \"%1$s\"."
 #: api/classes/CScreenItem.php:679
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Foi informado o ID de tela \"%1$s\" e ele é inválido para o elemento na tela."
 
 #: include/screens.inc.php:170 include/screens.inc.php:228
 msgid "Incorrect screen provided for slide show."
@@ -7345,7 +7345,7 @@ msgstr "Valor de origem inválido."
 #: api/classes/CHost.php:552
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
-msgstr ""
+msgstr "Status incorreto para o host \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:185
 #, c-format
@@ -7868,14 +7868,14 @@ msgstr "Protótipo de item excluído"
 #: disc_prototypes.php:321
 msgid "Item prototype disabled"
 msgid_plural "Item prototypes disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Protótipo de item desativado"
+msgstr[1] "Protótipos de item desativados"
 
 #: disc_prototypes.php:320
 msgid "Item prototype enabled"
 msgid_plural "Item prototypes enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Protótipo de item ativado"
+msgstr[1] "Protótipos de item ativados"
 
 #: disc_prototypes.php:296
 msgid "Item prototype updated"
@@ -8118,7 +8118,7 @@ msgstr "Autenticação LDAP"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Autenticação LDAP modificada"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8472,11 +8472,11 @@ msgstr "A conexão falhou \"%s\"."
 #: api/classes/CUser.php:1054
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "O nome de login \"%1$s\" não confere com o nome \"%2$s\" usado na autenticação HTTP."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "O nome de login ou senha estão incorretos!"
 
 #: api/classes/CUser.php:934 api/classes/CUser.php:953
 #: api/classes/CUser.php:1002
