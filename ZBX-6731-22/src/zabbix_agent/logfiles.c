@@ -596,8 +596,11 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 {
 	if (1 == szbyte)	/* single-byte character set */
 	{
-		while (p < p_end)
+		for (; p < p_end; p++)
 		{
+			if (0xd < *p || 0xa > *p)
+				continue;
+
 			if (0xa == *p)  /* LF (Unix) */
 			{
 				*p_next = p + 1;
@@ -615,8 +618,6 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 				*p_next = p + 1;
 				return p;
 			}
-
-			p++;
 		}
 		return (char *)NULL;
 	}
