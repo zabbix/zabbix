@@ -122,17 +122,19 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function (e, ui) {
+			create: function () {
 				// force not to change table width
 				slideTable.width(slideTableWidth);
 			},
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					$(this).width($(this).width());
+					var td = $(this);
+
+					td.width(td.width());
 				});
 
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
+				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
+				if (SF || IE8) {
 					// move back draggable element to proper position
 					ui.css('left', (ui.offset().left - 4) + 'px');
 				}

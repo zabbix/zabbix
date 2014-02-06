@@ -250,11 +250,11 @@
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
-			itemsTableColumns = jQuery('#itemsTable .header').find('td'),
-			itemsTableColumnWidths = new Array();
+			itemsTableColumns = jQuery('#itemsTable .header td'),
+			itemsTableColumnWidths = [];
 
 		itemsTableColumns.each(function() {
-			itemsTableColumnWidths.push(jQuery(this).width());
+			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
 		});
 
 		itemsTable.sortable({
@@ -266,13 +266,14 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function (e, ui) {
+			create: function () {
 				// force not to change table width
-				jQuery('#itemsTable').width(itemsTableWidth);
+				itemsTable.width(itemsTableWidth);
 			},
 			helper: function(e, ui) {
 				ui.children().each(function() {
 					var td = jQuery(this);
+
 					td.width(td.width());
 				});
 
@@ -282,8 +283,8 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				itemsTableColumns.each(function(index) {
-					jQuery(this).width(itemsTableColumnWidths[index]);
+				itemsTableColumns.each(function(i) {
+					jQuery(this).width(itemsTableColumnWidths[i]);
 				});
 
 				return ui;

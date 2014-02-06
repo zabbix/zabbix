@@ -109,7 +109,7 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function (e, ui) {
+			create: function () {
 				// force not to change table width
 				stepTable.width(stepTableWidth);
 			},
@@ -126,8 +126,8 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				stepTableColumns.each(function(index) {
-					$(this).width(stepTableColumnWidths[index]);
+				stepTableColumns.each(function(i) {
+					$(this).width(stepTableColumnWidths[i]);
 				});
 
 				return ui;
@@ -135,6 +135,10 @@
 			start: function(e, ui) {
 				// fix placeholder not to change height while object is beeing dragged
 				$(ui.placeholder).height($(ui.helper).height());
+
+				if (IE8) {
+					$('#stepTab #httpFormList ul.formlist').find('li.formrow');
+				}
 			}
 		});
 

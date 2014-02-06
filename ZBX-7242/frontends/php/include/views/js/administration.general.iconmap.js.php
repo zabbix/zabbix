@@ -23,7 +23,9 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					$(this).width($(this).width());
+					var td = $(this);
+
+					td.width(td.width());
 				});
 
 				// when dragging element on safari, it jumps out of the table
