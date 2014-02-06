@@ -1,5 +1,6 @@
 Changes for 1.8.20rc1
 
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-7643] fixed graph copying (Eduard)

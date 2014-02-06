@@ -41,14 +41,14 @@ include_once('include/page_header.php');
 		'ldap_base_dn'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 
 		'ldap_bind_dn'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-		'ldap_bind_password'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-
+		'ldap_bind_password'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,			null),
+		'change_bind_password' => array(T_ZBX_STR, O_OPT, null, null,	null),
 		'ldap_search_attribute'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 
 		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),			NULL),
 
-		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
-		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
+		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type})&&isset({save}) || isset({test}))'),
+		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type})&&isset({save}) || isset({test}))'),
 
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -140,6 +140,8 @@ include_once('include/page_header.php');
 			show_messages($result, S_LDAP.SPACE.S_UPDATED, S_LDAP.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
 
 			if($result){
+				unset($_REQUEST['change_bind_password']);
+
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_LDAP);
 			}
 		}
@@ -276,7 +278,15 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_SEARCH_ATTRIBUTE,new CTextBox('ldap_search_attribute',empty($config['ldap_search_attribute'])?'uid':$config['ldap_search_attribute']));
 
 		$frmAuth->addRow(S_BIND_DN.'*', new CTextBox('ldap_bind_dn',$config['ldap_bind_dn'],64));
-		$frmAuth->addRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password',$config['ldap_bind_password']));
+
+		// bind password
+		if (isset($_REQUEST['change_bind_password']) || (isset($config['ldap_bind_password']) && zbx_empty($config['ldap_bind_password']))) {
+			$frmAuth->addVar('change_bind_password', 1);
+			$frmAuth->addRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password'));
+		}
+		else {
+			$frmAuth->addRow(S_BIND_PASSWORD, new CButton('change_bind_password', S_CHANGE_PASSWORD));
+		}
 
 		$action = "javascript: if(confirm('".S_SWITCHING_LDAP."')) return true; else return false;";
 		$frmAuth->addRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
