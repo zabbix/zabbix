@@ -1072,7 +1072,7 @@ notsupported:
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
-			/* supported is handled in DBlld_process_discovery_rule()      */
+			/* supported is handled in lld_process_discovery_rule()        */
 			add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, 0, 0);
 
@@ -3060,7 +3060,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
-			DBlld_process_discovery_rule(itemid, value->text, ts);
+			lld_process_discovery_rule(itemid, value->text, ts);
 		else
 			dc_local_add_history_lld(itemid, ts, value->text);
 

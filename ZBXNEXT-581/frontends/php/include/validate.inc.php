@@ -44,14 +44,6 @@ function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
 
-function REGEXP($regexp, $var = null) {
-	return "(preg_match(\"".$regexp."\", {".$var."}))&&";
-}
-
-function GT($value, $var = '') {
-	return '({'.$var.'}>='.$value.')&&';
-}
-
 function IN($array, $var = '') {
 	if (is_array($array)) {
 		$array = implode(',', $array);
@@ -243,9 +235,10 @@ function calc_exp($fields, $field, $expression) {
 }
 
 function calc_exp2($fields, $expression) {
-	foreach ($fields as $f => $checks) {
-		$expression = str_replace('{'.$f.'}', '$_REQUEST["'.$f.'"]', $expression);
+	foreach ($fields as $field => $checks) {
+		$expression = str_replace('{'.$field.'}', '$_REQUEST["'.$field.'"]', $expression);
 	}
+
 	return eval('return ('.trim($expression, '& ').') ? 1 : 0;');
 }
 

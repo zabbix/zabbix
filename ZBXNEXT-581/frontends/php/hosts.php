@@ -99,9 +99,7 @@ $fields = array(
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// ajax
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,		null,			null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,		NOT_EMPTY,		'isset({favobj})'),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,		NOT_EMPTY,		'isset({favobj})&&"filter"=={favobj}')
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -121,15 +119,12 @@ if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid'])
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ('filter' == $_REQUEST['favobj']) {
-		CProfile::update('web.hosts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
+if (hasRequest('filterState')) {
+	CProfile::update('web.hosts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
-
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 $hostIds = get_request('hosts', array());
@@ -149,7 +144,8 @@ if ($exportData) {
 	else {
 		print($exportData);
 	}
-	exit();
+
+	exit;
 }
 
 /*
@@ -247,6 +243,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new or existing host groups
+		$newHostGroupIds = array();
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
@@ -254,7 +251,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$existGroups[] = $newGroup;
+						$newHostGroupIds[] = $newGroup;
 					}
 				}
 
@@ -263,22 +260,24 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						throw new Exception();
 					}
 
-					$existGroups = isset($existGroups)
-						? array_merge($existGroups, $createdGroups['groupids']) : $createdGroups['groupids'];
+					$newHostGroupIds = $newHostGroupIds
+						? array_merge($newHostGroupIds, $createdGroups['groupids'])
+						: $createdGroups['groupids'];
 				}
 			}
 			else {
-				$existGroups = $_REQUEST['new_groups'];
+				$newHostGroupIds = getRequest('new_groups');
 			}
 		}
 
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
-				$replaceHostGroupsIds = isset($existGroups)
-					? array_unique(array_merge($_REQUEST['groups'], $existGroups)) : $_REQUEST['groups'];
+				$replaceHostGroupsIds = $newHostGroupIds
+					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
+					: $_REQUEST['groups'];
 			}
-			elseif (isset($existGroups)) {
-				$replaceHostGroupsIds = $existGroups;
+			elseif ($newHostGroupIds) {
+				$replaceHostGroupsIds = $newHostGroupIds;
 			}
 
 			if (isset($replaceHostGroupsIds)) {
@@ -292,9 +291,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				$hosts['groups'] = array();
 			}
 		}
-		elseif (isset($existGroups)) {
-			$existGroups = API::HostGroup()->get(array(
-				'groupids' => $existGroups,
+		elseif ($newHostGroupIds) {
+			$newHostGroups = API::HostGroup()->get(array(
+				'groupids' => $newHostGroupIds,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -303,6 +302,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$hostTemplates = API::Template()->get(array(
+					'output' => array('templateid'),
 					'hostids' => $hostIds
 				));
 
@@ -326,8 +326,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
-			$add['groups'] = $existGroups;
+		if ($newHostGroupIds && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = zbx_toObject($newHostGroupIds, 'groupid');
 		}
 
 		if ($add) {
@@ -822,6 +822,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
+			'output' => array('hostid', 'name', 'status'),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,
@@ -869,6 +870,7 @@ else {
 	$templateIds = array_unique($templateIds);
 
 	$templates = API::Template()->get(array(
+		'output' => array('templateid', 'name'),
 		'templateids' => $templateIds,
 		'selectParentTemplates' => array('hostid', 'name')
 	));

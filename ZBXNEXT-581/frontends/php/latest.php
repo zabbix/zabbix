@@ -47,9 +47,8 @@ $fields = array(
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
@@ -68,11 +67,11 @@ if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))
 /*
  * Ajax
  */
+if (hasRequest('filterState')) {
+	CProfile::update('web.latest.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
 if (hasRequest('favobj')) {
-	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-	elseif ($_REQUEST['favobj'] == 'toggle') {
+	if ($_REQUEST['favobj'] == 'toggle') {
 		// $_REQUEST['toggle_ids'] can be single id or list of ids,
 		// where id xxxx is application id and id 0_xxxx is 0_ + host id
 		if (!is_array($_REQUEST['toggle_ids'])) {
@@ -102,7 +101,7 @@ if (hasRequest('favobj')) {
 
 if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
@@ -500,7 +499,7 @@ foreach ($applications as $appid => $dbApp) {
 		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
@@ -666,7 +665,7 @@ foreach ($hosts as $hostId => $dbHost) {
 		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-		$hostName->setMenuPopup(getMenuPopupHost($host, $hostScripts[$host['hostid']]));
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row

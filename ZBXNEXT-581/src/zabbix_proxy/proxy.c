@@ -198,6 +198,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
+char	*CONFIG_USER			= NULL;
+
 /* mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
@@ -290,30 +292,36 @@ static void	zbx_set_defaults()
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
-	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
-		exit(EXIT_FAILURE);
-	}
-
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "missing active proxy mandatory parameter [Server] in config file [%s]",
-				CONFIG_FILE);
-		exit(EXIT_FAILURE);
-	}
-
 	if (NULL == CONFIG_HOSTNAME)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
+		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s'", CONFIG_HOSTNAME);
+		exit(EXIT_FAILURE);
+	}
+
+	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
+		exit(EXIT_FAILURE);
+	}
+
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
+				" This parameter is mandatory for active proxies.");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		exit(EXIT_FAILURE);
 	}
 
@@ -381,11 +389,11 @@ static void	zbx_load_config()
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			24},
 		{"ProxyLocalBuffer",		&CONFIG_PROXY_LOCAL_BUFFER,		TYPE_INT,
@@ -461,7 +469,9 @@ static void	zbx_load_config()
 		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"User",			&CONFIG_USER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -571,7 +581,7 @@ int	main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	return daemon_start(CONFIG_ALLOW_ROOT);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()

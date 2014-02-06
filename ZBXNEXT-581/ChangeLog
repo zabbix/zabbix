@@ -2,30 +2,100 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
+........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
+..F....... [ZBX-7609] improved frontend messages mute/unmute (Eduard)
+..F....... [ZBXNEXT-1291] added clickable links for template names in host, template, host prototype and discovered host property templates tab (Oleg)
+..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
+..F....... [ZBXNEXT-2073] improved dashboard favourite menu (Eduard)
+..F....... [ZBXNEXT-2073] improved service configuration menu (Eduard)
+..F....... [ZBXNEXT-2073] improved slide show refresh multiplier popup menu (Eduard)
+..F....... [ZBXNEXT-2073] improved trigger log menu (Eduard)
+..F....... [ZBXNEXT-2073] improved trigger macros menu (Eduard)
+..F....... [ZBXNEXT-2073] updated jQuery to latest 1.10.2 (Eduard)
+...G...PS. [ZBXNEXT-453] added a new parameter 'User' to daemon configuration that allows dropping privileges to the specified user (Juris)
 ....I...S. [ZBXNEXT-581] split database upgrade patches over multiple files for easier maintenance (wiper)
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7707] fixed "Auto-logout" field to show submitted incorrect value (Ivo)
+A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
+....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
+....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
+A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo)
+..F....... [ZBX-7631] fixed dashboard favourite widget width (Eduard)
+....I..... [ZBX-7622] changed the default value of timeperiods.every field to '1' (wiper)
+...G...PS. [ZBX-7618] removed partial matching for long format command line options (Juris)
 ..F....... [ZBX-6940] fixed frontend history links not remembering search queries (Pavels)
-...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
-...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
-...G...... [ZBX-7413] fixed concistentcy of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
+...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
-........S. [ZBX-7204] fixed the timestamp order of events generated during network discovery (igors)
+........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.2rc3
+
+Bug fixes:
+........S. [ZBX-7758] fixed server crash when processing low-level discovery triggers prototypes (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.2rc2
+
+Bug fixes:
+..F....... [ZBX-6296] fixed macros in item names not being resolved in simple graph titles (Eduard)
+..F....... [ZBX-7743] fixed not being able to save the user or profile form if PHP gettext is unavailable (Eduard)
+A......... [ZBX-7693] fixed user media validation (Eduard)
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Eduard)
+........S. [ZBX-7711] fixed memory leak in vmware collector (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.2rc1
 
 New features:
-........S. [ZBXNEXT-2069] added HOST.PORT macro support for internal and trigger based notifications (wiper)
-A.F....... [ZBX-1357] updated American English, French, Hungarian, Italian, Japanese, Russian, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
+.......PS. [ZBX-7649] synchronize ICMP checks based on item interface. This should reduce the number of fping invocations in most cases (wiper)
+..F.....S. [ZBXNEXT-2069] added HOST.PORT macro support to internal/trigger based notifications and also to trigger names/descriptions (wiper, Oleg)
+A.F....... [ZBX-1357] updated American English, Czech, French, Greek, Hungarian, Italian, Japanese, Russian, Slovak, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
+..F....... [ZBX-7684] improved displaying of script execution page (Eduard)
+...G...... [ZBX-7668] fixed sending empty values when reading from a file with zabbix_sender (Juris)
+........S. [ZBX-7571] fixed incorrect processing of \177 (U+007F) control character in json (igors)
+..F....... [ZBX-7726] fixed max frontend available date displaying (Eduard)
+.......PS. [ZBX-7690] fixed cache for dynamic SNMP indexes not being used (asaveljevs)
+..F....... [ZBX-7610] fixed not being able to configure an empty database host in the setup (Pavels)
+....I..... [ZBX-7168] fixed configure.ac template to properly link libcurl to all components independently (Juris)
+A......... [ZBX-7671] fixed error when importing an existing trigger with dependencies from 1.8 (Pavels)
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
+...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
+........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
+........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
+........S. [ZBX-7608] fixed crashes when global scripts timed out (wiper)
+........S. [ZBX-7561] fixed SQL errors while processing host prototypes under MySQL (Sasha)
+..F....... [ZBX-7688] fixed discovery item import (Eduard)
+A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
+...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
+A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
+.......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
+........S. [ZBX-7653] correctly expand ITEM.LOG.* macros when retrieving eventlog specific attributes for log,logrt items (wiper)
+.......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
+..F....... [ZBX-7639] fixed error when trying to replace host groups and add a new host group at the same time in the host mass update form (Pavels)
+...G...PS. [ZBX-7458] added source IP validation on daemon startup (Juris)
+A......... [ZBX-7660] fixed host.get returning the "templates" property even if the "templateids" parameter is not used (Pavels)
+...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
+.......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
+....I..... [ZBX-7515] added missing delayed loading option of wevtapi.dll for x64 systems (igors)
+...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
+.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
+..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
+...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7590] fixed displaying functional macros in graph names when host visible name is not empty (Ivo)
 A......... [ZBX-7591] fixed deleting web scenario steps on template linked to host (Ivo)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
+..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
 ..F....... [ZBX-7518] fixed graph scrollbar overflow when clicking period "All" and with no page refresh option (Ivo)
 A......... [ZBX-7578] fixed graph item validation (Eduard)
 ..F....... [ZBX-7616] fixed green background color for "New group" field in host edit form (Ivo)
@@ -752,13 +822,34 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.11rc2
+
+Bug fixes:
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...GI..PS. [ZBX-5526] removed checking for PosgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
+....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
+...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
+........S. [ZBX-6315] fixed deleting of lost triggers by the low-level discovery rule (Sasha)
+........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
+A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
+.......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
+..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
+...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
+.......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
+...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
+..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
+...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
@@ -1416,7 +1507,7 @@ A......... [ZBX-5208] fixed host.update only accepting arrays of interfaces and 
 ..F....... [ZBX-5179] fixed filter layout on low resolution screens (Pavels)
 ..F....... [ZBX-3853] changed several message strings (Pavels)
 A......... [ZBX-5213] fixed usergroup.massupdate failing when updating only permissions or users (Pavels)
-..F....... [ZBX-5145] fixed PosgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
+..F....... [ZBX-5145] fixed PostgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
 ..F....... [ZBX-5065] fixed inability to delete a service with soft linked dependencies (Toms)
 A.F....... [ZBX-5065] added circularity check for IT services (Toms)
 ..F....... [ZBX-2501] fixed subnodes not opening when parent node is opened in IT services (Toms)
@@ -2214,8 +2305,17 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc2
+
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+
 Changes for 1.8.20rc1
 
+A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
+.......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
+..F....... [ZBX-7643] fixed graph copying (Eduard)
+A......... [ZBX-3702] fixed drule.get selectDChecks parameter not returning any results; thanks to Sergey Sireskin (Pavels)
 ...G...PS. [ZBX-4243] fixed Zabbix syslog application names (RFC 5424 APP-NAME) (Andris)
 
 Changes for 1.8.19

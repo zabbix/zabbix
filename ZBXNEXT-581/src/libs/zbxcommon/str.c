@@ -781,7 +781,6 @@ char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 char	*zbx_strdcat(char *dest, const char *src)
 {
 	size_t	len_dest, len_src;
-	char	*new_dest = NULL;
 
 	if (NULL == src)
 		return dest;
@@ -792,14 +791,11 @@ char	*zbx_strdcat(char *dest, const char *src)
 	len_dest = strlen(dest);
 	len_src = strlen(src);
 
-	new_dest = zbx_malloc(new_dest, len_dest + len_src + 1);
+	dest = zbx_realloc(dest, len_dest + len_src + 1);
 
-	zbx_strlcpy(new_dest, dest, len_dest + 1);
-	zbx_strlcpy(new_dest + len_dest, src, len_src + 1);
+	zbx_strlcpy(dest + len_dest, src, len_src + 1);
 
-	zbx_free(dest);
-
-	return new_dest;
+	return dest;
 }
 
 /******************************************************************************
@@ -3364,7 +3360,7 @@ int	is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
 	{
-		if (0 != ((1<<7) & *str)) /* check for range 0..127 */
+		if (0 != ((1 << 7) & *str))	/* check for range 0..127 */
 			return FAIL;
 
 		str++;

@@ -88,7 +88,7 @@ class CDService extends CZBXAPI{
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectDRules'				=> null,
 			'selectDHosts'				=> null,
 			'selectHosts'				=> null,
@@ -129,7 +129,6 @@ class CDService extends CZBXAPI{
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts['select']['dhostid'] = 'ds.dhostid';
 			$sqlParts['where'][] = dbConditionInt('ds.dhostid', $options['dhostids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -147,7 +146,6 @@ class CDService extends CZBXAPI{
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
 
-			$sqlParts['select']['dcheckid'] = 'dc.dcheckid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 			$sqlParts['from']['dchecks'] = 'dchecks dc';
 
@@ -164,7 +162,6 @@ class CDService extends CZBXAPI{
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 
-			$sqlParts['select']['druleid'] = 'dh.druleid';
 			$sqlParts['from']['dhosts'] = 'dhosts dh';
 
 			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
@@ -213,28 +210,8 @@ class CDService extends CZBXAPI{
 				else
 					$result = $dservice['rowscount'];
 			}
-			else{
-				if (!isset($result[$dservice['dserviceid']])) {
-					$result[$dservice['dserviceid']]= array();
-				}
-
-				// druleids
-				if (isset($dservice['druleid']) && is_null($options['selectDRules'])) {
-					if (!isset($result[$dservice['dserviceid']]['drules']))
-						$result[$dservice['dserviceid']]['drules'] = array();
-
-					$result[$dservice['dserviceid']]['drules'][] = array('druleid' => $dservice['druleid']);
-				}
-
-				// dhostids
-				if (isset($dservice['dhostid']) && is_null($options['selectDHosts'])) {
-					if (!isset($result[$dservice['dserviceid']]['dhosts']))
-						$result[$dservice['dserviceid']]['dhosts'] = array();
-
-					$result[$dservice['dserviceid']]['dhosts'][] = array('dhostid' => $dservice['dhostid']);
-				}
-
-				$result[$dservice['dserviceid']] += $dservice;
+			else {
+				$result[$dservice['dserviceid']] = $dservice;
 			}
 		}
 

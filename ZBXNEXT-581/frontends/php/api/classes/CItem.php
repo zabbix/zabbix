@@ -35,7 +35,8 @@ class CItem extends CItemGeneral {
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
 			self::ERROR_EXISTS_TEMPLATE => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s".')
+			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s".'),
+			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for item "%2$s" on "%3$s": %4$s.')
 		));
 	}
 
@@ -101,7 +102,7 @@ class CItem extends CItemGeneral {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
 			'selectTriggers'			=> null,
@@ -162,10 +163,6 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['hostid'] = 'i.hostid';
-			}
-
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
@@ -176,10 +173,6 @@ class CItem extends CItemGeneral {
 		// interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
-
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['interfaceid'] = 'i.interfaceid';
-			}
 
 			$sqlParts['where']['interfaceid'] = dbConditionInt('i.interfaceid', $options['interfaceids']);
 
@@ -192,7 +185,6 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
@@ -205,10 +197,6 @@ class CItem extends CItemGeneral {
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
-
-			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sqlParts['select']['proxyid'] = 'h.proxy_hostid';
-			}
 
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where'][] = dbConditionInt('h.proxy_hostid', $options['proxyids']);
@@ -223,7 +211,6 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['select']['triggerid'] = 'f.triggerid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
@@ -233,7 +220,6 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			$sqlParts['select']['applicationid'] = 'ia.applicationid';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where'][] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
@@ -243,7 +229,6 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['select']['graphid'] = 'gi.graphid';
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -325,7 +310,6 @@ class CItem extends CItemGeneral {
 
 		// host
 		if (!is_null($options['host'])) {
-			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
@@ -333,7 +317,6 @@ class CItem extends CItemGeneral {
 
 		// application
 		if (!is_null($options['application'])) {
-			$sqlParts['select']['application'] = 'a.name as application';
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
@@ -368,7 +351,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$itemids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -383,37 +365,7 @@ class CItem extends CItemGeneral {
 				}
 			}
 			else {
-				$itemids[$item['itemid']] = $item['itemid'];
-
-				if (!isset($result[$item['itemid']])) {
-					$result[$item['itemid']]= array();
-				}
-
-				// triggerids
-				if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
-					if (!isset($result[$item['itemid']]['triggers'])) {
-						$result[$item['itemid']]['triggers'] = array();
-					}
-					$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
-				}
-				// graphids
-				if (isset($item['graphid']) && is_null($options['selectGraphs'])) {
-					if (!isset($result[$item['itemid']]['graphs'])) {
-						$result[$item['itemid']]['graphs'] = array();
-					}
-					$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
-					unset($item['graphid']);
-				}
-				// applicationids
-				if (isset($item['applicationid']) && is_null($options['selectApplications'])) {
-					if (!isset($result[$item['itemid']]['applications'])) {
-						$result[$item['itemid']]['applications'] = array();
-					}
-					$result[$item['itemid']]['applications'][] = array('applicationid' => $item['applicationid']);
-					unset($item['applicationid']);
-				}
-
-				$result[$item['itemid']] += $item;
+				$result[$item['itemid']] = $item;
 			}
 		}
 
@@ -805,7 +757,7 @@ class CItem extends CItemGeneral {
 		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'selectApplications' => API_OUTPUT_REFER,
+			'selectApplications' => array('applicationid'),
 			'output' => $selectFields,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
@@ -1178,7 +1130,7 @@ class CItem extends CItemGeneral {
 		// adding item discovery
 		if ($options['selectItemDiscovery'] !== null) {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
-				'output' => $this->outputExtend('item_discovery', array('itemdiscoveryid', 'itemid'), $options['selectItemDiscovery']),
+				'output' => $this->outputExtend($options['selectItemDiscovery'], array('itemdiscoveryid', 'itemid')),
 				'filter' => array('itemid' => array_keys($result)),
 				'preservekeys' => true,
 				'nodeids' => get_current_nodeid(true)

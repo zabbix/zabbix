@@ -37,6 +37,101 @@ static int	DBpatch_2030000(void)
 
 static int	DBpatch_2030001(void)
 {
+	const ZBX_FIELD	field = {"every", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("timeperiods", &field);
+}
+
+static int	DBpatch_2030002(void)
+{
+	const ZBX_TABLE table =
+			{"trigger_discovery_tmp", "", 0,
+				{
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030003(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into trigger_discovery_tmp (select triggerid,parent_triggerid from trigger_discovery)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030004(void)
+{
+	return DBdrop_table("trigger_discovery");
+}
+
+static int	DBpatch_2030005(void)
+{
+	const ZBX_TABLE table =
+			{"trigger_discovery", "triggerid", 0,
+				{
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030006(void)
+{
+	return DBcreate_index("trigger_discovery", "trigger_discovery_1", "parent_triggerid", 0);
+}
+
+static int	DBpatch_2030007(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("trigger_discovery", 1, &field);
+}
+
+static int	DBpatch_2030008(void)
+{
+	const ZBX_FIELD	field = {"parent_triggerid", NULL, "triggers", "triggerid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("trigger_discovery", 2, &field);
+}
+
+static int	DBpatch_2030009(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into trigger_discovery (select triggerid,parent_triggerid from trigger_discovery_tmp)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030010(void)
+{
+	return DBdrop_table("trigger_discovery_tmp");
+}
+
+static int	DBpatch_2030011(void)
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2030012(void)
+{
 	const ZBX_TABLE	table =
 			{"item_condition", "item_conditionid", 0,
 				{
@@ -52,19 +147,19 @@ static int	DBpatch_2030001(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2030002(void)
+static int	DBpatch_2030013(void)
 {
 	return DBcreate_index("item_condition", "item_condition_1", "itemid", 0);
 }
 
-static int	DBpatch_2030003(void)
+static int	DBpatch_2030014(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_condition", 1, &field);
 }
 
-static int	DBpatch_2030004(void)
+static int	DBpatch_2030015(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -102,26 +197,26 @@ out:
 	return ret;
 }
 
-static int	DBpatch_2030005(void)
+static int	DBpatch_2030016(void)
 {
 	const ZBX_FIELD field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_2030006(void)
+static int	DBpatch_2030017(void)
 {
 	return DBdrop_field("items", "filter");
 }
 
-static int	DBpatch_2030007(void)
+static int	DBpatch_2030018(void)
 {
 	const ZBX_FIELD	field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_2030008(void)
+static int	DBpatch_2030019(void)
 {
 	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags=%d", ZBX_FLAG_DISCOVERY_RULE))
 		return FAIL;
@@ -144,5 +239,16 @@ DBPATCH_ADD(2030005, 0, 1)
 DBPATCH_ADD(2030006, 0, 1)
 DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
+DBPATCH_ADD(2030009, 0, 1)
+DBPATCH_ADD(2030010, 0, 1)
+DBPATCH_ADD(2030011, 2020001, 1)
+DBPATCH_ADD(2030012, 0, 1)
+DBPATCH_ADD(2030013, 0, 1)
+DBPATCH_ADD(2030014, 0, 1)
+DBPATCH_ADD(2030015, 0, 1)
+DBPATCH_ADD(2030016, 0, 1)
+DBPATCH_ADD(2030017, 0, 1)
+DBPATCH_ADD(2030018, 0, 1)
+DBPATCH_ADD(2030019, 0, 1)
 
 DBPATCH_END()

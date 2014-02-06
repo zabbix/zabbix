@@ -119,6 +119,7 @@ class CTemplateScreenItem extends CZBXAPI {
 			}
 
 			$dbTemplateScreens = API::TemplateScreen()->get(array(
+				'output' => array('screenitemid'),
 				'screenitemids' => $options['screenitemid'],
 				'hostids' => $options['hostids'],
 				'selectScreenItems' => API_OUTPUT_EXTEND

@@ -85,7 +85,7 @@ class CAlert extends CZBXAPI {
 			'time_till'					=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'selectMediatypes'			=> null,
 			'selectUsers'				=> null,
 			'selectHosts'				=> null,
@@ -244,7 +244,6 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['actionids'])) {
 			zbx_value2array($options['actionids']);
 
-			$sqlParts['select']['actionid'] = 'a.actionid';
 			$sqlParts['where'][] = dbConditionInt('a.actionid', $options['actionids']);
 		}
 
@@ -263,7 +262,6 @@ class CAlert extends CZBXAPI {
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			$sqlParts['select']['mediatypeid'] = 'a.mediatypeid';
 			$sqlParts['where'][] = dbConditionInt('a.mediatypeid', $options['mediatypeids']);
 		}
 

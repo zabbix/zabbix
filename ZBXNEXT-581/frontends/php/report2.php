@@ -45,9 +45,7 @@ $fields = array(
 	'filter_timesince' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
 	'filter_timetill' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
 	// ajax
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT, null,			null),
-	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,		'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,		'isset({favobj})&&"filter"=={favobj}')
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,			null)
 );
 check_fields($fields);
 
@@ -87,12 +85,12 @@ if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['tri
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj']) && $_REQUEST['favobj'] == 'filter') {
-	CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
+if (hasRequest('filterState')) {
+	CProfile::update('web.avail_report.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*
@@ -206,7 +204,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// trigger options
 		if (!empty($_REQUEST['filter_hostid']) || !$config['dropdown_first_entry']) {
-			$hosts = API::Host()->get(array('templateids' => $_REQUEST['filter_hostid']));
+			$hosts = API::Host()->get(array(
+				'output' => array('hostid'),
+				'templateids' => $_REQUEST['filter_hostid']
+			));
 
 			$triggerOptions['hostids'] = zbx_objectValues($hosts, 'hostid');
 		}
