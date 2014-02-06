@@ -96,7 +96,7 @@
 			jQuery('#screenListFooter').before(tpl.evaluate(value));
 		}
 
-		if (initSize <= 1) {
+		if (initSize < 2) {
 			initSortable();
 		}
 
@@ -106,15 +106,15 @@
 	jQuery(function($) {
 		var slideTable = $('#slideTable'),
 			slideTableWidth = slideTable.width(),
-			slideTableColumns = $('#slideTable .header').find('td'),
-			slideTableColumnWidths = new Array();
+			slideTableColumns = $('#slideTable .header td'),
+			slideTableColumnWidths = [];
 
 		slideTableColumns.each(function() {
-			slideTableColumnWidths.push($(this).width());
+			slideTableColumnWidths[slideTableColumnWidths.length] = $(this).width();
 		});
 
 		slideTable.sortable({
-			disabled: (slideTable.find('tr.sortable').length <= 1),
+			disabled: (slideTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -128,7 +128,7 @@
 			},
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					jQuery(this).width(jQuery(this).width());
+					$(this).width($(this).width());
 				});
 
 				// when dragging element on safari, it jumps out of the table
@@ -137,14 +137,14 @@
 					ui.css('left', (ui.offset().left - 4) + 'px');
 				}
 
-				slideTableColumns.each(function(index) {
-					$(this).width(slideTableColumnWidths[index]);
+				slideTableColumns.each(function(i) {
+					$(this).width(slideTableColumnWidths[i]);
 				});
 
 				return ui;
 			},
 			start: function(e, ui) {
-				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
 	});

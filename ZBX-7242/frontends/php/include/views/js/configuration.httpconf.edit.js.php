@@ -24,7 +24,8 @@
 
 	function recalculateSortOrder() {
 		var i = 0;
-		jQuery('#httpStepTable').find('tr.sortable .rowNum').each(function() {
+
+		jQuery('#httpStepTable tr.sortable .rowNum').each(function() {
 			var step = (i == 0) ? '0' : i;
 
 			// rewrite ids to temp
@@ -44,8 +45,9 @@
 			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
 
 			// set order number
-			jQuery(this).attr('new_step', i);
-			jQuery(this).text((i + 1) + ':');
+			jQuery(this)
+				.attr('new_step', i)
+				.text((i + 1) + ':');
 			i++;
 		});
 
@@ -74,8 +76,8 @@
 			jQuery('#steps_' + newStep + '_httptestid').attr('name', 'steps[' + newStep + '][httptestid]');
 			jQuery('#steps_' + newStep + '_name').attr('name', 'steps[' + newStep + '][name]');
 			jQuery('#steps_' + newStep + '_no')
-					.attr('name', 'steps[' + newStep + '][no]')
-					.val(parseInt(newStep) + 1);
+				.attr('name', 'steps[' + newStep + '][no]')
+				.val(parseInt(newStep) + 1);
 			jQuery('#steps_' + newStep + '_url').attr('name', 'steps[' + newStep + '][url]');
 			jQuery('#steps_' + newStep + '_timeout').attr('name', 'steps[' + newStep + '][timeout]');
 			jQuery('#steps_' + newStep + '_posts').attr('name', 'steps[' + newStep + '][posts]');
@@ -91,15 +93,15 @@
 	jQuery(function($) {
 		var stepTable = $('#httpStepTable'),
 			stepTableWidth = stepTable.width(),
-			stepTableColumns = $('#httpStepTable .header').find('td'),
-			stepTableColumnWidths = new Array();
+			stepTableColumns = $('#httpStepTable .header td'),
+			stepTableColumnWidths = [];
 
 		stepTableColumns.each(function() {
-			stepTableColumnWidths.push($(this).width());
+			stepTableColumnWidths[stepTableColumnWidths.length] = $(this).width();
 		});
 
 		stepTable.sortable({
-			disabled: (stepTable.find('tr.sortable').length <= 1),
+			disabled: (stepTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -114,6 +116,7 @@
 			helper: function(e, ui) {
 				ui.children().each(function() {
 					var td = $(this);
+
 					td.width(td.width());
 				});
 

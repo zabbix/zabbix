@@ -12,7 +12,7 @@
 		}
 
 		iconMapTable.sortable({
-			disabled: (iconMapTable.find('tr.sortable').length <= 1),
+			disabled: (iconMapTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -43,7 +43,7 @@
 			.delegate('input.removeMapping', 'click', function() {
 				$(this).parent().parent().remove();
 
-				if (iconMapTable.find('tr.sortable').length <= 1) {
+				if (iconMapTable.find('tr.sortable').length < 2) {
 					iconMapTable.sortable('disable');
 				}
 				recalculateSortOrder();
