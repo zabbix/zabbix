@@ -107,7 +107,8 @@ function DBconnect(&$error) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
 				else {
-					$error = 'Error connecting to database';
+					$ociError = oci_error();
+					$error = 'Error connecting to database: ['.$ociError['message'].']';
 					$result = false;
 				}
 
@@ -126,7 +127,7 @@ function DBconnect(&$error) {
 
 				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database';
+					$error = 'Error connecting to database: ['.db2_conn_errormsg().']';
 					$result = false;
 				}
 				else {
