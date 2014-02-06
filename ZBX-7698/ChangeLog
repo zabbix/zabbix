@@ -1,3 +1,9 @@
+Changes for 2.0.11rc2
+
+Bug fixes:
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.11rc1
 
 New features:
@@ -1476,6 +1482,11 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc2
+
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+
 Changes for 1.8.20rc1
 
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
