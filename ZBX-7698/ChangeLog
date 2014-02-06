@@ -1,6 +1,7 @@
 Changes for 2.0.11rc2
 
 Bug fixes:
+.......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
 
 --------------------------------------------------------------------------------
@@ -10,7 +11,6 @@ New features:
 A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-.......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
 ..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
