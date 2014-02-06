@@ -899,6 +899,15 @@ Copt::memoryPick();
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS);
 			return false;
 		}
+		elseif ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			// forbid admins to add media to other users
+			foreach ($users as $user) {
+				if ($USER_DETAILS['userid'] != $user['userid']) {
+					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					return false;
+				}
+			}
+		}
 
 		foreach($users as $unum => $user){
 			$userids[] = $user['userid'];
@@ -954,6 +963,20 @@ Copt::memoryPick();
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS);
 			return false;
 		}
+		elseif ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			// forbid admins to delete media of other users
+			$media = DBfetch(DBselect(
+				'SELECT m.userid'.
+					' FROM media m'.
+					' WHERE '.DBcondition('m.mediaid', $mediaids).
+					' AND m.userid!='.zbx_dbstr($USER_DETAILS['userid']),
+				1
+			));
+			if ($media) {
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				return false;
+			}
+		}
 
 		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
 		$result = DBexecute($sql);
@@ -999,6 +1022,14 @@ Copt::memoryPick();
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
 				return false;
+			}
+			elseif ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				// forbid admins to update media of other users
+				foreach ($users as $user) {
+					if ($USER_DETAILS['userid'] != $user['userid']) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+				}
 			}
 
 			$upd_medias = array();
