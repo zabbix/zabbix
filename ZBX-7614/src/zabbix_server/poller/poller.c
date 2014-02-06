@@ -443,7 +443,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(0);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_IPMI:
@@ -451,7 +451,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_ipmi(item, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
@@ -469,7 +469,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_AGGREGATE:
@@ -486,7 +486,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(0);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
@@ -504,7 +504,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 	}
 
 	if (SUCCEED != res)
