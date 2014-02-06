@@ -1173,62 +1173,43 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 
 	if (0 != to_verify_num)
 	{
-		AGENT_RESULT	current_index_values[MAX_BUNCH_ITEMS];
+		ret = zbx_snmp_bulkget_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type,
+				num, error, max_error_len);
+
+		if (SUCCEED != ret)
+			goto exit;
 
 		for (i = 0; i < to_verify_num; i++)
 		{
 			j = to_verify[i];
-			init_result(&current_index_values[j]);
-		}
 
-		ret = zbx_snmp_bulkget_values(ss, items, to_verify_oids, current_index_values, errcodes,
-				query_and_ignore_type, num, error, max_error_len);
+			if (SUCCEED != errcodes[j])
+				continue;
 
-		if (SUCCEED == ret)
-		{
-			for (i = 0; i < to_verify_num; i++)
+			if (NULL == GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
 			{
-				j = to_verify[i];
-
-				if (NULL == GET_STR_RESULT(&current_index_values[j]) ||
-						0 != strcmp(current_index_values[j].str, index_values[j]))
-				{
-					to_walk[to_walk_num++] = j;
-				}
-				else
-				{
-					/* ready to construct the final OID with index */
-
-					size_t	len;
-
-					len = strlen(oids_translated[j]);
-
-					pl = strchr(items[j].snmp_oid, '[');
-
-					*pl = '\0';
-					zbx_snmp_translate(oids_translated[j], items[j].snmp_oid,
-							sizeof(oids_translated[j]));
-					*pl = '[';
-
-					zbx_strlcat(oids_translated[j], to_verify_oids[j] + len,
-							sizeof(oids_translated[j]));
-				}
-
-				free_result(&current_index_values[j]);
+				to_walk[to_walk_num++] = j;
 			}
-		}
-		else
-		{
-			for (i = 0; i < to_verify_num; i++)
+			else
 			{
-				j = to_verify[i];
-				free_result(&current_index_values[j]);
+				/* ready to construct the final OID with index */
+
+				size_t	len;
+
+				len = strlen(oids_translated[j]);
+
+				pl = strchr(items[j].snmp_oid, '[');
+
+				*pl = '\0';
+				zbx_snmp_translate(oids_translated[j], items[j].snmp_oid, sizeof(oids_translated[j]));
+				*pl = '[';
+
+				zbx_strlcat(oids_translated[j], to_verify_oids[j] + len, sizeof(oids_translated[j]));
 			}
+
+			free_result(&results[j]);
 		}
 	}
-
-	if (SUCCEED != ret)
-		goto exit;
 
 	/* walk OID trees to build index cache for cache misses */
 
