@@ -838,15 +838,14 @@ static void	process_active_checks(char *server, unsigned short port)
 	int		i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
-	char		*value = NULL;
-	zbx_uint64_t	lastlogsize;
-	int		mtime;
 	char		params[MAX_STRING_LEN], filename[MAX_STRING_LEN];
 	char		pattern[MAX_STRING_LEN], output_template[MAX_STRING_LEN];
 	/* checks `log', `eventlog', `logrt' may contain parameter, which overrides CONFIG_MAX_LINES_PER_SECOND */
 	char		maxlines_persec_str[16];
 	int		maxlines_persec;
 #ifdef _WINDOWS
+	char		*value = NULL;
+	zbx_uint64_t	lastlogsize;
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
 	char		key_severity[MAX_STRING_LEN], str_severity[32] /* for `regex_match_ex' */;
@@ -1308,7 +1307,9 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		active_metrics[i].nextcheck = (int)time(NULL) + active_metrics[i].refresh;
 	}
+#ifdef _WINDOWS
 ret:
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
