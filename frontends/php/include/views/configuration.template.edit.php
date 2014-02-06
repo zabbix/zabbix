@@ -175,6 +175,12 @@ $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(
 	$cmbGroups
 )));
 
+$templateList->addRow(_('Description'), new CTextArea('description',
+	($templateid > 0 && !hasRequest('form_refresh'))
+		? $this->data['dbTemplate']['description']
+		: getRequest('description')
+));
+
 // FULL CLONE {
 if ($_REQUEST['form'] == 'full_clone') {
 	// template applications
