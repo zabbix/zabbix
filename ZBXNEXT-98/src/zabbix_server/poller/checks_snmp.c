@@ -856,6 +856,7 @@ out:
 	return ret;
 }
 
+/*
 static int	zbx_snmp_get_value(struct snmp_session *ss, unsigned char value_type, unsigned char data_type,
 		const DC_INTERFACE *interface, const char *snmp_oid, AGENT_RESULT *value)
 {
@@ -920,6 +921,7 @@ out:
 
 	return ret;
 }
+*/
 
 static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, char *error,
@@ -1155,8 +1157,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 
 		if (SUCCEED == cache_get_snmp_index(&items[i], oids_translated[i], index_values[i], &idx, &idx_alloc))
 		{
-			zbx_snprintf(to_verify_oids[to_verify_num], sizeof(to_verify_oids[to_verify_num]), "%s.%s",
-					oids_translated[i], idx);
+			zbx_snprintf(to_verify_oids[i], sizeof(to_verify_oids[i]), "%s.%s", oids_translated[i], idx);
 
 			to_verify[to_verify_num++] = i;
 			query_and_ignore_type[i] = 1;
@@ -1279,7 +1280,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 					if (0 == strcmp(oids_translated[to_walk[k]], oids_translated[j]))
 					{
 						SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, result.msg));
-						errcodes[to_walk[k]] = errcode;
+						errcodes[to_walk[k]] = NOTSUPPORTED;
 					}
 				}
 			}
