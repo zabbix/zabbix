@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-02 00:47+0200\n"
+"POT-Creation-Date: 2014-02-06 13:34+0200\n"
 "PO-Revision-Date: 2013-12-10 22:17+0300\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
 
-#: include/func.inc.php:459
+#: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -243,11 +243,11 @@ msgstr "Elfogadható SLA"
 msgid "Access denied!"
 msgstr "Hozzáférés megtagadva!"
 
-#: include/func.inc.php:1889
+#: include/func.inc.php:1895
 msgid "Access denied."
 msgstr ""
 
-#: api/classes/CUser.php:836
+#: api/classes/CUser.php:1008
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "A fiók %s másidpercig zárolva."
@@ -412,7 +412,7 @@ msgstr "Aktív eddig"
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:201
+#: include/views/administration.users.edit.php:205
 #: include/views/common.macros.php:67
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:523
@@ -446,8 +446,8 @@ msgstr "Aktív eddig"
 #: include/views/js/adm.regexprs.edit.js.php:249
 #: include/views/js/configuration.action.edit.js.php:287
 #: include/views/js/configuration.discovery.edit.js.php:110
-#: include/views/js/configuration.sysmaps.js.php:189
-#: include/views/js/configuration.sysmaps.js.php:402
+#: include/views/js/configuration.sysmaps.js.php:194
+#: include/views/js/configuration.sysmaps.js.php:407
 #: include/views/monitoring.history.php:100 jsLoader.php:177
 #: popup_bitem.php:166 popup_media.php:141 popup_period.php:130
 #: tr_logform.php:291 tr_status.php:762
@@ -631,6 +631,7 @@ msgstr "Bármely szót tartalmaz"
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.screen.constructor.edit.php:409
 #: include/views/inventory.host.view.php:235
+#: include/views/js/configuration.sysmaps.js.php:120
 #: include/views/monitoring.overview.php:32
 msgid "Application"
 msgstr "Alkalmazás"
@@ -675,9 +676,9 @@ msgstr ""
 msgid "Applications"
 msgstr "Alkalmazások"
 
-#: include/views/js/configuration.sysmaps.js.php:198
-#: include/views/js/configuration.sysmaps.js.php:299
-#: include/views/js/configuration.sysmaps.js.php:412
+#: include/views/js/configuration.sysmaps.js.php:203
+#: include/views/js/configuration.sysmaps.js.php:304
+#: include/views/js/configuration.sysmaps.js.php:417
 msgid "Apply"
 msgstr "Alkalmaz"
 
@@ -686,12 +687,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr ""
 
-#: include/func.inc.php:246
+#: include/func.inc.php:252
 msgid "Apr"
 msgstr "Ápr"
 
 #: include/forms.inc.php:1700 include/func.inc.php:132
-#: include/func.inc.php:263 jsLoader.php:112
+#: include/func.inc.php:269 jsLoader.php:112
 msgid "April"
 msgstr "Április"
 
@@ -794,12 +795,12 @@ msgstr ""
 msgid "Audit logs"
 msgstr "Audit logok"
 
-#: include/func.inc.php:250
+#: include/func.inc.php:256
 msgid "Aug"
 msgstr "Aug"
 
 #: include/forms.inc.php:1692 include/func.inc.php:136
-#: include/func.inc.php:267 jsLoader.php:116
+#: include/func.inc.php:273 jsLoader.php:116
 msgid "August"
 msgstr "Augusztus"
 
@@ -848,11 +849,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Automatikus regisztráció"
 
-#: include/views/administration.users.edit.php:149
+#: include/views/administration.users.edit.php:153
 msgid "Auto-login"
 msgstr "Automatikus belépés"
 
-#: include/views/administration.users.edit.php:150 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:154 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatikus kijelentkezés (minimum 90 mp)"
 
@@ -879,8 +880,8 @@ msgstr "Automatikus"
 msgid "Automatic icon mapping"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:130
-#: include/views/js/configuration.sysmaps.js.php:255
+#: include/views/js/configuration.sysmaps.js.php:135
+#: include/views/js/configuration.sysmaps.js.php:260
 msgid "Automatic icon selection"
 msgstr ""
 
@@ -925,7 +926,7 @@ msgstr ""
 msgid "Axis side"
 msgstr "Tengely elhelyezkedése"
 
-#: include/func.inc.php:427
+#: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
 msgstr "B"
@@ -982,8 +983,8 @@ msgstr "Villogó"
 msgid "Blocked"
 msgstr "Zárolva"
 
-#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:370
-#: include/views/js/configuration.sysmaps.js.php:448
+#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:375
+#: include/views/js/configuration.sysmaps.js.php:453
 msgid "Bold line"
 msgstr "Vastag vonal"
 
@@ -994,7 +995,7 @@ msgstr "Boolean"
 #: include/views/configuration.screen.constructor.edit.php:606
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:83
-#: include/views/js/configuration.sysmaps.js.php:245
+#: include/views/js/configuration.sysmaps.js.php:250
 msgid "Bottom"
 msgstr "Alúl"
 
@@ -1434,11 +1435,11 @@ msgstr "Triggerek létrehozása sikertelen"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:219
 msgid "Cannot add user"
 msgstr "Felhasználó létrehozása sikertelen"
 
-#: users.php:165
+#: users.php:166
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "Felhasználó létrehozása sikertelen. A beírt jelszavak nem azonosak."
 
@@ -1490,7 +1491,7 @@ msgstr ""
 msgid "Cannot clone trigger prototypes."
 msgstr ""
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr ""
 
@@ -1558,7 +1559,7 @@ msgstr "Nem hozható létre új elem."
 msgid "Cannot create screen."
 msgstr "Nem hozható létre új képernyő."
 
-#: api/classes/CUser.php:1170
+#: api/classes/CUser.php:1348
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
@@ -1783,11 +1784,11 @@ msgstr "Triggerek törlése sikertelen"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr ""
 
-#: users.php:241 users.php:301
+#: users.php:248 users.php:308
 msgid "Cannot delete user"
 msgstr "Felhasználó törlése sikertelen"
 
-#: api/classes/CUser.php:696
+#: api/classes/CUser.php:899
 msgid "Cannot delete user media."
 msgstr ""
 
@@ -2130,7 +2131,7 @@ msgstr[1] ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:725
+#: api/classes/CUser.php:688
 msgid "Cannot insert user media."
 msgstr ""
 
@@ -2138,11 +2139,11 @@ msgstr ""
 msgid "Cannot link template"
 msgstr "Minta csatolása sikertelen"
 
-#: api/classes/CUser.php:875
+#: api/classes/CUser.php:1049
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:800
+#: api/classes/CUser.php:971
 msgid "Cannot logout."
 msgstr ""
 
@@ -2199,7 +2200,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr "Makró eltávolítása sikertelen."
 
-#: api/classes/CUser.php:267
+#: api/classes/CUser.php:273
 msgid "Cannot rename guest user."
 msgstr ""
 
@@ -2245,7 +2246,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr ""
 
-#: users.php:269
+#: users.php:276
 msgid "Cannot unblock users"
 msgstr "Felhasználói-státusz engedélyezése sikertelen"
 
@@ -2538,15 +2539,15 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:203
+#: profile.php:177 users.php:210
 msgid "Cannot update user"
 msgstr "Felhasználó frissítése sikertelen"
 
-#: api/classes/CUser.php:717
+#: api/classes/CUser.php:768
 msgid "Cannot update user media."
 msgstr ""
 
-#: profile.php:113 users.php:162
+#: profile.php:114 users.php:163
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "Felhasználó frissítése sikertelen. A beírt jelszavak nem azonosak."
 
@@ -2783,9 +2784,9 @@ msgstr "Klón"
 #: include/views/js/configuration.discovery.edit.js.php:537
 #: include/views/js/configuration.discovery.edit.js.php:601
 #: include/views/js/configuration.discovery.edit.js.php:618
-#: include/views/js/configuration.sysmaps.js.php:200
-#: include/views/js/configuration.sysmaps.js.php:301
-#: include/views/js/configuration.sysmaps.js.php:414 jsLoader.php:143
+#: include/views/js/configuration.sysmaps.js.php:205
+#: include/views/js/configuration.sysmaps.js.php:306
+#: include/views/js/configuration.sysmaps.js.php:419 jsLoader.php:143
 #: jsLoader.php:167 tr_testexpr.php:183
 msgid "Close"
 msgstr "Bezár"
@@ -2797,7 +2798,7 @@ msgstr ""
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
 #: include/views/configuration.graph.edit.php:232
-#: include/views/js/configuration.sysmaps.js.php:394 popup_bitem.php:43
+#: include/views/js/configuration.sysmaps.js.php:399 popup_bitem.php:43
 #: popup_bitem.php:160 popup_period.php:125
 msgid "Colour"
 msgstr "Szín"
@@ -2808,7 +2809,7 @@ msgstr "Szín"
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:378
+#: include/views/js/configuration.sysmaps.js.php:383
 msgid "Colour (OK)"
 msgstr "Szín (OK)"
 
@@ -3069,7 +3070,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
 #: include/views/inventory.host.view.php:168
-#: include/views/js/configuration.sysmaps.js.php:357
+#: include/views/js/configuration.sysmaps.js.php:362
 msgid "Connect to"
 msgstr "Kapcsolódva"
 
@@ -3133,7 +3134,7 @@ msgstr ""
 msgid "Contract number"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:165
+#: include/views/js/configuration.sysmaps.js.php:170
 msgid "Coordinates"
 msgstr ""
 
@@ -3148,7 +3149,7 @@ msgstr "Másolás"
 msgid "Copy selected to ..."
 msgstr "Kiválasztott másolása ..."
 
-#: api/classes/CUser.php:920
+#: api/classes/CUser.php:1094
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr ""
@@ -3435,7 +3436,7 @@ msgstr ""
 msgid "Czech (cs_CZ)"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr ""
 
@@ -3521,8 +3522,8 @@ msgstr "Dashboard konfiguráció"
 msgid "Dashboard filter"
 msgstr "Dashboard szűrő"
 
-#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:372
-#: include/views/js/configuration.sysmaps.js.php:450
+#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:377
+#: include/views/js/configuration.sysmaps.js.php:455
 msgid "Dashed line"
 msgstr "Szaggatott vonal"
 
@@ -3534,7 +3535,7 @@ msgstr "Adat"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -3561,7 +3562,7 @@ msgstr "Adat típus"
 msgid "Database file"
 msgstr ""
 
-#: include/setup.inc.php:283 setup.php:38
+#: include/setup.inc.php:283
 msgid "Database host"
 msgstr ""
 
@@ -3681,12 +3682,12 @@ msgstr "Hibakereső mód"
 msgid "Debug mode updated"
 msgstr "Hibakereső mód frissítve"
 
-#: include/func.inc.php:254
+#: include/func.inc.php:260
 msgid "Dec"
 msgstr ""
 
 #: include/forms.inc.php:1712 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:120
+#: include/func.inc.php:277 jsLoader.php:120
 msgid "December"
 msgstr "December"
 
@@ -3701,8 +3702,8 @@ msgstr "Decimális"
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:97
 #: include/views/js/configuration.sysmaps.js.php:82
-#: include/views/js/configuration.sysmaps.js.php:136
-#: include/views/js/configuration.sysmaps.js.php:244
+#: include/views/js/configuration.sysmaps.js.php:141
+#: include/views/js/configuration.sysmaps.js.php:249
 #: include/views/monitoring.screen.php:88 jsLoader.php:142 popup_bitem.php:116
 #: popup_period.php:109 slides.php:224
 msgid "Default"
@@ -3864,7 +3865,7 @@ msgstr "Script törlése?"
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:208
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -4006,7 +4007,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr "Törli a kijelölt triggereket?"
 
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:376
 msgid "Delete selected user?"
 msgstr "Törli a kiválasztott felhasználót?"
 
@@ -4168,7 +4169,7 @@ msgid "Description"
 msgstr "Leírás"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:816
-#: include/func.inc.php:2009
+#: include/func.inc.php:2015
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4359,7 +4360,7 @@ msgstr "Letiltja a kijelölt triggereket?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:170
+#: include/views/administration.users.edit.php:174
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4367,7 +4368,7 @@ msgstr "Letiltja a kijelölt triggereket?"
 #: include/views/configuration.host.massupdate.php:240
 #: include/views/configuration.host.prototype.edit.php:302
 #: include/views/configuration.item.massupdate.php:300
-#: include/views/js/configuration.sysmaps.js.php:153
+#: include/views/js/configuration.sysmaps.js.php:158
 #: include/views/monitoring.dashconf.php:41 popup_media.php:137
 #: tr_logform.php:371
 msgid "Disabled"
@@ -4499,7 +4500,7 @@ msgstr "Felderítés állapota"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1785
+#: include/func.inc.php:1791
 msgid "Displaying"
 msgstr "Megjelenít"
 
@@ -4528,8 +4529,8 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
-#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:371
-#: include/views/js/configuration.sysmaps.js.php:449 jsLoader.php:145
+#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:376
+#: include/views/js/configuration.sysmaps.js.php:454 jsLoader.php:145
 msgid "Dot"
 msgstr "Pontozott vonal"
 
@@ -4624,7 +4625,7 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:275
+#: api/classes/CUser.php:281
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr ""
@@ -4646,12 +4647,12 @@ msgstr "Holland (nl_NL)"
 msgid "Dynamic item"
 msgstr "Dinamikus elem"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:1976
+#: include/func.inc.php:1982
 msgid "ERROR"
 msgstr ""
 
@@ -4663,7 +4664,7 @@ msgstr "ESEMÉNYEK"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:200
 #: include/views/configuration.action.edit.php:385
 #: include/views/configuration.action.edit.php:398
 #: include/views/configuration.maintenance.edit.php:112
@@ -4673,8 +4674,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/js/adm.regexprs.edit.js.php:7
 #: include/views/js/configuration.discovery.edit.js.php:7
-#: include/views/js/configuration.sysmaps.js.php:424
-#: include/views/js/configuration.sysmaps.js.php:432
+#: include/views/js/configuration.sysmaps.js.php:429
+#: include/views/js/configuration.sysmaps.js.php:437
 #: include/views/monitoring.triggerComment.php:51 jsLoader.php:184
 msgid "Edit"
 msgstr "Szerkesztés"
@@ -4691,7 +4692,7 @@ msgstr ""
 msgid "Element"
 msgstr "Elem"
 
-#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:323
+#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:328
 msgid "Element name"
 msgstr "Elem név"
 
@@ -4740,7 +4741,7 @@ msgstr ""
 #: api/classes/CTrigger.php:850 api/classes/CTrigger.php:914
 #: api/classes/CTrigger.php:1004 api/classes/CTriggerPrototype.php:605
 #: api/classes/CUserGroup.php:622 api/classes/CUserMacro.php:356
-#: api/classes/CUserMacro.php:508 api/classes/CUser.php:523
+#: api/classes/CUserMacro.php:508 api/classes/CUser.php:530
 msgid "Empty input parameter."
 msgstr ""
 
@@ -4907,7 +4908,7 @@ msgstr "Engedélyezi a kijelölt triggereket?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:166
+#: include/views/administration.users.edit.php:170
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:61
@@ -5020,7 +5021,7 @@ msgstr "Minden nap"
 msgid "Every week(s)"
 msgstr "Minden héten"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgid "Exa"
 msgstr "Exa"
 
@@ -5192,12 +5193,12 @@ msgstr ""
 msgid "Favourites"
 msgstr "Kedvencek"
 
-#: include/func.inc.php:244
+#: include/func.inc.php:250
 msgid "Feb"
 msgstr ""
 
 #: include/forms.inc.php:1690 include/func.inc.php:130
-#: include/func.inc.php:261 jsLoader.php:110
+#: include/func.inc.php:267 jsLoader.php:110
 msgid "February"
 msgstr "Február"
 
@@ -5335,7 +5336,7 @@ msgstr ""
 msgid "First"
 msgstr "Első"
 
-#: include/func.inc.php:1730
+#: include/func.inc.php:1736
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -5354,7 +5355,7 @@ msgstr "Fix"
 msgid "Flexible intervals"
 msgstr ""
 
-#: profile.php:116 users.php:169
+#: profile.php:117 users.php:170
 msgid "For guest, password must be empty"
 msgstr "A vendég felhasználó (guest) jelszavának üresnek kell lennie"
 
@@ -5370,12 +5371,12 @@ msgstr "Negyedik"
 msgid "French (fr_FR)"
 msgstr "Francia (fr_FR)"
 
-#: include/func.inc.php:224
+#: include/func.inc.php:230
 msgid "Fri"
 msgstr ""
 
 #: include/forms.inc.php:1675 include/forms.inc.php:1743
-#: include/func.inc.php:152 include/func.inc.php:236
+#: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Péntek"
 
@@ -5383,7 +5384,7 @@ msgstr "Péntek"
 #: include/views/configuration.action.edit.php:446
 #: include/views/configuration.services.edit.php:226
 #: include/views/configuration.services.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:115
+#: include/views/js/configuration.sysmaps.js.php:339 popup_period.php:115
 #: report2.php:376 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
 msgid "From"
@@ -5400,7 +5401,7 @@ msgstr ""
 msgid "Frontend access updated"
 msgstr ""
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:219
 msgid "Frontend messaging"
 msgstr ""
 
@@ -5418,7 +5419,7 @@ msgstr "Teljes képernyő"
 msgid "Function"
 msgstr "Funkció"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgctxt "Giga short"
 msgid "G"
 msgstr ""
@@ -5484,7 +5485,7 @@ msgstr "Támogatás"
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr ""
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgid "Giga"
 msgstr "Giga"
 
@@ -5534,7 +5535,7 @@ msgstr "Mehet"
 msgid "Go to"
 msgstr ""
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1913
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5826,8 +5827,8 @@ msgstr "Karbantartott csoportok"
 msgid "H.i"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr ""
@@ -6549,19 +6550,19 @@ msgstr "ELEMEK"
 msgid "Icon"
 msgstr "Ikon"
 
-#: include/views/js/configuration.sysmaps.js.php:264
+#: include/views/js/configuration.sysmaps.js.php:269
 msgid "Icon (default)"
 msgstr "Ikon (alapértelmezett)"
 
-#: include/views/js/configuration.sysmaps.js.php:291
+#: include/views/js/configuration.sysmaps.js.php:296
 msgid "Icon (disabled)"
 msgstr "Ikon (letiltva)"
 
-#: include/views/js/configuration.sysmaps.js.php:282
+#: include/views/js/configuration.sysmaps.js.php:287
 msgid "Icon (maintenance)"
 msgstr "Ikon (karbantartás)"
 
-#: include/views/js/configuration.sysmaps.js.php:273
+#: include/views/js/configuration.sysmaps.js.php:278
 msgid "Icon (problem)"
 msgstr "Ikon (hiba)"
 
@@ -6660,7 +6661,7 @@ msgstr ""
 msgid "Iconmap is not enabled"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:125
+#: include/views/js/configuration.sysmaps.js.php:130
 msgid "Icons"
 msgstr ""
 
@@ -6668,7 +6669,7 @@ msgstr ""
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:1897 include/func.inc.php:1917
+#: include/func.inc.php:1903 include/func.inc.php:1923
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -7343,7 +7344,7 @@ msgstr ""
 msgid "Incorrect status."
 msgstr ""
 
-#: api/classes/CUser.php:319
+#: api/classes/CUser.php:325
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr ""
@@ -7400,7 +7401,7 @@ msgstr ""
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr ""
 
-#: include/func.inc.php:1130
+#: include/func.inc.php:1136
 msgid "Incorrect type of asort_by_key."
 msgstr ""
 
@@ -7644,6 +7645,8 @@ msgstr ""
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:301 api/classes/CUserMacro.php:434
+#: api/classes/CUser.php:623 api/classes/CUser.php:643
+#: api/classes/CUser.php:801 api/classes/CUser.php:846
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -7723,7 +7726,7 @@ msgstr ""
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
-#: api/classes/CUserMedia.php:183 api/classes/CUser.php:151
+#: api/classes/CUserMedia.php:190 api/classes/CUser.php:152
 msgid "It is not possible to search by user password."
 msgstr ""
 
@@ -8002,12 +8005,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "Jabber Azonosító"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:249
 msgid "Jan"
 msgstr ""
 
 #: include/forms.inc.php:1685 include/func.inc.php:129
-#: include/func.inc.php:260 jsLoader.php:109
+#: include/func.inc.php:266 jsLoader.php:109
 msgid "January"
 msgstr "Január"
 
@@ -8015,25 +8018,25 @@ msgstr "Január"
 msgid "Japanese (ja_JP)"
 msgstr "Japán (ja_JP)"
 
-#: include/func.inc.php:249
+#: include/func.inc.php:255
 msgid "Jul"
 msgstr ""
 
 #: include/forms.inc.php:1687 include/func.inc.php:135
-#: include/func.inc.php:266 jsLoader.php:115
+#: include/func.inc.php:272 jsLoader.php:115
 msgid "July"
 msgstr "Július"
 
-#: include/func.inc.php:248
+#: include/func.inc.php:254
 msgid "Jun"
 msgstr ""
 
 #: include/forms.inc.php:1710 include/func.inc.php:134
-#: include/func.inc.php:265 jsLoader.php:114
+#: include/func.inc.php:271 jsLoader.php:114
 msgid "June"
 msgstr "Június"
 
-#: include/func.inc.php:434 include/func.inc.php:670
+#: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
 msgid "K"
 msgstr ""
@@ -8066,7 +8069,7 @@ msgstr ""
 msgid "Keyword"
 msgstr "Kulcsszó"
 
-#: include/func.inc.php:670
+#: include/func.inc.php:676
 msgid "Kilo"
 msgstr "Kilo"
 
@@ -8116,13 +8119,13 @@ msgstr ""
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:898
 #: include/views/js/configuration.sysmaps.js.php:70
-#: include/views/js/configuration.sysmaps.js.php:231
-#: include/views/js/configuration.sysmaps.js.php:349
+#: include/views/js/configuration.sysmaps.js.php:236
+#: include/views/js/configuration.sysmaps.js.php:354
 msgid "Label"
 msgstr "Cimke"
 
 #: include/views/js/configuration.sysmaps.js.php:78
-#: include/views/js/configuration.sysmaps.js.php:240
+#: include/views/js/configuration.sysmaps.js.php:245
 msgid "Label location"
 msgstr "Cimke elhelyezkedése"
 
@@ -8134,7 +8137,7 @@ msgstr "Nyelv"
 msgid "Last"
 msgstr "Utolsó"
 
-#: include/func.inc.php:1770
+#: include/func.inc.php:1776
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -8239,7 +8242,7 @@ msgstr "Litván (lv_LV)"
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:71
 #: include/views/js/configuration.sysmaps.js.php:84
-#: include/views/js/configuration.sysmaps.js.php:246
+#: include/views/js/configuration.sysmaps.js.php:251
 #: include/views/monitoring.overview.php:86 popup_bitem.php:153
 msgid "Left"
 msgstr "Balra"
@@ -8265,8 +8268,8 @@ msgstr ""
 msgid "Length of last (most recent) T value in characters is NOT N"
 msgstr ""
 
-#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:369
-#: include/views/js/configuration.sysmaps.js.php:447
+#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:374
+#: include/views/js/configuration.sysmaps.js.php:452
 msgid "Line"
 msgstr "Vonal"
 
@@ -8274,9 +8277,9 @@ msgstr "Vonal"
 msgid "Link"
 msgstr "Kapcsolat"
 
-#: include/views/js/configuration.sysmaps.js.php:324
-#: include/views/js/configuration.sysmaps.js.php:336
-#: include/views/js/configuration.sysmaps.js.php:388
+#: include/views/js/configuration.sysmaps.js.php:329
+#: include/views/js/configuration.sysmaps.js.php:341
+#: include/views/js/configuration.sysmaps.js.php:393
 msgid "Link indicators"
 msgstr "Kapcsolatjelzők"
 
@@ -8334,11 +8337,11 @@ msgstr "Csatolt minták"
 msgid "Linked to"
 msgstr "Csatolva"
 
-#: include/views/js/configuration.sysmaps.js.php:330
+#: include/views/js/configuration.sysmaps.js.php:335
 msgid "Links between the selected elements"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:319
+#: include/views/js/configuration.sysmaps.js.php:324
 msgid "Links for the selected element"
 msgstr ""
 
@@ -8424,7 +8427,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: auditlogs.php:142 include/func.inc.php:1903 include/func.inc.php:1920
+#: auditlogs.php:142 include/func.inc.php:1909 include/func.inc.php:1926
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8436,12 +8439,12 @@ msgstr "Belépés"
 msgid "Login as Guest"
 msgstr ""
 
-#: api/classes/CUser.php:912
+#: api/classes/CUser.php:1086
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:1054
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8450,8 +8453,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:765 api/classes/CUser.php:783
-#: api/classes/CUser.php:830
+#: api/classes/CUser.php:934 api/classes/CUser.php:953
+#: api/classes/CUser.php:1002
 msgid "Login name or password is incorrect."
 msgstr ""
 
@@ -8478,7 +8481,7 @@ msgstr ""
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr ""
 
-#: include/func.inc.php:430 include/func.inc.php:671
+#: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
 msgid "M"
 msgstr ""
@@ -8581,7 +8584,7 @@ msgstr ""
 #: include/audit.inc.php:48 include/maps.inc.php:833 include/maps.inc.php:923
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
-#: include/views/js/configuration.sysmaps.js.php:148
+#: include/views/js/configuration.sysmaps.js.php:153
 msgid "Maintenance"
 msgstr "Karbantartás"
 
@@ -8655,7 +8658,7 @@ msgstr ""
 #: include/audit.inc.php:40 include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
-#: include/views/js/configuration.sysmaps.js.php:115 jsLoader.php:138
+#: include/views/js/configuration.sysmaps.js.php:113 jsLoader.php:138
 #: map.php:25
 msgid "Map"
 msgstr "Térkép"
@@ -8718,12 +8721,12 @@ msgstr ""
 msgid "Maps"
 msgstr "Térképek"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:251
 msgid "Mar"
 msgstr ""
 
 #: include/forms.inc.php:1695 include/func.inc.php:131
-#: include/func.inc.php:262 jsLoader.php:111
+#: include/func.inc.php:268 jsLoader.php:111
 msgid "March"
 msgstr "Március"
 
@@ -8749,7 +8752,7 @@ msgstr ""
 msgid "Mass update"
 msgstr "Tömeges frissítés"
 
-#: include/views/js/configuration.sysmaps.js.php:214
+#: include/views/js/configuration.sysmaps.js.php:219
 msgid "Mass update elements"
 msgstr ""
 
@@ -8783,7 +8786,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Triggerenkénti maximálisan megjelenített eseményszám"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:2011
+#: include/func.inc.php:2017
 msgid "Maximize"
 msgstr "Maximalizál"
 
@@ -8794,7 +8797,7 @@ msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d chara
 msgstr[0] ""
 msgstr[1] ""
 
-#: api/classes/CUser.php:283
+#: api/classes/CUser.php:289
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8854,17 +8857,17 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: include/forms.inc.php:1705 include/func.inc.php:133
-#: include/func.inc.php:264 jsLoader.php:113
+#: include/func.inc.php:270 jsLoader.php:113
 msgid "May"
 msgstr "Május"
 
-#: include/func.inc.php:247
+#: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
 msgstr ""
 
-#: include/views/administration.users.edit.php:200
-#: include/views/administration.users.edit.php:328 popup_media.php:27
+#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:332 popup_media.php:27
 msgid "Media"
 msgstr "Eszköztípus"
 
@@ -8912,7 +8915,7 @@ msgstr "Eszköztípusok"
 msgid "Media types used by action \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:671
+#: include/func.inc.php:677
 msgid "Mega"
 msgstr "Mega"
 
@@ -8956,11 +8959,11 @@ msgstr "Üzenet eljárások"
 msgid "Message text limit"
 msgstr ""
 
-#: include/views/administration.users.edit.php:221
+#: include/views/administration.users.edit.php:225
 msgid "Message timeout"
 msgstr ""
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:220
 msgid "Message timeout (seconds)"
 msgstr ""
 
@@ -8968,7 +8971,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: include/views/administration.users.edit.php:357
+#: include/views/administration.users.edit.php:361
 msgid "Messaging"
 msgstr ""
 
@@ -8982,7 +8985,7 @@ msgid "Middle"
 msgstr "Középre"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:2011
+#: include/func.inc.php:2017
 msgid "Minimize"
 msgstr "Minimalizál"
 
@@ -9115,12 +9118,12 @@ msgstr "Mód"
 msgid "Model"
 msgstr ""
 
-#: include/func.inc.php:220
+#: include/func.inc.php:226
 msgid "Mon"
 msgstr ""
 
 #: include/forms.inc.php:1671 include/forms.inc.php:1739
-#: include/func.inc.php:148 include/func.inc.php:232
+#: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Hétfő"
 
@@ -9280,7 +9283,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:110
 #: include/views/configuration.triggers.massupdate.php:88
 #: include/views/inventory.host.list.php:79
-#: include/views/js/configuration.sysmaps.js.php:181 items.php:44
+#: include/views/js/configuration.sysmaps.js.php:186 items.php:44
 #: latest.php:316 maintenance.php:44 maintenance.php:200 maintenance.php:223
 #: popup_httpstep.php:36 popup.php:557 popup.php:616 popup.php:678
 #: popup.php:701 popup.php:815 popup.php:925 popup.php:934 popup.php:1018
@@ -9337,7 +9340,7 @@ msgstr "Hálózati térkép frissítve"
 msgid "Network maps"
 msgstr "Hálózati térképek"
 
-#: httpmon.php:155 include/func.inc.php:214
+#: httpmon.php:155 include/func.inc.php:220
 msgid "Never"
 msgstr "Soha"
 
@@ -9401,13 +9404,13 @@ msgstr "Új szolgáltatási időszak felvétele"
 msgid "Next"
 msgstr "Következő"
 
-#: include/func.inc.php:1763
+#: include/func.inc.php:1769
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
 #: events.php:762 include/events.inc.php:353 include/events.inc.php:371
-#: include/func.inc.php:2230 include/triggers.inc.php:1648
+#: include/func.inc.php:2236 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9798,7 +9801,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:162
+#: include/views/administration.users.edit.php:166
 msgid "No media found."
 msgstr ""
 
@@ -9860,7 +9863,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:844 api/classes/CUser.php:969
+#: api/classes/CUser.php:1016 api/classes/CUser.php:1144
 msgid "No permissions for system access."
 msgstr ""
 
@@ -9903,8 +9906,10 @@ msgstr ""
 #: api/classes/CTrigger.php:933 api/classes/CTrigger.php:954
 #: api/classes/CTrigger.php:1823 api/classes/CTriggerPrototype.php:519
 #: api/classes/CTriggerPrototype.php:622 api/classes/CUserMacro.php:551
-#: api/classes/CUserMacro.php:660 api/classes/CUser.php:1137
-#: include/func.inc.php:1877
+#: api/classes/CUserMacro.php:660 api/classes/CUser.php:630
+#: api/classes/CUser.php:809 api/classes/CUser.php:829
+#: api/classes/CUser.php:888 api/classes/CUser.php:1313
+#: include/func.inc.php:1883
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -10143,7 +10148,7 @@ msgstr "Elemek minta nélkül"
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:347
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
@@ -10201,12 +10206,12 @@ msgstr "Értesítési riportok"
 msgid "Notifications"
 msgstr "Értesítések"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:259
 msgid "Nov"
 msgstr ""
 
 #: include/forms.inc.php:1707 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:119
+#: include/func.inc.php:276 jsLoader.php:119
 msgid "November"
 msgstr "November"
 
@@ -10433,7 +10438,7 @@ msgstr ""
 msgid "OVERVIEW"
 msgstr "ÁTTEKINTÉS"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:258
 msgid "Oct"
 msgstr ""
 
@@ -10442,7 +10447,7 @@ msgid "Octal"
 msgstr "Oktális"
 
 #: include/forms.inc.php:1702 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:118
+#: include/func.inc.php:275 jsLoader.php:118
 msgid "October"
 msgstr "Október"
 
@@ -10467,7 +10472,7 @@ msgstr "BEKAPCSOL"
 msgid "On status change triggers blink for"
 msgstr ""
 
-#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:223
 msgid "Once"
 msgstr ""
 
@@ -10526,15 +10531,15 @@ msgstr ""
 msgid "Only Super Admins can update icon maps."
 msgstr ""
 
-#: api/classes/CUser.php:594
+#: api/classes/CUser.php:619
 msgid "Only Zabbix Admins can add user media."
 msgstr ""
 
-#: api/classes/CUser.php:662
+#: api/classes/CUser.php:797
 msgid "Only Zabbix Admins can change user media."
 msgstr ""
 
-#: api/classes/CUser.php:632
+#: api/classes/CUser.php:878
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
@@ -10740,7 +10745,7 @@ msgstr "Áttekintés"
 msgid "Overview by proxy"
 msgstr "Áttekintés proxinként"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgctxt "Peta short"
 msgid "P"
 msgstr ""
@@ -10997,7 +11002,7 @@ msgstr "Jelszó (ismétlés)"
 msgid "Password required for media type."
 msgstr ""
 
-#: profile.php:119 users.php:172
+#: profile.php:120 users.php:173
 msgid "Password should not be empty"
 msgstr "A jelszó nem lehet üres"
 
@@ -11041,11 +11046,11 @@ msgid "Periods"
 msgstr ""
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:354
+#: include/views/administration.users.edit.php:358
 msgid "Permissions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:352
+#: include/views/administration.users.edit.php:356
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
@@ -11053,7 +11058,7 @@ msgstr ""
 msgid "Persian (fa_IR)"
 msgstr ""
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgid "Peta"
 msgstr "Peta"
 
@@ -11069,12 +11074,12 @@ msgstr ""
 msgid "Plain text"
 msgstr "Szöveg"
 
-#: include/views/administration.users.edit.php:234
-#: include/views/administration.users.edit.php:271
+#: include/views/administration.users.edit.php:238
+#: include/views/administration.users.edit.php:275
 msgid "Play"
 msgstr ""
 
-#: include/views/administration.users.edit.php:222
+#: include/views/administration.users.edit.php:226
 msgid "Play sound"
 msgstr ""
 
@@ -11157,7 +11162,7 @@ msgstr "Előnézet"
 msgid "Previous"
 msgstr "Előző"
 
-#: include/func.inc.php:1736
+#: include/func.inc.php:1742
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -11233,12 +11238,12 @@ msgstr "Privát kulcsfájl"
 msgid "Privilege level"
 msgstr ""
 
-#: api/classes/CUser.php:757
+#: api/classes/CUser.php:925
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
 #: include/maps.inc.php:720 include/maps.inc.php:803 include/maps.inc.php:894
-#: include/views/js/configuration.sysmaps.js.php:141 tr_status.php:280
+#: include/views/js/configuration.sysmaps.js.php:146 tr_status.php:280
 msgid "Problem"
 msgstr "Hiba"
 
@@ -11400,7 +11405,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "Címzett(ek)"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:235
 msgid "Recovery"
 msgstr ""
 
@@ -11413,7 +11418,7 @@ msgstr "Üzenet a helyreállásról"
 msgid "Recovery subject"
 msgstr "Visszaállás tárgya"
 
-#: include/views/administration.users.edit.php:151 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:155 profile.php:53 users.php:64
 msgid "Refresh (in seconds)"
 msgstr "Frissités (másodpercben)"
 
@@ -11531,11 +11536,11 @@ msgstr "Távoli parancs"
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:74
 #: include/views/js/configuration.slideconf.edit.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:199
-#: include/views/js/configuration.sysmaps.js.php:300
-#: include/views/js/configuration.sysmaps.js.php:413
-#: include/views/js/configuration.sysmaps.js.php:458
-#: include/views/js/configuration.sysmaps.js.php:467 jsLoader.php:206
+#: include/views/js/configuration.sysmaps.js.php:204
+#: include/views/js/configuration.sysmaps.js.php:305
+#: include/views/js/configuration.sysmaps.js.php:418
+#: include/views/js/configuration.sysmaps.js.php:463
+#: include/views/js/configuration.sysmaps.js.php:472 jsLoader.php:206
 msgid "Remove"
 msgstr "Eltávolítás"
 
@@ -11720,7 +11725,7 @@ msgstr "Az eredmény HAMIS"
 msgid "Result is TRUE"
 msgstr "Az eredmény IGAZ"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr ""
@@ -11784,7 +11789,7 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:85
-#: include/views/js/configuration.sysmaps.js.php:247 popup_bitem.php:154
+#: include/views/js/configuration.sysmaps.js.php:252 popup_bitem.php:154
 msgid "Right"
 msgstr "Jobbra"
 
@@ -11801,7 +11806,7 @@ msgstr "Sorok száma"
 msgid "Rows"
 msgstr "Sorok"
 
-#: include/views/administration.users.edit.php:152 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:156 profile.php:54 users.php:65
 msgid "Rows per page"
 msgstr "Sorok oldalanként"
 
@@ -12024,12 +12029,12 @@ msgstr "ZABBIX ÁLLAPOT"
 msgid "Safari"
 msgstr ""
 
-#: include/func.inc.php:225
+#: include/func.inc.php:231
 msgid "Sat"
 msgstr ""
 
 #: include/forms.inc.php:1676 include/forms.inc.php:1744
-#: include/func.inc.php:153 include/func.inc.php:237
+#: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Szombat"
 
@@ -12055,9 +12060,9 @@ msgstr "Szombat"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:365
 #: include/views/administration.users.edit.php:369
-#: include/views/administration.users.edit.php:379
+#: include/views/administration.users.edit.php:373
+#: include/views/administration.users.edit.php:383
 #: include/views/configuration.action.edit.php:1053
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -12266,7 +12271,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:208 scripts_exec.php:26
+#: jsLoader.php:208 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Scriptek"
 
@@ -12319,7 +12324,7 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/views/administration.users.edit.php:220
+#: include/views/administration.users.edit.php:224
 msgid "Seconds"
 msgstr "Másodpercek"
 
@@ -12361,8 +12366,9 @@ msgstr ""
 #: include/views/configuration.services.child.list.php:63
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
-#: include/views/js/configuration.sysmaps.js.php:111
-#: include/views/js/configuration.sysmaps.js.php:118 popup_bitem.php:128
+#: include/views/js/configuration.sysmaps.js.php:109
+#: include/views/js/configuration.sysmaps.js.php:116
+#: include/views/js/configuration.sysmaps.js.php:123 popup_bitem.php:128
 #: popup.php:594 popup.php:663 popup.php:792 popup.php:903 popup.php:999
 #: popup.php:1155 popup.php:1226 popup.php:1291 popup.php:1353 popup.php:1538
 #: popup_right.php:107 popup_usrgrp.php:103 tr_logform.php:276
@@ -12393,7 +12399,7 @@ msgstr "Kijelölt"
 msgid "Selected actions deleted"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:220
+#: include/views/js/configuration.sysmaps.js.php:225
 msgid "Selected elements"
 msgstr ""
 
@@ -12437,7 +12443,7 @@ msgstr ""
 msgid "Sent"
 msgstr ""
 
-#: include/func.inc.php:251
+#: include/func.inc.php:257
 msgid "Sep"
 msgstr ""
 
@@ -12447,7 +12453,7 @@ msgid "Separated"
 msgstr ""
 
 #: include/forms.inc.php:1697 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:117
+#: include/func.inc.php:274 jsLoader.php:117
 msgid "September"
 msgstr "Szeptember"
 
@@ -12545,7 +12551,7 @@ msgstr "Szolgáltatások"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:963
+#: api/classes/CUser.php:1138
 msgid "Session terminated, re-login, please."
 msgstr ""
 
@@ -12994,8 +13000,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Lépések száma"
 
-#: include/views/administration.users.edit.php:235
-#: include/views/administration.users.edit.php:272
+#: include/views/administration.users.edit.php:239
+#: include/views/administration.users.edit.php:276
 msgid "Stop"
 msgstr ""
 
@@ -13053,12 +13059,12 @@ msgstr ""
 msgid "Sum of values of a period T is NOT N"
 msgstr ""
 
-#: include/func.inc.php:219
+#: include/func.inc.php:225
 msgid "Sun"
 msgstr ""
 
 #: include/forms.inc.php:1677 include/forms.inc.php:1745
-#: include/func.inc.php:155 include/func.inc.php:231
+#: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Vasárnap"
 
@@ -13116,7 +13122,7 @@ msgstr "Rendszer státusz"
 msgid "System uptime in seconds."
 msgstr ""
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgctxt "Tera short"
 msgid "T"
 msgstr ""
@@ -13299,7 +13305,7 @@ msgstr "Minták"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgid "Tera"
 msgstr "Tera"
 
@@ -13445,12 +13451,12 @@ msgstr "Ezen a héten"
 msgid "This year"
 msgstr "Ebben az évben"
 
-#: include/func.inc.php:223
+#: include/func.inc.php:229
 msgid "Thu"
 msgstr ""
 
 #: include/forms.inc.php:1674 include/forms.inc.php:1742
-#: include/func.inc.php:151 include/func.inc.php:235
+#: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Csütörtök"
 
@@ -13547,7 +13553,7 @@ msgid "Title"
 msgstr "Cím"
 
 #: include/views/configuration.action.edit.php:449
-#: include/views/js/configuration.sysmaps.js.php:335
+#: include/views/js/configuration.sysmaps.js.php:340
 msgid "To"
 msgstr ""
 
@@ -13563,7 +13569,7 @@ msgstr "Ma"
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
-#: include/views/js/configuration.sysmaps.js.php:248
+#: include/views/js/configuration.sysmaps.js.php:253
 #: include/views/monitoring.overview.php:85
 msgid "Top"
 msgstr "Felül"
@@ -13618,7 +13624,7 @@ msgid "Trends"
 msgstr "Trendek"
 
 #: events.php:295 events.php:336 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1642
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -13626,7 +13632,7 @@ msgstr "Trendek"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:107 jsLoader.php:139
+#: include/views/js/configuration.sysmaps.js.php:105 jsLoader.php:139
 #: jsLoader.php:212 report5.php:60 services.php:468 tr_comments.php:75
 #: tr_logform.php:150 tr_logform.php:163
 msgid "Trigger"
@@ -13805,7 +13811,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr ""
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:279
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:283
 msgid "Trigger severity"
 msgstr "Trigger súlyosság"
 
@@ -13830,7 +13836,7 @@ msgstr "Trigger érték"
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:227
 #: include/views/inventory.host.view.php:237
-#: include/views/js/configuration.sysmaps.js.php:392
+#: include/views/js/configuration.sysmaps.js.php:397
 #: include/views/monitoring.overview.php:27 popup.php:44 search.php:135
 #: search.php:142 search.php:174 search.php:194 search.php:209 search.php:267
 #: search.php:321 search.php:384 search.php:413 search.php:437
@@ -13879,12 +13885,12 @@ msgstr "Csonkolt"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:221
+#: include/func.inc.php:227
 msgid "Tue"
 msgstr ""
 
 #: include/forms.inc.php:1672 include/forms.inc.php:1740
-#: include/func.inc.php:149 include/func.inc.php:233
+#: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Kedd"
 
@@ -13926,7 +13932,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:129
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
-#: include/views/js/configuration.sysmaps.js.php:393
+#: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.overview.php:33 latest.php:331 popup_media.php:121
 #: popup.php:518 popup.php:817 popup.php:927 popup.php:936 tr_logform.php:301
 #: tr_logform.php:305
@@ -13937,7 +13943,7 @@ msgstr "Típus"
 msgid "Type (Full details)"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:365
+#: include/views/js/configuration.sysmaps.js.php:370
 msgid "Type (OK)"
 msgstr "Típus (OK)"
 
@@ -13986,12 +13992,12 @@ msgstr ""
 #: include/views/configuration.httpconf.popup.php:78
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:246
-#: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:213
+#: include/views/js/configuration.sysmaps.js.php:187 jsLoader.php:213
 #: popup_httpstep.php:37 tr_logform.php:370
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:153
+#: include/views/administration.users.edit.php:157
 msgid "URL (after login)"
 msgstr "URL (belépés után)"
 
@@ -14016,7 +14022,7 @@ msgid "URL parameter name is empty."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:180
-#: include/views/js/configuration.sysmaps.js.php:177 jsLoader.php:214
+#: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:214
 msgid "URLs"
 msgstr ""
 
@@ -14028,7 +14034,7 @@ msgstr ""
 msgid "USER PROFILE"
 msgstr "FELHASZNÁLÓI PROFIL"
 
-#: include/func.inc.php:2412
+#: include/func.inc.php:2418
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14374,22 +14380,22 @@ msgstr ""
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:326
+#: include/views/administration.users.edit.php:330
 #: include/views/configuration.action.edit.php:528
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
 msgstr "Felhasználó"
 
-#: api/classes/CUser.php:295
+#: api/classes/CUser.php:301
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
 
-#: users.php:212
+#: users.php:219
 msgid "User added"
 msgstr "Új felhasználó felvéve"
 
-#: include/views/administration.users.edit.php:344
+#: include/views/administration.users.edit.php:348
 msgid "User can't change type for himself"
 msgstr ""
 
@@ -14409,7 +14415,7 @@ msgstr "A felhasználó nem módosíthatja saját státuszát"
 msgid "User cannot change status of himself."
 msgstr ""
 
-#: users.php:241 users.php:301
+#: users.php:248 users.php:308
 msgid "User deleted"
 msgstr "Felhasználó törölve"
 
@@ -14470,16 +14476,16 @@ msgstr ""
 msgid "User groups"
 msgstr "Felhasználói csoportok"
 
-#: api/classes/CUser.php:1150
+#: api/classes/CUser.php:1326
 msgid "User is not allowed to delete himself."
 msgstr ""
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:314
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:312
+#: api/classes/CUser.php:318
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr ""
@@ -14517,17 +14523,17 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:344
 #: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:352
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "Felhasználó típus"
 
-#: profile.php:173 users.php:203
+#: profile.php:177 users.php:210
 msgid "User updated"
 msgstr "Felhasználó frissítve"
 
-#: api/classes/CUser.php:358
+#: api/classes/CUser.php:364
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr ""
@@ -14553,7 +14559,7 @@ msgstr "Felhasználók"
 msgid "Users (online)"
 msgstr "Felhasználók (bejelentkezve)"
 
-#: users.php:269
+#: users.php:276
 msgid "Users unblocked"
 msgstr "Felhasználói-zárolás megszüntetve"
 
@@ -14975,12 +14981,12 @@ msgstr ""
 msgid "Web scenarios"
 msgstr ""
 
-#: include/func.inc.php:222
+#: include/func.inc.php:228
 msgid "Wed"
 msgstr ""
 
 #: include/forms.inc.php:1673 include/forms.inc.php:1741
-#: include/func.inc.php:150 include/func.inc.php:234
+#: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Szerda"
 
@@ -15133,7 +15139,7 @@ msgstr ""
 msgid "Wrong fields for trigger."
 msgstr ""
 
-#: api/classes/CUser.php:239
+#: api/classes/CUser.php:246
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr ""
@@ -15143,7 +15149,7 @@ msgstr ""
 msgid "Wrong macro \"%1$s\"."
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:167
+#: include/views/js/configuration.sysmaps.js.php:172
 msgid "X"
 msgstr "X"
 
@@ -15173,11 +15179,11 @@ msgstr ""
 msgid "XML file contains warning %1$s:"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:169 report3.php:96
+#: include/views/js/configuration.sysmaps.js.php:174 report3.php:96
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgctxt "Yotta short"
 msgid "Y"
 msgstr ""
@@ -15227,7 +15233,7 @@ msgstr ""
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/func.inc.php:598 include/translateDefines.inc.php:48
+#: include/func.inc.php:604 include/translateDefines.inc.php:48
 msgid "Y.m.d H:i:s"
 msgstr ""
 
@@ -15243,14 +15249,14 @@ msgstr "Évi"
 
 #: events.php:762 include/blocks.inc.php:824
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:356
-#: include/events.inc.php:374 include/func.inc.php:2230
+#: include/events.inc.php:374 include/func.inc.php:2236
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "Igen"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -15258,12 +15264,12 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
-#: api/classes/CUser.php:324
+#: api/classes/CUser.php:330
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:1913
+#: include/func.inc.php:1919
 msgid "You are not logged in."
 msgstr ""
 
@@ -15301,27 +15307,27 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
-#: api/classes/CUser.php:245
+#: api/classes/CUser.php:252
 msgid "You do not have permissions to create users."
 msgstr ""
 
-#: api/classes/CUser.php:257
+#: api/classes/CUser.php:263
 msgid "You do not have permissions to update other users."
 msgstr ""
 
-#: api/classes/CUser.php:252
+#: api/classes/CUser.php:259
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/func.inc.php:1895
+#: include/func.inc.php:1901
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:1915
+#: include/func.inc.php:1921
 msgid "You must login to view this page."
 msgstr ""
 
-#: include/func.inc.php:1891
+#: include/func.inc.php:1897
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15329,7 +15335,7 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring."
 msgstr ""
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgctxt "Zetta short"
 msgid "Z"
 msgstr ""
@@ -15441,7 +15447,7 @@ msgstr ""
 msgid "Zabbix trapper"
 msgstr "ZABBIX trapper"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgid "Zetta"
 msgstr "Zeta"
 
@@ -15469,7 +15475,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15520,15 +15526,15 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
 msgid "avg"
 msgstr "átl"
 
-#: include/func.inc.php:558 jsLoader.php:96
+#: include/func.inc.php:564 jsLoader.php:96
 msgctxt "day short"
 msgid "d"
 msgstr ""
@@ -15566,14 +15572,14 @@ msgstr "Y M d H:i:s"
 msgid "d.M"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr ""
 
@@ -15615,7 +15621,7 @@ msgstr ""
 msgid "dynamic"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:215
+#: include/views/js/configuration.sysmaps.js.php:220
 msgid "elements"
 msgstr ""
 
@@ -15641,7 +15647,7 @@ msgstr "végrehajtva"
 msgid "fixed"
 msgstr ""
 
-#: include/func.inc.php:1795
+#: include/func.inc.php:1801
 msgid "found"
 msgstr "talált"
 
@@ -15651,7 +15657,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
 
-#: include/func.inc.php:559 jsLoader.php:97
+#: include/func.inc.php:565 jsLoader.php:97
 msgctxt "hour short"
 msgid "h"
 msgstr ""
@@ -15703,7 +15709,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:82
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15721,12 +15727,12 @@ msgstr "mint"
 msgid "low-level discovery rule"
 msgstr ""
 
-#: include/func.inc.php:560
+#: include/func.inc.php:566
 msgctxt "minute short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:557 jsLoader.php:95
+#: include/func.inc.php:563 jsLoader.php:95
 msgctxt "month short"
 msgid "m"
 msgstr ""
@@ -15743,16 +15749,16 @@ msgstr "karbantartás"
 msgid "map"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15769,7 +15775,7 @@ msgstr "minimum 60 másodperc"
 msgid "mm"
 msgstr ""
 
-#: include/func.inc.php:562
+#: include/func.inc.php:568
 msgctxt "millisecond short"
 msgid "ms"
 msgstr ""
@@ -15782,7 +15788,7 @@ msgstr ""
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
@@ -15816,7 +15822,7 @@ msgid "now"
 msgstr "most"
 
 #: include/blocks.inc.php:445 include/blocks.inc.php:791
-#: include/func.inc.php:1792
+#: include/func.inc.php:1798
 msgid "of"
 msgstr ""
 
@@ -15885,7 +15891,7 @@ msgstr "root"
 msgid "running"
 msgstr "futó"
 
-#: include/func.inc.php:561
+#: include/func.inc.php:567
 msgctxt "second short"
 msgid "s"
 msgstr "mp"
@@ -15923,7 +15929,7 @@ msgstr "érték hozzárendelések"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1788
+#: include/func.inc.php:1794
 msgid "to"
 msgstr "-nak/-nek"
 
@@ -15954,7 +15960,7 @@ msgstr "érték"
 msgid "via"
 msgstr "keresztűl"
 
-#: include/func.inc.php:556 jsLoader.php:94
+#: include/func.inc.php:562 jsLoader.php:94
 msgctxt "year short"
 msgid "y"
 msgstr "é"
