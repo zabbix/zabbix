@@ -976,6 +976,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->description_orig = NULL;
 			db_trigger->expression = zbx_strdup(NULL, row[2]);
 			db_trigger->expression_orig = NULL;
+			db_trigger->comments = NULL;
+			db_trigger->comments_orig = NULL;
 			db_trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
 			zbx_vector_ptr_create(&db_trigger->functions);
