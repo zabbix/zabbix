@@ -41,10 +41,11 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get Template data
+	 * Get template data.
 	 *
 	 * @param array $options
-	 * @return array|boolean Template data as array or false if error
+	 *
+	 * @return array
 	 */
 	public function get($options = array()) {
 		$result = array();
@@ -338,12 +339,13 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get Template ID by Template name
+	 * Get template ID by template name.
 	 *
-	 * @param array $template_data
-	 * @param array $template_data['host']
-	 * @param array $template_data['templateid']
-	 * @return string templateid
+	 * @param array $templateData
+	 * @param array $templateData['host']
+	 * @param array $templateData['templateid']
+	 *
+	 * @return string
 	 */
 	public function getObjects($templateData) {
 		$options = array(
@@ -381,61 +383,117 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Add Template
+	 * Add template.
 	 *
-	 * @param array $templates multidimensional array with templates data
-	 * @param string $templates['host']
-	 * @return boolean
+	 * @param array $templates
+	 *
+	 * @return array
 	 */
-	public function create($templates) {
+	public function create(array $templates) {
 		$templates = zbx_toArray($templates);
-		$templateids = array();
 
-		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
-		foreach ($templates as $tnum => $template) {
-			if (empty($template['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
-			}
-			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
+		$this->validateCreate($templates);
 
-			foreach ($templates[$tnum]['groups'] as $gnum => $group) {
-				$groupids[$group['groupid']] = $group['groupid'];
-			}
+		$templateIds = array();
+
+		foreach ($templates as $key => $template) {
+			$templates[$key]['groups'] = zbx_toArray($template['groups']);
 		}
-		// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
-
-		// PERMISSIONS {{{
-		$updGroups = API::HostGroup()->get(array(
-			'output' => array('groupid'),
-			'groupids' => $groupids,
-			'editable' => 1,
-			'preservekeys' => 1
-		));
-		foreach ($groupids as $gnum => $groupid) {
-			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-		// }}} PERMISSIONS
-
-		foreach ($templates as $tnum => $template) {
-			// If visible name is not given or empty it should be set to host name
+		foreach ($templates as $template) {
+			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
 				$template['name'] = $template['host'];
 			}
 
-			$templateDbFields = array(
-				'host' => null
-			);
+			$newTemplateIds = DB::insert('hosts', array(array(
+				'host' => $template['host'],
+				'name' => $template['name'],
+				'description' => isset($template['description']) ? $template['description'] : null,
+				'status' => HOST_STATUS_TEMPLATE
+			)));
+
+			$templateId = reset($newTemplateIds);
+
+			$templateIds[] = $templateId;
+
+			foreach ($template['groups'] as $group) {
+				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
+
+				$result = DBexecute(
+					'INSERT INTO hosts_groups (hostgroupid,hostid,groupid)'.
+					' VALUES ('.zbx_dbstr($hostGroupId).','.zbx_dbstr($templateId).','.zbx_dbstr($group['groupid']).')'
+				);
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
+				}
+			}
+
+			$template['templateid'] = $templateId;
+
+			$result = $this->massAdd(array(
+				'templates' => $template,
+				'templates_link' => isset($template['templates']) ? $template['templates'] : null,
+				'macros' => isset($template['macros']) ? $template['macros'] : null,
+				'hosts' => isset($template['hosts']) ? $template['hosts'] : null
+			));
+
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
+			}
+		}
+
+		return array('templateids' => $templateIds);
+	}
+
+	/**
+	 * Validate create template.
+	 *
+	 * @param array $templates
+	 */
+	protected function validateCreate(array $templates) {
+		$groupIds = array();
+
+		foreach ($templates as $template) {
+			// check if hosts have at least 1 group
+			if (!isset($template['groups']) || !$template['groups']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
+			}
+
+			foreach ($template['groups'] as $group) {
+				$groupIds[$group['groupid']] = $group['groupid'];
+			}
+		}
+
+		$dbHostGroups = API::HostGroup()->get(array(
+			'output' => array('groupid'),
+			'groupids' => $groupIds,
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($groupIds as $groupId) {
+			if (!isset($dbHostGroups[$groupId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+		}
+
+		$templateDbFields = array('host' => null);
+
+		foreach ($templates as $template) {
+			// if visible name is not given or empty it should be set to host name
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
+			}
 
 			if (!check_db_fields($templateDbFields, $template)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "host" is mandatory'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "host" is mandatory.'));
 			}
 
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $template['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect characters used for Template name "%1$s"',
+					'Incorrect characters used for Template name "%1$s".',
 					$template['host']
 				));
 			}
@@ -465,92 +523,77 @@ class CTemplate extends CHostGeneral {
 					));
 				}
 			}
-
-			$templateid = DB::insert('hosts', array(array('host' => $template['host'],'name' => $template['name'], 'status' => HOST_STATUS_TEMPLATE,)));
-			$templateids[] = $templateid = reset($templateid);
-
-
-			foreach ($template['groups'] as $group) {
-				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-				$result = DBexecute('INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES ('.zbx_dbstr($hostgroupid).','.zbx_dbstr($templateid).','.zbx_dbstr($group['groupid']).')');
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
-			}
-
-			$template['templateid'] = $templateid;
-			$options = array();
-			$options['templates'] = $template;
-			if (isset($template['templates']) && !is_null($template['templates']))
-				$options['templates_link'] = $template['templates'];
-			if (isset($template['macros']) && !is_null($template['macros']))
-				$options['macros'] = $template['macros'];
-			if (isset($template['hosts']) && !is_null($template['hosts']))
-				$options['hosts'] = $template['hosts'];
-
-			$result = $this->massAdd($options);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS);
 		}
-
-		return array('templateids' => $templateids);
 	}
 
 	/**
-	 * Update Template
+	 * Update template.
 	 *
-	 * @param array $templates multidimensional array with templates data
-	 * @return boolean
+	 * @param array $templates
+	 *
+	 * @return array
 	 */
-	public function update($templates) {
+	public function update(array $templates) {
 		$templates = zbx_toArray($templates);
-		$templateids = zbx_objectValues($templates, 'templateid');
 
-		$updTemplates = $this->get(array(
-			'templateids' => $templateids,
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		));
-
-		foreach ($templates as $template) {
-			if (!isset($updTemplates[$template['templateid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
+		$this->validateUpdate($templates);
 
 		$macros = array();
+
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
 				$template['name'] = $template['host'];
 			}
-			$tplTmp = $template;
+
+			$templateCopy = $template;
 
 			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
 
 			if (isset($template['macros'])) {
 				$macros[$template['templateid']] = $template['macros'];
+
 				unset($template['macros']);
 			}
 
-			unset($template['templates']);
-			unset($template['templateid']);
-			unset($tplTmp['templates']);
+			unset($template['templates'], $template['templateid'], $templateCopy['templates']);
 
-			$template['templates'] = array($tplTmp);
-			$result = $this->massUpdate($template);
-			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
+			$template['templates'] = array($templateCopy);
+
+			if (!$this->massUpdate($template)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template.'));
+			}
 		}
 
 		if ($macros) {
 			API::UserMacro()->replaceMacros($macros);
 		}
 
-		return array('templateids' => $templateids);
+		return array('templateids' => zbx_objectValues($templates, 'templateid'));
 	}
 
 	/**
-	 * Delete Template
+	 * Validate update template.
+	 *
+	 * @param array $templates
+	 */
+	protected function validateUpdate(array $templates) {
+		$dbTemplates = $this->get(array(
+			'output' => array('templateid'),
+			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($templates as $template) {
+			if (!isset($dbTemplates[$template['templateid']])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+		}
+	}
+
+	/**
+	 * Delete template.
 	 *
 	 * @param array $templateids
 	 * @param array $templateids['templateids']
@@ -740,103 +783,292 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$data['hosts'] = array();
+
 		return parent::massAdd($data);
 	}
 
 	/**
-	 * Mass update hosts
+	 * Mass update.
 	 *
-	 * @param _array $hosts multidimensional array with Hosts data
-	 * @param array $hosts['hosts'] Array of Host objects to update
-	 * @return boolean
+	 * @param string $data['host']
+	 * @param string $data['name']
+	 * @param string $data['description']
+	 * @param array  $data['templates']
+	 * @param array  $data['templates_clear']
+	 * @param array  $data['templates_link']
+	 * @param array  $data['groups']
+	 * @param array  $data['hosts']
+	 * @param array  $data['macros']
+	 *
+	 * @return array
 	 */
-	public function massUpdate($data) {
-		$templates = zbx_toArray($data['templates']);
-		$templateids = zbx_objectValues($templates, 'templateid');
+	public function massUpdate(array $data) {
+		$this->validateMassUpdate($data);
 
-		$options = array(
-			'templateids' => $templateids,
+		$templates = zbx_toArray($data['templates']);
+		$templateIds = zbx_objectValues($templates, 'templateid');
+
+		$fieldsToUpdate = array();
+
+		if (isset($data['host'])) {
+			$fieldsToUpdate[] = 'host='.zbx_dbstr($data['host']);
+		}
+
+		if (isset($data['name'])) {
+			// if visible name is empty replace it with host name
+			if (zbx_empty(trim($data['name'])) && isset($data['host'])) {
+				$fieldsToUpdate[] = 'name='.zbx_dbstr($data['host']);
+			}
+			// we cannot have empty visible name
+			elseif (zbx_empty(trim($data['name'])) && !isset($data['host'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot have empty visible template name.'));
+			}
+			else {
+				$fieldsToUpdate[] = 'name='.zbx_dbstr($data['name']);
+			}
+		}
+
+		if (isset($data['description'])) {
+			$fieldsToUpdate[] = 'description='.zbx_dbstr($data['description']);
+		}
+
+		if ($fieldsToUpdate) {
+			DBexecute('UPDATE hosts SET '.implode(', ', $fieldsToUpdate).' WHERE '.dbConditionInt('hostid', $templateIds));
+		}
+
+		// update hostgroups linkage
+		if (isset($data['groups']) && $data['groups'] !== null) {
+			$data['groups'] = zbx_toArray($data['groups']);
+
+			$templateGroups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'hostids' => $templateIds
+			));
+			$templateGroupIds = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupIds = zbx_objectValues($data['groups'], 'groupid');
+
+			$groupsToAdd = array_diff($newGroupIds, $templateGroupIds);
+
+			if ($groupsToAdd) {
+				$result = $this->massAdd(array(
+					'templates' => $templates,
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
+				}
+			}
+
+			$groupsToDelete = array_diff($templateGroupIds, $newGroupIds);
+
+			if ($groupsToDelete) {
+				$result = $this->massRemove(array(
+					'templateids' => $templateIds,
+					'groupids' => $groupsToDelete
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove group.'));
+				}
+			}
+		}
+
+		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
+		$templateIdsClear = zbx_objectValues($data['templates_clear'], 'templateid');
+
+		if ($data['templates_clear']) {
+			$this->massRemove(array(
+				'templateids' => $templateIds,
+				'templateids_clear' => $templateIdsClear
+			));
+		}
+
+		// update template linkage
+		// firstly need to unlink all things, to correctly check circulars
+		if (isset($data['hosts']) && $data['hosts'] !== null) {
+			$templateHosts = API::Host()->get(array(
+				'templateids' => $templateIds,
+				'templated_hosts' => true,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+			));
+			$templateHostIds = zbx_objectValues($templateHosts, 'hostid');
+			$newHostIds = zbx_objectValues($data['hosts'], 'hostid');
+
+			$hostsToDelete = array_diff($templateHostIds, $newHostIds);
+			$hostIdsToDelete = array_diff($hostsToDelete, $templateIdsClear);
+
+			if ($hostIdsToDelete) {
+				$result = $this->massRemove(array(
+					'hostids' => $hostIdsToDelete,
+					'templateids' => $templateIds
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template.'));
+				}
+			}
+		}
+
+		if (isset($data['templates_link']) && $data['templates_link'] !== null) {
+			$templateTemplates = API::Template()->get(array(
+				'output' => array('templateid'),
+				'hostids' => $templateIds
+			));
+			$templateTemplateIds = zbx_objectValues($templateTemplates, 'templateid');
+			$newTemplateIds = zbx_objectValues($data['templates_link'], 'templateid');
+
+			$templatesToDelete = array_diff($templateTemplateIds, $newTemplateIds);
+			$templateIdsToDelete = array_diff($templatesToDelete, $templateIdsClear);
+
+			if ($templateIdsToDelete) {
+				$result = $this->massRemove(array(
+					'templateids' => $templateIds,
+					'templateids_link' => $templateIdsToDelete
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template.'));
+				}
+			}
+		}
+
+		if (isset($data['hosts']) && $data['hosts'] !== null) {
+			$hostsToAdd = array_diff($newHostIds, $templateHostIds);
+
+			if ($hostsToAdd) {
+				$result = $this->massAdd(array(
+					'templates' => $templates,
+					'hosts' => $hostsToAdd
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot link template.'));
+				}
+			}
+		}
+
+		if (isset($data['templates_link']) && $data['templates_link'] !== null) {
+			$templatesToAdd = array_diff($newTemplateIds, $templateTemplateIds);
+
+			if ($templatesToAdd) {
+				$result = $this->massAdd(array(
+					'templates' => $templates,
+					'templates_link' => $templatesToAdd
+				));
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot link template.'));
+				}
+			}
+		}
+
+		// macros
+		if (isset($data['macros'])) {
+			DB::delete('hostmacro', array('hostid' => $templateIds));
+
+			$this->massAdd(array(
+				'hosts' => $templates,
+				'macros' => $data['macros']
+			));
+		}
+
+		return array('templateids' => $templateIds);
+	}
+
+	/**
+	 * Validate mass update.
+	 *
+	 * @param string $data['host']
+	 * @param string $data['name']
+	 * @param array  $data['templates']
+	 * @param array  $data['groups']
+	 * @param array  $data['hosts']
+	 *
+	 * @return array
+	 */
+	protected function validateMassUpdate(array $data) {
+		$templates = zbx_toArray($data['templates']);
+
+		$dbTemplates = $this->get(array(
+			'output' => array('templateid'),
+			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-		);
-		$updTemplates = $this->get($options);
-		foreach ($templates as $tnum => $template) {
-			if (!isset($updTemplates[$template['templateid']])) {
+			'preservekeys' => true
+		));
+
+		// check permissions
+		foreach ($templates as $template) {
+			if (!isset($dbTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
-		// CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP {{{
-		if (isset($data['groups']) && empty($data['groups'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template'));
+		// check if templates have at least 1 group
+		if (isset($data['groups']) && !$data['groups']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for template.'));
 		}
-		// }}} CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP
 
-
-		// UPDATE TEMPLATES PROPERTIES {{{
+		// check name
 		if (isset($data['name'])) {
 			if (count($templates) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible template name'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible template name.'));
 			}
 
-			$curTemplate = reset($templates);
+			$template = reset($templates);
 
-			$options = array(
-				'filter' => array(
-					'name' => $curTemplate['name']),
+			$templateExists = $this->get(array(
 				'output' => array('templateid'),
-				'editable' => 1,
-				'nopermissions' => 1
-			);
-			$templateExists = $this->get($options);
+				'filter' => array('name' => $template['name']),
+				'editable' => true,
+				'nopermissions' => true
+			));
 			$templateExist = reset($templateExists);
 
-			if ($templateExist && (bccomp($templateExist['templateid'], $curTemplate['templateid']) != 0)) {
+			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Template with the same visible name "%1$s" already exists.',
-					$curTemplate['name']
+					$template['name']
 				));
 			}
 
 			// can't set the same name as existing host
-			if (API::Host()->exists(array('name' => $curTemplate['name']))) {
+			if (API::Host()->exists(array('name' => $template['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Host with the same visible name "%1$s" already exists.',
-					$curTemplate['name']
+					$template['name']
 				));
 			}
 		}
 
+		// check host
 		if (isset($data['host'])) {
 			if (count($templates) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update template name'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update template name.'));
 			}
 
-			$curTemplate = reset($templates);
+			$template = reset($templates);
 
-			$options = array(
-				'filter' => array(
-					'host' => $curTemplate['host']),
+			$templateExists = $this->get(array(
 				'output' => array('templateid'),
-				'editable' => 1,
-				'nopermissions' => 1
-			);
-			$templateExists = $this->get($options);
+				'filter' => array('host' => $template['host']),
+				'editable' => true,
+				'nopermissions' => true
+			));
 			$templateExist = reset($templateExists);
 
-			if ($templateExist && (bccomp($templateExist['templateid'], $curTemplate['templateid']) != 0)) {
+			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Template with the same name "%1$s" already exists.',
-					$curTemplate['host']
+					$template['host']
 				));
 			}
 
 			// can't set the same name as existing host
-			if (API::Host()->exists(array('host' => $curTemplate['host']))) {
+			if (API::Host()->exists(array('host' => $template['host']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Host with the same name "%1$s" already exists.',
-					$curTemplate['host']
+					$template['host']
 				));
 			}
 		}
@@ -847,158 +1079,6 @@ class CTemplate extends CHostGeneral {
 				$data['host']
 			));
 		}
-
-		$sqlSet = array();
-		if (isset($data['host'])) {
-			$sqlSet[] = 'host=' . zbx_dbstr($data['host']);
-		}
-
-		if (isset($data['name'])) {
-			// if visible name is empty replace it with host name
-			if (zbx_empty(trim($data['name'])) && isset($data['host'])) {
-				$sqlSet[] = 'name=' . zbx_dbstr($data['host']);
-			}
-			// we cannot have empty visible name
-			elseif (zbx_empty(trim($data['name'])) && !isset($data['host'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot have empty visible template name'));
-			}
-			else {
-				$sqlSet[] = 'name=' . zbx_dbstr($data['name']);
-			}
-		}
-
-		if (!empty($sqlSet)) {
-			$sql = 'UPDATE hosts SET '.implode(', ', $sqlSet).' WHERE '.dbConditionInt('hostid', $templateids);
-			$result = DBexecute($sql);
-		}
-		// }}} UPDATE TEMPLATES PROPERTIES
-
-
-		// UPDATE HOSTGROUPS LINKAGE {{{
-		if (isset($data['groups']) && !is_null($data['groups'])) {
-			$data['groups'] = zbx_toArray($data['groups']);
-			$templateGroups = API::HostGroup()->get(array(
-				'output' => array('groupid'),
-				'hostids' => $templateids
-			));
-			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupids = zbx_objectValues($data['groups'], 'groupid');
-
-			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
-
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'templates' => $templates,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't add group"));
-				}
-			}
-
-			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
-			if (!empty($groupidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'groupids' => $groupidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove group"));
-				}
-			}
-		}
-		// }}} UPDATE HOSTGROUPS LINKAGE
-
-		$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
-		$templateidsClear = zbx_objectValues($data['templates_clear'], 'templateid');
-
-		if (!empty($data['templates_clear'])) {
-			$result = $this->massRemove(array(
-				'templateids' => $templateids,
-				'templateids_clear' => $templateidsClear,
-			));
-		}
-
-		// UPDATE TEMPLATE LINKAGE {{{
-		// firstly need to unlink all things, to correctly check circulars
-
-		if (isset($data['hosts']) && !is_null($data['hosts'])) {
-			$templateHosts = API::Host()->get(array(
-				'templateids' => $templateids,
-				'templated_hosts' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-			));
-			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
-			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
-
-			$hostsToDel = array_diff($templateHostids, $newHostids);
-			$hostidsToDel = array_diff($hostsToDel, $templateidsClear);
-
-			if (!empty($hostidsToDel)) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostidsToDel,
-					'templateids' => $templateids
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
-				}
-			}
-		}
-
-		if (isset($data['templates_link']) && !is_null($data['templates_link'])) {
-			$templateTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
-				'hostids' => $templateids
-			));
-			$templateTemplateids = zbx_objectValues($templateTemplates, 'templateid');
-			$newTemplateids = zbx_objectValues($data['templates_link'], 'templateid');
-
-			$templatesToDel = array_diff($templateTemplateids, $newTemplateids);
-			$templateidsToDel = array_diff($templatesToDel, $templateidsClear);
-			if (!empty($templateidsToDel)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'templateids_link' => $templateidsToDel
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't unlink template"));
-				}
-			}
-		}
-
-		if (isset($data['hosts']) && !is_null($data['hosts'])) {
-
-			$hostsToAdd = array_diff($newHostids, $templateHostids);
-			if (!empty($hostsToAdd)) {
-				$result = $this->massAdd(array('templates' => $templates, 'hosts' => $hostsToAdd));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
-				}
-			}
-		}
-
-		if (isset($data['templates_link']) && !is_null($data['templates_link'])) {
-			$templatesToAdd = array_diff($newTemplateids, $templateTemplateids);
-			if (!empty($templatesToAdd)) {
-				$result = $this->massAdd(array('templates' => $templates, 'templates_link' => $templatesToAdd));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't link template"));
-				}
-			}
-		}
-		// }}} UPDATE TEMPLATE LINKAGE
-
-		// macros
-		if (isset($data['macros'])) {
-			DB::delete('hostmacro', array('hostid' => $templateids));
-
-			$this->massAdd(array(
-				'hosts' => $templates,
-				'macros' => $data['macros']
-			));
-		}
-
-		return array('templateids' => $templateids);
 	}
 
 	/**
@@ -1031,6 +1111,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$data['hostids'] = array();
+
 		return parent::massRemove($data);
 	}
 

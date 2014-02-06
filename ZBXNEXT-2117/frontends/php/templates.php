@@ -57,6 +57,7 @@ $fields = array(
 	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'newgroup'			=> array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'description'		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
@@ -221,7 +222,8 @@ elseif (isset($_REQUEST['save'])) {
 			'groups' => $groups,
 			'templates' => $templates,
 			'hosts' => $hosts,
-			'macros' => $macros
+			'macros' => $macros,
+			'description' => getRequest('description')
 		);
 
 		// create/update template
