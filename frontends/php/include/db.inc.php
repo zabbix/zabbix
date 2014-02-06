@@ -679,17 +679,6 @@ function DBfetch($cursor, $convertNulls = true) {
 	return false;
 }
 
-function zbx_dbconcat($params) {
-	global $DB;
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_SQLITE3:
-			return implode(' || ', $params);
-		default:
-			return 'CONCAT('.implode(',', $params).')';
-	}
-}
-
 function zbx_sql_mod($x, $y) {
 	global $DB;
 
@@ -826,31 +815,6 @@ function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null) {
 	return $sqlPartWhere;
 }
 
-function in_node($id_var, $nodes = null) {
-	if (is_null($nodes)) {
-		$nodes = get_current_nodeid();
-	}
-
-	if (empty($nodes)) {
-		$nodes = 0;
-	}
-
-	if (zbx_ctype_digit($nodes)) {
-		$nodes = array($nodes);
-	}
-	elseif (is_string($nodes)) {
-		if (!preg_match('/^([0-9,]+)$/', $nodes)) {
-			fatal_error('Incorrect "nodes" for "in_node". Passed ['.$nodes.']');
-		}
-		$nodes = explode(',', $nodes);
-	}
-	elseif (!is_array($nodes)) {
-		fatal_error('Incorrect type of "nodes" for "in_node". Passed ['.gettype($nodes).']');
-	}
-
-	return uint_in_array(id2nodeid($id_var), $nodes);
-}
-
 function get_dbid($table, $field) {
 	// PGSQL on transaction failure on all queries returns false..
 	global $DB, $ZBX_LOCALNODEID;
@@ -908,19 +872,6 @@ function get_dbid($table, $field) {
 	while (false == $found);
 
 	return $ret2;
-}
-
-function create_id_by_nodeid($id, $nodeid = 0) {
-	global $ZBX_LOCALNODEID;
-
-	if ($id == 0) {
-		return 0;
-	}
-	$nodeid = ($nodeid == 0) ? get_current_nodeid(false) : $nodeid;
-
-	$id = remove_nodes_from_id($id);
-	$id = bcadd($id, bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), 0);
-	return $id;
 }
 
 function zbx_db_distinct($sql_parts) {

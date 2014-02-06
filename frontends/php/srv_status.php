@@ -54,6 +54,7 @@ check_fields($fields);
 
 if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = API::Service()->get(array(
+		'output' => array('serviceid'),
 		'serviceids' => $_REQUEST['serviceid'],
 		'preservekeys' => true
 	));

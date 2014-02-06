@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
 $parentHost = $data['parent_host'];
@@ -217,9 +218,11 @@ $ignoreTemplates = array();
 if ($hostPrototype['templates']) {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
+		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
+		$templateLink->setTarget('_blank');
 
 		$linkedTemplateTable->addRow(array(
-			$template['name'],
+			$templateLink,
 			!$hostPrototype['templateid'] ? new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu') : '',
 		));
 

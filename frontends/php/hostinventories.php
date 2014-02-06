@@ -39,9 +39,7 @@ $fields = array(
 	'filter_field_value'=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_exact'=>        array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
 	//ajax
-	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -57,15 +55,13 @@ if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid'))
 
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-if (hasRequest('favobj')) {
-	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostinventories.filter.state', getRequest('favstate'), PROFILE_TYPE_INT);
-	}
+if (hasRequest('filterState')) {
+	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
 }
 
 if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 $hostid = getRequest('hostid', 0);
@@ -111,6 +107,7 @@ if ($hostid > 0) {
 	}
 	else if ($userType == USER_TYPE_ZABBIX_ADMIN) {
 		$rwHost = API::Host()->get(array(
+			'output' => array('hostid'),
 			'hostids' => $hostid,
 			'editable' => true
 		));

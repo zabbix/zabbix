@@ -18,47 +18,8 @@
 **/
 
 
-var CDebug = Class.create({
-
-	className:		null,	// debuging class name
-	debug_status:	0,		// debug status: 0 - off, 1 - on, 2 - SDI;
-	debug_info:		'',		// debug string
-
-	initialize: function(className) {
-		this.className = className;
-	},
-
-	debug: function(str, id) {
-		if (this.debug_status) {
-			str = this.className + '. ' + str;
-
-			if (typeof(id) != 'undefined') {
-				str += ' :' + id;
-			}
-
-			this.debug_info += str + '\n';
-			if (this.debug_status == 2) {
-				SDI(str);
-			}
-
-			this.debug_prev = str;
-		}
-	},
-
-	notify: function() {
-	},
-
-	info: function(msg) {
-		alert(msg || 'Info.');
-	},
-
-	error: function(msg) {
-		throw(msg || 'Error.');
-	}
-});
-
 /**
- * Js debug
+ * Js debug.
  */
 var jsDump;
 

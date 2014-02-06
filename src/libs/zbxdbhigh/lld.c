@@ -460,6 +460,7 @@ static int	lld_rows_get(char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld
 
 		lld_row = zbx_malloc(NULL, sizeof(zbx_lld_row_t));
 		lld_row->jp_row = jp_row;
+		zbx_vector_ptr_create(&lld_row->item_links);
 
 		zbx_vector_ptr_append(lld_rows, lld_row);
 	}
@@ -471,14 +472,21 @@ out:
 	return ret;
 }
 
+static void	lld_item_link_free(zbx_lld_item_link_t *item_link)
+{
+	zbx_free(item_link);
+}
+
 static void	lld_row_free(zbx_lld_row_t *lld_row)
 {
+	zbx_vector_ptr_clean(&lld_row->item_links, (zbx_mem_free_func_t)lld_item_link_free);
+	zbx_vector_ptr_destroy(&lld_row->item_links);
 	zbx_free(lld_row);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_process_discovery_rule                                     *
+ * Function: lld_process_discovery_rule                                       *
  *                                                                            *
  * Purpose: add or update items, triggers and graphs for discovery item       *
  *                                                                            *
@@ -486,9 +494,9 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *             value      - [IN] received value from agent                    *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "DBlld_process_discovery_rule";
+	const char		*__function_name = "lld_process_discovery_rule";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -555,10 +563,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 
 	error = zbx_strdup(error, "");
 
-	DBlld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
-	DBlld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
-	DBlld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
-	DBlld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
+	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
+	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{

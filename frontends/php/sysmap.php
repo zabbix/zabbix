@@ -47,8 +47,7 @@ $fields = array(
 	'form_refresh' => array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favcnt' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
+	'favid' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -105,14 +104,14 @@ if (isset($_REQUEST['favobj'])) {
 		}
 
 		@ob_flush();
-		exit();
+		exit;
 
 	}
 }
 
 if (PAGE_TYPE_HTML != $page['type']) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
+	exit;
 }
 
 /*

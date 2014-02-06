@@ -447,7 +447,10 @@ class CXmlImport18 {
 			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
 			if ($exists && !empty($rules['screens']['updateExisting'])) {
-				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
+				$db_screens = API::Screen()->get(array(
+					'output' => array('screenid'),
+					'filter' => array('name' => $screen['name'])
+				));
 				if (empty($db_screens)) {
 					throw new Exception(_s('No permissions for screen "%1$s".', $screen['name']));
 				}
@@ -467,7 +470,14 @@ class CXmlImport18 {
 			}
 
 			foreach ($screen['screenitems'] as &$screenitem) {
-				$nodeCaption = isset($screenitem['resourceid']['node']) ? $screenitem['resourceid']['node'].':' : '';
+				if (isset($screenitem['resourceid']['node'])) {
+					$nodeId = getNodeIdByNodeName($screenitem['resourceid']['node']);
+					$nodeCaption = $screenitem['resourceid']['node'].':';
+				}
+				else {
+					$nodeId = null;
+					$nodeCaption = '';
+				}
 
 				if (!isset($screenitem['resourceid'])) {
 					$screenitem['resourceid'] = 0;
@@ -480,7 +490,13 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 							if (is_array($screenitem['resourceid'])) {
-								$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
+								$db_hostgroups = API::HostGroup()->get(array(
+									'output' => array('groupid'),
+									'nodeids' => $nodeId,
+									'filter' => array(
+										'name' => $screenitem['resourceid']['name']
+									)
+								));
 								if (empty($db_hostgroups)) {
 									$error = _s('Cannot find group "%1$s" used in screen "%2$s".',
 											$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
@@ -492,7 +508,13 @@ class CXmlImport18 {
 							}
 							break;
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
+							$db_hosts = API::Host()->get(array(
+								'output' => array('hostids'),
+								'nodeids' => $nodeId,
+								'filter' => array(
+									'host' => $screenitem['resourceid']['host']
+								)
+							));
 							if (empty($db_hosts)) {
 								$error = _s('Cannot find host "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['host'], $screen['name']);
@@ -503,7 +525,14 @@ class CXmlImport18 {
 							$screenitem['resourceid'] = $tmp['hostid'];
 							break;
 						case SCREEN_RESOURCE_GRAPH:
-							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
+							$db_graphs = API::Graph()->get(array(
+								'output' => array('graphid'),
+								'nodeids' => $nodeId,
+								'filter' => array(
+									'host' => $screenitem['resourceid']['host'],
+									'name' => $screenitem['resourceid']['name']
+								)
+							));
 							if (empty($db_graphs)) {
 								$error = _s('Cannot find graph "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['host'].NAME_DELIMITER.$screenitem['resourceid']['name'], $screen['name']);
@@ -515,7 +544,15 @@ class CXmlImport18 {
 							break;
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$db_items = API::Item()->getObjects($screenitem['resourceid']);
+							$db_items = API::Item()->get(array(
+								'output' => array('itemid'),
+								'nodeids' => $nodeId,
+								'webitems' => true,
+								'filter' => array(
+									'host' => $screenitem['resourceid']['host'],
+									'key_' => $screenitem['resourceid']['key_']
+								)
+							));
 
 							if (empty($db_items)) {
 								$error = _s('Cannot find item "%1$s" used in screen "%2$s".',
@@ -527,7 +564,13 @@ class CXmlImport18 {
 							$screenitem['resourceid'] = $tmp['itemid'];
 							break;
 						case SCREEN_RESOURCE_MAP:
-							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
+							$db_sysmaps = API::Map()->get(array(
+								'output' => array('sysmapid'),
+								'nodeids' => $nodeId,
+								'filter' => array(
+									'name' => $screenitem['resourceid']['name']
+								)
+							));
 							if (empty($db_sysmaps)) {
 								$error = _s('Cannot find map "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
@@ -538,7 +581,13 @@ class CXmlImport18 {
 							$screenitem['resourceid'] = $tmp['sysmapid'];
 							break;
 						case SCREEN_RESOURCE_SCREEN:
-							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
+							$db_screens = API::Screen()->get(array(
+								'output' => array('screenid'),
+								'nodeids' => $nodeId,
+								'filter' => array(
+									'name' => $screenitem['resourceid']['name']
+								)
+							));
 							if (empty($db_screens)) {
 								$error = _s('Cannot find screen "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
@@ -1087,7 +1136,10 @@ class CXmlImport18 {
 
 // HOSTS
 				if (isset($host_db['proxy_hostid'])) {
-					$proxy_exists = API::Proxy()->get(array('proxyids' => $host_db['proxy_hostid']));
+					$proxy_exists = API::Proxy()->get(array(
+						'output' => array('proxyid'),
+						'proxyids' => $host_db['proxy_hostid']
+					));
 					if (empty($proxy_exists)) {
 						$host_db['proxy_hostid'] = 0;
 					}
@@ -1720,7 +1772,7 @@ class CXmlImport18 {
 			if ($dependencies->length > 0) {
 				$triggersForDependencies = zbx_objectValues($triggersForDependencies, 'triggerid');
 				$triggersForDependencies = array_flip($triggersForDependencies);
-				$newDependencies = array();
+				$triggerDependencies = array();
 				foreach ($dependencies as $dependency) {
 
 					$triggerDescription = $dependency->getAttribute('description');
@@ -1731,18 +1783,24 @@ class CXmlImport18 {
 
 						foreach ($dependsOnList as $dependsOn) {
 							$depTrigger = get_trigger_by_description($dependsOn->nodeValue);
-							if ($depTrigger['triggerid']) {
-								$newDependencies[] = array(
-									'triggerid' => $currentTrigger['triggerid'],
-									'dependsOnTriggerid' => $depTrigger['triggerid']
+							if ($depTrigger) {
+								if (!isset($triggerDependencies[$currentTrigger['triggerid']])) {
+									$triggerDependencies[$currentTrigger['triggerid']] = array(
+										'triggerid' => $currentTrigger['triggerid'],
+										'dependencies' => array()
+									);
+								}
+
+								$triggerDependencies[$currentTrigger['triggerid']]['dependencies'][] = array(
+									'triggerid' => $depTrigger['triggerid']
 								);
 							}
 						}
 					}
 				}
 
-				if ($newDependencies) {
-					API::Trigger()->addDependencies($newDependencies);
+				if ($triggerDependencies) {
+					API::Trigger()->update($triggerDependencies);
 				}
 			}
 		}

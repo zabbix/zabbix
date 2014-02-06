@@ -17,23 +17,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-	require_once dirname(__FILE__).'/include/config.inc.php';
-	require_once dirname(__FILE__).'/include/js.inc.php';
 
-	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = _('Period');
-	$page['file'] = 'popup_period.php';
-	$page['scripts'] = array('class.calendar.js');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
 
-	define('ZBX_PAGE_NO_MENU', 1);
+$page['title'] = _('Period');
+$page['file'] = 'popup_period.php';
+$page['scripts'] = array('class.calendar.js');
+
+define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm'=>			array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,			null),

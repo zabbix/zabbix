@@ -142,11 +142,11 @@ $goOption = new CComboItem('disable_status', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected groups?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('enable_debug', _('Enable DEBUG'));
+$goOption = new CComboItem('enable_debug', _('Enable debug mode'));
 $goOption->setAttribute('confirm', _('Enable debug mode in selected groups?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable_debug', _('Disable DEBUG'));
+$goOption = new CComboItem('disable_debug', _('Disable debug mode'));
 $goOption->setAttribute('confirm', _('Disable debug mode in selected groups?'));
 $goComboBox->addItem($goOption);
 

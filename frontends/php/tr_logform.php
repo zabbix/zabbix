@@ -79,12 +79,10 @@ if (isset($_REQUEST['save_trigger'])) {
 		$type = TRIGGER_MULT_EVENT_ENABLED;
 
 		if(isset($_REQUEST['triggerid'])){
-			$options = array(
+			$triggersData = API::Trigger()->get(array(
 				'triggerids' => $_REQUEST['triggerid'],
-				'output' => API_OUTPUT_EXTEND,
-				'selectDependencies' => API_OUTPUT_REFER
-			);
-			$triggersData = API::Trigger()->get($options);
+				'output' => API_OUTPUT_EXTEND
+			));
 			$triggerData = reset($triggersData);
 
 			if($triggerData['templateid']){

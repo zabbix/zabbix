@@ -366,7 +366,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		'triggerids' => $srcTriggerIds,
 		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectDependencies' => API_OUTPUT_REFER
+		'selectDependencies' => array('triggerid')
 	);
 	if ($srcHostId) {
 		$srcHost = API::Host()->get(array(
@@ -1297,7 +1297,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$name = new CSpan($hostName, 'link_menu');
-			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
+			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
 			foreach ($triggers as $triggerHosts) {
@@ -1328,7 +1328,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = $css = $style = null;
-	$desc = $menuPopup = $triggerItems = $acknowledge = array();
+	$desc = $triggerItems = $acknowledge = array();
 
 	// for how long triggers should blink on status change (set by user in administration->general)
 	$config = select_config();
@@ -1445,7 +1445,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	}
 
 	if ($trigger) {
-		$column->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, $acknowledge));
 	}
 
 	return $column;
@@ -1614,29 +1614,31 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 }
 
 function make_trigger_details($trigger) {
-	$hosts = reset($trigger['hosts']);
-	$hostId = $hosts['hostid'];
+	$hostNames = array();
+
+	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
-		'hostids' => $hostId,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'preservekeys' => true
+		'hostids' => $hostIds,
+		'selectScreens' => API_OUTPUT_COUNT
 	));
-	$host = reset($hosts);
 
-	$scripts = API::Script()->getScriptsByHosts($hostId);
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
-	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->setMenuPopup(getMenuPopupHost($host, $scripts ? reset($scripts) : null));
+	foreach ($hosts as $host) {
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+		$hostNames[] = $hostName;
+		$hostNames[] = ', ';
+	}
+	array_pop($hostNames);
 
 	$table = new CTableInfo();
-
 	if (is_show_all_nodes()) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
-
-	$table->addRow(array(_('Host'), $hostName));
+	$table->addRow(array(_n('Host', 'Hosts', count($hosts)), $hostNames));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
@@ -2302,6 +2304,7 @@ function get_item_function_info($expr) {
 			}
 
 			$hostFound = API::Host()->get(array(
+				'output' => array('hostid'),
 				'filter' => array('host' => array($exprPart['host'])),
 				'templated_hosts' => true
 			));

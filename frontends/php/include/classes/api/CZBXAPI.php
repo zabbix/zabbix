@@ -86,7 +86,7 @@ class CZBXAPI {
 			'excludeSearch'			=> null,
 			'searchWildcardsEnabled'=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
+			'output'				=> API_OUTPUT_EXTEND,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -221,30 +221,22 @@ class CZBXAPI {
 	/**
 	 * Adds the given fields to the "output" option if it's not already present.
 	 *
-	 * @param string       $tableName
-	 * @param string|array $fields		either a single field name, or an array of fields
-	 * @param string       $output
+	 * @param string $output
+	 * @param array $fields        either a single field name, or an array of fields
 	 *
 	 * @return mixed
 	 */
-	protected function outputExtend($tableName, $fields, $output) {
-		$fields = (array) $fields;
-
+	protected function outputExtend($output, array $fields) {
 		if ($output === null) {
 			return $fields;
 		}
-
-		foreach ($fields as $field) {
-			if ($output == API_OUTPUT_REFER) {
-				$output = array($this->pk($tableName), $field);
-			}
-
-			if (is_array($output) && !in_array($field, $output)) {
-				$output[] = $field;
-			}
+		// if output is set to extend, it already contains that field; return it as is
+		elseif ($output === API_OUTPUT_EXTEND) {
+			return $output;
 		}
 
-		return $output;
+		// if output is an array, add the additional fields
+		return array_keys(array_flip(array_merge($output, $fields)));
 	}
 
 	/**
@@ -258,9 +250,7 @@ class CZBXAPI {
 	protected function outputIsRequested($field, $output) {
 		switch ($output) {
 			// if all fields are requested, just return true
-			// API_OUTPUT_REFER will always return true as an exception
 			case API_OUTPUT_EXTEND:
-			case API_OUTPUT_REFER:
 				return true;
 
 			// return false if nothing or an object count is requested

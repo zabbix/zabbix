@@ -71,7 +71,7 @@ class CProxy extends CZBXAPI {
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'selectHosts'				=> null,
@@ -137,11 +137,7 @@ class CProxy extends CZBXAPI {
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 
-				if (!isset($result[$proxy['proxyid']])) {
-					$result[$proxy['proxyid']]= array();
-				}
-
-				$result[$proxy['proxyid']] += $proxy;
+				$result[$proxy['proxyid']] = $proxy;
 			}
 		}
 
@@ -238,6 +234,7 @@ class CProxy extends CZBXAPI {
 				}
 
 				$proxiesExists = $this->get(array(
+					'output' => array('proxyid'),
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach ($proxiesExists as $proxyExists) {
@@ -591,7 +588,7 @@ class CProxy extends CZBXAPI {
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$hosts = API::Host()->get(array(
-				'output' => $this->outputExtend('hosts', array('hostid', 'proxy_hostid'), $options['selectHosts']),
+				'output' => $this->outputExtend($options['selectHosts'], array('hostid', 'proxy_hostid')),
 				'nodeids' => $options['nodeids'],
 				'proxyids' => $proxyIds,
 				'preservekeys' => true
@@ -605,7 +602,7 @@ class CProxy extends CZBXAPI {
 		// adding host interface
 		if ($options['selectInterface'] !== null && $options['selectInterface'] != API_OUTPUT_COUNT) {
 			$interfaces = API::HostInterface()->get(array(
-				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterface']),
+				'output' => $this->outputExtend($options['selectInterface'], array('interfaceid', 'hostid')),
 				'nodeids' => $options['nodeids'],
 				'hostids' => $proxyIds,
 				'nopermissions' => true,

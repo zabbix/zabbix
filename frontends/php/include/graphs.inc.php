@@ -38,16 +38,6 @@ function graphType($type = null) {
 	}
 }
 
-function graph_item_type2str($type) {
-	switch ($type) {
-		case GRAPH_ITEM_SUM:
-			return _('Graph sum');
-		case GRAPH_ITEM_SIMPLE:
-		default:
-			return _('Simple');
-	}
-}
-
 function graph_item_drawtypes() {
 	return array(
 		GRAPH_ITEM_DRAWTYPE_LINE,
@@ -146,16 +136,6 @@ function getGraphDims($graphid = null) {
 	}
 
 	return $graphDims;
-}
-
-function get_graphs_by_hostid($hostid) {
-	return DBselect(
-		'SELECT DISTINCT g.*'.
-		' FROM graphs g,graphs_items gi,items i'.
-		' WHERE g.graphid=gi.graphid'.
-			' AND gi.itemid=i.itemid'.
-			' AND i.hostid='.zbx_dbstr($hostid)
-	);
 }
 
 function get_realhosts_by_graphid($graphid) {
@@ -554,65 +534,6 @@ function get_next_palette($palette = 0, $palettetype = 0) {
 	$prev_color[$palette]++;
 
 	return $result;
-}
-
-function imageDiagonalMarks($im,$x, $y, $offset, $color) {
-	global $colors;
-
-	$gims = array(
-		'lt' => array(0, 0, -9, 0, -9, -3, -3, -9, 0, -9),
-		'rt' => array(0, 0, 9, 0, 9, -3, 3,-9, 0, -9),
-		'lb' => array(0, 0, -9, 0, -9, 3, -3, 9, 0, 9),
-		'rb' => array(0, 0, 9, 0, 9, 3, 3, 9, 0, 9)
-	);
-
-	foreach ($gims['lt'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['lt'][$num] = $px + $x - $offset;
-		}
-		else {
-			$gims['lt'][$num] = $px + $y - $offset;
-		}
-	}
-
-	foreach ($gims['rt'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['rt'][$num] = $px + $x + $offset;
-		}
-		else {
-			$gims['rt'][$num] = $px + $y - $offset;
-		}
-	}
-
-	foreach ($gims['lb'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['lb'][$num] = $px + $x - $offset;
-		}
-		else {
-			$gims['lb'][$num] = $px + $y + $offset;
-		}
-	}
-
-	foreach ($gims['rb'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['rb'][$num] = $px + $x + $offset;
-		}
-		else {
-			$gims['rb'][$num] = $px + $y + $offset;
-		}
-	}
-
-	imagefilledpolygon($im, $gims['lt'], 5, $color);
-	imagepolygon($im, $gims['lt'], 5, $colors['Dark Red']);
-
-	imagefilledpolygon($im, $gims['rt'], 5, $color);
-	imagepolygon($im, $gims['rt'], 5, $colors['Dark Red']);
-
-	imagefilledpolygon($im, $gims['lb'], 5, $color);
-	imagepolygon($im, $gims['lb'], 5, $colors['Dark Red']);
-
-	imagefilledpolygon($im, $gims['rb'], 5, $color);
-	imagepolygon($im, $gims['rb'], 5, $colors['Dark Red']);
 }
 
 /**

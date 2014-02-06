@@ -96,15 +96,6 @@ function eventSourceObjects() {
 	);
 }
 
-function get_tr_event_by_eventid($eventid) {
-	$sql = 'SELECT e.*,t.triggerid,t.description,t.expression,t.priority,t.status,t.type'.
-			' FROM events e,triggers t'.
-			' WHERE e.eventid='.zbx_dbstr($eventid).
-				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND t.triggerid=e.objectid';
-	return DBfetch(DBselect($sql));
-}
-
 function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false) {
 	$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 	get_map_elements($db_element, $elements);

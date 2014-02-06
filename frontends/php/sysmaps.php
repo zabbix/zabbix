@@ -114,7 +114,8 @@ if ($isExportData) {
 	else {
 		echo $exportData;
 	}
-	exit();
+
+	exit;
 }
 
 $_REQUEST['go'] = get_request('go', 'none');

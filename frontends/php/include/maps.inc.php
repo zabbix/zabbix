@@ -176,7 +176,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 		order_result($elem['urls'], 'name');
 
-		$area->setMenuPopup(getMenuPopupMap($hostId, $scripts, $gotos, $elem['urls']));
+		$area->setMenuPopup(CMenuPopupHelper::getMap($hostId, $scripts, $gotos, $elem['urls']));
 
 		$actionMap->addItem($area);
 	}
@@ -1005,7 +1005,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				while (!empty($mapids)) {
 					$maps = API::Map()->get(array(
 						'sysmapids' => $mapids,
-						'output' => API_OUTPUT_REFER,
+						'output' => array('sysmapid'),
 						'selectSelements' => API_OUTPUT_EXTEND,
 						'nopermissions' => true,
 						'nodeids' => get_current_nodeid(true)
@@ -1104,13 +1104,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 	$all_hosts = zbx_toHash($all_hosts, 'hostid');
 
-	$monitored_hostids = array();
-	foreach ($all_hosts as $hostid => $host) {
-		if ($host['status'] == HOST_STATUS_MONITORED) {
-			$monitored_hostids[$hostid] = $hostid;
-		}
-	}
-
 	// get triggers data, triggers from current map, select all
 	$all_triggers = array();
 
@@ -1150,30 +1143,86 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		}
 	}
 
+	$monitoredHostIds = array();
+	foreach ($all_hosts as $hostid => $host) {
+		if ($host['status'] == HOST_STATUS_MONITORED) {
+			$monitoredHostIds[$hostid] = $hostid;
+		}
+	}
+
 	// triggers from all hosts/hostgroups, skip dependent
-	if (!empty($monitored_hostids)) {
+	if ($monitoredHostIds) {
 		$triggers = API::Trigger()->get(array(
-			'hostids' => $monitored_hostids,
+			'hostids' => $monitoredHostIds,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
+			'selectItems' => array('itemid'),
 			'nopermissions' => true,
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
-			'skipDependent' => true
+			'skipDependent' => true,
 		));
+
 		$all_triggers = array_merge($all_triggers, $triggers);
 
+		$triggersToFilter = array();
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				if (isset($hosts_map[$host['hostid']])) {
 					foreach ($hosts_map[$host['hostid']] as $belongs_to_sel) {
+						// if the map element is using the application filter, save it's triggers for later filtering
+						if ($selements[$belongs_to_sel]['application'] !== '') {
+							$triggersToFilter[] = $trigger;
+						}
+
 						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
 					}
 				}
 			}
 		}
+
+		// filters triggers by applications for host and host group elements
+		if ($triggersToFilter) {
+			// create a trigger-application map
+			$itemIds = array();
+			foreach ($triggersToFilter as $trigger) {
+				foreach ($trigger['items'] as $item) {
+					$itemIds[$item['itemid']] = $item['itemid'];
+				}
+			}
+			$items = API::Item()->get(array(
+				'output' => array('itemid'),
+				'selectApplications' => array('name'),
+				'itemids' => $itemIds,
+				'preservekeys' => true
+			));
+
+			$triggerApps = array();
+			foreach ($triggersToFilter as $trigger) {
+				foreach ($trigger['items'] as $item) {
+					foreach ($items[$item['itemid']]['applications'] as $app) {
+						$triggerApps[$trigger['triggerid']][$app['name']] = true;
+					}
+				}
+			}
+
+			// unset triggers that don't belong to the chosen applications
+			foreach ($selements as &$selement) {
+				if ($selement['application'] === '') {
+					continue;
+				}
+
+				foreach ($selement['triggers'] as $triggerId) {
+					if (!isset($triggerApps[$triggerId][$selement['application']])) {
+						unset($selement['triggers'][$triggerId]);
+					}
+				}
+			}
+			unset($selement);
+		}
 	}
+
 	$all_triggers = zbx_toHash($all_triggers, 'triggerid');
 
 	$unackTriggerIds = API::Trigger()->get(array(

@@ -308,12 +308,9 @@ void	zbx_script_clean(zbx_script_t *script)
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
+ *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  * Comments: !!! always call 'zbx_script_clean' function after                *
  *           'zbx_execute_script' to clear allocated memory                   *
@@ -399,7 +396,7 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			zbx_snprintf(error, max_error_len, "Invalid command type [%d]", (int)script->type);
 	}
 
-	if (FAIL == ret && NULL != result)
+	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(*result, "");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

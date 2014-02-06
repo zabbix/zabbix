@@ -44,10 +44,11 @@ $themes[] = THEME_DEFAULT;
 $fields = array(
 	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})'),
+	'lang' =>				array(T_ZBX_STR, O_OPT, null, null, null),
 	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
+	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, P_SYS, null, null, 'isset({save})'),
 	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
 	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})', _('Refresh (in seconds)')),
 	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({save})', _('Rows per page')),
@@ -125,13 +126,16 @@ elseif (isset($_REQUEST['save'])) {
 		$user['passwd'] = get_request('password1');
 		$user['url'] = get_request('url');
 		$user['autologin'] = get_request('autologin', 0);
-		$user['autologout'] = get_request('autologout', 0);
-		$user['lang'] = get_request('lang');
+		$user['autologout'] = hasRequest('autologout_visible') ? getRequest('autologout') : 0;
 		$user['theme'] = get_request('theme');
 		$user['refresh'] = get_request('refresh');
 		$user['rows_per_page'] = get_request('rows_per_page');
 		$user['user_groups'] = null;
 		$user['user_medias'] = get_request('user_medias', array());
+
+		if (hasRequest('lang')) {
+			$user['lang'] = getRequest('lang');
+		}
 
 		$messages = get_request('messages', array());
 		if (!isset($messages['enabled'])) {
@@ -148,12 +152,12 @@ elseif (isset($_REQUEST['save'])) {
 		updateMessageSettings($messages);
 
 		$result = API::User()->updateProfile($user);
-		if ($result && (CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER)) {
-			$data = array(
+
+		if ($result && CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$result = API::User()->updateMedia(array(
 				'users' => $user,
 				'medias' => $user['user_medias']
-			);
-			$result = API::User()->updateMedia($data);
+			));
 		}
 
 		$result = DBend($result);
@@ -184,6 +188,7 @@ $data = getUserFormData(CWebUser::$data['userid'], true);
 $data['userid'] = CWebUser::$data['userid'];
 $data['form'] = get_request('form');
 $data['form_refresh'] = get_request('form_refresh', 0);
+$data['autologout'] = getRequest('autologout');
 
 // render view
 $usersView = new CView('administration.users.edit', $data);

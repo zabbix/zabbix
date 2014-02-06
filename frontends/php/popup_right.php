@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Resource');
@@ -27,8 +27,7 @@ $page['file'] = 'popup_right.php';
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
 	'dstfrm'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
@@ -37,8 +36,7 @@ $fields=array(
 );
 
 check_fields($fields);
-?>
-<?php
+
 	$dstfrm		= get_request('dstfrm',		0);			// destination form
 	$permission	= get_request('permission',	PERM_DENY);		// right
 	$nodeid		= get_request('nodeid', 	CProfile::get('web.popup_right.nodeid.last',get_current_nodeid(false)));
@@ -140,5 +138,3 @@ function check_all(value) {
 <?php
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

@@ -65,7 +65,6 @@ class CHistory extends CZBXAPI {
 			'nodeids'					=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
-			'triggerids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -78,10 +77,9 @@ class CHistory extends CZBXAPI {
 			'time_from'					=> null,
 			'time_till'					=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_EXTEND,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
-			'groupOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -126,7 +124,6 @@ class CHistory extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
@@ -144,13 +141,11 @@ class CHistory extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sqlParts['select']['clock'] = 'h.clock';
 			$sqlParts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sqlParts['select']['clock'] = 'h.clock';
 			$sqlParts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
 		}
 
@@ -183,14 +178,6 @@ class CHistory extends CZBXAPI {
 			}
 		}
 
-		// groupOutput
-		$groupOutput = false;
-		if (!is_null($options['groupOutput'])) {
-			if (str_in_array('h.'.$options['groupOutput'], $sqlParts['select']) || str_in_array('h.*', $sqlParts['select'])) {
-				$groupOutput = true;
-			}
-		}
-
 		// sorting
 		$sqlParts = $this->applyQuerySortOptions($tableName, $this->tableAlias(), $options, $sqlParts);
 
@@ -198,8 +185,6 @@ class CHistory extends CZBXAPI {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-
-		$itemids = array();
 
 		$sqlParts['select'] = array_unique($sqlParts['select']);
 		$sqlParts['from'] = array_unique($sqlParts['from']);
@@ -226,45 +211,12 @@ class CHistory extends CZBXAPI {
 				$sqlWhere.
 				$sqlOrder;
 		$dbRes = DBselect($sql, $sqlLimit);
-		$count = 0;
-		$group = array();
 		while ($data = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $data;
 			}
 			else {
-				$itemids[$data['itemid']] = $data['itemid'];
-
-				$result[$count] = array();
-
-				// hostids
-				if (isset($data['hostid'])) {
-					if (!isset($result[$count]['hosts'])) {
-						$result[$count]['hosts'] = array();
-					}
-					$result[$count]['hosts'][] = array('hostid' => $data['hostid']);
-					unset($data['hostid']);
-				}
-
-				// triggerids
-				if (isset($data['triggerid'])) {
-					if (!isset($result[$count]['triggers'])) {
-						$result[$count]['triggers'] = array();
-					}
-					$result[$count]['triggers'][] = array('triggerid' => $data['triggerid']);
-					unset($data['triggerid']);
-				}
-				$result[$count] += $data;
-
-				// grouping
-				if ($groupOutput) {
-					$dataid = $data[$options['groupOutput']];
-					if (!isset($group[$dataid])) {
-						$group[$dataid] = array();
-					}
-					$group[$dataid][] = $result[$count];
-				}
-				$count++;
+				$result[] = $data;
 			}
 		}
 

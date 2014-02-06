@@ -50,7 +50,6 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
-	'menu.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -102,19 +101,11 @@ $tranStrings = array(
 	),
 	'functions.js' => array(
 		'Cancel' => _('Cancel'),
-		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
-		'Events' => _('Events'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
-		'History' => _('History'),
-		'History and simple graphs' => _('History and simple graphs'),
-		'S_INSERT_MACRO' => _('Insert macro'),
-		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
 		'S_DELETE' => _('Delete'),
 		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?'),
-		'Simple graphs' => _('Simple graphs'),
-		'Triggers' => _('Triggers')
+		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
 	),
 	'class.calendar.js' => array(
 		'S_JANUARY' => _('January'),
@@ -169,26 +160,13 @@ $tranStrings = array(
 		'S_UNMUTE' => _('Unmute'),
 		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
-		'S_SNOOZE' => _('Snooze'),
-		'S_MOVE' => _('Move')
+		'S_SNOOZE' => _('Snooze')
 	),
 	'class.cookie.js' => array(
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	),
 	'main.js' => array(
-		'S_CLOSE' => _('Close'),
-		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!')
-	),
-	'init.js' => array(
-		'Host screens' => _('Host screens'),
-		'Go to' => _('Go to'),
-		'Latest data' => _('Latest data'),
-		'Scripts' => _('Scripts'),
-		'Host inventories' => _('Host inventories'),
-		'Add service' => _('Add service'),
-		'Edit service' => _('Edit service'),
-		'Delete service' => _('Delete service'),
-		'Delete the selected service?' => _('Delete the selected service?')
+		'S_CLOSE' => _('Close')
 	),
 	'multiselect.js' => array(
 		'No matches found' => _('No matches found'),
@@ -198,10 +176,25 @@ $tranStrings = array(
 	),
 	'menupopup.js' => array(
 		'Acknowledge' => _('Acknowledge'),
+		'Add' => _('Add'),
+		'Add child' => _('Add child'),
 		'Configuration' => _('Configuration'),
+		'Create trigger' => _('Create trigger'),
+		'Delete' => _('Delete'),
+		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Edit' => _('Edit'),
+		'Edit trigger' => _('Edit trigger'),
 		'Events' => _('Events'),
+		'Favourite graphs' => _('Favourite graphs'),
+		'Favourite maps' => _('Favourite maps'),
+		'Favourite screens' => _('Favourite screens'),
+		'Favourite simple graphs' => _('Favourite simple graphs'),
+		'Favourite slide shows' => _('Favourite slide shows'),
+		'Insert macro' => _('Insert macro'),
+		'Item "%1$s"' => _('Item "%1$s"'),
 		'Go to' => _('Go to'),
-		'History' => _('History'),
+		'Scripts' => _('History'),
 		'Host inventory' => _('Host inventory'),
 		'Host screens' => _('Host screens'),
 		'Latest data' => _('Latest data'),
@@ -210,12 +203,23 @@ $tranStrings = array(
 		'Last hour graph' => _('Last hour graph'),
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
+		'Refresh time' => _('Refresh time'),
+		'Refresh time multiplier' => _('Refresh time multiplier'),
+		'Remove' => _('Remove'),
+		'Remove all' => _('Remove all'),
 		'Scripts' => _('Scripts'),
+		'Service "%1$s"' => _('Service "%1$s"'),
 		'Status of triggers' => _('Status of triggers'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
 		'URL' => _('URL'),
-		'URLs' => _('URLs')
+		'URLs' => _('URLs'),
+		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
+		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
+		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
+		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
+		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
+		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
 	),
 	'items.js' => array(
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
@@ -239,10 +243,10 @@ if (empty($_GET['files'])) {
 		'class.csuggest.js',
 		'main.js',
 		'functions.js',
-		'menu.js',
 		'menupopup.js',
 		'init.js'
 	);
+
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.cmessages.js';
@@ -272,7 +276,7 @@ $etag = md5($jsLength);
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 	header('HTTP/1.1 304 Not Modified');
 	header('ETag: '.$etag);
-	exit();
+	exit;
 }
 
 header('Content-type: text/javascript; charset=UTF-8');
