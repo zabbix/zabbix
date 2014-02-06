@@ -838,7 +838,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	int		i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
-	char		*value = NULL, *item_value = NULL;
+	char		*value = NULL;
 	zbx_uint64_t	lastlogsize;
 	int		mtime;
 	char		params[MAX_STRING_LEN], filename[MAX_STRING_LEN];
@@ -929,7 +929,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				/* do not flood local system if file grows too fast */
 				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
-				ret = process_log(filename, &active_metrics[i].lastlogsize,
+				ret = process_log(filename, &active_metrics[i].lastlogsize, NULL,
 						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
 						&regexps, pattern, output_template, &p_count, &s_count, process_value,
 						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
@@ -953,7 +953,6 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			do
 			{
-				/* simple try realization */
 				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
 						params, sizeof(params)))
 				{
@@ -992,64 +991,18 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 != get_param(params, 6, output_template, sizeof(output_template)))
 					*output_template = '\0';
 
-				s_count = 0;
-				p_count = 0;
-				lastlogsize = active_metrics[i].lastlogsize;
-				mtime = active_metrics[i].mtime;
+				/* do not flood Zabbix server if files grow too fast */
+				s_count = maxlines_persec * active_metrics[i].refresh;
 
-				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value,
-						encoding, active_metrics[i].skip_old_data)))
-				{
-					active_metrics[i].skip_old_data = 0;
+				/* do not flood local system if files grow too fast */
+				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
-					/* End of file. The file could become empty,*/
-					/* must save `lastlogsize' and `mtime'. */
-					if (NULL == value)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						active_metrics[i].mtime	= mtime;
-						break;
-					}
-
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
-					{
-						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, item_value, &lastlogsize,
-								&mtime, NULL, NULL, NULL, NULL, 1);
-
-						zbx_free(item_value);
-
-						s_count++;
-					}
-					p_count++;
-
-					zbx_free(value);
-
-					if (SUCCEED == send_err)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						active_metrics[i].mtime = mtime;
-					}
-					else
-					{
-						/* buffer is full, stop processing active checks */
-						/* till the buffer is cleared */
-						lastlogsize = active_metrics[i].lastlogsize;
-						mtime = active_metrics[i].mtime;
-						goto ret;
-					}
-
-					/* do not flood Zabbix server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
-						break;
-
-					/* do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;
-				} /* while processing a log */
+				ret = process_logrt(filename, &active_metrics[i].lastlogsize, &active_metrics[i].mtime,
+						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
+						&regexps, pattern, output_template, &p_count, &s_count, process_value,
+						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}
-			while (0); /* simple try realization */
+			while (0);
 
 			if (FAIL == ret)
 			{
