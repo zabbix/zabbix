@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:34+0200\n"
-"PO-Revision-Date: 2014-01-01 21:43+0300\n"
+"POT-Creation-Date: 2014-02-06 13:49+0200\n"
+"PO-Revision-Date: 2014-02-02 16:18+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1388605384.0\n"
+"X-POOTLE-MTIME: 1391350682.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -74,17 +74,17 @@ msgstr[2] "%1$s dní"
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s minúta"
+msgstr[1] "%1$s minúty"
+msgstr[2] "%1$s minút"
 
 #: jsLoader.php:215 jsLoader.php:216
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s sekunda"
+msgstr[1] "%1$s sekundy"
+msgstr[2] "%1$s sekúnd"
 
 #: include/page_header.php:446
 #, c-format
@@ -466,7 +466,7 @@ msgstr "Pridať"
 
 #: jsLoader.php:178
 msgid "Add child"
-msgstr ""
+msgstr "Pridať potomka"
 
 #: acknow.php:220
 msgid "Add comment by"
@@ -1261,7 +1261,7 @@ msgstr "Nebolo možné pripojiť šablónu"
 
 #: api/classes/CTemplate.php:906
 msgid "Can't remove group"
-msgstr "Nebolo možné odstrániť skupinu"
+msgstr "Nebolo možné zmazať skupinu"
 
 #: api/classes/CTemplate.php:943 api/classes/CTemplate.php:964
 msgid "Can't unlink template"
@@ -1469,7 +1469,7 @@ msgstr "Nie je možné pridať scenár"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Nie je možné zmeniť autentifikáciu"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -2180,7 +2180,7 @@ msgstr "Nie je možné nalinkovať šablónu"
 
 #: api/classes/CUser.php:1049
 msgid "Cannot login."
-msgstr ""
+msgstr "Nie je možné Vás prihlásiť."
 
 #: api/classes/CUser.php:971
 msgid "Cannot logout."
@@ -2237,7 +2237,7 @@ msgstr "Nie je možné zmazať všetky položky, najmenej jedna musí ostať."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr "Nie je možné odstrániť makro."
+msgstr "Nie je možné zmazať makro."
 
 #: api/classes/CUser.php:273
 msgid "Cannot rename guest user."
@@ -4085,7 +4085,7 @@ msgstr "Zmazať označené s pripojenými elementami"
 #: jsLoader.php:182
 #, c-format
 msgid "Delete service \"%1$s\"?"
-msgstr ""
+msgstr "Zmazať službu \"%1$s\"?"
 
 #: include/views/configuration.slideconf.edit.php:117
 msgid "Delete slide show?"
@@ -4317,7 +4317,7 @@ msgstr "Zakázať"
 
 #: include/views/administration.usergroups.list.php:149
 msgid "Disable debug mode"
-msgstr ""
+msgstr "Zakázať ladiaci režim"
 
 #: include/views/administration.usergroups.list.php:150
 msgid "Disable debug mode in selected groups?"
@@ -4495,7 +4495,7 @@ msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\", zdedené z inej 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:648
 #, c-format
@@ -4856,7 +4856,7 @@ msgstr "Povoliť potvrdenia"
 
 #: include/views/administration.usergroups.list.php:145
 msgid "Enable debug mode"
-msgstr ""
+msgstr "Povoliť ladiaci režim"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Enable debug mode in selected groups?"
@@ -5237,11 +5237,11 @@ msgstr "Obľúbené obrazovky"
 
 #: jsLoader.php:190
 msgid "Favourite simple graphs"
-msgstr ""
+msgstr "Obľúbené jednoduché grafy"
 
 #: jsLoader.php:191
 msgid "Favourite slide shows"
-msgstr ""
+msgstr "Obľúbené prezentácie"
 
 #: include/views/monitoring.slides.php:44 slides.php:150 slides.php:158
 msgid "Favourites"
@@ -6093,12 +6093,11 @@ msgstr "Vodorovné zarovnanie"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:363 report2.php:399 report5.php:59 tr_status.php:258
 #: tr_status.php:375
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
-msgstr[1] "Host"
-msgstr[2] "Host"
+msgstr[1] "Hosty"
+msgstr[2] "Hostov"
 
 #: api/classes/CHost.php:1003 api/classes/CTemplate.php:449
 #, c-format
@@ -7382,7 +7381,7 @@ msgstr "Neplatné poradie sorder pre službu \"%1$s\"."
 
 #: api/classes/CEvent.php:384
 msgid "Incorrect source value."
-msgstr "Neplatná hodnota zdroja."
+msgstr "Neplatný stav hosta \"%1$s\"."
 
 #: api/classes/CHost.php:552
 #, c-format
@@ -7392,12 +7391,12 @@ msgstr ""
 #: api/classes/CHostPrototype.php:185
 #, c-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr "Neplatný status pre prototyp hosta \"%1$s\"."
+msgstr "Neplatný status pre hosta \"%1$s\"."
 
 #: api/classes/CService.php:1234
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr "Neplatný stav pre službu \"%1$s\"."
+msgstr "Neplatný stav pre host \"%1$s\"."
 
 #: api/classes/CDRule.php:242
 msgid "Incorrect status."
@@ -7678,22 +7677,22 @@ msgstr "Neplatné hostid pre makro \"%1$s\"."
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre zisťovacie pravidlo \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre položku \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\" pre prototyp \"%2$s\" na \"%3$s\": %4$s."
 
 #: api/classes/CDRule.php:288 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatný kľúč \"%1$s\": %2$s."
 
 #: maintenance.php:302
 msgid "Invalid maintenance period"
@@ -7805,7 +7804,7 @@ msgstr "Položka"
 #: jsLoader.php:193
 #, c-format
 msgid "Item \"%1$s\""
-msgstr ""
+msgstr "Položka \"%1$s\""
 
 #: api/classes/CItem.php:37
 #, c-format
@@ -7894,7 +7893,7 @@ msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\", zdedený z inej ša
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Prototyp položky \"%1$s\" už existuje na \"%2$s\"."
 
 #: disc_prototypes.php:300
 msgid "Item prototype added"
@@ -8156,7 +8155,7 @@ msgstr "LDAP autentifikácia"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP autentifikácia zmenená"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8511,11 +8510,11 @@ msgstr "Prihlásenie zlyhalo \"%s\"."
 #: api/classes/CUser.php:1054
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Prihlasovacie meno \"%1$s\" sa nezhoduje s menom \"%2$s\" použitým v HTTP autentifikácii."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nesprávne prihlasovacie meno alebo heslo!"
 
 #: api/classes/CUser.php:934 api/classes/CUser.php:953
 #: api/classes/CUser.php:1002
@@ -11496,7 +11495,7 @@ msgstr "Obnoviť (v sekundách)"
 
 #: jsLoader.php:204
 msgid "Refresh time"
-msgstr ""
+msgstr "Čas obnovania"
 
 #: jsLoader.php:205
 msgid "Refresh time multiplier"
@@ -11614,15 +11613,15 @@ msgstr "Vzdialený príkaz"
 #: include/views/js/configuration.sysmaps.js.php:463
 #: include/views/js/configuration.sysmaps.js.php:472 jsLoader.php:206
 msgid "Remove"
-msgstr "Odstrániť"
+msgstr "Zmazať"
 
 #: jsLoader.php:207
 msgid "Remove all"
-msgstr ""
+msgstr "Zmazať všetko"
 
 #: include/views/configuration.sysmap.constructor.php:30
 msgid "Remove element"
-msgstr "Odstrániť element"
+msgstr "Zmazať element"
 
 #: slides.php:150
 msgid "Remove from"
@@ -11647,11 +11646,11 @@ msgstr "Zmazať host"
 
 #: include/views/configuration.sysmap.constructor.php:35
 msgid "Remove link"
-msgstr "Odstrániť linku"
+msgstr "Zmazať linku"
 
 #: include/views/monitoring.history.php:105
 msgid "Remove selected"
-msgstr "Odstrániť označené"
+msgstr "Zmazať označené"
 
 #: include/views/configuration.host.massupdate.php:176
 #: include/views/configuration.triggers.edit.php:120
@@ -12561,7 +12560,7 @@ msgstr "Služba"
 #: jsLoader.php:209
 #, c-format
 msgid "Service \"%1$s\""
-msgstr ""
+msgstr "Služba \"%1$s\""
 
 #: api/classes/CService.php:1301
 #, c-format
@@ -14123,7 +14122,7 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/nodes.inc.php:346
 msgid "Unable to remove local node."
-msgstr "Nie je možné odstrániť lokálny uzol."
+msgstr "Nie je možné zmazať lokálny uzol."
 
 #: include/profiles.inc.php:262
 msgid "Unable to select configuration."
@@ -15776,7 +15775,7 @@ msgstr "v"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "nesprávna syntax pri \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15793,7 +15792,7 @@ msgstr "položka"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "kľúč je prázdny"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:82
@@ -16030,7 +16029,7 @@ msgstr "píšte sem pre hľadanie"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "neočakávaný koniec kľúča"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337
