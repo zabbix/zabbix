@@ -681,7 +681,11 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 			goto out;
 		}
 
-		offset = zbx_lseek(fd, 0, SEEK_CUR);
+		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
+		{
+			*big_rec = 0;
+			goto out;
+		}
 
 		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
 
