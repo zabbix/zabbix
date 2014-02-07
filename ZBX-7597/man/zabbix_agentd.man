@@ -33,13 +33,13 @@ Permission issues or incorrect user parameters could also result in the not supp
 .RS 4
 .TP 4
 s
-String. Not longer than 255 characters.
+Text. Maximum length not limited.
 .RE
 .RE
 .RS 4
 .TP 4
 t
-Text. Maximum length not limited.
+Text. Same as \fBt\fR.
 .RE
 .RE
 .RS 4
