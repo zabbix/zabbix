@@ -787,7 +787,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 			if (!$hasPrototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Trigger "%1$s:%2$s" does not have item prototype.', $createdTrigger['description'], $createdTrigger['expression']));
+					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
+						explode_exp($createdTrigger['expression'])));
 			}
 		}
 
