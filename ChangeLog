@@ -1,7 +1,7 @@
 Changes for 2.2.2rc3
 
 Bug fixes:
-........S. [ZBX-7521] fixed possible crash beacuse of item value type change handling in value cache (wiper)
+........S. [ZBX-7521] fixed possible crash because of item value type change handling in value cache (wiper)
 .......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
 ........S. [ZBX-7758] fixed server crash when processing low-level discovery triggers prototypes (Sasha)
 
