@@ -722,10 +722,12 @@ ret:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: ATTENTION! This function's address and pointers to arguments     *
- *           are used when calling process_log() and process_logrt(). If you  *
- *           ever change this process_value() arguments or return value do    *
- *           not forget to synchronize changes with process_log() and         *
- *           process_logrt() implementations and their callers.               *
+ *           are described in Zabbix defined type "zbx_process_value_func_t"  *
+ *           and used when calling process_log(), process_logrt() and         *
+ *           zbx_read2(). If you ever change this process_value() arguments   *
+ *           or return value do not forget to synchronize changes with the    *
+ *           defined type "zbx_process_value_func_t" and implementations of   *
+ *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
 static int	process_value(
