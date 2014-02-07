@@ -110,6 +110,7 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'], new CTextBox('param['.$paramId.']', $paramValue, 30));
+			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
 }
