@@ -224,7 +224,10 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		));
 		$hosts = array('hosts' => $hosts);
 
-		$properties = array('proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
+		$properties = array(
+			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status', 'description'
+		);
+
 		$newValues = array();
 		foreach ($properties as $property) {
 			if (isset($visible[$property])) {
@@ -654,6 +657,7 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		'groups' => get_request('groups', array()),
 		'newgroup' => get_request('newgroup', ''),
 		'status' => get_request('status', HOST_STATUS_MONITORED),
+		'description' => getRequest('description'),
 		'proxy_hostid' => get_request('proxy_hostid', ''),
 		'ipmi_authtype' => get_request('ipmi_authtype', -1),
 		'ipmi_privilege' => get_request('ipmi_privilege', 2),
