@@ -2870,7 +2870,6 @@ out:
 			vc_update_statistics(NULL, 0, values->values_num);
 		}
 	}
-	else
 finish:
 	if (NULL != item)
 		vc_item_release(item);
@@ -2975,7 +2974,6 @@ out:
 			*found = 1;
 		}
 	}
-	else
 finish:
 	if (NULL != item)
 		vc_item_release(item);
