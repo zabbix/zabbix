@@ -58,6 +58,7 @@ typedef struct
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
 	int			type;
 	char			*instance;
+	char			*label;
 }
 zbx_vmware_dev_t;
 
