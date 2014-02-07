@@ -2,7 +2,7 @@
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon.
 .SH SYNOPSIS
-.B zabbix_agentd [-hpV] [-c \fI<config-file>\fB] [-t \fI<item key>\fB]
+.B zabbix_agentd [-hpV] [-c \fI<config-file>\fB] [-t \fI<item-key>\fB]
 .SH DESCRIPTION
 .B zabbix_agentd
 is a daemon for monitoring of various server parameters.
@@ -49,7 +49,7 @@ Unsigned integer.
 .RE
 .RE
 .IP "-t, --test \fI<item-key>\fR"
-Test single item and exit. See \fI--print\fR for output description.
+Test single item and exit. See \fB--print\fR for output description.
 .IP "-h, --help"
 Display this help and exit.
 .IP "-V, --version"
