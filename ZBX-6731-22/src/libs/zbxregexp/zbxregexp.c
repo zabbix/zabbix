@@ -192,9 +192,11 @@ out:
  *********************************************************************************/
 static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
 {
-	regex_t		re;
+	static regex_t	re;
 	regmatch_t	match[10];
 	char		*ptr = NULL;
+	static char	*old_pattern = NULL;
+	static int	old_flags;
 
 	if (NULL == string)
 		return NULL;
@@ -202,13 +204,29 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 	if (NULL == output_template || '\0' == *output_template)
 		flags |= REG_NOSUB;
 
-	if (0 != regcomp(&re, pattern, flags))
-		return NULL;
+	/* performance optimization: if possible then reuse the last compiled regexp */
 
+	if (NULL == old_pattern)
+		goto compile;
+
+	if (0 != strcmp(old_pattern, pattern) || old_flags != flags)
+		regfree(&re);
+	else
+		goto execute;
+compile:
+	if (0 == regcomp(&re, pattern, flags))
+	{
+		old_pattern = zbx_strdup(old_pattern, pattern);
+		old_flags = flags;
+	}
+	else
+	{
+		zbx_free(old_pattern);
+		return NULL;
+	}
+execute:
 	if (0 == regexec(&re, string, ARRSIZE(match), match, 0))
 		ptr = regexp_sub_replace(string, output_template, match, ARRSIZE(match));
-
-	regfree(&re);
 
 	return ptr;
 }
