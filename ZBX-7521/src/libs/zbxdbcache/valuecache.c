@@ -165,6 +165,9 @@ typedef struct
 	/* the low memory mode flag */
 	int		low_memory;
 
+	/* timestamp of the last low memory warning message */
+	int		last_warning_time;
+
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
 
@@ -720,14 +723,13 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	static int	last_warning_time = 0;
 	int		now;
 
 	now = ZBX_VC_TIME();
 
-	if (now - last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
-		last_warning_time = now;
+		vc_cache->last_warning_time = now;
 
 		zabbix_log(LOG_LEVEL_WARNING, "value cache is fully used: please increase ValueCacheSize"
 				" configuration parameter");
