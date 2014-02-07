@@ -90,7 +90,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 #ifdef _WINDOWS
 	offset = _lseeki64(fd, 0, SEEK_CUR);
 #else
-	offset = lseek(fd, 0, SEEK_CUR);
+	offset = lseek(fd, (off_t)0, SEEK_CUR);
 #endif
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
@@ -155,7 +155,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 #ifdef _WINDOWS
 	_lseeki64(fd, offset + i, SEEK_SET);
 #else
-	lseek(fd, offset + i, SEEK_SET);
+	lseek(fd, offset + (off_t)i, SEEK_SET);
 #endif
 
 	return (int)i;
