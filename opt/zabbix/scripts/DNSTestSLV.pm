@@ -35,6 +35,8 @@ use constant TRIGGER_VALUE_TRUE => 1;
 
 use constant RTT_LIMIT_MULTIPLIER => 5;
 
+use constant SECONDS_WEEK => 604800;
+
 our ($result, $dbh, $tld);
 
 our %OPTS; # command-line options
@@ -61,8 +63,8 @@ my $probe_key_automatic = 'probe.status[automatic,%]'; # match all in SQL
 # configuration, set in set_slv_config()
 my $config = undef;
 
-my $avail_shift_back = 2; # minutes
-my $rollweek_shift_back = 3; # minutes
+my $avail_shift_back = 120; # seconds (must be divisible by 60 without remainder)
+my $rollweek_shift_back = 180; # seconds (must be divisible by 60 without remainder)
 
 # make sure only one copy of script runs (unless in test mode)
 my $pidfile;
@@ -374,49 +376,40 @@ sub set_slv_config
     $config = shift;
 }
 
-# Get bounds of the previous minute shifted $avail_shift_back minutes back.
+# Get bounds of the previous minute shifted $avail_shift_back seconds back.
 sub get_minute_bounds
 {
-    my $dt = DateTime->now;
+    my $t = time();
+    my $till = int($t / 60) * 60 - $avail_shift_back;
+    my $from = $till - 60;
 
-    $dt->truncate(to => 'minute');
-    $dt->subtract(minutes => $avail_shift_back);
-    my $till = $dt->epoch - 1;
-
-    $dt->subtract(minutes => 1);
-    my $from = $dt->epoch;
+    $till--;
 
     return ($from, $till, $till - 29);
 }
 
-# Get bounds of the previous rdds test period shifted $avail_shift_back minutes back.
+# Get bounds of the previous rdds test period shifted $avail_shift_back seconds back.
 sub get_interval_bounds
 {
     my $interval = shift;
 
-    my $dt = DateTime->now;
+    my $t = time();
+    my $till = int($t / 60) * 60 - $avail_shift_back;
+    my $from = $till - $interval;
 
-    $dt->truncate(to => 'minute');
-    $dt->subtract(minutes => $avail_shift_back);
-    my $till = $dt->epoch - 1;
-
-    $dt->subtract(seconds => $interval);
-    my $from = $dt->epoch;
+    $till--;
 
     return ($from, $till, $till - 29);
 }
 
-# Get bounds of the previous week shifted $rollweek_shift_back minutes back.
+# Get bounds of the previous week shifted $rollweek_shift_back seconds back.
 sub get_rollweek_bounds
 {
-    my $dt = DateTime->now;
+    my $t = time();
+    my $till = int($t / 60) * 60 - $rollweek_shift_back;
+    my $from = $till - SECONDS_WEEK;
 
-    $dt->truncate(to => 'minute');
-    $dt->subtract(minutes => $rollweek_shift_back);
-    my $till = $dt->epoch - 1;
-
-    $dt->subtract(weeks => 1);
-    my $from = $dt->epoch;
+    $till--;
 
     return ($from, $till, $till - 29);
 }
