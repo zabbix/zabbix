@@ -1,3 +1,10 @@
+Changes for 2.2.2rc3
+
+Bug fixes:
+.......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
+........S. [ZBX-7758] fixed server crash when processing low-level discovery triggers prototypes (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.2rc2
 
 Bug fixes:
@@ -780,6 +787,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.11rc2
+
+Bug fixes:
+.......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.11rc1
@@ -2259,6 +2273,11 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc2
+
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+
 Changes for 1.8.20rc1
 
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
