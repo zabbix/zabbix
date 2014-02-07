@@ -657,11 +657,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 	const char	*cr, *lf, *p_end;
 	char		*p_start, *p, *p_nl, *p_next, *item_value = NULL;
 	size_t		szbyte;
-#ifdef _WINDOWS
-	__int64		offset;
-#else
-	off_t		offset;
-#endif
+	zbx_offset_t	offset;
 	static char	*buf = NULL;
 	int		send_err;
 	zbx_uint64_t	lastlogsize1;
@@ -685,7 +681,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 			goto out;
 		}
 
-		offset = lseek(fd, (off_t)0, SEEK_CUR);
+		offset = zbx_lseek(fd, 0, SEEK_CUR);
 
 		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
 
@@ -715,7 +711,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 				/* Do not analyze it now, keep the same position in the file and wait the next check, */
 				/* maybe more data will come. */
 
-				if (0 <= lseek(fd, offset, SEEK_SET))
+				if ((zbx_offset_t)0 <= zbx_lseek(fd, offset, SEEK_SET))
 					ret = SUCCEED;
 
 				goto out;
@@ -836,7 +832,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
-					if (0 <= lseek(fd, (off_t)*lastlogsize, SEEK_SET))
+					if ((zbx_offset_t)0 <= zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
 						ret = SUCCEED;
 						break;
@@ -957,11 +953,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
 		l_size = 0;
 
-#ifdef _WINDOWS
-	if (-1L != _lseeki64(f, (__int64)l_size, SEEK_SET))
-#else
-	if ((off_t)-1 != lseek(f, (off_t)l_size, SEEK_SET))
-#endif
+	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
 	{
 		if (SUCCEED == zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, pattern,
 				output_template, p_count, s_count, process_value, server, port, hostname, key))
