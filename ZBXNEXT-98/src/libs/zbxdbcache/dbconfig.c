@@ -311,6 +311,8 @@ typedef struct
 	unsigned char	useip;
 	unsigned char	type;
 	unsigned char	main;
+	unsigned char	max_snmp_succeed;
+	unsigned char	min_snmp_fail;
 }
 ZBX_DC_INTERFACE;
 
@@ -2249,7 +2251,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
-	unsigned char		type, main_;
+	unsigned char		type, main_, useip;
+	unsigned char		reset_snmp_stats;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 
@@ -2275,6 +2278,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		ZBX_STR2UINT64(hostid, row[1]);
 		type = (unsigned char)atoi(row[2]);
 		main_ = (unsigned char)atoi(row[3]);
+		useip = (unsigned char)atoi(row[4]);
 
 		/* array of selected interfaces */
 		zbx_vector_uint64_append(&ids, interfaceid);
@@ -2315,13 +2319,18 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		/* store new information in interface structure */
 
+		if (0 == found || interface->hostid != hostid || interface->type != type || interface->useip != useip)
+			reset_snmp_stats = 1;
+		else
+			reset_snmp_stats = 0;
+
 		interface->hostid = hostid;
 		interface->type = type;
 		interface->main = main_;
-		interface->useip = (unsigned char)atoi(row[4]);
-		DCstrpool_replace(found, &interface->ip, row[5]);
-		DCstrpool_replace(found, &interface->dns, row[6]);
-		DCstrpool_replace(found, &interface->port, row[7]);
+		interface->useip = useip;
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
+		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
 
 		/* update interfaces_ht index using new data, if not done already */
 
@@ -2333,15 +2342,16 @@ static void	DCsync_interfaces(DB_RESULT result)
 			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
 		}
 
-		/* update interface_snmpaddrs */
+		/* update interface_snmpaddrs for SNMP traps or reset bulk request statistics */
 
-		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
+		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
 			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
 
 			if ('\0' != *interface_snmpaddr_local.addr)
 			{
-				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
+				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs,
+						&interface_snmpaddr_local)))
 				{
 					zbx_strpool_acquire(interface_snmpaddr_local.addr);
 
@@ -2354,6 +2364,12 @@ static void	DCsync_interfaces(DB_RESULT result)
 				}
 
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
+			}
+
+			if (1 == reset_snmp_stats)
+			{
+				interface->max_snmp_succeed = 0;
+				interface->min_snmp_fail = MAX_SNMP_ITEMS + 1;
 			}
 		}
 	}
@@ -3480,6 +3496,7 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 {
 	if (NULL != src_interface)
 	{
+		dst_interface->interfaceid = src_interface->interfaceid;
 		strscpy(dst_interface->ip_orig, src_interface->ip);
 		strscpy(dst_interface->dns_orig, src_interface->dns);
 		strscpy(dst_interface->port_orig, src_interface->port);
@@ -3489,6 +3506,7 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 	}
 	else
 	{
+		dst_interface->interfaceid = 0;
 		*dst_interface->ip_orig = '\0';
 		*dst_interface->dns_orig = '\0';
 		*dst_interface->port_orig = '\0';
@@ -4183,6 +4201,24 @@ void	DCfree_triggers(zbx_vector_ptr_t *triggers)
 	triggers->values_num = 0;
 }
 
+void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail)
+{
+	ZBX_DC_INTERFACE	*dc_interface;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
+	{
+		if (dc_interface->max_snmp_succeed < max_snmp_succeed)
+			dc_interface->max_snmp_succeed = (unsigned char)max_snmp_succeed;
+
+		if (dc_interface->min_snmp_fail > min_snmp_fail)
+			dc_interface->min_snmp_fail = (unsigned char)min_snmp_fail;
+	}
+
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_interface_by_type                                   *
@@ -4303,7 +4339,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 	switch (poller_type)
 	{
 		case ZBX_POLLER_TYPE_JAVA:
-			max_items = MAX_BUNCH_ITEMS;
+			max_items = MAX_JAVA_ITEMS;
 			break;
 		case ZBX_POLLER_TYPE_PINGER:
 			max_items = MAX_PINGER_ITEMS;
@@ -4421,7 +4457,17 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
 					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
 			{
-				max_items = MAX_BUNCH_ITEMS;
+				ZBX_DC_INTERFACE	*dc_interface;
+
+				dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+
+				if (NULL != dc_interface)
+				{
+					if (dc_interface->max_snmp_succeed + 1 < dc_interface->min_snmp_fail)
+						max_items = dc_interface->max_snmp_succeed + 1;
+					else
+						max_items = dc_interface->min_snmp_fail - 1;
+				}
 			}
 		}
 	}

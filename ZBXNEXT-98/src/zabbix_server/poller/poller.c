@@ -538,10 +538,10 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 static int	get_values(unsigned char poller_type)
 {
 	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_BUNCH_ITEMS];
-	AGENT_RESULT	results[MAX_BUNCH_ITEMS];
-	zbx_uint64_t	lastlogsizes[MAX_BUNCH_ITEMS];
-	int		errcodes[MAX_BUNCH_ITEMS];
+	DC_ITEM		items[MAX_POLLER_ITEMS];
+	AGENT_RESULT	results[MAX_POLLER_ITEMS];
+	zbx_uint64_t	lastlogsizes[MAX_POLLER_ITEMS];
+	int		errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t	timespec;
 	int		i, num;
 	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];

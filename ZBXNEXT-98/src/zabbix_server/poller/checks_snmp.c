@@ -925,12 +925,12 @@ out:
 
 static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, int max_error_len)
+		char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
 	const char		*__function_name = "zbx_snmp_bulkget_values";
 
 	int			i, j, status, ret = SUCCEED;
-	int			mapping[MAX_BUNCH_ITEMS], mapping_num = 0;
+	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
 
@@ -985,6 +985,9 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
+		if (*max_succeed < mapping_num)
+			*max_succeed = mapping_num;
+
 		for (i = 0, var = response->variables; NULL != var; i++, var = var->next_variable)
 		{
 			j = mapping[i];
@@ -995,7 +998,8 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 				zbx_snmp_set_result(var, items[j].value_type, items[j].data_type, &results[j]);
 		}
 	}
-	else if (1 < num && ((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
+	else if (1 < mapping_num &&
+			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
 	{
 		/* Since we are trying to obtain multiple values from the SNMP agent, the response that it has to  */
 		/* generate might be too big. It seems to be required by the SNMP standard that in such cases the  */
@@ -1009,6 +1013,9 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 		/* values one by one, and the next time configuration cache gives us items to query, it will give  */
 		/* us less. */
 
+		if (*min_fail > mapping_num)
+			*min_fail = mapping_num;
+
 		if (0 == level)
 		{
 			/* halve the number of items */
@@ -1016,7 +1023,7 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 			int	base;
 
 			ret = zbx_snmp_bulkget_values(ss, items, oids, results, errcodes, query_and_ignore_type,
-					num / 2, level + 1, error, max_error_len);
+					num / 2, level + 1, error, max_error_len, max_succeed, min_fail);
 
 			if (SUCCEED != ret)
 				goto exit;
@@ -1025,7 +1032,7 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 
 			ret = zbx_snmp_bulkget_values(ss, items + base, oids + base, results + base, errcodes + base,
 					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
-					level + 1, error, max_error_len);
+					level + 1, error, max_error_len, max_succeed, min_fail);
 		}
 		else if (1 == level)
 		{
@@ -1038,7 +1045,7 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 
 				ret = zbx_snmp_bulkget_values(ss, items + i, oids + i, results + i, errcodes + i,
 						NULL == query_and_ignore_type ? NULL : query_and_ignore_type + i, 1,
-						level + 1, error, max_error_len);
+						level + 1, error, max_error_len, max_succeed, min_fail);
 
 				if (SUCCEED != ret)
 					goto exit;
@@ -1156,18 +1163,18 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, DC_ITEM *items, A
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
 
 	int		i, j, k, ret = SUCCEED;
-	int		to_walk[MAX_BUNCH_ITEMS], to_walk_num = 0;
-	int		to_verify[MAX_BUNCH_ITEMS], to_verify_num = 0;
-	char		to_verify_oids[MAX_BUNCH_ITEMS][ITEM_SNMP_OID_LEN_MAX];
-	unsigned char	query_and_ignore_type[MAX_BUNCH_ITEMS];
-	char		index_oids[MAX_BUNCH_ITEMS][ITEM_SNMP_OID_LEN_MAX];
-	char		index_values[MAX_BUNCH_ITEMS][ITEM_SNMP_OID_LEN_MAX];
-	char		oids_translated[MAX_BUNCH_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	int		to_walk[MAX_SNMP_ITEMS], to_walk_num = 0;
+	int		to_verify[MAX_SNMP_ITEMS], to_verify_num = 0;
+	char		to_verify_oids[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	unsigned char	query_and_ignore_type[MAX_SNMP_ITEMS];
+	char		index_oids[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char		index_values[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char		oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
 	char		*idx = NULL, *pl;
 	size_t		idx_alloc = 32;
 
@@ -1225,7 +1232,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 	if (0 != to_verify_num)
 	{
 		ret = zbx_snmp_bulkget_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type,
-				num, 0, error, max_error_len);
+				num, 0, error, max_error_len, max_succeed, min_fail);
 
 		if (SUCCEED != ret)
 			goto exit;
@@ -1353,7 +1360,8 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 
 	/* query values based on the indices verified and/or determined above */
 
-	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len);
+	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
+			max_succeed, min_fail);
 exit:
 	zbx_free(idx);
 
@@ -1363,12 +1371,12 @@ exit:
 }
 
 static int	zbx_snmp_process_standard(struct snmp_session *ss, DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
 
 	int		i, ret = SUCCEED;
-	char		oids_translated[MAX_BUNCH_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char		oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1388,7 +1396,8 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, DC_ITEM *items, AG
 		zbx_snmp_translate(oids_translated[i], items[i].snmp_oid, sizeof(oids_translated[i]));
 	}
 
-	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len);
+	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
+			max_succeed, min_fail);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1409,8 +1418,8 @@ void	get_values_snmp(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int n
 	const char		*__function_name = "get_values_snmp";
 
 	struct snmp_session	*ss;
-	int			i, j, err = SUCCEED;
 	char			error[MAX_STRING_LEN];
+	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = MAX_SNMP_ITEMS + 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
@@ -1431,11 +1440,19 @@ void	get_values_snmp(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int n
 	}
 
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags))
+	{
 		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error));
+	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
-		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error));
+	{
+		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
+				&max_succeed, &min_fail);
+	}
 	else
-		err = zbx_snmp_process_standard(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error));
+	{
+		err = zbx_snmp_process_standard(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
+				&max_succeed, &min_fail);
+	}
 
 	zbx_snmp_close_session(ss);
 exit:
@@ -1453,6 +1470,8 @@ exit:
 			}
 		}
 	}
+	else
+		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
