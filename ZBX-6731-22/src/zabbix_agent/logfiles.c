@@ -398,10 +398,8 @@ out:
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
 		int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
-		const char *output_template, int *p_count, int *s_count, int (*process_value)(const char *,
-		unsigned short, const char *, const char *, const char *, zbx_uint64_t *, int *, unsigned long *,
-		const char *, unsigned short *, unsigned long *, unsigned char), const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;
@@ -691,10 +689,8 @@ static void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char 
 
 static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, int (*process_value)(const char *, unsigned short, const char *,
-		const char *, const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *,
-		unsigned long *, unsigned char), const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	int		ret = FAIL, nbytes;
 	const char	*cr, *lf, *p_end;
@@ -947,10 +943,8 @@ out:
  ******************************************************************************/
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, int (*process_value)(const char *, unsigned short, const char *,
-		const char *, const char *, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *,
-		unsigned long *, unsigned char), const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char	*__function_name = "process_log";
 

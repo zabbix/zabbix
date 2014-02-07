@@ -1018,6 +1018,10 @@ double	str2double(const char *str);
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
+
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
+
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 
