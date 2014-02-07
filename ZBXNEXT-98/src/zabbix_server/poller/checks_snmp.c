@@ -924,8 +924,8 @@ out:
 */
 
 static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
-		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, char *error,
-		int max_error_len)
+		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
+		char *error, int max_error_len)
 {
 	const char		*__function_name = "zbx_snmp_bulkget_values";
 
@@ -934,7 +934,7 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __function_name, num, level);
 
 	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
 	{
@@ -980,7 +980,8 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld", __function_name,
+			status, NULL == response ? (long)-1 : response->errstat);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -994,9 +995,59 @@ static int	zbx_snmp_bulkget_values(struct snmp_session *ss, DC_ITEM *items, char
 				zbx_snmp_set_result(var, items[j].value_type, items[j].data_type, &results[j]);
 		}
 	}
+	else if (1 < num && ((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
+	{
+		/* Since we are trying to obtain multiple values from the SNMP agent, the response that it has to  */
+		/* generate might be too big. It seems to be required by the SNMP standard that in such cases the  */
+		/* error status should be set to "tooBig(1)". However, some devices simply do not respond to such  */
+		/* queries and we get a timeout. Moreover, some devices exhibit both behaviors - they either send  */
+		/* "tooBig(1)" or do not respond at all. So what we do is halve the number of variables to query - */
+		/* it should work in the vast majority of cases, because, since we are now querying "num" values,  */
+		/* we know that querying "num/2" values succeeded previously. The case where it can still fail due */
+		/* to exceeded maximum response size is if we are now querying values that are unusually large. So */
+		/* if querying with half the number of the last values does not work either, we resort to querying */
+		/* values one by one, and the next time configuration cache gives us items to query, it will give  */
+		/* us less. */
+
+		if (0 == level)
+		{
+			/* halve the number of items */
+
+			int	base;
+
+			ret = zbx_snmp_bulkget_values(ss, items, oids, results, errcodes, query_and_ignore_type,
+					num / 2, level + 1, error, max_error_len);
+
+			if (SUCCEED != ret)
+				goto exit;
+
+			base = num / 2;
+
+			ret = zbx_snmp_bulkget_values(ss, items + base, oids + base, results + base, errcodes + base,
+					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
+					level + 1, error, max_error_len);
+		}
+		else if (1 == level)
+		{
+			/* resort to querying items one by one */
+
+			for (i = 0; i < num; i++)
+			{
+				if (SUCCEED != errcodes[i])
+					continue;
+
+				ret = zbx_snmp_bulkget_values(ss, items + i, oids + i, results + i, errcodes + i,
+						NULL == query_and_ignore_type ? NULL : query_and_ignore_type + i, 1,
+						level + 1, error, max_error_len);
+
+				if (SUCCEED != ret)
+					goto exit;
+			}
+		}
+	}
 	else
 		ret = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error, max_error_len);
-
+exit:
 	if (NULL != response)
 		snmp_free_pdu(response);
 out:
@@ -1174,7 +1225,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 	if (0 != to_verify_num)
 	{
 		ret = zbx_snmp_bulkget_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type,
-				num, error, max_error_len);
+				num, 0, error, max_error_len);
 
 		if (SUCCEED != ret)
 			goto exit;
@@ -1302,7 +1353,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGE
 
 	/* query values based on the indices verified and/or determined above */
 
-	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, error, max_error_len);
+	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len);
 exit:
 	zbx_free(idx);
 
@@ -1337,7 +1388,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, DC_ITEM *items, AG
 		zbx_snmp_translate(oids_translated[i], items[i].snmp_oid, sizeof(oids_translated[i]));
 	}
 
-	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, error, max_error_len);
+	ret = zbx_snmp_bulkget_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
