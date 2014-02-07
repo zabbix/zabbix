@@ -25,7 +25,7 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	$message = array(bold('Configuration file error:'), BR(), $e->getMessage());
+	$message = array('header' => 'Configuration file error', 'text' => $e->getMessage());
 	$warningView = new CView('general.warning', array('message' => $message));
 	$warningView->render();
 	exit;

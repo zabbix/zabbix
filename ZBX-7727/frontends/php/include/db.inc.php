@@ -75,7 +75,7 @@ function DBconnect(&$error) {
 
 				$DB['DB']= @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database';
+					$error = 'Error connecting to database.';
 					$result = false;
 				}
 				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
