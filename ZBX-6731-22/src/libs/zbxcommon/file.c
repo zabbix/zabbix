@@ -150,7 +150,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	if ((zbx_offset_t)-1 == (zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET)))
+	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
 		return -1;
 
 	return (int)i;
