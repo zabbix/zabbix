@@ -24,6 +24,8 @@ my ($from, $till, $value_ts) = get_rollweek_bounds();
 
 my $tlds_ref = get_tlds('RDDS');
 
+init_values();
+
 foreach (@$tlds_ref)
 {
     $tld = $_;
@@ -35,7 +37,9 @@ foreach (@$tlds_ref)
     my $perc = sprintf("%.3f", $fails * 100 / $cfg_sla);
 
     info("fails:$fails perc:$perc");
-    send_value($tld, $cfg_key_out, $value_ts, $perc);
+    push_value($tld, $cfg_key_out, $value_ts, $perc);
 }
+
+send_values();
 
 slv_exit(SUCCESS);

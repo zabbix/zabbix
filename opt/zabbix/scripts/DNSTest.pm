@@ -15,7 +15,7 @@ sub get_dnstest_config
 
     $config = Config::Tiny->read($config_file);
 
-    unless ($config)
+    unless (defined($config))
     {
 	print STDERR (Config::Tiny->errstr(), "\n");
 	exit(-1);

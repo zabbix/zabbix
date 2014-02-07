@@ -12,7 +12,6 @@ use IO::Socket;
 use IO::Select;
 use Net::Domain;
 
-
 has 'server' => (
     'is'       => 'rw',
     'isa'      => 'Str',
@@ -87,7 +86,7 @@ sub _init_json {
 sub _init_hostname {
     my $self = shift;
 
-    return Net::Domain::hostname() . '.' . Net::Domain::hostdomain();
+    return Net::Domain::hostname();
 }
 
 
@@ -100,21 +99,11 @@ has 'zabbix_template_1_8' => (
 
 sub _encode_request {
     my $self  = shift;
-    my $host  = shift;
-    my $item  = shift;
-    my $value = shift;
-    my $clock = shift;
-
-    my $data_ref = {
-        'host'  => $host,
-        'key'   => $item,
-        'value' => $value,
-    };
-    $data_ref->{'clock'} = $clock if defined($clock);
+    my $data_ref = shift;
 
     my $data = {
         'request' => 'sender data',
-        'data'    => [$data_ref],
+        'data'    => $data_ref,
     };
 
     my $output = '';
@@ -164,17 +153,25 @@ sub _decode_answer {
 # DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
 # and if the implementor avoids indirect object notation you should be fine.
 ## no critic (ProhibitBuiltinHomonyms)
-sub send {
+sub send_value {
 ## use critic
     my $self  = shift;
-    my $host  = shift;
+    my $host  = shift || $self->hostname();
     my $item  = shift;
     my $value = shift;
     my $clock = shift;
 
+    my $data_ref = {
+	'host'  => $host,
+	'key'   => $item,
+	'value' => $value,
+    };
+
+    $data_ref->{'clock'} = $clock if defined($clock);
+
     my $status = 0;
     foreach my $i ( 1 .. $self->retries() ) {
-        if ( $self->_send( $host, $item, $value, $clock ) ) {
+        if ( $self->_send( [ $data_ref ] ) ) {
             $status = 1;
             last;
         }
@@ -189,12 +186,61 @@ sub send {
 
 }
 
+# DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
+# and if the implementor avoids indirect object notation you should be fine.
+## no critic (ProhibitBuiltinHomonyms)
+sub send_hashref {
+## use critic
+    my $self  = shift;
+    my $data_ref = shift;
+
+    my $status = 0;
+    foreach my $i ( 1 .. $self->retries() ) {
+        if ( $self->_send( [ $data_ref ] ) ) {
+            $status = 1;
+            last;
+        }
+    }
+
+    if ($status) {
+        return 1;
+    }
+    else {
+        return;
+    }
+
+}
+
+# DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
+# and if the implementor avoids indirect object notation you should be fine.
+## no critic (ProhibitBuiltinHomonyms)
+sub send_arrref {
+## use critic
+    my $self  = shift;
+    my $data_ref = shift;
+
+    my $status = 0;
+    foreach my $i ( 1 .. $self->retries() ) {
+        if ( $self->_send( $data_ref ) ) {
+            $status = 1;
+            last;
+        }
+    }
+
+    if ($status) {
+        return 1;
+    }
+    else {
+        return;
+    }
+
+}
+
+
+
 sub _send {
     my $self  = shift;
-    my $host  = shift;
-    my $item  = shift;
-    my $value = shift;
-    my $clock = shift;
+    my $data_ref = shift;
 
     if ( time() - $self->_last_sent() < $self->interval() ) {
         my $sleep = $self->interval() - ( time() - $self->_last_sent() );
@@ -203,7 +249,7 @@ sub _send {
     }
 
     $self->_connect() unless $self->_socket();
-    $self->_socket()->send( $self->_encode_request( $host, $item, $value, $clock ) );
+    $self->_socket()->send( $self->_encode_request( $data_ref ) );
     my $Select  = IO::Select::->new($self->_socket());
     my @Handles = $Select->can_read( $self->timeout() );
 
@@ -232,7 +278,7 @@ sub _connect {
         PeerPort => $self->port(),
         Proto    => 'tcp',
         Timeout  => $self->timeout(),
-    ) or die("Could not create socket: $!");
+    ) or die("Could not create socket (".$self->server().":".$self->port()."): $!");
 
     $self->_socket($Socket);
 

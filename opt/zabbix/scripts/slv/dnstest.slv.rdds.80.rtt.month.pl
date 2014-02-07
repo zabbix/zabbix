@@ -26,6 +26,8 @@ my $cfg_delay = get_macro_rdds_delay();
 
 my $tlds_ref = get_tlds();
 
+init_values();
+
 foreach (@$tlds_ref)
 {
     $tld = $_;
@@ -34,6 +36,8 @@ foreach (@$tlds_ref)
 
     process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value);
 }
+
+send_values();
 
 slv_exit(SUCCESS);
 

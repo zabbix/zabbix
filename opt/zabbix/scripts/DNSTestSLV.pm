@@ -3,7 +3,6 @@ package DNSTestSLV;
 use strict;
 use warnings;
 use DBI;
-use IO::CaptureOutput qw/capture_exec/;
 use Getopt::Long;
 use Exporter qw(import);
 use DateTime;
@@ -37,6 +36,8 @@ use constant RTT_LIMIT_MULTIPLIER => 5;
 
 use constant SECONDS_WEEK => 604800;
 
+use constant SENDER_BATCH_COUNT => 250;
+
 our ($result, $dbh, $tld);
 
 our %OPTS; # command-line options
@@ -51,9 +52,9 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_epp_rtt get_rollweek_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
-		minutes_last_month get_online_probes probes2tldhostids send_value get_ns_from_key
-		is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly get_item_values
-		check_lastclock get_down_count
+		minutes_last_month get_online_probes probes2tldhostids send_value init_values push_value send_values
+		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
+		get_item_values check_lastclock get_down_count
 		dbg info warn fail slv_exit exit_if_running trim parse_opts);
 
 my $probe_group_name = 'Probes';
@@ -69,6 +70,8 @@ my $rollweek_shift_back = 180; # seconds (must be divisible by 60 without remain
 # make sure only one copy of script runs (unless in test mode)
 my $pidfile;
 my $pid_dir = '/tmp';
+
+my @_sender_values; # used to send values to Zabbix server
 
 sub get_macro_minns
 {
@@ -581,11 +584,11 @@ sub probes2tldhostids
     my $hosts_str = "";
     foreach (@$probes_ref)
     {
-	$hosts_str .= " or " if ("" ne $hosts_str);
+	$hosts_str .= " or " unless ($hosts_str eq "");
 	$hosts_str .= "host='$tld $_'";
     }
 
-    if ($hosts_str ne "")
+    unless ($hosts_str eq "")
     {
 	my $res = db_select("select hostid from hosts where $hosts_str");
 
@@ -607,11 +610,58 @@ sub send_value
     return if (defined($OPTS{'test'}));
 
     my $sender = Zabbix::Sender->new({
-        'server' => $config->{'slv'}->{'zserver'},
-        'port' => $config->{'slv'}->{'zport'},
+	'server' => $config->{'slv'}->{'zserver'},
+	'port' => $config->{'slv'}->{'zport'},
 	'retries' => 1 });
 
-    fail("cannot send value:$value clock:$timestamp ($hostname:$key)") if (not defined($sender->send($hostname, $key, "$value", "$timestamp")));
+    fail("cannot connect to Zabbix server") unless (defined($sender));
+
+    fail("cannot send data to Zabbix server ($hostname:$key, $timestamp, '$value')") unless (defined($sender->send_value($hostname, $key, "$value", "$timestamp")));
+}
+
+sub init_values
+{
+    @_sender_values = ();
+}
+
+sub push_value
+{
+    my $hostname = shift;
+    my $key = shift;
+    my $timestamp = shift;
+    my $value = shift;
+
+    push(@_sender_values, {'host' => $hostname, 'key' => $key,  'value' => "$value", 'clock' => $timestamp});
+}
+
+#
+# accepts array reference of values:
+#
+# [
+#   {'host' => 'host1', 'key' => 'item1', 'value' => '5', 'clock' => 1391790685},
+#   {'host' => 'host2', 'key' => 'item1', 'value' => '4', 'clock' => 1391790685},
+#   ...
+# ]
+#
+sub send_values
+{
+    return if (defined($OPTS{'test'}));
+
+    my $sender = Zabbix::Sender->new({
+	'server' => $config->{'slv'}->{'zserver'},
+	'port' => $config->{'slv'}->{'zport'},
+	'retries' => 1 });
+
+    fail("cannot connect to Zabbix server") unless (defined($sender));
+
+    my @suba;
+
+    while (scalar(@_sender_values) > 0)
+    {
+	@suba = splice(@_sender_values, 0, SENDER_BATCH_COUNT);
+
+	warn("cannot send data to Zabbix server: ", Dumper(\@suba)) unless (defined($sender->send_arrref(\@suba)));
+    }
 }
 
 # Get name server details (name, IP) from item key.
@@ -729,7 +779,7 @@ sub process_slv_ns_monthly
 	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $total_values{$ns});
 
 	info("$ns: $perc% successful values (", $successful_values{$ns}, " out of ", $total_values{$ns});
-	send_value($tld, $key_out, $value_ts, $perc);
+	push_value($tld, $key_out, $value_ts, $perc);
     }
 }
 
@@ -794,7 +844,7 @@ sub process_slv_monthly
     my $perc = sprintf("%.3f", $successful_values * 100 / $total_values);
 
     info("$perc% successful values ($successful_values out of $total_values)");
-    send_value($tld, $cfg_key_out, $value_ts, $perc);
+    push_value($tld, $cfg_key_out, $value_ts, $perc);
 }
 
 sub process_slv_ns_avail
@@ -819,7 +869,7 @@ sub process_slv_ns_avail
     if ($count < $cfg_minonline)
     {
 	info("success ($count probes are online, min - $cfg_minonline)");
-	send_value($tld, $_, $value_ts, UP) foreach (@out_keys);
+	push_value($tld, $_, $value_ts, UP) foreach (@out_keys);
 	return;
     }
 
@@ -842,7 +892,7 @@ sub process_slv_ns_avail
 	if ($count < $cfg_minonline)
 	{
 	    info("$ns success ($count online probes have results, min - $cfg_minonline)");
-	    send_value($tld, $out_key, $value_ts, UP);
+	    push_value($tld, $out_key, $value_ts, UP);
 	    next;
 	}
 
@@ -856,7 +906,7 @@ sub process_slv_ns_avail
 	my $success_perc = $success_results * 100 / $count;
 	my $test_result = $success_perc > $unavail_limit ? UP : DOWN;
 	info("$ns ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
-	send_value($tld, $out_key, $value_ts, $test_result);
+	push_value($tld, $out_key, $value_ts, $test_result);
     }
 }
 
@@ -884,7 +934,7 @@ sub get_item_values
 	my $items_str = "";
 	foreach (@$items_ref)
 	{
-	    $items_str .= "," if ("" ne $items_str);
+	    $items_str .= "," unless ($items_str eq "");
 	    $items_str .= $_->{'itemid'};
 	}
 
@@ -1109,7 +1159,7 @@ sub __get_ns_values
 	my $items_str = "";
 	foreach my $itemid (keys(%$items_ref))
 	{
-	    $items_str .= "," if ("" ne $items_str);
+	    $items_str .= "," unless ($items_str eq "");
 	    $items_str .= $itemid;
 	}
 
@@ -1166,7 +1216,7 @@ sub get_dbl_values
 	my $items_str = "";
 	foreach my $itemid (keys(%$items_ref))
 	{
-	    $items_str .= "," if ("" ne $items_str);
+	    $items_str .= "," unless ($items_str eq "");
 	    $items_str .= $itemid;
 	}
 
@@ -1339,7 +1389,7 @@ sub get_eventtimes
 
     my $rows = scalar(@$arr_ref);
 
-    fail("item $itemid must have one not classified trigger") if ($rows != 1);
+    fail("item $itemid must have one not classified trigger") unless ($rows == 1);
 
     my $triggerid = $arr_ref->[0]->[0];
 
@@ -1382,7 +1432,7 @@ sub get_eventtimes
     }
 
     push(@eventtimes, $_) foreach (sort(@unsorted_eventtimes));
-    push(@eventtimes, $till) if ((scalar(@eventtimes) % 2) != 0);
+    push(@eventtimes, $till) unless ((scalar(@eventtimes) % 2) == 0);
 
     return \@eventtimes;
 }

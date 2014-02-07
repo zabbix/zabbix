@@ -24,6 +24,8 @@ my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
 my $tlds_ref = get_tlds('RDDS');
 
+init_values();
+
 foreach (@$tlds_ref)
 {
     $tld = $_;
@@ -36,7 +38,7 @@ foreach (@$tlds_ref)
     if ($online_probes < $cfg_minonline)
     {
 	info("success ($online_probes probes are online, min - $cfg_minonline)");
-	send_value($tld, $cfg_key_out, $value_ts, UP);
+	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
 
@@ -49,7 +51,7 @@ foreach (@$tlds_ref)
     if ($probes_with_values < $cfg_minonline)
     {
 	info("success ($probes_with_values online probes have results, min - $cfg_minonline)");
-	send_value($tld, $cfg_key_out, $value_ts, UP);
+	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
 
@@ -77,8 +79,10 @@ foreach (@$tlds_ref)
     $test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
 
     info(($test_result == UP ? "success" : "fail"), " ($perc% UP)");
-    send_value($tld, $cfg_key_out, $value_ts, $test_result);
+    push_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
+
+send_values();
 
 slv_exit(SUCCESS);
 
