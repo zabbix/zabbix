@@ -35,6 +35,7 @@ $fields = array(
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
 	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -57,7 +58,8 @@ if (isset($_REQUEST['proxyid'])) {
 		'selectInterface' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	));
-	if (empty($dbProxy)) {
+
+	if (!$dbProxy) {
 		access_deny();
 	}
 }
@@ -86,7 +88,8 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'interface' => get_request('interface')
+		'interface' => get_request('interface'),
+		'description' => getRequest('description')
 	);
 
 	// skip discovered hosts
@@ -207,11 +210,12 @@ if (isset($_REQUEST['form'])) {
 		'status' => get_request('status', HOST_STATUS_PROXY_ACTIVE),
 		'hosts' => get_request('hosts', array()),
 		'interface' => get_request('interface', array()),
-		'proxy' => array()
+		'proxy' => array(),
+		'description' => getRequest('description', '')
 	);
 
 	// proxy
-	if (!empty($data['proxyid'])) {
+	if ($data['proxyid']) {
 		$dbProxy = reset($dbProxy);
 
 		if (!isset($_REQUEST['form_refresh'])) {
@@ -219,11 +223,12 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = $dbProxy['status'];
 			$data['interface'] = $dbProxy['interface'];
 			$data['hosts'] = zbx_objectValues($dbProxy['hosts'], 'hostid');
+			$data['description'] = $dbProxy['description'];
 		}
 	}
 
 	// interface
-	if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && empty($data['interface'])) {
+	if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && !$data['interface']) {
 		$data['interface'] = array(
 			'dns' => 'localhost',
 			'ip' => '127.0.0.1',
