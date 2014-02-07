@@ -2,7 +2,14 @@
 
 ### Auditlog info
 
+(See: [ZBXNEXT-2148](https://support.zabbix.com/browse/ZBXNEXT-2148))
 (Note these are the last 24h based on `auditlog:clock`)
+
+Auditlog range:
+
+```sql
+SELECT FROM_UNIXTIME(MIN(clock)), FROM_UNIXTIME(MAX(clock)) FROM auditlog;
+```
 
 
 Audit info by user:
