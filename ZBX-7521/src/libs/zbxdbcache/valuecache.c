@@ -702,7 +702,10 @@ static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
 static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 {
 	if (NULL != item)
+	{
 		item->hits += hits;
+		item->last_accessed = ZBX_VC_TIME();
+	}
 
 	if (NULL != vc_cache)
 	{
@@ -2868,10 +2871,6 @@ out:
 		}
 	}
 	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
-	}
 finish:
 	if (NULL != item)
 		vc_item_release(item);
@@ -2977,10 +2976,6 @@ out:
 		}
 	}
 	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
-	}
 finish:
 	if (NULL != item)
 		vc_item_release(item);
