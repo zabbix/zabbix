@@ -492,7 +492,7 @@ out:
 #if defined(HAVE_SQLITE3)
 void	zbx_create_sqlite3_mutex(const char *dbname)
 {
-	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+	if (PHP_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("cannot create mutex for SQLite3");
 		exit(EXIT_FAILURE);
