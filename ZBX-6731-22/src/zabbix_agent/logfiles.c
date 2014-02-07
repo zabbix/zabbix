@@ -607,7 +607,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 
 			if (0xd == *p)	/* CR (Mac) */
 			{
-				if (p + 1 < p_end && 0xa == *(p + 1))   /* CR+LF (Windows) */
+				if (p < p_end - 1 && 0xa == *(p + 1))   /* CR+LF (Windows) */
 				{
 					*p_next = p + 2;
 					return p;
@@ -621,7 +621,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 	else
 	{
-		while (p < p_end)
+		while (p <= p_end - szbyte)
 		{
 			if (0 == memcmp(p, lf, szbyte))		/* LF (Unix) */
 			{
@@ -631,8 +631,9 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 
 			if (0 == memcmp(p, cr, szbyte))		/* CR (Mac) */
 			{
-				if (p + szbyte < p_end && 0 == memcmp(p + szbyte, lf, szbyte))	/* CR+LF (Windows) */
+				if (p <= p_end - szbyte - szbyte && 0 == memcmp(p + szbyte, lf, szbyte))
 				{
+					/* CR+LF (Windows) */
 					*p_next = p + szbyte + szbyte;
 					return p;
 				}
