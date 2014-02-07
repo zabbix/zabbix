@@ -3066,6 +3066,9 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	const ZBX_DC_SNMPITEM	*s1;
 	const ZBX_DC_SNMPITEM	*s2;
 
+	unsigned char		f1;
+	unsigned char		f2;
+
 	if (i1->interfaceid < i2->interfaceid)
 		return -1;
 	if (i1->interfaceid > i2->interfaceid)
@@ -3081,9 +3084,12 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	if (i1->type > i2->type)
 		return +1;
 
-	if (i1->flags < i2->flags)
+	f1 = ZBX_FLAG_DISCOVERY_RULE & i1->flags;
+	f2 = ZBX_FLAG_DISCOVERY_RULE & i2->flags;
+
+	if (f1 < f2)
 		return -1;
-	if (i1->flags > i2->flags)
+	if (f1 > f2)
 		return +1;
 
 	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
