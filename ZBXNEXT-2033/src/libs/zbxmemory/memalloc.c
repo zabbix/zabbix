@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,6 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr);
 
 #define FREE_CHUNK(ptr)		(((*(zbx_uint64_t *)(ptr)) & MEM_FLG_USED) == 0)
 #define CHUNK_SIZE(ptr)		((*(zbx_uint64_t *)(ptr)) & ~MEM_FLG_USED)
-
 
 #define MEM_MIN_SIZE		__UINT64_C(128)
 #define MEM_MAX_SIZE		__UINT64_C(0x1000000000)	/* 64 GB */
@@ -274,6 +273,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 
 		int		counter = 0;
 		zbx_uint64_t	skip_min = __UINT64_C(0xffffffffffffffff), skip_max = __UINT64_C(0);
+
 		while (NULL != chunk && CHUNK_SIZE(chunk) < size)
 		{
 			counter++;
@@ -436,8 +436,17 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	{
 		void	*tmp = NULL;
 
-		/* in allow_oom mode realloc failure must keep the original memory untouched */
-		if (1 == info->allow_oom)
+		/* check if there would be enough space if the current chunk */
+		/* would be freed before allocating a new one                */
+		new_chunk_size = chunk_size;
+
+		if (0 != next_free)
+			new_chunk_size += CHUNK_SIZE(next_chunk) + 2 * MEM_SIZE_FIELD;
+
+		if (info->lo_bound < chunk && FREE_CHUNK(chunk - MEM_SIZE_FIELD))
+			new_chunk_size += CHUNK_SIZE(chunk - MEM_SIZE_FIELD) + 2 * MEM_SIZE_FIELD;
+
+		if (size > new_chunk_size)
 			return NULL;
 
 		tmp = zbx_malloc(tmp, chunk_size);
@@ -446,10 +455,13 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 
 		__mem_free(info, old);
 
-		new_chunk = __mem_malloc(info, size);
+		if (NULL == (new_chunk = __mem_malloc(info, size)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(FAIL);
+		}
 
-		if (NULL != new_chunk)
-			memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
+		memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
 
 		zbx_free(tmp);
 
@@ -601,8 +613,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uin
 
 		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for %s",
-					descr);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for %s", descr);
 			exit(FAIL);
 		}
 	}

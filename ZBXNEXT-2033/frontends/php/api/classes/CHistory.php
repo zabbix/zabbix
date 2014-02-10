@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,15 +98,13 @@ class CHistory extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
 		}
 		else {
-			$itemOptions = array(
+			$items = API::Item()->get(array(
+				'itemids' => ($options['itemids'] === null) ? null : $options['itemids'],
+				'output' => array('itemid'),
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true
-			);
-			if (!is_null($options['itemids'])) {
-				$itemOptions['itemids'] = $options['itemids'];
-			}
-			$items = API::Item()->get($itemOptions);
+			));
 			$options['itemids'] = array_keys($items);
 		}
 

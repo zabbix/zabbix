@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ $chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->get
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
 
 if ($this->data['graphid']) {
-	$chartsWidget->addPageHeader(_('Graphs'), array(
+	$chartsWidget->addPageHeader(_('GRAPHS'), array(
 		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
 		SPACE,
 		get_icon('reset', array('id' => $this->data['graphid'])),
@@ -38,7 +38,7 @@ if ($this->data['graphid']) {
 	));
 }
 else {
-	$chartsWidget->addPageHeader(_('Graphs'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$chartsWidget->addPageHeader(_('GRAPHS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 }
 
 $chartsWidget->addHeader(

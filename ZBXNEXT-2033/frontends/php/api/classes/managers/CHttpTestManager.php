@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,6 +144,8 @@ class CHttpTestManager {
 			'preservekeys' => true
 		));
 
+		$deleteStepItemIds = array();
+
 		foreach ($httpTests as $httpTest) {
 			DB::update('httptest', array(
 				'values' => $httpTest,
@@ -199,7 +201,15 @@ class CHttpTestManager {
 				$stepidsDelete = array_keys($dbSteps);
 
 				if (!empty($stepidsDelete)) {
-					$this->deleteStepsReal($stepidsDelete);
+					$result = DBselect(
+						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
+					);
+
+					foreach (DBfetchColumn($result, 'itemid') as $itemId) {
+						$deleteStepItemIds[] = $itemId;
+					}
+
+					DB::delete('httpstep', array('httpstepid' => $stepidsDelete));
 				}
 				if (!empty($stepsUpdate)) {
 					$this->updateStepsReal($httpTest, $stepsUpdate);
@@ -236,6 +246,10 @@ class CHttpTestManager {
 					));
 				}
 			}
+		}
+
+		if ($deleteStepItemIds) {
+			API::Item()->delete($deleteStepItemIds, true);
 		}
 
 		// TODO: REMOVE info
@@ -939,22 +953,6 @@ class CHttpTestManager {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
 			}
 		}
-	}
-
-	/**
-	 * Delete web scenario steps.
-	 *
-	 * @param $httpStepIds
-	 */
-	protected function deleteStepsReal($httpStepIds) {
-		$itemIds = DBfetchColumn(
-			DBselect('SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $httpStepIds)),
-			'itemid'
-		);
-
-		DB::delete('httpstep', array('httpstepid' => $httpStepIds));
-
-		API::Item()->delete($itemIds, true);
 	}
 
 	/**

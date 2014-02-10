@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,25 +36,22 @@ if (PAGE_TYPE_HTML == $page['type']) {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-	'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-	'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-
-	'fullscreen'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
-// filter
-	'select'=>				array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
-	'show_without_data'=>	array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
-	'show_details'=>		array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
-	'filter_rst'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
-	'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
-//ajax
-	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
-	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL),
-	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
-	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
+	'apps' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'fullscreen' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -199,15 +196,16 @@ if ($hosts) {
 	));
 }
 if ($items) {
-	// filter items by name
-	foreach ($items as $key => &$item) {
-		$item['resolvedName'] = itemName($item);
+	// macros
+	$items = CMacrosResolverHelper::resolveItemKeys($items);
+	$items = CMacrosResolverHelper::resolveItemNames($items);
 
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['resolvedName'], $filterSelect)) {
+	// filter items by name
+	foreach ($items as $key => $item) {
+		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name_expanded'], $filterSelect)) {
 			unset($items[$key]);
 		}
 	}
-	unset($item);
 
 	if ($items) {
 		// get history
@@ -236,13 +234,13 @@ if ($items) {
 
 		// sort
 		if ($sortField == 'i.name') {
-			$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
+			$sortFields = array(array('field' => 'name_expanded', 'order' => $sortOrder), 'itemid');
 		}
 		elseif ($sortField == 'i.lastclock') {
-			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
+			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name_expanded', 'itemid');
 		}
 		else {
-			$sortFields = array('resolvedName', 'itemid');
+			$sortFields = array('name_expanded', 'itemid');
 		}
 		CArrayHelper::sort($items, $sortFields);
 
@@ -252,6 +250,7 @@ if ($items) {
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		));
+
 		if ($applications) {
 			foreach ($applications as &$application) {
 				$application['hostname'] = $hosts[$application['hostid']]['name'];
@@ -275,6 +274,7 @@ if ($items) {
 				'countOutput' => true,
 				'groupCount' => true
 			));
+
 			foreach ($screens as $screen) {
 				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
 			}
@@ -367,16 +367,6 @@ foreach ($items as $key => $item){
 		$item['unitsLong'] = '';
 	}
 
-	$itemApplications = reset($item['applications']);
-	$db_app = &$applications[$itemApplications['applicationid']];
-
-	if (!isset($tab_rows[$db_app['applicationid']])) {
-		$tab_rows[$db_app['applicationid']] = array();
-	}
-	$app_rows = &$tab_rows[$db_app['applicationid']];
-
-	$db_app['item_cnt']++;
-
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
@@ -417,12 +407,11 @@ foreach ($items as $key => $item){
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
-	$itemName = $item['resolvedName'];
 
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan(resolveItemKeyMacros($item), 'enabled')
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_expanded'], 'enabled')
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -443,11 +432,11 @@ foreach ($items as $key => $item){
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -462,25 +451,32 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
 			new CCol($statusIcons)
-		)));
+		));
 	}
 	else {
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
 			($_REQUEST['hostid'] > 0) ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss.' item')),
+			new CCol(new CDiv($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
 			new CCol($actions, 'latest-actions'),
-		)));
+		));
+	}
+
+	// add the item row to each application tab
+	foreach ($item['applications'] as $itemApplication) {
+		$applicationId = $itemApplication['applicationid'];
+
+		$applications[$applicationId]['item_cnt']++;
+		$tab_rows[$applicationId][] = $row;
 	}
 
 	// remove items with applications from the collection
 	unset($items[$key]);
 }
-unset($app_rows, $db_app);
 
 foreach ($applications as $appid => $dbApp) {
 	$host = $hosts[$dbApp['hostid']];
@@ -542,13 +538,6 @@ foreach ($items as $item) {
 	else
 		$item['unitsLong'] = '';
 
-	$host = &$hosts[$item['hostid']];
-
-	if (!isset($tab_rows[$host['hostid']])) $tab_rows[$host['hostid']] = array();
-	$app_rows = &$tab_rows[$host['hostid']];
-
-	$host['item_cnt']++;
-
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
@@ -591,12 +580,11 @@ foreach ($items as $item) {
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
-	$itemName = $item['resolvedName'];
-
+	$host = $hosts[$item['hostid']];
 	if ($filterShowDetails) {
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan(resolveItemKeyMacros($item), 'enabled')
-			: new CLink(resolveItemKeyMacros($item), 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? new CSpan($item['key_expanded'], 'enabled')
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -617,11 +605,11 @@ foreach ($items as $item) {
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv(array($itemName, BR(), $itemKey), $stateCss.' item')),
+			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CDiv(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -636,22 +624,24 @@ foreach ($items as $item) {
 			new CCol(new CDiv($change, $stateCss)),
 			$actions,
 			new CCol($statusIcons)
-		)));
+		));
 	}
 	else {
-		array_push($app_rows, new CRow(array(
+		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$_REQUEST['hostid'] ? null : SPACE,
-			new CCol(new CDiv($itemName, $stateCss.' item')),
+			new CCol(new CDiv($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
 			$actions
-		)));
+		));
 	}
+
+	$hosts[$item['hostid']]['item_cnt']++;
+	$tab_rows[$item['hostid']][] = $row;
 }
-unset($host, $app_rows);
 
 foreach ($hosts as $hostId => $dbHost) {
 	$host = $hosts[$dbHost['hostid']];

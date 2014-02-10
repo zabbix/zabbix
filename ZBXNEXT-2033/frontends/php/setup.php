@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ require_once dirname(__FILE__).'/include/setup.inc.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
-	'server' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database host')),
+	'server' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')),
 	'database' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')),
 	'user' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
@@ -82,34 +82,6 @@ if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 elseif (hasRequest('cancel') || hasRequest('finish')) {
 	zbx_unsetcookie('ZBX_CONFIG');
 	redirect('index.php');
-}
-
-$ZBX_CONFIG['allowed_db'] = array();
-// MYSQL
-if (zbx_is_callable(array('mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
-		'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'))) {
-	$ZBX_CONFIG['allowed_db']['MYSQL'] = 'MySQL';
-}
-// POSTGRESQL
-if (zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))) {
-	$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
-}
-// ORACLE
-if (zbx_is_callable(array('oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
-		'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
-		'oci_bind_by_name', 'oci_free_statement'))) {
-	$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
-}
-// IBM_DB2
-if (zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_prepare', 'db2_execute', 'db2_fetch_assoc'))) {
-	$ZBX_CONFIG['allowed_db']['IBM_DB2'] = 'IBM DB2';
-}
-// SQLITE3. The false is here to avoid autoloading of the class.
-if (class_exists('SQLite3', false) && zbx_is_callable(array('ftok', 'sem_acquire', 'sem_release', 'sem_get'))) {
-	$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
-}
-if (count($ZBX_CONFIG['allowed_db']) == 0) {
-	$ZBX_CONFIG['allowed_db']['no'] = 'No';
 }
 
 /*

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 {
 	const char	*s, *delim;
 	char		flex_period[30];
-	int		flex_delay, current_delay = SEC_PER_YEAR;
+	int		flex_delay, current_delay = -1;
 
 	if (NULL == flex_intervals || '\0' == *flex_intervals)
 		return delay;
@@ -457,8 +457,11 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
 
-			if (flex_delay < current_delay && SUCCEED == check_time_period(flex_period, now))
+			if ((-1 == current_delay || flex_delay < current_delay) &&
+					SUCCEED == check_time_period(flex_period, now))
+			{
 				current_delay = flex_delay;
+			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
@@ -467,10 +470,10 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 			break;
 	}
 
-	if (SEC_PER_YEAR == current_delay)
+	if (-1 == current_delay)
 		return delay;
 
-	return current_delay == 0 ? SEC_PER_YEAR : current_delay;
+	return current_delay;
 }
 
 /******************************************************************************
@@ -591,68 +594,73 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: delay - [IN] default delay value, can be overridden            *
+ * Parameters: seed      - [IN] the seed value applied to delay to spread     *
+ *                              item checks over the delay period             *
+ *             item_type - [IN] the item type                                 *
+ *             delay     - [IN] default delay value, can be overridden        *
  *             flex_intervals - [IN] descriptions of flexible intervals       *
  *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now - current timestamp                                        *
+ *             now       - [IN] current timestamp                             *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments: if item check is forbidden with delay=0 (default and flexible),  *
- *           a timestamp approximately one year in the future is returned     *
+ *           a timestamp very far in the future is returned                   *
  *                                                                            *
  *           Old algorithm: now+delay                                         *
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now, int *effective_delay)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck = 0;
-
-	if (0 == delay)
-		delay = SEC_PER_YEAR;
 
 	/* special processing of active items to see better view in queue */
 	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
 	{
-		nextcheck = (int)now + delay;
+		if (0 != delay)
+			nextcheck = (int)now + delay;
+		else
+			nextcheck = ZBX_JAN_2038;
 	}
 	else
 	{
-		int		current_delay = SEC_PER_YEAR, try = 0;
-		time_t		next_interval, t, tmax;
-		zbx_uint64_t	shift;
+		int	current_delay = 0, try = 0;
+		time_t	next_interval, t, tmax;
 
 		/* Try to find the nearest 'nextcheck' value with condition */
-		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR */
+		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
+		/* possible to check the item within a year, fail. */
 
 		t = now;
 		tmax = now + SEC_PER_YEAR;
-
-		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
 
 		while (t < tmax)
 		{
 			/* calculate 'nextcheck' value for the current interval */
 			current_delay = get_current_delay(delay, flex_intervals, t);
 
-			nextcheck = current_delay * (int)(t / (time_t)current_delay) +
-					(int)(shift % (zbx_uint64_t)current_delay);
-
-			if (0 == try)
+			if (0 != current_delay)
 			{
-				while (nextcheck <= t)
-					nextcheck += current_delay;
+				nextcheck = current_delay * (int)(t / (time_t)current_delay) +
+						(int)(seed % (zbx_uint64_t)current_delay);
+
+				if (0 == try)
+				{
+					while (nextcheck <= t)
+						nextcheck += current_delay;
+				}
+				else
+				{
+					while (nextcheck < t)
+						nextcheck += current_delay;
+				}
 			}
 			else
-			{
-				while (nextcheck < t)
-					nextcheck += current_delay;
-			}
+				nextcheck = ZBX_JAN_2038;
 
 			/* 'nextcheck' < end of the current interval ? */
 			/* the end of the current interval is the beginning of the next interval - 1 */
@@ -666,11 +674,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 			else
 				break;	/* nextcheck is within the current interval */
 		}
-		delay = current_delay;
 	}
-
-	if (NULL != effective_delay)
-		*effective_delay = delay;
 
 	return nextcheck;
 }
@@ -1774,8 +1778,8 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
  *             num - number of elements                                       *
  *             id  - index to look for                                        *
  *                                                                            *
- * Return value: nearest index position                                       *
- *               0 - otherwise                                                *
+ * Return value: index at which it would be possible to insert the element so *
+ *               that the array is still sorted                               *
  *                                                                            *
  ******************************************************************************/
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
@@ -2346,3 +2350,4 @@ fail:
 
 	return res;
 }
+

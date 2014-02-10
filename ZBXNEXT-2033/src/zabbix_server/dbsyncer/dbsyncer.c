@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include "dbsyncer.h"
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern int		ZBX_SYNC_MAX;
 extern unsigned char	process_type;
 extern int		process_num;
 

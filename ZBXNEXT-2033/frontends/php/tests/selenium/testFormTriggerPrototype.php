@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -436,7 +436,7 @@ class testFormTriggerPrototype extends CWebTest {
 
 		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent('Trigger updated');
+		$this->zbxTestTextPresent('Trigger prototype updated');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 		$this->zbxTestTextPresent("$description");
@@ -831,7 +831,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
 				case TEST_GOOD:
-					$this->zbxTestTextPresent('Trigger added');
+					$this->zbxTestTextPresent('Trigger prototype added');
 					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 					break;
@@ -886,7 +886,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 
-			$this->zbxTestTextPresent('Triggers deleted');
+			$this->zbxTestTextPresent('Trigger prototypes deleted');
 			$this->zbxTestTextNotPresent($this->host.": $description");
 		}
 	}

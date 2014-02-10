@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -766,7 +766,7 @@ class testFormGraphPrototype extends CWebTest {
 		$this->zbxTestTextPresent(array(
 			'CONFIGURATION OF GRAPH PROTOTYPES',
 			'Graph prototypes of '.$this->discoveryRule,
-			'Graph updated',
+			'Graph prototype updated',
 			$data['name']
 		));
 
@@ -1182,7 +1182,7 @@ class testFormGraphPrototype extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestTextPresent('Graph added');
+				$this->zbxTestTextPresent('Graph prototype added');
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
@@ -1235,7 +1235,7 @@ class testFormGraphPrototype extends CWebTest {
 
 			$this->getConfirmation();
 			$this->wait();
-			$this->zbxTestTextPresent('Graphs deleted');
+			$this->zbxTestTextPresent('Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
 	}

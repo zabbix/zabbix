@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ static int	dlpi_attach(int fd, int ppa)
 	if (DL_OK_ACK != *(int *)buf_ctl)
 		return FAIL;
 
-	/* Succesfully attached to a PPA. */
+	/* Successfully attached to a PPA. */
 	return SUCCEED;
 }
 
@@ -264,7 +264,7 @@ static int	dlpi_detach(int fd)
 	if (DL_OK_ACK != *(int *)buf_ctl)
 		return FAIL;
 
-	/* succesfully detached */
+	/* successfully detached */
 	return SUCCEED;
 }
 

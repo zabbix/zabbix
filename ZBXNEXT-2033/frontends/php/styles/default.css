@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -263,8 +263,6 @@ span.subfilter_inactive:hover { color: #999999; }
 span.subfilter_active { color: teal; }
 
 /* requirements table */
-span.ok { white-space: normal; font-weight: bold; }
-span.fail { font-weight: bold; }
 span.info { font-weight: bold; font-size: 11px; }
 
 /* saverities */

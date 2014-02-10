@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionLinks = array();
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=edit&actionid='.$action['actionid']);
+			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']);
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);

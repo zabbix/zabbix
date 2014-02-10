@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -341,12 +341,13 @@ class CHttpTest extends CZBXAPI {
 			$dbTest = $dbHttpTests[$httpTest['httptestid']];
 			$test['hostid'] = $dbTest['hostid'];
 
-			if (!empty($dbTest['templateid']) || empty($test['name'])) {
+			if (!isset($test['name']) || zbx_empty($test['name']) || !empty($dbTest['templateid'])) {
 				$test['name'] = $dbTest['name'];
 			}
 			if (!empty($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
-					if (isset($step['httpstepid']) && (!empty($dbTest['templateid']) || empty($step['name']))) {
+					if (isset($step['httpstepid'])
+							&& (!empty($dbTest['templateid']) || !isset($step['name']) || zbx_empty($step['name']))) {
 						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
 					}
 					if (!empty($dbTest['templateid'])) {

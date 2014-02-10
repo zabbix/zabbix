@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -512,17 +512,6 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	}
 
 	return $query;
-}
-
-/**
- * Create a UNION ALL query from an array of SELECT queries and the return the DB resource.
- *
- * @param array $queries
- *
- * @return resource
- */
-function DBunion(array $queries) {
-	return DBselect('('.implode($queries, ') UNION ALL (').')');
 }
 
 function DBexecute($query, $skip_error_messages = 0) {

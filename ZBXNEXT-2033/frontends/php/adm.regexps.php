@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ elseif (isset($_REQUEST['go'])) {
 $generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeper'),
+	'adm.housekeeper.php' => _('Housekeeping'),
 	'adm.images.php' => _('Images'),
 	'adm.iconmapping.php' => _('Icon mapping'),
 	'adm.regexps.php' => _('Regular expressions'),

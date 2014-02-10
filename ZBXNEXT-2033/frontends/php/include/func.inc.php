@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * Verify that function exists and can be called as a function.
+ *
+ * @param array		$names
+ *
+ * @return bool
+ */
+function zbx_is_callable(array $names) {
+	foreach ($names as $name) {
+		if (!is_callable($name)) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 /************ REQUEST ************/
 function redirect($url) {
@@ -190,8 +207,14 @@ function dowHrMinToSec($dow, $hr, $min) {
 function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
-	if (is_null($value)) {
+	$prefix = '';
+
+	if ($value === null) {
 		$value = time();
+	}
+	elseif ($value > ZBX_MAX_DATE) {
+		$prefix = '> ';
+		$value = ZBX_MAX_DATE;
 	}
 	elseif (!$value) {
 		return _('Never');
@@ -262,11 +285,11 @@ function zbx_date2str($format, $value = null) {
 		'M' => $months[date('n', $value)]
 	);
 
-	$output = '';
-	$part = '';
+	$output = $part = '';
 	$length = zbx_strlen($format);
+
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -280,7 +303,7 @@ function zbx_date2str($format, $value = null) {
 
 	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
 
-	return $output;
+	return $prefix.$output;
 }
 
 // calculate and convert timestamp to string representation
@@ -794,7 +817,7 @@ function zbx_ctype_digit($x) {
 }
 
 function zbx_empty($value) {
-	if (is_null($value)) {
+	if ($value === null) {
 		return true;
 	}
 	if (is_array($value) && empty($value)) {
@@ -2464,9 +2487,12 @@ function get_status() {
 	// hosts
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
-				' FROM hosts h'.
-				' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-				' GROUP BY h.status');
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.status', array(
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE
+			)).
+			' AND '.dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -232,30 +232,38 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	}
 
 	// validate slide name
-	$db_slideshow = DBfetch(DBselect(
+	$dbSlideshow = DBfetch(DBselect(
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
 		' WHERE s.name='.zbx_dbstr($name).
 			' AND s.slideshowid<>'.zbx_dbstr($slideshowid).
 			' '.andDbNode('s.slideshowid')
 	));
-	if (!empty($db_slideshow)) {
-		error(_s('Slide show "%s" already exists.', $name));
+	if ($dbSlideshow) {
+		error(_s('Slide show "%1$s" already exists.', $name));
 		return false;
 	}
 
-	$db_slideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
-	$db_slideshow = $db_slideshow[0];
+	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
+	$dbSlideshow = $dbSlideshow[0];
 	$changed = false;
 	$slideshow = array('name' => $name, 'delay' => $delay);
+
 	foreach ($slideshow as $key => $val) {
-		if ($db_slideshow[$key] != $val) {
+		if ((string) $val !== (string) $dbSlideshow[$key]) {
 			$changed = true;
 			break;
 		}
 	}
+
 	if ($changed) {
-		if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).' WHERE slideshowid='.zbx_dbstr($slideshowid))) {
+		$result = DBexecute(
+			'UPDATE slideshows'.
+			' SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).
+			' WHERE slideshowid='.zbx_dbstr($slideshowid)
+		);
+
+		if (!$result) {
 			return false;
 		}
 	}

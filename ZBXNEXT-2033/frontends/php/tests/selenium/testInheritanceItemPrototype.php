@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('Item updated');
+		$this->zbxTestTextPresent('Item prototype updated');
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -100,7 +100,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of item prototypes');
 				$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-				$this->zbxTestTextPresent('Item added');
+				$this->zbxTestTextPresent('Item prototype added');
 
 				$itemId = 0;
 

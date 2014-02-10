@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'sysmapid' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	DB_ID,					null),
 	'mapname' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,					null),
-	'severity_min' =>	array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3,4,5'),		null),
+	'severity_min' =>	array(T_ZBX_INT, O_OPT, P_SYS,			IN('0,1,2,3,4,5'),		null),
 	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,			IN('0,1'),				null),
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,			null,					null),
 	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,			NOT_EMPTY,				null),

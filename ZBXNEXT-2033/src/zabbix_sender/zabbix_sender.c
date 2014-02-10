@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Sender";
+const char	syslog_app_name[] = "zabbix_sender";
 const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 
 const char	*help_message[] = {
@@ -482,7 +483,7 @@ int	main(int argc, char **argv)
 			{
 				zbx_strlcpy(key_value, p, sizeof(key_value));
 			}
-			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))) || '\0' == *key_value)
+			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
 				ret = FAIL;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-class CPie extends CGraphDraw {
+class CPieGraphDraw extends CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
@@ -35,10 +35,13 @@ class CPie extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['name'] = itemName($this->items[$this->num]);
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
+
+		$this->items[$this->num] = reset($items);
+
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
+		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
@@ -158,20 +161,26 @@ class CPie extends CGraphDraw {
 			$history = Manager::History()->getLast($lastValueItems);
 		}
 
+		$config = select_config();
+
 		for ($i = 0; $i < $this->num; $i++) {
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
 			$sql_arr = array();
 
-			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
-				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+			// override item history setting with housekeeping settings
+			if ($config['hk_history_global']) {
+				$item['history'] = $config['hk_history'];
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
+			$trendsEnabled = $config['hk_trends_global'] ? ($config['hk_trends'] > 0) : ($item['trends'] > 0);
+
+			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
 				$this->dataFrom = 'history';
+
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
 						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
@@ -194,6 +203,7 @@ class CPie extends CGraphDraw {
 			}
 			else {
 				$this->dataFrom = 'trends';
+
 				array_push($sql_arr,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
@@ -215,8 +225,8 @@ class CPie extends CGraphDraw {
 				);
 			}
 
-			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
-				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
+				? $history[$item['itemid']][0]['value'] : null;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
@@ -277,11 +287,11 @@ class CPie extends CGraphDraw {
 		$max_name_len = 0;
 
 		for ($i = 0; $i < $this->num; $i++) {
-			if (zbx_strlen($this->items[$i]['host']) > $max_host_len) {
-				$max_host_len = zbx_strlen($this->items[$i]['host']);
+			if (zbx_strlen($this->items[$i]['hostname']) > $max_host_len) {
+				$max_host_len = zbx_strlen($this->items[$i]['hostname']);
 			}
-			if (zbx_strlen($this->items[$i]['name']) > $max_name_len) {
-				$max_name_len = zbx_strlen($this->items[$i]['name']);
+			if (zbx_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
+				$max_name_len = zbx_strlen($this->items[$i]['name_expanded']);
 			}
 		}
 
@@ -323,16 +333,16 @@ class CPie extends CGraphDraw {
 				);
 
 				$str = sprintf('%s: %s [%s] ',
-					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' '),
+					str_pad($this->items[$i]['hostname'], $max_host_len, ' '),
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' '),
 					$fncRealName
 				);
 			}
 			else {
 				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
-					str_pad($this->items[$i]['host'], $max_host_len, ' '),
-					str_pad($this->items[$i]['name'], $max_name_len, ' ')
+					str_pad($this->items[$i]['hostname'], $max_host_len, ' '),
+					str_pad($this->items[$i]['name_expanded'], $max_name_len, ' ')
 				);
 			}
 

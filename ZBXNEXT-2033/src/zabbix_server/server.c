@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix server";
+const char	syslog_app_name[] = "zabbix_server";
 const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
 
 const char	*help_message[] = {
@@ -260,19 +261,26 @@ static void	zbx_set_defaults()
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not specified in config file or empty");
-		exit(EXIT_FAILURE);
-	}
-	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "value cache size must be either 0 or greater than 128KB");
+		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
 		exit(EXIT_FAILURE);
 	}
 
+	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"ValueCacheSize\" configuration parameter must be either 0"
+				" or greater than 128KB");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
+		exit(EXIT_FAILURE);
+	}
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
@@ -333,15 +341,15 @@ static void	zbx_load_config()
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&CONFIG_VALUE_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	0,	__UINT64_C(64) * ZBX_GIBIBYTE},
+			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
@@ -427,7 +435,7 @@ static void	zbx_load_config()
 		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	256 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
+			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{NULL}
 	};
 

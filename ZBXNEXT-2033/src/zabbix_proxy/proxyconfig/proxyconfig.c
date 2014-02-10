@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,32 +53,53 @@ static void	process_configuration_sync(size_t *data_size)
 	zbx_sock_t	sock;
 	char		*data;
 	struct		zbx_json_parse jp;
+	char		value[16];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	/* reset the performance metric */
+	*data_size = 0;
+
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
-		goto exit;
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
+		goto out;
 
-	if ('\0' != *data)
+	if ('\0' == *data)
 	{
-		*data_size = strlen(data);	/* performance metric */
-		zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
-				(zbx_fs_size_t)*data_size);
-	}
-	else
-	{
-		*data_size = 0;
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. "
-				"Proxy host name might not be matching that on the server.");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
+		goto out;
 	}
 
-	if (FAIL == zbx_json_open(data, &jp))
-		goto exit;
+	if (SUCCEED != zbx_json_open(data, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
+		goto out;
+	}
+
+	*data_size = (size_t)(jp.end - jp.start + 1);     /* performance metric */
+
+	/* if the answer is short then most likely it is a negative answer "response":"failed" */
+	if (128 > *data_size &&
+			SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)) &&
+			0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
+	{
+		char	*info = NULL;
+		size_t	info_alloc = 0;
+
+		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
+
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. " ZBX_PROTO_TAG_INFO
+				":\"%s\"", ZBX_NULL2EMPTY_STR(info));
+		zbx_free(info);
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+			(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);
-exit:
+out:
 	disconnect_server(&sock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

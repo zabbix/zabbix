@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,7 +212,7 @@ if (isset($_REQUEST['form'])) {
 		$data['groupid'] = $script['groupid'];
 		$data['access'] = $script['host_access'];
 		$data['confirmation'] = $script['confirmation'];
-		$data['enableConfirmation'] = !empty($script['confirmation']);
+		$data['enableConfirmation'] = !zbx_empty($script['confirmation']);
 		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 

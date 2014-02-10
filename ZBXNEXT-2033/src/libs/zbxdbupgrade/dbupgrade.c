@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2396,7 +2396,7 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_2020001(void)
+static int	DBpatch_2020002(void)
 {
 	const ZBX_TABLE	table = {"ticket", "ticketid", 0,
 		{
@@ -2412,7 +2412,7 @@ static int	DBpatch_2020001(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2020002(void)
+static int	DBpatch_2020003(void)
 {
 	return DBcreate_index("ticket", "ticket_1", "clock", 0);
 }
@@ -2664,8 +2664,9 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	DBPATCH_ADD(2020001, 0, 1)
 	DBPATCH_ADD(2020002, 0, 1)
+	DBPATCH_ADD(2020003, 0, 1)
+	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
 
 	DBPATCH_END()
 

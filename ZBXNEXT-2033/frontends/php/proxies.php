@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,14 +142,15 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['proxyid'])) {
 	unset($_REQUEST['proxyid'], $_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['hosts'])) {
-	$goResult = true;
-
-	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = get_request('hosts', array());
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('hosts')) {
+	$result = true;
+	$enable =(getRequest('go') == 'activate');
+	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+	$hosts = getRequest('hosts', array());
 
 	DBstart();
 
+	$updated = 0;
 	foreach ($hosts as $hostId) {
 		$dbHosts = DBselect(
 			'SELECT h.hostid,h.status'.
@@ -159,21 +160,30 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		);
 		while ($dbHost = DBfetch($dbHosts)) {
 			$oldStatus = $dbHost['status'];
+			$updated++;
+
 			if ($oldStatus == $status) {
 				continue;
 			}
 
-			$goResult &= updateHostStatus($dbHost['hostid'], $status);
-			if (!$goResult) {
+			$result &= updateHostStatus($dbHost['hostid'], $status);
+			if (!$result) {
 				continue;
 			}
 		}
 	}
 
-	$goResult = DBend($goResult && $hosts);
+	$result = DBend($result && $hosts);
 
-	show_messages($goResult, _('Host status updated'), null);
-	clearCookies($goResult);
+	$messageSuccess = $enable
+		? _n('Host enabled', 'Hosts enabled', $updated)
+		: _n('Host disabled', 'Hosts disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable host', 'Cannot enable hosts', $updated)
+		: _n('Cannot disable host', 'Cannot disable hosts', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();

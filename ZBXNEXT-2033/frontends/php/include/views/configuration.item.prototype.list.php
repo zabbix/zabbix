@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
-		itemName($item),
+		$item['name_expanded'],
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 
@@ -99,7 +99,8 @@ foreach ($this->data['items'] as $item) {
 		$item['key_'],
 		$item['delay'],
 		$item['history'],
-		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
+		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT))
+			? '' : $item['trends'],
 		item_type2str($item['type']),
 		new CCol($applications, 'wraptext'),
 		$status
@@ -108,16 +109,16 @@ foreach ($this->data['items'] as $item) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Enable selected items?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected items?'));
+$goOption->setAttribute('confirm', _('Disable selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected items?'));
+$goOption->setAttribute('confirm', _('Delete selected item prototypes?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');

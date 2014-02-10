@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,9 +104,11 @@ class CScreenHistory extends CScreenBase {
 				'itemids' => $this->itemids,
 				'webitems' => true,
 				'selectHosts' => array('name'),
-				'output' => array('itemid', 'key_', 'name', 'value_type', 'valuemapid'),
+				'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
 				'preservekeys' => true
 			));
+
+			$this->items = CMacrosResolverHelper::resolveItemNames($this->items);
 
 			$this->item = reset($this->items);
 		}
@@ -215,7 +217,7 @@ class CScreenHistory extends CScreenBase {
 						$row = array(nbsp(zbx_date2str(_('Y.M.d H:i:s'), $data['clock'])));
 
 						if ($isManyItems) {
-							$row[] = $host['name'].NAME_DELIMITER.itemName($item);
+							$row[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 						}
 
 						if ($useLogItem) {

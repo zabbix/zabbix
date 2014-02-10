@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Scripts');
 $page['file'] = 'scripts_exec.php';
@@ -32,43 +30,50 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
-	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
-	'execute' =>	array(T_ZBX_INT, O_OPT, P_ACT, IN('0,1'),	null)
+	'hostid' =>		array(T_ZBX_INT, O_OPT, P_ACT, DB_ID, null),
+	'scriptid' =>	array(T_ZBX_INT, O_OPT, null, DB_ID, null)
 );
 check_fields($fields);
 
-if (isset($_REQUEST['execute'])) {
-	$scriptid = get_request('scriptid');
-	$hostid = get_request('hostid');
+ob_flush();
+flush();
 
-	$data = array(
-		'message' => '',
-		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptid)))
-	);
+$scriptId = getRequest('scriptid');
+$hostId = getRequest('hostid');
 
-	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+$data = array(
+	'message' => '',
+	'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
+);
 
-	$isErrorExist = false;
-	if (empty($result)) {
-		$isErrorExist = true;
-	}
-	elseif ($result['response'] == 'failed') {
-		error($result['value']);
-		$isErrorExist = true;
-	}
-	else {
-		$data['message'] = $result['value'];
-	}
+$result = API::Script()->execute(array(
+	'hostid' => $hostId,
+	'scriptid' => $scriptId
+));
 
-	if ($isErrorExist) {
-		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
-	}
+$isErrorExist = false;
 
-	// render view
-	$scriptView = new CView('general.script.execute', $data);
-	$scriptView->render();
-	$scriptView->show();
+if (!$result) {
+	$isErrorExist = true;
 }
+elseif ($result['response'] == 'failed') {
+	error($result['value']);
+
+	$isErrorExist = true;
+}
+else {
+	$data['message'] = $result['value'];
+}
+
+if ($isErrorExist) {
+	show_error_message(
+		_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
+	);
+}
+
+// render view
+$scriptView = new CView('general.script.execute', $data);
+$scriptView->render();
+$scriptView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

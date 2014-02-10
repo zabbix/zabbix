@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ foreach ($this->data['actions'] as $action) {
 		$conditions[] = BR();
 	}
 
-	sortOperations($action['eventsource'], $action['operations']);
+	sortOperations($this->data['eventsource'], $action['operations']);
 	$operations = array();
 	foreach ($action['operations'] as $operation) {
 		$operations[] = get_operation_descr(SHORT_DESCRIPTION, $operation);

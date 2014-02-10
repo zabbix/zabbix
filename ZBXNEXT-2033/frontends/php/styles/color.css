@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-.ok		{ color: #00AA00; }
-.fail	{ color: #DC0000; }
-.info	{ color: #444444; }
+.ok	{ color: #00AA00; }
+.notice	{ color: #EE6000; }
+.fail { color: #DC0000; }
+.info { color: #444444; }
+
+.link_menu.ok { border-color: #00AA00; }
+.link_menu.notice { border-color: #EE6000; }
+.link_menu.fail { border-color: #DC0000; }
 
 .footer		{ color: #CCCCCC; }
 .enabled	{ color: #00AA00; }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -316,15 +316,19 @@ class CConfigurationImport {
 				$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
 				$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 			}
+
 			if ($graph['ymax_item_1']) {
 				$yMaxItem = $graph['ymax_item_1'];
 				$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
 				$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
 			}
-			foreach ($graph['gitems'] as $gitem) {
-				$gitemItem = $gitem['item'];
-				$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
-				$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as $gitem) {
+					$gitemItem = $gitem['item'];
+					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
+					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+				}
 			}
 		}
 
@@ -586,8 +590,17 @@ class CConfigurationImport {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 
-				if (!empty($item['valuemap'])) {
-					$item['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
+				if ($item['valuemap']) {
+					$valueMapId = $this->referencer->resolveValueMap($item['valuemap']['name']);
+					if (!$valueMapId) {
+						throw new Exception(_s(
+							'Cannot find value map "%1$s" used for item "%2$s" on "%3$s".',
+							$item['valuemap']['name'],
+							$item['name'],
+							$host
+						));
+					}
+					$item['valuemapid'] = $valueMapId;
 				}
 
 				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
@@ -714,8 +727,18 @@ class CConfigurationImport {
 						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostid][$prototype['interface_ref']];
 					}
 
-					if (!empty($prototype['valuemap'])) {
-						$prototype['valuemapid'] = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
+					if ($prototype['valuemap']) {
+						$valueMapId = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
+						if (!$valueMapId) {
+							throw new Exception(_s(
+								'Cannot find value map "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$prototype['valuemap']['name'],
+								$prototype['name'],
+								$item['name'],
+								$host
+							));
+						}
+						$prototype['valuemapid'] = $valueMapId;
 					}
 
 					$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
@@ -734,9 +757,17 @@ class CConfigurationImport {
 					// resolve group prototypes
 					$groupLinks = array();
 					foreach ($hostPrototype['group_links'] as $groupLink) {
-						$groupLinks[] = array(
-							'groupid' => $this->referencer->resolveGroup($groupLink['group']['name'])
-						);
+						$groupId = $this->referencer->resolveGroup($groupLink['group']['name']);
+						if (!$groupId) {
+							throw new Exception(_s(
+								'Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$groupLink['group']['name'],
+								$hostPrototype['name'],
+								$item['name'],
+								$host
+							));
+						}
+						$groupLinks[] = array('groupid' => $groupId);
 					}
 					$hostPrototype['groupLinks'] = $groupLinks;
 					$hostPrototype['groupPrototypes'] = $hostPrototype['group_prototypes'];
@@ -745,7 +776,17 @@ class CConfigurationImport {
 					// resolve templates
 					$templates = array();
 					foreach ($hostPrototype['templates'] as $template) {
-						$templates[] = array('templateid' => $this->referencer->resolveTemplate($template['name']));
+						$templateId = $this->referencer->resolveTemplate($template['name']);
+						if (!$templateId) {
+							throw new Exception(_s(
+								'Cannot find template "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$template['name'],
+								$hostPrototype['name'],
+								$item['name'],
+								$host
+							));
+						}
+						$templates[] = array('templateid' => $templateId);
 					}
 					$hostPrototype['templates'] = $templates;
 
@@ -838,13 +879,45 @@ class CConfigurationImport {
 				// graph prototypes
 				foreach ($item['graph_prototypes'] as $graph) {
 					$graphHostIds = array();
-					if (!empty($graph['ymin_item_1'])) {
+
+					if ($graph['ymin_item_1']) {
 						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
-						$graph['ymin_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']);
+						$itemId = ($hostId)
+							? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key'])
+							: false;
+
+						if (!$itemId) {
+							throw new Exception(_s(
+								'Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+								$graph['ymin_item_1']['key'],
+								$graph['ymin_item_1']['host'],
+								$graph['name'],
+								$item['name'],
+								$host
+							));
+						}
+
+						$graph['ymin_itemid'] = $itemId;
 					}
-					if (!empty($graph['ymax_item_1'])) {
+
+					if ($graph['ymax_item_1']) {
 						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
-						$graph['ymax_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']);
+						$itemId = ($hostId)
+							? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key'])
+							: false;
+
+						if (!$itemId) {
+							throw new Exception(_s(
+								'Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+								$graph['ymax_item_1']['key'],
+								$graph['ymax_item_1']['host'],
+								$graph['name'],
+								$item['name'],
+								$host
+							));
+						}
+
+						$graph['ymax_itemid'] = $itemId;
 					}
 
 
@@ -920,26 +993,60 @@ class CConfigurationImport {
 		foreach ($allGraphs as $graph) {
 			$graphHostIds = array();
 
-			if (!empty($graph['ymin_item_1'])) {
+			if ($graph['ymin_item_1']) {
 				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
-				$graph['ymin_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']);
-			}
-			if (!empty($graph['ymax_item_1'])) {
-				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
-				$graph['ymax_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']);
-			}
+				$itemId = ($hostId)
+					? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key'])
+					: false;
 
-			foreach ($graph['gitems'] as &$gitem) {
-				if (!$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host'])) {
-					throw new Exception(_s('Cannot find host or template "%1$s" used in graph "%2$s".',
-						$gitem['item']['host'], $graph['name']));
+				if (!$itemId) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph "%3$s".',
+						$graph['ymin_item_1']['key'],
+						$graph['ymin_item_1']['host'],
+						$graph['name']
+					));
 				}
 
-				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
-
-				$graphHostIds[$gitemHostId] = $gitemHostId;
+				$graph['ymin_itemid'] = $itemId;
 			}
-			unset($gitem);
+
+			if ($graph['ymax_item_1']) {
+				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
+				$itemId = ($hostId)
+					? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key'])
+					: false;
+
+				if (!$itemId) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph "%3$s".',
+						$graph['ymax_item_1']['key'],
+						$graph['ymax_item_1']['host'],
+						$graph['name']
+					));
+				}
+
+				$graph['ymax_itemid'] = $itemId;
+			}
+
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as &$gitem) {
+					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+
+					if (!$gitemHostId) {
+						throw new Exception(_s(
+							'Cannot find host or template "%1$s" used in graph "%2$s".',
+							$gitem['item']['host'],
+							$graph['name']
+						));
+					}
+
+					$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
+
+					$graphHostIds[$gitemHostId] = $gitemHostId;
+				}
+				unset($gitem);
+			}
 
 			// TODO: do this for all graphs at once
 			$sql = 'SELECT g.graphid'.

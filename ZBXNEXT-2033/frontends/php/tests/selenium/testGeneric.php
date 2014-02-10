@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class testGeneric extends CWebTest {
 
 			// Administration
 			array('adm.gui.php',					'Configuration of GUI'),
-			array('adm.housekeeper.php',			'Configuration of housekeeper'),
+			array('adm.housekeeper.php',			'Configuration of housekeeping'),
 			array('adm.images.php',					'Configuration of images'),
 			array('adm.iconmapping.php',			'Configuration of icon mapping'),
 			array('adm.regexps.php',				'Configuration of regular expressions'),

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -489,18 +489,18 @@ function insertInElement(element_name, text, tagName) {
 	}
 }
 
-function openWinCentered(loc, winname, iwidth, iheight, params) {
-	var tp = Math.ceil((screen.height - iheight) / 2);
-	var lf = Math.ceil((screen.width - iwidth) / 2);
+function openWinCentered(url, name, width, height, params) {
+	var top = Math.ceil((screen.height - height) / 2),
+		left = Math.ceil((screen.width - width) / 2);
 
 	if (params.length > 0) {
 		params = ', ' + params;
 	}
 
-	loc = new Curl(loc).getUrl();
-
-	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ', height=' + iheight + ', top=' + tp + ', left=' + lf + params);
-	WinObjReferer.focus();
+	var windowObj = window.open(new Curl(url).getUrl(), name,
+		'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + params
+	);
+	windowObj.focus();
 }
 
 function PopUp(url, width, height, form_name) {

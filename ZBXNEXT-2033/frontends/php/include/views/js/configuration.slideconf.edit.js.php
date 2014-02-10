@@ -10,10 +10,13 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?php echo CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]"
+			placeholder="<?php echo CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5"
+			onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeSlide(this);" />
+		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}"
+			value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeSlide(this);" />
 	</td>
 </tr>
 </script>
@@ -30,11 +33,13 @@
 		if (jQuery('#slideTable tr.sortable').length <= 1) {
 			jQuery('#slideTable').sortable('disable');
 		}
+
 		recalculateSortOrder();
 	}
 
 	function recalculateSortOrder() {
 		var i = 0;
+
 		jQuery('#slideTable tr.sortable .rowNum').each(function() {
 			var step = (i == 0) ? '0' : i;
 
@@ -47,9 +52,10 @@
 			jQuery('#current_slide_' + step).attr('id', 'tmp_current_slide_' + step);
 
 			// set order number
-			jQuery(this).attr('new_slide', i);
-			jQuery(this).text((i + 1) + ':');
-			i++
+			jQuery(this)
+				.attr('new_slide', i)
+				.text((i + 1) + ':');
+			i++;
 		});
 
 		// rewrite ids in new order
@@ -73,13 +79,16 @@
 	}
 
 	function addPopupValues(list) {
-		var initSize = jQuery('#slideTable tr.sortable .rowNum').length;
-		var defaultDelay = jQuery('#delay').val();
+		var initSize = jQuery('#slideTable tr.sortable .rowNum').length,
+			defaultDelay = jQuery('#delay').val();
+
 		for (var i = 0; i < list.values.length; i++) {
 			if (empty(list.values[i])) {
 				continue;
 			}
+
 			var value = list.values[i];
+
 			value['rowId'] = jQuery('#slideTable tr.sortable .rowNum').length;
 			value['rowNum'] = value['rowId'] + 1;
 			value['rowDelay'] = defaultDelay;
@@ -87,16 +96,16 @@
 			var tpl = new Template(jQuery('#screenRowTPL').html());
 			jQuery('#screenListFooter').before(tpl.evaluate(value));
 		}
+
 		if (initSize <= 1) {
 			initSortable();
 		}
+
 		createPlaceholders();
 	}
 
 	function initSortable() {
 		jQuery(document).ready(function() {
-			'use strict';
-
 			jQuery('#slideTable').sortable({
 				disabled: (jQuery('#slideTable tr.sortable').length <= 1),
 				items: 'tbody tr.sortable',
@@ -110,6 +119,7 @@
 					ui.children().each(function() {
 						jQuery(this).width(jQuery(this).width());
 					});
+
 					return ui;
 				},
 				start: function(e, ui) {

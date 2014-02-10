@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ class API_JSON_User extends CZabbixTest {
 	* @dataProvider authenticate_data
 	*/
 	public function testUser_Authenticate($data, $expect) {
-		$result = $this->api_call('user.authenticate', $data, $debug);
+		$result = $this->api_call('user.login', $data, $debug);
 
 		if ($expect) {
 			$this->assertTrue(isset($result['result']), $debug);

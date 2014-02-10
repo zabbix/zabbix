@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,4 +331,39 @@ int	next_prime(int n)
 		n++;
 
 	return n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_isqrt32                                                      *
+ *                                                                            *
+ * Purpose: calculate integer part of square root of a 32 bit integer value   *
+ *                                                                            *
+ * Parameters: value     - [IN] the value to calculate square root for        *
+ *                                                                            *
+ * Return value: the integer part of square root                              *
+ *                                                                            *
+ * Comments: Uses basic digit by digit square root calculation algorithm with *
+ *           binary base.                                                     *
+ *                                                                            *
+ ******************************************************************************/
+unsigned int	zbx_isqrt32(unsigned int value)
+{
+	unsigned int	i, remainder = 0, result = 0, p;
+
+	for (i = 0; i < 16; i++)
+	{
+		result <<= 1;
+		remainder = (remainder << 2) + (value >> 30);
+		value <<= 2;
+
+		p = (result << 1) | 1;
+		if (p <= remainder)
+		{
+			remainder -= p;
+			result |= 1;
+		}
+	}
+
+	return result;
 }

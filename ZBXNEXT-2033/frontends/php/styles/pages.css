@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,3 +247,5 @@ div.setup_wizard div.text { padding: 10px; text-align: left; }
 div.setup_wizard div.footer { clear: both }
 div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px; }
 div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
+div.setup_wizard .requirements .notice { color: #EE6000; border-color: #EE6000; }
+div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }

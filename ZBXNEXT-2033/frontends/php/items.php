@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,14 +50,17 @@ $fields = array(
 	'new_delay_flex' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex})&&isset({type})&&{type}!=2',
 		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
-	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
+	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})',
+		_('History storage period')
+	),
 	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(array(ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE)), null),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP)), 'isset({save})'),
 	'trends' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&isset({value_type})&&'.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Keep trends (in days)')),
+		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Trend storage period')
+	),
 	'value_type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({save})'),
 	'data_type' =>				array(T_ZBX_INT, O_OPT, null,
 		IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
@@ -133,7 +136,7 @@ $fields = array(
 	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -150,8 +153,8 @@ $fields = array(
 	'filter_value_type' =>		array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null),
 	'filter_data_type' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(-1, ITEM_DATA_TYPE_BOOLEAN), null),
 	'filter_delay' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')),
-	'filter_history' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep history (in days)')),
-	'filter_trends' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep trends (in days)')),
+	'filter_history' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null,	_('History')),
+	'filter_trends' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Trends')),
 	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED)), null),
 	'filter_state' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED)), null),
 	'filter_templated_items' => array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
@@ -441,9 +444,11 @@ elseif (isset($_REQUEST['save'])) {
 			'inventory_link' => get_request('inventory_link')
 		);
 
-		if (isset($_REQUEST['itemid'])) {
-			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+		if (hasRequest('itemid')) {
+			$itemId = getRequest('itemid');
+
+			$dbItem = get_item_by_itemid_limited($itemId);
+			$dbItem['applications'] = get_applications_by_itemid($itemId);
 
 			// unset snmpv3 fields
 			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -454,14 +459,8 @@ elseif (isset($_REQUEST['save'])) {
 				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 			}
 
-			// unset fields without changes
-			foreach ($item as $field => $value) {
-				if ($item[$field] == $db_item[$field]) {
-					unset($item[$field]);
-				}
-			}
-
-			$item['itemid'] = $_REQUEST['itemid'];
+			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
+			$item['itemid'] = $itemId;
 
 			$result = API::Item()->update($item);
 		}
@@ -665,27 +664,25 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		clearCookies($result, get_request('hostid'));
 	}
 }
-elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
+	$groupItemId = getRequest('group_itemid');
+	$enable = (getRequest('go') == 'activate');
 
 	DBstart();
+	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
+	$result = DBend($result);
 
-	$goResult = activate_item($group_itemid);
-	$goResult = DBend($goResult);
+	$updated = count($groupItemId);
 
-	show_messages($goResult, _('Items activated'), null);
-	clearCookies($goResult, get_request('hostid'));
-}
-elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+	$messageSuccess = $enable
+		? _n('Item enabled', 'Items enabled', $updated)
+		: _n('Item disabled', 'Items disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable item', 'Cannot enable items', $updated)
+		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
-	DBstart();
-
-	$goResult = disable_item($group_itemid);
-	$goResult = DBend($goResult);
-
-	show_messages($goResult, _('Items disabled'), null);
-	clearCookies($goResult, get_request('hostid'));
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
@@ -934,7 +931,10 @@ else {
 	$options = array(
 		'hostids' => $data['hostid'],
 		'search' => array(),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array(
+			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
+			'templateid', 'flags', 'state'
+		),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => API_OUTPUT_REFER,
@@ -1021,9 +1021,10 @@ else {
 	}
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if (!empty($data['items'])) {
+	if ($data['items']) {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
+
 		$dbHostItems = DBselect(
 			'SELECT i.itemid,h.name,h.hostid'.
 			' FROM hosts h,items i'.
@@ -1031,16 +1032,19 @@ else {
 				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as $itemid => $item) {
+			foreach ($data['items'] as &$item) {
 				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$data['items'][$itemid]['template_host'] = $dbHostItem;
+					$item['template_host'] = $dbHostItem;
 				}
 			}
+			unset($item);
 		}
+
+		// resolve name macros
+		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
-			$item['name_expanded'] = itemName($item);
 
 			if (empty($data['filter_hostid'])) {
 				$host = reset($item['hosts']);
@@ -1072,6 +1076,7 @@ else {
 					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			);
+
 			if (!empty($_REQUEST['subfilter_apps'])) {
 				foreach ($item['applications'] as $application) {
 					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {

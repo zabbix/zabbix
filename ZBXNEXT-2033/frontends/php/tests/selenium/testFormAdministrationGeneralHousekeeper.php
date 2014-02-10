@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,38 +26,38 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestLogin('adm.housekeeper.php');
 		$this->assertElementPresent('configDropDown');
 
-		$this->zbxTestCheckTitle('Configuration of housekeeper');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
+		$this->zbxTestCheckTitle('Configuration of housekeeping');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPING', 'Housekeeping'));
 
 		// events and alerts
 
 		$this->zbxTestTextPresent('Events and alerts');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_events_mode');
 		$this->assertAttribute("//input[@id='hk_events_mode']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Keep trigger data for (in days)');
+		$this->zbxTestTextPresent('Trigger data storage period (in days)');
 		$this->assertVisible('hk_events_trigger');
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_trigger']/@value", 365);
 		$this->assertElementNotPresent("//input[@id='hk_events_trigger']/@disabled");
 
-		$this->zbxTestTextPresent('Keep internal data for (in days)');
+		$this->zbxTestTextPresent('Internal data storage period (in days)');
 		$this->assertVisible('hk_events_internal');
 		$this->assertAttribute("//input[@id='hk_events_internal']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_internal']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_internal']/@value", 365);
 		$this->assertElementNotPresent("//input[@id='hk_events_internal']/@disabled");
 
-		$this->zbxTestTextPresent('Keep network discovery data for (in days)');
+		$this->zbxTestTextPresent('Network discovery data storage period (in days)');
 		$this->assertVisible('hk_events_discovery');
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@size", 5);
 		$this->assertAttribute("//input[@id='hk_events_discovery']/@value", 365);
 		$this->assertElementNotPresent("//input[@id='hk_events_discovery']/@disabled");
 
-		$this->zbxTestTextPresent('Keep auto-registration data for (in days)');
+		$this->zbxTestTextPresent('Auto-registration data storage period (in days)');
 		$this->assertVisible('hk_events_autoreg');
 		$this->assertAttribute("//input[@id='hk_events_autoreg']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_events_autoreg']/@size", 5);
@@ -73,11 +73,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		// IT services
 
 		$this->zbxTestTextPresent('IT services');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_services_mode');
 		$this->assertAttribute("//input[@id='hk_services_mode']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Keep data for (in days)');
+		$this->zbxTestTextPresent('Data storage period (in days)');
 		$this->assertVisible('hk_services');
 		$this->assertAttribute("//input[@id='hk_services']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_services']/@size", 5);
@@ -90,11 +90,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		// audit
 
 		$this->zbxTestTextPresent('Audit');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_audit_mode');
 		$this->assertAttribute("//input[@id='hk_audit_mode']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Keep data for (in days)');
+		$this->zbxTestTextPresent('Data storage period (in days)');
 		$this->assertVisible('hk_audit');
 		$this->assertAttribute("//input[@id='hk_audit']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_audit']/@size", 5);
@@ -107,11 +107,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		//	user sessions
 
 		$this->zbxTestTextPresent('User sessions');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_sessions_mode');
 		$this->assertAttribute("//input[@id='hk_sessions_mode']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Keep data for (in days)');
+		$this->zbxTestTextPresent('Data storage period (in days)');
 		$this->assertVisible('hk_sessions');
 		$this->assertAttribute("//input[@id='hk_sessions']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_sessions']/@size", 5);
@@ -124,7 +124,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		// history
 
 		$this->zbxTestTextPresent('History');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_history_mode');
 		$this->assertAttribute("//input[@id='hk_history_mode']/@checked", 'checked');
 
@@ -133,7 +133,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
 
-		$this->zbxTestTextPresent('Keep data for (in days)');
+		$this->zbxTestTextPresent('Data storage period (in days)');
 		$this->assertVisible('hk_history');
 		$this->assertAttribute("//input[@id='hk_history']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_history']/@size", 5);
@@ -144,13 +144,13 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
 
 		$this->zbxTestCheckboxSelect('hk_history_mode', false);
-		$this->assertElementPresent("//input[@id='hk_history_global']/@disabled");
-		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
+		$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
+		$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
 
 		// trends
 
 		$this->zbxTestTextPresent('Trends');
-		$this->zbxTestTextPresent('Enable housekeeping');
+		$this->zbxTestTextPresent('Enable internal housekeeping');
 		$this->assertVisible('hk_trends_mode');
 		$this->assertAttribute("//input[@id='hk_trends_mode']/@checked", 'checked');
 
@@ -159,7 +159,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
 
-		$this->zbxTestTextPresent('Keep data for (in days)');
+		$this->zbxTestTextPresent('Data storage period (in days)');
 		$this->assertVisible('hk_trends');
 		$this->assertAttribute("//input[@id='hk_trends']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='hk_trends']/@size", 5);
@@ -170,8 +170,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
 
 		$this->zbxTestCheckboxSelect('hk_trends_mode', false);
-		$this->assertElementPresent("//input[@id='hk_trends_global']/@disabled");
-		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
+		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
+		$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
 
 		// buttons
 
@@ -252,15 +252,15 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends' => -1,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "0" for "Keep trigger event and alert data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep internal event and alert data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep network discovery event and alert data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep auto-registration event and alert data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep IT service data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep audit data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "0" for "Keep user session data for (in days)" field: must be between 1 and 99999.',
-						'Incorrect value "-1" for "Keep history data for (in days)" field: must be between 0 and 99999.',
-						'Incorrect value "-1" for "Keep trend data for (in days)" field: must be between 0 and 99999.'
+						'Incorrect value "0" for "Trigger event and alert data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Internal event and alert data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Network discovery event and alert data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Auto-registration event and alert data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "IT service data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "Audit data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "0" for "User session data storage period" field: must be between 1 and 99999.',
+						'Incorrect value "-1" for "History data storage period" field: must be between 0 and 99999.',
+						'Incorrect value "-1" for "Trend data storage period" field: must be between 0 and 99999.'
 					)
 				)
 			),
@@ -381,17 +381,15 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		}
 
 		$this->zbxTestClickWait('save');
+		$this->zbxTestCheckTitle('Configuration of housekeeping');
+		$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPING');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of housekeeper');
-				$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPER');
 				$this->zbxTestTextPresent('Configuration updated');
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestCheckTitle('Configuration of housekeeper');
-				$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPER');
 				$this->zbxTestTextNotPresent('Configuration updated');
 				$this->zbxTestTextPresent($data['errors']);
 				break;

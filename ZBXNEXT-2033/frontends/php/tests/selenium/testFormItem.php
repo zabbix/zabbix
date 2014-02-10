@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1037,7 +1037,7 @@ class testFormItem extends CWebTest {
 				$this->assertNotVisible('add_delay_flex');
 		}
 
-		$this->zbxTestTextPresent('Keep history (in days)');
+		$this->zbxTestTextPresent('History storage period (in days)');
 		$this->assertVisible('history');
 		$this->assertAttribute("//input[@id='history']/@maxlength", 8);
 		if (!isset($itemid)) {
@@ -1046,7 +1046,7 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='history']/@size", 8);
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
-			$this->zbxTestTextPresent('Keep trends (in days)');
+			$this->zbxTestTextPresent('Trend storage period (in days)');
 			$this->assertVisible('trends');
 			$this->assertAttribute("//input[@id='trends']/@maxlength", 8);
 			if (!isset($itemid)) {
@@ -1055,7 +1055,7 @@ class testFormItem extends CWebTest {
 			$this->assertAttribute("//input[@id='trends']/@size", 8);
 		}
 		else {
-			$this->zbxTestTextNotPresent('Keep trends (in days)');
+			$this->zbxTestTextNotPresent('Trend storage period (in days)');
 			$this->assertNotVisible('trends');
 		}
 
@@ -1915,7 +1915,7 @@ class testFormItem extends CWebTest {
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Incorrect value "65536" for "Keep history (in days)" field: must be between 0 and 65535.'
+						'Incorrect value "65536" for "History storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1928,7 +1928,7 @@ class testFormItem extends CWebTest {
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "-1" for "Keep history (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1961,7 +1961,7 @@ class testFormItem extends CWebTest {
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "-1" for "Keep trends (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "-1" for "Trend storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -1974,7 +1974,7 @@ class testFormItem extends CWebTest {
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Incorrect value "65536" for "Keep trends (in days)" field: must be between 0 and 65535.'
+							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
 					)
 				)
 			),
@@ -2555,7 +2555,7 @@ class testFormItem extends CWebTest {
 	public function testFormItem_HousekeeperUpdate() {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
@@ -2567,12 +2567,12 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$this->item);
 
-		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings');
-		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
 
 		$this->zbxTestOpen('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
 		$this->input_type('hk_history', 99);
@@ -2587,12 +2587,12 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$this->item);
 
-		$this->zbxTestTextPresent('Overridden by global housekeeper settings (99 days)');
-		$this->zbxTestTextPresent('Overridden by global housekeeper settings (455 days)');
+		$this->zbxTestTextPresent('Overridden by global housekeeping settings (99 days)');
+		$this->zbxTestTextPresent('Overridden by global housekeeping settings (455 days)');
 
 		$this->zbxTestOpen('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
 		$this->input_type('hk_history', 90);
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
@@ -2607,8 +2607,8 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$this->item);
 
-		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings (99 days)');
-		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings (455 days)');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (455 days)');
 	}
 
 	/**

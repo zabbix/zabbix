@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../items.inc.php';
-require_once dirname(__FILE__).'/../hosts.inc.php';
-
-class CGraphDraw {
+abstract class CGraphDraw {
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;
@@ -234,11 +231,6 @@ class CGraphDraw {
 			$str = $this->items[0]['hostname'].NAME_DELIMITER.$this->items[0]['name'];
 		}
 		else {
-			foreach ($this->items as &$item) {
-				$item['host'] = $item['hostname'];
-			}
-			unset($item);
-
 			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
 		}
 

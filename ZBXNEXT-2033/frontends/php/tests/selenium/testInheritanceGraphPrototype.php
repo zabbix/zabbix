@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestTextPresent('Graph prototype updated');
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
@@ -111,7 +111,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
-				$this->zbxTestTextPresent('Graph added');
+				$this->zbxTestTextPresent('Graph prototype added');
 				break;
 
 			case TEST_BAD:

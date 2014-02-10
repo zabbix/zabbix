@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status'),
 	$data['showErrorColumn'] ? _('Error') : null
 ));
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -237,7 +238,7 @@ foreach ($this->data['items'] as $item) {
 			'call_triggerlog_menu('.
 				'event, '.
 				CJs::encodeJson($item['itemid']).', '.
-				CJs::encodeJson(CHtml::encode($item['name_expanded'])).', '.
+				CJs::encodeJson(CHtml::encode($item['name'])).', '.
 				$triggers.
 			');'
 		);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,12 +192,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-#define	DO_SWP_IN	1
-#define DO_PG_IN	2
-#define	DO_SWP_OUT	3
-#define DO_PG_OUT	4
-
-static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswapout)
+static int	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *pgswapin, zbx_uint64_t *swapout, zbx_uint64_t *pgswapout)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
@@ -206,39 +201,44 @@ static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double
 
 	if (NULL != (kc = kstat_open()))
 	{
-		while (NULL != (k = kc->kc_chain))
+		k = kc->kc_chain;
+
+		while (NULL != k)
 		{
 			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
-				cpu = (cpu_stat_t*)k->ks_data;
+				cpu = (cpu_stat_t *)k->ks_data;
 
 				if (NULL != swapin)
 				{
 					/* uint_t   swapin;	*/ /* swapins */
-					(*swapin) += (double)cpu->cpu_vminfo.swapin;
+					*swapin += cpu->cpu_vminfo.swapin;
 				}
 
 				if (NULL != pgswapin)
 				{
 					/* uint_t   pgswapin;	*/ /* pages swapped in */
-					(*pgswapin) += (double)cpu->cpu_vminfo.pgswapin;
+					*pgswapin += cpu->cpu_vminfo.pgswapin;
 				}
 
 				if (NULL != swapout)
 				{
 					/* uint_t   swapout;	*/ /* swapout */
-					(*swapout) += (double)cpu->cpu_vminfo.swapout;
+					*swapout += cpu->cpu_vminfo.swapout;
 				}
 
 				if (NULL != pgswapout)
 				{
 					/* uint_t   pgswapout;	*/ /* pages swapped out */
-					(*pgswapout) += (double)cpu->cpu_vminfo.pgswapout;
+					*pgswapout += cpu->cpu_vminfo.pgswapout;
 				}
-				cpu_count += 1;
+
+				cpu_count++;
 			}
+
 			k = k->ks_next;
 		}
+
 		kstat_close(kc);
 	}
 
@@ -250,9 +250,9 @@ static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double
 
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-	char	*tmp;
-	double	value = 0;
+	int		ret = SYSINFO_RET_FAIL;
+	char		*tmp;
+	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -280,9 +280,9 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-	char	*tmp;
-	double	value = 0;
+	int		ret = SYSINFO_RET_FAIL;
+	char		*tmp;
+	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -528,7 +528,7 @@ static int	check_response(char *response)
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 	char			info[MAX_STRING_LEN];
-	int			ret = SUCCEED;
+	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __function_name, response);
 

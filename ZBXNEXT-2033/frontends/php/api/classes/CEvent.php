@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,6 +168,7 @@ class CEvent extends CZBXAPI {
 				if ($options['objectids'] !== null) {
 					if ($options['object'] == EVENT_OBJECT_ITEM) {
 						$items = API::Item()->get(array(
+							'output' => array('itemid'),
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
 						));

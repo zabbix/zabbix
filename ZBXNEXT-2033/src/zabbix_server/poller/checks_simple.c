@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ static zbx_vmcheck_t	vmchecks[] =
  *                                                                            *
  * Purpose: Retrieves a handler of the item key                               *
  *                                                                            *
- * Paramaters: key    - [IN] an item key (without parameters)                 *
+ * Parameters: key    - [IN] an item key (without parameters)                 *
  *             vmfunc - [OUT] a handler of the item key; can be NULL if       *
  *                            libxml2 or libcurl is not compiled in           *
  *                                                                            *

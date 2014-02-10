@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
 
-			$sqlParts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
+			$sqlParts['select']['parent_templateid'] = 'ht.templateid as parent_templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -345,12 +345,12 @@ class CTemplate extends CHostGeneral {
 					unset($template['linked_hostid']);
 				}
 				// parentTemplateids
-				if (isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])) {
+				if (isset($template['parent_templateid']) && is_null($options['selectParentTemplates'])) {
 					if (!isset($result[$template['templateid']]['parentTemplates']))
 						$result[$template['templateid']]['parentTemplates'] = array();
 
-					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
-					unset($template['parentTemplateid']);
+					$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parent_templateid']);
+					unset($template['parent_templateid']);
 				}
 
 				// itemids
@@ -457,7 +457,7 @@ class CTemplate extends CHostGeneral {
 		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach ($templates as $tnum => $template) {
 			if (empty($template['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template [ %s ]', $template['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
 			}
 			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
 
@@ -484,9 +484,8 @@ class CTemplate extends CHostGeneral {
 
 		foreach ($templates as $tnum => $template) {
 			// If visible name is not given or empty it should be set to host name
-			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
-			{
-				if (isset($template['host'])) $template['name'] = $template['host'];
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
 			}
 
 			$templateDbFields = array(
@@ -498,26 +497,35 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $template['host'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Template name [ %1$s ]', $template['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Incorrect characters used for Template name "%1$s"',
+					$template['host']
+				));
 			}
 
 			if (isset($template['host'])) {
 				if ($this->exists(array('host' => $template['host']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%s" already exists.', $template['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $template['host']));
 				}
 
 				if (API::Host()->exists(array('host' => $template['host']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $template['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $template['host']));
 				}
 			}
 
 			if (isset($template['name'])) {
 				if ($this->exists(array('name' => $template['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $template['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Template with the same visible name "%1$s" already exists.',
+						$template['name']
+					));
 				}
 
 				if (API::Host()->exists(array('name' => $template['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $template['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Host with the same visible name "%1$s" already exists.',
+						$template['name']
+					));
 				}
 			}
 
@@ -576,9 +584,8 @@ class CTemplate extends CHostGeneral {
 		$macros = array();
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
-			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
-			{
-				if (isset($template['host'])) $template['name'] = $template['host'];
+			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+				$template['name'] = $template['host'];
 			}
 			$tplTmp = $template;
 
@@ -847,12 +854,18 @@ class CTemplate extends CHostGeneral {
 			$templateExist = reset($templateExists);
 
 			if ($templateExist && (bccomp($templateExist['templateid'], $curTemplate['templateid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same visible name "%s" already exists.', $curTemplate['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Template with the same visible name "%1$s" already exists.',
+					$curTemplate['name']
+				));
 			}
 
 			// can't set the same name as existing host
 			if (API::Host()->exists(array('name' => $curTemplate['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $curTemplate['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Host with the same visible name "%1$s" already exists.',
+					$curTemplate['name']
+				));
 			}
 		}
 
@@ -874,35 +887,43 @@ class CTemplate extends CHostGeneral {
 			$templateExist = reset($templateExists);
 
 			if ($templateExist && (bccomp($templateExist['templateid'], $curTemplate['templateid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template with the same name "%s" already exists.', $curTemplate['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Template with the same name "%1$s" already exists.',
+					$curTemplate['host']
+				));
 			}
 
 			// can't set the same name as existing host
 			if (API::Host()->exists(array('host' => $curTemplate['host']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $curTemplate['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Host with the same name "%1$s" already exists.',
+					$curTemplate['host']
+				));
 			}
 		}
 
 		if (isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for template name "%s".', $data['host']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Incorrect characters used for template name "%1$s".',
+				$data['host']
+			));
 		}
 
 		$sqlSet = array();
-		if (isset($data['host'])) $sqlSet[] = 'host=' . zbx_dbstr($data['host']);
-		if (isset($data['name']))
-		{
+		if (isset($data['host'])) {
+			$sqlSet[] = 'host=' . zbx_dbstr($data['host']);
+		}
+
+		if (isset($data['name'])) {
 			// if visible name is empty replace it with host name
-			if (zbx_empty(trim($data['name'])) && isset($data['host']))
-			{
+			if (zbx_empty(trim($data['name'])) && isset($data['host'])) {
 				$sqlSet[] = 'name=' . zbx_dbstr($data['host']);
 			}
-// we cannot have empty visible name
-			elseif (zbx_empty(trim($data['name'])) && !isset($data['host']))
-			{
+			// we cannot have empty visible name
+			elseif (zbx_empty(trim($data['name'])) && !isset($data['host'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot have empty visible template name'));
 			}
-			else
-			{
+			else {
 				$sqlSet[] = 'name=' . zbx_dbstr($data['name']);
 			}
 		}

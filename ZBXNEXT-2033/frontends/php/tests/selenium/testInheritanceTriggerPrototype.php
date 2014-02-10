@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->zbxTestLogin('trigger_prototypes.php?form=update&triggerid='.$data['triggerid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('Trigger updated');
+		$this->zbxTestTextPresent('Trigger prototype updated');
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
@@ -101,7 +101,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-				$this->zbxTestTextPresent('Trigger added');
+				$this->zbxTestTextPresent('Trigger prototype added');
 				break;
 
 			case TEST_BAD:

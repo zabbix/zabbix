@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,50 +83,73 @@ static zbx_history_table_t areg = {
 
 /******************************************************************************
  *                                                                            *
- * Function: get_proxy_id                                                     *
+ * Function: get_active_proxy_id                                              *
  *                                                                            *
- * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
+ * Purpose: extract a proxy name from JSON and find the proxy ID in database. *
+ *          The proxy must be configured in active mode.                      *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ * Parameters: jp            - [IN] JSON with the proxy name                  *
+ *             hostid        - [OUT] proxy host ID found in database          *
+ *             host          - [IN] buffer with minimum size                  *
+ *                                  'HOST_HOST_LEN_MAX'                       *
+ *             error         - [IN] buffer for printing error messages        *
+ *             max_error_len - [IN] "error" buffer size                       *
+ *                                                                            *
+ * Return value:  SUCCEED - proxy ID was found in database                    *
+ *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
+ *                          proxy is configured in passive mode               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
-	int		ret = FAIL;
+	int		ret = FAIL, status;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			zbx_snprintf(error, max_error_len, "invalid proxy name [%s]", host);
+			zbx_snprintf(error, max_error_len, "invalid proxy name \"%s\"", host);
 			return ret;
 		}
 
 		host_esc = DBdyn_escape_string(host);
 
 		result = DBselect(
-				"select hostid"
+				"select hostid,status"
 				" from hosts"
 				" where host='%s'"
-					" and status=%d"
+					" and status in (%d,%d)"
 					ZBX_SQL_NODE,
-				host_esc, HOST_STATUS_PROXY_ACTIVE, DBand_node_local("hostid"));
+				host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+				DBand_node_local("hostid"));
 
 		zbx_free(host_esc);
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		{
-			ZBX_STR2UINT64(*hostid, row[0]);
-			ret = SUCCEED;
+			if (SUCCEED == is_uint31(row[1], &status))
+			{
+				if (HOST_STATUS_PROXY_ACTIVE == status)
+				{
+					ZBX_STR2UINT64(*hostid, row[0]);
+					ret = SUCCEED;
+				}
+				else
+				{
+					zbx_snprintf(error, max_error_len, "proxy \"%s\" is configured in passive mode",
+							host);
+				}
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		else
-			zbx_snprintf(error, max_error_len, "proxy [%s] not found", host);
+			zbx_snprintf(error, max_error_len, "proxy \"%s\" not found", host);
 
 		DBfree_result(result);
 	}
@@ -788,7 +811,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 	DBfree_result(result);
 
-	/* these tables have unique indexes, need special preparation to avoid conflicts during inserts/updates */
+	/* these tables have unique indices, need special preparation to avoid conflicts during inserts/updates */
 	if (0 == strcmp("hosts_templates", table->table))
 	{
 		move_out = 1;
@@ -921,7 +944,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 
 		/* special preprocessing for 'hostmacro', 'items' and 'httptest' tables to eliminate conflicts */
-		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indexes */
+		/* in the 'hostid,macro', 'hostid,key_' and 'hostid,name' unique indices */
 		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
@@ -1563,7 +1586,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
-	DCconfig_update_host_availability(availability, availability_num);
+	DChost_update_availability(availability, availability_num);
 out:
 	zbx_free(availability);
 	zbx_free(sql);

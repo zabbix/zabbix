@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
 }
 $chartHeader .= $host['name'].NAME_DELIMITER.$dbGraph['name'];
 
-$graph = new CChart($dbGraph['graphtype']);
+$graph = new CLineGraphDraw($dbGraph['graphtype']);
 $graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);

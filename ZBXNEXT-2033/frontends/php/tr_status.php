@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ $fields = array(
 	'fullscreen' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'btnSelect' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// filter
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'show_events' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'ack_status' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
@@ -428,7 +428,8 @@ $triggers = API::Trigger()->get($options);
 order_result($triggers, $sortfield, $sortorder);
 $paging = getPagingLine($triggers);
 
-$options = array(
+
+$triggers = API::Trigger()->get(array(
 	'nodeids' => get_current_nodeid(),
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
@@ -438,8 +439,7 @@ $options = array(
 	'selectLastEvent' => true,
 	'expandDescription' => true,
 	'preservekeys' => true
-);
-$triggers = API::Trigger()->get($options);
+));
 
 order_result($triggers, $sortfield, $sortorder);
 
@@ -568,16 +568,11 @@ foreach ($triggers as $trigger) {
 
 	$triggerItems = array();
 
+	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+
 	foreach ($trigger['items'] as $item) {
-		$itemName = itemName($item);
-
-		// if we have items from different hosts, we must prefix a host name
-		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
-		}
-
 		$triggerItems[] = array(
-			'name' => $itemName,
+			'name' => ($usedHostCount > 1) ? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded'] : $item['name_expanded'],
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))

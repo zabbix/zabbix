@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,19 @@ class API_JSON_Host extends CZabbixTest {
 						array('groupid' => 5)		/* Discovered hosts */
 					),
 					'templates' => array(
-						array('templateid' => 10050)	/* Template App Zabbix Agent */
+						array('templateid' => 10047),	/* Template App Zabbix Server */
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10093),	/* Template App FTP Service */
+						array('templateid' => 10094),	/* Template App HTTP Service */
+						array('templateid' => 10095),	/* Template App HTTPS Service */
+						array('templateid' => 10096),	/* Template App IMAP Service */
+						array('templateid' => 10097),	/* Template App LDAP Service */
+						array('templateid' => 10098),	/* Template App NNTP Service */
+						array('templateid' => 10099),	/* Template App NTP Service */
+						array('templateid' => 10100),	/* Template App POP Service */
+						array('templateid' => 10101),	/* Template App SMTP Service */
+						array('templateid' => 10102),	/* Template App SSH Service */
+						array('templateid' => 10103)	/* Template App Telnet Service */
 					)
 				),
 				true
@@ -99,7 +111,17 @@ class API_JSON_Host extends CZabbixTest {
 						array('templateid' => 10047),	/* Template App Zabbix Server */
 						array('templateid' => 10050),	/* Template App Zabbix Agent */
 						array('templateid' => 10050),	/* Template App Zabbix Agent */
-						array('templateid' => 10056)	/* Template App Agentless */
+						array('templateid' => 10093),	/* Template App FTP Service */
+						array('templateid' => 10094),	/* Template App HTTP Service */
+						array('templateid' => 10095),	/* Template App HTTPS Service */
+						array('templateid' => 10096),	/* Template App IMAP Service */
+						array('templateid' => 10097),	/* Template App LDAP Service */
+						array('templateid' => 10098),	/* Template App NNTP Service */
+						array('templateid' => 10099),	/* Template App NTP Service */
+						array('templateid' => 10100),	/* Template App POP Service */
+						array('templateid' => 10101),	/* Template App SMTP Service */
+						array('templateid' => 10102),	/* Template App SSH Service */
+						array('templateid' => 10103)	/* Template App Telnet Service */
 					)
 				),
 				false

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,7 +205,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			// unset fields tht did not change
+			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get(array(
 				'httptestids' => $_REQUEST['httptestid'],
 				'output' => API_OUTPUT_EXTEND,
@@ -260,31 +260,44 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['group_httptestid'])) {
-	$goResult = false;
-	$group_httptestid = $_REQUEST['group_httptestid'];
-	$status = ($_REQUEST['go'] == 'activate') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
-	$msg_ok = ($_REQUEST['go'] == 'activate') ? _('Web scenario activated') : _('Web scenario disabled');
-	$msg_problem = ($_REQUEST['go'] == 'activate') ? _('Cannot activate web scenario') : _('Cannot disable web scenario');
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_httptestid')) {
+	$result = true;
+	$groupHttpTestId = getRequest('group_httptestid');
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
+	$statusName = $enable ? 'enabled' : 'disabled';
+	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
+	$updated = 0;
 
-	foreach ($group_httptestid as $id) {
-		if (!($httptest_data = get_httptest_by_httptestid($id))) {
+	foreach ($groupHttpTestId as $id) {
+		if (!($httpTestData = get_httptest_by_httptestid($id))) {
 			continue;
 		}
-		$result = API::HttpTest()->update(array('httptestid' => $id, 'status' => $status));
+		$result &= API::HttpTest()->update(array(
+			'httptestid' => $id,
+			'status' => $status
+		));
 
 		if ($result) {
-			$goResult = true;
 			$host = DBfetch(DBselect(
-				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)));
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$httptest_data['name'].'] ['.$id.
-				'] Host ['.$host['host'].']'.
-				($_REQUEST['go'] == 'activate' ? 'Web scenario activated' : 'Web scenario disabled'));
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($id)
+			));
+			add_audit($auditAction, AUDIT_RESOURCE_SCENARIO,
+				'Scenario ['.$httpTestData['name'].'] ['.$id.'] Host ['.$host['host'].'] '.$statusName
+			);
 		}
+		$updated++;
 	}
 
-	show_messages($goResult, $msg_ok, $msg_problem);
-	clearCookies($goResult, $_REQUEST['hostid']);
+	$messageSuccess = $enable
+		? _n('Web scenario enabled', 'Web scenarios enabled', $updated)
+		: _n('Web scenario disabled', 'Web scenarios disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable web scenario', 'Cannot enable web scenarios', $updated)
+		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
