@@ -34,46 +34,47 @@ use lib '/opt/zabbix/scripts';
 use strict;
 use warnings;
 use Zabbix;
-use LWP::Simple qw(get);
 use Getopt::Long;
 use Data::Dumper;
 use DNSTest;
 
-my $VALUE_TYPE_AVAIL = 0;
-my $VALUE_TYPE_PERC = 1;
+use constant LINUX_TEMPLATEID => 10001;
 
-my $ZBX_EC_DNS_NS_NOREPLY    = -200; # no reply from Name Server
-my $ZBX_EC_DNS_NS_ERRREPLY   = -201; # invalid reply from Name Server
-my $ZBX_EC_DNS_NS_NOTS       = -202; # no UNIX timestamp
-my $ZBX_EC_DNS_NS_ERRTS      = -203; # invalid UNIX timestamp
-my $ZBX_EC_DNS_NS_ERRSIG     = -204; # DNSSEC error
-my $ZBX_EC_DNS_RES_NOREPLY   = -205; # no reply from resolver
-my $ZBX_EC_DNS_RES_NOADBIT   = -206; # no AD bit in the answer from resolver
-my $ZBX_EC_RDDS43_NOREPLY    = -200; # no reply from RDDS43 server
-my $ZBX_EC_RDDS43_NONS       = -201; # Whois server returned no NS
-my $ZBX_EC_RDDS43_NOTS       = -202; # no Unix timestamp
-my $ZBX_EC_RDDS43_ERRTS      = -203; # invalid Unix timestamp
-my $ZBX_EC_RDDS80_NOREPLY    = -204; # no reply from RDDS80 server
-my $ZBX_EC_RDDS_ERRRES       = -205; # cannot resolve a Whois host
-my $ZBX_EC_RDDS80_NOHTTPCODE = -206; # no HTTP response code in response from RDDS80 server
-my $ZBX_EC_RDDS80_EHTTPCODE  = -207; # invalid HTTP response code in response from RDDS80 server
-my $ZBX_EC_EPP_NO_IP         = -200; # IP is missing for EPP server
-my $ZBX_EC_EPP_CONNECT       = -201; # cannot connect to EPP server
-my $ZBX_EC_EPP_CRYPT         = -202; # invalid certificate or private key
-my $ZBX_EC_EPP_FIRSTTO       = -203; # first message timeout
-my $ZBX_EC_EPP_FIRSTINVAL    = -204; # first message is invalid
-my $ZBX_EC_EPP_LOGINTO       = -205; # LOGIN command timeout
-my $ZBX_EC_EPP_LOGININVAL    = -206; # invalid reply to LOGIN command
-my $ZBX_EC_EPP_UPDATETO      = -207; # UPDATE command timeout
-my $ZBX_EC_EPP_UPDATEINVAL   = -208; # invalid reply to UPDATE command
-my $ZBX_EC_EPP_INFOTO        = -209; # INFO command timeout
-my $ZBX_EC_EPP_INFOINVAL     = -210; # invalid reply to INFO command
+use constant VALUE_TYPE_AVAIL => 0;
+use constant VALUE_TYPE_PERC => 1;
 
-my $cfg_probe_status_delay = 60;
-my $cfg_default_rdds_ns_string = "Name Server:";
+use constant ZBX_EC_DNS_NS_NOREPLY    => -200; # no reply from Name Server
+use constant ZBX_EC_DNS_NS_ERRREPLY   => -201; # invalid reply from Name Server
+use constant ZBX_EC_DNS_NS_NOTS       => -202; # no UNIX timestamp
+use constant ZBX_EC_DNS_NS_ERRTS      => -203; # invalid UNIX timestamp
+use constant ZBX_EC_DNS_NS_ERRSIG     => -204; # DNSSEC error
+use constant ZBX_EC_DNS_RES_NOREPLY   => -205; # no reply from resolver
+use constant ZBX_EC_DNS_RES_NOADBIT   => -206; # no AD bit in the answer from resolver
+use constant ZBX_EC_RDDS43_NOREPLY    => -200; # no reply from RDDS43 server
+use constant ZBX_EC_RDDS43_NONS       => -201; # Whois server returned no NS
+use constant ZBX_EC_RDDS43_NOTS       => -202; # no Unix timestamp
+use constant ZBX_EC_RDDS43_ERRTS      => -203; # invalid Unix timestamp
+use constant ZBX_EC_RDDS80_NOREPLY    => -204; # no reply from RDDS80 server
+use constant ZBX_EC_RDDS_ERRRES       => -205; # cannot resolve a Whois host
+use constant ZBX_EC_RDDS80_NOHTTPCODE => -206; # no HTTP response code in response from RDDS80 server
+use constant ZBX_EC_RDDS80_EHTTPCODE  => -207; # invalid HTTP response code in response from RDDS80 server
+use constant ZBX_EC_EPP_NO_IP         => -200; # IP is missing for EPP server
+use constant ZBX_EC_EPP_CONNECT       => -201; # cannot connect to EPP server
+use constant ZBX_EC_EPP_CRYPT         => -202; # invalid certificate or private key
+use constant ZBX_EC_EPP_FIRSTTO       => -203; # first message timeout
+use constant ZBX_EC_EPP_FIRSTINVAL    => -204; # first message is invalid
+use constant ZBX_EC_EPP_LOGINTO       => -205; # LOGIN command timeout
+use constant ZBX_EC_EPP_LOGININVAL    => -206; # invalid reply to LOGIN command
+use constant ZBX_EC_EPP_UPDATETO      => -207; # UPDATE command timeout
+use constant ZBX_EC_EPP_UPDATEINVAL   => -208; # invalid reply to UPDATE command
+use constant ZBX_EC_EPP_INFOTO        => -209; # INFO command timeout
+use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
 
-my $dnstest_host = "dnstest"; # global config history
-my $dnstest_group = "dnstest";
+use constant cfg_probe_status_delay => 60;
+use constant cfg_default_rdds_ns_string => qw(Name Server:);
+
+use constant dnstest_host => qw(dnstest); # global config history
+use constant dnstest_group => qw(dnstest);
 
 my %OPTS;
 my $args = GetOptions(\%OPTS,
@@ -209,10 +210,10 @@ unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'ext
     }
 my $cfg_epp_delay = $result->{'value'};
 
-my $dnstest_groupid = create_group($dnstest_group);
+my $dnstest_groupid = create_group(dnstest_group);
 
 my $dnstest_hostid = create_host({'groups' => [{'groupid' => $dnstest_groupid}],
-			      'host' => $dnstest_host,
+			      'host' => dnstest_host,
 			      'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
@@ -238,7 +239,7 @@ my $probes_groupid = create_group('Probes');
 
 my $probes_mon_groupid = create_group('Probes - Mon');
 
-my $proxy_mon_templateid = create_template('Template Proxy Health');
+my $proxy_mon_templateid = create_template('Template Proxy Health', LINUX_TEMPLATEID);
 
 foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_name = $proxies->{$proxyid}->{'host'};
@@ -477,6 +478,8 @@ sub create_trigger {
         $result = $zabbix->create('trigger', $options);
     }
 
+#    pfail("cannot create trigger:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
+
     return $result;
 }
 
@@ -504,52 +507,52 @@ sub create_item_dns_rtt {
 
     create_item($options);
 
-    $options = { 'description' => 'No reply from Name Server '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from Name Server '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid reply from Name Server '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - Invalid reply from Name Server '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'UNIXTIME is missing from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - UNIX timestamp is missing from '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'Invalid UNIXTIME from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - Invalid UNIX timestamp from '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => '5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
+	$options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.']',
+		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG,
 		     'priority' => '2',
 	};
 
 	create_trigger($options);
     }
 
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from resolver',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY,
 			'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing from '.$ns_name.' ['.$ip.'] on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 2 - AD bit is missing from '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT,
 			'priority' => '2',
                 };
 
@@ -566,7 +569,7 @@ sub create_slv_item {
     my $applicationids = shift;
 
     my $options;
-    if ($value_type == $VALUE_TYPE_AVAIL)
+    if ($value_type == VALUE_TYPE_AVAIL)
     {
 	$options = {'name' => $name,
                                               'key_'=> $key,
@@ -575,7 +578,7 @@ sub create_slv_item {
 					      'applications' => $applicationids,
 					      'valuemapid' => value_mappings->{'dnstest_avail'}};
     }
-    elsif ($value_type == $VALUE_TYPE_PERC) {
+    elsif ($value_type == VALUE_TYPE_PERC) {
 	$options = {'name' => $name,
                                               'key_'=> $key,
                                               'hostid' => $hostid,
@@ -594,6 +597,7 @@ sub create_item_dns_udp_upd {
     my $ns_name = shift;
     my $ip = shift;
     my $templateid = shift;
+    my $template_name = shift;
 
     my $proto_uc = 'UDP';
 
@@ -620,65 +624,13 @@ sub create_items_dns {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_dns_tcp_delay, 'valuemapid' => value_mappings->{'dnstest_dns'}};
+                                              'delay' => $cfg_dns_tcp_delay};
 
     create_item($options);
 
-    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully on {HOST.NAME} ('.$proto_uc.')',
+    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
 			'priority' => '4',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
-		    'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
-		    'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => 'DNSSEC error on {HOST.NAME} ('.$proto_uc.')',
-		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
-		     'priority' => '3',
-	};
-
-	create_trigger($options);
-    }
-
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
-			'priority' => '3',
                 };
 
     create_trigger($options);
@@ -696,61 +648,9 @@ sub create_items_dns {
 
     create_item($options);
 
-    $options = { 'description' => '5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully on {HOST.NAME} ('.$proto_uc.')',
+    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
 			'priority' => '4',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'No reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOREPLY,
-		    'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'Invalid reply from Name Server on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRREPLY,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => '5.1.1 Step 6 - UNIXTIME is missing on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_NOTS,
-		    'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => '5.1.1 Step 6 - Invalid UNIXTIME on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRTS,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => 'DNSSEC error on {HOST.NAME} ('.$proto_uc.')',
-		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_NS_ERRSIG,
-		     'priority' => '3',
-	};
-
-	create_trigger($options);
-    }
-
-    $options = { 'description' => 'No reply from resolver on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOREPLY,
-			'priority' => '3',
-                };
-
-    create_trigger($options);
-
-
-    $options = { 'description' => '5.1.1 Step 2 - ad bit is missing on {HOST.NAME} ('.$proto_uc.')',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_DNS_RES_NOADBIT,
-			'priority' => '3',
                 };
 
     create_trigger($options);
@@ -783,41 +683,36 @@ sub create_items_rdds {
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOREPLY.
-                        		    '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - RDDS43 server [{ITEM.LASTVALUE2}] output does not contain "{$DNSTEST.RDDS.NS.STRING}" on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NONS.
-				        '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - The server output does not contain "{$DNSTEST.RDDS.NS.STRING}"',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NONS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - UNIXTIME is missing in reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_NOTS.
-                        		    '|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 6 - UNIX timestamp is missing in reply from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 6 - Invalid UNIXTIME in reply from RDDS43 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS43_ERRTS.
-                        		'|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 6 - Invalid UNIX timestamp in reply from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_ERRTS,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS43 host [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES.
-                        		'|{'.$template_name.':dnstest.rdds.43.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot resolve a host',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS_ERRRES,
                         'priority' => '2',
                 };
 
@@ -834,6 +729,13 @@ sub create_items_rdds {
 		    'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'},
 		    'status' => (defined($OPTS{'epp-server'}) ? 0 : 1)};
 	create_item($options);
+
+	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
+                        'priority' => '2',
+                };
+
+	create_trigger($options);
     }
 
     $item_key = 'dnstest.rdds.80.ip[{$DNSTEST.TLD}]';
@@ -855,33 +757,29 @@ sub create_items_rdds {
                                               'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
     create_item($options);
 
-    $options = { 'description' => '6.1.1 Step 5 - No reply from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOREPLY.
-                        		    '|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_NOREPLY,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot resolve an RDDS80 host [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS_ERRRES.
-                        		'|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot resolve a host',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS_ERRRES,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Cannot get HTTP response code from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_NOHTTPCODE.
-                        		    '|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot get HTTP response code from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_NOHTTPCODE,
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '6.1.1 Step 2 - Invalid HTTP response code from RDDS80 server [{ITEM.LASTVALUE2}] on {HOST.NAME}',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.$ZBX_EC_RDDS80_EHTTPCODE.
-                        		'|{'.$template_name.':dnstest.rdds.80.ip[{$DNSTEST.TLD}].str(dummy)}=1',
+    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Invalid HTTP response code from the server',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_EHTTPCODE,
                         'priority' => '2',
                 };
 
@@ -960,6 +858,83 @@ sub create_items_epp {
 		'valuemapid' => value_mappings->{'dnstest_epp'}};
 
     create_item($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 2 - IP is missing',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_NO_IP,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 4 - Cannot connect to the server',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_CONNECT,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - Invalid certificate or private key',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_CRYPT,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - First message timeout',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_FIRSTTO,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - First message is invalid',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_FIRSTINVAL,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 6 - LOGIN command timeout',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_LOGINTO,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 6 - Invalid reply to LOGIN command',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_LOGININVAL,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - UPDATE command timeout',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_UPDATETO,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - Invalid reply to UPDATE command',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_UPDATEINVAL,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - INFO command timeout',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_INFOTO,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - Invalid reply to INFO command',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_INFOINVAL,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
 }
 
 sub create_macro {
@@ -973,7 +948,7 @@ sub create_macro {
     if (defined($templateid)) {
 	if ($zabbix->get('usermacro',{'countOutput' => 1, 'hostids' => $templateid, 'filter' => {'macro' => $name}})) {
 	    $result = $zabbix->get('usermacro',{'output' => 'hostmacroid', 'hostids' => $templateid, 'filter' => {'macro' => $name}} );
-    	    $result = $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'} 
+    	    $result = $zabbix->update('usermacro',{'hostmacroid' => $result->{'hostmacroid'}, 'value' => $value}) if defined $result->{'hostmacroid'}
 														     and defined($force_update);
 	}
 	else {
@@ -985,7 +960,7 @@ sub create_macro {
     else {
 	if ($zabbix->get('usermacro',{'countOutput' => 1, 'globalmacro' => 1, 'filter' => {'macro' => $name}})) {
             $result = $zabbix->get('usermacro',{'output' => 'globalmacroid', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
-            $result = $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'} 
+            $result = $zabbix->macro_global_update({'globalmacroid' => $result->{'globalmacroid'}, 'value' => $value}) if defined $result->{'globalmacroid'}
 															and defined($force_update);
         }
         else {
@@ -1009,12 +984,12 @@ sub create_probe_status_template {
                                               'key_'=> 'dnstest.probe.status[automatic,'.$root_servers_macros.']',
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('Probe status', $templateid)],
-                                              'type' => 3, 'value_type' => 3, 'delay' => $cfg_probe_status_delay,
+                                              'type' => 3, 'value_type' => 3, 'delay' => cfg_probe_status_delay,
                                               'valuemapid' => value_mappings->{'dnstest_probe'}};
 
     create_item($options);
 
-    $options = { 'description' => '8.3 - Long manual disable node {HOST.HOST}',
+    $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago',
                          'expression' => '{'.$template_name.':dnstest.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
                         'priority' => '3',
                 };
@@ -1031,7 +1006,7 @@ sub create_probe_status_template {
 
     create_item($options);
 
-    $options = { 'description' => '8.2 - Probe {HOST.HOST} has been disabled by tests',
+    $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
                          'expression' => '{'.$template_name.':dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"].last(0)}=0',
                         'priority' => '4',
                 };
@@ -1058,7 +1033,7 @@ sub create_probe_template {
 }
 
 sub update_root_servers {
-    my $content = LWP::Simple::get('http://www.internic.net/zones/named.root');
+    my $content = LWP::UserAgent->new->get('http://www.internic.net/zones/named.root')->{'_content'};
 
     my $macro_value_v4;
     my $macro_value_v6;
@@ -1148,7 +1123,16 @@ sub create_main_template {
 
             create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "tcp");
 	    create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "udp");
-    	    create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid) if (defined($OPTS{'epp-server'}));
+	    if (defined($OPTS{'epp-server'})) {
+    		create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid);
+
+		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv4[$i_ipv4].']',
+            	             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
+                	    'priority' => '2',
+                };
+
+	        create_trigger($options);
+    	    }
         }
 
 	foreach (my $i_ipv6 = 0; $i_ipv6 <= $#ipv6; $i_ipv6++) {
@@ -1157,7 +1141,16 @@ sub create_main_template {
 
 	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "tcp");
     	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "udp");
-    	    create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid) if (defined($OPTS{'epp-server'}));
+	    if (defined($OPTS{'epp-server'})) {
+    		create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid);
+
+		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv6[$i_ipv6].']',
+                             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
+                            'priority' => '2',
+                };
+
+                create_trigger($options);
+	    }
         }
     }
 
@@ -1168,7 +1161,7 @@ sub create_main_template {
     create_macro('{$DNSTEST.TLD}', $tld, $templateid);
     create_macro('{$DNSTEST.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid);
     create_macro('{$DNSTEST.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid) if (defined($OPTS{'rdds-test-prefix'}));
-    create_macro('{$DNSTEST.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : $cfg_default_rdds_ns_string, $templateid);
+    create_macro('{$DNSTEST.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid);
     create_macro('{$DNSTEST.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.EPP.ENABLED}', defined($OPTS{'epp-server'}) ? 1 : 0, $templateid);
@@ -1181,11 +1174,11 @@ sub create_all_slv_ns_items {
     my $ip = shift;
     my $hostid = shift;
 
-    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
-    create_slv_item('DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
+    create_slv_item('DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
 
 sub create_slv_ns_items {
@@ -1217,13 +1210,13 @@ sub create_slv_items {
 
     create_slv_ns_items($ns_servers, $hostid);
 
-    create_slv_item('DNS availability', 'dnstest.slv.dns.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('DNS availability', 'dnstest.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
     my $options;
 
     # NB! Configuration trigger that is used in PHP and C code to detect incident!
     # priority must be set to 0!
-    $options = { 'description' => '5.2.4 DNS service is not available at {HOST.HOST} TLD',
+    $options = { 'description' => 'DNS-AVAIL {HOST.NAME}: 5.2.4 - The service is not available',
                          'expression' => '({TRIGGER.VALUE}=0&'.
 						'{'.$host_name.':dnstest.slv.dns.avail.count(#{$INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
 					 '({TRIGGER.VALUE}=1&'.
@@ -1233,9 +1226,9 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    create_slv_item('DNS weekly unavailability', 'dnstest.slv.dns.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+    create_slv_item('DNS weekly unavailability', 'dnstest.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 10%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
                          'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=10|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>10)&'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<25',
@@ -1244,7 +1237,7 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 25%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
                          'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=25|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>25)&'.
                                         '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<50',
@@ -1253,7 +1246,7 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 50%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
                          'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=50|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>50)&'.
                                         '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<75',
@@ -1262,7 +1255,7 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 75%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
                          'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>75|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>75)&'.
                                         '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<90',
@@ -1271,7 +1264,7 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 90%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
                          'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=90|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>90)&'.
                                         '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<100',
@@ -1280,7 +1273,7 @@ sub create_slv_items {
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 DNS Service Availability [{ITEM.LASTVALUE1}] > 100%',
+    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
                          'expression' => '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=100|'.
 					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>100',
                         'priority' => '5',
@@ -1289,11 +1282,11 @@ sub create_slv_items {
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	create_slv_item('DNSSEC availability', 'dnstest.slv.dnssec.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('DNSSEC availability', 'dnstest.slv.dnssec.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
-	$options = { 'description' => '5.3.3 DNSSEC service is not available at {HOST.HOST} TLD',
+	$options = { 'description' => 'DNSSEC-AVAIL {HOST.NAME}: 5.3.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.FAIL},0,"eq")}={$INCIDENT.DNSSEC.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
@@ -1303,9 +1296,9 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	create_slv_item('DNSSEC weekly unavailability', 'dnstest.slv.dnssec.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('DNSSEC weekly unavailability', 'dnstest.slv.dnssec.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 10%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 10%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>10&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<25',
 			 'priority' => '2',
@@ -1313,7 +1306,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 25%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 25%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>25&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<50',
 			 'priority' => '3',
@@ -1321,7 +1314,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 50%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 50%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>50&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<75',
 			 'priority' => '3',
@@ -1329,7 +1322,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 75%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 75%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>75&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<90',
 			 'priority' => '4',
@@ -1337,7 +1330,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 90%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 90%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>90&'.
 			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<100',
 			 'priority' => '4',
@@ -1345,7 +1338,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 DNSSEC proper resolution > 100%',
+	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 100%',
 		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>100',
 		     'priority' => '5',
 	};
@@ -1354,11 +1347,11 @@ sub create_slv_items {
     }
 
     if (defined($OPTS{'rdds43-servers'})) {
-	create_slv_item('RDDS availability', 'dnstest.slv.rdds.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('RDDS availability', 'dnstest.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
-	$options = { 'description' => '6.2.3 RDDS service is not available at {HOST.HOST} TLD',
+	$options = { 'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
 			 '{'.$host_name.':dnstest.slv.rdds.avail.count(#{$INCIDENT.RDDS.FAIL},0,"eq")}={$INCIDENT.RDDS.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
@@ -1368,9 +1361,9 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	create_slv_item('RDDS weekly unavailability', 'dnstest.slv.rdds.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('RDDS weekly unavailability', 'dnstest.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-        $options = { 'description' => '12.2 RDDS Availability > 10%',
+        $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>10&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<25',
 			 'priority' => '2',
@@ -1378,7 +1371,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 RDDS Availability > 25%',
+	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>25&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<50',
 			 'priority' => '3',
@@ -1386,7 +1379,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 RDDS Availability > 50%',
+	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>50&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<75',
 			 'priority' => '3',
@@ -1394,7 +1387,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 RDDS Availability > 75%',
+	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>75&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<90',
 			 'priority' => '4',
@@ -1402,7 +1395,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 RDDS Availability > 90%',
+	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>90&'.
 			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<100',
 			 'priority' => '4',
@@ -1410,29 +1403,29 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 RDDS Availability > 100%',
+	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
 		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>100',
 		     'priority' => '5',
 	};
 
 	create_trigger($options);
 
-	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'dnstest.slv.rdds.43.rtt.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'dnstest.slv.rdds.80.rtt.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
+	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'dnstest.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'dnstest.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
     }
 
     if (defined($OPTS{'epp-server'})) {
-	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, $VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'dnstest.slv.epp.rtt.login.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'dnstest.slv.epp.rtt.update.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'dnstest.slv.epp.rtt.info.month', $hostid, $VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'dnstest.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'dnstest.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'dnstest.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
-	$options = { 'description' => '7.2.3 EPP service is not available at {HOST.HOST} TLD',
+	$options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
 			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
@@ -1442,7 +1435,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-        $options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 10%',
+        $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
                          'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=10|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>10)&'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<25',
@@ -1451,7 +1444,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 25%',
+	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
                          'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=25|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>25)&'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<50',
@@ -1460,7 +1453,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 50%',
+	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
                          'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=50|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>50)&'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<75',
@@ -1469,7 +1462,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 75%',
+	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
                          'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75)&'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<90',
@@ -1478,7 +1471,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-	$options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 90%',
+	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
                          'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=90|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>90)&'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<100',
@@ -1487,7 +1480,7 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-        $options = { 'description' => '12.2 EPP Service Availability [{ITEM.LASTVALUE1}] > 100%',
+        $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
                          'expression' => '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=100|'.
                                         '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>100',
                         'priority' => '5',
@@ -1621,7 +1614,7 @@ Other options
                 specify EPP server
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
-		(default: "$cfg_default_rdds_ns_string")
+		(default: "cfg_default_rdds_ns_string")
         --rdds-test-prefix=STRING
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
         --only-cron
@@ -1689,21 +1682,21 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    $options = { 'description' => '12.2 Online probes for DNS test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
+    $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
                          'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 Online probes for RDDS test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.RDDS.PROBE.ONLINE}]',
+    $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.RDDS.PROBE.ONLINE}]',
                          'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => '12.2 Online probes for EPP test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
+    $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
                          'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
                         'priority' => '5',
                 };
