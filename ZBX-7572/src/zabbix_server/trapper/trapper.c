@@ -591,17 +591,14 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
 		}
-		return ret;
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s);
-		return ret;
 	}
 	else if (0 == strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23)) /* request for last IDs */
 	{
 		send_history_last_id(sock, s);
-		return ret;
 	}
 	else if (0 == strncmp(s, "Data", 4))	/* node data exchange */
 	{
@@ -637,8 +634,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		}
 
 		node_sync_unlock(0);
-
-		return ret;
 	}
 	else if (0 == strncmp(s, "History", 7))	/* slave node history */
 	{
@@ -650,8 +645,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		if (SUCCEED != zbx_tcp_send_raw(sock, reply))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
 		alarm(0);
-
-		return ret;
 	}
 	else
 	{
@@ -701,9 +694,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		alarm(0);
-
-		return ret;
 	}
+	return ret;
 }
 
 static void	process_trapper_child(zbx_sock_t *sock)
