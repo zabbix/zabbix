@@ -54,7 +54,7 @@ function DBconnect(&$error) {
 			case ZBX_DB_MYSQL:
 				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database ['.trim(mysqli_connect_error()).']';
+					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
 					$result = false;
 				}
 				else {
@@ -108,7 +108,7 @@ function DBconnect(&$error) {
 				}
 				else {
 					$ociError = oci_error();
-					$error = 'Error connecting to database: ['.$ociError['message'].']';
+					$error = 'Error connecting to database: '.$ociError['message'];
 					$result = false;
 				}
 
@@ -127,7 +127,7 @@ function DBconnect(&$error) {
 
 				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database: ['.db2_conn_errormsg().']';
+					$error = 'Error connecting to database: '.db2_conn_errormsg();
 					$result = false;
 				}
 				else {
@@ -152,7 +152,7 @@ function DBconnect(&$error) {
 						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 					}
 					catch (Exception $e) {
-						$error = 'Error connecting to database';
+						$error = 'Error connecting to database.';
 						$result = false;
 					}
 					unlock_sqlite3_access();
