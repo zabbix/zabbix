@@ -558,7 +558,7 @@ end:
 }
 
 static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char value_type, unsigned char data_type,
-		AGENT_RESULT *value)
+		AGENT_RESULT *result)
 {
 	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
@@ -571,12 +571,12 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var)))
 		{
-			SET_MSG_RESULT(value, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
 			ret = NOTSUPPORTED;
 		}
 		else
 		{
-			if (SUCCEED != set_result_type(value, value_type, data_type, strval_dyn))
+			if (SUCCEED != set_result_type(result, value_type, data_type, strval_dyn))
 				ret = NOTSUPPORTED;
 
 			zbx_free(strval_dyn);
@@ -590,11 +590,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
 #endif
 	{
-		SET_UI64_RESULT(value, (unsigned long)*var->val.integer);
+		SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
 	}
 	else if (ASN_COUNTER64 == var->type)
 	{
-		SET_UI64_RESULT(value, (((zbx_uint64_t)var->val.counter64->high) << 32) +
+		SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
 				(zbx_uint64_t)var->val.counter64->low);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
@@ -605,23 +605,23 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		/* negative integer values are converted to double */
 		if (0 > *var->val.integer)
-			SET_DBL_RESULT(value, (double)*var->val.integer);
+			SET_DBL_RESULT(result, (double)*var->val.integer);
 		else
-			SET_UI64_RESULT(value, (zbx_uint64_t)*var->val.integer);
+			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_FLOAT == var->type)
 	{
-		SET_DBL_RESULT(value, *var->val.floatVal);
+		SET_DBL_RESULT(result, *var->val.floatVal);
 	}
 	else if (ASN_DOUBLE == var->type)
 	{
-		SET_DBL_RESULT(value, *var->val.doubleVal);
+		SET_DBL_RESULT(result, *var->val.doubleVal);
 	}
 #endif
 	else if (ASN_IPADDRESS == var->type)
 	{
-		SET_STR_RESULT(value, zbx_dsprintf(NULL, "%u.%u.%u.%u",
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, "%u.%u.%u.%u",
 				(unsigned int)var->val.string[0],
 				(unsigned int)var->val.string[1],
 				(unsigned int)var->val.string[2],
@@ -629,7 +629,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	}
 	else
 	{
-		SET_MSG_RESULT(value, zbx_get_snmp_type_error(var->type));
+		SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
 		ret = NOTSUPPORTED;
 	}
 
@@ -672,7 +672,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
 static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *value)
+		AGENT_RESULT *result)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
@@ -683,7 +683,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	struct variable_list	*var;
 	int			bulk, status, running, ret = SUCCEED;
 	struct zbx_json		j;
-	AGENT_RESULT		snmp_value;
+	AGENT_RESULT		snmp_result;
 
 	bulk = (ITEM_TYPE_SNMPv1 == item->type ? 0 : 1);	/* GetBulkRequest-PDU available since SNMPv2 */
 
@@ -692,14 +692,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
 	{
-		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", OID));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", OID));
 		ret = NOTSUPPORTED;
 		goto out;
 	}
 
 	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
 	{
-		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
 		ret = NOTSUPPORTED;
 		goto out;
 	}
@@ -727,14 +727,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	{
 		if (NULL == (pdu = snmp_pdu_create(0 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK)))	/* create PDU */
 		{
-			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
 			ret = NOTSUPPORTED;
 			break;
 		}
 
 		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))	/* add OID as variable to PDU */
 		{
-			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 			ret = NOTSUPPORTED;
 			snmp_free_pdu(pdu);
 			break;
@@ -755,7 +755,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, err, sizeof(err));
-			SET_MSG_RESULT(value, zbx_strdup(NULL, err));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 			running = 0;
 			goto next;
 		}
@@ -781,7 +781,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 
 					if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
 					{
-						SET_MSG_RESULT(value, zbx_strdup(NULL, "OID not increasing."));
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "OID not increasing."));
 						ret = NOTSUPPORTED;
 						running = 0;
 						break;
@@ -790,7 +790,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid),
 								var->name, var->name_length))
 					{
-						SET_MSG_RESULT(value, zbx_dsprintf(NULL,
+						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 								"snprint_objid(): buffer is not large enough:"
 								" OID: \"%s\" snmp_oid: \"%s\".", OID, snmp_oid));
 						ret = NOTSUPPORTED;
@@ -798,14 +798,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 						break;
 					}
 
-					init_result(&snmp_value);
+					init_result(&snmp_result);
 
-					if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_value) &&
-							NULL != GET_STR_RESULT(&snmp_value))
+					if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
+							NULL != GET_STR_RESULT(&snmp_result))
 					{
 						if (ZBX_SNMP_WALK_MODE_CACHE == mode)
 						{
-							cache_put_snmp_index(item, (char *)OID, snmp_value.str,
+							cache_put_snmp_index(item, (char *)OID, snmp_result.str,
 									&snmp_oid[OID_len + 1]);
 						}
 						else
@@ -813,7 +813,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 							zbx_json_addobject(&j, NULL);
 							zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
 									ZBX_JSON_TYPE_STRING);
-							zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_value.str,
+							zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
 									ZBX_JSON_TYPE_STRING);
 							zbx_json_close(&j);
 						}
@@ -822,14 +822,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 					{
 						char	**msg;
 
-						msg = GET_MSG_RESULT(&snmp_value);
+						msg = GET_MSG_RESULT(&snmp_result);
 
 						zabbix_log(LOG_LEVEL_DEBUG, "cannot get OID '%s' string value: %s",
 								snmp_oid,
 								NULL != msg && NULL != *msg ? *msg : "(null)");
 					}
 
-					free_result(&snmp_value);
+					free_result(&snmp_result);
 
 					/* go to next variable */
 					memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
@@ -839,7 +839,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 				{
 					/* an exception value, so stop */
 
-					SET_MSG_RESULT(value, zbx_get_snmp_type_error(var->type));
+					SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -856,7 +856,7 @@ next:
 		zbx_json_close(&j);
 
 		if (SUCCEED == ret)
-			SET_TEXT_RESULT(value, zbx_strdup(NULL, j.buffer));
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 		zbx_json_free(&j);
 	}
