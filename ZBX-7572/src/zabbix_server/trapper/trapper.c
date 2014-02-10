@@ -508,6 +508,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	{
 		if (SUCCEED != zbx_json_open(s, &jp))
 		{
+			zbx_send_response(sock, FAIL, "received invalid JSON object", CONFIG_TIMEOUT);
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object");
 			return FAIL;
 		}
