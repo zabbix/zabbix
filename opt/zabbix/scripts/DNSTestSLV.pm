@@ -51,7 +51,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_epp_rtt get_rollweek_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
-		minutes_last_month get_online_probes probes2tldhostids send_value init_values push_value send_values
+		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
 		get_item_values check_lastclock get_down_count
 		dbg info warn fail slv_exit exit_if_running trim parse_opts);
@@ -602,26 +602,6 @@ sub probes2tldhostids
     return \@result;
 }
 
-# <hostname> <key> <timestamp> <value>
-sub send_value
-{
-    my $hostname = shift;
-    my $key = shift;
-    my $timestamp = shift;
-    my $value = shift;
-
-    return if (defined($OPTS{'test'}));
-
-    my $sender = Zabbix::Sender->new({
-	'server' => $config->{'slv'}->{'zserver'},
-	'port' => $config->{'slv'}->{'zport'},
-	'retries' => 1 });
-
-    fail("cannot connect to Zabbix server") unless (defined($sender));
-
-    fail("cannot send data to Zabbix server ($hostname:$key, $timestamp, '$value')") unless (defined($sender->send_value($hostname, $key, "$value", "$timestamp")));
-}
-
 sub init_values
 {
     @_sender_values = ();
@@ -648,7 +628,7 @@ sub push_value
 #
 sub send_values
 {
-    return if (defined($OPTS{'test'}));
+    return if (defined($OPTS{'test'}) or scalar(@_sender_values) == 0);
 
     my $sender = Zabbix::Sender->new({
 	'server' => $config->{'slv'}->{'zserver'},

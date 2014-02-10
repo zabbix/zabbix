@@ -4,75 +4,59 @@ package Zabbix::Sender;
 }
 # ABSTRACT: A pure-perl implementation of zabbix-sender.
 
-use Moose;
-use namespace::autoclean;
-
 use JSON;
 use IO::Socket;
 use IO::Select;
 use Net::Domain;
 
-has 'server' => (
-    'is'       => 'rw',
-    'isa'      => 'Str',
-    'required' => 1,
-);
+require Exporter;
+our @ISA = qw(Exporter);
+@Zabbix::Sender::EXPORT = qw(send_arrref);
 
-has 'port' => (
-    'is'      => 'rw',
-    'isa'     => 'Int',
-    'default' => 10051,
-);
+my %ZOPTS;
 
-has 'timeout' => (
-    'is'      => 'rw',
-    'isa'     => 'Int',
-    'default' => 30,
-);
+sub new
+{
+    my $self = shift;
 
-has 'hostname' => (
-    'is'      => 'rw',
-    'isa'     => 'Str',
-    'lazy'    => 1,
-    'builder' => '_init_hostname',
-);
+    %ZOPTS = ('port' => 10051,
+	      'timeout' => 30,
+	      'interval' => 1,
+	      'retries' => 1,
+	      'zabbix_template_1_8' => "a4 b C4 C4 a*",
+	      'keepalive' => 0,
+	      '_last_sent' => 0);
 
-has 'interval' => (
-    'is'      => 'rw',
-    'isa'     => 'Int',
-    'default' => 1,
-);
+    my %h = %{$_[0]};
 
-has 'retries' => (
-    'is'      => 'rw',
-    'isa'     => 'Int',
-    'default' => 3,
-);
+    foreach my $key (keys(%h))
+    {
+	$ZOPTS{$key} = $h{$key};
+    }
 
-has 'keepalive' => (
-    'is'    => 'rw',
-    'isa'   => 'Bool',
-    'default' => 0,
-);
+    $ZOPTS{'_json'} = _init_json();
 
-has '_json' => (
-    'is'      => 'rw',
-    'isa'     => 'JSON',
-    'lazy'    => 1,
-    'builder' => '_init_json',
-);
+    return bless {}, $self;
+}
 
-has '_last_sent' => (
-    'is'      => 'rw',
-    'isa'     => 'Int',
-    'default' => 0,
-);
+sub server { return $ZOPTS{'server'} }
+sub port { return $ZOPTS{'port'} }
+sub retries { return $ZOPTS{'retries'} }
+sub timeout { return $ZOPTS{'timeout'} }
+sub interval { return $ZOPTS{'interval'} }
+sub keepalive { return $ZOPTS{'keepalive'} }
+sub zabbix_template_1_8 { return $ZOPTS{'zabbix_template_1_8'} }
+sub _last_sent { return $ZOPTS{'_last_sent'} }
+sub _json { return $ZOPTS{'_json'} }
 
-has '_socket' => (
-    'is'    => 'rw',
-    'isa'   => 'Maybe[IO::Socket]',
-);
+sub _socket
+{
+    my $self = shift;
 
+    return $ZOPTS{'_socket'} unless (@_);
+
+    $ZOPTS{'_socket'} = shift;
+}
 
 sub _init_json {
     my $self = shift;
@@ -88,14 +72,6 @@ sub _init_hostname {
 
     return Net::Domain::hostname();
 }
-
-
-has 'zabbix_template_1_8' => (
-    'is'      => 'ro',
-    'isa'     => 'Str',
-    'default' => "a4 b C4 C4 a*",
-);
-
 
 sub _encode_request {
     my $self  = shift;
@@ -129,7 +105,6 @@ sub _encode_request {
     return $output;
 }
 
-
 sub _decode_answer {
     my $self = shift;
     my $data = shift;
@@ -149,67 +124,6 @@ sub _decode_answer {
     return;
 }
 
-
-# DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
-# and if the implementor avoids indirect object notation you should be fine.
-## no critic (ProhibitBuiltinHomonyms)
-sub send_value {
-## use critic
-    my $self  = shift;
-    my $host  = shift || $self->hostname();
-    my $item  = shift;
-    my $value = shift;
-    my $clock = shift;
-
-    my $data_ref = {
-	'host'  => $host,
-	'key'   => $item,
-	'value' => $value,
-    };
-
-    $data_ref->{'clock'} = $clock if defined($clock);
-
-    my $status = 0;
-    foreach my $i ( 1 .. $self->retries() ) {
-        if ( $self->_send( [ $data_ref ] ) ) {
-            $status = 1;
-            last;
-        }
-    }
-
-    if ($status) {
-        return 1;
-    }
-    else {
-        return;
-    }
-
-}
-
-# DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
-# and if the implementor avoids indirect object notation you should be fine.
-## no critic (ProhibitBuiltinHomonyms)
-sub send_hashref {
-## use critic
-    my $self  = shift;
-    my $data_ref = shift;
-
-    my $status = 0;
-    foreach my $i ( 1 .. $self->retries() ) {
-        if ( $self->_send( [ $data_ref ] ) ) {
-            $status = 1;
-            last;
-        }
-    }
-
-    if ($status) {
-        return 1;
-    }
-    else {
-        return;
-    }
-
-}
 
 # DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
 # and if the implementor avoids indirect object notation you should be fine.
@@ -306,10 +220,6 @@ sub DEMOLISH {
 
     return 1;
 }
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-
 
 1;    # End of Zabbix::Sender
 
