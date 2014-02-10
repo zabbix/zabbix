@@ -564,7 +564,8 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	char		*strval_dyn;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d value_type:%d data_type:%d", __function_name,
+			(int)var->type, (int)value_type, (int)data_type);
 
 	if (ASN_OCTET_STR == var->type)
 	{
@@ -748,7 +749,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld", __function_name,
+				status, NULL == response ? (long)-1 : response->errstat);
 
 		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
@@ -918,11 +920,11 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, DC_ITEM *items, char oid
 		snmp_free_pdu(pdu);
 		goto out;
 	}
-
+retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld", __function_name,
-			status, NULL == response ? (long)-1 : response->errstat);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld mapping_num:%d", __function_name,
+			status, NULL == response ? (long)-1 : response->errstat, mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -934,9 +936,54 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, DC_ITEM *items, char oid
 			j = mapping[i];
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
-				zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &results[j]);
+			{
+				(void)zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &results[j]);
+			}
 			else
-				zbx_snmp_set_result(var, items[j].value_type, items[j].data_type, &results[j]);
+			{
+				errcodes[j] = zbx_snmp_set_result(var, items[j].value_type, items[j].data_type,
+						&results[j]);
+			}
+		}
+	}
+	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex &&
+			ITEM_TYPE_SNMPv1 == items[0].type)
+	{
+		/* If a request PDU contains a bad variable, the specified behavior is different between SNMPv1 and */
+		/* later versions. In SNMPv1, the whole PDU is rejected and "response->errindex" is set to indicate */
+		/* the bad variable. In SNMPv2 and later, the SNMP agent processes the PDU by filling values for the */
+		/* known variables and marking unknown variables individually in the variable binding list. So if we */
+		/* get this error with SNMPv1, we fix the PDU by removing the bad variable and retry the request. */
+
+		i = response->errindex - 1;
+		j = mapping[i];
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() errindex:%ld oid:'%s'", __function_name,
+				response->errindex, oids[j]);
+
+		if (NULL == query_and_ignore_type || 0 == query_and_ignore_type[j])
+		{
+			errcodes[j] = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error,
+					max_error_len);
+			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, error));
+			*error = '\0';
+		}
+
+		if (1 < mapping_num)
+		{
+			if (NULL != (pdu = snmp_fix_pdu(response, SNMP_MSG_GET)))
+			{
+				memmove(mapping + i, mapping + i + 1, sizeof(int) * (mapping_num - i - 1));
+				mapping_num--;
+
+				snmp_free_pdu(response);
+				goto retry;
+			}
+			else
+			{
+				strlcpy(error, "snmp_fix_pdu(): cannot fix PDU object.", max_error_len);
+				ret = NOTSUPPORTED;
+			}
 		}
 	}
 	else if (1 < mapping_num &&
