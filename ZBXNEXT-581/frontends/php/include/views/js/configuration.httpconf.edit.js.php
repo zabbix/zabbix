@@ -150,6 +150,4 @@
 			});
 		<?php endforeach ?>
 	});
-
-	createPlaceholders();
 </script>
