@@ -242,7 +242,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid', 'formula', 'evaltype'), $options['output']);
+			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -1416,7 +1416,7 @@ class CDiscoveryRule extends CItemGeneral {
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				$conditions = API::getApi()->select('item_condition', array(
-					'output' => array('item_conditionid', 'macro', 'value', 'formulaid', 'itemid', 'operator'),
+					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,
 					'nodeids' => get_current_nodeid(true)
@@ -1424,9 +1424,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
-			}
 
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				foreach ($filters as &$filter) {
 					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$formula = $filter['formula'];
@@ -1439,7 +1437,7 @@ class CDiscoveryRule extends CItemGeneral {
 						foreach ($conditions as $condition) {
 							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
 						}
-						$formula = CConditionHelper::getFormula($formulaConditions, $rule['evaltype']);
+						$formula = CConditionHelper::getFormula($formulaConditions, $filter['evaltype']);
 					}
 
 					// generate formulaids from the effective formula
@@ -1465,6 +1463,7 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($result as &$rule) {
 				$rule['filter'] = $filters[$rule['itemid']];
 			}
+			unset($rule);
 		}
 
 		return $result;
