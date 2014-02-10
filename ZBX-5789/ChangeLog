@@ -1,9 +1,17 @@
+Changes for 2.0.11rc2
+
+Bug fixes:
+.......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.11rc1
 
 New features:
 A.F....... [ZBX-1357] updated French, Italian, Japanese, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7600] updated .htaccess files to be compatible with Apache 2.4 (Richlv)
 ....I..... [ZBX-7168] fixed configure.in template to properly link libcurl to all components independently (Juris)
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
 ...G...... [ZBX-7648] fixed name resolution when using net.dns items (Juris)
@@ -1474,6 +1482,11 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20rc2
+
+A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
+..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+
 Changes for 1.8.20rc1
 
 A......... [ZBX-7703] fixed being able to switch users without proper credentials when using HTTP authentication (Pavels)
