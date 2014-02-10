@@ -680,11 +680,13 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
 	char			snmp_oid[MAX_STRING_LEN], err[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			status, running, ret = SUCCEED;
+	int			bulk, status, running, ret = SUCCEED;
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' mode:%d", __function_name, OID, (int)mode);
+	bulk = (ITEM_TYPE_SNMPv1 == item->type ? 0 : 1);	/* GetBulkRequest-PDU available since SNMPv2 */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' bulk:%d mode:%d", __function_name, OID, bulk, (int)mode);
 
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
@@ -722,7 +724,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 
 	while (1 == running)
 	{
-		if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GETNEXT)))	/* create empty PDU */
+		if (NULL == (pdu = snmp_pdu_create(0 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK)))	/* create PDU */
 		{
 			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
 			ret = NOTSUPPORTED;
@@ -735,6 +737,12 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 			ret = NOTSUPPORTED;
 			snmp_free_pdu(pdu);
 			break;
+		}
+
+		if (1 == bulk)
+		{
+			pdu->non_repeaters = 0;
+			pdu->max_repetitions = 10;
 		}
 
 		/* communicate with agent */
