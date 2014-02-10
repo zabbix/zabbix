@@ -39,7 +39,7 @@ Text. Maximum length not limited.
 .RS 4
 .TP 4
 t
-Text. Same as \fBt\fR.
+Text. Same as \fBs\fR.
 .RE
 .RE
 .RS 4
