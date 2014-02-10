@@ -1126,7 +1126,7 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	}
 
 	// fill data from item
-	if (($item && !isset($_REQUEST['form_refresh'])) || ($data['limited'] && !isset($_REQUEST['form_refresh']))) {
+	if (!hasRequest('form_refresh') && ($item || $data['limited'])) {
 		$data['name'] = $data['item']['name'];
 		$data['description'] = $data['item']['description'];
 		$data['key'] = $data['item']['key_'];
