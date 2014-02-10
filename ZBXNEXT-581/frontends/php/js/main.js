@@ -1035,28 +1035,30 @@ function num2letter(number) {
  * @returns {string}
  */
 function getConditionFormula(conditions, evalType) {
+	var conditionOperator, groupOperator;
+
 	switch (evalType) {
 		// and
 		case 1:
-			var conditionOperator = 'and';
-			var groupOperator = conditionOperator;
+			conditionOperator = 'and';
+			groupOperator = conditionOperator;
 
 			break;
 		// or
 		case 2:
-			var conditionOperator = 'or';
-			var groupOperator = conditionOperator;
+			conditionOperator = 'or';
+			groupOperator = conditionOperator;
 
 			break;
 		// and/or
 		default:
-			var conditionOperator = 'or';
-			var groupOperator = 'and';
+			conditionOperator = 'or';
+			groupOperator = 'and';
 	}
 
 	var groupedFormulas = [];
 	for (var i = 0; i < conditions.length; i++) {
-		if (typeof conditions[i] == 'undefined') {
+		if (typeof conditions[i] === 'undefined') {
 			continue;
 		}
 
@@ -1065,7 +1067,7 @@ function getConditionFormula(conditions, evalType) {
 
 		// search for other conditions of the same type
 		for (var n = i + 1; n < conditions.length; n++) {
-			if (typeof conditions[n] != 'undefined' && conditions[i].type == conditions[n].type) {
+			if (typeof conditions[n] !== 'undefined' && conditions[i].type == conditions[n].type) {
 				groupedConditions.push(conditions[n].id);
 				delete conditions[n];
 			}
@@ -1118,7 +1120,7 @@ function getConditionFormula(conditions, evalType) {
 			dataCallback: function(data) {
 				return {};
 			}
-		}, options)
+		}, options);
 
 		return this.each(function() {
 			var table = $(this);

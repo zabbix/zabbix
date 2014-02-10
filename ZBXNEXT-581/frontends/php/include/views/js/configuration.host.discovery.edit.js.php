@@ -34,7 +34,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 	</tr>
 </script>
 <script type="text/javascript">
-	(function($){
+	(function($) {
 		$(function() {
 			function updateExpression() {
 				var conditions = [];

@@ -33,6 +33,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
+// supported eval types
+$evalTypes = array(
+	CONDITION_EVAL_TYPE_AND_OR,
+	CONDITION_EVAL_TYPE_AND,
+	CONDITION_EVAL_TYPE_OR,
+	CONDITION_EVAL_TYPE_EXPRESSION
+);
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'),
@@ -95,8 +103,7 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
-		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION)), 'isset({save})'
+	'evaltype' =>	 		array(T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({save})'
 	),
 	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -197,34 +204,34 @@ elseif (isset($_REQUEST['save'])) {
 
 	$newItem = array(
 		'itemid' => getRequest('itemid'),
-		'interfaceid' => get_request('interfaceid'),
-		'name' => get_request('name'),
-		'description' => get_request('description'),
-		'key_' => get_request('key'),
-		'hostid' => get_request('hostid'),
-		'delay' => get_request('delay'),
-		'status' => get_request('status', ITEM_STATUS_DISABLED),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'snmpv3_contextname' => get_request('snmpv3_contextname'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+		'interfaceid' => getRequest('interfaceid'),
+		'name' => getRequest('name'),
+		'description' => getRequest('description'),
+		'key_' => getRequest('key'),
+		'hostid' => getRequest('hostid'),
+		'delay' => getRequest('delay'),
+		'status' => getRequest('status', ITEM_STATUS_DISABLED),
+		'type' => getRequest('type'),
+		'snmp_community' => getRequest('snmp_community'),
+		'snmp_oid' => getRequest('snmp_oid'),
+		'trapper_hosts' => getRequest('trapper_hosts'),
+		'port' => getRequest('port'),
+		'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+		'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 		'delay_flex' => $db_delay_flex,
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'params' => get_request('params'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'lifetime' => get_request('lifetime')
+		'authtype' => getRequest('authtype'),
+		'username' => getRequest('username'),
+		'password' => getRequest('password'),
+		'publickey' => getRequest('publickey'),
+		'privatekey' => getRequest('privatekey'),
+		'params' => getRequest('params'),
+		'ipmi_sensor' => getRequest('ipmi_sensor'),
+		'lifetime' => getRequest('lifetime')
 	);
 
 	// add macros; ignore empty new macros
@@ -234,7 +241,7 @@ elseif (isset($_REQUEST['save'])) {
 		'conditions' => array()
 	);
 	foreach (getRequest('conditions', array()) as $condition) {
-		if (isset($condition['item_conditionid']) || !(zbx_empty($condition['macro']))) {
+		if (isset($condition['item_conditionid']) || !zbx_empty($condition['macro'])) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
 			$filter['conditions'][] = $condition;
@@ -276,7 +283,9 @@ elseif (isset($_REQUEST['save'])) {
 			$conditions = zbx_toHash($item['filter']['conditions'], 'item_conditionid');
 			foreach ($newItem['filter']['conditions'] as $condition) {
 				if (isset($condition['item_conditionid'])) {
-					$condition = CArrayHelper::unsetEqualValues($condition, $conditions[$condition['item_conditionid']]);
+					$condition = CArrayHelper::unsetEqualValues($condition,
+						$conditions[$condition['item_conditionid']]
+					);
 					if ($condition) {
 						$conditionsChanged = true;
 						break;

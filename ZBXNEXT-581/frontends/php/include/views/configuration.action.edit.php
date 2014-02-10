@@ -951,9 +951,9 @@ if (!empty($this->data['new_operation'])) {
 			$grouped_opconditions = implode(' '.$glog_op.' ', $grouped_opconditions);
 
 			$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
-			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('AND / OR'));
-			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('AND'));
-			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('OR'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 
 			$newOperationsTable->addRow(array(
 				_('Type of calculation'),

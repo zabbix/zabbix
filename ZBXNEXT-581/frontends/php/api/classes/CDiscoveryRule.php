@@ -819,14 +819,14 @@ class CDiscoveryRule extends CItemGeneral {
 				)),
 				'conditions' => new CCollectionValidator(array(
 					'empty' => true,
-					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".'),
+					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".')
 				))
 			),
 			'postValidators' => array(
 				new CConditionValidator(array(
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
-					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".'),
+					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".')
 				))
 			),
 			'required' => array('evaltype', 'conditions'),
@@ -1242,9 +1242,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 		if ($options['countOutput'] === null) {
 			// add filter fields
-			if ($this->outputIsRequested('formula', $options['selectFilter']) ||
-					$this->outputIsRequested('eval_formula', $options['selectFilter']) ||
-					$this->outputIsRequested('conditions', $options['selectFilter'])) {
+			if ($this->outputIsRequested('formula', $options['selectFilter'])
+					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
+					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
 
 				$sqlParts = $this->addQuerySelect('i.formula', $sqlParts);
 				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
