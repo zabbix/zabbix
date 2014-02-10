@@ -548,7 +548,7 @@ class CConfigurationImport {
 			}
 		}
 
-		// refresh applications beacuse templated ones can be inherited to host and used in items
+		// refresh applications because templated ones can be inherited to host and used in items
 		$this->referencer->refreshApplications();
 	}
 
