@@ -5,7 +5,6 @@ use warnings;
 use DBI;
 use Getopt::Long;
 use Exporter qw(import);
-use DateTime;
 use Zabbix;
 use Sender;
 use File::Pid;
@@ -420,6 +419,8 @@ sub get_rollweek_bounds
 # Get bounds of previous month.
 sub get_month_bounds
 {
+    require DateTime;
+
     my $dt = DateTime->now;
 
     $dt->truncate(to => 'month');
@@ -433,6 +434,8 @@ sub get_month_bounds
 
 sub minutes_last_month
 {
+    require DateTime;
+
     my $dt = DateTime->now;
 
     $dt->truncate(to => 'month');
