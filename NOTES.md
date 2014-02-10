@@ -44,3 +44,21 @@ SELECT COUNT(al.auditid), al.action, al.resourcetype
 ```
 
 Action type and resource type decoder: [defines.inc.php#L151-L186](https://github.llnw.net/Zabbix/svn.zabbix.com/blob/LLNW-UIAPI/frontends/php/include/defines.inc.php#L151-L186)
+
+
+### Timer process functions
+
+(rel: [Zabbix: Timer process too busy (high CPU load)](http://crypt47.blogspot.com/2012/12/zabbix-timer-process-too-busy-high-cpu.html))
+
+```sql
+SELECT function, count(*)
+ FROM functions
+ GROUP BY function;
+```
+
+```sql
+SELECT function, parameter, count(*)
+ FROM functions
+ WHERE function IN ('nodata', 'date', 'dayofmonth', 'dayofweek', 'time', 'now')
+ GROUP BY function, parameter;
+```
