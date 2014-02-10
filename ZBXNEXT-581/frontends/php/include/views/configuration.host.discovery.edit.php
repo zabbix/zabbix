@@ -296,7 +296,7 @@ if (!$conditions) {
 }
 else {
 	// sort conditions by formula id as if they were numbers
-	usort($conditions, function($condition1, $condition2) {
+	uasort($conditions, function($condition1, $condition2) {
 		$len1 = strlen($condition1['formulaid']);
 		$len2 = strlen($condition2['formulaid']);
 

@@ -1,4 +1,12 @@
 <?php
+	$counter = null;
+	if (hasRequest('conditions')) {
+		$conditions = getRequest('conditions');
+		krsort($conditions);
+		$counter = key($conditions) + 1;
+	}
+?>
+<?php
 include dirname(__FILE__).'/common.item.edit.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
@@ -36,7 +44,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 						id: macroInput.data('formulaid'),
 						type: macroInput.val()
 					});
-				})
+				});
 
 				$('#expression').html(getConditionFormula(conditions, +$('#evaltype').val()));
 			}
@@ -44,6 +52,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			$('#conditions')
 				.elementTable({
 					template: '#condition-row',
+					counter: <?php echo CJs::encodeJson($counter) ?>,
 					dataCallback: function(data) {
 						data.formulaId = num2letter(data.rowNum);
 

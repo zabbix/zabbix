@@ -1098,6 +1098,7 @@ function getConditionFormula(conditions, evalType) {
 	 * - row			- element row selector
 	 * - add			- add row button selector
 	 * - remove			- remove row button selector
+	 * - counter 		- number to start row enumeration from
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
@@ -1112,6 +1113,7 @@ function getConditionFormula(conditions, evalType) {
 			row: '.form_row',
 			add: '.element-table-add',
 			remove: '.element-table-remove',
+			counter: null,
 			dataCallback: function(data) {
 				return {};
 			}
@@ -1121,7 +1123,7 @@ function getConditionFormula(conditions, evalType) {
 			var table = $(this);
 
 			table.data('elementTable', {
-				counter: $(options.row, table).length
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
 			});
 
 			// add buttons
