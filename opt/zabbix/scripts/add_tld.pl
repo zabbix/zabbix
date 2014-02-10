@@ -1562,15 +1562,25 @@ sub create_cron_items {
 
     pfail("cannot open $slv_path") unless ($rv);
 
+    my $avail_shift = 30;
+    my $rollweek_shift = 0;
+
     my $slv_file;
     while (($slv_file = readdir DIR)) {
-	next if ($slv_file =~ /^\.$/ or $slv_file =~ /^\.\.$/);
+	next unless ($slv_file =~ /^dnstest\.slv\..*\.pl$/);
 
 	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
 	    # check monthly data once a day
 	    system("echo '0 0 * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
+	} elsif ($slv_file =~ /\.slv\..*\.avail\.pl$/) {
+	    # separate rollweek and avail by some delay
+	    system("echo '* * * * * root sleep $avail_shift; $slv_path/$slv_file' > /etc/cron.d/$slv_file");
+	    $avail_shift += 5;
+	    $avail_shift = 30 unless ($avail_shift < 60);
 	} else {
-	    system("echo '* * * * * root $slv_path/$slv_file' > /etc/cron.d/$slv_file");
+	    system("echo '* * * * * root sleep $rollweek_shift; $slv_path/$slv_file' > /etc/cron.d/$slv_file");
+	    $rollweek_shift += 5;
+	    $rollweek_shift = 0 unless ($rollweek_shift < 30);
 	}
     }
 }
