@@ -112,4 +112,6 @@ jQuery(function($) {
 
 		return false;
 	});
+
+	createPlaceholders();
 });

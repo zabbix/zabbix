@@ -944,36 +944,37 @@ function sendAjaxData(options) {
 	jQuery.ajax(jQuery.extend({}, defaults, options));
 }
 
+/**
+ * Finds all elements with a 'placeholder' attribute and emulates the placeholder in IE.
+ */
 function createPlaceholders() {
 	if (IE) {
-		jQuery(document).ready(function() {
-			jQuery('[placeholder]')
-				.focus(function() {
-					var obj = jQuery(this);
+		jQuery('[placeholder]')
+			.focus(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-						obj.removeClass('placeholder');
-					}
-				})
-				.blur(function() {
-					var obj = jQuery(this);
+				if (obj.val() == obj.attr('placeholder')) {
+					obj.val('');
+					obj.removeClass('placeholder');
+				}
+			})
+			.blur(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
-						obj.val(obj.attr('placeholder'));
-						obj.addClass('placeholder');
-					}
-				})
-				.blur();
+				if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
+					obj.val(obj.attr('placeholder'));
+					obj.addClass('placeholder');
+				}
+			})
+			.blur();
 
-			jQuery('form').submit(function() {
-				jQuery('.placeholder').each(function() {
-					var obj = jQuery(this);
+		jQuery('form').submit(function() {
+			jQuery('.placeholder').each(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-					}
-				});
+				if (obj.val() == obj.attr('placeholder')) {
+					obj.val('');
+				}
 			});
 		});
 	}
