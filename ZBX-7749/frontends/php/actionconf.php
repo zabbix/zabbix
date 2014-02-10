@@ -142,12 +142,15 @@ elseif (hasRequest('save')) {
 		}
 	}
 
+	$messageSuccess = '';
 	DBstart();
 	if (hasRequest('actionid')) {
 		$action['actionid'] = getRequest('actionid');
 
 		$result = API::Action()->update($action);
-		show_messages($result, _('Action updated'), _('Cannot update action'));
+
+		$messageSuccess = _('Action updated');
+		$messageFailed = _('Cannot update action');
 	}
 	else {
 		$action['eventsource'] = getRequest('eventsource',
@@ -155,20 +158,21 @@ elseif (hasRequest('save')) {
 		);
 
 		$result = API::Action()->create($action);
-		show_messages($result, _('Action added'), _('Cannot add action'));
+
+		$messageSuccess = _('Action added');
+		$messageFailed = _('Cannot add action');
 	}
 
-	$result = DBend($result);
 	if ($result) {
-		add_audit(
-			hasRequest('actionid') ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
-			AUDIT_RESOURCE_ACTION,
+		add_audit(hasRequest('actionid') ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION,
 			_('Name').NAME_DELIMITER.$action['name']
 		);
 
 		unset($_REQUEST['form']);
 	}
 
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
@@ -334,7 +338,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		}
 		$updated++;
 	}
-	$result = DBend($result);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
@@ -347,6 +350,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable action', 'Cannot enable actions', $updated)
 		: _n('Cannot disable action', 'Cannot disable actions', $updated);
 
+	$result = DBend($result);
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }

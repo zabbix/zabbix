@@ -91,40 +91,45 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
-	if (isset($_REQUEST['slideshowid'])) {
-		DBstart();
-		$result = update_slideshow($_REQUEST['slideshowid'], $_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
-		$result = DBend($result);
+	DBstart();
 
-		$audit_action = AUDIT_ACTION_UPDATE;
-		show_messages($result, _('Slide show updated'), _('Cannot update slide show'));
+	if (isset($_REQUEST['slideshowid'])) {
+		$result = update_slideshow($_REQUEST['slideshowid'], $_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
+
+		$messageSuccess = _('Slide show updated');
+		$messageFailed = _('Cannot update slide show');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		DBstart();
-		$slideshowid = add_slideshow($_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
-		$result = DBend($slideshowid);
+		$result = add_slideshow($_REQUEST['name'], $_REQUEST['delay'], get_request('slides', array()));
 
-		$audit_action = AUDIT_ACTION_ADD;
-		show_messages($result, _('Slide show added'), _('Cannot add slide show'));
+		$messageSuccess = _('Slide show added');
+		$messageFailed = _('Cannot add slide show');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($audit_action, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$_REQUEST['name'].'" ');
+		add_audit($auditAction, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$_REQUEST['name'].'" ');
 		unset($_REQUEST['form'], $_REQUEST['slideshowid']);
-		clearCookies($result);
 	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	DBstart();
-	delete_slideshow($_REQUEST['slideshowid']);
-	$result = DBend();
 
-	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
+	$result = delete_slideshow($_REQUEST['slideshowid']);
+
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$dbSlideshow['name'].'" ');
 	}
 
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
+
+	$result = DBend($result);
+	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {

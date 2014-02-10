@@ -156,26 +156,33 @@ if (isset($_REQUEST['save'])) {
 		}
 	}
 
+	DBstart();
+
 	if (isset($_REQUEST['sysmapid'])) {
 		// TODO check permission by new value.
 		$map['sysmapid'] = $_REQUEST['sysmapid'];
 		$result = API::Map()->update($map);
 
+		$messageSuccess = _('Network map updated');
+		$messageFailed = _('Cannot update network map');
 		$auditAction = AUDIT_ACTION_UPDATE;
-		show_messages($result, _('Network map updated'), _('Cannot update network map'));
 	}
 	else {
 		$result = API::Map()->create($map);
 
+		$messageSuccess = _('Network map added');
+		$messageFailed = _('Cannot add network map');
 		$auditAction = AUDIT_ACTION_ADD;
-		show_messages($result, _('Network map added'), _('Cannot add network map'));
 	}
 
 	if ($result) {
 		add_audit($auditAction, AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
 		unset($_REQUEST['form']);
-		clearCookies($result);
 	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUEST['go'] == 'delete') {
 	$sysmapIds = get_request('maps', array());

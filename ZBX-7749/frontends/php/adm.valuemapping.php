@@ -67,53 +67,55 @@ try {
 			$audit_action = AUDIT_ACTION_UPDATE;
 
 			$valueMap['valuemapid'] = get_request('valuemapid');
-			updateValueMap($valueMap, $mappings);
+			$result = updateValueMap($valueMap, $mappings);
 		}
 		else {
 			$msgOk = _('Value map added');
 			$msgFail = _('Cannot add value map');
 			$audit_action = AUDIT_ACTION_ADD;
 
-			addValueMap($valueMap, $mappings);
+			$result = addValueMap($valueMap, $mappings);
 		}
 
-		add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _s('Value map "%1$s".', $valueMap['name']));
-		show_messages(true, $msgOk);
+		if ($result) {
+			add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _s('Value map "%1$s".', $valueMap['name']));
+		}
 		unset($_REQUEST['form']);
 
-		DBend(true);
+		$result = DBend($result);
+		show_messages($result, $msgOk, $msgFail);
 	}
 	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])) {
-		DBstart();
-
 		$msgOk = _('Value map deleted');
 		$msgFail = _('Cannot delete value map');
+
+		DBstart();
 
 		$sql = 'SELECT v.name,v.valuemapid'.
 				' FROM valuemaps v'.
 				' WHERE v.valuemapid='.zbx_dbstr($_REQUEST['valuemapid']).
 					andDbNode('v.valuemapid');
 		if ($valueMapToDelete = DBfetch(DBselect($sql))) {
-			deleteValueMap($_REQUEST['valuemapid']);
+			$result = deleteValueMap($_REQUEST['valuemapid']);
+
+			if ($result) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP,
+					_s('Value map "%1$s" "%2$s".', $valueMapToDelete['name'], $valueMapToDelete['valuemapid'])
+				);
+			}
 		}
 		else {
 			throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $_REQUEST['valuemapid']));
 		}
 
-		add_audit(
-			AUDIT_ACTION_DELETE,
-			AUDIT_RESOURCE_VALUE_MAP,
-			_s('Value map "%1$s" "%2$s".', $valueMapToDelete['name'], $valueMapToDelete['valuemapid'])
-		);
-		show_messages(true, $msgOk);
 		unset($_REQUEST['form']);
 
-		DBend(true);
+		$result = DBend($result);
+		show_messages($result, $msgOk, $msgFail);
 	}
 }
 catch (Exception $e) {
 	DBend(false);
-
 	error($e->getMessage());
 	show_messages(false, null, $msgFail);
 }

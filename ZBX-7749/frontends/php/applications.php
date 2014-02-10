@@ -107,18 +107,19 @@ if (isset($_REQUEST['save'])) {
 		$msgOk = _('Application added');
 		$msgFail = _('Cannot add application');
 	}
-	$result = DBend($dbApplications);
 
-	show_messages($result, $msgOk, $msgFail);
-
-	if ($result) {
+	if ($dbApplications) {
 		$applicationId = reset($dbApplications['applicationids']);
 
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationId.']');
 		unset($_REQUEST['form']);
-		clearCookies($result, $_REQUEST['hostid']);
+		clearCookies($dbApplications, $_REQUEST['hostid']);
 	}
+
 	unset($_REQUEST['save']);
+
+	$result = DBend($dbApplications);
+	show_messages($result, $msgOk, $msgFail);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
 	unset($_REQUEST['applicationid']);
@@ -128,22 +129,24 @@ elseif (isset($_REQUEST['delete'])) {
 	if (isset($_REQUEST['applicationid'])) {
 		$result = false;
 
+		DBstart();
+
 		if ($app = get_application_by_applicationid($_REQUEST['applicationid'])) {
 			$host = get_host_by_hostid($app['hostid']);
 
-			DBstart();
-
 			$result = API::Application()->delete($_REQUEST['applicationid']);
-			$result = DBend($result);
 		}
 
-		show_messages($result, _('Application deleted'), _('Cannot delete application'));
-
 		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$app['name'].'] from host ['.$host['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
+				'Application ['.$app['name'].'] from host ['.$host['host'].']'
+			);
 		}
 
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
+
+		$result = DBend($result);
+		show_messages($result, _('Application deleted'), _('Cannot delete application'));
 		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
@@ -170,7 +173,8 @@ elseif ($_REQUEST['go'] == 'delete') {
 			$host = get_host_by_hostid($dbApplication['hostid']);
 
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
-				'Application ['.$dbApplication['name'].'] from host ['.$host['host'].']');
+				'Application ['.$dbApplication['name'].'] from host ['.$host['host'].']'
+			);
 		}
 	}
 
@@ -186,6 +190,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 	$updated = 0;
 
 	DBstart();
+
 	foreach (getRequest('applications') as $id => $appid) {
 		$dbItems = DBselect(
 			'SELECT ia.itemid,i.hostid,i.key_'.
@@ -197,7 +202,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 				andDbNode('ia.applicationid')
 		);
 		while ($item = DBfetch($dbItems)) {
-			$result &= $enable ? activate_item($item['itemid']) : disable_item($item['itemid']);
+			$result &= ($enable ? activate_item($item['itemid']) : disable_item($item['itemid']));
 			$updated++;
 		}
 	}

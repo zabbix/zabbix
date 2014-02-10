@@ -117,15 +117,17 @@ elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 }
 elseif (isset($_REQUEST['save'])) {
 	if (isset($_REQUEST['maintenanceid'])) {
-		$msg1 = _('Maintenance updated');
-		$msg2 = _('Cannot update maintenance');
+		$messageSuccess = _('Maintenance updated');
+		$messageFailed = _('Cannot update maintenance');
 	}
 	else {
-		$msg1 = _('Maintenance added');
-		$msg2 = _('Cannot add maintenance');
+		$messageSuccess = _('Maintenance added');
+		$messageFailed = _('Cannot add maintenance');
 	}
 
 	$result = true;
+
+	DBstart();
 
 	if (!validateDateTime($_REQUEST['active_since_year'],
 			$_REQUEST['active_since_month'],
@@ -201,7 +203,8 @@ elseif (isset($_REQUEST['save'])) {
 		unset($_REQUEST['form']);
 	}
 
-	show_messages($result, $msg1, $msg2);
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
@@ -213,20 +216,26 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	zbx_value2array($maintenanceids);
 
 	$maintenances = array();
+
+	DBstart();
+
 	foreach ($maintenanceids as $id => $maintenanceid) {
 		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 	}
 
-	$goResult = API::Maintenance()->delete($maintenanceids);
-	if ($goResult) {
+	$result = API::Maintenance()->delete($maintenanceids);
+	if ($result) {
 		foreach ($maintenances as $maintenanceid => $maintenance) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE,
+				'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']'
+			);
 		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
 
-	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
-	clearCookies($goResult);
+	$result = DBend($result);
+	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];

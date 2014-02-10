@@ -148,8 +148,10 @@ if (isset($_REQUEST['save_trigger'])) {
 			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 
-		if($result){
+		if ($result){
+			DBstart();
 			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, _('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']');
+			DBend(true);
 			unset($_REQUEST['sform']);
 
 			zbx_add_post_js('closeForm("items.php");');

@@ -213,6 +213,8 @@ elseif (hasRequest('save')) {
 		'gitems' => $items
 	);
 
+	DBstart();
+
 	// create and update graph prototypes
 	if (hasRequest('parent_discoveryid')) {
 		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
@@ -251,9 +253,7 @@ elseif (hasRequest('save')) {
 
 	if ($result) {
 		if (hasRequest('graphid')) {
-			add_audit(
-				AUDIT_ACTION_UPDATE,
-				AUDIT_RESOURCE_GRAPH,
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH,
 				'Graph ID ['.$graph['graphid'].'] Graph ['.getRequest('name').']'
 			);
 		}
@@ -263,6 +263,8 @@ elseif (hasRequest('save')) {
 
 		unset($_REQUEST['form']);
 	}
+
+	DBend($result);
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');

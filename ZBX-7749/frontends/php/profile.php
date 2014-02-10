@@ -165,10 +165,12 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($result) {
+			DBstart();
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
 				'User alias ['.CWebUser::$data['alias'].'] Name ['.CWebUser::$data['name'].']'.
-				' Surname ['.CWebUser::$data['surname'].'] profile id ['.CWebUser::$data['userid'].']');
-
+				' Surname ['.CWebUser::$data['surname'].'] profile id ['.CWebUser::$data['userid'].']'
+			);
+			DBend(true);
 			ob_end_clean();
 			redirect(CWebUser::$data['last_page']['url']);
 		}
