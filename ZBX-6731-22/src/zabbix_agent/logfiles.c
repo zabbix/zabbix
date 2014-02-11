@@ -431,7 +431,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
 	{
 		regerror(reg_error, &re, err_buf, sizeof(err_buf));
-		regfree(&re);
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for a logrt[] "
 				"item. Error: %s", format, err_buf);
 		goto out;
@@ -447,6 +446,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
+		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
 		zbx_free(find_wpath);
@@ -479,6 +479,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	if (NULL == (dir = opendir(directory)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
+		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
 		goto out;
