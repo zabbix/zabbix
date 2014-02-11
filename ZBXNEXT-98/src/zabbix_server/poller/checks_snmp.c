@@ -1451,8 +1451,10 @@ exit:
 			}
 		}
 	}
-	else
+	else if (0 != max_succeed || MAX_SNMP_ITEMS + 1 != min_fail)
+	{
 		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
