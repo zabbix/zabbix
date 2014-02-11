@@ -138,54 +138,57 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 	$_REQUEST['form'] = 'full_clone';
 	$_REQUEST['hosts'] = array();
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('save')) {
+	$templateId = getRequest('templateid');
+
+	if ($templateId) {
+		$msgOk = _('Template updated');
+		$msgFail = _('Cannot update template');
+	}
+	else {
+		$msgOk = _('Template added');
+		$msgFail = _('Cannot add template');
+	}
+
 	try {
 		DBstart();
 
-		$macros = get_request('macros', array());
-		$groups = get_request('groups', array());
-		$templates = get_request('templates', array());
-		$templatesClear = get_request('clear_templates', array());
-		$templateId = get_request('templateid', 0);
-		$newGroup = get_request('newgroup', 0);
-		$templateName = get_request('template_name', '');
-		$visibleName = get_request('visiblename', '');
-		$cloneTemplateId = false;
+		$templates = getRequest('templates', array());
+		$templateName = getRequest('template_name', '');
 
-		if ($_REQUEST['form'] == 'full_clone') {
+		// clone template id
+		$cloneTemplateId = null;
+		$templatesClear = getRequest('clear_templates', array());
+
+		if (getRequest('form') === 'full_clone') {
 			$cloneTemplateId = $templateId;
 			$templateId = null;
 		}
 
-		if ($templateId) {
-			$msgOk = _('Template updated');
-			$msgFail = _('Cannot update template');
-		}
-		else {
-			$msgOk = _('Template added');
-			$msgFail = _('Cannot add template');
-		}
+		// macros
+		$macros = getRequest('macros', array());
 
 		foreach ($macros as $key => $macro) {
 			if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 				unset($macros[$key]);
 			}
+			else {
+				// transform macros to uppercase {$aaa} => {$AAA}
+				$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
+			}
 		}
 
-		foreach ($macros as $key => $macro) {
-			// transform macros to uppercase {$aaa} => {$AAA}
-			$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
-		}
-
-		// create new group
+		// groups
+		$groups = getRequest('groups', array());
 		$groups = zbx_toObject($groups, 'groupid');
 
-		if (!zbx_empty($newGroup)) {
-			$result = API::HostGroup()->create(array('name' => $newGroup));
+		// create new group
+		$newGroup = getRequest('newgroup');
 
-			if (!$result) {
-				throw new Exception();
-			}
+		if (!zbx_empty($newGroup)) {
+			$result = API::HostGroup()->create(array(
+				'name' => $newGroup
+			));
 
 			$newGroup = API::HostGroup()->get(array(
 				'groupids' => $result['groupids'],
@@ -200,6 +203,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
+		// linked templates
 		$linkedTemplates = $templates;
 		$templates = array();
 		foreach ($linkedTemplates as $linkedTemplateId) {
@@ -208,27 +212,28 @@ elseif (isset($_REQUEST['save'])) {
 
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 
-		// skip discovered hosts
-		$hosts = API::Host()->get(array(
-			'hostids' => get_request('hosts', array()),
+		// discovered hosts
+		$dbHosts = API::Host()->get(array(
 			'output' => array('hostid'),
+			'hostids' => getRequest('hosts', array()),
 			'templated_hosts' => true,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
+		// create / update template
 		$template = array(
 			'host' => $templateName,
-			'name' => $visibleName,
+			'name' => getRequest('visiblename', ''),
 			'groups' => $groups,
 			'templates' => $templates,
-			'hosts' => $hosts,
+			'hosts' => $dbHosts,
 			'macros' => $macros,
-			'description' => getRequest('description')
+			'description' => getRequest('description', '')
 		);
 
-		// create/update template
 		if ($templateId) {
 			$created = false;
+
 			$template['templateid'] = $templateId;
 			$template['templates_clear'] = $templatesClear;
 
@@ -238,6 +243,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 		else {
 			$created = true;
+
 			$result = API::Template()->create($template);
 
 			if ($result) {
@@ -249,7 +255,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		// full clone
-		if (!zbx_empty($templateId) && $templateId && $cloneTemplateId && $_REQUEST['form'] == 'full_clone') {
+		if ($templateId && $cloneTemplateId && getRequest('form') === 'full_clone') {
 			if (!copyApplications($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
@@ -258,43 +264,38 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 
-			// clone triggers
-			$triggers = API::Trigger()->get(array(
-				'hostids' => $cloneTemplateId,
+			// copy triggers
+			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid'),
+				'hostids' => $cloneTemplateId,
 				'inherited' => false
 			));
-			if ($triggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateId, $cloneTemplateId)) {
-					throw new Exception();
-				}
-			}
 
-			// host graphs
-			$dbGraphs = API::Graph()->get(array(
-				'hostids' => $cloneTemplateId,
-				'inherited' => false,
-				'output' => array('graphid')
-			));
-
-			$result = true;
-			foreach ($dbGraphs as $dbGraph) {
-				$result &= (bool) copyGraphToHost($dbGraph['graphid'], $templateId);
-			}
-
-			if (!$result) {
+			if ($dbTriggers && !copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $templateId, $cloneTemplateId)) {
 				throw new Exception();
 			}
 
-			// clone discovery rules
-			$discoveryRules = API::DiscoveryRule()->get(array(
+			// copy graphs
+			$dbGraphs = API::Graph()->get(array(
+				'output' => array('graphid'),
+				'hostids' => $cloneTemplateId,
+				'inherited' => false
+			));
+
+			foreach ($dbGraphs as $dbGraph) {
+				copyGraphToHost($dbGraph['graphid'], $templateId);
+			}
+
+			// copy discovery rules
+			$dbDiscoveryRules = API::DiscoveryRule()->get(array(
 				'output' => array('itemid'),
 				'hostids' => $cloneTemplateId,
 				'inherited' => false
 			));
-			if ($discoveryRules) {
+
+			if ($dbDiscoveryRules) {
 				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
-					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => array($templateId)
 				));
 
@@ -303,20 +304,21 @@ elseif (isset($_REQUEST['save'])) {
 				}
 			}
 
-			// clone screens
-			$screens = API::TemplateScreen()->get(array(
-				'templateids' => $cloneTemplateId,
+			// copy template screens
+			$dbTemplateScreens = API::TemplateScreen()->get(array(
 				'output' => array('screenid'),
+				'templateids' => $cloneTemplateId,
 				'preservekeys' => true,
 				'inherited' => false
 			));
-			if ($screens) {
-				$screensCopied = API::TemplateScreen()->copy(array(
-					'screenIds' => zbx_objectValues($screens, 'screenid'),
+
+			if ($dbTemplateScreens) {
+				$copyTemplateScreens = API::TemplateScreen()->copy(array(
+					'screenIds' => zbx_objectValues($dbTemplateScreens, 'screenid'),
 					'templateIds' => $templateId
 				));
 
-				if (!$screensCopied) {
+				if (!$copyTemplateScreens) {
 					throw new Exception();
 				}
 			}
@@ -330,14 +332,15 @@ elseif (isset($_REQUEST['save'])) {
 		if ($created) {
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
-		unset($_REQUEST['form'], $_REQUEST['templateid']);
 
+		unset($_REQUEST['form'], $_REQUEST['templateid']);
 	}
 	catch (Exception $e) {
 		DBend(false);
 
 		show_messages(false, $msgOk, $msgFail);
 	}
+
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
@@ -448,8 +451,14 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
+	// description
+	$data['description'] = ($templateId && !hasRequest('form_refresh'))
+		? $data['dbTemplate']['description']
+		: getRequest('description');
+
 	$templateIds = getRequest('templates', hasRequest('form_refresh') ? array() : $data['original_templates']);
 
+	// linked templates
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
 		'output' => array('templateid', 'name')
