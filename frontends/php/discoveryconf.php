@@ -127,31 +127,33 @@ if (isset($_REQUEST['save'])) {
 		'dchecks' => $dChecks
 	);
 
+	DBStart();
+
 	if (isset($_REQUEST['druleid'])) {
 		$discoveryRule['druleid'] = get_request('druleid');
 		$result = API::DRule()->update($discoveryRule);
 
-		$msgOk = _('Discovery rule updated');
-		$msgFail = _('Cannot update discovery rule');
+		$messageSuccess = _('Discovery rule updated');
+		$messageFailed = _('Cannot update discovery rule');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$result = API::DRule()->create($discoveryRule);
 
-		$msgOk = _('Discovery rule created');
-		$msgFail = _('Cannot create discovery rule');
+		$messageSuccess = _('Discovery rule created');
+		$messageFailed = _('Cannot create discovery rule');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
-
-	show_messages($result, $msgOk, $msgFail);
 
 	if ($result) {
 		$druleid = reset($result['druleids']);
-		add_audit(isset($discoveryRule['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
-			AUDIT_RESOURCE_DISCOVERY_RULE,
-			'['.$druleid.'] '.$discoveryRule['name']
-		);
+		add_audit($auditAction, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$discoveryRule['name']);
 		unset($_REQUEST['form']);
-		clearCookies($result);
 	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 	$result = API::DRule()->delete(array($_REQUEST['druleid']));
@@ -170,6 +172,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
 
+	DBStart();
+
 	foreach (getRequest('g_druleid') as $druleId) {
 		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
 
@@ -177,6 +181,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 			$druleData = get_discovery_rule_by_druleid($druleId);
 			add_audit($auditAction, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.'] '.$druleData['name']);
 		}
+
 		$updated++;
 	}
 
@@ -187,6 +192,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 
+	$result = DBend($result);
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }

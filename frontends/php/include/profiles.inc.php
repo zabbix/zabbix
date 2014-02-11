@@ -468,5 +468,10 @@ function add_user_history($page) {
 					' WHERE userid='.$userid;
 		}
 	}
-	return DBexecute($sql);
+
+	DBstart();
+
+	$result = DBexecute($sql);
+
+	DBend($result);
 }
