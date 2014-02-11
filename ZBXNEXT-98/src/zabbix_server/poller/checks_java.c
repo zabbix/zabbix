@@ -25,8 +25,8 @@
 
 #include "checks_java.h"
 
-static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
-		char *response, char *error, int max_error_len)
+static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, char *response,
+		char *error, int max_error_len)
 {
 	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
@@ -118,7 +118,7 @@ exit:
 	return ret;
 }
 
-int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result)
 {
 	int	errcode = SUCCEED;
 
@@ -127,7 +127,7 @@ int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
 {
 	const char	*__function_name = "get_values_java";
 

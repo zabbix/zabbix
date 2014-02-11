@@ -176,7 +176,7 @@ end:
 	return index;
 }
 
-static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
+static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
 {
 	const char		*__function_name = "cache_get_snmp_index";
 	int			i, res = FAIL;
@@ -205,7 +205,7 @@ end:
 	return res;
 }
 
-static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, const char *idx)
+static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, const char *idx)
 {
 	const char		*__function_name = "cache_put_snmp_index";
 	int			i;
@@ -251,7 +251,7 @@ static void	cache_del_snmp_index_by_position(int i)
 	memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i));
 }
 
-static void	cache_del_snmp_index_subtree(DC_ITEM *item, const char *oid)
+static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 {
 	const char		*__function_name = "cache_del_snmp_index_subtree";
 	int			i;
@@ -282,7 +282,7 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static struct snmp_session	*zbx_snmp_open_session(DC_ITEM *item, char *err)
+static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err)
 {
 	const char		*__function_name = "zbx_snmp_open_session";
 	struct snmp_session	session, *ss = NULL;
@@ -671,7 +671,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 #define ZBX_SNMP_WALK_MODE_CACHE	0
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
-static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, unsigned char mode,
+static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
 		AGENT_RESULT *result)
 {
 	const char		*__function_name = "zbx_snmp_walk";
@@ -859,7 +859,7 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_get_values(struct snmp_session *ss, DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
+static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
 		char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
@@ -1113,7 +1113,7 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() oid_translated:'%s'", __function_name, oid_translated);
 }
 
-static int	zbx_snmp_process_discovery(struct snmp_session *ss, DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, int max_error_len)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
@@ -1143,7 +1143,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, DC_ITEM *items, A
 	return ret;
 }
 
-static int	zbx_snmp_process_dynamic(struct snmp_session *ss, DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
@@ -1351,7 +1351,7 @@ exit:
 	return ret;
 }
 
-static int	zbx_snmp_process_standard(struct snmp_session *ss, DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
@@ -1385,7 +1385,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, DC_ITEM *items, AG
 	return ret;
 }
 
-int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	int	errcode = SUCCEED;
 
@@ -1394,7 +1394,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *result)
 	return errcode;
 }
 
-void	get_values_snmp(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
 {
 	const char		*__function_name = "get_values_snmp";
 
