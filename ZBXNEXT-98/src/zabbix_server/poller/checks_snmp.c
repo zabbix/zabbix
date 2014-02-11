@@ -771,77 +771,72 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 				running = 0;
 				break;
 			}
-			else
+			else if (SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
 			{
-				if (SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
+				/* not an exception value */
+
+				if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
 				{
-					/* not an exception value */
-
-					if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
-					{
-						SET_MSG_RESULT(result, zbx_strdup(NULL, "OID not increasing."));
-						ret = NOTSUPPORTED;
-						running = 0;
-						break;
-					}
-
-					if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid),
-								var->name, var->name_length))
-					{
-						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-								"snprint_objid(): buffer is not large enough:"
-								" OID: \"%s\" snmp_oid: \"%s\".", OID, snmp_oid));
-						ret = NOTSUPPORTED;
-						running = 0;
-						break;
-					}
-
-					init_result(&snmp_result);
-
-					if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
-							NULL != GET_STR_RESULT(&snmp_result))
-					{
-						if (ZBX_SNMP_WALK_MODE_CACHE == mode)
-						{
-							cache_put_snmp_index(item, (char *)OID, snmp_result.str,
-									&snmp_oid[OID_len + 1]);
-						}
-						else
-						{
-							zbx_json_addobject(&j, NULL);
-							zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
-									ZBX_JSON_TYPE_STRING);
-							zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
-									ZBX_JSON_TYPE_STRING);
-							zbx_json_close(&j);
-						}
-					}
-					else
-					{
-						char	**msg;
-
-						msg = GET_MSG_RESULT(&snmp_result);
-
-						zabbix_log(LOG_LEVEL_DEBUG, "cannot get OID '%s' string value: %s",
-								snmp_oid,
-								NULL != msg && NULL != *msg ? *msg : "(null)");
-					}
-
-					free_result(&snmp_result);
-
-					/* go to next variable */
-					memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
-					anOID_len = var->name_length;
-				}
-				else
-				{
-					/* an exception value, so stop */
-
-					SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "OID not increasing."));
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
 				}
+
+				if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), var->name, var->name_length))
+				{
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+							"snprint_objid(): buffer is not large enough:"
+							" OID: \"%s\" snmp_oid: \"%s\".", OID, snmp_oid));
+					ret = NOTSUPPORTED;
+					running = 0;
+					break;
+				}
+
+				init_result(&snmp_result);
+
+				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
+						NULL != GET_STR_RESULT(&snmp_result))
+				{
+					if (ZBX_SNMP_WALK_MODE_CACHE == mode)
+					{
+						cache_put_snmp_index(item, (char *)OID, snmp_result.str,
+								&snmp_oid[OID_len + 1]);
+					}
+					else
+					{
+						zbx_json_addobject(&j, NULL);
+						zbx_json_addstring(&j, "{#SNMPINDEX}", &snmp_oid[OID_len + 1],
+								ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
+								ZBX_JSON_TYPE_STRING);
+						zbx_json_close(&j);
+					}
+				}
+				else
+				{
+					char	**msg;
+
+					msg = GET_MSG_RESULT(&snmp_result);
+
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot get OID '%s' string value: %s",
+							snmp_oid, NULL != msg && NULL != *msg ? *msg : "(null)");
+				}
+
+				free_result(&snmp_result);
+
+				/* go to next variable */
+				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
+				anOID_len = var->name_length;
+			}
+			else
+			{
+				/* an exception value, so stop */
+
+				SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
+				ret = NOTSUPPORTED;
+				running = 0;
+				break;
 			}
 		}
 next:
