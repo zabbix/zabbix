@@ -764,18 +764,16 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		for (var = response->variables; NULL != var; var = var->next_variable)
 		{
 			/* verify if we are in the same subtree */
-			if (var->name_length < rootOID_len ||
+			if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
 					0 != memcmp(rootOID, var->name, rootOID_len * sizeof(oid)))
 			{
-				/* not part of this subtree */
+				/* reached the end or past this subtree */
 				running = 0;
 				break;
 			}
 			else
 			{
-				/* verify if OIDs are increasing */
-				if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
-						SNMP_NOSUCHINSTANCE != var->type)
+				if (SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
 				{
 					/* not an exception value */
 
