@@ -85,12 +85,8 @@ out:
 
 static zbx_vmware_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
 {
-	const char	*__function_name = "vm_get";
-
 	int		i;
 	zbx_vmware_vm_t	*vm;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s", __function_name, uuid);
 
 	for (i = 0; i < vms->values_num; i++)
 	{
@@ -99,12 +95,8 @@ static zbx_vmware_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
 		if (0 == strcmp(vm->uuid, uuid))
 			goto out;
 	}
-
 	vm = NULL;
-
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(NULL != vm ? SUCCEED : FAIL));
-
 	return vm;
 }
 
@@ -227,7 +219,10 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] %s: " ZBX_FS_UI64, __function_name, uuid, instance, counterid);
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto out;
+	}
 
 	for (i = 0; i < vm->devs.values_num; i++)
 	{
@@ -238,7 +233,10 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 	}
 
 	if (i == vm->devs.values_num)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown device instance"));
 		goto out;
+	}
 
 	ret = vmware_counter_get(vm->stats, instance, counterid, coeff, result);
 
@@ -266,6 +264,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 
 	if (SUCCEED != zbx_xml_read_values(events, ZBX_XPATH_LN2("Event", "key"), &keys))
 	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "no event key found"));
 		zbx_vector_str_destroy(&keys);
 		goto out;
 	}
@@ -448,7 +447,10 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *username, cons
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto unlock;
+	}
 
 	if (NULL == (value = zbx_xml_read_value(vm->details, xpath)))
 		goto unlock;
@@ -561,7 +563,10 @@ static int	get_vcenter_stat(AGENT_REQUEST *request, const char *username, const 
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	ret = hv_get_stat(hv, opt, xpath, result);
 unlock:
@@ -651,7 +656,10 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 
 	if (NULL == (cluster = cluster_get_by_name(&service->data->clusters, name)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown cluster name"));
 		goto unlock;
+	}
 
 	if (NULL == (status = zbx_xml_read_value(cluster->status, ZBX_XPATH_LN2("val", "overallStatus"))))
 		goto unlock;
@@ -811,7 +819,10 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	if (NULL != hv->clusterid)
 		cluster = cluster_get(&service->data->clusters, hv->clusterid);
@@ -1217,7 +1228,10 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	ret = vmware_counter_get(hv->stats, "", service->counters.nic_received, ZBX_KIBIBYTE, result);
 unlock:
@@ -1256,7 +1270,10 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	ret = vmware_counter_get(hv->stats, "", service->counters.nic_transmitted, ZBX_KIBIBYTE, result);
 unlock:
@@ -1293,7 +1310,10 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
@@ -1352,7 +1372,10 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
@@ -1407,7 +1430,10 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown hypervisor uuid"));
 		goto unlock;
+	}
 
 	for (i = 0; i < hv->datastores.values_num; i++)
 	{
@@ -1639,6 +1665,10 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 		SET_STR_RESULT(result, name);
 		ret = SYSINFO_RET_OK;
 	}
+	else
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
+
+
 unlock:
 	zbx_vmware_unlock();
 
@@ -1848,7 +1878,10 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto unlock;
+	}
 
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
@@ -2073,7 +2106,10 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto unlock;
+	}
 
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
@@ -2234,7 +2270,10 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto unlock;
+	}
 
 	zbx_vector_str_create(&disks);
 
@@ -2299,7 +2338,10 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "unknown virtual machine uuid"));
 		goto unlock;
+	}
 
 	zbx_snprintf(xpath, sizeof(xpath),
 			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/.." ZBX_XPATH_LN("capacity"), fsname);
