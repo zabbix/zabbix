@@ -485,31 +485,22 @@ static void	active_passive_misconfig(zbx_sock_t *sock)
 
 static int	process_trap(zbx_sock_t	*sock, char *s)
 {
-	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
-	char	lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
-	int	sender_nodeid, nodeid;
-	char	*answer;
-
-	int	ret = SUCCEED, res;
-	size_t	datalen;
-
-	struct 		zbx_json_parse jp;
-	char		value[MAX_STRING_LEN];
-	AGENT_VALUE	av;
-
-	memset(&av, 0, sizeof(AGENT_VALUE));
+	int	ret = SUCCEED;
 
 	zbx_rtrim(s, " \r\n");
 
-	datalen = strlen(s);
-	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len " ZBX_FS_SIZE_T, s, (zbx_fs_size_t)datalen);
+	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 
 	if ('{' == *s)	/* JSON protocol */
 	{
+		struct zbx_json_parse	jp;
+		char			value[MAX_STRING_LEN];
+
 		if (SUCCEED != zbx_json_open(s, &jp))
 		{
-			zbx_send_response(sock, FAIL, "received invalid JSON object", CONFIG_TIMEOUT);
-			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object");
+			zbx_send_response(sock, FAIL, zbx_json_strerror(), CONFIG_TIMEOUT);
+			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object from %s: %s",
+					get_ip_by_socket(sock), zbx_json_strerror());
 			return FAIL;
 		}
 
@@ -524,7 +515,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
-							" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
+							" Datalen " ZBX_FS_SIZE_T,
+							(zbx_fs_size_t)(jp.end - jp.start + 1));
 					recv_proxyconfig(sock, &jp);
 				}
 				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
@@ -602,6 +594,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	}
 	else if (0 == strncmp(s, "Data", 4))	/* node data exchange */
 	{
+		int	res, nodeid, sender_nodeid;
+		char	*data, *answer;
+
 		node_sync_lock(0);
 
 		res = node_sync(s, &sender_nodeid, &nodeid);
@@ -639,7 +634,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	{
 		const char	*reply;
 
-		reply = (SUCCEED == node_history(s, datalen) ? "OK" : "FAIL");
+		reply = (SUCCEED == node_history(s, strlen(s)) ? "OK" : "FAIL");
 
 		alarm(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, reply))
@@ -648,21 +643,29 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	}
 	else
 	{
+		char		value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
+				source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
+		AGENT_VALUE	av;
+
+		memset(&av, 0, sizeof(AGENT_VALUE));
+
 		if ('<' == *s)	/* XML protocol */
 		{
 			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
-			av.value	= value_dec;
+			av.value = value_dec;
 			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
 				av.lastlogsize = 0;
-			av.timestamp	= atoi(timestamp);
-			av.source	= source;
-			av.severity	= atoi(severity);
+			av.timestamp = atoi(timestamp);
+			av.source = source;
+			av.severity = atoi(severity);
 		}
 		else
 		{
+			char	*pl, *pr;
+
 			pl = s;
 			if (NULL == (pr = strchr(pl, ':')))
 				return FAIL;
@@ -679,8 +682,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			zbx_strlcpy(av.key, pl, sizeof(av.key));
 			*pr = ':';
 
-			av.value	= pr + 1;
-			av.severity	= 0;
+			av.value = pr + 1;
+			av.severity = 0;
 		}
 
 		zbx_timespec(&av.ts);
@@ -695,6 +698,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		alarm(0);
 	}
+
 	return ret;
 }
 
