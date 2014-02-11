@@ -26,7 +26,11 @@ try {
 }
 catch (Exception $e) {
 	$message = array('header' => 'Configuration file error', 'text' => $e->getMessage());
-	$warningView = new CView('general.warning', array('message' => $message));
+	$warningView = new CView('general.warning', array(
+		'message' => array(
+			'header' => 'Configuration file error', 'text' => $e->getMessage()
+		)
+	));
 	$warningView->render();
 	exit;
 }

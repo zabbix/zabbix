@@ -32,8 +32,11 @@ try {
 	Z::getInstance()->run();
 }
 catch (DBException $e) {
-	$message = array('header' => 'Database error:', 'text' => $e->getMessage());
-	$warningView = new CView('general.warning', array('message' => $message));
+	$warningView = new CView('general.warning', array(
+		'message' => array(
+			'header' => 'Database error', 'text' => $e->getMessage()
+		)
+	));
 	$warningView->render();
 	exit;
 }
@@ -44,8 +47,11 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			$message = array('header' => 'Configuration file error', 'text' => $e->getMessage());
-			$warningView = new CView('general.warning', array('message' => $message));
+			$warningView = new CView('general.warning', array(
+				'message' => array(
+					'header' => 'Configuration file error', 'text' => $e->getMessage()
+				)
+			));
 			$warningView->render();
 			exit;
 	}
