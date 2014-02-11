@@ -93,7 +93,17 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		order_result($userGroupUsers, 'alias');
 
 		$users = array();
+		$i = 0;
+
 		foreach ($userGroupUsers as $user) {
+			$i++;
+
+			if ($i > $this->data['config']['max_in_table']) {
+				$users[] = ' &hellip;';
+
+				break;
+			}
+
 			$userTypeStyle = 'enabled';
 			if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
 				$userTypeStyle = 'orange';
@@ -110,13 +120,15 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				$userStatusStyle = 'disabled';
 			}
 
+			if ($users) {
+				$users[] = ', ';
+			}
+
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
 				$userStatusStyle
 			);
-			$users[] = ', ';
 		}
-		array_pop($users);
 	}
 
 	$userGroupTable->addRow(array(

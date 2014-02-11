@@ -89,11 +89,23 @@ foreach ($this->data['users'] as $user) {
 	order_result($user['usrgrps'], 'name');
 
 	$usersGroups = array();
+	$i = 0;
+
 	foreach ($user['usrgrps'] as $userGroup) {
+		$i++;
+
+		if ($i > $this->data['config']['max_in_table']) {
+			$usersGroups[] = ' &hellip;';
+
+			break;
+		}
+
+		if ($usersGroups) {
+			$usersGroups[] = ', ';
+		}
+
 		$usersGroups[] = new CLink($userGroup['name'], 'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']);
-		$usersGroups[] = BR();
 	}
-	array_pop($usersGroups);
 
 	// user type style
 	$userTypeStyle = 'enabled';
