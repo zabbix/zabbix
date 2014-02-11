@@ -61,32 +61,6 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	$postScript =
-		'var page_refresh = null;'."\n\n".
-		'jQuery(function() {'."\n";
-
-	if (isset($ZBX_PAGE_POST_JS)) {
-		foreach ($ZBX_PAGE_POST_JS as $script) {
-			$postScript .= "\t".$script."\n";
-		}
-	}
-
-	if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']) {
-		$postScript .= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
-	}
-
-	if (isset($page['scripts']) && in_array('flickerfreescreen.js', $page['scripts'])) {
-		$postScript .=
-			"\t".'window.flickerfreeScreenShadow.timeout = '.SCREEN_REFRESH_TIMEOUT.' * 1000;'."\n".
-			"\t".'window.flickerfreeScreenShadow.responsiveness = '.SCREEN_REFRESH_RESPONSIVENESS.' * 1000;'."\n";
-	}
-
-	// the chkbxRange.init() method must be called after the inserted post scripts
-	$postScript .=
-			"\t".'cookie.init();'."\n".
-			"\t".'chkbxRange.init();'."\n".
-		'});';
-
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
 		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 
@@ -113,7 +87,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$table->show();
 	}
 
-	insert_js($postScript);
+	require_once 'include/views/js/common.init.js.php';
 
 	echo '</body>'."\n".
 		'</html>'."\n";

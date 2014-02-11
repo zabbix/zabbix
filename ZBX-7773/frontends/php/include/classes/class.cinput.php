@@ -71,10 +71,5 @@ class CInput extends CTag {
 	public function useJQueryStyle($class = '') {
 		$this->jQuery = true;
 		$this->attr('class', 'jqueryinput '.$this->getAttribute('class').' '.$class);
-		if (!defined('ZBX_JQUERY_INPUT')) {
-			define('ZBX_JQUERY_INPUT', true);
-			zbx_add_post_js('jQuery("input.jqueryinput").button();');
-		}
-		return $this;
 	}
 }
