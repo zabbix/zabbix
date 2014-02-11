@@ -282,7 +282,7 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err)
+static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, int max_error_len)
 {
 	const char		*__function_name = "zbx_snmp_open_session";
 	struct snmp_session	session, *ss = NULL;
@@ -317,7 +317,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 							/* (net-snmp default = 1 second) */
 
 #ifdef HAVE_IPV6
-	if (SUCCEED != get_address_family(item->interface.addr, &family, err, MAX_STRING_LEN))
+	if (SUCCEED != get_address_family(item->interface.addr, &family, error, max_error_len))
 		goto end;
 
 	if (PF_INET == family)
@@ -378,7 +378,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
 						break;
 					default:
-						zbx_snprintf(err, MAX_STRING_LEN,
+						zbx_snprintf(error, max_error_len,
 								"Unsupported authentication protocol [%d]",
 								item->snmpv3_authprotocol);
 						goto end;
@@ -391,8 +391,8 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						strlen(item->snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
 				{
-					zbx_strlcpy(err, "Error generating Ku from authentication pass phrase",
-							MAX_STRING_LEN);
+					zbx_strlcpy(error, "Error generating Ku from authentication pass phrase",
+							max_error_len);
 					goto end;
 				}
 				break;
@@ -412,7 +412,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
 						break;
 					default:
-						zbx_snprintf(err, MAX_STRING_LEN,
+						zbx_snprintf(error, max_error_len,
 								"Unsupported authentication protocol [%d]",
 								item->snmpv3_authprotocol);
 						goto end;
@@ -425,8 +425,8 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						strlen(item->snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
 				{
-					zbx_strlcpy(err, "Error generating Ku from authentication pass phrase",
-							MAX_STRING_LEN);
+					zbx_strlcpy(error, "Error generating Ku from authentication pass phrase",
+							max_error_len);
 					goto end;
 				}
 
@@ -443,7 +443,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
 					default:
-						zbx_snprintf(err, MAX_STRING_LEN,
+						zbx_snprintf(error, max_error_len,
 								"Unsupported privacy protocol [%d]",
 								item->snmpv3_privprotocol);
 						goto end;
@@ -456,8 +456,8 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						strlen(item->snmpv3_privpassphrase), session.securityPrivKey,
 						&session.securityPrivKeyLen))
 				{
-					zbx_strlcpy(err, "Error generating Ku from privacy pass phrase",
-							MAX_STRING_LEN);
+					zbx_strlcpy(error, "Error generating Ku from privacy pass phrase",
+							max_error_len);
 					goto end;
 				}
 				break;
@@ -486,7 +486,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	{
 		SOCK_CLEANUP;
 
-		zbx_strlcpy(err, "Cannot open snmp session", MAX_STRING_LEN);
+		zbx_strlcpy(error, "Cannot open snmp session", max_error_len);
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -509,8 +509,9 @@ static void	zbx_snmp_close_session(struct snmp_session *session)
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 {
 	const char	*__function_name = "zbx_snmp_get_octet_string";
-	static char	buf[MAX_STRING_LEN];
+
 	const char	*hint;
+	char		buffer[MAX_STRING_LEN];
 	char		*strval_dyn = NULL, is_hex = 0;
 	size_t          offset = 0;
 	struct tree     *subtree;
@@ -522,13 +523,13 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 	hint = (NULL != subtree ? subtree->hint : NULL);
 
 	/* we will decide if we want the value from var->val or what snprint_value() returned later */
-	if (-1 == snprint_value(buf, sizeof(buf), var->name, var->name_length, var))
+	if (-1 == snprint_value(buffer, sizeof(buffer), var->name, var->name_length, var))
 		goto end;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s' hint:'%s'", __function_name, buf, ZBX_NULL2STR(hint));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s' hint:'%s'", __function_name, buffer, ZBX_NULL2STR(hint));
 
 	/* decide if it's Hex, offset will be possibly needed later */
-	if (0 == strncmp(buf, "Hex-STRING: ", 12))
+	if (0 == strncmp(buffer, "Hex-STRING: ", 12))
 	{
 		is_hex = 1;
 		offset = 12;
@@ -544,10 +545,10 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 	}
 	else
 	{
-		if (0 == is_hex && 0 == strncmp(buf, "STRING: ", 8))
+		if (0 == is_hex && 0 == strncmp(buffer, "STRING: ", 8))
 			offset = 8;
 
-		strval_dyn = zbx_strdup(strval_dyn, buf + offset);
+		strval_dyn = zbx_strdup(strval_dyn, buffer + offset);
 	}
 
 	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
@@ -679,7 +680,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
-	char			snmp_oid[MAX_STRING_LEN], err[MAX_STRING_LEN];
+	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
 	int			bulk, status, running, ret = SUCCEED;
 	struct zbx_json		j;
@@ -754,8 +755,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
-			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, err, sizeof(err));
-			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, sizeof(error));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 			running = 0;
 			goto next;
 		}
@@ -1414,7 +1415,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	if (j == num)	/* all items already NOTSUPPORTED (with invalid key, port or SNMP parameters) */
 		goto out;
 
-	if (NULL == (ss = zbx_snmp_open_session(&items[j], error)))
+	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error))))
 	{
 		err = NOTSUPPORTED;
 		goto exit;
