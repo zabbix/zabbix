@@ -47,7 +47,7 @@ if ($this->data['host']['host'] !== $this->data['host']['name']) {
 $agentInterfaceRows = $snmpInterfaceRows = $ipmiInterfaceRows = $jmxInterfaceRows = array();
 
 foreach ($this->data['host']['interfaces'] as $interface) {
-	$spanClass = $interface['main'] ? ' default_interface' : null;
+	$spanClass = $interface['main'] ? ' default_interface' : '';
 
 	switch ($interface['type']) {
 		case INTERFACE_TYPE_AGENT:
@@ -185,7 +185,7 @@ if ($this->data['host']['inventory']) {
 }
 
 // description
-$overviewFormList->addRow(_('Description'), new CDiv($this->data['host']['description']));
+$overviewFormList->addRow(_('Description'), new CDiv($this->data['host']['description'], 'description'));
 
 // latest data
 $overviewFormList->addRow(_('Latest data'), array(
