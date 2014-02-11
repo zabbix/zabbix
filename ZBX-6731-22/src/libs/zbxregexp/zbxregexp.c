@@ -193,7 +193,7 @@ out:
 static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
 {
 	static regex_t	re;
-	regmatch_t	match[10];
+	regmatch_t	match[10];	/* up to 10 capture groups in regexp */
 	char		*ptr = NULL;
 	static char	*old_pattern = NULL;
 	static int	old_flags;
