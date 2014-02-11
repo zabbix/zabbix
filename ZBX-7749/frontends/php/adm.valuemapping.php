@@ -53,8 +53,6 @@ if (isset($_REQUEST['valuemapid'])) {
  * Actions
  */
 try {
-	$msgOk = $msgFail = '';
-
 	if (isset($_REQUEST['save'])) {
 		DBstart();
 
@@ -62,32 +60,32 @@ try {
 		$mappings = get_request('mappings', array());
 
 		if (isset($_REQUEST['valuemapid'])) {
-			$msgOk = _('Value map updated');
-			$msgFail = _('Cannot update value map');
-			$audit_action = AUDIT_ACTION_UPDATE;
+			$messageSuccess = _('Value map updated');
+			$messageFailed = _('Cannot update value map');
+			$auditAction = AUDIT_ACTION_UPDATE;
 
 			$valueMap['valuemapid'] = get_request('valuemapid');
 			$result = updateValueMap($valueMap, $mappings);
 		}
 		else {
-			$msgOk = _('Value map added');
-			$msgFail = _('Cannot add value map');
-			$audit_action = AUDIT_ACTION_ADD;
+			$messageSuccess = _('Value map added');
+			$messageFailed = _('Cannot add value map');
+			$auditAction = AUDIT_ACTION_ADD;
 
 			$result = addValueMap($valueMap, $mappings);
 		}
 
 		if ($result) {
-			add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _s('Value map "%1$s".', $valueMap['name']));
+			add_audit($auditAction, AUDIT_RESOURCE_VALUE_MAP, _s('Value map "%1$s".', $valueMap['name']));
 		}
 		unset($_REQUEST['form']);
 
 		$result = DBend($result);
-		show_messages($result, $msgOk, $msgFail);
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])) {
-		$msgOk = _('Value map deleted');
-		$msgFail = _('Cannot delete value map');
+		$messageSuccess = _('Value map deleted');
+		$messageFailed = _('Cannot delete value map');
 
 		DBstart();
 
@@ -111,13 +109,13 @@ try {
 		unset($_REQUEST['form']);
 
 		$result = DBend($result);
-		show_messages($result, $msgOk, $msgFail);
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }
 catch (Exception $e) {
 	DBend(false);
 	error($e->getMessage());
-	show_messages(false, null, $msgFail);
+	show_messages(false, null, $messageFailed);
 }
 
 /*

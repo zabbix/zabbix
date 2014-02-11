@@ -119,10 +119,12 @@ elseif (isset($_REQUEST['save'])) {
 	if (isset($_REQUEST['maintenanceid'])) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$messageSuccess = _('Maintenance added');
 		$messageFailed = _('Cannot add maintenance');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	$result = true;
@@ -199,7 +201,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
+		add_audit($auditAction, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
 	}
 

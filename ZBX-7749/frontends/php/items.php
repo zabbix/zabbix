@@ -759,8 +759,8 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	if ($result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
-				_('Host').' ['.$host['name'].']'
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
+				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
 			);
 		}
 	}

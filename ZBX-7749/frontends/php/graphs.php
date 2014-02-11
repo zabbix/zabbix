@@ -223,16 +223,17 @@ elseif (hasRequest('save')) {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
 
-			show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
-
+			$messageSuccess = _('Graph prototype updated');
+			$messageFailed = _('Cannot update graph prototype');
 		}
 		else {
 			$result = API::GraphPrototype()->create($graph);
 
-			show_messages($result, _('Graph prototype added'), _('Cannot add graph prototype'));
+			$messageSuccess = _('Graph prototype added');
+			$messageFailed = _('Cannot add graph prototype');
 		}
 
-		clearCookies($result, getRequest('parent_discoveryid'));
+		$cookieId = getRequest('parent_discoveryid');
 	}
 	// create and update graphs
 	else {
@@ -240,15 +241,17 @@ elseif (hasRequest('save')) {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::Graph()->update($graph);
 
-			show_messages($result, _('Graph updated'), _('Cannot update graph'));
+			$messageSuccess = _('Graph updated');
+			$messageFailed = _('Cannot update graph');
 		}
 		else {
 			$result = API::Graph()->create($graph);
 
-			show_messages($result, _('Graph added'), _('Cannot add graph'));
+			$messageSuccess = _('Graph added');
+			$messageFailed = _('Cannot add graph');
 		}
 
-		clearCookies($result, getRequest('hostid'));
+		$cookieId = getRequest('hostid');
 	}
 
 	if ($result) {
@@ -264,7 +267,9 @@ elseif (hasRequest('save')) {
 		unset($_REQUEST['form']);
 	}
 
-	DBend($result);
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, $cookieId);
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');

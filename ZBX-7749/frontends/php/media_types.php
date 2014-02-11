@@ -117,12 +117,11 @@ if (isset($_REQUEST['save'])) {
 
 	if ($mediaTypeId) {
 		$mediaType['mediatypeid'] = $mediaTypeId;
-
 		$result = API::Mediatype()->update($mediaType);
 
 		$messageSuccess = _('Media type updated');
 		$messageFailed = _('Cannot update media type');
-		$action = AUDIT_ACTION_UPDATE;
+		$auditAction = AUDIT_ACTION_UPDATE;
 
 	}
 	else {
@@ -130,11 +129,11 @@ if (isset($_REQUEST['save'])) {
 
 		$messageSuccess = _('Media type added');
 		$messageFailed = _('Cannot add media type');
-		$action = AUDIT_ACTION_ADD;
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediaType['description'].']');
+		add_audit($auditAction, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediaType['description'].']');
 		unset($_REQUEST['form']);
 	}
 

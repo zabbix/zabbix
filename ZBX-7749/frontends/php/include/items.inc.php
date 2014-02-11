@@ -802,13 +802,13 @@ function delete_history_by_itemid($itemIds) {
 		return $result;
 	}
 
-	DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
 
-	return true;
+	return (bool) $result;
 }
 
 /**

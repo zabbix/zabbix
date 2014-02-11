@@ -127,7 +127,6 @@ elseif (isset($_REQUEST['save'])) {
 
 			$messageSuccess = _('Script added');
 			$messageFailed = _('Cannot add script');
-
 			$auditAction = AUDIT_ACTION_ADD;
 		}
 
@@ -136,7 +135,6 @@ elseif (isset($_REQUEST['save'])) {
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
 			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
-
 		}
 
 		$result = DBend($result);

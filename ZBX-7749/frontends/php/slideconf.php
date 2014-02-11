@@ -125,7 +125,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$dbSlideshow['name'].'" ');
 	}
-
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
 	$result = DBend($result);

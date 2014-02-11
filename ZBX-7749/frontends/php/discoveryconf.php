@@ -133,27 +133,26 @@ if (isset($_REQUEST['save'])) {
 		$discoveryRule['druleid'] = get_request('druleid');
 		$result = API::DRule()->update($discoveryRule);
 
-		$msgOk = _('Discovery rule updated');
-		$msgFail = _('Cannot update discovery rule');
+		$messageSuccess = _('Discovery rule updated');
+		$messageFailed = _('Cannot update discovery rule');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$result = API::DRule()->create($discoveryRule);
 
-		$msgOk = _('Discovery rule created');
-		$msgFail = _('Cannot create discovery rule');
+		$messageSuccess = _('Discovery rule created');
+		$messageFailed = _('Cannot create discovery rule');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
 		$druleid = reset($result['druleids']);
-		add_audit(isset($discoveryRule['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
-			AUDIT_RESOURCE_DISCOVERY_RULE,
-			'['.$druleid.'] '.$discoveryRule['name']
-		);
+		add_audit($auditAction, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$discoveryRule['name']);
 		unset($_REQUEST['form']);
 	}
 
 	$result = DBend($result);
-	show_messages($result, $msgOk, $msgFail);
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
@@ -182,6 +181,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 			$druleData = get_discovery_rule_by_druleid($druleId);
 			add_audit($auditAction, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleId.'] '.$druleData['name']);
 		}
+
 		$updated++;
 	}
 

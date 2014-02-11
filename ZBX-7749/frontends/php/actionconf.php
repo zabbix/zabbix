@@ -142,8 +142,8 @@ elseif (hasRequest('save')) {
 		}
 	}
 
-	$messageSuccess = '';
 	DBstart();
+
 	if (hasRequest('actionid')) {
 		$action['actionid'] = getRequest('actionid');
 
@@ -151,6 +151,7 @@ elseif (hasRequest('save')) {
 
 		$messageSuccess = _('Action updated');
 		$messageFailed = _('Cannot update action');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$action['eventsource'] = getRequest('eventsource',
@@ -161,13 +162,11 @@ elseif (hasRequest('save')) {
 
 		$messageSuccess = _('Action added');
 		$messageFailed = _('Cannot add action');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit(hasRequest('actionid') ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION,
-			_('Name').NAME_DELIMITER.$action['name']
-		);
-
+		add_audit($auditAction, AUDIT_RESOURCE_ACTION, _('Name').NAME_DELIMITER.$action['name']);
 		unset($_REQUEST['form']);
 	}
 
@@ -322,6 +321,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$updated = 0;
 
 	DBstart();
+
 	$dbActions = DBselect(
 		'SELECT a.actionid'.
 		' FROM actions a'.

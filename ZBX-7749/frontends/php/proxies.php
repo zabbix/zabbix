@@ -102,26 +102,26 @@ if (isset($_REQUEST['save'])) {
 		$proxy['proxyid'] = $_REQUEST['proxyid'];
 		$result = API::Proxy()->update($proxy);
 
-		$action = AUDIT_ACTION_UPDATE;
-		$msgOk = _('Proxy updated');
-		$msgFail = _('Cannot update proxy');
+		$messageSuccess = _('Proxy updated');
+		$messageFailed = _('Cannot update proxy');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$result = API::Proxy()->create($proxy);
 
-		$action = AUDIT_ACTION_ADD;
-		$msgOk = _('Proxy added');
-		$msgFail = _('Cannot add proxy');
+		$messageSuccess = _('Proxy added');
+		$messageFailed = _('Cannot add proxy');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($proxyIds['proxyids']).']');
+		add_audit($auditAction, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($result['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
 	unset($_REQUEST['save']);
 
 	$result = DBend($result);
-	show_messages($result, $msgOk, $msgFail);
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete'])) {

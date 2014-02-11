@@ -110,7 +110,7 @@ if (isset($_REQUEST['new_httpstep'])) {
 }
 
 if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
-	$result = true;
+	$result = false;
 
 	DBstart();
 
@@ -121,14 +121,15 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 			' AND ht.httptestid='.zbx_dbstr($_REQUEST['httptestid'])
 	));
 
-	if ($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])) {
-		$result &= API::HttpTest()->delete($_REQUEST['httptestid']);
-	}
+	$httptestData = get_httptest_by_httptestid($_REQUEST['httptestid']);
+	if ($httptestData) {
+		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
 
-	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-			'Web scenario ['.$httptest_data['name'].'] ['.$_REQUEST['httptestid'].'] Host ['.$host['host'].']'
-		);
+		if ($result) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
+				'Web scenario ['.$httptestData['name'].'] ['.$_REQUEST['httptestid'].'] Host ['.$host['host'].']'
+			);
+		}
 	}
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 
@@ -283,7 +284,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		if (!($httpTestData = get_httptest_by_httptestid($id))) {
 			continue;
 		}
-		$result &= API::HttpTest()->update(array(
+
+		$result &= (bool) API::HttpTest()->update(array(
 			'httptestid' => $id,
 			'status' => $status
 		));
@@ -296,6 +298,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 				'Scenario ['.$httpTestData['name'].'] ['.$id.'] Host ['.$host['host'].'] '.$statusName
 			);
 		}
+
 		$updated++;
 	}
 
@@ -318,8 +321,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 			continue;
 		}
 
-		$deleteHistory = delete_history_by_httptestid($id);
-		if ($deleteHistory) {
+		$result &= delete_history_by_httptestid($id);
+		if ($result) {
 			$result &= DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($id));
 
 			$host = DBfetch(DBselect(

@@ -176,7 +176,6 @@ elseif (isset($_REQUEST['save'])) {
 
 	if (isset($_REQUEST['usrgrpid'])) {
 		$userGroup['usrgrpid'] = $_REQUEST['usrgrpid'];
-
 		$result = API::UserGroup()->update($userGroup);
 
 		$messageSuccess = _('Group updated');

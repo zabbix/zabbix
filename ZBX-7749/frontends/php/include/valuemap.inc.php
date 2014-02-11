@@ -66,7 +66,6 @@ function updateValueMap(array $valueMap, array $mappings) {
 	unset($valueMap['valuemapid']);
 
 	// check existence
-	DBStart();
 	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($valueMapId).' '.andDbNode('v.valuemapid');
 	if (!DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
@@ -90,9 +89,7 @@ function updateValueMap(array $valueMap, array $mappings) {
 		'where' => array('valuemapid' => $valueMapId)
 	));
 
-	$result = DBend($result);
-
-	return $result;
+	return (bool) $result;
 }
 
 /**
@@ -198,7 +195,7 @@ function rewriteValueMapMappings($valueMapId, array $mappings) {
 		$result &= updateValueMapMappings($mappingsToUpdate);
 	}
 
-	return $result;
+	return (bool) $result;
 }
 
 /**
@@ -206,6 +203,8 @@ function rewriteValueMapMappings($valueMapId, array $mappings) {
  *
  * @param int   $valueMapId
  * @param array $mappings
+ *
+ * @return bool
  */
 function addValueMapMappings($valueMapId, array $mappings) {
 	foreach ($mappings as &$mapping) {
@@ -213,7 +212,7 @@ function addValueMapMappings($valueMapId, array $mappings) {
 	}
 	unset($mapping);
 
-	return DB::insert('mappings', $mappings);
+	return (bool) DB::insert('mappings', $mappings);
 }
 
 /**
@@ -236,7 +235,7 @@ function updateValueMapMappings(array $mappings) {
 	}
 	unset($mapping);
 
-	return $result;
+	return (bool) $result;
 }
 
 /**
@@ -247,7 +246,7 @@ function updateValueMapMappings(array $mappings) {
  * @return bool
  */
 function deleteValueMapMappings(array $mappingIds) {
-	return DB::delete('mappings', array('mappingid' => $mappingIds));
+	return (bool) DB::delete('mappings', array('mappingid' => $mappingIds));
 }
 
 /**

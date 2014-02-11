@@ -196,12 +196,9 @@ elseif (isset($_REQUEST['save'])) {
 		DBstart();
 
 		if (isset($_REQUEST['userid'])) {
-			$action = AUDIT_ACTION_UPDATE;
 			$user['userid'] = $_REQUEST['userid'];
-
-
-
 			$result = API::User()->update(array($user));
+
 			if ($result) {
 				$result = API::User()->updateMedia(array(
 					'users' => $user,
@@ -211,18 +208,20 @@ elseif (isset($_REQUEST['save'])) {
 
 			$messageSuccess = _('User updated');
 			$messageFailed = _('Cannot update user');
-			$action = AUDIT_ACTION_UPDATE;
+			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 		else {
-			$result = DBend(API::User()->create($user));
+			$result = API::User()->create($user);
 
 			$messageSuccess = _('User added');
 			$messageFailed = _('Cannot add user');
-			$action = AUDIT_ACTION_ADD;
+			$auditAction = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
-			add_audit($action, AUDIT_RESOURCE_USER, 'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']');
+			add_audit($auditAction, AUDIT_RESOURCE_USER,
+				'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']'
+			);
 			unset($_REQUEST['form']);
 		}
 
@@ -302,7 +301,6 @@ elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 		unset($_REQUEST['usrgrpid'], $_REQUEST['userid']);
 	}
-
 	unset($_REQUEST['grpaction'], $_REQUEST['form']);
 
 	$result = DBend($result);
