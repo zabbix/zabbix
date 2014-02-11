@@ -100,11 +100,23 @@ foreach ($this->data['users'] as $user) {
 			break;
 		}
 
+		$userGroupStatusCss = 'enabled';
+		if ($userGroup['users_status'] == GROUP_GUI_ACCESS_DISABLED) {
+			$userGroupStatusCss = 'disabled';
+		}
+		if ($userGroup['users_status'] == GROUP_STATUS_DISABLED) {
+			$userGroupStatusCss = 'disabled';
+		}
+
 		if ($usersGroups) {
 			$usersGroups[] = ', ';
 		}
 
-		$usersGroups[] = new CLink($userGroup['name'], 'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']);
+		$usersGroups[] = new CLink(
+			$userGroup['name'],
+			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid'],
+			$userGroupStatusCss
+		);
 	}
 
 	// user type style

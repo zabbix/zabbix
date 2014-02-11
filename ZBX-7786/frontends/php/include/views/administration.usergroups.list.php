@@ -104,20 +104,12 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				break;
 			}
 
-			$userTypeStyle = 'enabled';
-			if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$userTypeStyle = 'orange';
-			}
-			if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
-				$userTypeStyle = 'disabled';
-			}
-
-			$userStatusStyle = 'enabled';
+			$userStatusCss = 'enabled';
 			if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				$userStatusStyle = 'disabled';
+				$userStatusCss = 'disabled';
 			}
 			if ($user['users_status'] == GROUP_STATUS_DISABLED) {
-				$userStatusStyle = 'disabled';
+				$userStatusCss = 'disabled';
 			}
 
 			if ($users) {
@@ -126,7 +118,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
-				$userStatusStyle
+				$userStatusCss
 			);
 		}
 	}
