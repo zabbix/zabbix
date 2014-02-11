@@ -762,6 +762,10 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
+
+			// unset fields that are updated using the 'filter' parameter
+			unset($item['evaltype']);
+			unset($item['formula']);
 		}
 		unset($item);
 
