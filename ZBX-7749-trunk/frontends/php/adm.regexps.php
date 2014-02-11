@@ -123,17 +123,15 @@ elseif (isset($_REQUEST['save'])) {
 		$regExp['regexpid'] = $_REQUEST['regexpid'];
 		$result = updateRegexp($regExp, $expressions);
 
-		$msg1 = _('Regular expression updated');
-		$msg2 = _('Cannot update regular expression');
+		$messageSuccess = _('Regular expression updated');
+		$messageFailed = _('Cannot update regular expression');
 	}
 	else {
 		$result = addRegexp($regExp, $expressions);
 
-		$msg1 = _('Regular expression added');
-		$msg2 = _('Cannot add regular expression');
+		$messageSuccess = _('Regular expression added');
+		$messageFailed = _('Cannot add regular expression');
 	}
-
-	show_messages($result, $msg1, $msg2);
 
 	if ($result) {
 		add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
@@ -142,8 +140,8 @@ elseif (isset($_REQUEST['save'])) {
 		unset($_REQUEST['form']);
 	}
 
-	Dbend($result);
-
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['go'])) {
@@ -164,23 +162,25 @@ elseif (isset($_REQUEST['go'])) {
 		DBstart();
 
 		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpIds));
-		$result = Dbend($result);
 
 		$regExpCount = count($regExpIds);
 
+		if ($result) {
+			foreach ($regExps as $regExpId => $regExp) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
+					'Id ['.$regExpId.'] '._('Name').' ['.$regExp['name'].']'
+				);
+			}
+
+			unset($_REQUEST['form'], $_REQUEST['regexpid']);
+		}
+
+		$result = DBend($result);
 		show_messages($result,
 			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
-
-		if ($result) {
-			foreach ($regExps as $regExpId => $regExp) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regExpId.'] '._('Name').' ['.$regExp['name'].']');
-			}
-
-			unset($_REQUEST['form'], $_REQUEST['regexpid']);
-			clearCookies($result);
-		}
+		clearCookies($result);
 	}
 }
 

@@ -43,7 +43,9 @@ check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
+	DBstart();
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
+	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
 }
