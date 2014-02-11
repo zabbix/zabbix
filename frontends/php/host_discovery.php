@@ -347,7 +347,8 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = getItemFormData(hasRequest('itemid') ? $item : array(), array(
+	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : array();
+	$data = getItemFormData($formItem, array(
 		'is_discovery_rule' => true
 	));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
