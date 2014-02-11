@@ -1029,6 +1029,24 @@ sub create_probe_template {
     create_macro('{$DNSTEST.RDDS.ENABLED}', '1', $templateid);
     create_macro('{$DNSTEST.EPP.ENABLED}', '1', $templateid);
 
+    my $delay = 300;
+    my $appid = get_application_id('Configuration', $templateid);
+    my ($options, $key);
+
+    foreach my $m ('DNSTEST.IP4.ENABLED', 'DNSTEST.IP6.ENABLED') {
+	$key = 'probe.configvalue['.$root_name.','.$m.']';
+
+	$options = {'name' => '$2 value',
+		    'key_'=> $key,
+		    'hostid' => $templateid,
+		    'applications' => [$appid],
+		    'params' => '{$'.$m.'}',
+		    'delay' => $delay,
+		    'type' => 15, 'value_type' => 3};
+
+	create_item($options);
+    }
+
     return $templateid;
 }
 
