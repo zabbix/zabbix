@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-03 16:26+0200\n"
+"POT-Creation-Date: 2014-02-06 13:20+0200\n"
 "PO-Revision-Date: 2013-11-04 15:07+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -233,7 +233,7 @@ msgstr "Acesso negado!"
 msgid "Access denied."
 msgstr "Acesso negado."
 
-#: api/classes/CUser.php:882
+#: api/classes/CUser.php:1058
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Conta bloqueada por %s segundos"
@@ -1425,7 +1425,7 @@ msgstr "Tigger não foi adicionada"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:218
 msgid "Cannot add user"
 msgstr "Usuário não foi incluído"
 
@@ -1481,7 +1481,7 @@ msgstr "Não foi possível clonar protótipos do item."
 msgid "Cannot clone trigger prototypes."
 msgstr "Não foi possível clonar protótipos da trigger."
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Não foi possível conectar à porta de trap do servidor zabbix, ela deverá estar disponível para executar o script."
 
@@ -1549,7 +1549,7 @@ msgstr "Não foi possivel criar um novo elemento"
 msgid "Cannot create screen."
 msgstr "Não foi possível criar a tela."
 
-#: api/classes/CUser.php:1216
+#: api/classes/CUser.php:1398
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Não é possível excluir o usuário interno do Zabbix \"%1$s\", tente desabilitar esse usuário."
@@ -1773,11 +1773,11 @@ msgstr "As triggers não foram excluídas"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Não é possível excluir triggers criadas pela auto-busca (LLD)."
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "Cannot delete user"
 msgstr "Usuário não foi removido"
 
-#: api/classes/CUser.php:742
+#: api/classes/CUser.php:949
 msgid "Cannot delete user media."
 msgstr "Não foi possível excluir a mídia do usuário."
 
@@ -2123,7 +2123,7 @@ msgstr[1] "Não foi possível importar o template \"%1$s\", vinculado com os tem
 msgid "Cannot include view file \"%s\"."
 msgstr "Não foi possível incluir o arquivo de visualização \"%s\"."
 
-#: api/classes/CUser.php:771
+#: api/classes/CUser.php:738
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir a mídia do usuário."
 
@@ -2131,11 +2131,11 @@ msgstr "Não foi possível inserir a mídia do usuário."
 msgid "Cannot link template"
 msgstr "Falha na associação do template"
 
-#: api/classes/CUser.php:921
+#: api/classes/CUser.php:1099
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:846
+#: api/classes/CUser.php:1021
 msgid "Cannot logout."
 msgstr "Não foi possível terminar sessão."
 
@@ -2192,7 +2192,7 @@ msgstr "Não é possível remover todos os itens, no mínimo um deverá ser mant
 msgid "Cannot remove macro."
 msgstr "Não foi possível remover macro."
 
-#: api/classes/CUser.php:300
+#: api/classes/CUser.php:310
 msgid "Cannot rename guest user."
 msgstr "Não é possível renomear o usuário convidado."
 
@@ -2238,7 +2238,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 msgid "Cannot switch host for interface."
 msgstr "Não foi possível mudar a interface do host."
 
-#: users.php:317
+#: users.php:323
 msgid "Cannot unblock users"
 msgstr "Não foi possível desbloquear usuários"
 
@@ -2531,11 +2531,11 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "Cannot update user"
 msgstr "Usuário não foi atualizado"
 
-#: api/classes/CUser.php:763
+#: api/classes/CUser.php:818
 msgid "Cannot update user media."
 msgstr "Não foi possível atualizar a mídia do usuário."
 
@@ -3151,7 +3151,7 @@ msgstr "Copiar"
 msgid "Copy selected to ..."
 msgstr "Copiar selecionados para ..."
 
-#: api/classes/CUser.php:966
+#: api/classes/CUser.php:1144
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Login correto \"%s\"."
@@ -3438,7 +3438,7 @@ msgstr "Slides personalizados"
 msgid "Czech (cs_CZ)"
 msgstr "Checo(cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr "D"
 
@@ -3537,7 +3537,7 @@ msgstr "Dados"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4631,7 +4631,7 @@ msgstr "Nome de script duplicado \"%1$s\"."
 msgid "Duplicate severity name \"%s\"."
 msgstr "Nome duplicado para a severidade: \"%s\"."
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:318
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "Apelido de usuário duplicado: \"%s\"."
@@ -4751,7 +4751,7 @@ msgstr "Host nulo."
 #: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
 #: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
 msgstr "Parâmetro de entrada vazio."
 
@@ -5831,8 +5831,8 @@ msgstr "Grupos em manutenção"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -7350,7 +7350,7 @@ msgstr "Status inválido para o serviço \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Status inválido."
 
-#: api/classes/CUser.php:352
+#: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "Tema incorreto para o usuário \"%1$s\"."
@@ -7654,6 +7654,8 @@ msgstr "Período de manutenção inválido"
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
+#: api/classes/CUser.php:673 api/classes/CUser.php:693
+#: api/classes/CUser.php:851 api/classes/CUser.php:896
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Os parâmetros do método são inválidos."
@@ -7733,7 +7735,7 @@ msgstr "Não é possível filtrar pela senha de usuário."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "Não é possível terminar a sessão de autenticação HTTP."
 
-#: api/classes/CUserMedia.php:186 api/classes/CUser.php:154
+#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "Não é possível pesquisar pela senha de usuário."
 
@@ -8446,12 +8448,12 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Conectado como Guest"
 
-#: api/classes/CUser.php:958
+#: api/classes/CUser.php:1136
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "A conexão falhou \"%s\"."
 
-#: api/classes/CUser.php:926
+#: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8460,8 +8462,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876
+#: api/classes/CUser.php:984 api/classes/CUser.php:1003
+#: api/classes/CUser.php:1052
 msgid "Login name or password is incorrect."
 msgstr "O nome de login ou a senha está incorreto."
 
@@ -8807,7 +8809,7 @@ msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d chara
 msgstr[0] "O tamanho máximo do nome de DNS é de %1$d caracteres, \"%2$s\" possui %3$d caracter."
 msgstr[1] "O tamanho máximo do nome de DNS é de %1$d caracteres, \"%2$s\" possui %3$d caracteres."
 
-#: api/classes/CUser.php:316
+#: api/classes/CUser.php:326
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9892,7 +9894,7 @@ msgstr "Sem permissão para o mapa \"%1$s\"."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Sem permissão para a tela \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1015
+#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
 msgid "No permissions for system access."
 msgstr "Sem permissão de acesso ao sistema."
 
@@ -9935,7 +9937,9 @@ msgstr "Sem permissão de acesso ao sistema."
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
+#: api/classes/CUser.php:859 api/classes/CUser.php:879
+#: api/classes/CUser.php:938 api/classes/CUser.php:1363
 #: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Sem permissão para o objeto referenciado ou ele não existe!"
@@ -10064,7 +10068,7 @@ msgstr "Nenhuma trigger definida."
 msgid "No triggers found."
 msgstr "Nenhuma trigger localizada."
 
-#: api/classes/CUser.php:579
+#: api/classes/CUser.php:590
 msgid "No user ID given."
 msgstr "Nenhum usuário com o ID informado."
 
@@ -10187,7 +10191,7 @@ msgstr "Itens fora do emplate"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nem todos os templates estão vinculados ao \"%s\"."
 
-#: api/classes/CUser.php:374
+#: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Não autorizado para definir a senha do usuário \"guest\"."
 
@@ -10570,15 +10574,15 @@ msgstr "Apenas os super administradores podem atualizar macros globais."
 msgid "Only Super Admins can update icon maps."
 msgstr "Apenas os super administradores podem atualizar mapeamento de ícones."
 
-#: api/classes/CUser.php:640
+#: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
 msgstr "Apenas os administradores podem adicionar mídia de usuário."
 
-#: api/classes/CUser.php:708
+#: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
 msgstr "Apenas os administradores podem mudar mídia de usuário."
 
-#: api/classes/CUser.php:678
+#: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Apenas os administradores podem remover mídia de usuário."
 
@@ -11277,7 +11281,7 @@ msgstr "Arquivo de chave privada"
 msgid "Privilege level"
 msgstr "Nível de acesso"
 
-#: api/classes/CUser.php:803
+#: api/classes/CUser.php:975
 msgid "Probably php-ldap module is missing."
 msgstr "Provavelmente o módulo php-ldap está ausente."
 
@@ -11763,7 +11767,7 @@ msgstr "Resultado é FALSO"
 msgid "Result is TRUE"
 msgstr "Resultado VERDADEIRO"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr "Resultado de \"%s\""
@@ -12311,7 +12315,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "Não existe script com o scriptid \"%1$s\"."
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Scripts"
 
@@ -12585,7 +12589,7 @@ msgstr "Serviços"
 msgid "Services form a circular dependency."
 msgstr "Os serviços formam uma dependência circular."
 
-#: api/classes/CUser.php:1009
+#: api/classes/CUser.php:1188
 msgid "Session terminated, re-login, please."
 msgstr "Sessão terminada, conecte-se novamente por favor."
 
@@ -13674,7 +13678,7 @@ msgid "Trends"
 msgstr "Estatísticas"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -14437,12 +14441,12 @@ msgstr "Usado nas ações"
 msgid "User"
 msgstr "Usuário"
 
-#: api/classes/CUser.php:328
+#: api/classes/CUser.php:338
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "O usuário \"%s\" deve possuir, no mínimo, um grupo de usuários."
 
-#: users.php:212
+#: users.php:218
 msgid "User added"
 msgstr "Usuário incluído"
 
@@ -14467,7 +14471,7 @@ msgstr "Usuário não pode alterar seu próprio status"
 msgid "User cannot change status of himself."
 msgstr "Um usuário não pode modificar seu próprio status."
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "User deleted"
 msgstr "Usuário removido"
 
@@ -14528,16 +14532,16 @@ msgstr "Grupo para mensagens de problemas com o banco de dados \"%1$s\"."
 msgid "User groups"
 msgstr "Grupos de usuários"
 
-#: api/classes/CUser.php:1196
+#: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
 msgstr "Um usuário não pode excluir a sí próprio."
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:351
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Um usuário não pode modificar o seu acesso à GUI ao colocar-se como membro do grupo de usuários \"%s\"."
 
-#: api/classes/CUser.php:345
+#: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Um usuário não pode modificar o seu acesso ao sistema ao colocar-se como membro do grupo de usuários \"%s\"."
@@ -14581,11 +14585,11 @@ msgstr "Sessões de usuários"
 msgid "User type"
 msgstr "Tipo de usuário"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "User updated"
 msgstr "Usuário atualizado"
 
-#: api/classes/CUser.php:390
+#: api/classes/CUser.php:400
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Já existe um usuário com o apelido \"%s\"."
@@ -14611,7 +14615,7 @@ msgstr "Usuários"
 msgid "Users (online)"
 msgstr "Usuários (online)"
 
-#: users.php:317
+#: users.php:323
 msgid "Users unblocked"
 msgstr "Usuários desbloqueados"
 
@@ -15192,7 +15196,7 @@ msgstr "Campos errados para o horário do serviço \"%1$s\"."
 msgid "Wrong fields for trigger."
 msgstr "Campos errados para a trigger."
 
-#: api/classes/CUser.php:272
+#: api/classes/CUser.php:283
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "Campos incorretos para o usuário \"%s\"."
@@ -15317,7 +15321,7 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Não é possível selecionar alguns idiomas, o suporte aos idiomas adicionais necessita da instalação do pacote \"locale\" em seu servidor web."
 
-#: api/classes/CUser.php:357
+#: api/classes/CUser.php:367
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Você não tem permissão para alterar os privilégios para o usuário \"%s\"."
@@ -15361,16 +15365,16 @@ msgstr "Você não especificou o alvo da operação do script global \"%s\"."
 msgid "You do not have permission to perform this operation."
 msgstr "Você não tem permissão para executar esta operação."
 
-#: api/classes/CUser.php:278
+#: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
 msgstr "Você não tem permissão para criar usuários."
 
 # Você estava escrito incorreto (Voucê) e permissões estava sem acento
-#: api/classes/CUser.php:290
+#: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
 msgstr "Você não tem permissão para alterar outros usuários."
 
-#: api/classes/CUser.php:285
+#: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Você não tem permissão para atualizar o usuário ou o usuário não existe."
 
@@ -15533,7 +15537,7 @@ msgid "agent"
 msgstr "agente"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15584,8 +15588,8 @@ msgstr "auto-registro"
 msgid "auto-registered host"
 msgstr "host auto-registrado"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
@@ -15630,14 +15634,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d/M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr "d/m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr "d/m H:i"
 
@@ -15769,7 +15773,7 @@ msgstr "item"
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15809,16 +15813,16 @@ msgstr "manutenção"
 msgid "map"
 msgstr "mapa"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "máx"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15848,7 +15852,7 @@ msgstr "necessário um usuário LDAP válido"
 msgid "new"
 msgstr "novo"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"

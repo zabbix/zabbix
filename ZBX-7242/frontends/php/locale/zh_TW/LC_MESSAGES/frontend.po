@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-03 16:26+0200\n"
+"POT-Creation-Date: 2014-02-06 13:20+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -229,7 +229,7 @@ msgstr "存取被拒!"
 msgid "Access denied."
 msgstr ""
 
-#: api/classes/CUser.php:882
+#: api/classes/CUser.php:1058
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
@@ -1416,7 +1416,7 @@ msgstr "無法新增觸發器"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:218
 msgid "Cannot add user"
 msgstr "無法新增用户"
 
@@ -1472,7 +1472,7 @@ msgstr "無法克隆項目原型"
 msgid "Cannot clone trigger prototypes."
 msgstr "無法克隆觸發器原型"
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "無法連接到系統主機主控程序的捉捕器的埠, 但是它應該可用的..."
 
@@ -1540,7 +1540,7 @@ msgstr "無法創建新組件"
 msgid "Cannot create screen."
 msgstr "無法創建篩選."
 
-#: api/classes/CUser.php:1216
+#: api/classes/CUser.php:1398
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "無法刪除Zabbix內部用戶 \"%1$s\", 試試停用那用戶."
@@ -1763,11 +1763,11 @@ msgstr "無法删除觸發器"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "無法刪除由低階層發現所創建的觸發器."
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
-#: api/classes/CUser.php:742
+#: api/classes/CUser.php:949
 msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
@@ -2086,7 +2086,7 @@ msgstr[0] ""
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含檢視檔案\"%s\"."
 
-#: api/classes/CUser.php:771
+#: api/classes/CUser.php:738
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
@@ -2094,11 +2094,11 @@ msgstr "不能插入用戶示警媒介"
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
-#: api/classes/CUser.php:921
+#: api/classes/CUser.php:1099
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:846
+#: api/classes/CUser.php:1021
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -2155,7 +2155,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr "無法移除巨集."
 
-#: api/classes/CUser.php:300
+#: api/classes/CUser.php:310
 msgid "Cannot rename guest user."
 msgstr "無法重新命名訪客用戶."
 
@@ -2201,7 +2201,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "無法為介面切換主機."
 
-#: users.php:317
+#: users.php:323
 msgid "Cannot unblock users"
 msgstr "無法解除阻擋用戶"
 
@@ -2494,11 +2494,11 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
-#: api/classes/CUser.php:763
+#: api/classes/CUser.php:818
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
@@ -3115,7 +3115,7 @@ msgstr "複製"
 msgid "Copy selected to ..."
 msgstr "複製所選的到 ..."
 
-#: api/classes/CUser.php:966
+#: api/classes/CUser.php:1144
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "正確登入\"%s\"."
@@ -3402,7 +3402,7 @@ msgstr "自訂簡報片"
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr "D"
 
@@ -3501,7 +3501,7 @@ msgstr "資料"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4591,7 +4591,7 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr "重複的嚴重性名稱\"%s\"."
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:318
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "重複的用戶別名\"%s\"."
@@ -4711,7 +4711,7 @@ msgstr ""
 #: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
 #: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
 msgstr "空的輸入參數."
 
@@ -5791,8 +5791,8 @@ msgstr "維修中的群組"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -7306,7 +7306,7 @@ msgstr "予服務\"%1$s\"不正確的狀態."
 msgid "Incorrect status."
 msgstr "不正確的狀態."
 
-#: api/classes/CUser.php:352
+#: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr ""
@@ -7607,6 +7607,8 @@ msgstr ""
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
+#: api/classes/CUser.php:673 api/classes/CUser.php:693
+#: api/classes/CUser.php:851 api/classes/CUser.php:896
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "無效的方法參數."
@@ -7686,7 +7688,7 @@ msgstr "以用戶密碼過濾是不可能的."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "不可能於HTTP認證中登出."
 
-#: api/classes/CUserMedia.php:186 api/classes/CUser.php:154
+#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
@@ -8389,12 +8391,12 @@ msgstr "登入"
 msgid "Login as Guest"
 msgstr "登入為訪客"
 
-#: api/classes/CUser.php:958
+#: api/classes/CUser.php:1136
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "登入失敗\"%s\"."
 
-#: api/classes/CUser.php:926
+#: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8403,8 +8405,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876
+#: api/classes/CUser.php:984 api/classes/CUser.php:1003
+#: api/classes/CUser.php:1052
 msgid "Login name or password is incorrect."
 msgstr "登入名稱或密碼是不正確的."
 
@@ -8747,7 +8749,7 @@ msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: api/classes/CUser.php:316
+#: api/classes/CUser.php:326
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9818,7 +9820,7 @@ msgstr "不具拓墣圖\"%1$s\"的許可權."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1015
+#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
@@ -9861,7 +9863,9 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
+#: api/classes/CUser.php:859 api/classes/CUser.php:879
+#: api/classes/CUser.php:938 api/classes/CUser.php:1363
 #: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
@@ -9990,7 +9994,7 @@ msgstr "沒有已定義的觸發器."
 msgid "No triggers found."
 msgstr "每有找到觸發器."
 
-#: api/classes/CUser.php:579
+#: api/classes/CUser.php:590
 msgid "No user ID given."
 msgstr ""
 
@@ -10113,7 +10117,7 @@ msgstr "非模板項目"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "並非所有的模板都連結到\"%s\"."
 
-#: api/classes/CUser.php:374
+#: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "不允許設定用戶\"guest\"的密碼."
 
@@ -10496,15 +10500,15 @@ msgstr "只有超級管理員可以更新全域巨集."
 msgid "Only Super Admins can update icon maps."
 msgstr "只有超級管理員可以更新圖示對應."
 
-#: api/classes/CUser.php:640
+#: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超級管理員可以新增用戶示警媒介."
 
-#: api/classes/CUser.php:708
+#: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超級管理員可以用改變戶示警媒介."
 
-#: api/classes/CUser.php:678
+#: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超級管理員可以移除用戶示警媒介."
 
@@ -11203,7 +11207,7 @@ msgstr "私有金鑰檔"
 msgid "Privilege level"
 msgstr "優先權層級"
 
-#: api/classes/CUser.php:803
+#: api/classes/CUser.php:975
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
@@ -11688,7 +11692,7 @@ msgstr "結果為偽"
 msgid "Result is TRUE"
 msgstr "結果為真"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr "\"%s\"的結果"
@@ -12234,7 +12238,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "脚本"
 
@@ -12508,7 +12512,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: api/classes/CUser.php:1009
+#: api/classes/CUser.php:1188
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -13591,7 +13595,7 @@ msgid "Trends"
 msgstr "趨勢"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -14349,12 +14353,12 @@ msgstr "用於動作中"
 msgid "User"
 msgstr "用户"
 
-#: api/classes/CUser.php:328
+#: api/classes/CUser.php:338
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "用戶\"%s\"不能沒有用戶群組."
 
-#: users.php:212
+#: users.php:218
 msgid "User added"
 msgstr "新增用户"
 
@@ -14379,7 +14383,7 @@ msgstr "用戶不能改變自己的狀態"
 msgid "User cannot change status of himself."
 msgstr "用戶不能改變自己的狀態"
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "User deleted"
 msgstr "用户已删除"
 
@@ -14438,16 +14442,16 @@ msgstr ""
 msgid "User groups"
 msgstr "用户群組"
 
-#: api/classes/CUser.php:1196
+#: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
 msgstr "用戶是不允許刪除自己"
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:351
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "用戶不能因為成為用戶群組 \"%s\"的成員而幫自己修改GUI存取."
 
-#: api/classes/CUser.php:345
+#: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "用戶不能因為成為用戶群組 \"%s\"的成員而幫自己修改系統狀態."
@@ -14491,11 +14495,11 @@ msgstr ""
 msgid "User type"
 msgstr "用戶類型"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "User updated"
 msgstr "用户已更新"
 
-#: api/classes/CUser.php:390
+#: api/classes/CUser.php:400
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "使用別名\"%s\"的用戶已存在."
@@ -14521,7 +14525,7 @@ msgstr "用户"
 msgid "Users (online)"
 msgstr "用戶(線上)"
 
-#: users.php:317
+#: users.php:323
 msgid "Users unblocked"
 msgstr "未被封鎖的用戶"
 
@@ -15099,7 +15103,7 @@ msgstr "錯誤的服務\"%1$s\"其時間欄位."
 msgid "Wrong fields for trigger."
 msgstr "錯誤的觸發器欄位."
 
-#: api/classes/CUser.php:272
+#: api/classes/CUser.php:283
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "錯誤的用戶欄位\"%s\"."
@@ -15224,7 +15228,7 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您無法選擇某些語言, 因為這些語系並未安裝於web伺服器上."
 
-#: api/classes/CUser.php:357
+#: api/classes/CUser.php:367
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允許來幫用戶\"%s\"轉換優先權."
@@ -15268,15 +15272,15 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 msgid "You do not have permission to perform this operation."
 msgstr "您沒有許可權來完成此操作."
 
-#: api/classes/CUser.php:278
+#: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
 msgstr "您沒有許可權來創建用戶."
 
-#: api/classes/CUser.php:290
+#: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
 msgstr "您沒有許可權來更新其它用戶."
 
-#: api/classes/CUser.php:285
+#: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您沒有許可權來來更新用戶或用戶不存在."
 
@@ -15439,7 +15443,7 @@ msgid "agent"
 msgstr "端點代理程式"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15490,8 +15494,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
@@ -15536,14 +15540,14 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15673,7 +15677,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15713,16 +15717,16 @@ msgstr "維護"
 msgid "map"
 msgstr "拓墣圖"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "最大"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15752,7 +15756,7 @@ msgstr "必需為一個正確的LDAP用戶"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"

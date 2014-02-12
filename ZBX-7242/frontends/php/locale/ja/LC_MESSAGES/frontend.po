@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-03 16:26+0200\n"
-"PO-Revision-Date: 2014-01-29 02:05+0300\n"
+"POT-Creation-Date: 2014-02-06 13:21+0200\n"
+"PO-Revision-Date: 2014-02-02 09:14+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1390953918.0\n"
+"X-POOTLE-MTIME: 1391325245.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -227,7 +227,7 @@ msgstr "アクセスは拒否されました！"
 msgid "Access denied."
 msgstr "アクセスは拒否されました。"
 
-#: api/classes/CUser.php:882
+#: api/classes/CUser.php:1058
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "アカウントは%s秒間ブロックされています"
@@ -1414,7 +1414,7 @@ msgstr "トリガーを追加できません"
 msgid "Cannot add trigger prototype"
 msgstr "トリガーのプロトタイプが追加できません"
 
-#: users.php:212
+#: users.php:218
 msgid "Cannot add user"
 msgstr "ユーザーを追加できません"
 
@@ -1470,7 +1470,7 @@ msgstr "アイテムのプロトタイプを複製できません"
 msgid "Cannot clone trigger prototypes."
 msgstr "トリガーのプロトタイプを複製できません"
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "ZabbixサーバーデーモンのTrapperポートに接続できません。スクリプトを実行するためには適切に設定を行ってください。"
 
@@ -1538,7 +1538,7 @@ msgstr "新しい要素を作成できません"
 msgid "Cannot create screen."
 msgstr "スクリーンを作成できません。"
 
-#: api/classes/CUser.php:1216
+#: api/classes/CUser.php:1398
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbixユーザー\"%1$s\"を削除できません。ユーザーを無効に設定してください。"
@@ -1761,11 +1761,11 @@ msgstr "トリガーを削除できません"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "ローレベルディスカバリによって作成されたトリガーは削除できません。"
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "Cannot delete user"
 msgstr "ユーザーを削除できません"
 
-#: api/classes/CUser.php:742
+#: api/classes/CUser.php:949
 msgid "Cannot delete user media."
 msgstr "ユーザーのメディアを削除できません"
 
@@ -2082,7 +2082,7 @@ msgstr[0] "テンプレート\"%1$s\"をインポートできません。リン�
 msgid "Cannot include view file \"%s\"."
 msgstr "ビューファイル\"%s\"を読み込めません。"
 
-#: api/classes/CUser.php:771
+#: api/classes/CUser.php:738
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
@@ -2090,11 +2090,11 @@ msgstr "ユーザーメディアを追加できません"
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
-#: api/classes/CUser.php:921
+#: api/classes/CUser.php:1099
 msgid "Cannot login."
-msgstr ""
+msgstr "ログインできません。"
 
-#: api/classes/CUser.php:846
+#: api/classes/CUser.php:1021
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
@@ -2151,7 +2151,7 @@ msgstr "すべてのアイテムを削除できません。少なくとの1つ�
 msgid "Cannot remove macro."
 msgstr "マクロを削除できません"
 
-#: api/classes/CUser.php:300
+#: api/classes/CUser.php:310
 msgid "Cannot rename guest user."
 msgstr "ゲストユーザーの名前は変更できません"
 
@@ -2197,7 +2197,7 @@ msgstr "無効の状態のインベントリのフィールドは設定できま
 msgid "Cannot switch host for interface."
 msgstr "インターフェースのためのホストを切り替えできません。"
 
-#: users.php:317
+#: users.php:323
 msgid "Cannot unblock users"
 msgstr "ユーザーのブロックを解除できません"
 
@@ -2490,11 +2490,11 @@ msgstr "トリガーのプロトタイプが更新できません"
 msgid "Cannot update trigger prototypes"
 msgstr "トリガーのプロトタイプが更新できません"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "Cannot update user"
 msgstr "ユーザーを更新できません"
 
-#: api/classes/CUser.php:763
+#: api/classes/CUser.php:818
 msgid "Cannot update user media."
 msgstr "ユーザーのメディアを更新できません"
 
@@ -3111,7 +3111,7 @@ msgstr "コピー"
 msgid "Copy selected to ..."
 msgstr "選択をコピー..."
 
-#: api/classes/CUser.php:966
+#: api/classes/CUser.php:1144
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "ユーザー\"%s\"のログイン"
@@ -3398,7 +3398,7 @@ msgstr "カスタムスライド"
 msgid "Czech (cs_CZ)"
 msgstr "チェコ語 (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr "D"
 
@@ -3497,7 +3497,7 @@ msgstr "データ"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "データキャッシュの統計。cache - values (mode: all, float, uint, str, log, text)、history (mode: pfree, total, used, free)、trend (mode: pfree, total, used, free)、text (mode: pfree, total, used, free)。"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4587,7 +4587,7 @@ msgstr "スクリプト名\"%1$s\"は重複しています"
 msgid "Duplicate severity name \"%s\"."
 msgstr "重要度名\"%s\"は重複しています"
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:318
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "ユーザー名\"%s\"は重複しています"
@@ -4707,7 +4707,7 @@ msgstr "ホストが空白です。"
 #: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
 #: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
 msgstr "入力パラメータが空白です"
 
@@ -5787,8 +5787,8 @@ msgstr "メンテナンス対象のホストグループ"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -7302,7 +7302,7 @@ msgstr "サービス\"%1$s\"のステータスが正しくありません。"
 msgid "Incorrect status."
 msgstr "ステータスが正しくありません。"
 
-#: api/classes/CUser.php:352
+#: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr "ユーザー\"%1$s\"のテーマが正しくありません。"
@@ -7603,6 +7603,8 @@ msgstr "メンテナンス期間が正しくありません。"
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
+#: api/classes/CUser.php:673 api/classes/CUser.php:693
+#: api/classes/CUser.php:851 api/classes/CUser.php:896
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "メソッドのパラメータが正しくありません。"
@@ -7682,7 +7684,7 @@ msgstr "ユーザーのパスワードによるフィルターは行えません
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "HTTP認証からはログアウトできません。"
 
-#: api/classes/CUserMedia.php:186 api/classes/CUser.php:154
+#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "ユーザーのパスワードによる検索は行えません。"
 
@@ -8385,22 +8387,22 @@ msgstr "ログイン"
 msgid "Login as Guest"
 msgstr "ゲストとしてログイン"
 
-#: api/classes/CUser.php:958
+#: api/classes/CUser.php:1136
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "ログイン失敗\"%s\""
 
-#: api/classes/CUser.php:926
+#: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "ユーザー名\"%1$s\"がHTTP認証で利用したユーザー名\"%2$s\"と一致しません。"
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
 msgstr "ログイン名かパスワードが間違っています!"
 
-#: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876
+#: api/classes/CUser.php:984 api/classes/CUser.php:1003
+#: api/classes/CUser.php:1052
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
 
@@ -8743,7 +8745,7 @@ msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] "DNS名の最大文字数は%1$d文字です。\"%2$s\"は%3$d文字あります。"
 
-#: api/classes/CUser.php:316
+#: api/classes/CUser.php:326
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9812,7 +9814,7 @@ msgstr "マップ\"%1$s\"への権限がありません。"
 msgid "No permissions for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"への権限がありません。"
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1015
+#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -9855,7 +9857,9 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
+#: api/classes/CUser.php:859 api/classes/CUser.php:879
+#: api/classes/CUser.php:938 api/classes/CUser.php:1363
 #: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "対象が存在しないか、アクセス権がありません！"
@@ -9984,7 +9988,7 @@ msgstr "トリガーが設定されていません。"
 msgid "No triggers found."
 msgstr "トリガーが存在しません。"
 
-#: api/classes/CUser.php:579
+#: api/classes/CUser.php:590
 msgid "No user ID given."
 msgstr "ユーザー IDが存在しません。"
 
@@ -10107,7 +10111,7 @@ msgstr "テンプレートではないアイテム"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "すべてのテンプレートは\"%s\"にリンクされていません。"
 
-#: api/classes/CUser.php:374
+#: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "ゲストユーザーはパスワードを設定できません。"
 
@@ -10490,15 +10494,15 @@ msgstr "特権管理者のみがグローバルマクロを更新できます。
 msgid "Only Super Admins can update icon maps."
 msgstr "特権管理者のみがアイコンのマッピングを更新できます。"
 
-#: api/classes/CUser.php:640
+#: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
 msgstr "特権管理者のみがユーザーのメディアを追加できます。"
 
-#: api/classes/CUser.php:708
+#: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
 msgstr "特権管理者のみがユーザーのメディアを変更できます。"
 
-#: api/classes/CUser.php:678
+#: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
@@ -11197,7 +11201,7 @@ msgstr "秘密鍵ファイル"
 msgid "Privilege level"
 msgstr "特権レベル"
 
-#: api/classes/CUser.php:803
+#: api/classes/CUser.php:975
 msgid "Probably php-ldap module is missing."
 msgstr "php-ldapモジュールが見つかりません。"
 
@@ -11682,7 +11686,7 @@ msgstr "結果が偽"
 msgid "Result is TRUE"
 msgstr "結果が真"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr "\"%s\"の結果"
@@ -12228,7 +12232,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトID\"%1$s\"は存在しません。"
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "スクリプト"
 
@@ -12502,7 +12506,7 @@ msgstr "サービス"
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
-#: api/classes/CUser.php:1009
+#: api/classes/CUser.php:1188
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
@@ -13585,7 +13589,7 @@ msgid "Trends"
 msgstr "トレンド"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -14343,12 +14347,12 @@ msgstr "アクションで利用"
 msgid "User"
 msgstr "ユーザー"
 
-#: api/classes/CUser.php:328
+#: api/classes/CUser.php:338
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "ユーザー\"%s\"にユーザーグループを設定してください。"
 
-#: users.php:212
+#: users.php:218
 msgid "User added"
 msgstr "ユーザーを追加しました"
 
@@ -14373,7 +14377,7 @@ msgstr "ユーザーは自分自身のステータスを変更できません"
 msgid "User cannot change status of himself."
 msgstr "ユーザーは自分自身のステータスを変更できません。"
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "User deleted"
 msgstr "ユーザーを削除しました"
 
@@ -14432,16 +14436,16 @@ msgstr "データベース停止メッセージ\"%1$s\"の送信先グループ�
 msgid "User groups"
 msgstr "ユーザーグループ"
 
-#: api/classes/CUser.php:1196
+#: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:351
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のWebインターフェースへのアクセス設定を変更することはできません。"
 
-#: api/classes/CUser.php:345
+#: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "ユーザーはグループ\"%s\"のメンバーになることにより自分自身のシステムステータスを変更することはできません。"
@@ -14485,11 +14489,11 @@ msgstr "ユーザーセッション"
 msgid "User type"
 msgstr "ユーザーの種類"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "User updated"
 msgstr "ユーザーを更新しました"
 
-#: api/classes/CUser.php:390
+#: api/classes/CUser.php:400
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "アカウント名\"%s\"を持つユーザーがすでに存在します。"
@@ -14515,7 +14519,7 @@ msgstr "ユーザー"
 msgid "Users (online)"
 msgstr "ユーザー数 (オンライン)"
 
-#: users.php:317
+#: users.php:323
 msgid "Users unblocked"
 msgstr "ユーザーのブロックを解除しました"
 
@@ -15093,7 +15097,7 @@ msgstr "サービス\"%1$s\"のための時間の設定が正しくありませ�
 msgid "Wrong fields for trigger."
 msgstr "トリガーの設定が正しくありません。"
 
-#: api/classes/CUser.php:272
+#: api/classes/CUser.php:283
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "ユーザー\"%s\"の設定が正しくありません"
@@ -15218,7 +15222,7 @@ msgstr "ヨタ"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
-#: api/classes/CUser.php:357
+#: api/classes/CUser.php:367
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "ユーザー\"%s\"の権限変更は許可されていません。"
@@ -15262,15 +15266,15 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 msgid "You do not have permission to perform this operation."
 msgstr "操作に対する権限がありません。"
 
-#: api/classes/CUser.php:278
+#: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
 msgstr "ユーザーを作成する権限がありません。"
 
-#: api/classes/CUser.php:290
+#: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
 msgstr "他のユーザーを更新する権限がありません。"
 
-#: api/classes/CUser.php:285
+#: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "ユーザーを更新する権限がないか、ユーザーが存在しません。"
 
@@ -15433,7 +15437,7 @@ msgid "agent"
 msgstr "エージェント"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15484,8 +15488,8 @@ msgstr "自動登録"
 msgid "auto-registered host"
 msgstr "自動登録ホスト"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
@@ -15530,14 +15534,14 @@ msgstr "Y/m/d H:i:s"
 msgid "d.M"
 msgstr "m/d"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr "m/d"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr "m/d H:i"
 
@@ -15667,7 +15671,7 @@ msgstr "アイテム"
 msgid "key is empty"
 msgstr "キーが設定されていません"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15707,16 +15711,16 @@ msgstr "メンテナンス"
 msgid "map"
 msgstr "マップ"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "最大"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15746,7 +15750,7 @@ msgstr "有効なLDAPユーザーが必要です"
 msgid "new"
 msgstr "新規"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
