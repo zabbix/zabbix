@@ -92,7 +92,7 @@ $probe = API::Host()->get(array(
 $data['probe'] = reset($probe);
 
 // get probe host
-$hostName = $data['tld']['host'].' '.$data['probe']['host'];
+$hostName = $data['probe']['host'];
 
 $host = API::Host()->get(array(
 	'output' => array('hostid'),
