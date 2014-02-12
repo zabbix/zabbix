@@ -231,7 +231,7 @@ sub get_lastclock
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_ like '$key%')");
+	    	" and i.key_ like '$key%'");
     }
     else
     {
