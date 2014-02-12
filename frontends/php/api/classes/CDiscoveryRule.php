@@ -1413,7 +1413,7 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($result as $rule) {
 				$filters[$rule['itemid']] = array(
 					'evaltype' => $rule['evaltype'],
-					'formula' => $rule['formula']
+					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
 				);
 			}
 
