@@ -3,6 +3,7 @@ Changes for 2.0.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.11
