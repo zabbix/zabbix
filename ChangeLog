@@ -3,6 +3,7 @@ Changes for 2.2.3rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
 ..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
 ..F....... [ZBX-7651] fixed item configuration flexible interval adding (Eduard)
 ..F....... [ZBX-7630] fixed latest issues link on monitoring events (Eduard)
@@ -810,6 +811,7 @@ Changes for 2.0.12rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
 ..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
 
 --------------------------------------------------------------------------------
