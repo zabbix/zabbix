@@ -37,6 +37,7 @@ Changes for 2.2.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7756] fixed SQL error in Monitoring > Maps page (Ivo)
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
 ..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
 ..F....... [ZBX-7651] fixed item configuration flexible interval adding (Eduard)
