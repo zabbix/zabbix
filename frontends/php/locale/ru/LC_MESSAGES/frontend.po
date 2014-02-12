@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 13:20+0200\n"
+"POT-Creation-Date: 2014-02-13 01:48+0200\n"
 "PO-Revision-Date: 2014-01-26 15:22+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -38,7 +38,7 @@ msgstr[0] "%1$d день"
 msgstr[1] "%1$d дня"
 msgstr[2] "%1$d дней"
 
-#: include/blocks.inc.php:1041
+#: include/blocks.inc.php:1042
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -125,7 +125,7 @@ msgstr "(без прокси)"
 msgid "(with warnings)"
 msgstr "(с предупреждениями)"
 
-#: include/blocks.inc.php:1517
+#: include/blocks.inc.php:1518
 msgid "-"
 msgstr "-"
 
@@ -244,14 +244,14 @@ msgstr "Доступ запрещен."
 msgid "Account is blocked for %s seconds"
 msgstr "Аккаунт заблокирован на %s секунд"
 
-#: events.php:584 events.php:597 include/actions.inc.php:256
-#: include/blocks.inc.php:923 include/blocks.inc.php:1490
+#: events.php:586 events.php:599 include/actions.inc.php:256
+#: include/blocks.inc.php:923 include/blocks.inc.php:1491
 #: include/events.inc.php:204 include/events.inc.php:279
 #: include/views/configuration.action.edit.php:1013
 msgid "Ack"
 msgstr "Подтверждено"
 
-#: acknow.php:226 jsLoader.php:198 tr_status.php:708
+#: acknow.php:226 jsLoader.php:198 tr_status.php:711
 msgid "Acknowledge"
 msgstr "Подтвердить"
 
@@ -271,7 +271,7 @@ msgstr "Подтвердить и вернуться"
 msgid "Acknowledge status"
 msgstr "Состояние подтверждения"
 
-#: include/events.inc.php:189 tr_status.php:375 tr_status.php:719
+#: include/events.inc.php:189 tr_status.php:375 tr_status.php:722
 msgid "Acknowledged"
 msgstr "Подтверждено"
 
@@ -364,8 +364,8 @@ msgstr "Операции действия"
 msgid "Action updated"
 msgstr "Действие обновлено"
 
-#: events.php:585 events.php:598 include/blocks.inc.php:924
-#: include/blocks.inc.php:1491 include/events.inc.php:205
+#: events.php:587 events.php:600 include/blocks.inc.php:924
+#: include/blocks.inc.php:1492 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -395,9 +395,9 @@ msgstr "Активно с"
 msgid "Active till"
 msgstr "Активно до"
 
-#: include/blocks.inc.php:1209 include/blocks.inc.php:1215
-#: include/blocks.inc.php:1333 include/blocks.inc.php:1378
-#: include/blocks.inc.php:1384 include/reports.inc.php:122
+#: include/blocks.inc.php:1210 include/blocks.inc.php:1216
+#: include/blocks.inc.php:1334 include/blocks.inc.php:1379
+#: include/blocks.inc.php:1385 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -446,7 +446,7 @@ msgstr "Активно до"
 #: include/views/js/configuration.sysmaps.js.php:402
 #: include/views/monitoring.history.php:100 popup_bitem.php:166
 #: popup_media.php:141 popup_period.php:134 tr_logform.php:293
-#: tr_status.php:763
+#: tr_status.php:766
 msgid "Add"
 msgstr "Добавить"
 
@@ -519,7 +519,7 @@ msgstr "Администрирование"
 msgid "Advanced labels"
 msgstr "Расширенные подписи"
 
-#: include/blocks.inc.php:921 include/blocks.inc.php:1488
+#: include/blocks.inc.php:921 include/blocks.inc.php:1489
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -568,9 +568,9 @@ msgstr "Псевдоним"
 msgid "Align icons"
 msgstr "Привязать иконки"
 
-#: include/blocks.inc.php:1311 include/blocks.inc.php:1320
-#: include/blocks.inc.php:1366 include/blocks.inc.php:1450
-#: include/blocks.inc.php:1459 include/nodes.inc.php:174
+#: include/blocks.inc.php:1312 include/blocks.inc.php:1321
+#: include/blocks.inc.php:1367 include/blocks.inc.php:1451
+#: include/blocks.inc.php:1460 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -688,7 +688,7 @@ msgstr "Близится"
 msgid "Apr"
 msgstr "Апр"
 
-#: include/forms.inc.php:1695 include/func.inc.php:132
+#: include/forms.inc.php:1693 include/func.inc.php:132
 #: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "Апрель"
@@ -756,7 +756,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/forms.inc.php:1776
+#: include/forms.inc.php:1774
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
 
@@ -798,7 +798,7 @@ msgstr "Журнал аудита"
 msgid "Aug"
 msgstr "Авг"
 
-#: include/forms.inc.php:1687 include/func.inc.php:136
+#: include/forms.inc.php:1685 include/func.inc.php:136
 #: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "Август"
@@ -1006,7 +1006,7 @@ msgstr "Светлее"
 msgid "Bulgarian (bg_BG)"
 msgstr "Болгарский (bg_BG)"
 
-#: tr_status.php:850
+#: tr_status.php:853
 msgid "Bulk acknowledge"
 msgstr "Массовое подтверждение"
 
@@ -2597,11 +2597,11 @@ msgstr "Заголовок"
 msgid "Case sensitive"
 msgstr "Регистрозависимое"
 
-#: include/classes/items/CHelpItems.php:785
+#: include/classes/items/CHelpItems.php:781
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr "Отлов всех SNMP трапов с соответствующего адреса, которые совпадают с регулярным выражением. По умолчанию регулярным выражением является пустая строка."
 
-#: include/classes/items/CHelpItems.php:781
+#: include/classes/items/CHelpItems.php:777
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[] с соответствующего адреса интерфейса."
 
@@ -2610,7 +2610,7 @@ msgid "Center"
 msgstr "По центру"
 
 #: include/classes/screens/CScreenBase.php:258
-#: include/classes/screens/CScreenBuilder.php:419
+#: include/classes/screens/CScreenBuilder.php:417
 #: include/classes/screens/CScreenMap.php:61
 #: include/views/configuration.services.edit.php:52
 msgid "Change"
@@ -2916,7 +2916,7 @@ msgstr "Условия"
 msgid "Configuration"
 msgstr "Настройка"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:847
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика кэша конфигурации. Кэш - buffer (режимы: pfree, total, used, free)."
 
@@ -3494,8 +3494,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "ДЕТАЛИ СЦЕНАРИЯ"
 
-#: include/maps.inc.php:674 include/maps.inc.php:756 include/maps.inc.php:844
-#: include/maps.inc.php:934
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "ОТКЛЮЧЕНО"
 
@@ -3507,7 +3507,7 @@ msgstr "ОБНАРУЖЕНО"
 msgid "DM"
 msgstr "РМ"
 
-#: events.php:503 events.php:512 hosts.php:774
+#: events.php:505 events.php:514 hosts.php:774
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -3532,7 +3532,7 @@ msgstr "DNS имя"
 msgid "DOWN"
 msgstr "НЕДОСТУПНО"
 
-#: include/forms.inc.php:1644 include/maintenances.inc.php:36
+#: include/forms.inc.php:1642 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3567,7 +3567,7 @@ msgstr "Пунктирная линия"
 msgid "Data"
 msgstr "Данные"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:883
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trend (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
@@ -3634,7 +3634,7 @@ msgstr "Тип базы данных"
 msgid "Database user"
 msgstr "Имя пользователя от базы данных"
 
-#: include/forms.inc.php:1711 include/forms.inc.php:1772 jsrpc.php:137
+#: include/forms.inc.php:1709 include/forms.inc.php:1770 jsrpc.php:137
 msgid "Date"
 msgstr "Дата"
 
@@ -3654,12 +3654,12 @@ msgstr "Дата окончания обслуживания HW"
 msgid "Date HW purchased"
 msgstr "Дата покупки HW"
 
-#: include/forms.inc.php:1713 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1711 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:295 tr_status.php:297
 msgid "Day"
 msgstr "День"
 
-#: include/forms.inc.php:1745
+#: include/forms.inc.php:1743
 msgid "Day of month"
 msgstr "День месяца"
 
@@ -3679,8 +3679,8 @@ msgstr "День месяца > N"
 msgid "Day of month is NOT N"
 msgstr "День месяца NOT N"
 
-#: include/forms.inc.php:1673 include/forms.inc.php:1716
-#: include/forms.inc.php:1741
+#: include/forms.inc.php:1671 include/forms.inc.php:1714
+#: include/forms.inc.php:1739
 msgid "Day of week"
 msgstr "День недели"
 
@@ -3700,7 +3700,7 @@ msgstr "День недели > N"
 msgid "Day of week is NOT N"
 msgstr "День недели NOT N"
 
-#: include/forms.inc.php:1789 tr_status.php:295 tr_status.php:297
+#: include/forms.inc.php:1787 tr_status.php:295 tr_status.php:297
 msgid "Days"
 msgstr "Дни"
 
@@ -3722,7 +3722,7 @@ msgstr "Режим отладки обновлен"
 msgid "Dec"
 msgstr "Дек"
 
-#: include/forms.inc.php:1707 include/func.inc.php:140
+#: include/forms.inc.php:1705 include/func.inc.php:140
 #: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "Декабрь"
@@ -4195,7 +4195,7 @@ msgstr "Зависит от"
 msgid "Deployment status"
 msgstr "Состояние развертывания"
 
-#: events.php:504 events.php:513 events.php:580 events.php:593
+#: events.php:506 events.php:515 events.php:582 events.php:595
 #: include/classes/screens/CScreenEvents.php:42
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
@@ -4468,7 +4468,7 @@ msgid "Discovery object"
 msgstr "Объект обнаружения"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1180 include/forms.inc.php:1131
+#: include/blocks.inc.php:1181 include/forms.inc.php:1131
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4576,7 +4576,7 @@ msgstr "Готово"
 msgid "Dot"
 msgstr "Точечная линия"
 
-#: include/blocks.inc.php:1182
+#: include/blocks.inc.php:1183
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Недоступно"
@@ -4672,7 +4672,7 @@ msgstr "Дублированное имя важности \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дубликат псевдонима пользователя \"%s\"."
 
-#: events.php:583 events.php:596 include/events.inc.php:202
+#: events.php:585 events.php:598 include/events.inc.php:202
 #: include/events.inc.php:279 include/events.inc.php:282 tr_status.php:374
 msgid "Duration"
 msgstr "Длительность"
@@ -5060,11 +5060,11 @@ msgstr "События"
 msgid "Events and alerts"
 msgstr "События и оповещения"
 
-#: include/forms.inc.php:1656
+#: include/forms.inc.php:1654
 msgid "Every day(s)"
 msgstr "Каждый день(и)"
 
-#: include/forms.inc.php:1663
+#: include/forms.inc.php:1661
 msgid "Every week(s)"
 msgstr "Каждую неделю(и)"
 
@@ -5128,7 +5128,7 @@ msgstr "Расширенный круговой"
 msgid "Export selected"
 msgstr "Экспортировать выбранное"
 
-#: events.php:266
+#: events.php:265
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
@@ -5146,8 +5146,8 @@ msgstr "Экспорт в CSV"
 msgid "Expression"
 msgstr "Выражение"
 
-#: include/forms.inc.php:1482 include/forms.inc.php:1487
-#: include/forms.inc.php:1500
+#: include/forms.inc.php:1480 include/forms.inc.php:1485
+#: include/forms.inc.php:1498
 msgid "Expression Syntax Error."
 msgstr "Ошибка в синтаксисе выражения."
 
@@ -5204,7 +5204,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Ошибка"
 
-#: include/actions.inc.php:1075 include/blocks.inc.php:1093
+#: include/actions.inc.php:1075 include/blocks.inc.php:1094
 msgid "Failed"
 msgstr "Неудачно"
 
@@ -5216,15 +5216,15 @@ msgstr "Ошибка обновления шаблона"
 msgid "Failure Audit"
 msgstr "Аудит отказа"
 
-#: dashboard.php:311 include/blocks.inc.php:1202
+#: dashboard.php:311 include/blocks.inc.php:1203
 msgid "Favourite graphs"
 msgstr "Избранные графики"
 
-#: dashboard.php:339 include/blocks.inc.php:1331
+#: dashboard.php:339 include/blocks.inc.php:1332
 msgid "Favourite maps"
 msgstr "Избранные карты сетей"
 
-#: dashboard.php:325 include/blocks.inc.php:1376
+#: dashboard.php:325 include/blocks.inc.php:1377
 msgid "Favourite screens"
 msgstr "Избранные комплексные экраны"
 
@@ -5236,7 +5236,7 @@ msgstr "Избранные"
 msgid "Feb"
 msgstr "Фев"
 
-#: include/forms.inc.php:1685 include/func.inc.php:130
+#: include/forms.inc.php:1683 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "Февраль"
@@ -5325,7 +5325,7 @@ msgstr "Информация о времени файла. Количество 
 msgid "Filled region"
 msgstr "Заполнение"
 
-#: events.php:356 hosts.php:779 include/classes/class.cwidget.php:130
+#: events.php:358 hosts.php:779 include/classes/class.cwidget.php:130
 #: include/forms.inc.php:627
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -5371,7 +5371,7 @@ msgstr "Финиш"
 msgid "Finnish (fi_FI)"
 msgstr "Финский (fi_FI)"
 
-#: include/forms.inc.php:1723 include/maintenances.inc.php:118
+#: include/forms.inc.php:1721 include/maintenances.inc.php:118
 msgid "First"
 msgstr "Первый"
 
@@ -5402,7 +5402,7 @@ msgstr "Пароль для Гостя должен быть пустым"
 msgid "Formula"
 msgstr "Формула"
 
-#: include/forms.inc.php:1726 include/maintenances.inc.php:121
+#: include/forms.inc.php:1724 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "Четвертый"
 
@@ -5414,7 +5414,7 @@ msgstr "French (fr_FR)"
 msgid "Fri"
 msgstr "Пт"
 
-#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/forms.inc.php:1668 include/forms.inc.php:1736
 #: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Пятница"
@@ -5520,7 +5520,6 @@ msgstr "Поддержка"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:551
-#: include/classes/items/CHelpItems.php:775
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr "Получение времени загрузки полной веб-страницы. Путь по умолчанию - /"
 
@@ -5566,7 +5565,7 @@ msgstr "Глобальные скрипты"
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:67
 #: include/views/configuration.triggers.list.php:292 templates.php:650
-#: tr_status.php:852
+#: tr_status.php:855
 msgid "Go"
 msgstr "Выполнить"
 
@@ -5586,7 +5585,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Градиентная линия"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1209
+#: include/audit.inc.php:29 include/blocks.inc.php:1210
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:403 latest.php:575
@@ -5708,7 +5707,7 @@ msgid "Graph prototypes of"
 msgstr "Прототипы графиков для"
 
 #: include/graphs.inc.php:44
-#: include/views/js/configuration.graph.edit.js.php:28
+#: include/views/js/configuration.graph.edit.js.php:31
 msgid "Graph sum"
 msgstr "Суммарный график"
 
@@ -5731,7 +5730,7 @@ msgstr "График с именем \"%1$s\" уже существует в г�
 msgid "Graph with same name but other type exist."
 msgstr "График с таким же именем, но другого типа, уже существует."
 
-#: dashboard.php:312 hosts.php:811 hosts.php:904 include/blocks.inc.php:1311
+#: dashboard.php:312 hosts.php:811 hosts.php:904 include/blocks.inc.php:1312
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5874,15 +5873,15 @@ msgid "H:i"
 msgstr "H:i"
 
 #: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1039
-#: include/blocks.inc.php:1138 include/blocks.inc.php:1196
+#: include/blocks.inc.php:786 include/blocks.inc.php:1040
+#: include/blocks.inc.php:1139 include/blocks.inc.php:1197
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
 msgid "H:i:s"
 msgstr "H:i:s"
 
-#: events.php:269
+#: events.php:268
 msgid "HISTORY OF EVENTS"
 msgstr "ИСТОРИЯ СОБЫТИЙ"
 
@@ -6046,11 +6045,11 @@ msgstr "Горизонтальный"
 msgid "Horizontal align"
 msgstr "Выравнивание по горизонтали"
 
-#: events.php:289 events.php:528 events.php:579 events.php:592 httpmon.php:73
+#: events.php:289 events.php:530 events.php:581 events.php:594 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:602 include/blocks.inc.php:649
 #: include/blocks.inc.php:907 include/blocks.inc.php:918
-#: include/blocks.inc.php:1486 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1487 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6148,7 +6147,7 @@ msgstr[2] "Узлы сети активированы"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
-#: include/blocks.inc.php:1091 include/forms.inc.php:517
+#: include/blocks.inc.php:1092 include/forms.inc.php:517
 #: include/maps.inc.php:25 include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
@@ -6438,7 +6437,7 @@ msgstr "Узлы сети обновлены"
 msgid "Hourly"
 msgstr "Ежечасно"
 
-#: include/forms.inc.php:1791
+#: include/forms.inc.php:1789
 msgid "Hours"
 msgstr "Часы"
 
@@ -6470,7 +6469,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:502 events.php:511 hosts.php:775
+#: events.php:504 events.php:513 hosts.php:775
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6725,7 +6724,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:956
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7526,7 +7525,7 @@ msgstr "Некорректный y мин элемент данных для г�
 msgid "Indonesian (id_ID)"
 msgstr "Индонезийский (id_ID)"
 
-#: include/blocks.inc.php:922 include/blocks.inc.php:1489
+#: include/blocks.inc.php:922 include/blocks.inc.php:1490
 #: include/classes/class.cformlist.php:72 tr_status.php:371
 msgid "Info"
 msgstr "Инфо"
@@ -7540,7 +7539,7 @@ msgstr "Информация"
 msgid "Insert"
 msgstr "Вставить"
 
-#: include/forms.inc.php:1494 jsLoader.php:109
+#: include/forms.inc.php:1492 jsLoader.php:109
 msgid "Insert macro"
 msgstr "Вставить макрос"
 
@@ -7760,7 +7759,7 @@ msgid "Is online?"
 msgstr "В системе?"
 
 #: include/blocks.inc.php:909 include/blocks.inc.php:919
-#: include/blocks.inc.php:1487
+#: include/blocks.inc.php:1488
 msgid "Issue"
 msgstr "Проблема"
 
@@ -8054,7 +8053,7 @@ msgstr "Идентификатор Jabber"
 msgid "Jan"
 msgstr "Янв"
 
-#: include/forms.inc.php:1680 include/func.inc.php:129
+#: include/forms.inc.php:1678 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "Январь"
@@ -8067,7 +8066,7 @@ msgstr "Japanese (ja_JP)"
 msgid "Jul"
 msgstr "Июл"
 
-#: include/forms.inc.php:1682 include/func.inc.php:135
+#: include/forms.inc.php:1680 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "Июль"
@@ -8076,7 +8075,7 @@ msgstr "Июль"
 msgid "Jun"
 msgstr "Июн"
 
-#: include/forms.inc.php:1705 include/func.inc.php:134
+#: include/forms.inc.php:1703 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "Июнь"
@@ -8179,7 +8178,7 @@ msgstr "Расположение подписи"
 msgid "Language"
 msgstr "Язык"
 
-#: include/forms.inc.php:1727 include/maintenances.inc.php:122
+#: include/forms.inc.php:1725 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "Последний"
 
@@ -8287,7 +8286,7 @@ msgstr "Latvian (lv_LV)"
 #: include/views/configuration.screen.constructor.edit.php:559
 #: include/views/configuration.screen.constructor.edit.php:588
 #: include/views/configuration.sysmap.edit.php:115
-#: include/views/js/configuration.graph.edit.js.php:71
+#: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
 #: include/views/js/configuration.sysmaps.js.php:246
 #: include/views/monitoring.overview.php:86 popup_bitem.php:153
@@ -8555,7 +8554,7 @@ msgstr "MAC адрес A"
 msgid "MAC address B"
 msgstr "MAC адрес B"
 
-#: include/maps.inc.php:748
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "ОБСЛУЖИВАНИЕ"
 
@@ -8628,7 +8627,7 @@ msgstr "Макросы"
 msgid "Macros updated"
 msgstr "Макросы обновлены"
 
-#: include/audit.inc.php:48 include/maps.inc.php:833 include/maps.inc.php:923
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:148
@@ -8660,7 +8659,7 @@ msgstr "Обслуживание удалено"
 msgid "Maintenance period"
 msgstr "Период обслуживания"
 
-#: include/forms.inc.php:1786
+#: include/forms.inc.php:1784
 msgid "Maintenance period length"
 msgstr "Длительность периода обслуживания"
 
@@ -8702,7 +8701,7 @@ msgstr "Вручную"
 msgid "Manual Logout"
 msgstr "Принудительный выход"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1333
+#: include/audit.inc.php:40 include/blocks.inc.php:1334
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
@@ -8762,7 +8761,7 @@ msgstr "Преобразование значения \"%1$s\" не уникал
 msgid "Mappings"
 msgstr "Соответствия"
 
-#: dashboard.php:340 include/blocks.inc.php:1366 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1367 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:80
@@ -8773,7 +8772,7 @@ msgstr "Карты сетей"
 msgid "Mar"
 msgstr "Мар"
 
-#: include/forms.inc.php:1690 include/func.inc.php:131
+#: include/forms.inc.php:1688 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "Март"
@@ -8909,7 +8908,7 @@ msgstr[0] "Максимальная длина видимого имени уз�
 msgstr[1] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символа."
 msgstr[2] "Максимальная длина видимого имени узла сети %1$d символов, \"%2$s\" - %3$d символов."
 
-#: include/forms.inc.php:1700 include/func.inc.php:133
+#: include/forms.inc.php:1698 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "Май"
@@ -9104,7 +9103,7 @@ msgstr "Минимальное значение за период T > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Минимальное значение за период T NOT N"
 
-#: include/forms.inc.php:1793
+#: include/forms.inc.php:1791
 msgid "Minutes"
 msgstr "Минут"
 
@@ -9176,7 +9175,7 @@ msgstr "Модель"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:1666 include/forms.inc.php:1734
+#: include/forms.inc.php:1664 include/forms.inc.php:1732
 #: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Понедельник"
@@ -9214,11 +9213,11 @@ msgstr "Мониторинг за файлом журнала с ротацие�
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr "Мониторинг за файлом журнала. шаблон - регулярное выражение"
 
-#: include/forms.inc.php:1709 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1707 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "Месяц"
 
-#: include/forms.inc.php:1646 include/maintenances.inc.php:40
+#: include/forms.inc.php:1644 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:405
 #: include/reports.inc.php:413 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9467,7 +9466,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Следующая"
 
-#: events.php:763 include/events.inc.php:362 include/events.inc.php:380
+#: events.php:765 include/events.inc.php:362 include/events.inc.php:380
 #: include/func.inc.php:2429 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
@@ -9657,11 +9656,11 @@ msgstr "Элементы не выбраны!"
 msgid "No errors found."
 msgstr "Ошибки не найдены."
 
-#: include/blocks.inc.php:996 include/blocks.inc.php:1508 tr_status.php:729
+#: include/blocks.inc.php:996 include/blocks.inc.php:1509 tr_status.php:732
 msgid "No events"
 msgstr "Нет событий"
 
-#: events.php:370 include/blocks.inc.php:915
+#: events.php:372 include/blocks.inc.php:915
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
 msgstr "События не найдены."
@@ -10017,10 +10016,6 @@ msgstr "Нет получателей сообщения в операции д�
 msgid "No regular expressions found."
 msgstr "Регулярные выражения не найдены."
 
-#: include/classes/screens/CScreenBuilder.php:293
-msgid "No rows in screen."
-msgstr "В комплексном экране нет строк."
-
 #: api/classes/CScreenItem.php:517
 msgid "No screen ID provided for screen element."
 msgstr "Не указан ID комплексного экрана для элемента комплексного экрана."
@@ -10127,16 +10122,16 @@ msgstr "Преобразования значений не найдены."
 msgid "No values found."
 msgstr "Значения не найдены."
 
-#: httpmon.php:84 include/blocks.inc.php:1088
+#: httpmon.php:84 include/blocks.inc.php:1089
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr "Веб-сценарии не найдены."
 
-#: events.php:578 events.php:591 hosts.php:806 httpmon.php:86
+#: events.php:580 events.php:593 hosts.php:806 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:195 include/blocks.inc.php:385
-#: include/blocks.inc.php:917 include/blocks.inc.php:1090
-#: include/blocks.inc.php:1179 include/blocks.inc.php:1485
+#: include/blocks.inc.php:917 include/blocks.inc.php:1091
+#: include/blocks.inc.php:1180 include/blocks.inc.php:1486
 #: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
 #: include/triggers.inc.php:1636
 #: include/views/administration.general.iconmap.list.php:24
@@ -10288,7 +10283,7 @@ msgstr "Оповещения"
 msgid "Nov"
 msgstr "Ноя"
 
-#: include/forms.inc.php:1702 include/func.inc.php:139
+#: include/forms.inc.php:1700 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "Ноябрь"
@@ -10315,19 +10310,19 @@ msgstr "Количество inode у указанного раздела. Ес�
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Количество элементов данных (активных/деактивированых/не поддерживаются)"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of items in Zabbix database."
 msgstr "Количество элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:839
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые не были еще отправлены на сервер"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Количество элементов данных в очереди которые задерживаются от и до секунд, включительно."
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of monitored hosts"
 msgstr "Количество наблюдаемых узлов сети"
 
@@ -10392,11 +10387,11 @@ msgstr "Количество успешно полученных значени�
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr "Количество триггеров (активированных/деактивированных) [проблема/ок]"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of triggers in Zabbix database."
 msgstr "Количество триггеров в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Количество неподдерживаемых элементов данных в базе данных Zabbix."
 
@@ -10409,31 +10404,31 @@ msgstr "Количество пользователей (в сети)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr "Количество подключенных пользователей. Используется команда who на стороне агента."
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:791
 msgid "Number of values stored in table HISTORY."
 msgstr "Количество значений записанных в таблице HISTORY."
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:795
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Количество значений записанных в таблице HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:799
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Количество значений записанных в таблице HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:803
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Количество значений записанных в таблице HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Количество значений записанных в таблице HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:855
 msgid "Number of values stored in table TRENDS."
 msgstr "Количество значений записанных в таблице TRENDS."
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:859
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
@@ -10465,8 +10460,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:149 httpdetails.php:234
 #: httpmon.php:149 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:682 include/maps.inc.php:764 include/maps.inc.php:854
-#: include/maps.inc.php:944 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10524,7 +10519,7 @@ msgstr "Окт"
 msgid "Octal"
 msgstr "Восьмеричный"
 
-#: include/forms.inc.php:1697 include/func.inc.php:138
+#: include/forms.inc.php:1695 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "Октябрь"
@@ -10534,7 +10529,7 @@ msgstr "Октябрь"
 msgid "Off"
 msgstr "Выкл"
 
-#: include/actions.inc.php:1072 include/blocks.inc.php:1092
+#: include/actions.inc.php:1072 include/blocks.inc.php:1093
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:401
 #: report3.php:83
@@ -10558,7 +10553,7 @@ msgstr "Один раз"
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
-#: include/forms.inc.php:1643 include/maintenances.inc.php:34
+#: include/forms.inc.php:1641 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "Единовременно"
 
@@ -10985,7 +10980,7 @@ msgstr "Отсутствует расширение PHP xmlwriter."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:666 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
@@ -11113,7 +11108,7 @@ msgstr "Выполнение DNS запроса. При успехе возвр�
 msgid "Period"
 msgstr "Период"
 
-#: include/forms.inc.php:1648
+#: include/forms.inc.php:1646
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Тип периода"
@@ -11320,7 +11315,7 @@ msgstr "Уровень привилегий"
 msgid "Probably php-ldap module is missing."
 msgstr "Возможно отсутствует модуль php-ldap."
 
-#: include/maps.inc.php:720 include/maps.inc.php:803 include/maps.inc.php:894
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:141 tr_status.php:282
 msgid "Problem"
 msgstr "Проблема"
@@ -11346,8 +11341,8 @@ msgstr "Проблема, если все подчиненные имеют пр
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, если хотя бы у одного из подчиненных имеется проблема"
 
-#: chart4.php:163 include/maps.inc.php:714 include/maps.inc.php:797
-#: include/maps.inc.php:888 report2.php:400 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:400 report3.php:83
 msgid "Problems"
 msgstr "Проблемы"
 
@@ -11582,10 +11577,10 @@ msgstr "Запомнить меня на 30 дней"
 msgid "Remote command"
 msgstr "Удаленная команда"
 
-#: include/blocks.inc.php:1222 include/blocks.inc.php:1311
-#: include/blocks.inc.php:1320 include/blocks.inc.php:1338
-#: include/blocks.inc.php:1366 include/blocks.inc.php:1389
-#: include/blocks.inc.php:1450 include/blocks.inc.php:1459
+#: include/blocks.inc.php:1223 include/blocks.inc.php:1312
+#: include/blocks.inc.php:1321 include/blocks.inc.php:1339
+#: include/blocks.inc.php:1367 include/blocks.inc.php:1390
+#: include/blocks.inc.php:1451 include/blocks.inc.php:1460
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
@@ -11614,7 +11609,7 @@ msgstr "Удаленная команда"
 #: include/views/js/configuration.action.edit.js.php:60
 #: include/views/js/configuration.action.edit.js.php:74
 #: include/views/js/configuration.discovery.edit.js.php:11
-#: include/views/js/configuration.graph.edit.js.php:89
+#: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.edit.js.php:29
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:74
@@ -11721,7 +11716,7 @@ msgstr "Требуемые права доступа к узлу сети"
 msgid "Required performance (vps)"
 msgstr "Требуемое быстродействие (знч/сек)"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:851
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемое быстродействие Zabbix сервера, ожидаемые новые значения в секунду."
 
@@ -11737,7 +11732,7 @@ msgstr "Требуемые коды состояния"
 msgid "Required string"
 msgstr "Требуемая строка"
 
-#: events.php:357 hosts.php:784 include/forms.inc.php:632
+#: events.php:359 hosts.php:784 include/forms.inc.php:632
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -11841,7 +11836,7 @@ msgstr "Повтор"
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Возвращает время ответа на ICMP пинг в секундах. Пример: 0.02"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:811
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Возвращается доступность определенных проверок у узла сети. Значение этого элемента данных соответствует иконкам доступности в списке узлов сети. Возможные типы: agent, snmp, ipmi, jmx."
 
@@ -11855,7 +11850,7 @@ msgstr "Возвращает подробную информацию о хост
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr "Возвращает имя хоста (или NetBIOS имя (по умолчанию) на Windows). Строковое значение. Пример возвращаемого значения: www.zabbix.com"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:827
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Возвращает информацию связанную с Zabbix Java gateway. Допустимые параметры: ping, version."
 
@@ -11866,7 +11861,7 @@ msgstr "Возвращает процент потерянных пакетов 
 #: include/reports.inc.php:103
 #: include/views/configuration.screen.constructor.edit.php:592
 #: include/views/configuration.sysmap.edit.php:115
-#: include/views/js/configuration.graph.edit.js.php:72
+#: include/views/js/configuration.graph.edit.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:85
 #: include/views/js/configuration.sysmaps.js.php:247 popup_bitem.php:154
 msgid "Right"
@@ -12112,7 +12107,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Сб"
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1739
+#: include/forms.inc.php:1669 include/forms.inc.php:1737
 #: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Суббота"
@@ -12205,7 +12200,7 @@ msgstr "Запланировано"
 msgid "Scheduled check"
 msgstr "Запланированная проверка"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1378
+#: include/audit.inc.php:41 include/blocks.inc.php:1379
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12285,7 +12280,7 @@ msgstr "Комплексный экран должен содержать по �
 msgid "Screen updated"
 msgstr "Комплексный экран обновлен"
 
-#: dashboard.php:326 include/blocks.inc.php:1450 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1451 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:372
@@ -12371,7 +12366,7 @@ msgstr "Шаблон поиска пустой"
 msgid "Search/Filter elements limit"
 msgstr "Лимит элементов в поиске/фильтре"
 
-#: include/forms.inc.php:1724 include/maintenances.inc.php:119
+#: include/forms.inc.php:1722 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "Секунда"
 
@@ -12530,7 +12525,7 @@ msgstr "Сен"
 msgid "Separated"
 msgstr "Неподтвержденные отдельно"
 
-#: include/forms.inc.php:1692 include/func.inc.php:137
+#: include/forms.inc.php:1690 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "Сентябрь"
@@ -12556,7 +12551,7 @@ msgstr "Информация о сервере"
 msgid "Server time"
 msgstr "Время на сервере"
 
-#: events.php:542 include/actions.inc.php:105
+#: events.php:544 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.parent.list.php:36 services.php:466
@@ -12628,7 +12623,7 @@ msgstr "Услуги образуют круговую зависимость."
 msgid "Session terminated, re-login, please."
 msgstr "Сессия завершена, пожалуйста, зайдите повторно в систему."
 
-#: events.php:582 events.php:595 include/classes/screens/CScreenEvents.php:44
+#: events.php:584 events.php:597 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
 #: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
@@ -12652,7 +12647,7 @@ msgstr "Имя важности не может быть пустым."
 #: include/reports.inc.php:456
 #: include/views/configuration.application.list.php:63
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:418
-#: tr_status.php:763 tr_status.php:768
+#: tr_status.php:766 tr_status.php:771
 msgid "Show"
 msgstr "Показать"
 
@@ -12756,7 +12751,7 @@ msgid "Sign in"
 msgstr "Войти"
 
 #: include/graphs.inc.php:47
-#: include/views/js/configuration.graph.edit.js.php:27
+#: include/views/js/configuration.graph.edit.js.php:30
 msgid "Simple"
 msgstr "Простой"
 
@@ -12764,11 +12759,11 @@ msgstr "Простой"
 msgid "Simple check"
 msgstr "Простая проверка"
 
-#: include/blocks.inc.php:1215 include/screens.inc.php:38
+#: include/blocks.inc.php:1216 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Простой график"
 
-#: include/blocks.inc.php:1320 jsLoader.php:114
+#: include/blocks.inc.php:1321 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Простые графики"
 
@@ -12827,7 +12822,7 @@ msgstr "Пропущено копирование графика \"%1$s\" в у�
 msgid "Slide"
 msgstr "Слайд"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1384
+#: include/audit.inc.php:45 include/blocks.inc.php:1385
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Слайд-шоу"
@@ -12864,7 +12859,7 @@ msgstr "Слайд-шоу обновлено"
 msgid "Slide shows"
 msgstr "Слайд-шоу"
 
-#: include/blocks.inc.php:1459
+#: include/blocks.inc.php:1460
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Слайды"
@@ -12965,7 +12960,7 @@ msgstr "Стандартные элементы данных"
 msgid "Start in"
 msgstr "Начинать в"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:787
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Время запуска Zabbix сервера, Unix timestamp."
 
@@ -12979,7 +12974,7 @@ msgstr "Состояние"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "Состояние сервиса. 0 - запущен, 1 - на паузе, 2 - ожидание запуска, 3 - ожидание паузы, 4 - ожидание продолжения, 5 - ожидание остановки, 6 - остановлен, 7 - неизвестно, 255 - отсутствие сервиса"
 
-#: events.php:505 events.php:514 events.php:581 events.php:594 hosts.php:816
+#: events.php:507 events.php:516 events.php:583 events.php:596 hosts.php:816
 #: httpdetails.php:134 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -13144,7 +13139,7 @@ msgstr "Сумма значений за период T NOT N"
 msgid "Sun"
 msgstr "Вс"
 
-#: include/forms.inc.php:1672 include/forms.inc.php:1740
+#: include/forms.inc.php:1670 include/forms.inc.php:1738
 #: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Воскресенье"
@@ -13511,7 +13506,7 @@ msgstr[0] "Существует \"%1$d\" группа с внутренним д
 msgstr[1] "Существует \"%1$d\" группы с внутренним доступом к GUI."
 msgstr[2] "Существует \"%1$d\" групп с внутренним доступом к GUI."
 
-#: include/forms.inc.php:1725 include/maintenances.inc.php:120
+#: include/forms.inc.php:1723 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "Третий"
 
@@ -13524,11 +13519,11 @@ msgstr "Это поле автоматически заполняется эле
 msgid "This month"
 msgstr "Этот месяц"
 
-#: include/classes/screens/CScreenBuilder.php:489
+#: include/classes/screens/CScreenBuilder.php:487
 msgid "This screen-column is not empty. Delete it?"
 msgstr "Колонка комплексного экрана не пустая. Удалить её?"
 
-#: include/classes/screens/CScreenBuilder.php:471
+#: include/classes/screens/CScreenBuilder.php:469
 msgid "This screen-row is not empty. Delete it?"
 msgstr "Строка комплексного экрана не пустая. Удалить её?"
 
@@ -13544,7 +13539,7 @@ msgstr "Этот год"
 msgid "Thu"
 msgstr "Чт"
 
-#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/forms.inc.php:1667 include/forms.inc.php:1735
 #: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Четверг"
@@ -13557,7 +13552,7 @@ msgstr "Четверг"
 msgid "Till"
 msgstr "До"
 
-#: events.php:501 events.php:510 events.php:577 events.php:590
+#: events.php:503 events.php:512 events.php:579 events.php:592
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
 #: include/actions.inc.php:925 include/blocks.inc.php:911
@@ -13587,11 +13582,11 @@ msgstr "Время (в порядке возрастания)"
 msgid "Time (descending)"
 msgstr "Время (в порядке убывания)"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:831
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "Время конкретного процесса Zabbix или группы процессов (указывается через <тип> и <режим>), потраченное на <состояние> в процентах."
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:835
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Время последнего доступа прокси. Имя - имя прокси. Параметры - lastaccess. Unix штамп времени."
 
@@ -13982,7 +13977,7 @@ msgstr "Попытка чтения недоступного свойства \"
 msgid "Tue"
 msgstr "Вт"
 
-#: include/forms.inc.php:1667 include/forms.inc.php:1735
+#: include/forms.inc.php:1665 include/forms.inc.php:1733
 #: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Вторник"
@@ -14147,7 +14142,7 @@ msgstr "Не удалось выбрать конфигурацию."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Не удалось загрузить файл, так как \"file_uploads\" отключено."
 
-#: include/maps.inc.php:731 include/maps.inc.php:814 include/maps.inc.php:905
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Неподтверждено"
 
@@ -14177,15 +14172,15 @@ msgstr "Разблокировать выбранных пользователе
 msgid "Units"
 msgstr "Единица измерения"
 
-#: events.php:525 events.php:526 events.php:536 events.php:537 events.php:538
-#: events.php:539 hosts.php:951 httpdetails.php:163 httpmon.php:156
+#: events.php:527 events.php:528 events.php:538 events.php:539 events.php:540
+#: events.php:541 hosts.php:951 httpdetails.php:163 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
 #: include/actions.inc.php:201 include/actions.inc.php:209
 #: include/actions.inc.php:223 include/actions.inc.php:234
 #: include/actions.inc.php:265 include/actions.inc.php:654
-#: include/actions.inc.php:1167 include/blocks.inc.php:1094
+#: include/actions.inc.php:1167 include/blocks.inc.php:1095
 #: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:132
 #: include/discovery.inc.php:169 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
@@ -14336,7 +14331,7 @@ msgstr "Неподдерживаемый параметр \"%2$s\" для про
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Неподдерживаемый параметр \"%2$s\" для прототипа узла сети %1$s инвентарных данных."
 
-#: include/blocks.inc.php:1181
+#: include/blocks.inc.php:1182
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Доступно"
@@ -14382,8 +14377,8 @@ msgid "Updated status of host"
 msgstr "Состояние узла сети обновлено"
 
 #: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1039
-#: include/blocks.inc.php:1138 include/blocks.inc.php:1196
+#: include/blocks.inc.php:786 include/blocks.inc.php:1040
+#: include/blocks.inc.php:1139 include/blocks.inc.php:1197
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14444,7 +14439,7 @@ msgstr "Карты верхнего уровня"
 msgid "Uptime"
 msgstr "Доступен"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:867
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Время работы процесса Zabbix сервера в секундах."
 
@@ -14659,7 +14654,7 @@ msgstr "Пользователи (в сети)"
 msgid "Users unblocked"
 msgstr "Разблокированные пользователи"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кэша VMware. Допустимые режимы: total, free, pfree, used и pused."
 
@@ -14870,11 +14865,11 @@ msgstr "Значение \"%1$s\" является чересчур длинны
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Значение \"%1$s\" слишком длинное для поля \"%2$s\" - %3$d символов. Допустимая длина 2048 символов."
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:875
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Эффективность кэша значений. Допустимые параметры: requests, hits и misses."
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:871
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика по кэшу значений. Допустимые режимы: total, free, pfree, used и pused."
 
@@ -15083,7 +15078,7 @@ msgstr "Веб-сценарии"
 msgid "Wed"
 msgstr "Ср"
 
-#: include/forms.inc.php:1668 include/forms.inc.php:1736
+#: include/forms.inc.php:1666 include/forms.inc.php:1734
 #: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Среда"
@@ -15092,7 +15087,7 @@ msgstr "Среда"
 msgid "Week"
 msgstr "Неделя"
 
-#: include/forms.inc.php:1645 include/maintenances.inc.php:38
+#: include/forms.inc.php:1643 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:404
 #: include/reports.inc.php:412 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15345,7 +15340,7 @@ msgstr "Год"
 msgid "Yearly"
 msgstr "Ежегодно"
 
-#: events.php:763 include/blocks.inc.php:737
+#: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2429
 #: include/triggers.inc.php:1646
@@ -15586,7 +15581,7 @@ msgstr "агент"
 #: include/forms.inc.php:438 include/forms.inc.php:445
 #: include/forms.inc.php:462 include/forms.inc.php:595
 #: include/forms.inc.php:610 include/graphs.inc.php:86
-#: include/views/js/configuration.graph.edit.js.php:45 report2.php:222
+#: include/views/js/configuration.graph.edit.js.php:46 report2.php:222
 #: report2.php:241 report2.php:263 report2.php:300 report2.php:326
 #: report2.php:345 report4.php:94 report4.php:270
 msgid "all"
@@ -15631,8 +15626,8 @@ msgstr "автоматически зарегистрированный узел
 #: include/classes/graphdraw/CLineGraphDraw.php:1809
 #: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
-#: include/views/js/configuration.graph.edit.js.php:40
-#: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
+#: include/views/js/configuration.graph.edit.js.php:41
+#: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
 msgid "avg"
 msgstr "сред"
 
@@ -15654,7 +15649,7 @@ msgstr "d M Y"
 msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
-#: acknow.php:210 events.php:269 httpdetails.php:116 httpmon.php:140
+#: acknow.php:210 events.php:268 httpdetails.php:116 httpmon.php:140
 #: include/acknow.inc.php:54 include/blocks.inc.php:1015
 #: include/classes/screens/CScreenEvents.php:58
 #: include/classes/screens/CScreenPlainText.php:97 include/events.inc.php:183
@@ -15666,7 +15661,7 @@ msgstr "d M Y H:i"
 #: include/views/administration.auditacts.list.php:123
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:372 latest.php:543 tr_status.php:264 tr_status.php:697
-#: tr_status.php:812
+#: tr_status.php:815
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
@@ -15813,7 +15808,7 @@ msgstr "пустой ключ"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
-#: include/views/js/configuration.graph.edit.js.php:42
+#: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
 msgstr "посл"
 
@@ -15854,16 +15849,16 @@ msgstr "карта сети"
 #: include/classes/graphdraw/CLineGraphDraw.php:1810
 #: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
-#: include/views/js/configuration.graph.edit.js.php:41
-#: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
+#: include/views/js/configuration.graph.edit.js.php:42
+#: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "макс"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1808
 #: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
-#: include/views/js/configuration.graph.edit.js.php:39
-#: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
+#: include/views/js/configuration.graph.edit.js.php:40
+#: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
 msgid "min"
 msgstr "мин"
 
