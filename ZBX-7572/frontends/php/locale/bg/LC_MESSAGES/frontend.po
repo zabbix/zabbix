@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-03 16:26+0200\n"
+"POT-Creation-Date: 2014-02-06 13:20+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -232,7 +232,7 @@ msgstr "Достъпът отказан!"
 msgid "Access denied."
 msgstr ""
 
-#: api/classes/CUser.php:882
+#: api/classes/CUser.php:1058
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Акаунтът е блокиран за %s секунди"
@@ -1425,7 +1425,7 @@ msgstr "Не може да се добави тригер"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:218
 msgid "Cannot add user"
 msgstr "Не може да се добави потребител"
 
@@ -1481,7 +1481,7 @@ msgstr "Не може да се клонират елемент на данни�
 msgid "Cannot clone trigger prototypes."
 msgstr "Не може да се клонират тригер прототипите"
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Не може да се свърже към трапер порта на Zabbix сървър демона, но той трябва да бъде наличен за да тръгне скрипта."
 
@@ -1550,7 +1550,7 @@ msgstr "Не може да се създаде нов елемент"
 msgid "Cannot create screen."
 msgstr "Не може да се създаде екран."
 
-#: api/classes/CUser.php:1216
+#: api/classes/CUser.php:1398
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не може да се изтрие Zabbix вътрешен потребител \"%1$s\", опитайте с изключване на този потребител."
@@ -1775,11 +1775,11 @@ msgstr "Не може да се изтрият тригерите"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Не може да се изтрият тригерите, създадени с ниско ниво на откриване."
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "Cannot delete user"
 msgstr "Не може да се изтрие потребителя"
 
-#: api/classes/CUser.php:742
+#: api/classes/CUser.php:949
 msgid "Cannot delete user media."
 msgstr "Не може да се изтрие потребителско уведомление."
 
@@ -2125,7 +2125,7 @@ msgstr[1] ""
 msgid "Cannot include view file \"%s\"."
 msgstr "Неуспешно свързване с \"view file\" \"%s\"."
 
-#: api/classes/CUser.php:771
+#: api/classes/CUser.php:738
 msgid "Cannot insert user media."
 msgstr "Не може да вмъкне потребителско уведомление."
 
@@ -2133,11 +2133,11 @@ msgstr "Не може да вмъкне потребителско уведом�
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
 
-#: api/classes/CUser.php:921
+#: api/classes/CUser.php:1099
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:846
+#: api/classes/CUser.php:1021
 msgid "Cannot logout."
 msgstr "Неуспешно излизане от системата."
 
@@ -2194,7 +2194,7 @@ msgstr "Не може да се премахнат всички елементи
 msgid "Cannot remove macro."
 msgstr "Грешка при изтриване на макрос."
 
-#: api/classes/CUser.php:300
+#: api/classes/CUser.php:310
 msgid "Cannot rename guest user."
 msgstr "Не може да се преименува гост потребителя."
 
@@ -2240,7 +2240,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "Не може да се превключи хоста на мрежовия интерфейс."
 
-#: users.php:317
+#: users.php:323
 msgid "Cannot unblock users"
 msgstr "Не може да се деблокират потребителите"
 
@@ -2534,11 +2534,11 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "Cannot update user"
 msgstr "Не може да се актуализира потребителя"
 
-#: api/classes/CUser.php:763
+#: api/classes/CUser.php:818
 msgid "Cannot update user media."
 msgstr "Не може да се актуализира потребителското уведомление."
 
@@ -3157,7 +3157,7 @@ msgstr "Копирай"
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
 
-#: api/classes/CUser.php:966
+#: api/classes/CUser.php:1144
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "Неправилен вход \"%s\"."
@@ -3445,7 +3445,7 @@ msgstr "Персонализирани слайдове"
 msgid "Czech (cs_CZ)"
 msgstr "Чешки (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr "D"
 
@@ -3544,7 +3544,7 @@ msgstr "Данни"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4638,7 +4638,7 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr "Дублиране име на важност \"%s\"."
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:318
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дублиране на потребителски псевдоним \"%s\"."
@@ -4758,7 +4758,7 @@ msgstr ""
 #: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
 #: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
 msgstr "Празен входен параметър."
 
@@ -5838,8 +5838,8 @@ msgstr "Групи в поддръжка"
 msgid "H.i"
 msgstr "h.i A"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "h:i A"
@@ -7364,7 +7364,7 @@ msgstr "Неправилно състояние за услуга  \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Неправилно състояние."
 
-#: api/classes/CUser.php:352
+#: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr ""
@@ -7665,6 +7665,8 @@ msgstr "Невалиден период на поддръжка"
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
+#: api/classes/CUser.php:673 api/classes/CUser.php:693
+#: api/classes/CUser.php:851 api/classes/CUser.php:896
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Невалидни параметри на метода."
@@ -7744,7 +7746,7 @@ msgstr "Не е възможно да се филтрира по парола н
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "Не е възможно да се излезе от HTTP автентификация."
 
-#: api/classes/CUserMedia.php:186 api/classes/CUser.php:154
+#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "Не е възможно да се търси по парола на потребителя."
 
@@ -8452,12 +8454,12 @@ msgstr "Вход в системата"
 msgid "Login as Guest"
 msgstr "Вход като гост"
 
-#: api/classes/CUser.php:958
+#: api/classes/CUser.php:1136
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Неуспешно влизане \"%s\"."
 
-#: api/classes/CUser.php:926
+#: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8466,8 +8468,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876
+#: api/classes/CUser.php:984 api/classes/CUser.php:1003
+#: api/classes/CUser.php:1052
 msgid "Login name or password is incorrect."
 msgstr "Неправилно въведено потребителско име или парола."
 
@@ -8811,7 +8813,7 @@ msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d chara
 msgstr[0] ""
 msgstr[1] ""
 
-#: api/classes/CUser.php:316
+#: api/classes/CUser.php:326
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9891,7 +9893,7 @@ msgstr "Нямате право на достъп до карта на мреж�
 msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1015
+#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
 msgid "No permissions for system access."
 msgstr "Нямате право на достъп до системата."
 
@@ -9934,7 +9936,9 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
+#: api/classes/CUser.php:859 api/classes/CUser.php:879
+#: api/classes/CUser.php:938 api/classes/CUser.php:1363
 #: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нямате право на достъп до посочения обект или той не съществува!"
@@ -10063,7 +10067,7 @@ msgstr "Не са дефинирани тригери."
 msgid "No triggers found."
 msgstr "Не са намерени тригери."
 
-#: api/classes/CUser.php:579
+#: api/classes/CUser.php:590
 msgid "No user ID given."
 msgstr ""
 
@@ -10186,7 +10190,7 @@ msgstr "Няма шаблонни елементи на данните"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не всички шаблони са свързани към \"%s\"."
 
-#: api/classes/CUser.php:374
+#: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Не е позволено да зададете парола за потребителя \"гост\"."
 
@@ -10571,15 +10575,15 @@ msgstr "Само Супер Администраторите могат да а�
 msgid "Only Super Admins can update icon maps."
 msgstr "Само Супер Администраторите могат да актуализират съответствие на икона."
 
-#: api/classes/CUser.php:640
+#: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
 msgstr "Само Zabbix Администраторите могат да добавят потребителско уведомление."
 
-#: api/classes/CUser.php:708
+#: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
 msgstr "Само Zabbix Администраторите могат да променят потребителско уведомление."
 
-#: api/classes/CUser.php:678
+#: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Само Zabbix Администраторите могат да премахват потребителско уведомление."
 
@@ -11279,7 +11283,7 @@ msgstr "Файл с личен ключ"
 msgid "Privilege level"
 msgstr "Ниво на привилегия"
 
-#: api/classes/CUser.php:803
+#: api/classes/CUser.php:975
 msgid "Probably php-ldap module is missing."
 msgstr "Може би липсва php-ldap модула."
 
@@ -11768,7 +11772,7 @@ msgstr "Резултатът е ЛЪЖА"
 msgid "Result is TRUE"
 msgstr "Резултатът е ИСТИНА"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr "Резултат от \"%s\""
@@ -12314,7 +12318,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Скриптове"
 
@@ -12588,7 +12592,7 @@ msgstr "Услуги"
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
-#: api/classes/CUser.php:1009
+#: api/classes/CUser.php:1188
 msgid "Session terminated, re-login, please."
 msgstr "Сесията е прекратена, моля влезте повторно в системата."
 
@@ -13675,7 +13679,7 @@ msgid "Trends"
 msgstr "Динамика на промените"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -14438,12 +14442,12 @@ msgstr "Използва се в действия"
 msgid "User"
 msgstr "Потребител"
 
-#: api/classes/CUser.php:328
+#: api/classes/CUser.php:338
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "Потребител \"%s\" не може да бъде без потребителска група."
 
-#: users.php:212
+#: users.php:218
 msgid "User added"
 msgstr "Потребител добавен"
 
@@ -14468,7 +14472,7 @@ msgstr "Потребителят не може да промени състоя�
 msgid "User cannot change status of himself."
 msgstr "Потребителят не може да промени състоянието за себе си"
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "User deleted"
 msgstr "Потребител изтрит"
 
@@ -14529,16 +14533,16 @@ msgstr ""
 msgid "User groups"
 msgstr "Потребителски групи"
 
-#: api/classes/CUser.php:1196
+#: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
 msgstr "Не е позполено на потребителя да изтрие себе си."
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:351
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Потребителят не може да промени GUI достъпа за себе си, като стане член на потребителска група \"%s\"."
 
-#: api/classes/CUser.php:345
+#: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Потребителят не може да промени системното състояние за себе си, като стане член на потребителска група  \"%s\"."
@@ -14582,11 +14586,11 @@ msgstr ""
 msgid "User type"
 msgstr "Тип потребител"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "User updated"
 msgstr "Потребител актуализиран"
 
-#: api/classes/CUser.php:390
+#: api/classes/CUser.php:400
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Потребител с псевдоним \"%s\" вече съществува."
@@ -14612,7 +14616,7 @@ msgstr "Потребители"
 msgid "Users (online)"
 msgstr "Потребители (на линия)"
 
-#: users.php:317
+#: users.php:323
 msgid "Users unblocked"
 msgstr "Деблокирани потребители"
 
@@ -15195,7 +15199,7 @@ msgstr "Грешни полета за време на услуга \"%1$s\"."
 msgid "Wrong fields for trigger."
 msgstr "Грешни полета за тригер."
 
-#: api/classes/CUser.php:272
+#: api/classes/CUser.php:283
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "Грешни полета за потребител \"%s\"."
@@ -15321,7 +15325,7 @@ msgstr "Йотта"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Вие не може да изберете някои от езиците, защото не е инсталирана локализация за тях на уеб сървъра."
 
-#: api/classes/CUser.php:357
+#: api/classes/CUser.php:367
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вие нямате право да променяте привилегиите за потребител \"%s\"."
@@ -15365,15 +15369,15 @@ msgstr "Вие не сте уточнили цели за глобален ск�
 msgid "You do not have permission to perform this operation."
 msgstr "Вие нямате права за извършване на тази операция."
 
-#: api/classes/CUser.php:278
+#: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
 msgstr "Вие нямате права за създаване на потребители."
 
-#: api/classes/CUser.php:290
+#: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
 msgstr "Вие нямате права за актуализиране на другите потребители."
 
-#: api/classes/CUser.php:285
+#: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Вие нямате права за актуализиране на потребителя или потребителят не съществува."
 
@@ -15536,7 +15540,7 @@ msgid "agent"
 msgstr "агент"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15587,8 +15591,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
@@ -15633,14 +15637,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15770,7 +15774,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15810,16 +15814,16 @@ msgstr "поддръжка"
 msgid "map"
 msgstr "карта на мрежата"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "макс"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15849,7 +15853,7 @@ msgstr "трябва да бъде валиден LDAP потребител"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
