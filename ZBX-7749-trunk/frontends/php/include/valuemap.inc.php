@@ -106,7 +106,7 @@ function deleteValueMap($valueMapId) {
 	));
 	$result &= DB::delete('valuemaps', array('valuemapid' => $valueMapId));
 
-	return $result;
+	return (bool) $result;
 }
 
 /**
