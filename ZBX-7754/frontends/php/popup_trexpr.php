@@ -689,6 +689,33 @@ if ($itemId) {
 	}
 }
 
+$submittedFunction = $data['function'].'['.$data['operator'].']';
+$selectedFunction = null;
+
+// check if submitted function is usable with selected item
+foreach ($data['functions'] as $id => $f) {
+	if ((!$data['itemValueType'] || isset($f['allowed_types'][$data['itemValueType']])) && $id == $submittedFunction) {
+		$selectedFunction = $id;
+		break;
+	}
+}
+$data['selectedFunction'] = $selectedFunction;
+
+if ($selectedFunction === null) {
+	error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
+		$data['functions'][$submittedFunction]['description'],
+		$data['description']
+	));
+	show_messages();
+}
+
+// remove functions that not correspond to chosen item
+foreach ($data['functions'] as $id => $f) {
+	if ($data['itemValueType'] && !isset($f['allowed_types'][$data['itemValueType']])) {
+		unset($data['functions'][$id]);
+	}
+}
+
 // create and validate trigger expression
 if (isset($data['insert'])) {
 	if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
@@ -750,7 +777,6 @@ if (isset($data['insert'])) {
 		}
 	}
 }
-
 
 // render view
 $expressionView = new CView('configuration.triggers.expression', $data);
