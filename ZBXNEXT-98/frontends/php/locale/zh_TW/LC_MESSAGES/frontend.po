@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:58+0200\n"
+"POT-Creation-Date: 2014-02-06 13:20+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -32,7 +32,7 @@ msgstr "\"顯示[正常]的觸發器\" 必須為 \"0\" 或正整數."
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr "\"觸發器閃爍狀態改變時\" 必須為 \"0\" 或正整數."
 
-#: include/func.inc.php:459
+#: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -225,11 +225,11 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: include/func.inc.php:2082
+#: include/func.inc.php:2088
 msgid "Access denied."
 msgstr ""
 
-#: api/classes/CUser.php:882
+#: api/classes/CUser.php:1058
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
@@ -670,12 +670,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "接近中"
 
-#: include/func.inc.php:246
+#: include/func.inc.php:252
 msgid "Apr"
 msgstr "四月"
 
 #: include/forms.inc.php:1695 include/func.inc.php:132
-#: include/func.inc.php:263 jsLoader.php:121
+#: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "四月"
 
@@ -776,12 +776,12 @@ msgstr ""
 msgid "Audit logs"
 msgstr "審計紀錄"
 
-#: include/func.inc.php:250
+#: include/func.inc.php:256
 msgid "Aug"
 msgstr "八月"
 
 #: include/forms.inc.php:1687 include/func.inc.php:136
-#: include/func.inc.php:267 jsLoader.php:125
+#: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "八月"
 
@@ -907,7 +907,7 @@ msgstr "一個期間T的平均值不是 N"
 msgid "Axis side"
 msgstr "軸側"
 
-#: include/func.inc.php:427
+#: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
 msgstr "B"
@@ -1416,7 +1416,7 @@ msgstr "無法新增觸發器"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:218
 msgid "Cannot add user"
 msgstr "無法新增用户"
 
@@ -1472,7 +1472,7 @@ msgstr "無法克隆項目原型"
 msgid "Cannot clone trigger prototypes."
 msgstr "無法克隆觸發器原型"
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "無法連接到系統主機主控程序的捉捕器的埠, 但是它應該可用的..."
 
@@ -1540,7 +1540,7 @@ msgstr "無法創建新組件"
 msgid "Cannot create screen."
 msgstr "無法創建篩選."
 
-#: api/classes/CUser.php:1216
+#: api/classes/CUser.php:1398
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "無法刪除Zabbix內部用戶 \"%1$s\", 試試停用那用戶."
@@ -1763,11 +1763,11 @@ msgstr "無法删除觸發器"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "無法刪除由低階層發現所創建的觸發器."
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
-#: api/classes/CUser.php:742
+#: api/classes/CUser.php:949
 msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
@@ -2086,7 +2086,7 @@ msgstr[0] ""
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含檢視檔案\"%s\"."
 
-#: api/classes/CUser.php:771
+#: api/classes/CUser.php:738
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
@@ -2094,11 +2094,11 @@ msgstr "不能插入用戶示警媒介"
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
-#: api/classes/CUser.php:921
+#: api/classes/CUser.php:1099
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:846
+#: api/classes/CUser.php:1021
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -2155,7 +2155,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr "無法移除巨集."
 
-#: api/classes/CUser.php:300
+#: api/classes/CUser.php:310
 msgid "Cannot rename guest user."
 msgstr "無法重新命名訪客用戶."
 
@@ -2201,7 +2201,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "無法為介面切換主機."
 
-#: users.php:317
+#: users.php:323
 msgid "Cannot unblock users"
 msgstr "無法解除阻擋用戶"
 
@@ -2494,11 +2494,11 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
-#: api/classes/CUser.php:763
+#: api/classes/CUser.php:818
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
@@ -3115,7 +3115,7 @@ msgstr "複製"
 msgid "Copy selected to ..."
 msgstr "複製所選的到 ..."
 
-#: api/classes/CUser.php:966
+#: api/classes/CUser.php:1144
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr "正確登入\"%s\"."
@@ -3402,7 +3402,7 @@ msgstr "自訂簡報片"
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr "D"
 
@@ -3501,7 +3501,7 @@ msgstr "資料"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -3528,7 +3528,7 @@ msgstr "資料類型"
 msgid "Database file"
 msgstr "資料庫檔案"
 
-#: include/setup.inc.php:283 setup.php:38
+#: include/setup.inc.php:283
 msgid "Database host"
 msgstr "資料庫主機"
 
@@ -3648,12 +3648,12 @@ msgstr "調試模式"
 msgid "Debug mode updated"
 msgstr "調試模式已更新"
 
-#: include/func.inc.php:254
+#: include/func.inc.php:260
 msgid "Dec"
 msgstr "十二"
 
 #: include/forms.inc.php:1707 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:129
+#: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "十二"
 
@@ -4137,7 +4137,7 @@ msgid "Description"
 msgstr "描述"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2202
+#: include/func.inc.php:2208
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4466,7 +4466,7 @@ msgstr "探索狀態"
 msgid "Display OK triggers for"
 msgstr "顯示OK觸發器予"
 
-#: include/func.inc.php:1886
+#: include/func.inc.php:1892
 msgid "Displaying"
 msgstr "顯示"
 
@@ -4591,7 +4591,7 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr "重複的嚴重性名稱\"%s\"."
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:318
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "重複的用戶別名\"%s\"."
@@ -4613,12 +4613,12 @@ msgstr "荷蘭(nl_NL)"
 msgid "Dynamic item"
 msgstr "動態監控項"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2169
+#: include/func.inc.php:2175
 msgid "ERROR"
 msgstr "錯誤"
 
@@ -4711,7 +4711,7 @@ msgstr ""
 #: api/classes/CTrigger.php:877 api/classes/CTrigger.php:941
 #: api/classes/CTrigger.php:1031 api/classes/CTriggerPrototype.php:652
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
-#: api/classes/CUserMacro.php:546 api/classes/CUser.php:555
+#: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
 msgstr "空的輸入參數."
 
@@ -4992,7 +4992,7 @@ msgstr "每日"
 msgid "Every week(s)"
 msgstr "每週"
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgid "Exa"
 msgstr "Exa"
 
@@ -5156,12 +5156,12 @@ msgstr "常用的篩選"
 msgid "Favourites"
 msgstr "常用的"
 
-#: include/func.inc.php:244
+#: include/func.inc.php:250
 msgid "Feb"
 msgstr "二月"
 
 #: include/forms.inc.php:1685 include/func.inc.php:130
-#: include/func.inc.php:261 jsLoader.php:119
+#: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "二月"
 
@@ -5299,7 +5299,7 @@ msgstr "芬蘭語 (fi_FI)"
 msgid "First"
 msgstr "首"
 
-#: include/func.inc.php:1831
+#: include/func.inc.php:1837
 msgctxt "page navigation"
 msgid "First"
 msgstr "首"
@@ -5334,12 +5334,12 @@ msgstr "第四"
 msgid "French (fr_FR)"
 msgstr "法語 (fr_FR)"
 
-#: include/func.inc.php:224
+#: include/func.inc.php:230
 msgid "Fri"
 msgstr "週五"
 
 #: include/forms.inc.php:1670 include/forms.inc.php:1738
-#: include/func.inc.php:152 include/func.inc.php:236
+#: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "週五"
 
@@ -5382,7 +5382,7 @@ msgstr "全屏"
 msgid "Function"
 msgstr "功能"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgctxt "Giga short"
 msgid "G"
 msgstr "G"
@@ -5448,7 +5448,7 @@ msgstr "獲取支援"
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr ""
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgid "Giga"
 msgstr "Giga"
 
@@ -5498,7 +5498,7 @@ msgstr "確認"
 msgid "Go to"
 msgstr "到"
 
-#: include/func.inc.php:2100
+#: include/func.inc.php:2106
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5791,8 +5791,8 @@ msgstr "維修中的群組"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -6636,7 +6636,7 @@ msgstr "圖示"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2090 include/func.inc.php:2110
+#: include/func.inc.php:2096 include/func.inc.php:2116
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您認為這個訊息是錯的, 請諮詢您的管理者關於如何取得需要的許可權."
 
@@ -7306,7 +7306,7 @@ msgstr "予服務\"%1$s\"不正確的狀態."
 msgid "Incorrect status."
 msgstr "不正確的狀態."
 
-#: api/classes/CUser.php:352
+#: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr ""
@@ -7363,7 +7363,7 @@ msgstr "不正確的觸發器表示式. 觸發器表示式組件不該同時屬�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "用了不正確的觸發器方程式\"%1$s\"於表示式中."
 
-#: include/func.inc.php:1176
+#: include/func.inc.php:1182
 msgid "Incorrect type of asort_by_key."
 msgstr "不正確的asort_by_key類型."
 
@@ -7607,6 +7607,8 @@ msgstr ""
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
+#: api/classes/CUser.php:673 api/classes/CUser.php:693
+#: api/classes/CUser.php:851 api/classes/CUser.php:896
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "無效的方法參數."
@@ -7686,7 +7688,7 @@ msgstr "以用戶密碼過濾是不可能的."
 msgid "It is not possible to logout from HTTP authentication."
 msgstr "不可能於HTTP認證中登出."
 
-#: api/classes/CUserMedia.php:186 api/classes/CUser.php:154
+#: api/classes/CUserMedia.php:193 api/classes/CUser.php:155
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
@@ -7956,12 +7958,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "Jabber Identifier"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:249
 msgid "Jan"
 msgstr "一月"
 
 #: include/forms.inc.php:1680 include/func.inc.php:129
-#: include/func.inc.php:260 jsLoader.php:118
+#: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "一月"
 
@@ -7969,25 +7971,25 @@ msgstr "一月"
 msgid "Japanese (ja_JP)"
 msgstr "日語 (ja_JP)"
 
-#: include/func.inc.php:249
+#: include/func.inc.php:255
 msgid "Jul"
 msgstr "七月"
 
 #: include/forms.inc.php:1682 include/func.inc.php:135
-#: include/func.inc.php:266 jsLoader.php:124
+#: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "七月"
 
-#: include/func.inc.php:248
+#: include/func.inc.php:254
 msgid "Jun"
 msgstr "六月"
 
 #: include/forms.inc.php:1705 include/func.inc.php:134
-#: include/func.inc.php:265 jsLoader.php:123
+#: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "六月"
 
-#: include/func.inc.php:434 include/func.inc.php:670
+#: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
 msgid "K"
 msgstr "K"
@@ -8020,7 +8022,7 @@ msgstr "鍵值通行短語"
 msgid "Keyword"
 msgstr "關鍵字"
 
-#: include/func.inc.php:670
+#: include/func.inc.php:676
 msgid "Kilo"
 msgstr "Kilo"
 
@@ -8088,7 +8090,7 @@ msgstr "語言"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:1871
+#: include/func.inc.php:1877
 msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
@@ -8377,7 +8379,7 @@ msgstr "日誌與SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登入為"
 
-#: auditlogs.php:143 include/func.inc.php:2096 include/func.inc.php:2113
+#: auditlogs.php:143 include/func.inc.php:2102 include/func.inc.php:2119
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8389,12 +8391,12 @@ msgstr "登入"
 msgid "Login as Guest"
 msgstr "登入為訪客"
 
-#: api/classes/CUser.php:958
+#: api/classes/CUser.php:1136
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "登入失敗\"%s\"."
 
-#: api/classes/CUser.php:926
+#: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8403,8 +8405,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:811 api/classes/CUser.php:829
-#: api/classes/CUser.php:876
+#: api/classes/CUser.php:984 api/classes/CUser.php:1003
+#: api/classes/CUser.php:1052
 msgid "Login name or password is incorrect."
 msgstr "登入名稱或密碼是不正確的."
 
@@ -8431,7 +8433,7 @@ msgstr ""
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr ""
 
-#: include/func.inc.php:430 include/func.inc.php:671
+#: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
 msgid "M"
 msgstr "M"
@@ -8672,12 +8674,12 @@ msgstr "對應"
 msgid "Maps"
 msgstr "拓墣圖"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:251
 msgid "Mar"
 msgstr "三月"
 
 #: include/forms.inc.php:1690 include/func.inc.php:131
-#: include/func.inc.php:262 jsLoader.php:120
+#: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "三月"
 
@@ -8737,7 +8739,7 @@ msgid "Max count of events per trigger to show"
 msgstr "可展示的每觸發器最多事件計數"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8747,7 +8749,7 @@ msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: api/classes/CUser.php:316
+#: api/classes/CUser.php:326
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8803,11 +8805,11 @@ msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %
 msgstr[0] ""
 
 #: include/forms.inc.php:1700 include/func.inc.php:133
-#: include/func.inc.php:264 jsLoader.php:122
+#: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "五月"
 
-#: include/func.inc.php:247
+#: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
 msgstr "五月"
@@ -8861,7 +8863,7 @@ msgstr "示警媒介類型"
 msgid "Media types used by action \"%s\"."
 msgstr "示警媒介類型用於動作\"%s\"."
 
-#: include/func.inc.php:671
+#: include/func.inc.php:677
 msgid "Mega"
 msgstr "Mega"
 
@@ -8929,7 +8931,7 @@ msgid "Middle"
 msgstr "居中"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 msgid "Minimize"
 msgstr "最小化"
 
@@ -9061,12 +9063,12 @@ msgstr "節點"
 msgid "Model"
 msgstr "模型"
 
-#: include/func.inc.php:220
+#: include/func.inc.php:226
 msgid "Mon"
 msgstr "一"
 
 #: include/forms.inc.php:1666 include/forms.inc.php:1734
-#: include/func.inc.php:148 include/func.inc.php:232
+#: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "週一"
 
@@ -9287,7 +9289,7 @@ msgstr "網路拓墣圖已新增"
 msgid "Network maps"
 msgstr "網絡結拓墣圖"
 
-#: httpmon.php:155 include/func.inc.php:214
+#: httpmon.php:155 include/func.inc.php:220
 msgid "Never"
 msgstr "從未"
 
@@ -9351,13 +9353,13 @@ msgstr "新的服務時間"
 msgid "Next"
 msgstr "下一步"
 
-#: include/func.inc.php:1864
+#: include/func.inc.php:1870
 msgctxt "page navigation"
 msgid "Next"
 msgstr "次"
 
 #: events.php:763 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2423 include/triggers.inc.php:1646
+#: include/func.inc.php:2429 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9818,7 +9820,7 @@ msgstr "不具拓墣圖\"%1$s\"的許可權."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
 
-#: api/classes/CUser.php:890 api/classes/CUser.php:1015
+#: api/classes/CUser.php:1066 api/classes/CUser.php:1194
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
@@ -9861,8 +9863,10 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CTrigger.php:960 api/classes/CTrigger.php:981
 #: api/classes/CTrigger.php:1856 api/classes/CTriggerPrototype.php:566
 #: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:1183
-#: include/func.inc.php:2070
+#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
+#: api/classes/CUser.php:859 api/classes/CUser.php:879
+#: api/classes/CUser.php:938 api/classes/CUser.php:1363
+#: include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
 
@@ -9990,7 +9994,7 @@ msgstr "沒有已定義的觸發器."
 msgid "No triggers found."
 msgstr "每有找到觸發器."
 
-#: api/classes/CUser.php:579
+#: api/classes/CUser.php:590
 msgid "No user ID given."
 msgstr ""
 
@@ -10113,7 +10117,7 @@ msgstr "非模板項目"
 msgid "Not all templates are linked to \"%s\"."
 msgstr "並非所有的模板都連結到\"%s\"."
 
-#: api/classes/CUser.php:374
+#: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "不允許設定用戶\"guest\"的密碼."
 
@@ -10171,12 +10175,12 @@ msgstr "警報匯總"
 msgid "Notifications"
 msgstr "警報"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:259
 msgid "Nov"
 msgstr "十一"
 
 #: include/forms.inc.php:1702 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:128
+#: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "十一月"
 
@@ -10403,7 +10407,7 @@ msgstr "其它組態參數"
 msgid "OVERVIEW"
 msgstr "概覽"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:258
 msgid "Oct"
 msgstr "十月"
 
@@ -10412,7 +10416,7 @@ msgid "Octal"
 msgstr "八進位"
 
 #: include/forms.inc.php:1697 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:127
+#: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "十月"
 
@@ -10496,15 +10500,15 @@ msgstr "只有超級管理員可以更新全域巨集."
 msgid "Only Super Admins can update icon maps."
 msgstr "只有超級管理員可以更新圖示對應."
 
-#: api/classes/CUser.php:640
+#: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超級管理員可以新增用戶示警媒介."
 
-#: api/classes/CUser.php:708
+#: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超級管理員可以用改變戶示警媒介."
 
-#: api/classes/CUser.php:678
+#: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超級管理員可以移除用戶示警媒介."
 
@@ -10710,7 +10714,7 @@ msgstr "總覽"
 msgid "Overview by proxy"
 msgstr "依系統代理程式概覽"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgctxt "Peta short"
 msgid "P"
 msgstr "P"
@@ -11023,7 +11027,7 @@ msgstr "許可權只能被指派予用戶群組"
 msgid "Persian (fa_IR)"
 msgstr "波斯語 (fa_IR)"
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgid "Peta"
 msgstr "Peta"
 
@@ -11127,7 +11131,7 @@ msgstr "預覽"
 msgid "Previous"
 msgstr "前"
 
-#: include/func.inc.php:1837
+#: include/func.inc.php:1843
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "前"
@@ -11203,7 +11207,7 @@ msgstr "私有金鑰檔"
 msgid "Privilege level"
 msgstr "優先權層級"
 
-#: api/classes/CUser.php:803
+#: api/classes/CUser.php:975
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
@@ -11387,11 +11391,11 @@ msgstr "恢復主旨"
 msgid "Refresh (in seconds)"
 msgstr "刷新(秒計)"
 
-#: include/func.inc.php:1945
+#: include/func.inc.php:1951
 msgid "Refresh time in seconds"
 msgstr "以秒計的刷新時間"
 
-#: include/func.inc.php:1949
+#: include/func.inc.php:1955
 msgid "Refresh time multiplier"
 msgstr "刷新時間倍數"
 
@@ -11688,7 +11692,7 @@ msgstr "結果為偽"
 msgid "Result is TRUE"
 msgstr "結果為真"
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr "\"%s\"的結果"
@@ -11992,12 +11996,12 @@ msgstr "ZABBIX 狀態"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:225
+#: include/func.inc.php:231
 msgid "Sat"
 msgstr "六"
 
 #: include/forms.inc.php:1671 include/forms.inc.php:1739
-#: include/func.inc.php:153 include/func.inc.php:237
+#: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "週六"
 
@@ -12234,7 +12238,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:26
+#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "脚本"
 
@@ -12405,7 +12409,7 @@ msgstr "送到用戶"
 msgid "Sent"
 msgstr "已送"
 
-#: include/func.inc.php:251
+#: include/func.inc.php:257
 msgid "Sep"
 msgstr "九月"
 
@@ -12415,7 +12419,7 @@ msgid "Separated"
 msgstr "分開的"
 
 #: include/forms.inc.php:1692 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:126
+#: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "九月"
 
@@ -12508,7 +12512,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: api/classes/CUser.php:1009
+#: api/classes/CUser.php:1188
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -13024,12 +13028,12 @@ msgstr "期間的總時間是 T > N"
 msgid "Sum of values of a period T is NOT N"
 msgstr ""
 
-#: include/func.inc.php:219
+#: include/func.inc.php:225
 msgid "Sun"
 msgstr "日"
 
 #: include/forms.inc.php:1672 include/forms.inc.php:1740
-#: include/func.inc.php:155 include/func.inc.php:231
+#: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "日"
 
@@ -13087,7 +13091,7 @@ msgstr "系統狀態"
 msgid "System uptime in seconds."
 msgstr ""
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgctxt "Tera short"
 msgid "T"
 msgstr "T"
@@ -13275,7 +13279,7 @@ msgstr "模板"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "模板\"%1$s\"自主機\"%2$s\"斷連."
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgid "Tera"
 msgstr "Tera"
 
@@ -13418,12 +13422,12 @@ msgstr "本周"
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:223
+#: include/func.inc.php:229
 msgid "Thu"
 msgstr "四"
 
 #: include/forms.inc.php:1669 include/forms.inc.php:1737
-#: include/func.inc.php:151 include/func.inc.php:235
+#: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "週四"
 
@@ -13591,7 +13595,7 @@ msgid "Trends"
 msgstr "趨勢"
 
 #: events.php:296 events.php:337 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -13848,12 +13852,12 @@ msgstr "刪短的"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "嘗試讀取不能存取的屬性\"%s\"."
 
-#: include/func.inc.php:221
+#: include/func.inc.php:227
 msgid "Tue"
 msgstr "二"
 
 #: include/forms.inc.php:1667 include/forms.inc.php:1735
-#: include/func.inc.php:149 include/func.inc.php:233
+#: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "週二"
 
@@ -13997,7 +14001,7 @@ msgstr "USA (160字元)"
 msgid "USER PROFILE"
 msgstr "用戶基本資料"
 
-#: include/func.inc.php:2605
+#: include/func.inc.php:2611
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14349,12 +14353,12 @@ msgstr "用於動作中"
 msgid "User"
 msgstr "用户"
 
-#: api/classes/CUser.php:328
+#: api/classes/CUser.php:338
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "用戶\"%s\"不能沒有用戶群組."
 
-#: users.php:212
+#: users.php:218
 msgid "User added"
 msgstr "新增用户"
 
@@ -14379,7 +14383,7 @@ msgstr "用戶不能改變自己的狀態"
 msgid "User cannot change status of himself."
 msgstr "用戶不能改變自己的狀態"
 
-#: users.php:241 users.php:349
+#: users.php:247 users.php:355
 msgid "User deleted"
 msgstr "用户已删除"
 
@@ -14438,16 +14442,16 @@ msgstr ""
 msgid "User groups"
 msgstr "用户群組"
 
-#: api/classes/CUser.php:1196
+#: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
 msgstr "用戶是不允許刪除自己"
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:351
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "用戶不能因為成為用戶群組 \"%s\"的成員而幫自己修改GUI存取."
 
-#: api/classes/CUser.php:345
+#: api/classes/CUser.php:355
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "用戶不能因為成為用戶群組 \"%s\"的成員而幫自己修改系統狀態."
@@ -14491,11 +14495,11 @@ msgstr ""
 msgid "User type"
 msgstr "用戶類型"
 
-#: profile.php:173 users.php:205 users.php:263 users.php:287
+#: profile.php:176 users.php:211 users.php:269 users.php:293
 msgid "User updated"
 msgstr "用户已更新"
 
-#: api/classes/CUser.php:390
+#: api/classes/CUser.php:400
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr "使用別名\"%s\"的用戶已存在."
@@ -14521,7 +14525,7 @@ msgstr "用户"
 msgid "Users (online)"
 msgstr "用戶(線上)"
 
-#: users.php:317
+#: users.php:323
 msgid "Users unblocked"
 msgstr "未被封鎖的用戶"
 
@@ -14941,12 +14945,12 @@ msgstr ""
 msgid "Web scenarios"
 msgstr ""
 
-#: include/func.inc.php:222
+#: include/func.inc.php:228
 msgid "Wed"
 msgstr "三"
 
 #: include/forms.inc.php:1668 include/forms.inc.php:1736
-#: include/func.inc.php:150 include/func.inc.php:234
+#: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "週三"
 
@@ -15099,7 +15103,7 @@ msgstr "錯誤的服務\"%1$s\"其時間欄位."
 msgid "Wrong fields for trigger."
 msgstr "錯誤的觸發器欄位."
 
-#: api/classes/CUser.php:272
+#: api/classes/CUser.php:283
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "錯誤的用戶欄位\"%s\"."
@@ -15143,7 +15147,7 @@ msgstr "XML檔含有警告 %1$s:"
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgctxt "Yotta short"
 msgid "Y"
 msgstr "Y"
@@ -15193,7 +15197,7 @@ msgstr "Y.m.d"
 msgid "Y.m.d H:i"
 msgstr "Y.m.d H:i"
 
-#: include/func.inc.php:598 include/translateDefines.inc.php:47
+#: include/func.inc.php:604 include/translateDefines.inc.php:47
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
@@ -15209,14 +15213,14 @@ msgstr "每年"
 
 #: events.php:763 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2423
+#: include/events.inc.php:383 include/func.inc.php:2429
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "是"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -15224,12 +15228,12 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您無法選擇某些語言, 因為這些語系並未安裝於web伺服器上."
 
-#: api/classes/CUser.php:357
+#: api/classes/CUser.php:367
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允許來幫用戶\"%s\"轉換優先權."
 
-#: include/func.inc.php:2106
+#: include/func.inc.php:2112
 msgid "You are not logged in."
 msgstr "您尚未登入."
 
@@ -15268,27 +15272,27 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 msgid "You do not have permission to perform this operation."
 msgstr "您沒有許可權來完成此操作."
 
-#: api/classes/CUser.php:278
+#: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
 msgstr "您沒有許可權來創建用戶."
 
-#: api/classes/CUser.php:290
+#: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
 msgstr "您沒有許可權來更新其它用戶."
 
-#: api/classes/CUser.php:285
+#: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您沒有許可權來來更新用戶或用戶不存在."
 
-#: include/func.inc.php:2088
+#: include/func.inc.php:2094
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2108
+#: include/func.inc.php:2114
 msgid "You must login to view this page."
 msgstr "您必需登入才能瀏覽此頁面."
 
-#: include/func.inc.php:2084
+#: include/func.inc.php:2090
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15296,7 +15300,7 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring."
 msgstr "您的設定並未組態為分散式監測."
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgctxt "Zetta short"
 msgid "Z"
 msgstr "Z"
@@ -15411,7 +15415,7 @@ msgstr "Zabbix主機埠"
 msgid "Zabbix trapper"
 msgstr "Zabbix捉捕器"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgid "Zetta"
 msgstr "Zetta"
 
@@ -15439,7 +15443,7 @@ msgid "agent"
 msgstr "端點代理程式"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15490,15 +15494,15 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
 msgid "avg"
 msgstr "平均"
 
-#: include/func.inc.php:558 jsLoader.php:97
+#: include/func.inc.php:564 jsLoader.php:97
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -15536,14 +15540,14 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15611,7 +15615,7 @@ msgstr "已執行"
 msgid "fixed"
 msgstr "固定的"
 
-#: include/func.inc.php:1896
+#: include/func.inc.php:1902
 msgid "found"
 msgstr "已發現"
 
@@ -15621,7 +15625,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
 
-#: include/func.inc.php:559 jsLoader.php:98
+#: include/func.inc.php:565 jsLoader.php:98
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -15673,7 +15677,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
@@ -15691,12 +15695,12 @@ msgstr "似"
 msgid "low-level discovery rule"
 msgstr ""
 
-#: include/func.inc.php:560
+#: include/func.inc.php:566
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:557 jsLoader.php:96
+#: include/func.inc.php:563 jsLoader.php:96
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -15713,16 +15717,16 @@ msgstr "維護"
 msgid "map"
 msgstr "拓墣圖"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
 msgid "max"
 msgstr "最大"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
@@ -15739,7 +15743,7 @@ msgstr "最少60秒"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:562
+#: include/func.inc.php:568
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "毫秒"
@@ -15752,7 +15756,7 @@ msgstr "必需為一個正確的LDAP用戶"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
@@ -15786,7 +15790,7 @@ msgid "now"
 msgstr "現在"
 
 #: include/blocks.inc.php:362 include/blocks.inc.php:706
-#: include/func.inc.php:1893
+#: include/func.inc.php:1899
 msgid "of"
 msgstr "其"
 
@@ -15855,7 +15859,7 @@ msgstr "root"
 msgid "running"
 msgstr "運作中"
 
-#: include/func.inc.php:561
+#: include/func.inc.php:567
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -15893,7 +15897,7 @@ msgstr "展示值對應"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "模板ID\"%1$s\"已傳送%2$s次"
 
-#: include/func.inc.php:1889
+#: include/func.inc.php:1895
 msgid "to"
 msgstr "到"
 
@@ -15924,7 +15928,7 @@ msgstr "值"
 msgid "via"
 msgstr ""
 
-#: include/func.inc.php:556 jsLoader.php:95
+#: include/func.inc.php:562 jsLoader.php:95
 msgctxt "year short"
 msgid "y"
 msgstr "y"
