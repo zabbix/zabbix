@@ -806,7 +806,7 @@ static int	process_value(
 	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
-	el->value = (NULL == value) ? NULL : zbx_strdup(NULL, value);
+	el->value = zbx_strdup(NULL, value);
 
 	if (NULL != source)
 		el->source = strdup(source);
@@ -943,8 +943,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
-						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
+						ZBX_NOTSUPPORTED, &active_metrics[i].lastlogsize, NULL, NULL, NULL,
+						NULL, NULL, 0);
 			}
 		}
 		/* special processing for log files with rotation */
@@ -1011,9 +1012,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
-						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
-						NULL, NULL, NULL, NULL, 0);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
+						ZBX_NOTSUPPORTED, &active_metrics[i].lastlogsize,
+						&active_metrics[i].mtime, NULL, NULL, NULL, NULL, 0);
 			}
 		}
 		/* special processing for eventlog */
@@ -1279,8 +1280,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
-				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, NULL,
-						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
+						ZBX_NOTSUPPORTED, &active_metrics[i].lastlogsize, NULL, NULL, NULL,
+						NULL, NULL, 0);
 			}
 		}
 		else
