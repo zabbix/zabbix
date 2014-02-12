@@ -71,10 +71,10 @@ use constant ZBX_EC_EPP_INFOTO        => -209; # INFO command timeout
 use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
 
 use constant cfg_probe_status_delay => 60;
-use constant cfg_default_rdds_ns_string => qw(Name Server:);
+use constant cfg_default_rdds_ns_string => 'Name Server:';
 
-use constant dnstest_host => qw(dnstest); # global config history
-use constant dnstest_group => qw(dnstest);
+use constant dnstest_host => 'dnstest'; # global config history
+use constant dnstest_group => 'dnstest';
 
 my %OPTS;
 my $args = GetOptions(\%OPTS,
@@ -1622,6 +1622,8 @@ sub create_cron_items {
 sub usage {
     my ($opt_name, $opt_value) = @_;
 
+    my $cfg_default_rdds_ns_string = cfg_default_rdds_ns_string;
+
     print <<EOF;
 
     Usage: $0 [options]
@@ -1658,7 +1660,7 @@ Other options
                 specify EPP server
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
-		(default: "cfg_default_rdds_ns_string")
+		(default: $cfg_default_rdds_ns_string)
         --rdds-test-prefix=STRING
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
         --only-cron
