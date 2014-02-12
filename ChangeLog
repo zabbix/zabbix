@@ -3,6 +3,7 @@ Changes for 2.2.3rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-7763] fixed checking the wrong exit code of php_get_sem() (igors)
 ..F....... [ZBX-7770] removed web.page.perf item key from simple check item type (Eduard)
 ..F....... [ZBX-7242] fixed jQuery sortable objects not to change with when dragging them (Ivo)
 ..F....... [ZBX-7736] fixed incorrectly working global regular expression type "Any character string included" (Ivo)
