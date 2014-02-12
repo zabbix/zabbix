@@ -405,34 +405,40 @@ sub create_group {
     return $groupid;
 }
 
-sub create_template {
-    my $name = shift;
-    my $child_templateid = shift;
+sub create_template {                      
+    my $name = shift;                      
+    my $child_templateid = shift;          
+                                           
+    my ($result, $templateid, $options, $groupid);
+                                                            
+    unless ($zabbix->exist('hostgroup', {'name' => 'Templates - TLD'})) {
+        $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
+        $groupid = $result->{'groupids'}[0];
+    }
+    else {
+        $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates - TLD'}});
+        $groupid = $result->{'groupid'};
+    }
 
-    my ($result, $templateid, $options);
+    unless ($zabbix->exist('template',{'host' => $name})) { 
+        $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
+                                                            
+        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
 
-    unless ($zabbix->exist('template',{'host' => $name})) {
-        $result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates'}});
-
-	$options = {'groups'=> {'groupid' => $result->{'groupid'}}, 'host' => $name};
-
-	$options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-
-	$result = $zabbix->create('template', $options);
+        $result = $zabbix->create('template', $options);
         $templateid = $result->{'templateids'}[0];
     }
     else {
-	$result = $zabbix->get('template', {'filter' => {'host' => $name}});
-	$templateid = $result->{'templateid'};
-	$result = $zabbix->get('hostgroup', {'filter' => {'name' => 'Templates'}});
-
-	$options = {'templateid' => $templateid, 'groups'=> {'groupid' => $result->{'groupid'}}, 'host' => $name};
-	$options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-
-	$result = $zabbix->update('template', $options);
-	$templateid = $result->{'templateids'}[0];
+        $result = $zabbix->get('template', {'filter' => {'host' => $name}});
+        $templateid = $result->{'templateid'};
+        
+        $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
+        $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
+        
+        $result = $zabbix->update('template', $options);
+        $templateid = $result->{'templateids'}[0];
     }
-
+    
     return $templateid;
 }
 
@@ -489,6 +495,7 @@ sub create_item_dns_rtt {
     my $templateid = shift;
     my $template_name = shift;
     my $proto = shift;
+    my $ipv = shift;
 
     pfail("undefined template ID passed to create_item_dns_rtt()") unless ($templateid);
     pfail("no protocol parameter specified to create_item_dns_rtt()") unless ($proto);
@@ -508,28 +515,32 @@ sub create_item_dns_rtt {
     create_item($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from Name Server '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY.
+					    '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - Invalid reply from Name Server '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - UNIX timestamp is missing from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - Invalid UNIX timestamp from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
@@ -537,7 +548,8 @@ sub create_item_dns_rtt {
 
     if (defined($OPTS{'dnssec'})) {
 	$options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.']',
-		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG,
+		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 		     'priority' => '2',
 	};
 
@@ -545,14 +557,16 @@ sub create_item_dns_rtt {
     }
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from resolver',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 2 - AD bit is missing from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT,
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT.
+                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
                 };
 
@@ -1029,24 +1043,6 @@ sub create_probe_template {
     create_macro('{$DNSTEST.RDDS.ENABLED}', '1', $templateid);
     create_macro('{$DNSTEST.EPP.ENABLED}', '1', $templateid);
 
-    my $delay = 300;
-    my $appid = get_application_id('Configuration', $templateid);
-    my ($options, $key);
-
-    foreach my $m ('DNSTEST.IP4.ENABLED', 'DNSTEST.IP6.ENABLED') {
-	$key = 'probe.configvalue['.$root_name.','.$m.']';
-
-	$options = {'name' => '$2 value',
-		    'key_'=> $key,
-		    'hostid' => $templateid,
-		    'applications' => [$appid],
-		    'params' => '{$'.$m.'}',
-		    'delay' => $delay,
-		    'type' => 15, 'value_type' => 3};
-
-	create_item($options);
-    }
-
     return $templateid;
 }
 
@@ -1129,6 +1125,24 @@ sub create_main_template {
 
     pfail("cannot create Template '".$template_name."'") unless ($templateid);
 
+    my $delay = 300;
+    my $appid = get_application_id('Configuration', $templateid);
+    my ($options, $key);
+
+    foreach my $m ('DNSTEST.IP4.ENABLED', 'DNSTEST.IP6.ENABLED') {
+        $key = 'probe.configvalue['.$m.']';
+
+        $options = {'name' => 'Value of $1 variable',
+                    'key_'=> $key,
+                    'hostid' => $templateid,
+                    'applications' => [$appid],
+                    'params' => '{$'.$m.'}',
+                    'delay' => $delay,
+                    'type' => 15, 'value_type' => 3};
+
+        create_item($options);
+    }
+
     foreach my $ns_name (sort keys %{$ns_servers}) {
 	print $ns_name."\n";
 
@@ -1139,13 +1153,14 @@ sub create_main_template {
 	    next unless defined $ipv4[$i_ipv4];
 	    print "	--v4     $ipv4[$i_ipv4]\n";
 
-            create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "tcp");
-	    create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "udp");
+            create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "tcp", '4');
+	    create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "udp", '4');
 	    if (defined($OPTS{'epp-server'})) {
     		create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv4[$i_ipv4].']',
-            	             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
+            	             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+					     '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP4.ENABLED]'.'.last(0)}=1',
                 	    'priority' => '2',
                 };
 
@@ -1157,13 +1172,14 @@ sub create_main_template {
 	    next unless defined $ipv6[$i_ipv6];
     	    print "	--v6     $ipv6[$i_ipv6]\n";
 
-	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "tcp");
-    	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "udp");
+	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "tcp", '6');
+    	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "udp", '6');
 	    if (defined($OPTS{'epp-server'})) {
     		create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv6[$i_ipv6].']',
-                             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS,
+                             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+						'&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP6.ENABLED]'.'.last(0)}=1',
                             'priority' => '2',
                 };
 
