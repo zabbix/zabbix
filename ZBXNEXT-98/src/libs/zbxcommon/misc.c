@@ -1431,7 +1431,6 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	return SUCCEED;
 }
 
-
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
 {

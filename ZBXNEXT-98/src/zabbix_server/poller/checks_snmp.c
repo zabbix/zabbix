@@ -1152,7 +1152,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
 
-	int		i, j, k, ret = SUCCEED;
+	int		i, j, k, ret;
 	int		to_walk[MAX_SNMP_ITEMS], to_walk_num = 0;
 	int		to_verify[MAX_SNMP_ITEMS], to_verify_num = 0;
 	char		to_verify_oids[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
@@ -1336,8 +1336,8 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			else
 			{
 				SET_MSG_RESULT(&results[j], zbx_dsprintf(NULL,
-						"Cannot find index \"%s\" of the OID \"%s\".",
-						index_oids[j], items[j].snmp_oid));
+						"Cannot find index of \"%s\" in \"%s\".",
+						index_values[j], index_oids[j]));
 				errcodes[j] = NOTSUPPORTED;
 			}
 		}
@@ -1360,7 +1360,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
 
-	int		i, ret = SUCCEED;
+	int		i, ret;
 	char		oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
