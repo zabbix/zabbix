@@ -70,7 +70,7 @@
 .inventory-host .formlist .formrow .interfaces { min-width: 500px; }
 
 /* icon mapping */
-#iconMapTable .sortable { height: 30px; }
+#iconMapTable .sortable { height: 30px; line-height: 30px; }
 #iconMapTable .sortable .preview { vertical-align: middle; }
 
 /* overview monitoring */
