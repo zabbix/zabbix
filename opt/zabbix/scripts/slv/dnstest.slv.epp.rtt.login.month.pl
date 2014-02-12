@@ -32,7 +32,8 @@ foreach (@$tlds_ref)
 {
     $tld = $_;
 
-    next if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
+    my $lastclock = get_lastclock($tld, $cfg_key_out);
+    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     db_connect();
 

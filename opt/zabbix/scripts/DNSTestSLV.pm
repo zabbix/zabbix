@@ -643,7 +643,12 @@ sub send_values
     {
 	@suba = splice(@_sender_values, 0, SENDER_BATCH_COUNT);
 
-	warn("cannot send data to Zabbix server: ", Dumper(\@suba)) unless (defined($sender->send_arrref(\@suba)));
+	unless (defined($sender->send_arrref(\@suba)))
+	{
+	    require Data::Dumper;
+
+	    warn("cannot send data to Zabbix server: ", Dumper(\@suba));
+	}
     }
 }
 

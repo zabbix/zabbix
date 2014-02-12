@@ -36,7 +36,7 @@ foreach (@$tlds_ref)
 
     if ($online_probes < $cfg_minonline)
     {
-	info("success ($count probes are online, min - $cfg_minonline)");
+	info("success ($online_probes probes are online, min - $cfg_minonline)");
 	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }

@@ -32,7 +32,8 @@ foreach (@$tlds_ref)
 {
     $tld = $_;
 
-    next if (check_lastclock($tld, $cfg_key_out, $value_ts, $interval) != SUCCESS);
+    my $lastclock = get_lastclock($tld, $cfg_key_out);
+    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_UPDATE_ERROR, MAX_UPDATE_ERROR);
 }
