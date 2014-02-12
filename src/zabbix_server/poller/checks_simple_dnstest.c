@@ -1596,7 +1596,7 @@ static void	zbx_get_rdds43_nss(zbx_vector_str_t *nss, const char *recv_buf, cons
 	p = recv_buf;
 	rdds_ns_string_size = strlen(rdds_ns_string);
 
-	while (NULL != (p = strstr(p, rdds_ns_string)))
+	while (NULL != (p = zbx_strcasestr(p, rdds_ns_string)))
 	{
 		p += rdds_ns_string_size;
 
