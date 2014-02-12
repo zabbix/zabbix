@@ -170,7 +170,7 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		$result = DBend($result);
-		show_messages($result, _('Service updated'), _('Cannot update service'));
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	// validate and get service times
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
