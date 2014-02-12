@@ -185,30 +185,33 @@ if (isset($_REQUEST['save'])) {
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
 }
-elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUEST['go'] == 'delete') {
-	$sysmapIds = get_request('maps', array());
+elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 'delete') {
+	$sysmapIds = getRequest('maps', array());
 
-	if (isset($_REQUEST['sysmapid'])) {
-		$sysmapIds[] = $_REQUEST['sysmapid'];
+	if (hasRequest('sysmapid')) {
+		$sysmapIds[] = getRequest('sysmapid');
 	}
+
+	DBstart();
 
 	$maps = API::Map()->get(array(
 		'sysmapids' => $sysmapIds,
 		'output' => array('name'),
 		'editable' => true
 	));
-	$goResult = API::Map()->delete($sysmapIds);
+	$result = API::Map()->delete($sysmapIds);
 
-	show_messages($goResult, _('Network map deleted'), _('Cannot delete network map'));
-	clearCookies($goResult);
-
-	if ($goResult) {
+	if ($result) {
 		unset($_REQUEST['form']);
 
 		foreach ($maps as $map) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
 		}
 	}
+
+	$result = DBend($result);
+	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
+	clearCookies($result);
 }
 
 /*

@@ -70,6 +70,8 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])) {
 elseif (isset($_REQUEST['save'])) {
 	$hostIds = get_request('hosts', array());
 
+	DBstart();
+
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
 		'output' => array('hostid'),
@@ -82,7 +84,8 @@ elseif (isset($_REQUEST['save'])) {
 	));
 
 	if (!empty($_REQUEST['groupid'])) {
-		DBstart();
+		$messageSuccess = _('Group updated');
+		$messageFailed = _('Cannot update group');
 
 		$oldGroup = API::HostGroup()->get(array(
 			'groupids' => $_REQUEST['groupid'],
@@ -110,22 +113,18 @@ elseif (isset($_REQUEST['save'])) {
 				'templates' => $templates,
 				'groups' => $groups
 			));
-		}
 
-		$result = DBend($result);
-
-		if ($result) {
 			$group = reset($groups);
 
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
-				'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
+			if ($result) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
+					'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
+			}
 		}
-
-		$msgOk = _('Group updated');
-		$msgFail = _('Cannot update group');
 	}
 	else {
-		DBstart();
+		$messageSuccess = _('Group added');
+		$messageFailed = _('Cannot add group');
 
 		$result = API::HostGroup()->create(array('name' => $_REQUEST['name']));
 
@@ -147,20 +146,17 @@ elseif (isset($_REQUEST['save'])) {
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
 			}
 		}
-
-		$result = DBend($result);
-
-		$msgOk = _('Group added');
-		$msgFail = _('Cannot add group');
 	}
 
-	show_messages($result, $msgOk, $msgFail);
+	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		clearCookies($result);
 	}
 	unset($_REQUEST['save']);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
 	$result = API::HostGroup()->delete($_REQUEST['groupid']);
