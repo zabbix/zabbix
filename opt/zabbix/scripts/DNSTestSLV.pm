@@ -320,8 +320,7 @@ sub get_items_by_hostids
 
     if (scalar(@items) == 0)
     {
-	fail("no input items ($cfg_key) found on hostids ($hostids)") if ($complete);
-	fail("no input items ($cfg_key*) found on hostids ($hostids)");
+	fail("cannot find items ($cfg_key", ($complete ? '' : '*'), ") on hostids ($hostids)");
     }
 
     return \@items;
@@ -345,7 +344,7 @@ sub get_tld_items
 	push(@items, \@row);
     }
 
-    fail("no items matching '$cfg_key*' at host $tld found in the database") if (scalar(@items) == 0);
+    fail("cannot find items ($cfg_key*) on host ($tld)") if (scalar(@items) == 0);
 
     return \@items;
 }
@@ -647,7 +646,7 @@ sub send_values
 	{
 	    require Data::Dumper;
 
-	    warn("cannot send data to Zabbix server: ", Dumper(\@suba));
+	    warn("cannot send data to Zabbix server:\n", Dumper(\@suba));
 	}
     }
 }
@@ -869,7 +868,7 @@ sub process_slv_ns_avail
 
     my $values_ref = __get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
 
-    warn("no values found in the database") if (scalar(keys(%$values_ref)) == 0);
+    warn("no values of $cfg_key_in* at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
     foreach my $ns (keys(%$values_ref))
     {
@@ -996,7 +995,7 @@ sub slv_exit
 
     if (defined($pidfile))
     {
-	$pidfile->remove() or warn("cannot unlink pid file ", $pidfile->file());
+	$pidfile->remove() or warn("cannot remove pid file ", $pidfile->file());
     }
 
     exit($rv);
@@ -1008,11 +1007,12 @@ sub exit_if_running
 
     $pidfile = __get_pidfile();
 
-    fail("cannot lock script", (defined($tld) ? " $tld" : '')) unless (defined($pidfile));
+    fail("cannot lock script") unless (defined($pidfile));
 
     if (my $pid = $pidfile->running())
     {
-	fail("already running (pid:$pid)");
+	warn("already running (pid:$pid)");
+	exit(SUCCESS);
     }
 
     $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file());
@@ -1321,7 +1321,7 @@ sub __get_nss
 	push(@nss, get_ns_from_key($row[0]));
     }
 
-    fail("cannot find items '$cfg_key_out*' on host '$tld'") if (scalar(@nss) == 0);
+    fail("cannot find items ($cfg_key_out*) on host ($tld)") if (scalar(@nss) == 0);
 
     return \@nss;
 }
