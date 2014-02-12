@@ -65,15 +65,17 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
-	if (CWebUser::login(get_request('name', ''), get_request('password', ''))) {
+	if (CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
 		// save remember login preference
-		$user = array('autologin' => get_request('autologin', 0));
+		$user = array('autologin' => getRequest('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
-			$result = API::User()->updateProfile($user);
+			API::User()->updateProfile($user);
 		}
+		DBstart();
 		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
+		DBend(true);
 
-		$request = get_request('request');
+		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
 			$url = 'dashboard.php';
