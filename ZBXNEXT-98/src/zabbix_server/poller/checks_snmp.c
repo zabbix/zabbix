@@ -1119,7 +1119,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
-	int		ret = SUCCEED;
+	int		ret;
 	char		oid_translated[ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1138,6 +1138,9 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 					items[0].snmp_oid));
 			errcodes[0] = NOTSUPPORTED;
 	}
+
+	if (SUCCEED != (ret = errcodes[0]))
+		zbx_strlcpy(error, results[0].msg, max_error_len);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1440,16 +1443,15 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 exit:
 	if (SUCCEED != err)
 	{
-		for (i = 0; i < num; i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "getting SNMP values failed: %s", error);
+
+		for (i = j; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			if (!ISSET_MSG(&results[i]))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = err;
-			}
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = err;
 		}
 	}
 	else if (0 != max_succeed || MAX_SNMP_ITEMS + 1 != min_fail)

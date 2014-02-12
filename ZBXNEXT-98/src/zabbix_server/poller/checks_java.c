@@ -193,7 +193,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 		assert(0);
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
-	for (i = 0; i < num; i++)
+	for (i = j; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])
 			continue;
@@ -230,18 +230,15 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 exit:
 	if (NETWORK_ERROR == err || GATEWAY_ERROR == err)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Getting Java values failed: %s", error);
+		zabbix_log(LOG_LEVEL_DEBUG, "getting Java values failed: %s", error);
 
-		for (i = 0; i < num; i++)
+		for (i = j; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			if (!ISSET_MSG(&results[i]))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = err;
-			}
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = err;
 		}
 	}
 out:
