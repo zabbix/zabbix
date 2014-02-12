@@ -49,7 +49,7 @@ foreach (@$tlds_ref)
 
     if (scalar(@$values_ref) == 0)
     {
-	warn("no values found in the database");
+	wrn("no item values ($cfg_key_in) found");
 	next;
     }
 
@@ -75,6 +75,9 @@ foreach (@$tlds_ref)
     info(($test_result == UP ? "success" : "fail"), " (dnssec success: $success_values)");
     push_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
+
+# unset TLD (for the logs)
+$tld = undef;
 
 send_values();
 

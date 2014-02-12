@@ -40,6 +40,9 @@ foreach (@$tlds_ref)
     process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_LOGIN_ERROR, MAX_LOGIN_ERROR);
 }
 
+# unset TLD (for the logs)
+$tld = undef;
+
 send_values();
 
 slv_exit(SUCCESS);

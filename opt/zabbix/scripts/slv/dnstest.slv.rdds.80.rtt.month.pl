@@ -38,6 +38,9 @@ foreach (@$tlds_ref)
     process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value);
 }
 
+# unset TLD (for the logs)
+$tld = undef;
+
 send_values();
 
 slv_exit(SUCCESS);

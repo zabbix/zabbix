@@ -51,6 +51,9 @@ foreach (@$tlds_ref)
     }
 }
 
+# unset TLD (for the logs)
+$tld = undef;
+
 send_values();
 
 slv_exit(SUCCESS);

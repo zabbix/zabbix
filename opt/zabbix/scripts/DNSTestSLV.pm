@@ -54,7 +54,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
 		get_item_values check_lastclock get_down_count
-		dbg info warn fail slv_exit exit_if_running trim parse_opts);
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts);
 
 my $probe_group_name = 'Probes';
 my $probe_key_manual = 'probe.status[manual]';
@@ -247,7 +247,7 @@ sub get_lastclock
 
     fail("lastclock check failed: cannot find item ($key) at host ($host)") if (scalar(@$arr_ref) < 1);
 
-    return $arr_ref->[0]->[0];
+    return $arr_ref->[0]->[0] ? $arr_ref->[0]->[0] : 0;
 }
 
 sub get_tlds
@@ -641,9 +641,18 @@ sub send_values
 
 	unless (defined($sender->send_arrref(\@suba)))
 	{
-	    require Data::Dumper;
+	    wrn("cannot send data to Zabbix server:");
 
-	    warn("cannot send data to Zabbix server:\n", Dumper(\@suba));
+	    foreach my $entry (@suba)
+	    {
+		my $line = '{';
+
+		$line .= ($line ne '{' ? ', ' : '') . $_ . ' => ' . $entry->{$_} foreach (keys(%$entry));
+
+		$line .= '}';
+
+		wrn($line);
+	    }
 	}
     }
 }
@@ -865,7 +874,7 @@ sub process_slv_ns_avail
 
     my $values_ref = __get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
 
-    warn("no values of $cfg_key_in* at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
+    wrn("no values of $cfg_key_in* at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
     foreach my $ns (keys(%$values_ref))
     {
@@ -992,7 +1001,7 @@ sub slv_exit
 
     if (defined($pidfile))
     {
-	$pidfile->remove() or warn("cannot remove pid file ", $pidfile->file());
+	$pidfile->remove() or wrn("cannot remove pid file ", $pidfile->file());
     }
 
     exit($rv);
@@ -1002,17 +1011,29 @@ sub exit_if_running
 {
     return if (defined($OPTS{'test'}));
 
-    $pidfile = __get_pidfile();
+    my $filename = __get_pidfile();
 
+    $pidfile = File::Pid->new({ file => $filename });
     fail("cannot lock script") unless (defined($pidfile));
 
+    $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file);
+
+    return if ($pidfile->pid == $$);
+
+    # pid file exists and has valid pid
     if (my $pid = $pidfile->running())
     {
-	warn("already running (pid:$pid)");
+	wrn("already running (pid:$pid)");
 	exit(SUCCESS);
     }
 
-    $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file());
+    # pid file exists but the pid in it is invalid
+    $pidfile->remove() or fail("cannot remove pid file ", $pidfile->file);
+
+    $pidfile = File::Pid->new({ file => $filename });
+    fail("cannot lock script") unless (defined($pidfile));
+
+    $pidfile->write() or fail("cannot write to a pid file ", $pidfile->file);
 }
 
 sub dbg
@@ -1029,7 +1050,7 @@ sub info
     __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
 }
 
-sub warn
+sub wrn
 {
     my $msg = join('', @_);
 
@@ -1094,10 +1115,7 @@ sub __log
 
     my $OUTFILE;
 
-    my $script = __script();
-    $script =~ s,\.pl$,,;
-
-    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : "") . $script . '.log';
+    my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log';
 
     open $OUTFILE, '>>', $file or die("cannot open $file: $!");
 
@@ -1334,9 +1352,7 @@ sub __script
 
 sub __get_pidfile
 {
-    my $filename = $pid_dir . '/' . __script() . (defined($tld) ? "-$tld" : "") . '.pid';
-
-    return File::Pid->new({ file => $filename });
+    return $pid_dir . '/' . __script() . '.pid';
 }
 
 sub __ts

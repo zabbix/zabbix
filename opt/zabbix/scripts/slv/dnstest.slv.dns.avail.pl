@@ -80,6 +80,9 @@ foreach (@$tlds_ref)
     push_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
 
+# unset TLD (for the logs)
+$tld = undef;
+
 send_values();
 
 slv_exit(SUCCESS);

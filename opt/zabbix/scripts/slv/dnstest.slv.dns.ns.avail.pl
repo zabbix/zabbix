@@ -33,6 +33,9 @@ foreach (@$tlds_ref)
     process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline, SLV_UNAVAILABILITY_LIMIT, \&check_item_value);
 }
 
+# unset TLD (for the logs)
+$tld = undef;
+
 send_values();
 
 slv_exit(SUCCESS);
