@@ -1,6 +1,7 @@
 Changes for 2.2.3rc1
 
 New features:
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
@@ -816,6 +817,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.12rc1
 
 New features:
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:48+0200\n"
-"PO-Revision-Date: 2014-01-28 13:34+0300\n"
+"POT-Creation-Date: 2014-02-13 01:54+0200\n"
+"PO-Revision-Date: 2014-02-12 16:12+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1390908891.0\n"
+"X-POOTLE-MTIME: 1392214375.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -4144,7 +4144,7 @@ msgstr "Dipendenze"
 
 #: include/triggers.inc.php:1418 tr_status.php:610
 msgid "Dependent"
-msgstr "Dipendente"
+msgstr "Subordinato"
 
 #: include/triggers.inc.php:1398
 #: include/views/configuration.services.edit.php:115
