@@ -188,7 +188,7 @@ sub get_rollweek_data
 
     my $rows = scalar(@$arr_ref);
 
-    fail("cannot find items by key/pattern '$cfg_key_in' and '$cfg_key_out' at host '$host'") if ($rows < 2);
+    fail("cannot find items ($cfg_key_in and $cfg_key_out) at host ($host)") if ($rows < 2);
 
     my $itemid_in = undef;
     my $itemid_out = undef;
@@ -211,7 +211,7 @@ sub get_rollweek_data
 	last if (defined($itemid_in) and defined($itemid_out));
     }
 
-    fail("cannot find itemids by key/pattern '$cfg_key_in' and '$cfg_key_out' at host '$host'")
+    fail("cannot find itemid ($cfg_key_in and $cfg_key_out) at host ($host)")
 	unless (defined($itemid_in) and defined($itemid_out));
 
     return ($itemid_in, $itemid_out, $lastclock);
@@ -245,7 +245,7 @@ sub get_lastclock
 
     my $arr_ref = $res->fetchall_arrayref();
 
-    fail("cannot find item by key/pattern '$key' at host '$host'") unless (scalar(@$arr_ref) == 1);
+    fail("lastclock check failed: cannot find item ($key) at host ($host)") if (scalar(@$arr_ref) < 1);
 
     return $arr_ref->[0]->[0];
 }
@@ -318,10 +318,7 @@ sub get_items_by_hostids
 	push(@items, \%hash);
     }
 
-    if (scalar(@items) == 0)
-    {
-	fail("cannot find items ($cfg_key", ($complete ? '' : '*'), ") on hostids ($hostids)");
-    }
+    fail("cannot find items ($cfg_key", ($complete ? '' : '*'), ") at hostids ($hostids)") if (scalar(@items) == 0);
 
     return \@items;
 }
@@ -344,7 +341,7 @@ sub get_tld_items
 	push(@items, \@row);
     }
 
-    fail("cannot find items ($cfg_key*) on host ($tld)") if (scalar(@items) == 0);
+    fail("cannot find items ($cfg_key*) at host ($tld)") if (scalar(@items) == 0);
 
     return \@items;
 }
@@ -1273,7 +1270,7 @@ sub __get_all_ns_items
 	$all_ns_items{$row[0]}{$row[1]} = get_ns_from_key($row[2]);
     }
 
-    fail("cannot find items (searched for: $keys_str)") if (scalar(keys(%all_ns_items)) == 0);
+    fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%all_ns_items)) == 0);
 
     return \%all_ns_items;
 }
@@ -1321,7 +1318,7 @@ sub __get_nss
 	push(@nss, get_ns_from_key($row[0]));
     }
 
-    fail("cannot find items ($cfg_key_out*) on host ($tld)") if (scalar(@nss) == 0);
+    fail("cannot find items ($cfg_key_out*) at host ($tld)") if (scalar(@nss) == 0);
 
     return \@nss;
 }
