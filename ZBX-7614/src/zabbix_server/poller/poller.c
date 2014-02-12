@@ -553,6 +553,7 @@ static int	get_values(unsigned char poller_type)
 	zbx_timespec_t	timespec;
 	int		i, num;
 	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int		last_action = HOST_STATUS_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -683,11 +684,19 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				activate_host(&items[i], &timespec);
+				if (HOST_ACTIVE != last_action || HOST_STATUS_UNKNOWN == last_action)
+				{
+					activate_host(&items[i], &timespec);
+					last_action = HOST_ACTIVE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				deactivate_host(&items[i], &timespec, results[i].msg);
+				if (HOST_NOTACTIVE != last_action || HOST_STATUS_UNKNOWN == last_action)
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_action = HOST_NOTACTIVE;
+				}
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
