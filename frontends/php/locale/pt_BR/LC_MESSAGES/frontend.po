@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 02:07+0200\n"
+"POT-Creation-Date: 2014-02-13 02:16+0200\n"
 "PO-Revision-Date: 2014-02-02 00:37+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6056,6 +6056,7 @@ msgstr "Alinhamento horizontal"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:363 report2.php:399 report5.php:59 tr_status.php:258
 #: tr_status.php:375
+#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
