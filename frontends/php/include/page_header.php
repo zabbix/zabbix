@@ -435,7 +435,7 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
-	zbx_add_post_js('var msglistid = initMessages({});');
+	zbx_add_post_js('initMessages({});');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning
