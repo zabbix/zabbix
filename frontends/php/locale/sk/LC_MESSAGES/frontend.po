@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 02:07+0200\n"
-"PO-Revision-Date: 2014-02-02 16:18+0300\n"
+"POT-Creation-Date: 2014-02-13 02:16+0200\n"
+"PO-Revision-Date: 2014-02-10 21:40+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391350682.0\n"
+"X-POOTLE-MTIME: 1392061248.0\n"
 
 #: api/classes/CMaintenance.php:353 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:467 api/classes/CMaintenance.php:472
@@ -7385,7 +7385,7 @@ msgstr "Neplatný stav hosta \"%1$s\"."
 #: api/classes/CHost.php:552
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
-msgstr ""
+msgstr "Neplatný stav pre hosta \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:185
 #, c-format
