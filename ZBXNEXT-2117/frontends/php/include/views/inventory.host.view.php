@@ -226,12 +226,12 @@ else {
 
 $overviewFormList->addRow(_('Configuration'), array(
 	$hostLink,
-	new CSpan (array($applicationsLink, SPACE, '('.$this->data['host']['applications'].')'), 'overview-link'),
-	new CSpan (array($itemsLink, SPACE, '('.$this->data['host']['items'].')'), 'overview-link'),
-	new CSpan (array($triggersLink, SPACE, '('.$this->data['host']['triggers'].')'), 'overview-link'),
-	new CSpan (array($graphsLink, SPACE, '('.$this->data['host']['graphs'].')'), 'overview-link'),
-	new CSpan (array($discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')'), 'overview-link'),
-	new CSpan (array($webLink, SPACE, '('.$this->data['host']['httpTests'].')'), 'overview-link')
+	new CSpan(array($applicationsLink, SPACE, '('.$this->data['host']['applications'].')'), 'overview-link'),
+	new CSpan(array($itemsLink, SPACE, '('.$this->data['host']['items'].')'), 'overview-link'),
+	new CSpan(array($triggersLink, SPACE, '('.$this->data['host']['triggers'].')'), 'overview-link'),
+	new CSpan(array($graphsLink, SPACE, '('.$this->data['host']['graphs'].')'), 'overview-link'),
+	new CSpan(array($discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')'), 'overview-link'),
+	new CSpan(array($webLink, SPACE, '('.$this->data['host']['httpTests'].')'), 'overview-link')
 ));
 
 $hostInventoriesTab = new CTabView(array('remember' => true));
