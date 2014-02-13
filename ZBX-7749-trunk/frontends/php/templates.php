@@ -329,8 +329,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	catch (Exception $e) {
 		DBend(false);
-		error($e->getMessage());
-		show_messages(false, null, $messageFailed);
+		show_error_message($messageFailed);
 	}
 	unset($_REQUEST['save']);
 }
