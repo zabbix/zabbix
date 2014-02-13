@@ -205,7 +205,7 @@ sub get_rollweek_data
 	else
 	{
 	    $itemid_out = $row->[1];
-	    $lastclock = $row->[2];
+	    $lastclock = $row->[2] ? $row->[2] : 0;
 	}
 
 	last if (defined($itemid_in) and defined($itemid_out));
