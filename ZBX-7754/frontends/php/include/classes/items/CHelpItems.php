@@ -769,10 +769,6 @@ class CHelpItems {
 				array(
 					'key' => 'vmware.vm.vfs.fs.size[<url>,<uuid>,<fsname>,<mode>]',
 					'description' => _('VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused')
-				),
-				array(
-					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full WEB page. Default path is /')
 				)
 			),
 			ITEM_TYPE_SNMPTRAP => array(

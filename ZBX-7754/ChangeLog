@@ -1,6 +1,32 @@
+Changes for 2.2.3rc1
+
+New features:
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-7772] fixed HTTP authentication error (Eduard)
+...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
+........S. [ZBX-7572] fixed processing of JSON object by trapper (igors)
+.......PS. [ZBX-7763] fixed checking the wrong exit code of php_get_sem() (igors)
+..F....... [ZBX-7770] removed web.page.perf item key from simple check item type (Eduard)
+..F....... [ZBX-7242] fixed jQuery sortable objects not to change with when dragging them (Ivo)
+..F....... [ZBX-7736] fixed incorrectly working global regular expression type "Any character string included" (Ivo)
+..F....... [ZBX-7756] fixed SQL error in Monitoring > Maps page (Ivo)
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
+..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
+..F....... [ZBX-7651] fixed item configuration flexible interval adding (Eduard)
+..F....... [ZBX-7630] fixed latest issues link on monitoring events (Eduard)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.2
+
+2.2.2rc3 was released as 2.2.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.2rc3
 
 Bug fixes:
+........S. [ZBX-7521] fixed possible crash because of item value type change handling in value cache (wiper)
 .......PS. [ZBX-7698] fixed closing a connection to the database when database server is unavailable (Sasha)
 ........S. [ZBX-7758] fixed server crash when processing low-level discovery triggers prototypes (Sasha)
 
@@ -346,7 +372,7 @@ Changes for 2.1.6
 
 New features:
 ..F....... [ZBX-2616] upgraded the bundled DejaVu font from 2.33 to 2.34 (Richlv)
-..F....... [ZBXNEXT-1763] added links to inventory in Monitoring -> Maps and Monitoring -> Latest Data (Oleg)
+..F....... [ZBXNEXT-1763] added link to inventory in Monitoring -> Maps and displayed link to inventory page for hosts without inventory data in Monitoring -> Latest Data (Oleg)
 ..F....... [ZBXNEXT-1763] added host related information under Monitoring (Oleg)
 ..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
@@ -787,6 +813,21 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc1
+
+New features:
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
+..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.11
+
+2.0.11rc2 was released as 2.0.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.11rc2
@@ -2273,6 +2314,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.21rc1
+
+
+Changes for 1.8.20
+
+1.8.20rc2 was released as 1.8.20 without any changes
+
 Changes for 1.8.20rc2
 
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
