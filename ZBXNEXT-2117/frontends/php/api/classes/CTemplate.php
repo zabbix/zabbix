@@ -461,6 +461,8 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%1$s".', $template['host']));
 			}
 
+			$template['groups'] = zbx_toArray($template['groups']);
+
 			foreach ($template['groups'] as $group) {
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
