@@ -858,7 +858,7 @@ class CDiscoveryRule extends CItemGeneral {
 		return array(
 			'validators' => array(
 				'macro' => new CStringValidator(array(
-					'regex' => ZBX_PREG_EXPRESSION_LLD_MACROS,
+					'regex' => '/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/',
 					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s"'),
 					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s"')
 				)),
