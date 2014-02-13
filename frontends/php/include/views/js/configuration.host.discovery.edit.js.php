@@ -50,7 +50,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			}
 
 			$('#conditions')
-				.elementTable({
+				.dynamicRows({
 					template: '#condition-row',
 					counter: <?php echo CJs::encodeJson($counter) ?>,
 					dataCallback: function(data) {
@@ -59,10 +59,10 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 						return data;
 					}
 				})
-				.bind('tableupdate.elementTable', function(event, options) {
+				.bind('tableupdate.dynamicRows', function(event, options) {
 					$('#conditionRow').toggleClass('hidden', ($(options.row, $(this)).length <= 1));
 				})
-				.bind('rowremove.elementTable', function() {
+				.bind('rowremove.dynamicRows', function() {
 					updateExpression();
 				})
 				.on('change', '.macro', function() {

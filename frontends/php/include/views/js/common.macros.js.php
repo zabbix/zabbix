@@ -37,7 +37,7 @@
 			}
 		});
 
-		jQuery('#tbl_macros').elementTable({
+		jQuery('#tbl_macros').dynamicRows({
 			template: '#macroRow'
 		});
 	});

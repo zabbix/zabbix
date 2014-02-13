@@ -1105,13 +1105,13 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - rowremove.elementTable 	- after removing a row (triggered before tableupdate.elementTable)
-	 * - tableupdate.elementTable 	- after adding or removing a row
+	 * - rowremove.dynamicRows 	- after removing a row (triggered before tableupdate.dynamicRows)
+	 * - tableupdate.dynamicRows 	- after adding or removing a row
 	 *
 	 * @param options
 	 */
-	$.fn.elementTable = function(options) {
-		var options = $.extend({
+	$.fn.dynamicRows = function(options) {
+		options = $.extend({}, {
 			template: '',
 			row: '.form_row',
 			add: '.element-table-add',
@@ -1125,7 +1125,7 @@ function getConditionFormula(conditions, evalType) {
 		return this.each(function() {
 			var table = $(this);
 
-			table.data('elementTable', {
+			table.data('dynamicRows', {
 				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
 			});
 
@@ -1152,17 +1152,17 @@ function getConditionFormula(conditions, evalType) {
 	 */
 	function addRow(table, beforeRow, options) {
 		var data = {
-			rowNum: table.data('elementTable').counter
+			rowNum: table.data('dynamicRows').counter
 		};
 		data = $.extend(data, options.dataCallback(data));
 
 		var template = new Template($(options.template).html());
 		beforeRow.before(template.evaluate(data));
-		table.data('elementTable').counter++;
+		table.data('dynamicRows').counter++;
 
 		createPlaceholders();
 
-		table.trigger('tableupdate.elementTable', options);
+		table.trigger('tableupdate.dynamicRows', options);
 	}
 
 	/**
@@ -1175,7 +1175,7 @@ function getConditionFormula(conditions, evalType) {
 	function removeRow(table, row, options) {
 		row.remove();
 
-		table.trigger('rowremove.elementTable', options);
-		table.trigger('tableupdate.elementTable', options);
+		table.trigger('rowremove.dynamicRows', options);
+		table.trigger('tableupdate.dynamicRows', options);
 	}
 }(jQuery));
