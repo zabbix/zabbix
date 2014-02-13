@@ -95,14 +95,15 @@ if (hasRequest('filterState')) {
 }
 
 if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'timeline') {
-		if (isset($_REQUEST['elementid']) && isset($_REQUEST['period'])) {
-			navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
-		}
+	if (getRequest('favobj') === 'timeline' && hasRequest('elementid') && hasRequest('period')) {
+		navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
 	}
 
 	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
+
+		DBstart();
+
 		if ($_REQUEST['favaction'] == 'add') {
 			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
@@ -118,16 +119,16 @@ if (isset($_REQUEST['favobj'])) {
 			}
 		}
 
+		$result = DBend($result);
+
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 	}
 
 	// saving fixed/dynamic setting to profile
-	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
-		if (isset($_REQUEST['favid'])) {
-			CProfile::update('web.screens.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
-		}
+	if ($_REQUEST['favobj'] == 'timelinefixedperiod' && isset($_REQUEST['favid'])) {
+		CProfile::update('web.screens.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 	}
 }
 

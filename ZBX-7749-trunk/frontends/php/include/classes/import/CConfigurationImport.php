@@ -104,6 +104,7 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 * @throws UnexpectedValueException
+	 *
 	 * @return bool
 	 */
 	public function import() {
@@ -115,7 +116,6 @@ class CConfigurationImport {
 			// hack to make api throw exceptions
 			// this made to not check all api calls results for false return
 			czbxrpc::$useExceptions = true;
-			DBstart();
 
 			$this->data = $this->reader->read($this->source);
 
@@ -166,11 +166,10 @@ class CConfigurationImport {
 
 			// prevent api from throwing exception
 			czbxrpc::$useExceptions = false;
-			return DBend(true);
+			return true;
 		}
 		catch (Exception $e) {
 			czbxrpc::$useExceptions = false;
-			DBend(false);
 			throw new Exception($e->getMessage(), $e->getCode());
 		}
 	}
