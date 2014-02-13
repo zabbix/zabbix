@@ -333,6 +333,21 @@ class CDiscoveryRule extends CItemGeneral {
 		));
 
 		$this->checkInput($items, true, $dbItems);
+
+		// set the default values required for updating
+		foreach ($items as &$item) {
+			if (isset($item['filter'])) {
+				foreach ($item['filter']['conditions'] as &$condition) {
+					$condition += array(
+						'operator' => DB::getDefault('item_condition', 'operator')
+					);
+				}
+				unset($condition);
+			}
+		}
+		unset($item);
+
+		// update
 		$this->updateReal($items);
 		$this->inherit($items);
 
