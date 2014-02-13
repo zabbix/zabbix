@@ -122,7 +122,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
-int	zbx_getnameinfo(struct sockaddr *sa, char *hbuf, size_t hlen, char *sbuf, size_t slen, int flags);
+int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, size_t hlen, char *sbuf, size_t slen, int flags);
 
 #define ZBX_DEFAULT_FTP_PORT		21
 #define ZBX_DEFAULT_SSH_PORT		22

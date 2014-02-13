@@ -1307,7 +1307,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, size_t hlen, char *sbuf, size_t slen, int flags)
 {
-	switch()
+	switch((unsigned short)sa->sa_family)
 	{
 #if defined(HAVE_IPV6)
 	case AF_INET6:
