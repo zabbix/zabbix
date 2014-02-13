@@ -372,7 +372,7 @@ Changes for 2.1.6
 
 New features:
 ..F....... [ZBX-2616] upgraded the bundled DejaVu font from 2.33 to 2.34 (Richlv)
-..F....... [ZBXNEXT-1763] added links to inventory in Monitoring -> Maps and Monitoring -> Latest Data (Oleg)
+..F....... [ZBXNEXT-1763] added link to inventory in Monitoring -> Maps and displayed link to inventory page for hosts without inventory data in Monitoring -> Latest Data (Oleg)
 ..F....... [ZBXNEXT-1763] added host related information under Monitoring (Oleg)
 ..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
