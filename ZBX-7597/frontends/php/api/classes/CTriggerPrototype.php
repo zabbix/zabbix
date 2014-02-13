@@ -768,11 +768,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		$this->createReal($triggers);
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		$triggerids = array_keys($triggers);
 
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$createdTriggers = $this->get(array(
 			'triggerids' => $triggerids,
-			'output' => array('description', 'expression', 'flags'),
+			'output' => array('triggerid', 'description', 'expression', 'flags'),
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name')
 		));
@@ -787,7 +788,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 			if (!$hasPrototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Trigger "%1$s:%2$s" does not have item prototype.', $createdTrigger['description'], $createdTrigger['expression']));
+					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
+						$triggers[$createdTrigger['triggerid']]['expression']));
 			}
 		}
 

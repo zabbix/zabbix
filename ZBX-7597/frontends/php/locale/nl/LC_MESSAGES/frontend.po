@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-31 11:59+0200\n"
+"POT-Creation-Date: 2014-02-13 01:24+0200\n"
 "PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -207,7 +207,7 @@ msgstr "Acceptabele SLA"
 msgid "Access denied!"
 msgstr "Toegang geweigerd!"
 
-#: api/classes/CUser.php:917
+#: api/classes/CUser.php:946
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Account is geblokkeerd voor %s seconden"
@@ -356,8 +356,8 @@ msgstr "Actief tot"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
-#: include/blocks.inc.php:1314 include/forms.inc.php:1705
-#: include/forms.inc.php:2009 include/reports.inc.php:332
+#: include/blocks.inc.php:1314 include/forms.inc.php:1703
+#: include/forms.inc.php:2007 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
@@ -633,7 +633,7 @@ msgstr "Aankomende"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:1556 include/func.inc.php:107
+#: include/forms.inc.php:1554 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "April"
@@ -674,7 +674,7 @@ msgstr "Asset nummer"
 msgid "At"
 msgstr "Op"
 
-#: include/forms.inc.php:1682
+#: include/forms.inc.php:1680
 msgid "At (hour:minute)"
 msgstr "Op (hour:minute)"
 
@@ -706,7 +706,7 @@ msgstr "Logs controleren"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:1548 include/func.inc.php:111
+#: include/forms.inc.php:1546 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "Augustus"
@@ -1107,7 +1107,7 @@ msgid "Canada (136 characters)"
 msgstr "Canada (136 karakter)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
-#: include/forms.inc.php:1707 include/forms.inc.php:2010
+#: include/forms.inc.php:1705 include/forms.inc.php:2008
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.action.edit.php:962
@@ -1513,7 +1513,7 @@ msgstr "Kan template items niet verwijderen"
 msgid "Cannot delete templated items."
 msgstr "Kan template items niet verwijderen."
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:925
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kan de template trigger \"%1$s:%2$s\" niet verwijderen."
@@ -1534,7 +1534,7 @@ msgstr "Kan trigger niet verwijderen."
 msgid "Cannot delete triggers"
 msgstr "Kan triggers niet verwijderen"
 
-#: api/classes/CTriggerPrototype.php:963
+#: api/classes/CTriggerPrototype.php:965
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Kan triggers niet verwijderen die gemaakt zijn door een low level discovery."
 
@@ -1542,7 +1542,7 @@ msgstr "Kan triggers niet verwijderen die gemaakt zijn door een low level discov
 msgid "Cannot delete user"
 msgstr "Kan gebruiker niet verwijderen"
 
-#: api/classes/CUser.php:787
+#: api/classes/CUser.php:816
 msgid "Cannot delete user media."
 msgstr "Kan gebruikers gegevens niet verwijderen."
 
@@ -1673,8 +1673,8 @@ msgid "Cannot have empty visible template name"
 msgstr "Zichtbare template naam mag niet leeg zijn"
 
 #: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
-#: api/classes/CTriggerPrototype.php:1006
-#: api/classes/CTriggerPrototype.php:1064
+#: api/classes/CTriggerPrototype.php:1008
+#: api/classes/CTriggerPrototype.php:1066
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Kan expressie \"%s\" niet imploderen."
@@ -1698,7 +1698,7 @@ msgstr[1] "Kan template \"%2$s\" niet importen, de gekoppelde templates \"%3$s\"
 msgid "Cannot include view file \"%s\"."
 msgstr "Kan view bestand \"%s\" niet invoegen."
 
-#: api/classes/CUser.php:816
+#: api/classes/CUser.php:845
 msgid "Cannot insert user media."
 msgstr "Kan media van gebruiker niet invoegen."
 
@@ -1706,11 +1706,11 @@ msgstr "Kan media van gebruiker niet invoegen."
 msgid "Cannot link template"
 msgstr "Kan template niet ontkoppelen"
 
-#: api/classes/CUser.php:956
+#: api/classes/CUser.php:985
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:881
+#: api/classes/CUser.php:910
 msgid "Cannot logout."
 msgstr "Kan niet afmelden."
 
@@ -1862,7 +1862,7 @@ msgstr "Kan \"templateid\" voor scherm \"%1$s\" niet updaten."
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "Kan \"templateid\" voor trekker \"%1$s\" niet updaten."
 
-#: api/classes/CTriggerPrototype.php:831
+#: api/classes/CTriggerPrototype.php:833
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Kan \"templateid\" voor trekker prototype \"%1$s\" niet updaten."
@@ -2019,7 +2019,7 @@ msgstr "Kan trigger niet bijwerken"
 msgid "Cannot update user"
 msgstr "Kan gebruiker niet bijwerken"
 
-#: api/classes/CUser.php:808
+#: api/classes/CUser.php:837
 msgid "Cannot update user media."
 msgstr "Kan media van gebruiker niet updaten."
 
@@ -2039,7 +2039,7 @@ msgstr "Kan value map niet bijwerken"
 msgid "Caption"
 msgstr "Beschrijving"
 
-#: include/forms.inc.php:1908 include/forms.inc.php:2004
+#: include/forms.inc.php:1906 include/forms.inc.php:2002
 msgid "Case sensitive"
 msgstr "Hoofdlettergevoelig"
 
@@ -2048,7 +2048,7 @@ msgid "Center"
 msgstr "Midden"
 
 #: include/classes/screens/CScreenBase.php:258
-#: include/classes/screens/CScreenBuilder.php:419
+#: include/classes/screens/CScreenBuilder.php:417
 #: include/classes/screens/CScreenMap.php:54
 #: include/views/configuration.services.edit.php:48
 msgid "Change"
@@ -2170,7 +2170,7 @@ msgstr "Wissen bij ontkoppelen"
 msgid "Clock"
 msgstr "Klok"
 
-#: include/forms.inc.php:1872
+#: include/forms.inc.php:1870
 #: include/views/administration.general.iconmap.edit.php:141
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
@@ -2232,7 +2232,7 @@ msgstr "Column bereik van het scherm element gelegen op X - %1$s en Y - %2$s is 
 msgid "Columns"
 msgstr "Kolommen"
 
-#: include/forms.inc.php:1844
+#: include/forms.inc.php:1842
 msgid "Combined result"
 msgstr "Gecombineerd resultaat"
 
@@ -2542,7 +2542,7 @@ msgstr "Kopiëren"
 msgid "Copy selected to ..."
 msgstr "Kopiëer selectie naar ..."
 
-#: api/classes/CUser.php:1001
+#: api/classes/CUser.php:1030
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "Correcte login \"%s\"."
@@ -2701,7 +2701,7 @@ msgstr "Gemaakt: Item prototype \"%1$s\" op \"%2$s\"."
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Gemaakt: Trigger \"%1$s\" op \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1013
+#: api/classes/CTriggerPrototype.php:1015
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Gemaakt: Trigger prototype \"%1$s\" op \"%2$s\"."
@@ -2907,7 +2907,7 @@ msgstr "DNS naam"
 msgid "DOWN"
 msgstr "UIT"
 
-#: include/forms.inc.php:1505 include/maintenances.inc.php:35
+#: include/forms.inc.php:1503 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
 #: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
@@ -2997,7 +2997,7 @@ msgstr "Database type"
 msgid "Database user"
 msgstr "Database gebruiker"
 
-#: include/forms.inc.php:1591 include/forms.inc.php:1676 jsrpc.php:137
+#: include/forms.inc.php:1589 include/forms.inc.php:1674 jsrpc.php:137
 msgid "Date"
 msgstr "Datum"
 
@@ -3017,12 +3017,12 @@ msgstr "Datum HW onderhoud vervalt"
 msgid "Date HW purchased"
 msgstr "Datum HW aangekocht"
 
-#: include/forms.inc.php:1591 report3.php:126 report4.php:161 report5.php:45
+#: include/forms.inc.php:1589 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
 msgstr "Dag"
 
-#: include/forms.inc.php:1619
+#: include/forms.inc.php:1617
 msgid "Day of month"
 msgstr "Dag van de maand"
 
@@ -3042,8 +3042,8 @@ msgstr "Dag van de maand is > N"
 msgid "Day of month is NOT N"
 msgstr "Dag van de maand is NOT N"
 
-#: include/forms.inc.php:1534 include/forms.inc.php:1591
-#: include/forms.inc.php:1615
+#: include/forms.inc.php:1532 include/forms.inc.php:1589
+#: include/forms.inc.php:1613
 msgid "Day of week"
 msgstr "Dag van de week"
 
@@ -3063,7 +3063,7 @@ msgstr "Dag van de week > N"
 msgid "Day of week is NOT N"
 msgstr "Dag van de week is NOT N"
 
-#: include/forms.inc.php:1697 tr_status.php:207 tr_status.php:209
+#: include/forms.inc.php:1695 tr_status.php:207 tr_status.php:209
 msgid "Days"
 msgstr "Dagen"
 
@@ -3085,7 +3085,7 @@ msgstr "Debug-modus bijgewerkt"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:1568 include/func.inc.php:115
+#: include/forms.inc.php:1566 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "December"
@@ -3149,7 +3149,7 @@ msgstr "Vertraging (in sec)"
 msgid "Delayed by"
 msgstr "Vertraagd met"
 
-#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
+#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1936
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:328 tr_logform.php:345
@@ -3226,7 +3226,7 @@ msgstr "Netwerk map verwijderen?"
 msgid "Delete proxy?"
 msgstr "Verwijder proxy?"
 
-#: include/forms.inc.php:1874
+#: include/forms.inc.php:1872
 msgid "Delete regular expression?"
 msgstr "Verwijder reguliere expressie?"
 
@@ -3469,13 +3469,13 @@ msgstr "Verwijderde: Sjabloon \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Verwijderde: Trigger \"%1$s\" op \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:969
+#: api/classes/CTriggerPrototype.php:971
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Verwijderde: Trigger prototype \"%1$s\" on \"%2$s\"."
 
-#: include/forms.inc.php:1835 include/forms.inc.php:1916
-#: include/forms.inc.php:1996
+#: include/forms.inc.php:1833 include/forms.inc.php:1914
+#: include/forms.inc.php:1994
 msgid "Delimiter"
 msgstr "Scheidingsteken"
 
@@ -4000,7 +4000,7 @@ msgstr "EVENEMENTEN"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Elke URL moet een unieke naam hebben. AUB wees zeker dat er maar 1 URL is met deze naam"
 
-#: include/forms.inc.php:1909 include/forms.inc.php:1923
+#: include/forms.inc.php:1907 include/forms.inc.php:1921
 #: include/views/administration.users.edit.php:164
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:377
@@ -4060,7 +4060,7 @@ msgstr "Lege actie staat."
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:907
+#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4306,11 +4306,11 @@ msgstr "Gebeurtenisbron gegevens"
 msgid "Events"
 msgstr "Gebeurtenissen"
 
-#: include/forms.inc.php:1517
+#: include/forms.inc.php:1515
 msgid "Every day(s)"
 msgstr "Alle dag(en)"
 
-#: include/forms.inc.php:1524
+#: include/forms.inc.php:1522
 msgid "Every week(s)"
 msgstr "Alle we(e)k(en)"
 
@@ -4356,7 +4356,7 @@ msgstr "Uitbreiding van macro's"
 msgid "Expand single problem"
 msgstr "Uitbreiding enkel probleem"
 
-#: include/forms.inc.php:1776 include/forms.inc.php:1907
+#: include/forms.inc.php:1774 include/forms.inc.php:1905
 msgid "Expected result"
 msgstr "Verwacht resultaat"
 
@@ -4383,8 +4383,8 @@ msgstr "Geselecteerde exporteren"
 msgid "Export to CSV"
 msgstr "Exporteren naar CSV"
 
-#: include/forms.inc.php:1775 include/forms.inc.php:1906
-#: include/forms.inc.php:1979 include/triggers.inc.php:1646
+#: include/forms.inc.php:1773 include/forms.inc.php:1904
+#: include/forms.inc.php:1977 include/triggers.inc.php:1646
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4394,8 +4394,8 @@ msgstr "Exporteren naar CSV"
 msgid "Expression"
 msgstr "Expressie"
 
-#: include/forms.inc.php:1341 include/forms.inc.php:1346
-#: include/forms.inc.php:1359
+#: include/forms.inc.php:1339 include/forms.inc.php:1344
+#: include/forms.inc.php:1357
 msgid "Expression Syntax Error."
 msgstr "Expressie Syntax fout."
 
@@ -4411,7 +4411,7 @@ msgstr "Expressie kan niet leeg zijn"
 msgid "Expression constructor"
 msgstr "Expressie bouwer"
 
-#: include/forms.inc.php:1988
+#: include/forms.inc.php:1986
 msgid "Expression type"
 msgstr "Expressie type"
 
@@ -4435,7 +4435,7 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "F"
 
-#: include/forms.inc.php:1831 include/forms.inc.php:1851
+#: include/forms.inc.php:1829 include/forms.inc.php:1849
 msgid "FALSE"
 msgstr "ONWAAR"
 
@@ -4486,7 +4486,7 @@ msgstr "Favorieten"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:1546 include/func.inc.php:105
+#: include/forms.inc.php:1544 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "Februari"
@@ -4563,7 +4563,7 @@ msgstr "Einde"
 msgid "Finnish (fi_FI)"
 msgstr "Fins (fi_FI)"
 
-#: include/forms.inc.php:1597 include/maintenances.inc.php:103
+#: include/forms.inc.php:1595 include/maintenances.inc.php:103
 msgid "First"
 msgstr "Eerste"
 
@@ -4594,7 +4594,7 @@ msgstr "Voor de gasten, moet het wachtwoord leeg zijn"
 msgid "Formula"
 msgstr "Formule"
 
-#: include/forms.inc.php:1600 include/maintenances.inc.php:106
+#: include/forms.inc.php:1598 include/maintenances.inc.php:106
 msgid "Fourth"
 msgstr "Vierde"
 
@@ -4606,7 +4606,7 @@ msgstr "French (fr_FR)"
 msgid "Fri"
 msgstr "Vrij"
 
-#: include/forms.inc.php:1531 include/forms.inc.php:1612
+#: include/forms.inc.php:1529 include/forms.inc.php:1610
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
 msgstr "Vrijdag"
@@ -5204,7 +5204,7 @@ msgstr "Host (oplopend)"
 msgid "Host IP"
 msgstr "Host IP"
 
-#: include/forms.inc.php:1717
+#: include/forms.inc.php:1715
 msgid "Host Inventory"
 msgstr "Host Inventaris"
 
@@ -5410,7 +5410,7 @@ msgstr "Hosts bijgewerkt"
 msgid "Hourly"
 msgstr "Elk uur"
 
-#: include/forms.inc.php:1699
+#: include/forms.inc.php:1697
 msgid "Hours"
 msgstr "Uren"
 
@@ -6377,7 +6377,7 @@ msgstr "Informatie"
 msgid "Insert"
 msgstr ""
 
-#: include/forms.inc.php:1353 jsLoader.php:102
+#: include/forms.inc.php:1351 jsLoader.php:102
 msgid "Insert macro"
 msgstr ""
 
@@ -6748,7 +6748,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1541 include/func.inc.php:104
+#: include/forms.inc.php:1539 include/func.inc.php:104
 #: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "Januari"
@@ -6761,7 +6761,7 @@ msgstr "Japans (ja_JP)"
 msgid "Jul"
 msgstr "Jul"
 
-#: include/forms.inc.php:1543 include/func.inc.php:110
+#: include/forms.inc.php:1541 include/func.inc.php:110
 #: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "Juli"
@@ -6770,7 +6770,7 @@ msgstr "Juli"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/forms.inc.php:1566 include/func.inc.php:109
+#: include/forms.inc.php:1564 include/func.inc.php:109
 #: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "Juni"
@@ -6894,7 +6894,7 @@ msgstr "Label locatie"
 msgid "Language"
 msgstr "Taal"
 
-#: include/forms.inc.php:1601 include/maintenances.inc.php:107
+#: include/forms.inc.php:1599 include/maintenances.inc.php:107
 msgid "Last"
 msgstr "Laatst"
 
@@ -7188,12 +7188,12 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr "Login in als Guest"
 
-#: api/classes/CUser.php:993
+#: api/classes/CUser.php:1022
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:961
+#: api/classes/CUser.php:990
 #, php-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -7202,8 +7202,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:846 api/classes/CUser.php:864
-#: api/classes/CUser.php:911
+#: api/classes/CUser.php:875 api/classes/CUser.php:893
+#: api/classes/CUser.php:940
 msgid "Login name or password is incorrect."
 msgstr ""
 
@@ -7338,7 +7338,7 @@ msgstr "Onderhoud toegevoegd"
 msgid "Maintenance deleted"
 msgstr "Onderhoud verwijderd"
 
-#: include/forms.inc.php:1694
+#: include/forms.inc.php:1692
 msgid "Maintenance period length"
 msgstr "Onderhouds duur"
 
@@ -7454,7 +7454,7 @@ msgstr "Kaarten"
 msgid "Mar"
 msgstr "Mrt"
 
-#: include/forms.inc.php:1551 include/func.inc.php:106
+#: include/forms.inc.php:1549 include/func.inc.php:106
 #: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "Maart"
@@ -7553,7 +7553,7 @@ msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %
 msgstr[0] "Maximale zichtbare hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakter."
 msgstr[1] "Maximale zichtbare hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakters."
 
-#: include/forms.inc.php:1561 include/func.inc.php:108
+#: include/forms.inc.php:1559 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "Mei"
@@ -7734,7 +7734,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1701
+#: include/forms.inc.php:1699
 msgid "Minutes"
 msgstr ""
 
@@ -7778,7 +7778,7 @@ msgstr ""
 msgid "Mon"
 msgstr ""
 
-#: include/forms.inc.php:1527 include/forms.inc.php:1608
+#: include/forms.inc.php:1525 include/forms.inc.php:1606
 #: include/func.inc.php:123 include/func.inc.php:207
 msgid "Monday"
 msgstr ""
@@ -7802,11 +7802,11 @@ msgstr ""
 msgid "Monitoring"
 msgstr "Monitoring"
 
-#: include/forms.inc.php:1570 report3.php:108 report4.php:143 report5.php:47
+#: include/forms.inc.php:1568 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
 msgstr "Maand"
 
-#: include/forms.inc.php:1507 include/maintenances.inc.php:39
+#: include/forms.inc.php:1505 include/maintenances.inc.php:39
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
@@ -7866,7 +7866,7 @@ msgstr ""
 #: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
-#: include/forms.inc.php:1770 include/hosts.inc.php:114
+#: include/forms.inc.php:1768 include/hosts.inc.php:114
 #: include/reports.inc.php:382 include/setup.inc.php:318
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
@@ -7955,7 +7955,7 @@ msgstr "Nooit"
 msgid "Never executed"
 msgstr ""
 
-#: include/forms.inc.php:1937 include/views/configuration.action.edit.php:396
+#: include/forms.inc.php:1935 include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:603
 #: include/views/configuration.action.edit.php:903
 #: include/views/configuration.discovery.edit.php:54
@@ -8028,7 +8028,7 @@ msgid "Next check"
 msgstr "Volgende controle"
 
 #: events.php:760 include/config.inc.php:568 include/events.inc.php:302
-#: include/events.inc.php:320 include/forms.inc.php:1922
+#: include/events.inc.php:320 include/forms.inc.php:1920
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
@@ -8433,7 +8433,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1050
+#: api/classes/CUser.php:954 api/classes/CUser.php:1079
 msgid "No permissions for system access."
 msgstr ""
 
@@ -8464,10 +8464,11 @@ msgstr ""
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:822
-#: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
-#: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:249 report6.php:159
+#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
+#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
+#: api/classes/CUser.php:743 api/classes/CUser.php:780
+#: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -8507,10 +8508,6 @@ msgstr ""
 
 #: popup_right.php:74
 msgid "No resources defined."
-msgstr ""
-
-#: include/classes/screens/CScreenBuilder.php:293
-msgid "No rows in screen."
 msgstr ""
 
 #: api/classes/CScreenItem.php:468
@@ -8743,7 +8740,7 @@ msgstr "Notificaties"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1563 include/func.inc.php:114
+#: include/forms.inc.php:1561 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "November"
@@ -8886,7 +8883,7 @@ msgstr "Okt"
 msgid "Octal"
 msgstr "Octaal"
 
-#: include/forms.inc.php:1558 include/func.inc.php:113
+#: include/forms.inc.php:1556 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "Oktober"
@@ -8915,7 +8912,7 @@ msgstr ""
 msgid "Once"
 msgstr "Eenmaal"
 
-#: include/forms.inc.php:1504 include/maintenances.inc.php:33
+#: include/forms.inc.php:1502 include/maintenances.inc.php:33
 msgid "One time only"
 msgstr ""
 
@@ -8977,11 +8974,11 @@ msgstr ""
 msgid "Only Zabbix Admins can add user media."
 msgstr ""
 
-#: api/classes/CUser.php:753
+#: api/classes/CUser.php:774
 msgid "Only Zabbix Admins can change user media."
 msgstr ""
 
-#: api/classes/CUser.php:723
+#: api/classes/CUser.php:731
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
@@ -9457,7 +9454,7 @@ msgstr ""
 msgid "Period"
 msgstr "Periode"
 
-#: include/forms.inc.php:1509
+#: include/forms.inc.php:1507
 #: include/views/configuration.maintenance.edit.php:133
 msgid "Period type"
 msgstr ""
@@ -9641,7 +9638,7 @@ msgstr ""
 msgid "Privilege level"
 msgstr ""
 
-#: api/classes/CUser.php:836
+#: api/classes/CUser.php:865
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
@@ -10110,7 +10107,7 @@ msgstr ""
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
 
-#: include/forms.inc.php:1777 include/forms.inc.php:1859 tr_testexpr.php:135
+#: include/forms.inc.php:1775 include/forms.inc.php:1857 tr_testexpr.php:135
 #: tr_testexpr.php:167
 msgid "Result"
 msgstr "Resultaat"
@@ -10411,13 +10408,13 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Zat"
 
-#: include/forms.inc.php:1532 include/forms.inc.php:1613
+#: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:128 include/func.inc.php:212
 msgid "Saturday"
 msgstr "Zaterdag"
 
-#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
-#: include/forms.inc.php:1863 include/forms.inc.php:2009
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1703
+#: include/forms.inc.php:1861 include/forms.inc.php:2007
 #: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
@@ -10676,7 +10673,7 @@ msgstr ""
 msgid "Search/Filter elements limit"
 msgstr ""
 
-#: include/forms.inc.php:1598 include/maintenances.inc.php:104
+#: include/forms.inc.php:1596 include/maintenances.inc.php:104
 msgid "Second"
 msgstr ""
 
@@ -10839,7 +10836,7 @@ msgstr ""
 msgid "Separated"
 msgstr ""
 
-#: include/forms.inc.php:1553 include/func.inc.php:112
+#: include/forms.inc.php:1551 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr ""
@@ -10933,7 +10930,7 @@ msgstr ""
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:1044
+#: api/classes/CUser.php:1073
 msgid "Session terminated, re-login, please."
 msgstr ""
 
@@ -11439,7 +11436,7 @@ msgstr ""
 msgid "Sun"
 msgstr ""
 
-#: include/forms.inc.php:1533 include/forms.inc.php:1614
+#: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:130 include/func.inc.php:206
 msgid "Sunday"
 msgstr ""
@@ -11505,7 +11502,7 @@ msgstr ""
 msgid "TRIGGER COMMENTS"
 msgstr "TRIGGER OPMERKINGEN"
 
-#: include/forms.inc.php:1829 include/forms.inc.php:1848
+#: include/forms.inc.php:1827 include/forms.inc.php:1846
 msgid "TRUE"
 msgstr "WAAR"
 
@@ -11652,7 +11649,7 @@ msgstr ""
 msgid "Tera"
 msgstr ""
 
-#: include/forms.inc.php:1868
+#: include/forms.inc.php:1866
 #: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
@@ -11671,7 +11668,7 @@ msgstr ""
 msgid "Test data"
 msgstr ""
 
-#: adm.regexps.php:37 include/forms.inc.php:1771
+#: adm.regexps.php:37 include/forms.inc.php:1769
 msgid "Test string"
 msgstr ""
 
@@ -11723,7 +11720,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1599 include/maintenances.inc.php:105
+#: include/forms.inc.php:1597 include/maintenances.inc.php:105
 msgid "Third"
 msgstr ""
 
@@ -11736,11 +11733,11 @@ msgstr ""
 msgid "This month"
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:489
+#: include/classes/screens/CScreenBuilder.php:487
 msgid "This screen-column is not empty. Delete it?"
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:471
+#: include/classes/screens/CScreenBuilder.php:469
 msgid "This screen-row is not empty. Delete it?"
 msgstr ""
 
@@ -11756,7 +11753,7 @@ msgstr ""
 msgid "Thu"
 msgstr ""
 
-#: include/forms.inc.php:1530 include/forms.inc.php:1611
+#: include/forms.inc.php:1528 include/forms.inc.php:1609
 #: include/func.inc.php:126 include/func.inc.php:210
 msgid "Thursday"
 msgstr ""
@@ -11918,7 +11915,7 @@ msgstr ""
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:883
+#: api/classes/CTriggerPrototype.php:885
 #, php-format
 msgid "Trigger \"%1$s\" does not have item prototype."
 msgstr ""
@@ -11927,11 +11924,6 @@ msgstr ""
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
-msgstr ""
-
-#: api/classes/CTriggerPrototype.php:790
-#, php-format
-msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr ""
 
 #: api/classes/CTrigger.php:1931
@@ -11968,7 +11960,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr ""
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1052
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -12000,6 +11992,11 @@ msgstr ""
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:791
+#, php-format
+msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
@@ -12102,7 +12099,7 @@ msgstr ""
 msgid "Tue"
 msgstr "Din"
 
-#: include/forms.inc.php:1528 include/forms.inc.php:1609
+#: include/forms.inc.php:1526 include/forms.inc.php:1607
 #: include/func.inc.php:124 include/func.inc.php:208
 msgid "Tuesday"
 msgstr "Dinsdag"
@@ -12500,7 +12497,7 @@ msgstr "Bijgewerkt: Item prototype \"%1$s\" van \"%2$s\"."
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Bijgewerkt: Trigger \"%1$s\" van \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1083
+#: api/classes/CTriggerPrototype.php:1085
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Bijgewerkt: Trigger prototype \"%1$s\" van \"%2$s\"."
@@ -12959,7 +12956,7 @@ msgstr ""
 msgid "Wed"
 msgstr ""
 
-#: include/forms.inc.php:1529 include/forms.inc.php:1610
+#: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:125 include/func.inc.php:209
 msgid "Wednesday"
 msgstr ""
@@ -12968,7 +12965,7 @@ msgstr ""
 msgid "Week"
 msgstr "Week"
 
-#: include/forms.inc.php:1506 include/maintenances.inc.php:37
+#: include/forms.inc.php:1504 include/maintenances.inc.php:37
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
@@ -13106,7 +13103,7 @@ msgstr ""
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:826
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
 msgid "Wrong fields for trigger."
 msgstr ""
 
@@ -13221,7 +13218,7 @@ msgstr "Jaarlijks"
 #: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:305 include/events.inc.php:323
-#: include/forms.inc.php:1922 include/triggers.inc.php:1648
+#: include/forms.inc.php:1920 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "Ja"
