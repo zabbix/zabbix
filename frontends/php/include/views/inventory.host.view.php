@@ -185,7 +185,7 @@ if ($this->data['host']['inventory']) {
 }
 
 // description
-$overviewFormList->addRow(_('Description'), new CDiv($this->data['host']['description'], 'description'));
+$overviewFormList->addRow(_('Description'), new CDiv(zbx_str2links($this->data['host']['description']), 'description'));
 
 // latest data
 $overviewFormList->addRow(_('Latest data'), array(
