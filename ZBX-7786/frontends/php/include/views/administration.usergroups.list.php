@@ -46,9 +46,9 @@ $userGroupTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name'),
 	'#',
 	_('Members'),
-	_('Status'),
 	_('Frontend access'),
-	_('Debug mode')
+	_('Debug mode'),
+	_('Status')
 ));
 
 foreach ($this->data['usergroups'] as $usrgrp) {
@@ -104,21 +104,14 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				break;
 			}
 
-			$userStatusCss = 'enabled';
-			if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				$userStatusCss = 'disabled';
-			}
-			if ($user['users_status'] == GROUP_STATUS_DISABLED) {
-				$userStatusCss = 'disabled';
-			}
-
 			if ($users) {
 				$users[] = ', ';
 			}
 
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
-				$userStatusCss
+				($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED)
+					? 'disabled' : 'enabled'
 			);
 		}
 	}
@@ -129,9 +122,9 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
 		array(new CLink(_('Users'), 'users.php?&filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
 		new CCol($users, 'wraptext'),
-		$usersStatus,
 		$guiAccess,
-		$debugMode
+		$debugMode,
+		$usersStatus
 	));
 }
 
