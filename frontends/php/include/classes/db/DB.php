@@ -664,6 +664,82 @@ class DB {
 	}
 
 	/**
+	 * Replaces the records given in $groupedOldRecords with the ones given in $groupedNewRecords.
+	 *
+	 * This method can be used to replace related objects in one-to-many relations. Both old and new records
+	 * must be grouped by the ID of the record they belong to. The records will be matched by position, instead of
+	 * the primary key as in DB::replace(). That is, the first new record will update the first old one, second new
+	 * record - the second old one, etc. Since the records are matched by position, the new records should not contain
+	 * primary keys.
+	 *
+	 * Example 1:
+	 * $old = array(2 => array( array('gitemid' => 1, 'color' => 'FF0000') ));
+	 * $new = array(2 => array( array('color' => '00FF00') ));
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'))
+	 *
+	 * The new record updated the old one.
+	 *
+	 * Example 2:
+	 * $old = array(2 => array( array('gitemid' => 1, 'color' => 'FF0000') ));
+	 * $new = array(
+	 *     2 => array(
+	 *         array('color' => '00FF00'),
+	 *         array('color' => '0000FF')
+	 *     )
+	 * );
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'), array('gitemid' => 2, 'color' => '0000FF'))
+	 *
+	 * The first record was updated, the second one - created.
+	 *
+	 * Example 3:
+	 * $old = array(
+	 *     2 => array(
+	 *         array('gitemid' => 1, 'color' => 'FF0000'),
+	 *         array('gitemid' => 2, 'color' => '0000FF')
+	 *     )
+	 * );
+	 * $new = array(2 => array( array('color' => '00FF00') ));
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'))
+	 *
+	 * The first record was updated, the second one - deleted.
+	 *
+	 * @param string 	$tableName			table to update
+	 * @param array 	$groupedOldRecords	grouped old records
+	 * @param array 	$groupedNewRecords	grouped new records
+	 *
+	 * @return array	array of new records not grouped (!).
+	 */
+	public static function replaceByPosition($tableName, array $groupedOldRecords, array $groupedNewRecords) {
+		$pk = self::getPk($tableName);
+
+		$allOldRecords = array();
+		$allNewRecords = array();
+		foreach ($groupedNewRecords as $key => $newRecords) {
+			// if records exist for the parent object - replace them, otherwise create new records
+			if (isset($groupedOldRecords[$key])) {
+				$oldRecords = $groupedOldRecords[$key];
+
+				// updated the records by position
+				$newRecords = self::mergeRecords($oldRecords, $newRecords, $pk);
+
+				foreach ($oldRecords as $record) {
+					$allOldRecords[] = $record;
+				}
+			}
+
+			foreach ($newRecords as $record) {
+				$allNewRecords[] = $record;
+			}
+		}
+
+		// replace the old records with the new ones
+		return self::replace($tableName, $allOldRecords, $allNewRecords);
+	}
+
+	/**
 	 * Compares the fields, that are present in both records, and returns true if any of the values differ.
 	 *
 	 * @static
@@ -683,6 +759,30 @@ class DB {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Replace each record in $oldRecords with a corresponding record in $newRecords, but keep the old record IDs.
+	 * The records are match by position, that is, the first new record, replaces the first old record and etc.
+	 * If there are less $newRecords than $oldRecords, the remaining old records will be discarded.
+	 *
+	 * @param array 	$oldRecords		array of old records
+	 * @param array 	$newRecords		array of new records
+	 * @param string 	$pk				name of the private key column
+	 *
+	 * @return array	array of new records with the primary keys from the old ones
+	 */
+	protected static function mergeRecords(array $oldRecords, array $newRecords, $pk) {
+		$result = array();
+		foreach ($newRecords as $i => $record) {
+			if (isset($oldRecords[$i])) {
+				$record[$pk] = $oldRecords[$i][$pk];
+			}
+
+			$result[] = $record;
+		}
+
+		return $result;
 	}
 
 	/**

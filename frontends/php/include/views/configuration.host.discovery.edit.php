@@ -328,9 +328,6 @@ foreach ($conditions as $i => $condition) {
 
 	// delete button
 	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove'));
-	if (isset($condition['item_conditionid'])) {
-		$deleteButtonCell[] = new CVar('conditions['.$i.'][item_conditionid]', $condition['item_conditionid'], 'conditions_'.$i.'_id');
-	}
 
 	$row = array($formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell);
 	$conditionTable->addRow($row, 'form_row');
