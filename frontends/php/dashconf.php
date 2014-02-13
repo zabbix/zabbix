@@ -51,7 +51,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['save'])) {
 	// filter
-	$filterEnable = get_request('filterEnable', 0);
+	$filterEnable = getRequest('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
 	if ($filterEnable == 1) {
@@ -60,29 +60,35 @@ if (isset($_REQUEST['save'])) {
 
 		if ($_REQUEST['grpswitch'] == 1) {
 			// show groups
-			$groupIds = get_request('groupids', array());
+			$groupIds = getRequest('groupids', array());
 
-			CFavorite::remove('web.dashconf.groups.groupids');
+			$result = true;
+
+			DBstart();
+
+			$result &= CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupIds as $groupId) {
-				CFavorite::add('web.dashconf.groups.groupids', $groupId);
+				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
 			}
 
 			// hide groups
-			$hideGroupIds = get_request('hidegroupids', array());
+			$hideGroupIds = getRequest('hidegroupids', array());
 
-			CFavorite::remove('web.dashconf.groups.hide.groupids');
+			$result &= CFavorite::remove('web.dashconf.groups.hide.groupids');
 			foreach ($hideGroupIds as $hideGroupId) {
-				CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
+				$result &= CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
 			}
+
+			DBend($result);
 		}
 
 		// hosts
-		$_REQUEST['maintenance'] = get_request('maintenance', 0);
+		$_REQUEST['maintenance'] = getRequest('maintenance', 0);
 		CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
 
 		// triggers
-		$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
-		$_REQUEST['extAck'] = get_request('extAck', 0);
+		$_REQUEST['trgSeverity'] = getRequest('trgSeverity', array());
+		$_REQUEST['extAck'] = getRequest('extAck', 0);
 
 		CProfile::update('web.dashconf.triggers.severity', implode(';', array_keys($_REQUEST['trgSeverity'])), PROFILE_TYPE_STR);
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);

@@ -65,13 +65,14 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
+	DBstart();
+
 	if (CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
 		// save remember login preference
 		$user = array('autologin' => getRequest('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			API::User()->updateProfile($user);
 		}
-		DBstart();
 		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
 		DBend(true);
 
@@ -85,6 +86,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	}
 	// login failed, fall back to a guest account
 	else {
+		DBend(false);
 		CWebUser::checkAuthentication(null);
 	}
 }

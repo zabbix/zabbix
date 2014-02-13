@@ -35,7 +35,13 @@ if (!defined('PAGE_HEADER_LOADED')) {
 
 // history
 if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	add_user_history($page);
+	// if URL length is greater than DB field size, skip history update
+	$url = validateHistoryUrl($page);
+	if ($url) {
+		DBstart();
+		$result = addUserHistory($page['title'], $url);
+		DBend($result);
+	}
 }
 
 // last page
@@ -43,7 +49,11 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 }
 
-CProfile::flush();
+if (CProfile::isModified()) {
+	DBstart();
+	$result = CProfile::flush();
+	DBend($result);
+}
 
 // end transactions if they have not been closed already
 if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
