@@ -21,11 +21,8 @@
 
 class CInput extends CTag {
 
-	protected $jQuery;
-
 	public function __construct($type = 'text', $name = 'textbox', $value = '', $class = null, $id = null) {
 		parent::__construct('input', 'no');
-		$this->jQuery = false;
 		$this->setType($type);
 
 		// if id is not passed, it will be the same as element name
@@ -69,7 +66,6 @@ class CInput extends CTag {
 	}
 
 	public function useJQueryStyle($class = '') {
-		$this->jQuery = true;
 		$this->attr('class', 'jqueryinput '.$this->getAttribute('class').' '.$class);
 	}
 }

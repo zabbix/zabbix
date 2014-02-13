@@ -1,6 +1,4 @@
 <script type="text/javascript">
-	var page_refresh = null;
-
 	jQuery(document).ready(function() {
 		<?php if (isset($ZBX_PAGE_POST_JS)): ?>
 			<?php foreach ($ZBX_PAGE_POST_JS as $script): ?>
@@ -17,9 +15,7 @@
 			window.flickerfreeScreenShadow.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
 		<?php endif ?>
 
-		jQuery('input.jqueryinput').button();
-		jQuery('div.jqueryinputset').buttonset();
-
+		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
 	});

@@ -112,4 +112,8 @@ jQuery(function($) {
 
 		return false;
 	});
+
+	// create jquery buttons
+	$('input.jqueryinput').button();
+	$('div.jqueryinputset').buttonset();
 });
