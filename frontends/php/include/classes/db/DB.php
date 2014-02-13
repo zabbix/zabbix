@@ -299,6 +299,21 @@ class DB {
 		return $defaults;
 	}
 
+	/**
+	 * Returns the default value of the given field.
+	 *
+	 * @param string $table		name of the table
+	 * @param string $field		name of the field
+	 *
+	 * @return string|null
+	 */
+	public static function getDefault($table, $field) {
+		$table = self::getSchema($table);
+		$field = $table['fields'][$field];
+
+		return isset($field['default']) ? $field['default'] : null;
+	}
+
 	public static function checkValueTypes($table, &$values) {
 		global $DB;
 		$tableSchema = self::getSchema($table);
