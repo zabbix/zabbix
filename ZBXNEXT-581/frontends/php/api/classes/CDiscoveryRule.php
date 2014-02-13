@@ -253,7 +253,15 @@ class CDiscoveryRule extends CItemGeneral {
 						array('conditions', 'formula', 'evaltype'),
 						$options['selectFilter']
 					);
-					$rule['filter'] = $filter[0];
+					$filter = reset($filter);
+					if (isset($filter['conditions'])) {
+						foreach ($filter['conditions'] as &$condition) {
+							unset($condition['item_conditionid'], $condition['itemid']);
+						}
+						unset($condition);
+					}
+
+					$rule['filter'] = $filter;
 				}
 			}
 			unset($rule);
@@ -658,69 +666,77 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
+		$ruleIds = zbx_objectValues($items, 'itemid');
 		$exRules = $this->get(array(
-			'itemids' => zbx_objectValues($items, 'itemid'),
+			'itemids' => $ruleIds,
 			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
-			'selectFilter' => array('evaltype', 'formula', 'conditions'),
+			'selectFilter' => array('evaltype'),
 			'nopermissions' => true,
 			'preservekeys' => true,
 		));
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $exRules, array('filter'));
-
 		$data = array();
 		foreach ($items as $item) {
-			// clear the formula for non-custom expression rules
-			if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-				$item['formula'] = '';
+			$values = $item;
+
+			if (isset($item['filter'])) {
+				// clear the formula for non-custom expression rules
+				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					$values['formula'] = '';
+				}
+
+				$values['evaltype'] = $item['filter']['evaltype'];
+				unset($values['filter']);
 			}
 
-			$item['evaltype'] = $item['filter']['evaltype'];
-			unset($item['filter']);
-
-			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
+			$data[] = array('values' => $values, 'where' => array('itemid' => $item['itemid']));
 		}
 		DB::update('items', $data);
 
-		$conditions = null;
-		$exConditions = array();
+		$newRuleConditions = null;
 		foreach ($items as $item) {
 			// conditions
 			if (isset($item['filter'])) {
-				if ($conditions === null) {
-					$conditions = array();
+				if ($newRuleConditions === null) {
+					$newRuleConditions = array();
 				}
+
+				$newRuleConditions[$item['itemid']] = array();
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
-					$conditions[] = $condition;
-				}
-
-				foreach ($exRules[$item['itemid']]['filter']['conditions'] as $condition) {
-					$exConditions[] = $condition;
+					$newRuleConditions[$item['itemid']][] = $condition;
 				}
 			}
 		}
 
-		$itemConditions = array();
-		if ($conditions !== null) {
-			$conditions = DB::replace('item_condition', $exConditions, $conditions);
+		// replace conditions
+		$ruleConditions = array();
+		if ($newRuleConditions !== null) {
+			// fetch existing conditions
+			$exConditions = DBfetchArray(DBselect(
+				'SELECT item_conditionid,itemid,macro,value,operator'.
+				' FROM item_condition'.
+				' WHERE '.dbConditionInt('itemid', $ruleIds).
+				' ORDER BY item_conditionid'
+			));
+			$exRuleConditions = array();
+			foreach ($exConditions as $condition) {
+				$exRuleConditions[$condition['itemid']][] = $condition;
+			}
 
+			// replace and add the new IDs
+			$conditions = DB::replaceByPosition('item_condition', $exRuleConditions, $newRuleConditions);
 			foreach ($conditions as $condition) {
-				$itemConditions[$condition['itemid']][] = $condition;
+				$ruleConditions[$condition['itemid']][] = $condition;
 			}
 		}
 
 		// update formulas
 		foreach ($items as $item) {
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-
-				$conditions = (isset($itemConditions[$item['itemid']]))
-					? $itemConditions[$item['itemid']]
-					: $exRules[$item['itemid']]['filter']['conditions'];
-
-				$this->updateFormula($item['itemid'], $item['filter']['formula'], $conditions);
+				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
 			}
 		}
 
@@ -781,12 +797,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// condition validation
 		$conditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		if ($update) {
-			$conditionValidator->setValidator('item_conditionid', new CIdValidator(array(
-				'messageRegex' => _('Incorrect filter condition ID for discovery rule "%1$s".')
-			)));
-		}
-
 		foreach ($validateItems as $item) {
 			// validate custom formula and conditions
 			if (isset($item['filter'])) {
@@ -909,23 +919,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// propagate the inheritance to the children
 		return $this->inherit(array_merge($updateItems, $insertItems));
-	}
-
-	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null) {
-		$items = parent::prepareInheritedItems($itemsToInherit, $hostIds);
-
-		// unset condition ids, so they would override all child conditions
-		foreach ($items as &$item) {
-			if (isset($item['filter'])) {
-				foreach ($item['filter']['conditions'] as &$condition) {
-					unset($condition['item_conditionid'], $condition['itemid']);
-				}
-				unset($condition);
-			}
-		}
-		unset($item);
-
-		return $items;
 	}
 
 	/**
@@ -1423,17 +1416,21 @@ class CDiscoveryRule extends CItemGeneral {
 					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,
-					'nodeids' => get_current_nodeid(true)
+					'nodeids' => get_current_nodeid(true),
+					'sortfield' => 'item_conditionid'
 				));
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
 
 				foreach ($filters as &$filter) {
+					// in case of a custom expression - use the given formula
 					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						$formula = $filter['formula'];
 					}
+					// in other cases - generate the formula automatically
 					else {
+						// sort the conditions by macro before generating the formula
 						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
 						$conditions = order_macros($conditions, 'macro');
 

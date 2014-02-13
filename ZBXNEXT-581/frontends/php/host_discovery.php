@@ -235,13 +235,15 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	// add macros; ignore empty new macros
-	$conditions = array();
 	$filter = array(
 		'evaltype' => getRequest('evaltype'),
 		'conditions' => array()
 	);
-	foreach (getRequest('conditions', array()) as $condition) {
-		if (isset($condition['item_conditionid']) || !zbx_empty($condition['macro'])) {
+	$conditions = getRequest('conditions', array());
+	ksort($conditions);
+	$conditions = array_values($conditions);
+	foreach ($conditions as $condition) {
+		if (!zbx_empty($condition['macro'])) {
 			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
 			$filter['conditions'][] = $condition;
@@ -280,18 +282,9 @@ elseif (isset($_REQUEST['save'])) {
 			$conditionsChanged = true;
 		}
 		else {
-			$conditions = zbx_toHash($item['filter']['conditions'], 'item_conditionid');
-			foreach ($newItem['filter']['conditions'] as $condition) {
-				if (isset($condition['item_conditionid'])) {
-					$condition = CArrayHelper::unsetEqualValues($condition,
-						$conditions[$condition['item_conditionid']]
-					);
-					if ($condition) {
-						$conditionsChanged = true;
-						break;
-					}
-				}
-				else {
+			$conditions = $item['filter']['conditions'];
+			foreach ($newItem['filter']['conditions'] as $i => $condition) {
+				if (CArrayHelper::unsetEqualValues($condition, $conditions[$i])) {
 					$conditionsChanged = true;
 					break;
 				}
@@ -367,9 +360,6 @@ if (isset($_REQUEST['form'])) {
 	// clone form
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
-		foreach ($data['conditions'] as &$condition) {
-			unset($condition['item_conditionid']);
-		}
 		unset($condition);
 		$data['form'] = 'clone';
 	}
