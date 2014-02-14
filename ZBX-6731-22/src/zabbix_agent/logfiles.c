@@ -536,7 +536,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	for (; i < logfiles_num; i++)
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
-		if (0 != zbx_stat(logfile_candidate, &file_buf))/* situation could have changed */
+		if (0 != zbx_stat(logfile_candidate, &file_buf))	/* situation could have changed */
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", logfile_candidate, zbx_strerror(errno));
 			break;	/* must return, situation could have changed */
@@ -649,12 +649,12 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key)
 {
-	int		ret = FAIL, nbytes;
+	int		ret, nbytes;
 	const char	*cr, *lf, *p_end;
 	char		*p_start, *p, *p_nl, *p_next, *item_value = NULL;
 	size_t		szbyte;
@@ -685,6 +685,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		{
 			*big_rec = 0;
+			ret = FAIL;
 			goto out;
 		}
 
@@ -694,6 +695,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 		{
 			/* error on read */
 			*big_rec = 0;
+			ret = FAIL;
 			goto out;
 		}
 
@@ -716,20 +718,20 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 				/* Do not analyze it now, keep the same position in the file and wait the next check, */
 				/* maybe more data will come. */
 
-				if ((zbx_offset_t)0 <= zbx_lseek(fd, offset, SEEK_SET))
-					ret = SUCCEED;
-
+				*lastlogsize = (zbx_uint64_t)offset;
+				ret = SUCCEED;
 				goto out;
 			}
 			else
 			{
-				/* Buffer is full and there is no "newline" in it. It could be the beginning of */
-				/* a long record or the middle part of a long record. If it is the beginning part */
-				/* then analyze it now (as our buffer length corresponds to what we can save in the */
-				/* database), otherwise ignore it. */
+				/* buffer is full and there is no "newline" in it */
 
 				if (0 == *big_rec)
 				{
+					/* It is the first, beginning part of a long record. Match it against the */
+					/* regexp now (our buffer length corresponds to what we can save in the */
+					/* database). */
+
 					char	*value = NULL;
 
 					buf[BUF_SIZE] = '\0';
@@ -761,21 +763,25 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
-					{
 						*lastlogsize = lastlogsize1;
-						*skip_old_data = 0;
-					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
 
 					*big_rec = 1;	/* ignore the rest of this record */
 				}
+				else
+				{
+					/* It is a middle part of a long record. Ignore it. We have already */
+					/* checked the first part against the regexp. */
+
+					*lastlogsize = (size_t)offset + (size_t)nbytes;
+				}
 			}
 		}
 		else
 		{
-			/* the "newline" was found, so there is at least one record */
+			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
 
 			while (p < p_end)
@@ -815,10 +821,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
-					{
 						*lastlogsize = lastlogsize1;
-						*skip_old_data = 0;
-					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -830,6 +833,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 					*big_rec = 0;
 				}
 
+				/* move to the next record in the buffer */
 				p_start = p_next;
 				p = p_next;
 
@@ -837,13 +841,13 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned cha
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
-					if ((zbx_offset_t)0 <= zbx_lseek(fd, *lastlogsize, SEEK_SET))
+					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
-						ret = SUCCEED;
-						break;
+						ret = FAIL;
+						goto out;
 					}
 					else
-						goto out;
+						break;
 				}
 			}
 		}
@@ -964,8 +968,11 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
 	{
-		ret = zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, pattern,
-				output_template, p_count, s_count, process_value, server, port, hostname, key);
+		*lastlogsize = l_size;
+		*skip_old_data = 0;
+
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, encoding, regexps, pattern, output_template, p_count,
+				s_count, process_value, server, port, hostname, key);
 	}
 	else
 	{
