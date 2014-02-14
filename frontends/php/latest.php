@@ -398,11 +398,19 @@ foreach ($items as $key => $item){
 		$change = UNKNOWN_VALUE;
 	}
 
+	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
+			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
+	);
+
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
+		$actions = $showLink
+			? UNKNOWN_VALUE
+			: new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
 	else {
-		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
+		$actions = $showLink
+			? UNKNOWN_VALUE
+			: new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
@@ -448,7 +456,7 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			new CCol($actions, 'latest-actions'),
+			new CCol($actions, $stateCss),
 			new CCol($statusIcons)
 		));
 	}
@@ -461,7 +469,7 @@ foreach ($items as $key => $item){
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			new CCol($actions, 'latest-actions'),
+			new CCol($actions, $stateCss)
 		));
 	}
 
@@ -566,15 +574,23 @@ foreach ($items as $item) {
 		$change = nbsp($change);
 	}
 	else {
-		$change = ' - ';
+		$change = UNKNOWN_VALUE;
 	}
 
 	// column "action"
-	if (($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
-		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
+	$showLink = ((($config['hk_history_global'] && $config['hk_history'] == 0) || $item['history'] == 0)
+			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
+	);
+
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$actions = $showLink
+			? UNKNOWN_VALUE
+			: new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$item['itemid']);
 	}
-	else{
-		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
+	else {
+		$actions = $showLink
+			? UNKNOWN_VALUE
+			: new CLink(_('History'), 'history.php?action=showvalues&itemid='.$item['itemid']);
 	}
 
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
@@ -621,7 +637,7 @@ foreach ($items as $item) {
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			$actions,
+			new CCol($actions, $stateCss),
 			new CCol($statusIcons)
 		));
 	}
@@ -634,7 +650,7 @@ foreach ($items as $item) {
 			new CCol(new CDiv($lastClock, $stateCss)),
 			new CCol(new CDiv($lastValue, $stateCss)),
 			new CCol(new CDiv($change, $stateCss)),
-			$actions
+			new CCol($actions, $stateCss)
 		));
 	}
 
