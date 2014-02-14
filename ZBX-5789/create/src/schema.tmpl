@@ -1136,7 +1136,7 @@ FIELD		|snmp_lastsize	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|graph_discovery|graphid|ZBX_SYNC
 FIELD		|graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|graphs
-FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid
+FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid	|RESTRICT
 INDEX		|1		|parent_graphid
 
 TABLE|host_inventory|hostid|ZBX_SYNC
