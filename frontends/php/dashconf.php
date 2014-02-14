@@ -30,6 +30,8 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('multiselect.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR						 TYPE		 OPTIONAL FLAGS	VALIDATION		EXCEPTION
@@ -42,14 +44,15 @@ $fields = array(
 	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
 	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null)
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 );
 check_fields($fields);
 
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('save')) {
 	// filter
 	$filterEnable = get_request('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
@@ -88,8 +91,15 @@ if (isset($_REQUEST['save'])) {
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
-	jsRedirect('dashboard.php');
+	ob_end_clean();
+	redirect('dashboard.php');
 }
+elseif (hasRequest('cancel')) {
+	ob_end_clean();
+	redirect('dashboard.php');
+}
+
+ob_end_flush();
 
 /*
  * Display
