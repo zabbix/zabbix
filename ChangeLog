@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
 ........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] improved frontend messages mute/unmute (Eduard)

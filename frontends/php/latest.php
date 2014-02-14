@@ -115,7 +115,7 @@ $filterShowDetails = getRequest('show_details', 0);
 
 if (hasRequest('filter_rst')) {
 	$filterSelect = '';
-	$filterShowWithoutData = 0;
+	$filterShowWithoutData = 1;
 	$filterShowDetails = 0;
 }
 
@@ -126,7 +126,7 @@ if (hasRequest('filter_set') || hasRequest('filter_rst')) {
 }
 else {
 	$filterSelect = CProfile::get('web.latest.filter.select', '');
-	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 0);
+	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
 	$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
 }
 
