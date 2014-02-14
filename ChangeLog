@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
 ..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
 ........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
@@ -19,7 +20,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration and fixed dashboard filter name to show pointer cursor (Ivo)
+..F....... [ZBX-7095] fixed dashboard filter name to show pointer cursor (Ivo)
 ..F....... [ZBX-7773] fixed jquery buttonset initializing (Eduard)
 ..F....... [ZBX-7707] fixed "Auto-logout" field to show submitted incorrect value (Ivo)
 A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
