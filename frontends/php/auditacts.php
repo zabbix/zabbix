@@ -128,6 +128,20 @@ if ($queryData) {
 		)));
 	}
 
+	$actionids = array();
+	foreach ($data['alerts'] as $alert) {
+		if (!isset($actionids[$alert['actionid']])) {
+			$actionids[$alert['actionid']] = $alert['actionid'];
+		}
+	}
+
+	// get action name
+	$data['actions'] = API::Action()->get(array(
+		'output' => array('actionid	', 'name'),
+		'actionids' => $actionids,
+		'preservekeys' => true
+	));
+
 	CArrayHelper::sort($data['alerts'], array(
 		array('field' => 'alertid', 'order' => ZBX_SORT_DOWN)
 	));
