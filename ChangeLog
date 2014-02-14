@@ -19,6 +19,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration and fixed dashboard filter name to show pointer cursor (Ivo)
 ..F....... [ZBX-7773] fixed jquery buttonset initializing (Eduard)
 ..F....... [ZBX-7707] fixed "Auto-logout" field to show submitted incorrect value (Ivo)
 A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
