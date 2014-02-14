@@ -511,10 +511,6 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	if ($sortfield === 'status') {
-		$sortfield = ($sortorder === ZBX_SORT_UP) ? 'active_till' : 'active_since';
-	}
-
 	$groupIds = array();
 	if ($pageFilter->groupsSelected) {
 		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);

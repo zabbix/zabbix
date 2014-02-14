@@ -44,7 +44,9 @@ $maintenanceTable->setHeader(array(
 	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Type'), 'maintenance_type'),
-	make_sorting_header(_('State'), 'status'),
+	make_sorting_header(_('Active since'), 'active_since'),
+	make_sorting_header(_('Active till'), 'active_till'),
+	_('State'),
 	_('Description')
 ));
 
@@ -68,6 +70,8 @@ foreach ($this->data['maintenances'] as $maintenance) {
 		$this->data['displayNodes'] ? $maintenance['nodename'] : null,
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
+		zbx_date2str(_('d M Y H:i'), $maintenance['active_since']),
+		zbx_date2str(_('d M Y H:i'), $maintenance['active_till']),
 		$maintenanceStatus,
 		$maintenance['description']
 	));
