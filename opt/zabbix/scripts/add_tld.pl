@@ -77,25 +77,26 @@ use constant dnstest_host => 'dnstest'; # global config history
 use constant dnstest_group => 'dnstest';
 
 my %OPTS;
-my $args = GetOptions(\%OPTS,
-		      "tld=s",
-		      "rdds43-servers=s",
-		      "rdds80-servers=s",
-		      "dns-test-prefix=s",
-		      "rdds-test-prefix=s",
-		      "ipv4!",
-		      "ipv6!",
-		      "dnssec!",
-		      "epp-server=s",
-		      "ns-servers-v4=s",
-		      "ns-servers-v6=s",
-		      "rdds-ns-string=s",
-		      "only-cron!",
-		      "verbose!",
-		      "quiet!",
-		      "help|?");
+my $rv = GetOptions(\%OPTS,
+		    "tld=s",
+		    "rdds43-servers=s",
+		    "rdds80-servers=s",
+		    "dns-test-prefix=s",
+		    "rdds-test-prefix=s",
+		    "ipv4!",
+		    "ipv6!",
+		    "dnssec!",
+		    "epp-servers=s",
+		    "epp-dir=s",
+		    "ns-servers-v4=s",
+		    "ns-servers-v6=s",
+		    "rdds-ns-string=s",
+		    "only-cron!",
+		    "verbose!",
+		    "quiet!",
+		    "help|?");
 
-usage() if ($OPTS{'help'});
+usage() if ($OPTS{'help'} or not $rv);
 
 validate_input();
 lc_options();
@@ -621,7 +622,7 @@ sub create_item_dns_udp_upd {
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => value_mappings->{'dnstest_dns'},
-		                              'status' => (defined($OPTS{'epp-server'}) ? 0 : 1)};
+		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
     return create_item($options);
 }
 
@@ -732,7 +733,7 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    if (defined($OPTS{'epp-server'})) {
+    if (defined($OPTS{'epp-servers'})) {
 	$item_key = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
 
 	$options = {'name' => 'RDDS43 update time of $1',
@@ -741,7 +742,7 @@ sub create_items_rdds {
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
 		    'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'},
-		    'status' => (defined($OPTS{'epp-server'}) ? 0 : 1)};
+		    'status' => 0};
 	create_item($options);
 
 	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
@@ -819,7 +820,7 @@ sub create_items_epp {
 
     my ($item_key, $options);
 
-    $item_key = 'dnstest.epp[{$DNSTEST.TLD},'.$OPTS{'epp-server'}.']';
+    $item_key = 'dnstest.epp[{$DNSTEST.TLD},"'.$OPTS{'epp-servers'}.'"]';
 
     $options = {'name' => 'EPP service availability at $1 ($2)',
 		'key_'=> $item_key,
@@ -1155,7 +1156,7 @@ sub create_main_template {
 
             create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "tcp", '4');
 	    create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "udp", '4');
-	    if (defined($OPTS{'epp-server'})) {
+	    if (defined($OPTS{'epp-servers'})) {
     		create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv4[$i_ipv4].']',
@@ -1174,7 +1175,7 @@ sub create_main_template {
 
 	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "tcp", '6');
     	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "udp", '6');
-	    if (defined($OPTS{'epp-server'})) {
+	    if (defined($OPTS{'epp-servers'})) {
     		create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv6[$i_ipv6].']',
@@ -1190,7 +1191,7 @@ sub create_main_template {
 
     create_items_dns($templateid, $template_name);
     create_items_rdds($templateid, $template_name) if (defined($OPTS{'rdds43-servers'}));
-    create_items_epp($templateid, $template_name) if (defined($OPTS{'epp-server'}));
+    create_items_epp($templateid, $template_name) if (defined($OPTS{'epp-servers'}));
 
     create_macro('{$DNSTEST.TLD}', $tld, $templateid);
     create_macro('{$DNSTEST.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid);
@@ -1198,7 +1199,7 @@ sub create_main_template {
     create_macro('{$DNSTEST.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid);
     create_macro('{$DNSTEST.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
-    create_macro('{$DNSTEST.TLD.EPP.ENABLED}', defined($OPTS{'epp-server'}) ? 1 : 0, $templateid);
+    create_macro('{$DNSTEST.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid);
 
     return $templateid;
 }
@@ -1210,7 +1211,7 @@ sub create_all_slv_ns_items {
 
     create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
     create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
+    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
     create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
@@ -1446,10 +1447,10 @@ sub create_slv_items {
 
 	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'dnstest.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'dnstest.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-server'}));
+	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     }
 
-    if (defined($OPTS{'epp-server'})) {
+    if (defined($OPTS{'epp-servers'})) {
 	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
@@ -1656,8 +1657,8 @@ Other options
                 list of RDDS43 servers separated by comma: "NAME1,NAME2,..."
         --rdds80-servers=STRING
                 list of RDDS80 servers separated by comma: "NAME1,NAME2,..."
-        --epp-server=STRING
-                specify EPP server
+        --epp-servers=STRING
+                list of EPP servers separated by comma: "NAME1,NAME2,..."
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
@@ -1680,8 +1681,10 @@ sub validate_input {
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
-    $msg .= "none or both --rdds43-servers and --rdds80-servers should be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
+    $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
+    $msg .= "none or both --epp-servers and --epp-dir must be specified\n" if ((defined($OPTS{'epp-servers'}) and not defined($OPTS{'epp-dir'})) or
+									       (defined($OPTS{'epp-dir'}) and not defined($OPTS{'epp-servers'})));
 
     if ($msg ne "")
     {

@@ -49,8 +49,9 @@
 
 #define RTT_LIMIT_MULTIPLIER	5
 
-#define COMMANDS_DIR			"/opt/zabbix/epp/commands"
-#define CERTS_DIR			"/opt/zabbix/epp/certs"
+#define EPP_BASE_DIR			"/opt/zabbix/epp"
+#define EPP_COMMANDS_DIR		"commands"
+#define EPP_CERTS_DIR			"certs"
 
 #define EXPECTED_SERVER_ID		"192.0.34.201/620:0:2d0:270:1::201"
 #define EXPECTED_RESULT_CODE		"1000"
@@ -1861,7 +1862,7 @@ static int	zbx_validate_host_list(const char *list, char delim)
 	return FAIL;
 }
 
-static void	zbx_get_strings_from_list(zbx_vector_str_t *strings, char *list, char delim, char *err, size_t err_size)
+static void	zbx_get_strings_from_list(zbx_vector_str_t *strings, char *list, char delim)
 {
 	char	*p, *p_end;
 
@@ -2095,11 +2096,11 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		goto out;
 	}
 
-	zbx_get_strings_from_list(&hosts43, value_str, ',', err, sizeof(err));
+	zbx_get_strings_from_list(&hosts43, value_str, ',');
 
 	if (0 == hosts43.values_num)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "no RDDS43 hosts"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "cannot get RDDS43 hosts from key parameter"));
 		goto out;
 	}
 
@@ -2117,11 +2118,11 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 		goto out;
 	}
 
-	zbx_get_strings_from_list(&hosts80, value_str, ',', err, sizeof(err));
+	zbx_get_strings_from_list(&hosts80, value_str, ',');
 
 	if (0 == hosts80.values_num)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "no RDDS80 hosts"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "cannot get RDDS80 hosts from key parameter"));
 		goto out;
 	}
 
@@ -2208,7 +2209,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	i = zbx_random(hosts43.values_num);
 	random_host = hosts43.values[i];
 
-	/* start RDDS43 test, resolve hosts to ips */
+	/* start RDDS43 test, resolve host to ips */
 	if (SUCCEED != zbx_resolve_host(res, random_host, &ips43, ipv4_enabled, ipv6_enabled, log_fd, err, sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS_ERES;
@@ -2303,7 +2304,7 @@ int	check_dnstest_rdds(DC_ITEM *item, const char *keyname, const char *params, A
 	i = zbx_random(hosts80.values_num);
 	random_host = hosts80.values[i];
 
-	/* start RDDS80 test, resolve hosts to ips */
+	/* start RDDS80 test, resolve host to ips */
 	if (SUCCEED != zbx_resolve_host(res, random_host, &ips80, ipv4_enabled, ipv6_enabled, log_fd, err, sizeof(err)))
 	{
 		rtt80 = ZBX_EC_RDDS_ERES;
@@ -2542,16 +2543,15 @@ out:
 	return ret;
 }
 
-static int	get_tmpl(const char *command, char *tmpl_buf, size_t tmpl_buf_size)
+static int	get_tmpl(const char *domain, const char *command, char *tmpl_buf, size_t tmpl_buf_size)
 {
+	static char	path_buf[512];
+
 	FILE		*f;
-	static char	path_buf[256];
 	size_t		read;
 	int		ret = FAIL;
 
-	path_buf[sizeof(path_buf) - 1] = '\0';
-
-	zbx_snprintf(path_buf, sizeof(path_buf) -1, "%s/%s.tmpl", COMMANDS_DIR, command);
+	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s/%s/%s.tmpl", EPP_BASE_DIR, domain, EPP_COMMANDS_DIR, command);
 
 	if (NULL == (f = fopen(path_buf, "r")))
 		goto out;
@@ -2616,7 +2616,8 @@ out:
 	return ret;
 }
 
-static int	command_login(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char *err, size_t err_size)
+static int	command_login(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+		char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
 			*data = NULL;
@@ -2624,7 +2625,7 @@ static int	command_login(const char *name, SSL *ssl, int *rtt, FILE *log_fd, cha
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2680,7 +2681,8 @@ out:
 	return ret;
 }
 
-static int	command_update(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char *err, size_t err_size)
+static int	command_update(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+		char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t		data_len;
@@ -2688,7 +2690,7 @@ static int	command_update(const char *name, SSL *ssl, int *rtt, FILE *log_fd, ch
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2746,7 +2748,8 @@ out:
 	return ret;
 }
 
-static int	command_info(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char *err, size_t err_size)
+static int	command_info(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+		char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
 			*data = NULL;
@@ -2754,7 +2757,7 @@ static int	command_info(const char *name, SSL *ssl, int *rtt, FILE *log_fd, char
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2810,13 +2813,13 @@ out:
 	return ret;
 }
 
-static int	command_logout(const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
+static int	command_logout(const char *domain, const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
 {
 	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
 	int	ret = FAIL;
 
-	if (SUCCEED != get_tmpl(name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		goto out;
@@ -2987,31 +2990,41 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 	}
 }
 
+static const char	*get_epp_certs_path(const char *domain, const char *file)
+{
+	static char	path_buf[512];
+
+	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s/%s/%s.tmpl", EPP_BASE_DIR, domain, EPP_COMMANDS_DIR, file);
+
+	return path_buf;
+}
+
 int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	static int		ssl_initialized = 0;
+	static char		cert_file[512], key_file[512];
 
-	char			domain[ZBX_HOST_BUF_SIZE], epp_host[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE];
-	short			epp_port;
+	ldns_resolver		*res = NULL;
+	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str, *res_ip;
+	short			epp_port = 700;
 	X509			*cert = NULL;
 	const SSL_METHOD	*method;
-	const char		*ip = NULL, *cert_file, *key_file/*, *ca_file*/;
+	const char		*ip, *random_host;
 	SSL_CTX			*ctx = NULL;
 	SSL			*ssl = NULL;
 	FILE			*log_fd = NULL;
 	zbx_sock_t		sock;
 	DC_ITEM			*items = NULL;
 	size_t			items_num = 0;
-	int			epp_enabled, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE, rtt3 = ZBX_NO_VALUE, res,
+	zbx_vector_str_t	epp_hosts, epp_ips;
+	int			epp_enabled, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE, rtt3 = ZBX_NO_VALUE, rv, i,
 				rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled, ret = SYSINFO_RET_FAIL;
 
 	memset(&sock, 0, sizeof(zbx_sock_t));
 	sock.socket = ZBX_SOCK_ERROR;
 
-	epp_port = 700;
-	cert_file = CERTS_DIR "/client.crt";
-	key_file = CERTS_DIR "/client.unsecured.key";
-	/*ca_file = "ca.crt";*/
+	zbx_vector_str_create(&epp_hosts);
+	zbx_vector_str_create(&epp_ips);
 
 	/* first read the TLD */
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -3027,14 +3040,20 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	/* get EPP server */
-	if (0 != get_param(params, 2, epp_host, sizeof(epp_host)) || '\0' == *epp_host)
+	/* get EPP servers list */
+	if (NULL == (value_str = get_param_dyn(params, 2)) || '\0' == *value_str)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "second key parameter missing"));
 		goto out;
 	}
 
-	ip = epp_host;
+	zbx_get_strings_from_list(&epp_hosts, value_str, ',');
+
+	if (0 == epp_hosts.values_num)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "cannot get EPP hosts from key parameter"));
+		goto out;
+	}
 
 	/* make sure the service is enabled */
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)))
@@ -3063,6 +3082,12 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_RESOLVER, &res_ip, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_LOGIN_RTT, &rtt1_limit, 1, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
@@ -3087,15 +3112,23 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	/* from this point item will not become NOT_SUPPORTED */
-	ret = SYSINFO_RET_OK;
-
 	/* get epp items */
 	if (0 == (items_num = zbx_get_epp_items(keyname, item, domain, &items, log_fd)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "no EPP items found"));
 		goto out;
 	}
+
+	/* create resolver */
+	if (SUCCEED != zbx_create_resolver(&res, "resolver", res_ip, ZBX_DNSTEST_TCP, ipv4_enabled, ipv6_enabled, log_fd,
+			err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot create resolver: %s", err));
+		goto out;
+	}
+
+	/* from this point item will not become NOT_SUPPORTED */
+	ret = SYSINFO_RET_OK;
 
 	/* these function calls initialize openssl for correct work */
 	if (0 == ssl_initialized)
@@ -3138,19 +3171,27 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	/* validate IP */
-	if (SUCCEED != zbx_validate_ip(epp_host, ipv4_enabled, ipv6_enabled, NULL, NULL))
+	/* choose random host */
+	i = zbx_random(epp_hosts.values_num);
+	random_host = epp_hosts.values[i];
+
+	/* resolve host to ips */
+	if (SUCCEED != zbx_resolve_host(res, random_host, &epp_ips, ipv4_enabled, ipv6_enabled, log_fd,
+			err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_NO_IP;
-		zbx_dns_errf(log_fd, "invalid or unsupported IP \"%s\"", epp_host);
-		goto out;
+		zbx_dns_errf(log_fd, "EPP \"%s\": %s", random_host, err);
 	}
 
+	/* choose random IP */
+	i = zbx_random(epp_ips.values_num);
+	ip = epp_ips.values[i];
+
 	/* make the underlying TCP socket connection */
-	if (SUCCEED != zbx_tcp_connect(&sock, NULL, epp_host, epp_port, ZBX_DNSTEST_TCP_TIMEOUT))
+	if (SUCCEED != zbx_tcp_connect(&sock, NULL, ip, epp_port, ZBX_DNSTEST_TCP_TIMEOUT))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CONNECT;
-		zbx_dns_errf(log_fd, "cannot connect to EPP server %s", epp_host);
+		zbx_dns_errf(log_fd, "cannot connect to EPP server %s:%d", ip, epp_port);
 		goto out;
 	}
 
@@ -3161,6 +3202,9 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		zbx_dns_err(log_fd, "cannot attach the SSL session to the socket");
 		goto out;
 	}
+
+	zbx_snprintf(cert_file, sizeof(cert_file), "%s/%s/%s/client.crt", EPP_BASE_DIR, domain, EPP_CERTS_DIR);
+	zbx_snprintf(key_file, sizeof(key_file), "%s/%s/%s/client.unsecured.key", EPP_BASE_DIR, domain, EPP_CERTS_DIR);
 
 	if (1 != SSL_use_certificate_file(ssl, cert_file, SSL_FILETYPE_PEM))
 	{
@@ -3180,7 +3224,7 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	if (1 != SSL_connect(ssl))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
-		zbx_dns_errf(log_fd, "cannot build an SSL connection to %s", epp_host);
+		zbx_dns_errf(log_fd, "cannot build an SSL connection to %s:%d", ip, epp_port);
 		goto out;
 	}
 
@@ -3188,44 +3232,42 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	if (NULL == (cert = SSL_get_peer_certificate(ssl)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
-		zbx_dns_errf(log_fd, "cannot get a certificate from %s", epp_host);
+		zbx_dns_errf(log_fd, "cannot get a certificate from %s:%d", ip, epp_port);
 		goto out;
 	}
 
 	zbx_dns_infof(log_fd, "start EPP test (ip %s)", ip);
 
-	if (SUCCEED != get_first_message(ssl, &res, log_fd, err, sizeof(err)))
+	if (SUCCEED != get_first_message(ssl, &rv, log_fd, err, sizeof(err)))
 	{
-		rtt1 = rtt2 = rtt3 = res;
+		rtt1 = rtt2 = rtt3 = rv;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_login(COMMAND_LOGIN, ssl, &rtt1, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_login(domain, COMMAND_LOGIN, ssl, &rtt1, log_fd, err, sizeof(err)))
 	{
 		rtt2 = rtt3 = rtt1;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_update(COMMAND_UPDATE, ssl, &rtt2, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_update(domain, COMMAND_UPDATE, ssl, &rtt2, log_fd, err, sizeof(err)))
 	{
 		rtt3 = rtt2;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_info(COMMAND_INFO, ssl, &rtt3, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_info(domain, COMMAND_INFO, ssl, &rtt3, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
 	/* logout command errors should not affect the test results */
-	if (SUCCEED != command_logout(COMMAND_LOGOUT, ssl, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_logout(domain, COMMAND_LOGOUT, ssl, log_fd, err, sizeof(err)))
 		zbx_dns_err(log_fd, err);
-
-	res = 1;	/* success */
 
 	zbx_dns_infof(log_fd, "end EPP test (ip %s):SUCCESS", ip);
 out:
@@ -3278,6 +3320,12 @@ out:
 
 	if (NULL != log_fd)
 		fclose(log_fd);
+
+	zbx_free(value_str);
+	zbx_free(res_ip);
+
+	zbx_vector_str_destroy(&epp_ips);
+	zbx_vector_str_destroy(&epp_hosts);
 
 	return ret;
 }
@@ -3422,7 +3470,7 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 			goto out;
 		}
 
-		zbx_get_strings_from_list(&ips4, value_str, ',', err, sizeof(err));
+		zbx_get_strings_from_list(&ips4, value_str, ',');
 
 		ok_servers = 0;
 
@@ -3490,7 +3538,7 @@ int	check_dnstest_probe_status(DC_ITEM *item, const char *keyname, const char *p
 			goto out;
 		}
 
-		zbx_get_strings_from_list(&ips6, value_str, ',', err, sizeof(err));
+		zbx_get_strings_from_list(&ips6, value_str, ',');
 
 		ok_servers = 0;
 
