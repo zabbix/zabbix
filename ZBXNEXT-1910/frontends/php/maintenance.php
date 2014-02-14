@@ -510,37 +510,39 @@ else {
 	// get maintenances
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
-	$options = array(
+
+	if ($sortfield === 'status') {
+		$sortfield = ($sortorder === ZBX_SORT_UP) ? 'active_till' : 'active_since';
+	}
+
+	$groupIds = array();
+	if ($pageFilter->groupsSelected) {
+		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);
+	}
+
+	$data['maintenances'] = API::Maintenance()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'editable' => true,
+		'groupids' => $groupIds,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
+		'editable' => true,
 		'limit' => $config['search_limit'] + 1
-	);
-	if ($pageFilter->groupsSelected) {
-		if ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		else {
-			$options['groupids'] = array_keys($pageFilter->groups);
-		}
-	}
-	else {
-		$options['groupids'] = array();
-	}
-	$data['maintenances'] = API::Maintenance()->get($options);
-	foreach ($data['maintenances'] as $number => $maintenance) {
+	));
+
+	foreach ($data['maintenances'] as $key => $maintenance) {
 		if ($maintenance['active_till'] < time()) {
-			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_EXPIRED;
+			$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_EXPIRED;
 		}
 		elseif ($maintenance['active_since'] > time()) {
-			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_APPROACH;
+			$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_APPROACH;
 		}
 		else {
-			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_ACTIVE;
+			$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_ACTIVE;
 		}
 	}
+
 	order_result($data['maintenances'], $sortfield, $sortorder);
+
 	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 	$data['pageFilter'] = $pageFilter;
 

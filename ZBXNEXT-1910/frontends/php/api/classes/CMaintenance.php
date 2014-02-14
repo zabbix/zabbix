@@ -28,24 +28,25 @@ class CMaintenance extends CZBXAPI {
 
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';
-	protected $sortColumns = array('maintenanceid', 'name', 'maintenance_type');
+	protected $sortColumns = array('maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since');
 
 	/**
-	 * Get maintenances data
+	 * Get maintenances data.
 	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['maintenanceids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
+	 * @param array  $options
+	 * @param array  $options['itemids']
+	 * @param array  $options['hostids']
+	 * @param array  $options['groupids']
+	 * @param array  $options['triggerids']
+	 * @param array  $options['maintenanceids']
+	 * @param bool   $options['status']
+	 * @param bool   $options['editable']
+	 * @param bool   $options['count']
 	 * @param string $options['pattern']
-	 * @param int $options['limit']
+	 * @param int    $options['limit']
 	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
+	 *
+	 * @return array
 	 */
 	public function get(array $options = array()) {
 		$result = array();

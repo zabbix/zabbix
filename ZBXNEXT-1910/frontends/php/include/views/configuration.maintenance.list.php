@@ -44,7 +44,7 @@ $maintenanceTable->setHeader(array(
 	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Type'), 'maintenance_type'),
-	_('State'),
+	make_sorting_header(_('State'), 'status'),
 	_('Description')
 ));
 
