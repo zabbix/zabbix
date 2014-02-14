@@ -68,7 +68,7 @@ $auditTable = new CTableInfo(_('No audit entries found.'));
 $auditTable->setHeader(array(
 	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
-	_('Action name'),
+	_('Action'),
 	_('Type'),
 	_('Status'),
 	_('Retries left'),
