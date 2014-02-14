@@ -165,6 +165,9 @@ typedef struct
 	/* the low memory mode flag */
 	int		low_memory;
 
+	/* timestamp of the last low memory warning message */
+	int		last_warning_time;
+
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
 
@@ -560,12 +563,12 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -699,7 +702,10 @@ static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
 static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 {
 	if (NULL != item)
+	{
 		item->hits += hits;
+		item->last_accessed = ZBX_VC_TIME();
+	}
 
 	if (NULL != vc_cache)
 	{
@@ -720,14 +726,13 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	static int	last_warning_time = 0;
 	int		now;
 
 	now = ZBX_VC_TIME();
 
-	if (now - last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
-		last_warning_time = now;
+		vc_cache->last_warning_time = now;
 
 		zabbix_log(LOG_LEVEL_WARNING, "value cache is fully used: please increase ValueCacheSize"
 				" configuration parameter");
@@ -1010,7 +1015,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	(*(uint32_t *)ptr)++;
 
-	return ptr + REFCOUNT_FIELD_SIZE;
+	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
 /******************************************************************************
@@ -1162,44 +1167,6 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_reset_cache                                              *
- *                                                                            *
- * Purpose: resets item cache by freeing allocated data and setting cache     *
- *          data to 0.                                                        *
- *                                                                            *
- * Parameters: item    - [IN] the item                                        *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_reset_cache(zbx_vc_item_t *item)
-{
-	vch_item_free_cache(item);
-
-	/* reset all item data except itemid and value_type which are the first members in zbx_vc_item_t structure */
-	memset((void*)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
-			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_item_change_value_type                                        *
- *                                                                            *
- * Purpose: changes item value type                                           *
- *                                                                            *
- * Parameters:  item       - [IN] the item                                    *
- *              value_type - [IN] the new value type                          *
- *                                                                            *
- * Comments: Changing item value type means dropping all cached data and      *
- *           reseting item cache parameters.                                  *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_change_value_type(zbx_vc_item_t *item, int value_type)
-{
-	vc_item_reset_cache(item);
-	item->value_type = value_type;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vc_remove_item                                                   *
  *                                                                            *
  * Purpose: removes item from cache and frees resources allocated for it      *
@@ -1211,40 +1178,6 @@ static void	vc_remove_item(zbx_vc_item_t *item)
 {
 	vch_item_free_cache(item);
 	zbx_hashset_remove(&vc_cache->items, item);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_prepare_item                                                  *
- *                                                                            *
- * Purpose: prepares the item for history request                             *
- *                                                                            *
- * Parameters: item       - [IN] the item to prepare                          *
- *             value_type - [IN] the new value type                           *
- *             seconds    - [IN] the time period to retrieve data for         *
- *             count      - [IN] the number of history values to retrieve     *
- *             timestamp  - [IN] the period end timestamp                     *
- *             ts         - [IN] the value timestamp                          *
- *                                                                            *
- * Return value:  SUCCEED - the item can't handle the history request         *
- *                FAIL    - the item can't handle the request and the data    *
- *                          must be read from database                        *
- *                                                                            *
- ******************************************************************************/
-static int	vc_prepare_item(zbx_vc_item_t *item, int value_type, int seconds, int count,
-		int timestamp, const zbx_timespec_t *ts)
-{
-	int	ret = FAIL;
-
-	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
-		goto out;
-
-	if (item->value_type != value_type)
-		vc_item_change_value_type(item, value_type);
-
-	ret = SUCCEED;
-out:
-	return ret;
 }
 
 /******************************************************************************
@@ -1342,17 +1275,14 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 		/* check if during data retrieval from DB the item was not already added to cache */
 		if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 		{
-			if (0 == vc_cache->low_memory)
-			{
-				zbx_vc_item_t   new_item = {itemid, value_type};
+			zbx_vc_item_t   new_item = {itemid, value_type};
 
-				if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
-					goto out;
+			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+				goto out;
 
-				vc_item_addref(item);
+			vc_item_addref(item);
 
-				vch_init(item, values, seconds, count, timestamp, ts);
-			}
+			vch_init(item, values, seconds, count, timestamp, ts);
 		}
 		else
 			vch_item_add_values_at_beginning(item, values->values, values->values_num);
@@ -2796,10 +2726,14 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 		vc_item_addref(item);
 
-		if (item->value_type != value_type)
-			vc_item_change_value_type(item, value_type);
-
-		if (FAIL == (ret = vch_item_add_values_at_end(item, &record, 1)))
+		/* If the new value type does not match the item's type in cache we can't  */
+		/* change the cache because other processes might still be accessing it    */
+		/* at the same time. The only thing that can be done - mark it for removal */
+		/* so it could be added later with new type.                               */
+		/* Also mark it for removal if the value adding failed. In this case we    */
+		/* won't have the latest data in cache - so the requests must go directly  */
+		/* to the database.                                                        */
+		if (item->value_type != value_type || FAIL == (ret = vch_item_add_values_at_end(item, &record, 1)))
 			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
 
 		vc_item_release(item);
@@ -2859,6 +2793,9 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	{
 		int	i, start = 0;
 
+		if (1 == vc_cache->low_memory)
+			goto out;
+
 		item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values);
 
 		/* The values vector contains cache data sorted in ascending order, which  */
@@ -2899,12 +2836,12 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 
 		ret = SUCCEED;
 
-		goto out;
+		goto finish;
 	}
 
 	vc_item_addref(item);
 
-	if (FAIL == vc_prepare_item(item, value_type, seconds, count, timestamp, NULL))
+	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
 		goto out;
 
 	ret = vch_item_get_value_range(item, values, seconds, count, timestamp);
@@ -2933,12 +2870,7 @@ out:
 			vc_update_statistics(NULL, 0, values->values_num);
 		}
 	}
-	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
-	}
-
+finish:
 	if (NULL != item)
 		vc_item_release(item);
 
@@ -2996,6 +2928,9 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 		zbx_vector_history_record_t	values;
 		int				i;
 
+		if (1 == vc_cache->low_memory)
+			goto out;
+
 		zbx_vector_history_record_create(&values);
 
 		item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values);
@@ -3021,7 +2956,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 	vc_item_addref(item);
 
-	if (FAIL == vc_prepare_item(item, value_type, 0, 0, 0, ts))
+	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
 		goto out;
 
 	ret = vch_item_get_value(item, ts, value, found);
@@ -3038,11 +2973,6 @@ out:
 			vc_update_statistics(NULL, 0, 1);
 			*found = 1;
 		}
-	}
-	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
 	}
 finish:
 	if (NULL != item)

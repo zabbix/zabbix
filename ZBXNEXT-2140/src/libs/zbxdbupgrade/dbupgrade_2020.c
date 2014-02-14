@@ -42,5 +42,6 @@ DBPATCH_START(2020)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2020000, 0, 1)
+/* Patch 2020001 is duplicated by 2030011 */
 
 DBPATCH_END()
