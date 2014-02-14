@@ -37,6 +37,7 @@ if (!defined('PAGE_HEADER_LOADED')) {
 if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	// if URL length is greater than DB field size, skip history update
 	$url = validateHistoryUrl($page);
+
 	if ($url) {
 		DBstart();
 		$result = addUserHistory($page['title'], $url);
