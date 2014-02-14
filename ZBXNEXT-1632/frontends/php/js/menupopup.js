@@ -242,7 +242,7 @@ function getMenuPopupHost(options) {
 		// graphs
 		if (options.hasGraphs) {
 			gotos[gotos.length] = {
-				label: t('Host graphs'),
+				label: t('Graphs'),
 				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
 			};
 		}
@@ -325,7 +325,7 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-				label: t('Host graphs'),
+				label: t('Graphs'),
 				url: url.getUrl()
 			};
 		}
