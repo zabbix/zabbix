@@ -459,15 +459,19 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, file_name_utf8);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, file_name_utf8, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8,
+						(int)file_buf.st_mtime);
+			}
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
-		}
-		else if (0 == regexec(&re, file_name_utf8, (size_t)0, NULL, 0))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8, (int)file_buf.st_mtime);
-		}
 
 		zbx_free(logfile_candidate);
 		zbx_free(file_name_utf8);
@@ -489,15 +493,19 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name,
+						(int)file_buf.st_mtime);
+			}
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
-		}
-		else if (0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
-		}
 
 		zbx_free(logfile_candidate);
 	}
@@ -528,10 +536,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 			break;	/* all next mtimes are bigger */
 	}
 
-	/* if all mtimes are less than the given one, take the latest file from existing ones */
-	if (0 < logfiles_num && i == logfiles_num)
-		i = logfiles_num - 1;	/* i cannot be bigger than logfiles_num */
-
 	/* processing matched or moving to the newer one and repeating the cycle */
 	for (; i < logfiles_num; i++)
 	{
@@ -552,7 +556,12 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	}	/* trying to read from logfiles */
 
 	if (0 == logfiles_num)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
+
+		/* do not make a logrt[] item NOTSUPPORTED if there are no matching files in the directory */
+		ret = SUCCEED;
+	}
 
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 
