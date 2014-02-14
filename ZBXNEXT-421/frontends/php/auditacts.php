@@ -86,40 +86,34 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
  * Display
  */
 $effectivePeriod = navigation_bar_calc('web.auditacts.timeline', 0, true);
+
 $data = array(
-	'stime' => get_request('stime'),
-	'alias' => get_request('alias'),
+	'stime' => getRequest('stime'),
+	'alias' => getRequest('alias'),
+	'users' => array(),
 	'alerts' => array()
 );
 
-$from = zbxDateToTime($data['stime']);
-$till = $from + $effectivePeriod;
-
-$user = null;
-$queryData = true;
-$firstAlert = null;
-
 if ($data['alias']) {
-	$user = API::User()->get(array(
-		'output' => array('userid'),
-		'filter' => array('alias' => $data['alias'])
+	$data['users'] = API::User()->get(array(
+		'output' => array('userid', 'alias', 'name', 'surname'),
+		'filter' => array('alias' => $data['alias']),
+		'preservekeys' => true
 	));
-
-	if ($user) {
-		$user = reset($user);
-	}
-	else {
-		$queryData = false;
-	}
 }
 
-// fetch alerts for different objects and sources and combine them in a single stream
-if ($queryData) {
+if (!$data['alias'] || $data['users']) {
+	$userIds = array_keys($data['users']);
+
+	$from = zbxDateToTime($data['stime']);
+	$till = $from + $effectivePeriod;
+
+	// fetch alerts for different objects and sources and combine them in a single stream
 	foreach (eventSourceObjects() as $eventSource) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectMediatypes' => API_OUTPUT_EXTEND,
-			'userids' => $data['alias'] ? $user['userid'] : null,
+			'userids' => $userIds ? $userIds : null,
 			'time_from' => $from,
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
@@ -134,14 +128,26 @@ if ($queryData) {
 
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
-	// get first alert
-	if ($user) {
-		$firstAlert = DBfetch(DBselect(
-			'SELECT MIN(a.clock) AS clock'.
-			' FROM alerts a'.
-			' WHERE a.userid='.zbx_dbstr($user['userid'])
+	// get users
+	if (!$data['alias']) {
+		$data['users'] = API::User()->get(array(
+			'output' => array('userid', 'alias', 'name', 'surname'),
+			'userids' => zbx_objectValues($data['alerts'], 'userid'),
+			'preservekeys' => true
 		));
 	}
+
+	// get first alert clock
+	$firstAlert = DBfetch(DBselect(
+		'SELECT MIN(a.clock) AS clock'.
+		' FROM alerts a'.
+		' WHERE '.dbConditionInt('a.userid', array_keys($data['users']))
+	));
+
+	$minStartTime = $firstAlert['clock'];
+}
+else {
+	$minStartTime = ZBX_MAX_PERIOD;
 }
 
 // padding
@@ -150,8 +156,8 @@ $data['paging'] = getPagingLine($data['alerts']);
 // timeline
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, ($firstAlert ? $firstAlert['clock'] : ZBX_MAX_PERIOD)),
-	'usertime' => isset($data['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
+	'starttime' => date(TIMESTAMP_FORMAT, $minStartTime),
+	'usertime' => $data['stime'] ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 
 // render view
