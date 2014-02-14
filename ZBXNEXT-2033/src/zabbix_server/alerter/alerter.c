@@ -177,7 +177,7 @@ void	main_alerter_loop(void)
 		result = DBselect(
 				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
 				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-				"mt.gsm_modem,mt.username,mt.passwd,a.retries,a.eventid"
+				"mt.gsm_modem,mt.username,mt.passwd,a.retries,a.eventid,a.userid"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -210,6 +210,7 @@ void	main_alerter_loop(void)
 
 			alert.retries = atoi(row[16]);
 			ZBX_STR2UINT64(alert.eventid, row[17]);
+			ZBX_STR2UINT64(alert.userid, row[18]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));

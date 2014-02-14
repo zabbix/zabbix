@@ -82,6 +82,11 @@
 
 #define ZBX_REMEDY_CI_ID_FIELD		"tag"
 
+/* incident status for automatic event acknowledgement */
+#define ZBX_REMEDY_INCIDENT_CREATE	1
+#define ZBX_REMEDY_INCIDENT_REOPEN	2
+#define ZBX_REMEDY_INCIDENT_UPDATE	3
+
 typedef struct
 {
 	char	*name;
@@ -893,6 +898,66 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: remedy_acknowledge_event                                         *
+ *                                                                            *
+ * Purpose: acknowledges event with appropriate message                       *
+ *                                                                            *
+ * Parameters: eventid       - [IN] the event to acknowledge                  *
+ *             userid        - [IN] the user the alert is assigned to         *
+ *             ticketnumber  - [IN] the number of corresponding incident in   *
+ *             status        - [IN] the incident status, see                  *
+ *                                  ZBX_REMEDY_INCIDENT_* defines             *
+ *                                                                            *
+ * Return Value: SUCCEED - the event was acknowledged                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const char *ticketnumber, int status)
+{
+	int		ret = FAIL;
+	char		*sql = NULL, *message, *message_esc;
+	size_t		sql_offset = 0, sql_alloc = 0;
+	zbx_uint64_t	ackid;
+
+	switch (status)
+	{
+		case ZBX_REMEDY_INCIDENT_CREATE:
+			message = zbx_dsprintf(NULL, "Created a new incident %", ticketnumber);
+			break;
+		case ZBX_REMEDY_INCIDENT_REOPEN:
+			message = zbx_dsprintf(NULL, "Reopened resolved incident %", ticketnumber);
+			break;
+		case ZBX_REMEDY_INCIDENT_UPDATE:
+			message = zbx_dsprintf(NULL, "Updated new or assigned incident %", ticketnumber);
+			break;
+		default:
+			goto out;
+	}
+
+	ackid = DBget_maxid("acknowledges");
+	message_esc = DBdyn_escape_string(message);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into acknowledgments"
+			" (acknowledgeid,userid,eventid,clock,message) values"
+			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
+			ackid, userid, eventid, time(NULL), message);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set acknowledged=1"
+			" where eventid=" ZBX_FS_UI64, eventid);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+	zbx_free(message_esc);
+	zbx_free(message);
+out:
+	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: remedy_process_alert                                             *
  *                                                                            *
  * Purpose: processes alert by either creating or closing ticket in Remedy    *
@@ -976,6 +1041,8 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	DBbegin();
+
 	result = DBselect("select e.value,t.priority,t.triggerid,h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
 			" from triggers t,hosts h,items i,functions f,events e,host_inventory hi"
 			" where e.eventid=" ZBX_FS_UI64
@@ -1002,13 +1069,16 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	if (TRIGGER_VALUE_OK != atoi(row[0]))
 	{
-		char	*ticketnumber, *service_name = NULL, *service_id = NULL;
-		int	remedy_event;
-		char	*impact_map[] = {"3-Medium", "2-Significant/Large"};
-		char	*urgency_map[] = {"3-Moderate/Limited", "2-High"};
+		char		*ticketnumber, *service_name = NULL, *service_id = NULL;
+		int		remedy_event;
+		char		*impact_map[] = {"3-Medium", "2-Significant/Large"};
+		char		*urgency_map[] = {"3-Moderate/Limited", "2-High"};
+		const char	*incident_number;
 
 		/* check if the ticket should be reopened */
-		if (NULL != remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER))
+		incident_number = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER);
+
+		if (NULL != incident_number)
 		{
 			status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
 
@@ -1020,8 +1090,13 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
 						alert->subject);
 
-				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
-						media->passwd, fields, ARRSIZE(fields), error);
+				if (SUCCEED == (ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo,
+						media->username, media->passwd, fields, ARRSIZE(fields), error)))
+				{
+					remedy_acknowledge_event(alert->eventid, alert->userid, incident_number,
+						ZBX_REMEDY_INCIDENT_REOPEN);
+				}
+
 				goto out;
 			}
 
@@ -1032,8 +1107,13 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
 						alert->subject);
 
-				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
-						media->passwd, fields, ARRSIZE(fields), error);
+				if (SUCCEED == (ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo,
+						media->username, media->passwd, fields, ARRSIZE(fields), error)))
+				{
+					remedy_acknowledge_event(alert->eventid, alert->userid, incident_number,
+						ZBX_REMEDY_INCIDENT_UPDATE);
+				}
+
 				goto out;
 			}
 		}
@@ -1074,6 +1154,11 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			{
 				ret = FAIL;
 			}
+			else
+			{
+				ret = remedy_acknowledge_event(alert->eventid, alert->userid, ticketnumber,
+						ZBX_REMEDY_INCIDENT_CREATE);
+			}
 
 			zbx_free(ticketnumber_dyn);
 			zbx_free(ticketnumber);
@@ -1110,8 +1195,9 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 	}
 
 out:
-
 	DBfree_result(result);
+
+	DBcommit();
 
 	remedy_fields_clean_values(fields, ARRSIZE(fields));
 

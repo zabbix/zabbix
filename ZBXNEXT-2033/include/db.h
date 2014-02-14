@@ -356,6 +356,7 @@ typedef struct DB_ALERT
 	zbx_uint64_t 	actionid;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	mediatypeid;
+	zbx_uint64_t	userid;
 	char		*sendto;
 	char		*subject;
 	char		*message;
