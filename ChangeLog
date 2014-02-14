@@ -67,7 +67,7 @@ A......... [ZBX-7703] fixed being able to switch users without proper credential
 ........S. [ZBX-7561] fixed SQL errors while processing host prototypes under MySQL (Sasha)
 ..F....... [ZBX-7688] fixed discovery item import (Eduard)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
-...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
+...G...... [ZBX-7697] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
