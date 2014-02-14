@@ -80,7 +80,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$interfaces[$interface['interfaceid']] = $interface;
 	}
 	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
-	zbx_add_post_js('hostInterfacesManager.disable()');
+	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
 	$ifTab = new CTable(null, 'formElementTable');
