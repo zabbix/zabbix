@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).');');
 
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
