@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 
-$page['title'] = _('Audit actions');
+$page['title'] = _('Audit alerts');
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
