@@ -1639,9 +1639,15 @@ function make_trigger_details($trigger) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
 	$table->addRow(array(_n('Host', 'Hosts', count($hosts)), $hostNames));
-	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
+	$table->addRow(array(
+		new CCol(_('Trigger')),
+		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
+	));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
-	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
+	$table->addRow(array(
+		new CCol(_('Expression')),
+		new CCol(explode_exp($trigger['expression'], true, true), 'wraptext')
+	));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
 	$table->addRow(array(_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
