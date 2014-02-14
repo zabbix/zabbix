@@ -129,7 +129,6 @@ if (isset($_FILES['import_file'])) {
 
 		$configurationImport = new CConfigurationImport($file->getContent(), $data['rules']);
 		$configurationImport->setReader($importReader);
-
 		$configurationImport->import();
 
 		DBend();
