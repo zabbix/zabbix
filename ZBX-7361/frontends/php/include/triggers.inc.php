@@ -1624,6 +1624,10 @@ function make_trigger_details($trigger) {
 		'selectScreens' => API_OUTPUT_COUNT
 	));
 
+	if (count($hosts) > 1) {
+		order_result($hosts, 'name', ZBX_SORT_UP);
+	}
+
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
@@ -1638,7 +1642,10 @@ function make_trigger_details($trigger) {
 	if (is_show_all_nodes()) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
-	$table->addRow(array(_n('Host', 'Hosts', count($hosts)), $hostNames));
+	$table->addRow(array(
+		new CCol(_n('Host', 'Hosts', count($hosts))),
+		new CCol($hostNames, 'wraptext')
+	));
 	$table->addRow(array(
 		new CCol(_('Trigger')),
 		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
