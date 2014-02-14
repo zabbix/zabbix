@@ -170,7 +170,10 @@ function make_event_details($event, $trigger) {
 	$config = select_config();
 	$table = new CTableInfo();
 
-	$table->addRow(array(_('Event'), CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))));
+	$table->addRow(array(
+		new CCol(_('Event')),
+		new CCol(CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event)), 'wraptext')
+	));
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
