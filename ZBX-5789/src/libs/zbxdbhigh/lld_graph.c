@@ -246,9 +246,15 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 {
 	const char		*__function_name = "lld_gitems_get";
 
-	int			i;
+	int			i, index;
 	zbx_lld_graph_t		*graph;
+	zbx_lld_gitem_t		*gitem;
+	zbx_uint64_t		graphid;
 	zbx_vector_uint64_t	graphids;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -262,74 +268,63 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 		zbx_vector_uint64_append(&graphids, graph->graphid);
 	}
 
-	if (0 != graphids.values_num)
+	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type"
+			" from graphs_items"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid",
+			graphids.values, graphids.values_num);
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-		zbx_lld_gitem_t	*gitem;
-		zbx_uint64_t	graphid;
-		char		*sql = NULL;
-		size_t		sql_alloc = 256, sql_offset = 0;
-		int		index;
+		gitem = zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
 
-		zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ZBX_STR2UINT64(gitem->gitemid, row[0]);
+		ZBX_STR2UINT64(graphid, row[1]);
+		ZBX_STR2UINT64(gitem->itemid, row[2]);
+		ZBX_STR2UCHAR(gitem->drawtype, row[3]);
+		gitem->sortorder = atoi(row[4]);
+		gitem->color = zbx_strdup(NULL, row[5]);
+		ZBX_STR2UCHAR(gitem->yaxisside, row[6]);
+		ZBX_STR2UCHAR(gitem->calc_fnc, row[7]);
+		ZBX_STR2UCHAR(gitem->type, row[8]);
 
-		sql = zbx_malloc(sql, sql_alloc);
+		gitem->flags = ZBX_FLAG_LLD_GITEM_UNSET;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type"
-				" from graphs_items"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid",
-				graphids.values, graphids.values_num);
-
-		result = DBselect("%s", sql);
-
-		zbx_free(sql);
-
-		while (NULL != (row = DBfetch(result)))
+		if (graphid == parent_graphid)
 		{
-			gitem = zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
-
-			ZBX_STR2UINT64(gitem->gitemid, row[0]);
-			ZBX_STR2UINT64(graphid, row[1]);
-			ZBX_STR2UINT64(gitem->itemid, row[2]);
-			ZBX_STR2UCHAR(gitem->drawtype, row[3]);
-			gitem->sortorder = atoi(row[4]);
-			gitem->color = zbx_strdup(NULL, row[5]);
-			ZBX_STR2UCHAR(gitem->yaxisside, row[6]);
-			ZBX_STR2UCHAR(gitem->calc_fnc, row[7]);
-			ZBX_STR2UCHAR(gitem->type, row[8]);
-
-			gitem->flags = ZBX_FLAG_LLD_GITEM_UNSET;
-
-			if (graphid == parent_graphid)
-			{
-				zbx_vector_ptr_append(gitems_proto, gitem);
-			}
-			else if (FAIL != (index = zbx_vector_ptr_bsearch(graphs, &graphid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				graph = (zbx_lld_graph_t *)graphs->values[index];
-
-				zbx_vector_ptr_append(&graph->gitems, gitem);
-			}
-			else
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				lld_gitem_free(gitem);
-			}
+			zbx_vector_ptr_append(gitems_proto, gitem);
 		}
-		DBfree_result(result);
-
-		zbx_vector_ptr_sort(gitems_proto, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		for (i = 0; i < graphs->values_num; i++)
+		else if (FAIL != (index = zbx_vector_ptr_bsearch(graphs, &graphid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			graph = (zbx_lld_graph_t *)graphs->values[i];
+			graph = (zbx_lld_graph_t *)graphs->values[index];
 
-			zbx_vector_ptr_sort(&graph->gitems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			zbx_vector_ptr_append(&graph->gitems, gitem);
 		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			lld_gitem_free(gitem);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_vector_ptr_sort(gitems_proto, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < graphs->values_num; i++)
+	{
+		graph = (zbx_lld_graph_t *)graphs->values[i];
+
+		zbx_vector_ptr_sort(&graph->gitems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
 	zbx_vector_uint64_destroy(&graphids);
