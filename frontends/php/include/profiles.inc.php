@@ -407,14 +407,14 @@ function get_user_history() {
 }
 
 /**
- * Check if url length is greater than DB field size. If size is OK, return valid URL string. Return false if not.
+ * Check if url length is greater than DB field size. If size is OK, return URL string.
  *
  * @param string $page['hist_arg']
  * @param string $page['file']
  *
  * @return string
  */
-function validateHistoryUrl($page) {
+function getHistoryUrl($page) {
 	if (isset($page['hist_arg']) && is_array($page['hist_arg'])) {
 		$url = '';
 
