@@ -91,9 +91,9 @@ $tranStrings = array(
 		'S_FIXED_SMALL' => _('fixed'),
 		'S_DYNAMIC_SMALL' => _('dynamic'),
 		'S_NOW_SMALL' => _('now'),
-		'S_YEAR_SHORT' => _x('y', 'year short'),
-		'S_MONTH_SHORT' => _x('m', 'month short'),
-		'S_DAY_SHORT' => _x('d', 'day short'),
+		'S_YEAR_SHORT' => _x('Y', 'year short'),
+		'S_MONTH_SHORT' => _x('M', 'month short'),
+		'S_DAY_SHORT' => _x('D', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
 	),

@@ -559,9 +559,9 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 		}
 	}
 
-	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
-	$str .= isset($values['m']) ? $values['m']._x('m', 'month short').' ' : '';
-	$str .= isset($values['d']) ? $values['d']._x('d', 'day short').' ' : '';
+	$str .= isset($values['y']) ? $values['y']._x('Y', 'year short').' ' : '';
+	$str .= isset($values['m']) ? $values['m']._x('M', 'month short').' ' : '';
+	$str .= isset($values['d']) ? $values['d']._x('D', 'day short').' ' : '';
 	$str .= isset($values['h']) ? $values['h']._x('h', 'hour short').' ' : '';
 	$str .= isset($values['mm']) ? $values['mm']._x('m', 'minute short').' ' : '';
 	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
