@@ -26,7 +26,7 @@ $configForm = new CForm('get');
 $configComboBox = new CComboBox('config', 'auditlogs.php');
 $configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configComboBox->addItem('auditlogs.php', _('Logs'));
-$configComboBox->addItem('auditacts.php', _('Actions'));
+$configComboBox->addItem('auditacts.php', _('Alerts'));
 $configForm->addItem($configComboBox);
 $auditWidget->addPageHeader(_('AUDIT LOGS'), $configForm);
 $auditWidget->addHeader(_('Logs'));
