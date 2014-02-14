@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-02 00:47+0200\n"
+"POT-Creation-Date: 2014-02-13 02:07+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -28,13 +28,13 @@ msgstr ""
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
 
-#: include/func.inc.php:459
+#: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] ""
 
-#: include/blocks.inc.php:1135
+#: include/blocks.inc.php:1136
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -123,7 +123,7 @@ msgstr ""
 msgid "(with warnings)"
 msgstr ""
 
-#: include/blocks.inc.php:1348
+#: include/blocks.inc.php:1349
 msgid "-"
 msgstr ""
 
@@ -233,23 +233,23 @@ msgstr ""
 msgid "Access denied!"
 msgstr ""
 
-#: include/func.inc.php:1889
+#: include/func.inc.php:1895
 msgid "Access denied."
 msgstr ""
 
-#: api/classes/CUser.php:836
+#: api/classes/CUser.php:1008
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr ""
 
-#: events.php:583 events.php:596 include/actions.inc.php:256
-#: include/blocks.inc.php:1015 include/blocks.inc.php:1321
+#: events.php:585 events.php:598 include/actions.inc.php:256
+#: include/blocks.inc.php:1015 include/blocks.inc.php:1322
 #: include/events.inc.php:195 include/events.inc.php:270
 #: include/views/configuration.action.edit.php:1013
 msgid "Ack"
 msgstr "인지"
 
-#: acknow.php:226 jsLoader.php:176 tr_status.php:707
+#: acknow.php:226 jsLoader.php:176 tr_status.php:710
 msgid "Acknowledge"
 msgstr "인지"
 
@@ -269,7 +269,7 @@ msgstr ""
 msgid "Acknowledge status"
 msgstr ""
 
-#: include/events.inc.php:180 tr_status.php:373 tr_status.php:718
+#: include/events.inc.php:180 tr_status.php:373 tr_status.php:721
 msgid "Acknowledged"
 msgstr "인지 완료"
 
@@ -358,8 +358,8 @@ msgstr ""
 msgid "Action updated"
 msgstr "액션을 갱신하였습니다"
 
-#: events.php:584 events.php:597 include/blocks.inc.php:1016
-#: include/blocks.inc.php:1322 include/events.inc.php:196
+#: events.php:586 events.php:599 include/blocks.inc.php:1016
+#: include/blocks.inc.php:1323 include/events.inc.php:196
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -400,7 +400,7 @@ msgstr ""
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
 #: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:201
+#: include/views/administration.users.edit.php:205
 #: include/views/common.macros.php:67
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:523
@@ -434,11 +434,11 @@ msgstr ""
 #: include/views/js/adm.regexprs.edit.js.php:249
 #: include/views/js/configuration.action.edit.js.php:287
 #: include/views/js/configuration.discovery.edit.js.php:110
-#: include/views/js/configuration.sysmaps.js.php:189
-#: include/views/js/configuration.sysmaps.js.php:402
+#: include/views/js/configuration.sysmaps.js.php:194
+#: include/views/js/configuration.sysmaps.js.php:407
 #: include/views/monitoring.history.php:100 jsLoader.php:177
 #: popup_bitem.php:166 popup_media.php:141 popup_period.php:130
-#: tr_logform.php:291 tr_status.php:762
+#: tr_logform.php:291 tr_status.php:765
 msgid "Add"
 msgstr "추가"
 
@@ -511,7 +511,7 @@ msgstr "관리"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/blocks.inc.php:1013 include/blocks.inc.php:1319
+#: include/blocks.inc.php:1013 include/blocks.inc.php:1320
 #: include/events.inc.php:194 include/events.inc.php:270
 #: include/events.inc.php:273 tr_status.php:371
 msgid "Age"
@@ -619,6 +619,7 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.screen.constructor.edit.php:409
 #: include/views/inventory.host.view.php:235
+#: include/views/js/configuration.sysmaps.js.php:120
 #: include/views/monitoring.overview.php:32
 msgid "Application"
 msgstr "애플리케이션"
@@ -663,9 +664,9 @@ msgstr ""
 msgid "Applications"
 msgstr "애플리케이션"
 
-#: include/views/js/configuration.sysmaps.js.php:198
-#: include/views/js/configuration.sysmaps.js.php:299
-#: include/views/js/configuration.sysmaps.js.php:412
+#: include/views/js/configuration.sysmaps.js.php:203
+#: include/views/js/configuration.sysmaps.js.php:304
+#: include/views/js/configuration.sysmaps.js.php:417
 msgid "Apply"
 msgstr ""
 
@@ -674,12 +675,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr ""
 
-#: include/func.inc.php:246
+#: include/func.inc.php:252
 msgid "Apr"
 msgstr ""
 
-#: include/forms.inc.php:1700 include/func.inc.php:132
-#: include/func.inc.php:263 jsLoader.php:112
+#: include/forms.inc.php:1698 include/func.inc.php:132
+#: include/func.inc.php:269 jsLoader.php:112
 msgid "April"
 msgstr ""
 
@@ -742,7 +743,7 @@ msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 
-#: include/forms.inc.php:1781
+#: include/forms.inc.php:1779
 msgid "At (hour:minute)"
 msgstr ""
 
@@ -780,12 +781,12 @@ msgstr ""
 msgid "Audit logs"
 msgstr ""
 
-#: include/func.inc.php:250
+#: include/func.inc.php:256
 msgid "Aug"
 msgstr ""
 
-#: include/forms.inc.php:1692 include/func.inc.php:136
-#: include/func.inc.php:267 jsLoader.php:116
+#: include/forms.inc.php:1690 include/func.inc.php:136
+#: include/func.inc.php:273 jsLoader.php:116
 msgid "August"
 msgstr ""
 
@@ -834,11 +835,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr ""
 
-#: include/views/administration.users.edit.php:149
+#: include/views/administration.users.edit.php:153
 msgid "Auto-login"
 msgstr ""
 
-#: include/views/administration.users.edit.php:150 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:154 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr ""
 
@@ -865,8 +866,8 @@ msgstr ""
 msgid "Automatic icon mapping"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:130
-#: include/views/js/configuration.sysmaps.js.php:255
+#: include/views/js/configuration.sysmaps.js.php:135
+#: include/views/js/configuration.sysmaps.js.php:260
 msgid "Automatic icon selection"
 msgstr ""
 
@@ -911,7 +912,7 @@ msgstr ""
 msgid "Axis side"
 msgstr ""
 
-#: include/func.inc.php:427
+#: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
 msgstr ""
@@ -968,8 +969,8 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:370
-#: include/views/js/configuration.sysmaps.js.php:448
+#: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:375
+#: include/views/js/configuration.sysmaps.js.php:453
 msgid "Bold line"
 msgstr "굵은 선"
 
@@ -980,7 +981,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:606
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:83
-#: include/views/js/configuration.sysmaps.js.php:245
+#: include/views/js/configuration.sysmaps.js.php:250
 msgid "Bottom"
 msgstr "아래쪽"
 
@@ -992,7 +993,7 @@ msgstr ""
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
-#: tr_status.php:849
+#: tr_status.php:852
 msgid "Bulk acknowledge"
 msgstr ""
 
@@ -1420,11 +1421,11 @@ msgstr "트리거를 추가할 수 없습니다"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:212
+#: users.php:219
 msgid "Cannot add user"
 msgstr "사용자를 추가할 수 없습니다"
 
-#: users.php:165
+#: users.php:166
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습니다."
 
@@ -1476,7 +1477,7 @@ msgstr ""
 msgid "Cannot clone trigger prototypes."
 msgstr ""
 
-#: scripts_exec.php:65
+#: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr ""
 
@@ -1544,7 +1545,7 @@ msgstr ""
 msgid "Cannot create screen."
 msgstr ""
 
-#: api/classes/CUser.php:1170
+#: api/classes/CUser.php:1348
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
@@ -1767,11 +1768,11 @@ msgstr "트리거를 삭제할 수 없습니다"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr ""
 
-#: users.php:241 users.php:301
+#: users.php:248 users.php:308
 msgid "Cannot delete user"
 msgstr "사용자를 삭제할 수 없습니다"
 
-#: api/classes/CUser.php:696
+#: api/classes/CUser.php:899
 msgid "Cannot delete user media."
 msgstr ""
 
@@ -2088,7 +2089,7 @@ msgstr[0] ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:725
+#: api/classes/CUser.php:688
 msgid "Cannot insert user media."
 msgstr ""
 
@@ -2096,11 +2097,11 @@ msgstr ""
 msgid "Cannot link template"
 msgstr ""
 
-#: api/classes/CUser.php:875
+#: api/classes/CUser.php:1049
 msgid "Cannot login."
 msgstr ""
 
-#: api/classes/CUser.php:800
+#: api/classes/CUser.php:971
 msgid "Cannot logout."
 msgstr ""
 
@@ -2157,7 +2158,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr ""
 
-#: api/classes/CUser.php:267
+#: api/classes/CUser.php:273
 msgid "Cannot rename guest user."
 msgstr ""
 
@@ -2203,7 +2204,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr ""
 
-#: users.php:269
+#: users.php:276
 msgid "Cannot unblock users"
 msgstr ""
 
@@ -2496,15 +2497,15 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:173 users.php:203
+#: profile.php:177 users.php:210
 msgid "Cannot update user"
 msgstr "사용자를 갱신할 수 없습니다"
 
-#: api/classes/CUser.php:717
+#: api/classes/CUser.php:768
 msgid "Cannot update user media."
 msgstr ""
 
-#: profile.php:113 users.php:162
+#: profile.php:114 users.php:163
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "사용자를 갱신할 수 없습니다. 암호가 일치하지 않습니다."
 
@@ -2529,11 +2530,11 @@ msgstr ""
 msgid "Case sensitive"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:785
+#: include/classes/items/CHelpItems.php:781
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:781
+#: include/classes/items/CHelpItems.php:777
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
@@ -2542,7 +2543,7 @@ msgid "Center"
 msgstr ""
 
 #: include/classes/screens/CScreenBase.php:258
-#: include/classes/screens/CScreenBuilder.php:419
+#: include/classes/screens/CScreenBuilder.php:417
 #: include/classes/screens/CScreenMap.php:61
 #: include/views/configuration.services.edit.php:52
 msgid "Change"
@@ -2741,9 +2742,9 @@ msgstr "복제"
 #: include/views/js/configuration.discovery.edit.js.php:537
 #: include/views/js/configuration.discovery.edit.js.php:601
 #: include/views/js/configuration.discovery.edit.js.php:618
-#: include/views/js/configuration.sysmaps.js.php:200
-#: include/views/js/configuration.sysmaps.js.php:301
-#: include/views/js/configuration.sysmaps.js.php:414 jsLoader.php:143
+#: include/views/js/configuration.sysmaps.js.php:205
+#: include/views/js/configuration.sysmaps.js.php:306
+#: include/views/js/configuration.sysmaps.js.php:419 jsLoader.php:143
 #: jsLoader.php:167 tr_testexpr.php:183
 msgid "Close"
 msgstr ""
@@ -2755,7 +2756,7 @@ msgstr ""
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
 #: include/views/configuration.graph.edit.php:232
-#: include/views/js/configuration.sysmaps.js.php:394 popup_bitem.php:43
+#: include/views/js/configuration.sysmaps.js.php:399 popup_bitem.php:43
 #: popup_bitem.php:160 popup_period.php:125
 msgid "Colour"
 msgstr "색"
@@ -2766,7 +2767,7 @@ msgstr "색"
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:378
+#: include/views/js/configuration.sysmaps.js.php:383
 msgid "Colour (OK)"
 msgstr ""
 
@@ -2848,7 +2849,7 @@ msgstr "조건"
 msgid "Configuration"
 msgstr "설정"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:847
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3027,7 +3028,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
 #: include/views/inventory.host.view.php:168
-#: include/views/js/configuration.sysmaps.js.php:357
+#: include/views/js/configuration.sysmaps.js.php:362
 msgid "Connect to"
 msgstr "접속 방법"
 
@@ -3091,7 +3092,7 @@ msgstr ""
 msgid "Contract number"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:165
+#: include/views/js/configuration.sysmaps.js.php:170
 msgid "Coordinates"
 msgstr ""
 
@@ -3106,7 +3107,7 @@ msgstr "복사"
 msgid "Copy selected to ..."
 msgstr "선택 항목 복사..."
 
-#: api/classes/CUser.php:920
+#: api/classes/CUser.php:1094
 #, c-format
 msgid "Correct login \"%s\"."
 msgstr ""
@@ -3393,7 +3394,7 @@ msgstr ""
 msgid "Czech (cs_CZ)"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1344
+#: include/classes/graphdraw/CLineGraphDraw.php:1346
 msgid "D"
 msgstr ""
 
@@ -3415,8 +3416,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "시나리오 이름"
 
-#: include/maps.inc.php:674 include/maps.inc.php:756 include/maps.inc.php:844
-#: include/maps.inc.php:934
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr ""
 
@@ -3428,7 +3429,7 @@ msgstr ""
 msgid "DM"
 msgstr ""
 
-#: events.php:502 events.php:511 hosts.php:771
+#: events.php:504 events.php:513 hosts.php:771
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -3453,7 +3454,7 @@ msgstr "DNS 이름"
 msgid "DOWN"
 msgstr ""
 
-#: include/forms.inc.php:1649 include/maintenances.inc.php:36
+#: include/forms.inc.php:1647 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:401
 #: include/reports.inc.php:409 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3479,8 +3480,8 @@ msgstr ""
 msgid "Dashboard filter"
 msgstr ""
 
-#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:372
-#: include/views/js/configuration.sysmaps.js.php:450
+#: include/graphs.inc.php:63 include/views/js/configuration.sysmaps.js.php:377
+#: include/views/js/configuration.sysmaps.js.php:455
 msgid "Dashed line"
 msgstr "파선"
 
@@ -3488,11 +3489,11 @@ msgstr "파선"
 msgid "Data"
 msgstr "데이터"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:883
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2484
+#: include/classes/graphdraw/CLineGraphDraw.php:2486
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -3519,7 +3520,7 @@ msgstr ""
 msgid "Database file"
 msgstr ""
 
-#: include/setup.inc.php:283 setup.php:38
+#: include/setup.inc.php:283
 msgid "Database host"
 msgstr ""
 
@@ -3555,7 +3556,7 @@ msgstr ""
 msgid "Database user"
 msgstr ""
 
-#: include/forms.inc.php:1716 include/forms.inc.php:1777 jsrpc.php:137
+#: include/forms.inc.php:1714 include/forms.inc.php:1775 jsrpc.php:137
 msgid "Date"
 msgstr ""
 
@@ -3575,12 +3576,12 @@ msgstr ""
 msgid "Date HW purchased"
 msgstr ""
 
-#: include/forms.inc.php:1718 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1716 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:293 tr_status.php:295
 msgid "Day"
 msgstr "일"
 
-#: include/forms.inc.php:1750
+#: include/forms.inc.php:1748
 msgid "Day of month"
 msgstr ""
 
@@ -3600,8 +3601,8 @@ msgstr ""
 msgid "Day of month is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1678 include/forms.inc.php:1721
-#: include/forms.inc.php:1746
+#: include/forms.inc.php:1676 include/forms.inc.php:1719
+#: include/forms.inc.php:1744
 msgid "Day of week"
 msgstr ""
 
@@ -3621,7 +3622,7 @@ msgstr ""
 msgid "Day of week is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1794 tr_status.php:293 tr_status.php:295
+#: include/forms.inc.php:1792 tr_status.php:293 tr_status.php:295
 msgid "Days"
 msgstr ""
 
@@ -3639,12 +3640,12 @@ msgstr ""
 msgid "Debug mode updated"
 msgstr ""
 
-#: include/func.inc.php:254
+#: include/func.inc.php:260
 msgid "Dec"
 msgstr ""
 
-#: include/forms.inc.php:1712 include/func.inc.php:140
-#: include/func.inc.php:271 jsLoader.php:120
+#: include/forms.inc.php:1710 include/func.inc.php:140
+#: include/func.inc.php:277 jsLoader.php:120
 msgid "December"
 msgstr ""
 
@@ -3659,8 +3660,8 @@ msgstr ""
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:97
 #: include/views/js/configuration.sysmaps.js.php:82
-#: include/views/js/configuration.sysmaps.js.php:136
-#: include/views/js/configuration.sysmaps.js.php:244
+#: include/views/js/configuration.sysmaps.js.php:141
+#: include/views/js/configuration.sysmaps.js.php:249
 #: include/views/monitoring.screen.php:88 jsLoader.php:142 popup_bitem.php:116
 #: popup_period.php:109 slides.php:224
 msgid "Default"
@@ -3822,7 +3823,7 @@ msgstr ""
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
 #: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:208
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3964,7 +3965,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr ""
 
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:376
 msgid "Delete selected user?"
 msgstr ""
 
@@ -4111,7 +4112,7 @@ msgstr "의존 대상"
 msgid "Deployment status"
 msgstr ""
 
-#: events.php:503 events.php:512 events.php:579 events.php:592
+#: events.php:505 events.php:514 events.php:581 events.php:594
 #: include/classes/screens/CScreenEvents.php:42
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
@@ -4125,7 +4126,7 @@ msgid "Description"
 msgstr "이름"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:816
-#: include/func.inc.php:2009
+#: include/func.inc.php:2015
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4316,7 +4317,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:170
+#: include/views/administration.users.edit.php:174
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4324,7 +4325,7 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:240
 #: include/views/configuration.host.prototype.edit.php:302
 #: include/views/configuration.item.massupdate.php:300
-#: include/views/js/configuration.sysmaps.js.php:153
+#: include/views/js/configuration.sysmaps.js.php:158
 #: include/views/monitoring.dashconf.php:41 popup_media.php:137
 #: tr_logform.php:371
 msgid "Disabled"
@@ -4384,7 +4385,7 @@ msgid "Discovery object"
 msgstr ""
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1275 include/forms.inc.php:1134
+#: include/blocks.inc.php:1276 include/forms.inc.php:1134
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4454,7 +4455,7 @@ msgstr "디스커버리 상태"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/func.inc.php:1785
+#: include/func.inc.php:1791
 msgid "Displaying"
 msgstr ""
 
@@ -4483,12 +4484,12 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
-#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:371
-#: include/views/js/configuration.sysmaps.js.php:449 jsLoader.php:145
+#: include/graphs.inc.php:61 include/views/js/configuration.sysmaps.js.php:376
+#: include/views/js/configuration.sysmaps.js.php:454 jsLoader.php:145
 msgid "Dot"
 msgstr "점선"
 
-#: include/blocks.inc.php:1277
+#: include/blocks.inc.php:1278
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr ""
@@ -4579,12 +4580,12 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:275
+#: api/classes/CUser.php:281
 #, c-format
 msgid "Duplicate user alias \"%s\"."
 msgstr ""
 
-#: events.php:582 events.php:595 include/events.inc.php:193
+#: events.php:584 events.php:597 include/events.inc.php:193
 #: include/events.inc.php:270 include/events.inc.php:273 tr_status.php:372
 msgid "Duration"
 msgstr "기간"
@@ -4601,12 +4602,12 @@ msgstr "네덜란드어 (nl_NL)"
 msgid "Dynamic item"
 msgstr ""
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgctxt "Exa short"
 msgid "E"
 msgstr ""
 
-#: include/func.inc.php:1976
+#: include/func.inc.php:1982
 msgid "ERROR"
 msgstr ""
 
@@ -4618,7 +4619,7 @@ msgstr "이벤트"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:200
 #: include/views/configuration.action.edit.php:385
 #: include/views/configuration.action.edit.php:398
 #: include/views/configuration.maintenance.edit.php:112
@@ -4628,8 +4629,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/js/adm.regexprs.edit.js.php:7
 #: include/views/js/configuration.discovery.edit.js.php:7
-#: include/views/js/configuration.sysmaps.js.php:424
-#: include/views/js/configuration.sysmaps.js.php:432
+#: include/views/js/configuration.sysmaps.js.php:429
+#: include/views/js/configuration.sysmaps.js.php:437
 #: include/views/monitoring.triggerComment.php:51 jsLoader.php:184
 msgid "Edit"
 msgstr "편집"
@@ -4646,7 +4647,7 @@ msgstr ""
 msgid "Element"
 msgstr "항목"
 
-#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:323
+#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:328
 msgid "Element name"
 msgstr "구성요소 이름"
 
@@ -4695,7 +4696,7 @@ msgstr ""
 #: api/classes/CTrigger.php:850 api/classes/CTrigger.php:914
 #: api/classes/CTrigger.php:1004 api/classes/CTriggerPrototype.php:605
 #: api/classes/CUserGroup.php:622 api/classes/CUserMacro.php:356
-#: api/classes/CUserMacro.php:508 api/classes/CUser.php:523
+#: api/classes/CUserMacro.php:508 api/classes/CUser.php:530
 msgid "Empty input parameter."
 msgstr ""
 
@@ -4862,7 +4863,7 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:166
+#: include/views/administration.users.edit.php:170
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:61
@@ -4967,15 +4968,15 @@ msgstr "이벤트"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1661
+#: include/forms.inc.php:1659
 msgid "Every day(s)"
 msgstr ""
 
-#: include/forms.inc.php:1668
+#: include/forms.inc.php:1666
 msgid "Every week(s)"
 msgstr ""
 
-#: include/func.inc.php:675
+#: include/func.inc.php:681
 msgid "Exa"
 msgstr ""
 
@@ -5035,7 +5036,7 @@ msgstr ""
 msgid "Export selected"
 msgstr ""
 
-#: events.php:265
+#: events.php:264
 msgid "Export to CSV"
 msgstr ""
 
@@ -5053,8 +5054,8 @@ msgstr ""
 msgid "Expression"
 msgstr "조건식"
 
-#: include/forms.inc.php:1485 include/forms.inc.php:1490
-#: include/forms.inc.php:1506
+#: include/forms.inc.php:1483 include/forms.inc.php:1488
+#: include/forms.inc.php:1504
 msgid "Expression Syntax Error."
 msgstr ""
 
@@ -5111,7 +5112,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "실패"
 
-#: include/actions.inc.php:1075 include/blocks.inc.php:1187
+#: include/actions.inc.php:1075 include/blocks.inc.php:1188
 msgid "Failed"
 msgstr ""
 
@@ -5147,12 +5148,12 @@ msgstr ""
 msgid "Favourites"
 msgstr ""
 
-#: include/func.inc.php:244
+#: include/func.inc.php:250
 msgid "Feb"
 msgstr ""
 
-#: include/forms.inc.php:1690 include/func.inc.php:130
-#: include/func.inc.php:261 jsLoader.php:110
+#: include/forms.inc.php:1688 include/func.inc.php:130
+#: include/func.inc.php:267 jsLoader.php:110
 msgid "February"
 msgstr ""
 
@@ -5240,7 +5241,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "면"
 
-#: events.php:355 hosts.php:776 include/classes/class.cwidget.php:127
+#: events.php:357 hosts.php:776 include/classes/class.cwidget.php:127
 #: include/forms.inc.php:630
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -5286,11 +5287,11 @@ msgstr "종료"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1728 include/maintenances.inc.php:118
+#: include/forms.inc.php:1726 include/maintenances.inc.php:118
 msgid "First"
 msgstr ""
 
-#: include/func.inc.php:1730
+#: include/func.inc.php:1736
 msgctxt "page navigation"
 msgid "First"
 msgstr ""
@@ -5309,7 +5310,7 @@ msgstr "고정"
 msgid "Flexible intervals"
 msgstr ""
 
-#: profile.php:116 users.php:169
+#: profile.php:117 users.php:170
 msgid "For guest, password must be empty"
 msgstr ""
 
@@ -5317,7 +5318,7 @@ msgstr ""
 msgid "Formula"
 msgstr ""
 
-#: include/forms.inc.php:1731 include/maintenances.inc.php:121
+#: include/forms.inc.php:1729 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr ""
 
@@ -5325,12 +5326,12 @@ msgstr ""
 msgid "French (fr_FR)"
 msgstr "프랑스어 (fr_FR)"
 
-#: include/func.inc.php:224
+#: include/func.inc.php:230
 msgid "Fri"
 msgstr ""
 
-#: include/forms.inc.php:1675 include/forms.inc.php:1743
-#: include/func.inc.php:152 include/func.inc.php:236
+#: include/forms.inc.php:1673 include/forms.inc.php:1741
+#: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "금"
 
@@ -5338,7 +5339,7 @@ msgstr "금"
 #: include/views/configuration.action.edit.php:446
 #: include/views/configuration.services.edit.php:226
 #: include/views/configuration.services.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:115
+#: include/views/js/configuration.sysmaps.js.php:339 popup_period.php:115
 #: report2.php:376 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
 msgid "From"
@@ -5355,7 +5356,7 @@ msgstr ""
 msgid "Frontend access updated"
 msgstr ""
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:219
 msgid "Frontend messaging"
 msgstr ""
 
@@ -5373,7 +5374,7 @@ msgstr ""
 msgid "Function"
 msgstr "기능"
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgctxt "Giga short"
 msgid "G"
 msgstr ""
@@ -5435,11 +5436,10 @@ msgstr "서포트"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:551
-#: include/classes/items/CHelpItems.php:775
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr ""
 
-#: include/func.inc.php:672
+#: include/func.inc.php:678
 msgid "Giga"
 msgstr ""
 
@@ -5481,7 +5481,7 @@ msgstr ""
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:67
 #: include/views/configuration.triggers.list.php:292 templates.php:653
-#: tr_status.php:851
+#: tr_status.php:854
 msgid "Go"
 msgstr ""
 
@@ -5489,7 +5489,7 @@ msgstr ""
 msgid "Go to"
 msgstr ""
 
-#: include/func.inc.php:1907
+#: include/func.inc.php:1913
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5622,7 +5622,7 @@ msgstr ""
 msgid "Graph prototypes of"
 msgstr ""
 
-#: include/views/js/configuration.graph.edit.js.php:28
+#: include/views/js/configuration.graph.edit.js.php:31
 msgid "Graph sum"
 msgstr ""
 
@@ -5781,22 +5781,22 @@ msgstr ""
 msgid "H.i"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1350
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
+#: include/classes/graphdraw/CLineGraphDraw.php:1352
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/page_header.php:450
 msgid "H:i"
 msgstr ""
 
 #: include/blocks.inc.php:461 include/blocks.inc.php:803
-#: include/blocks.inc.php:875 include/blocks.inc.php:1132
-#: include/blocks.inc.php:1233 include/blocks.inc.php:1293
+#: include/blocks.inc.php:875 include/blocks.inc.php:1133
+#: include/blocks.inc.php:1234 include/blocks.inc.php:1294
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:552
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
 msgid "H:i:s"
 msgstr ""
 
-#: events.php:268
+#: events.php:267
 msgid "HISTORY OF EVENTS"
 msgstr ""
 
@@ -5954,11 +5954,11 @@ msgstr "가로"
 msgid "Horizontal align"
 msgstr "가로 위치"
 
-#: events.php:288 events.php:527 events.php:578 events.php:591 httpmon.php:73
+#: events.php:288 events.php:529 events.php:580 events.php:593 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:687 include/blocks.inc.php:734
 #: include/blocks.inc.php:999 include/blocks.inc.php:1010
-#: include/blocks.inc.php:1317 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:1318 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -6054,7 +6054,7 @@ msgstr[0] ""
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:277 include/blocks.inc.php:471
-#: include/blocks.inc.php:1185 include/forms.inc.php:520
+#: include/blocks.inc.php:1186 include/forms.inc.php:520
 #: include/maps.inc.php:25 include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
@@ -6336,7 +6336,7 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: include/forms.inc.php:1796
+#: include/forms.inc.php:1794
 msgid "Hours"
 msgstr ""
 
@@ -6368,7 +6368,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:501 events.php:510 hosts.php:772
+#: events.php:503 events.php:512 hosts.php:772
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6499,19 +6499,19 @@ msgstr "아이템"
 msgid "Icon"
 msgstr "아이콘"
 
-#: include/views/js/configuration.sysmaps.js.php:264
+#: include/views/js/configuration.sysmaps.js.php:269
 msgid "Icon (default)"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:291
+#: include/views/js/configuration.sysmaps.js.php:296
 msgid "Icon (disabled)"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:282
+#: include/views/js/configuration.sysmaps.js.php:287
 msgid "Icon (maintenance)"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:273
+#: include/views/js/configuration.sysmaps.js.php:278
 msgid "Icon (problem)"
 msgstr ""
 
@@ -6610,7 +6610,7 @@ msgstr ""
 msgid "Iconmap is not enabled"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:125
+#: include/views/js/configuration.sysmaps.js.php:130
 msgid "Icons"
 msgstr ""
 
@@ -6618,12 +6618,12 @@ msgstr ""
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:1897 include/func.inc.php:1917
+#: include/func.inc.php:1903 include/func.inc.php:1923
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:956
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7293,7 +7293,7 @@ msgstr ""
 msgid "Incorrect status."
 msgstr ""
 
-#: api/classes/CUser.php:319
+#: api/classes/CUser.php:325
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
 msgstr ""
@@ -7350,7 +7350,7 @@ msgstr ""
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr ""
 
-#: include/func.inc.php:1130
+#: include/func.inc.php:1136
 msgid "Incorrect type of asort_by_key."
 msgstr ""
 
@@ -7429,7 +7429,7 @@ msgstr ""
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/blocks.inc.php:1014 include/blocks.inc.php:1320
+#: include/blocks.inc.php:1014 include/blocks.inc.php:1321
 #: include/classes/class.cformlist.php:72 tr_status.php:369
 msgid "Info"
 msgstr ""
@@ -7443,7 +7443,7 @@ msgstr "정보"
 msgid "Insert"
 msgstr "삽입"
 
-#: include/forms.inc.php:1498 jsLoader.php:192
+#: include/forms.inc.php:1496 jsLoader.php:192
 msgid "Insert macro"
 msgstr ""
 
@@ -7594,6 +7594,8 @@ msgstr ""
 #: api/classes/CScript.php:442 api/classes/CService.php:206
 #: api/classes/CService.php:382 api/classes/CService.php:1472
 #: api/classes/CUserMacro.php:301 api/classes/CUserMacro.php:434
+#: api/classes/CUser.php:623 api/classes/CUser.php:643
+#: api/classes/CUser.php:801 api/classes/CUser.php:846
 #: api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -7661,7 +7663,7 @@ msgid "Is online?"
 msgstr "로그인 상태"
 
 #: include/blocks.inc.php:1001 include/blocks.inc.php:1011
-#: include/blocks.inc.php:1318
+#: include/blocks.inc.php:1319
 msgid "Issue"
 msgstr ""
 
@@ -7673,7 +7675,7 @@ msgstr ""
 msgid "It is not possible to logout from HTTP authentication."
 msgstr ""
 
-#: api/classes/CUserMedia.php:183 api/classes/CUser.php:151
+#: api/classes/CUserMedia.php:190 api/classes/CUser.php:152
 msgid "It is not possible to search by user password."
 msgstr ""
 
@@ -7948,12 +7950,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "JabberID"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:249
 msgid "Jan"
 msgstr ""
 
-#: include/forms.inc.php:1685 include/func.inc.php:129
-#: include/func.inc.php:260 jsLoader.php:109
+#: include/forms.inc.php:1683 include/func.inc.php:129
+#: include/func.inc.php:266 jsLoader.php:109
 msgid "January"
 msgstr ""
 
@@ -7961,25 +7963,25 @@ msgstr ""
 msgid "Japanese (ja_JP)"
 msgstr "일본어 (ja_JP)"
 
-#: include/func.inc.php:249
+#: include/func.inc.php:255
 msgid "Jul"
 msgstr ""
 
-#: include/forms.inc.php:1687 include/func.inc.php:135
-#: include/func.inc.php:266 jsLoader.php:115
+#: include/forms.inc.php:1685 include/func.inc.php:135
+#: include/func.inc.php:272 jsLoader.php:115
 msgid "July"
 msgstr ""
 
-#: include/func.inc.php:248
+#: include/func.inc.php:254
 msgid "Jun"
 msgstr ""
 
-#: include/forms.inc.php:1710 include/func.inc.php:134
-#: include/func.inc.php:265 jsLoader.php:114
+#: include/forms.inc.php:1708 include/func.inc.php:134
+#: include/func.inc.php:271 jsLoader.php:114
 msgid "June"
 msgstr ""
 
-#: include/func.inc.php:434 include/func.inc.php:670
+#: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
 msgid "K"
 msgstr ""
@@ -8012,7 +8014,7 @@ msgstr ""
 msgid "Keyword"
 msgstr ""
 
-#: include/func.inc.php:670
+#: include/func.inc.php:676
 msgid "Kilo"
 msgstr ""
 
@@ -8062,13 +8064,13 @@ msgstr ""
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
 #: include/views/configuration.action.edit.php:898
 #: include/views/js/configuration.sysmaps.js.php:70
-#: include/views/js/configuration.sysmaps.js.php:231
-#: include/views/js/configuration.sysmaps.js.php:349
+#: include/views/js/configuration.sysmaps.js.php:236
+#: include/views/js/configuration.sysmaps.js.php:354
 msgid "Label"
 msgstr "라벨"
 
 #: include/views/js/configuration.sysmaps.js.php:78
-#: include/views/js/configuration.sysmaps.js.php:240
+#: include/views/js/configuration.sysmaps.js.php:245
 msgid "Label location"
 msgstr "라벨 위치"
 
@@ -8076,11 +8078,11 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/forms.inc.php:1732 include/maintenances.inc.php:122
+#: include/forms.inc.php:1730 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "최근"
 
-#: include/func.inc.php:1770
+#: include/func.inc.php:1776
 msgctxt "page navigation"
 msgid "Last"
 msgstr ""
@@ -8182,9 +8184,9 @@ msgstr "라트비아어 (lv_LV)"
 #: include/views/configuration.screen.constructor.edit.php:559
 #: include/views/configuration.screen.constructor.edit.php:588
 #: include/views/configuration.sysmap.edit.php:115
-#: include/views/js/configuration.graph.edit.js.php:71
+#: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
-#: include/views/js/configuration.sysmaps.js.php:246
+#: include/views/js/configuration.sysmaps.js.php:251
 #: include/views/monitoring.overview.php:86 popup_bitem.php:153
 msgid "Left"
 msgstr "왼쪽"
@@ -8210,8 +8212,8 @@ msgstr ""
 msgid "Length of last (most recent) T value in characters is NOT N"
 msgstr ""
 
-#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:369
-#: include/views/js/configuration.sysmaps.js.php:447
+#: include/graphs.inc.php:55 include/views/js/configuration.sysmaps.js.php:374
+#: include/views/js/configuration.sysmaps.js.php:452
 msgid "Line"
 msgstr "선"
 
@@ -8219,9 +8221,9 @@ msgstr "선"
 msgid "Link"
 msgstr "연결"
 
-#: include/views/js/configuration.sysmaps.js.php:324
-#: include/views/js/configuration.sysmaps.js.php:336
-#: include/views/js/configuration.sysmaps.js.php:388
+#: include/views/js/configuration.sysmaps.js.php:329
+#: include/views/js/configuration.sysmaps.js.php:341
+#: include/views/js/configuration.sysmaps.js.php:393
 msgid "Link indicators"
 msgstr ""
 
@@ -8279,11 +8281,11 @@ msgstr ""
 msgid "Linked to"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:330
+#: include/views/js/configuration.sysmaps.js.php:335
 msgid "Links between the selected elements"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:319
+#: include/views/js/configuration.sysmaps.js.php:324
 msgid "Links for the selected element"
 msgstr ""
 
@@ -8369,7 +8371,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: auditlogs.php:142 include/func.inc.php:1903 include/func.inc.php:1920
+#: auditlogs.php:142 include/func.inc.php:1909 include/func.inc.php:1926
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8381,12 +8383,12 @@ msgstr "로그인"
 msgid "Login as Guest"
 msgstr ""
 
-#: api/classes/CUser.php:912
+#: api/classes/CUser.php:1086
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:880
+#: api/classes/CUser.php:1054
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8395,8 +8397,8 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: api/classes/CUser.php:765 api/classes/CUser.php:783
-#: api/classes/CUser.php:830
+#: api/classes/CUser.php:934 api/classes/CUser.php:953
+#: api/classes/CUser.php:1002
 msgid "Login name or password is incorrect."
 msgstr ""
 
@@ -8423,7 +8425,7 @@ msgstr ""
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr ""
 
-#: include/func.inc.php:430 include/func.inc.php:671
+#: include/func.inc.php:436 include/func.inc.php:677
 msgctxt "Mega short"
 msgid "M"
 msgstr ""
@@ -8450,7 +8452,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:748
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -8523,10 +8525,10 @@ msgstr ""
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:48 include/maps.inc.php:833 include/maps.inc.php:923
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
-#: include/views/js/configuration.sysmaps.js.php:148
+#: include/views/js/configuration.sysmaps.js.php:153
 msgid "Maintenance"
 msgstr ""
 
@@ -8555,7 +8557,7 @@ msgstr ""
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1791
+#: include/forms.inc.php:1789
 msgid "Maintenance period length"
 msgstr ""
 
@@ -8600,7 +8602,7 @@ msgstr ""
 #: include/audit.inc.php:40 include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
-#: include/views/js/configuration.sysmaps.js.php:115 jsLoader.php:138
+#: include/views/js/configuration.sysmaps.js.php:113 jsLoader.php:138
 #: map.php:25
 msgid "Map"
 msgstr "맵"
@@ -8663,12 +8665,12 @@ msgstr ""
 msgid "Maps"
 msgstr "맵"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:251
 msgid "Mar"
 msgstr ""
 
-#: include/forms.inc.php:1695 include/func.inc.php:131
-#: include/func.inc.php:262 jsLoader.php:111
+#: include/forms.inc.php:1693 include/func.inc.php:131
+#: include/func.inc.php:268 jsLoader.php:111
 msgid "March"
 msgstr ""
 
@@ -8694,7 +8696,7 @@ msgstr ""
 msgid "Mass update"
 msgstr "일괄갱신"
 
-#: include/views/js/configuration.sysmaps.js.php:214
+#: include/views/js/configuration.sysmaps.js.php:219
 msgid "Mass update elements"
 msgstr ""
 
@@ -8728,7 +8730,7 @@ msgid "Max count of events per trigger to show"
 msgstr ""
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:2011
+#: include/func.inc.php:2017
 msgid "Maximize"
 msgstr ""
 
@@ -8738,7 +8740,7 @@ msgid "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum DNS name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: api/classes/CUser.php:283
+#: api/classes/CUser.php:289
 #, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8793,18 +8795,18 @@ msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d cha
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: include/forms.inc.php:1705 include/func.inc.php:133
-#: include/func.inc.php:264 jsLoader.php:113
+#: include/forms.inc.php:1703 include/func.inc.php:133
+#: include/func.inc.php:270 jsLoader.php:113
 msgid "May"
 msgstr ""
 
-#: include/func.inc.php:247
+#: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
 msgstr ""
 
-#: include/views/administration.users.edit.php:200
-#: include/views/administration.users.edit.php:328 popup_media.php:27
+#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:332 popup_media.php:27
 msgid "Media"
 msgstr "연락 방법"
 
@@ -8850,7 +8852,7 @@ msgstr "연락 방법"
 msgid "Media types used by action \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:671
+#: include/func.inc.php:677
 msgid "Mega"
 msgstr ""
 
@@ -8894,11 +8896,11 @@ msgstr ""
 msgid "Message text limit"
 msgstr ""
 
-#: include/views/administration.users.edit.php:221
+#: include/views/administration.users.edit.php:225
 msgid "Message timeout"
 msgstr ""
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:220
 msgid "Message timeout (seconds)"
 msgstr ""
 
@@ -8906,7 +8908,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: include/views/administration.users.edit.php:357
+#: include/views/administration.users.edit.php:361
 msgid "Messaging"
 msgstr ""
 
@@ -8920,7 +8922,7 @@ msgid "Middle"
 msgstr "가운데"
 
 #: include/classes/class.cwidget.php:121 include/classes/class.cwidget.php:124
-#: include/func.inc.php:2011
+#: include/func.inc.php:2017
 msgid "Minimize"
 msgstr ""
 
@@ -8984,7 +8986,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1798
+#: include/forms.inc.php:1796
 msgid "Minutes"
 msgstr ""
 
@@ -9052,12 +9054,12 @@ msgstr "모드"
 msgid "Model"
 msgstr ""
 
-#: include/func.inc.php:220
+#: include/func.inc.php:226
 msgid "Mon"
 msgstr ""
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1739
-#: include/func.inc.php:148 include/func.inc.php:232
+#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "월"
 
@@ -9094,11 +9096,11 @@ msgstr ""
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1714 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1712 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "월"
 
-#: include/forms.inc.php:1651 include/maintenances.inc.php:40
+#: include/forms.inc.php:1649 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9217,7 +9219,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:110
 #: include/views/configuration.triggers.massupdate.php:88
 #: include/views/inventory.host.list.php:79
-#: include/views/js/configuration.sysmaps.js.php:181 items.php:44
+#: include/views/js/configuration.sysmaps.js.php:186 items.php:44
 #: latest.php:316 maintenance.php:44 maintenance.php:200 maintenance.php:223
 #: popup_httpstep.php:36 popup.php:557 popup.php:616 popup.php:678
 #: popup.php:701 popup.php:815 popup.php:925 popup.php:934 popup.php:1018
@@ -9274,7 +9276,7 @@ msgstr ""
 msgid "Network maps"
 msgstr "네트워크 맵"
 
-#: httpmon.php:155 include/func.inc.php:214
+#: httpmon.php:155 include/func.inc.php:220
 msgid "Never"
 msgstr "Never"
 
@@ -9338,13 +9340,13 @@ msgstr "새 서비스 시간"
 msgid "Next"
 msgstr "다음"
 
-#: include/func.inc.php:1763
+#: include/func.inc.php:1769
 msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
-#: events.php:762 include/events.inc.php:353 include/events.inc.php:371
-#: include/func.inc.php:2230 include/triggers.inc.php:1648
+#: events.php:764 include/events.inc.php:353 include/events.inc.php:371
+#: include/func.inc.php:2236 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9529,11 +9531,11 @@ msgstr ""
 msgid "No errors found."
 msgstr ""
 
-#: include/blocks.inc.php:1088 include/blocks.inc.php:1339 tr_status.php:728
+#: include/blocks.inc.php:1088 include/blocks.inc.php:1340 tr_status.php:731
 msgid "No events"
 msgstr ""
 
-#: events.php:369 include/blocks.inc.php:1007
+#: events.php:371 include/blocks.inc.php:1007
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:189
 msgid "No events found."
 msgstr ""
@@ -9735,7 +9737,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:162
+#: include/views/administration.users.edit.php:166
 msgid "No media found."
 msgstr ""
 
@@ -9797,7 +9799,7 @@ msgstr ""
 msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUser.php:844 api/classes/CUser.php:969
+#: api/classes/CUser.php:1016 api/classes/CUser.php:1144
 msgid "No permissions for system access."
 msgstr ""
 
@@ -9840,8 +9842,10 @@ msgstr ""
 #: api/classes/CTrigger.php:933 api/classes/CTrigger.php:954
 #: api/classes/CTrigger.php:1823 api/classes/CTriggerPrototype.php:519
 #: api/classes/CTriggerPrototype.php:622 api/classes/CUserMacro.php:551
-#: api/classes/CUserMacro.php:660 api/classes/CUser.php:1137
-#: include/func.inc.php:1877
+#: api/classes/CUserMacro.php:660 api/classes/CUser.php:630
+#: api/classes/CUser.php:809 api/classes/CUser.php:829
+#: api/classes/CUser.php:888 api/classes/CUser.php:1313
+#: include/func.inc.php:1883
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -9877,10 +9881,6 @@ msgstr ""
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
-msgstr ""
-
-#: include/classes/screens/CScreenBuilder.php:293
-msgid "No rows in screen."
 msgstr ""
 
 #: api/classes/CScreenItem.php:518
@@ -9981,16 +9981,16 @@ msgstr ""
 msgid "No values found."
 msgstr ""
 
-#: httpmon.php:84 include/blocks.inc.php:1182
+#: httpmon.php:84 include/blocks.inc.php:1183
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr ""
 
-#: events.php:577 events.php:590 hosts.php:803 httpmon.php:86
+#: events.php:579 events.php:592 hosts.php:803 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:276 include/blocks.inc.php:470
-#: include/blocks.inc.php:1009 include/blocks.inc.php:1184
-#: include/blocks.inc.php:1274 include/blocks.inc.php:1316
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1185
+#: include/blocks.inc.php:1275 include/blocks.inc.php:1317
 #: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
 #: include/triggers.inc.php:1639
 #: include/views/administration.general.iconmap.list.php:24
@@ -10080,7 +10080,7 @@ msgstr ""
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:341
+#: api/classes/CUser.php:347
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
@@ -10138,12 +10138,12 @@ msgstr "통지 보고서"
 msgid "Notifications"
 msgstr "통지"
 
-#: include/func.inc.php:253
+#: include/func.inc.php:259
 msgid "Nov"
 msgstr ""
 
-#: include/forms.inc.php:1707 include/func.inc.php:139
-#: include/func.inc.php:270 jsLoader.php:119
+#: include/forms.inc.php:1705 include/func.inc.php:139
+#: include/func.inc.php:276 jsLoader.php:119
 msgid "November"
 msgstr ""
 
@@ -10169,19 +10169,19 @@ msgstr ""
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "아이템 수(감시/미감시/취득불가)"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of items in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:839
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of monitored hosts"
 msgstr ""
 
@@ -10246,11 +10246,11 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of triggers in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of unsupported items in Zabbix database."
 msgstr ""
 
@@ -10263,31 +10263,31 @@ msgstr "사용자 수 (온라인)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:791
 msgid "Number of values stored in table HISTORY."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:795
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:799
 msgid "Number of values stored in table HISTORY_STR."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:803
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:855
 msgid "Number of values stored in table TRENDS."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:859
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
@@ -10319,8 +10319,8 @@ msgstr ""
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:147 httpdetails.php:232
 #: httpmon.php:149 include/classes/tree/CServiceTree.php:45
-#: include/maps.inc.php:682 include/maps.inc.php:764 include/maps.inc.php:854
-#: include/maps.inc.php:944 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:166
 #: include/views/monitoring.overview.php:41
@@ -10370,7 +10370,7 @@ msgstr ""
 msgid "OVERVIEW"
 msgstr "개요"
 
-#: include/func.inc.php:252
+#: include/func.inc.php:258
 msgid "Oct"
 msgstr ""
 
@@ -10378,8 +10378,8 @@ msgstr ""
 msgid "Octal"
 msgstr ""
 
-#: include/forms.inc.php:1702 include/func.inc.php:138
-#: include/func.inc.php:269 jsLoader.php:118
+#: include/forms.inc.php:1700 include/func.inc.php:138
+#: include/func.inc.php:275 jsLoader.php:118
 msgid "October"
 msgstr ""
 
@@ -10388,7 +10388,7 @@ msgstr ""
 msgid "Off"
 msgstr "OFF"
 
-#: include/actions.inc.php:1072 include/blocks.inc.php:1186
+#: include/actions.inc.php:1072 include/blocks.inc.php:1187
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:402
 #: report3.php:83
@@ -10404,7 +10404,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr ""
 
-#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:223
 msgid "Once"
 msgstr ""
 
@@ -10412,7 +10412,7 @@ msgstr ""
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1648 include/maintenances.inc.php:34
+#: include/forms.inc.php:1646 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr ""
 
@@ -10463,15 +10463,15 @@ msgstr ""
 msgid "Only Super Admins can update icon maps."
 msgstr ""
 
-#: api/classes/CUser.php:594
+#: api/classes/CUser.php:619
 msgid "Only Zabbix Admins can add user media."
 msgstr ""
 
-#: api/classes/CUser.php:662
+#: api/classes/CUser.php:797
 msgid "Only Zabbix Admins can change user media."
 msgstr ""
 
-#: api/classes/CUser.php:632
+#: api/classes/CUser.php:878
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
@@ -10677,7 +10677,7 @@ msgstr "개요"
 msgid "Overview by proxy"
 msgstr ""
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgctxt "Peta short"
 msgid "P"
 msgstr ""
@@ -10839,7 +10839,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:666 include/triggers.inc.php:167
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr ""
@@ -10934,7 +10934,7 @@ msgstr "암호 확인"
 msgid "Password required for media type."
 msgstr ""
 
-#: profile.php:119 users.php:172
+#: profile.php:120 users.php:173
 msgid "Password should not be empty"
 msgstr ""
 
@@ -10967,7 +10967,7 @@ msgstr ""
 msgid "Period"
 msgstr "기간"
 
-#: include/forms.inc.php:1653
+#: include/forms.inc.php:1651
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr ""
@@ -10978,11 +10978,11 @@ msgid "Periods"
 msgstr ""
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:354
+#: include/views/administration.users.edit.php:358
 msgid "Permissions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:352
+#: include/views/administration.users.edit.php:356
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
@@ -10990,7 +10990,7 @@ msgstr ""
 msgid "Persian (fa_IR)"
 msgstr ""
 
-#: include/func.inc.php:674
+#: include/func.inc.php:680
 msgid "Peta"
 msgstr ""
 
@@ -11006,12 +11006,12 @@ msgstr ""
 msgid "Plain text"
 msgstr "일반 텍스트"
 
-#: include/views/administration.users.edit.php:234
-#: include/views/administration.users.edit.php:271
+#: include/views/administration.users.edit.php:238
+#: include/views/administration.users.edit.php:275
 msgid "Play"
 msgstr ""
 
-#: include/views/administration.users.edit.php:222
+#: include/views/administration.users.edit.php:226
 msgid "Play sound"
 msgstr ""
 
@@ -11094,7 +11094,7 @@ msgstr "미리보기"
 msgid "Previous"
 msgstr "이전"
 
-#: include/func.inc.php:1736
+#: include/func.inc.php:1742
 msgctxt "page navigation"
 msgid "Previous"
 msgstr ""
@@ -11170,12 +11170,12 @@ msgstr ""
 msgid "Privilege level"
 msgstr ""
 
-#: api/classes/CUser.php:757
+#: api/classes/CUser.php:925
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:720 include/maps.inc.php:803 include/maps.inc.php:894
-#: include/views/js/configuration.sysmaps.js.php:141 tr_status.php:280
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
+#: include/views/js/configuration.sysmaps.js.php:146 tr_status.php:280
 msgid "Problem"
 msgstr ""
 
@@ -11200,8 +11200,8 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:714 include/maps.inc.php:797
-#: include/maps.inc.php:888 report2.php:401 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:401 report3.php:83
 msgid "Problems"
 msgstr "장애"
 
@@ -11337,7 +11337,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "수신처"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:235
 msgid "Recovery"
 msgstr ""
 
@@ -11350,7 +11350,7 @@ msgstr ""
 msgid "Recovery subject"
 msgstr ""
 
-#: include/views/administration.users.edit.php:151 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:155 profile.php:53 users.php:64
 msgid "Refresh (in seconds)"
 msgstr "새로 고침(초)"
 
@@ -11461,16 +11461,16 @@ msgstr "원격 명령"
 #: include/views/js/configuration.action.edit.js.php:60
 #: include/views/js/configuration.action.edit.js.php:74
 #: include/views/js/configuration.discovery.edit.js.php:11
-#: include/views/js/configuration.graph.edit.js.php:89
+#: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.edit.js.php:29
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:74
 #: include/views/js/configuration.slideconf.edit.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:199
-#: include/views/js/configuration.sysmaps.js.php:300
-#: include/views/js/configuration.sysmaps.js.php:413
-#: include/views/js/configuration.sysmaps.js.php:458
-#: include/views/js/configuration.sysmaps.js.php:467 jsLoader.php:206
+#: include/views/js/configuration.sysmaps.js.php:204
+#: include/views/js/configuration.sysmaps.js.php:305
+#: include/views/js/configuration.sysmaps.js.php:418
+#: include/views/js/configuration.sysmaps.js.php:463
+#: include/views/js/configuration.sysmaps.js.php:472 jsLoader.php:206
 msgid "Remove"
 msgstr "삭제"
 
@@ -11572,7 +11572,7 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:851
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
@@ -11588,7 +11588,7 @@ msgstr ""
 msgid "Required string"
 msgstr ""
 
-#: events.php:356 hosts.php:781 include/forms.inc.php:635
+#: events.php:358 hosts.php:781 include/forms.inc.php:635
 #: include/html.inc.php:203 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:456
 #: include/views/administration.auditacts.list.php:51
@@ -11655,7 +11655,7 @@ msgstr ""
 msgid "Result is TRUE"
 msgstr ""
 
-#: include/views/general.script.execute.php:30
+#: include/views/general.script.execute.php:28
 #, c-format
 msgid "Result of \"%s\""
 msgstr ""
@@ -11692,7 +11692,7 @@ msgstr "재실행"
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:811
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr ""
 
@@ -11706,7 +11706,7 @@ msgstr ""
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:827
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr ""
 
@@ -11717,9 +11717,9 @@ msgstr ""
 #: include/reports.inc.php:103
 #: include/views/configuration.screen.constructor.edit.php:592
 #: include/views/configuration.sysmap.edit.php:115
-#: include/views/js/configuration.graph.edit.js.php:72
+#: include/views/js/configuration.graph.edit.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:85
-#: include/views/js/configuration.sysmaps.js.php:247 popup_bitem.php:154
+#: include/views/js/configuration.sysmaps.js.php:252 popup_bitem.php:154
 msgid "Right"
 msgstr "오른쪽"
 
@@ -11736,7 +11736,7 @@ msgstr "행 합치기"
 msgid "Rows"
 msgstr "행"
 
-#: include/views/administration.users.edit.php:152 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:156 profile.php:54 users.php:65
 msgid "Rows per page"
 msgstr ""
 
@@ -11959,12 +11959,12 @@ msgstr "ZABBIX 서버 상태"
 msgid "Safari"
 msgstr ""
 
-#: include/func.inc.php:225
+#: include/func.inc.php:231
 msgid "Sat"
 msgstr ""
 
-#: include/forms.inc.php:1676 include/forms.inc.php:1744
-#: include/func.inc.php:153 include/func.inc.php:237
+#: include/forms.inc.php:1674 include/forms.inc.php:1742
+#: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "토"
 
@@ -11990,9 +11990,9 @@ msgstr "토"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:365
 #: include/views/administration.users.edit.php:369
-#: include/views/administration.users.edit.php:379
+#: include/views/administration.users.edit.php:373
+#: include/views/administration.users.edit.php:383
 #: include/views/configuration.action.edit.php:1053
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -12201,7 +12201,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:208 scripts_exec.php:26
+#: jsLoader.php:208 scripts_exec.php:24
 msgid "Scripts"
 msgstr ""
 
@@ -12222,7 +12222,7 @@ msgstr ""
 msgid "Search/Filter elements limit"
 msgstr ""
 
-#: include/forms.inc.php:1729 include/maintenances.inc.php:119
+#: include/forms.inc.php:1727 include/maintenances.inc.php:119
 msgid "Second"
 msgstr ""
 
@@ -12254,7 +12254,7 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/views/administration.users.edit.php:220
+#: include/views/administration.users.edit.php:224
 msgid "Seconds"
 msgstr "초"
 
@@ -12296,8 +12296,9 @@ msgstr ""
 #: include/views/configuration.services.child.list.php:63
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
-#: include/views/js/configuration.sysmaps.js.php:111
-#: include/views/js/configuration.sysmaps.js.php:118 popup_bitem.php:128
+#: include/views/js/configuration.sysmaps.js.php:109
+#: include/views/js/configuration.sysmaps.js.php:116
+#: include/views/js/configuration.sysmaps.js.php:123 popup_bitem.php:128
 #: popup.php:594 popup.php:663 popup.php:792 popup.php:903 popup.php:999
 #: popup.php:1155 popup.php:1226 popup.php:1291 popup.php:1353 popup.php:1538
 #: popup_right.php:107 popup_usrgrp.php:103 tr_logform.php:276
@@ -12328,7 +12329,7 @@ msgstr ""
 msgid "Selected actions deleted"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:220
+#: include/views/js/configuration.sysmaps.js.php:225
 msgid "Selected elements"
 msgstr ""
 
@@ -12372,7 +12373,7 @@ msgstr ""
 msgid "Sent"
 msgstr ""
 
-#: include/func.inc.php:251
+#: include/func.inc.php:257
 msgid "Sep"
 msgstr ""
 
@@ -12381,8 +12382,8 @@ msgstr ""
 msgid "Separated"
 msgstr ""
 
-#: include/forms.inc.php:1697 include/func.inc.php:137
-#: include/func.inc.php:268 jsLoader.php:117
+#: include/forms.inc.php:1695 include/func.inc.php:137
+#: include/func.inc.php:274 jsLoader.php:117
 msgid "September"
 msgstr ""
 
@@ -12407,7 +12408,7 @@ msgstr "서버 정보"
 msgid "Server time"
 msgstr "서버 시간"
 
-#: events.php:541 include/actions.inc.php:105
+#: events.php:543 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:278
 #: include/views/configuration.services.parent.list.php:36 services.php:466
@@ -12480,11 +12481,11 @@ msgstr "서비스"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: api/classes/CUser.php:963
+#: api/classes/CUser.php:1138
 msgid "Session terminated, re-login, please."
 msgstr ""
 
-#: events.php:581 events.php:594 include/classes/screens/CScreenEvents.php:44
+#: events.php:583 events.php:596 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
 #: include/triggers.inc.php:1643 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
@@ -12506,7 +12507,7 @@ msgstr ""
 #: include/reports.inc.php:272 include/reports.inc.php:454
 #: include/views/configuration.application.list.php:63
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:762 tr_status.php:767
+#: tr_status.php:765 tr_status.php:770
 msgid "Show"
 msgstr "표시"
 
@@ -12609,7 +12610,7 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: include/views/js/configuration.graph.edit.js.php:27
+#: include/views/js/configuration.graph.edit.js.php:30
 msgid "Simple"
 msgstr "표준"
 
@@ -12813,7 +12814,7 @@ msgstr ""
 msgid "Start in"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:787
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr ""
 
@@ -12827,7 +12828,7 @@ msgstr "상태"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:504 events.php:513 events.php:580 events.php:593 hosts.php:813
+#: events.php:506 events.php:515 events.php:582 events.php:595 hosts.php:813
 #: httpdetails.php:132 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -12929,8 +12930,8 @@ msgstr ""
 msgid "Steps"
 msgstr "스텝"
 
-#: include/views/administration.users.edit.php:235
-#: include/views/administration.users.edit.php:272
+#: include/views/administration.users.edit.php:239
+#: include/views/administration.users.edit.php:276
 msgid "Stop"
 msgstr ""
 
@@ -12988,12 +12989,12 @@ msgstr ""
 msgid "Sum of values of a period T is NOT N"
 msgstr ""
 
-#: include/func.inc.php:219
+#: include/func.inc.php:225
 msgid "Sun"
 msgstr ""
 
-#: include/forms.inc.php:1677 include/forms.inc.php:1745
-#: include/func.inc.php:155 include/func.inc.php:231
+#: include/forms.inc.php:1675 include/forms.inc.php:1743
+#: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "일"
 
@@ -13051,7 +13052,7 @@ msgstr ""
 msgid "System uptime in seconds."
 msgstr ""
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgctxt "Tera short"
 msgid "T"
 msgstr ""
@@ -13234,7 +13235,7 @@ msgstr "템플릿"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
-#: include/func.inc.php:673
+#: include/func.inc.php:679
 msgid "Tera"
 msgstr ""
 
@@ -13348,7 +13349,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] ""
 
-#: include/forms.inc.php:1730 include/maintenances.inc.php:120
+#: include/forms.inc.php:1728 include/maintenances.inc.php:120
 msgid "Third"
 msgstr ""
 
@@ -13361,11 +13362,11 @@ msgstr ""
 msgid "This month"
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:489
+#: include/classes/screens/CScreenBuilder.php:487
 msgid "This screen-column is not empty. Delete it?"
 msgstr ""
 
-#: include/classes/screens/CScreenBuilder.php:471
+#: include/classes/screens/CScreenBuilder.php:469
 msgid "This screen-row is not empty. Delete it?"
 msgstr ""
 
@@ -13377,12 +13378,12 @@ msgstr ""
 msgid "This year"
 msgstr ""
 
-#: include/func.inc.php:223
+#: include/func.inc.php:229
 msgid "Thu"
 msgstr ""
 
-#: include/forms.inc.php:1674 include/forms.inc.php:1742
-#: include/func.inc.php:151 include/func.inc.php:235
+#: include/forms.inc.php:1672 include/forms.inc.php:1740
+#: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "목"
 
@@ -13394,7 +13395,7 @@ msgstr "목"
 msgid "Till"
 msgstr "종료"
 
-#: events.php:500 events.php:509 events.php:576 events.php:589
+#: events.php:502 events.php:511 events.php:578 events.php:591
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
 #: include/actions.inc.php:925 include/blocks.inc.php:1003
@@ -13424,11 +13425,11 @@ msgstr ""
 msgid "Time (descending)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:831
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:835
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr ""
 
@@ -13479,7 +13480,7 @@ msgid "Title"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:449
-#: include/views/js/configuration.sysmaps.js.php:335
+#: include/views/js/configuration.sysmaps.js.php:340
 msgid "To"
 msgstr ""
 
@@ -13495,7 +13496,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
-#: include/views/js/configuration.sysmaps.js.php:248
+#: include/views/js/configuration.sysmaps.js.php:253
 #: include/views/monitoring.overview.php:85
 msgid "Top"
 msgstr "위쪽"
@@ -13550,7 +13551,7 @@ msgid "Trends"
 msgstr "트렌드"
 
 #: events.php:295 events.php:336 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:478
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
 #: include/maps.inc.php:26 include/triggers.inc.php:1642
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -13558,7 +13559,7 @@ msgstr "트렌드"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:107 jsLoader.php:139
+#: include/views/js/configuration.sysmaps.js.php:105 jsLoader.php:139
 #: jsLoader.php:212 report5.php:60 services.php:468 tr_comments.php:75
 #: tr_logform.php:150 tr_logform.php:163
 msgid "Trigger"
@@ -13733,7 +13734,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr ""
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:279
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:283
 msgid "Trigger severity"
 msgstr "트리거 심각도"
 
@@ -13758,7 +13759,7 @@ msgstr "트리거 값"
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:227
 #: include/views/inventory.host.view.php:237
-#: include/views/js/configuration.sysmaps.js.php:392
+#: include/views/js/configuration.sysmaps.js.php:397
 #: include/views/monitoring.overview.php:27 popup.php:44 search.php:135
 #: search.php:142 search.php:174 search.php:194 search.php:209 search.php:267
 #: search.php:321 search.php:384 search.php:413 search.php:437
@@ -13807,12 +13808,12 @@ msgstr ""
 msgid "Try to read inaccessible property \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:221
+#: include/func.inc.php:227
 msgid "Tue"
 msgstr ""
 
-#: include/forms.inc.php:1672 include/forms.inc.php:1740
-#: include/func.inc.php:149 include/func.inc.php:233
+#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "화"
 
@@ -13854,7 +13855,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:129
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
-#: include/views/js/configuration.sysmaps.js.php:393
+#: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.overview.php:33 latest.php:331 popup_media.php:121
 #: popup.php:518 popup.php:817 popup.php:927 popup.php:936 tr_logform.php:301
 #: tr_logform.php:305
@@ -13865,7 +13866,7 @@ msgstr "종류"
 msgid "Type (Full details)"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:365
+#: include/views/js/configuration.sysmaps.js.php:370
 msgid "Type (OK)"
 msgstr ""
 
@@ -13914,12 +13915,12 @@ msgstr ""
 #: include/views/configuration.httpconf.popup.php:78
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:246
-#: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:213
+#: include/views/js/configuration.sysmaps.js.php:187 jsLoader.php:213
 #: popup_httpstep.php:37 tr_logform.php:370
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:153
+#: include/views/administration.users.edit.php:157
 msgid "URL (after login)"
 msgstr "로그인 후 URL"
 
@@ -13944,7 +13945,7 @@ msgid "URL parameter name is empty."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:180
-#: include/views/js/configuration.sysmaps.js.php:177 jsLoader.php:214
+#: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:214
 msgid "URLs"
 msgstr ""
 
@@ -13956,7 +13957,7 @@ msgstr ""
 msgid "USER PROFILE"
 msgstr "사용자 프로파일"
 
-#: include/func.inc.php:2412
+#: include/func.inc.php:2418
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -13976,7 +13977,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:731 include/maps.inc.php:814 include/maps.inc.php:905
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr ""
 
@@ -14006,15 +14007,15 @@ msgstr ""
 msgid "Units"
 msgstr "단위"
 
-#: events.php:524 events.php:525 events.php:535 events.php:536 events.php:537
-#: events.php:538 hosts.php:950 httpdetails.php:161 httpmon.php:156
+#: events.php:526 events.php:527 events.php:537 events.php:538 events.php:539
+#: events.php:540 hosts.php:950 httpdetails.php:161 httpmon.php:156
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
 #: include/actions.inc.php:201 include/actions.inc.php:209
 #: include/actions.inc.php:223 include/actions.inc.php:234
 #: include/actions.inc.php:265 include/actions.inc.php:654
-#: include/actions.inc.php:1167 include/blocks.inc.php:1188
+#: include/actions.inc.php:1167 include/blocks.inc.php:1189
 #: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:132
 #: include/discovery.inc.php:169 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
@@ -14165,7 +14166,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/blocks.inc.php:1276
+#: include/blocks.inc.php:1277
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -14211,8 +14212,8 @@ msgid "Updated status of host"
 msgstr ""
 
 #: include/blocks.inc.php:461 include/blocks.inc.php:803
-#: include/blocks.inc.php:875 include/blocks.inc.php:1132
-#: include/blocks.inc.php:1233 include/blocks.inc.php:1293
+#: include/blocks.inc.php:875 include/blocks.inc.php:1133
+#: include/blocks.inc.php:1234 include/blocks.inc.php:1294
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14273,7 +14274,7 @@ msgstr ""
 msgid "Uptime"
 msgstr "가동 시간"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:867
 msgid "Uptime of Zabbix server process in seconds."
 msgstr ""
 
@@ -14302,22 +14303,22 @@ msgstr ""
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:326
+#: include/views/administration.users.edit.php:330
 #: include/views/configuration.action.edit.php:528
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
 msgstr "사용자"
 
-#: api/classes/CUser.php:295
+#: api/classes/CUser.php:301
 #, c-format
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
 
-#: users.php:212
+#: users.php:219
 msgid "User added"
 msgstr "사용자를 추가하였습니다"
 
-#: include/views/administration.users.edit.php:344
+#: include/views/administration.users.edit.php:348
 msgid "User can't change type for himself"
 msgstr ""
 
@@ -14337,7 +14338,7 @@ msgstr ""
 msgid "User cannot change status of himself."
 msgstr ""
 
-#: users.php:241 users.php:301
+#: users.php:248 users.php:308
 msgid "User deleted"
 msgstr "사용자를 삭제하였습니다"
 
@@ -14396,16 +14397,16 @@ msgstr ""
 msgid "User groups"
 msgstr "사용자 그룹"
 
-#: api/classes/CUser.php:1150
+#: api/classes/CUser.php:1326
 msgid "User is not allowed to delete himself."
 msgstr ""
 
-#: api/classes/CUser.php:308
+#: api/classes/CUser.php:314
 #, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:312
+#: api/classes/CUser.php:318
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr ""
@@ -14443,17 +14444,17 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:344
 #: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:352
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "사용자 종류"
 
-#: profile.php:173 users.php:203
+#: profile.php:177 users.php:210
 msgid "User updated"
 msgstr "사용자를 갱신하였습니다"
 
-#: api/classes/CUser.php:358
+#: api/classes/CUser.php:364
 #, c-format
 msgid "User with alias \"%s\" already exists."
 msgstr ""
@@ -14479,11 +14480,11 @@ msgstr "사용자"
 msgid "Users (online)"
 msgstr "사용자 (온라인)"
 
-#: users.php:269
+#: users.php:276
 msgid "Users unblocked"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -14694,11 +14695,11 @@ msgstr ""
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:875
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:871
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -14899,12 +14900,12 @@ msgstr ""
 msgid "Web scenarios"
 msgstr ""
 
-#: include/func.inc.php:222
+#: include/func.inc.php:228
 msgid "Wed"
 msgstr ""
 
-#: include/forms.inc.php:1673 include/forms.inc.php:1741
-#: include/func.inc.php:150 include/func.inc.php:234
+#: include/forms.inc.php:1671 include/forms.inc.php:1739
+#: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "수"
 
@@ -14912,7 +14913,7 @@ msgstr "수"
 msgid "Week"
 msgstr "주"
 
-#: include/forms.inc.php:1650 include/maintenances.inc.php:38
+#: include/forms.inc.php:1648 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:402
 #: include/reports.inc.php:410 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15057,7 +15058,7 @@ msgstr ""
 msgid "Wrong fields for trigger."
 msgstr ""
 
-#: api/classes/CUser.php:239
+#: api/classes/CUser.php:246
 #, c-format
 msgid "Wrong fields for user \"%s\"."
 msgstr ""
@@ -15067,7 +15068,7 @@ msgstr ""
 msgid "Wrong macro \"%1$s\"."
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:167
+#: include/views/js/configuration.sysmaps.js.php:172
 msgid "X"
 msgstr "X"
 
@@ -15097,11 +15098,11 @@ msgstr ""
 msgid "XML file contains warning %1$s:"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:169 report3.php:96
+#: include/views/js/configuration.sysmaps.js.php:174 report3.php:96
 msgid "Y"
 msgstr "Y"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgctxt "Yotta short"
 msgid "Y"
 msgstr ""
@@ -15151,7 +15152,7 @@ msgstr ""
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/func.inc.php:598 include/translateDefines.inc.php:48
+#: include/func.inc.php:604 include/translateDefines.inc.php:48
 msgid "Y.m.d H:i:s"
 msgstr ""
 
@@ -15165,16 +15166,16 @@ msgstr "년"
 msgid "Yearly"
 msgstr "연간"
 
-#: events.php:762 include/blocks.inc.php:824
+#: events.php:764 include/blocks.inc.php:824
 #: include/classes/class.cserverinfo.php:32 include/events.inc.php:356
-#: include/events.inc.php:374 include/func.inc.php:2230
+#: include/events.inc.php:374 include/func.inc.php:2236
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "예"
 
-#: include/func.inc.php:677
+#: include/func.inc.php:683
 msgid "Yotta"
 msgstr ""
 
@@ -15182,12 +15183,12 @@ msgstr ""
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
-#: api/classes/CUser.php:324
+#: api/classes/CUser.php:330
 #, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/func.inc.php:1913
+#: include/func.inc.php:1919
 msgid "You are not logged in."
 msgstr ""
 
@@ -15225,27 +15226,27 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
-#: api/classes/CUser.php:245
+#: api/classes/CUser.php:252
 msgid "You do not have permissions to create users."
 msgstr ""
 
-#: api/classes/CUser.php:257
+#: api/classes/CUser.php:263
 msgid "You do not have permissions to update other users."
 msgstr ""
 
-#: api/classes/CUser.php:252
+#: api/classes/CUser.php:259
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/func.inc.php:1895
+#: include/func.inc.php:1901
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:1915
+#: include/func.inc.php:1921
 msgid "You must login to view this page."
 msgstr ""
 
-#: include/func.inc.php:1891
+#: include/func.inc.php:1897
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15253,7 +15254,7 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring."
 msgstr ""
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgctxt "Zetta short"
 msgid "Z"
 msgstr ""
@@ -15365,7 +15366,7 @@ msgstr ""
 msgid "Zabbix trapper"
 msgstr "ZABBIX trapper"
 
-#: include/func.inc.php:676
+#: include/func.inc.php:682
 msgid "Zetta"
 msgstr ""
 
@@ -15393,7 +15394,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1825
+#: include/classes/graphdraw/CLineGraphDraw.php:1827
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15402,7 +15403,7 @@ msgstr ""
 #: include/forms.inc.php:441 include/forms.inc.php:448
 #: include/forms.inc.php:465 include/forms.inc.php:598
 #: include/forms.inc.php:613 include/graphs.inc.php:76
-#: include/views/js/configuration.graph.edit.js.php:45 report2.php:223
+#: include/views/js/configuration.graph.edit.js.php:46 report2.php:223
 #: report2.php:242 report2.php:264 report2.php:301 report2.php:327
 #: report2.php:346 report4.php:94 report4.php:270
 msgid "all"
@@ -15444,15 +15445,15 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1807
-#: include/classes/graphdraw/CLineGraphDraw.php:1829
+#: include/classes/graphdraw/CLineGraphDraw.php:1809
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:85
-#: include/views/js/configuration.graph.edit.js.php:40
-#: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:145
+#: include/views/js/configuration.graph.edit.js.php:41
+#: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
 msgid "avg"
 msgstr "평균"
 
-#: include/func.inc.php:558 jsLoader.php:96
+#: include/func.inc.php:564 jsLoader.php:96
 msgctxt "day short"
 msgid "d"
 msgstr ""
@@ -15470,7 +15471,7 @@ msgstr "d M Y"
 msgid "d M Y H:i"
 msgstr ""
 
-#: acknow.php:210 events.php:268 httpdetails.php:114 httpmon.php:140
+#: acknow.php:210 events.php:267 httpdetails.php:114 httpmon.php:140
 #: include/acknow.inc.php:54 include/blocks.inc.php:1107
 #: include/classes/screens/CScreenEvents.php:58
 #: include/classes/screens/CScreenPlainText.php:97 include/events.inc.php:174
@@ -15482,7 +15483,7 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:123
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
 #: latest.php:371 latest.php:542 tr_status.php:262 tr_status.php:696
-#: tr_status.php:811
+#: tr_status.php:814
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
@@ -15490,14 +15491,14 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1347
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
+#: include/classes/graphdraw/CLineGraphDraw.php:1349
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
 msgid "d.m"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
-#: include/classes/graphdraw/CLineGraphDraw.php:1384
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1386
+#: include/classes/graphdraw/CLineGraphDraw.php:1405
 msgid "d.m H:i"
 msgstr ""
 
@@ -15539,7 +15540,7 @@ msgstr ""
 msgid "dynamic"
 msgstr ""
 
-#: include/views/js/configuration.sysmaps.js.php:215
+#: include/views/js/configuration.sysmaps.js.php:220
 msgid "elements"
 msgstr ""
 
@@ -15565,7 +15566,7 @@ msgstr ""
 msgid "fixed"
 msgstr ""
 
-#: include/func.inc.php:1795
+#: include/func.inc.php:1801
 msgid "found"
 msgstr ""
 
@@ -15575,7 +15576,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
 
-#: include/func.inc.php:559 jsLoader.php:97
+#: include/func.inc.php:565 jsLoader.php:97
 msgctxt "hour short"
 msgid "h"
 msgstr ""
@@ -15627,9 +15628,9 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1805
+#: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:82
-#: include/views/js/configuration.graph.edit.js.php:42
+#: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
 msgstr ""
 
@@ -15645,12 +15646,12 @@ msgstr "포함"
 msgid "low-level discovery rule"
 msgstr ""
 
-#: include/func.inc.php:560
+#: include/func.inc.php:566
 msgctxt "minute short"
 msgid "m"
 msgstr ""
 
-#: include/func.inc.php:557 jsLoader.php:95
+#: include/func.inc.php:563 jsLoader.php:95
 msgctxt "month short"
 msgid "m"
 msgstr ""
@@ -15667,19 +15668,19 @@ msgstr ""
 msgid "map"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1808
-#: include/classes/graphdraw/CLineGraphDraw.php:1822
+#: include/classes/graphdraw/CLineGraphDraw.php:1810
+#: include/classes/graphdraw/CLineGraphDraw.php:1824
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:80
-#: include/views/js/configuration.graph.edit.js.php:41
-#: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:146
+#: include/views/js/configuration.graph.edit.js.php:42
+#: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "최대"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1806
-#: include/classes/graphdraw/CLineGraphDraw.php:1819
+#: include/classes/graphdraw/CLineGraphDraw.php:1808
+#: include/classes/graphdraw/CLineGraphDraw.php:1821
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:78
-#: include/views/js/configuration.graph.edit.js.php:39
-#: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:144
+#: include/views/js/configuration.graph.edit.js.php:40
+#: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
 msgid "min"
 msgstr "최소"
 
@@ -15693,7 +15694,7 @@ msgstr ""
 msgid "mm"
 msgstr ""
 
-#: include/func.inc.php:562
+#: include/func.inc.php:568
 msgctxt "millisecond short"
 msgid "ms"
 msgstr ""
@@ -15706,7 +15707,7 @@ msgstr ""
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1900
+#: include/classes/graphdraw/CLineGraphDraw.php:1902
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
@@ -15740,7 +15741,7 @@ msgid "now"
 msgstr ""
 
 #: include/blocks.inc.php:445 include/blocks.inc.php:791
-#: include/func.inc.php:1792
+#: include/func.inc.php:1798
 msgid "of"
 msgstr "of"
 
@@ -15809,7 +15810,7 @@ msgstr "root"
 msgid "running"
 msgstr "가동 중"
 
-#: include/func.inc.php:561
+#: include/func.inc.php:567
 msgctxt "second short"
 msgid "s"
 msgstr ""
@@ -15847,7 +15848,7 @@ msgstr ""
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr ""
 
-#: include/func.inc.php:1788
+#: include/func.inc.php:1794
 msgid "to"
 msgstr ""
 
@@ -15878,7 +15879,7 @@ msgstr ""
 msgid "via"
 msgstr ""
 
-#: include/func.inc.php:556 jsLoader.php:94
+#: include/func.inc.php:562 jsLoader.php:94
 msgctxt "year short"
 msgid "y"
 msgstr ""

@@ -213,7 +213,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
 	}
 
-	if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	if (isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
 		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
 			" if (this.state == 'none') { this.state = 'block'; }".
@@ -435,7 +435,7 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
-	zbx_add_post_js('var msglistid = initMessages({});');
+	zbx_add_post_js('initMessages({});');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning
