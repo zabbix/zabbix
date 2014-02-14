@@ -41,8 +41,18 @@ foreach (@$tlds_ref)
     }
 
     my $hostids_ref = probes2tldhostids($tld, $probes_ref);
+    if (scalar(@$hostids_ref) == 0)
+    {
+        wrn("no probe hosts found");
+        next;
+    }
 
     my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 1); # complete key
+    if (scalar(@$items_ref) == 0)
+    {
+	wrn("no items ($cfg_key_in) found");
+	next;
+    }
 
     my $values_ref = get_item_values($items_ref, $from, $till);
     my $probes_with_values = scalar(keys(%$values_ref));

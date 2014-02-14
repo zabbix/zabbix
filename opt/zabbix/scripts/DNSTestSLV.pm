@@ -812,7 +812,7 @@ sub process_slv_monthly
 
 	my $online_items_ref = __get_online_items($hostids_ref, $all_items_ref);
 
-	my $values_ref = get_dbl_values($online_items_ref, $cur_from, $cur_till);
+	my $values_ref = __get_dbl_values($online_items_ref, $cur_from, $cur_till);
 
 	foreach my $value (@$values_ref)
 	{
@@ -874,7 +874,7 @@ sub process_slv_ns_avail
 
     my $values_ref = __get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
 
-    wrn("no values of $cfg_key_in* at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
+    wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
     foreach my $ns (keys(%$values_ref))
     {
@@ -976,7 +976,7 @@ sub get_down_count
     my $from = shift;
     my $till = shift;
 
-    my $eventtimes = get_eventtimes($itemid_src, $from, $till);
+    my $eventtimes = __get_eventtimes($itemid_src, $from, $till);
 
     my $count = 0;
 
@@ -1206,7 +1206,7 @@ sub __get_ns_values
 }
 
 # return an array reference of values of items for the particular period
-sub get_dbl_values
+sub __get_dbl_values
 {
     my $items_ref = shift;
     my $from = shift;
@@ -1373,7 +1373,7 @@ sub __ts
 #
 # if the incident is still onoing at the passed $from time that time will be used
 # as end time
-sub get_eventtimes
+sub __get_eventtimes
 {
     my $itemid = shift;
     my $from = shift;

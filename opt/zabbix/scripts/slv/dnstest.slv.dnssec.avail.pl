@@ -42,11 +42,20 @@ foreach (@$tlds_ref)
     }
 
     my $hostids_ref = probes2tldhostids($tld, $probes_ref);
+    if (scalar(@$hostids_ref) == 0)
+    {
+	wrn("no probe hosts found");
+	next;
+    }
 
-    my $items = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
+    my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
+    if (scalar(@$items_ref) == 0)
+    {
+        wrn("no items ($cfg_key_in) found");
+        next;
+    }
 
-    my $values_ref = get_values_by_items($items);
-
+    my $values_ref = get_values_by_items($items_ref);
     if (scalar(@$values_ref) == 0)
     {
 	wrn("no item values ($cfg_key_in) found");
@@ -55,7 +64,7 @@ foreach (@$tlds_ref)
 
     info("  itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
 
-    my $probes_with_values = get_probes_count($items, $values_ref);
+    my $probes_with_values = get_probes_count($items_ref, $values_ref);
     if ($probes_with_values < $cfg_minonline)
     {
 	info("success ($probes_with_values online probes have results, min - $cfg_minonline)");
