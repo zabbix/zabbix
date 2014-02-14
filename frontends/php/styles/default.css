@@ -54,7 +54,7 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 .rarr { font-size: 16px; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter { font-weight: bold; color: #000; }
-.pointer:hover { cursor: pointer; }
+div.pointer, img.pointer, span.pointer { cursor: pointer; }
 
 .move { cursor: move; }
 

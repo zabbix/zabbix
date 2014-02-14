@@ -36,16 +36,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR						 TYPE		 OPTIONAL FLAGS	VALIDATION		EXCEPTION
 $fields = array(
-	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
-	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'hidegroupids' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
-	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
+	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
+	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'hidegroupids' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
+	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,			null)
 );
 check_fields($fields);
 
@@ -91,8 +91,7 @@ if (hasRequest('save')) {
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
-	ob_end_clean();
-	redirect('dashboard.php');
+	jSredirect('dashboard.php');
 }
 elseif (hasRequest('cancel')) {
 	ob_end_clean();
