@@ -128,20 +128,6 @@ if ($queryData) {
 		)));
 	}
 
-	$actionids = array();
-	foreach ($data['alerts'] as $alert) {
-		if (!isset($actionids[$alert['actionid']])) {
-			$actionids[$alert['actionid']] = $alert['actionid'];
-		}
-	}
-
-	// get action name
-	$data['actions'] = API::Action()->get(array(
-		'output' => array('actionid	', 'name'),
-		'actionids' => $actionids,
-		'preservekeys' => true
-	));
-
 	CArrayHelper::sort($data['alerts'], array(
 		array('field' => 'alertid', 'order' => ZBX_SORT_DOWN)
 	));
@@ -160,6 +146,19 @@ if ($queryData) {
 
 // padding
 $data['paging'] = getPagingLine($data['alerts']);
+
+// get actions names
+if ($data['alerts']) {
+	$actionids = array_unique(zbx_objectValues($data['alerts'], 'actionid'));
+
+	if ($actionids) {
+		$data['actions'] = API::Action()->get(array(
+			'output' => array('actionid	', 'name'),
+			'actionids' => $actionids,
+			'preservekeys' => true
+		));
+	}
+}
 
 // timeline
 $data['timeline'] = array(
