@@ -933,7 +933,7 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	zbx_vector_ptr_t	upd_gitems; 	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t	del_gitemids;
 
-	zbx_uint64_t		graphid = 0, graphdiscoveryid = 0, gitemid = 0;
+	zbx_uint64_t		graphid = 0, gitemid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
 				*name_esc, *color_esc;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
@@ -947,7 +947,7 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 					"ymin_itemid,ymax_type,ymax_itemid,flags)"
 				" values ";
 	const char		*ins_graph_discovery_sql =
-				"insert into graph_discovery (graphdiscoveryid,graphid,parent_graphid) values ";
+				"insert into graph_discovery (graphid,parent_graphid) values ";
 	const char		*ins_graphs_items_sql =
 				"insert into graphs_items"
 				" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
@@ -1001,7 +1001,6 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	if (0 != new_graphs)
 	{
 		graphid = DBget_maxid_num("graphs", new_graphs);
-		graphdiscoveryid = DBget_maxid_num("graph_discovery", new_graphs);
 
 		sql1 = zbx_malloc(sql1, sql1_alloc);
 		sql2 = zbx_malloc(sql2, sql2_alloc);
@@ -1058,11 +1057,9 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_graph_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					graphdiscoveryid, graphid, parent_graphid);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL, graphid, parent_graphid);
 
 			graph->graphid = graphid++;
-			graphdiscoveryid++;
 		}
 		else if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE))
 		{
