@@ -449,9 +449,14 @@ function addUserHistory($title, $url) {
 		' WHERE uh.userid='.$userId
 	));
 
-	if ($history5 && $history5['title5'] === $title && $history5['url5'] != $url) {
-		// title same, url isnt, change only url
-		$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
+	if ($history5 && ($history5['title5'] === $title)) {
+		if ($history5['url5'] !== $url) {
+			// title same, url isnt, change only url
+			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
+		}
+		else {
+			return true;
+		}
 	}
 	else {
 		// new page with new title is added
