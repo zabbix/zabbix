@@ -1614,32 +1614,40 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 }
 
 function make_trigger_details($trigger) {
-	$hosts = reset($trigger['hosts']);
-	$hostId = $hosts['hostid'];
+	$hostNames = array();
+
+	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
-		'hostids' => $hostId,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'preservekeys' => true
+		'hostids' => $hostIds,
+		'selectScreens' => API_OUTPUT_COUNT
 	));
-	$host = reset($hosts);
 
-	$scripts = API::Script()->getScriptsByHosts($hostId);
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
-	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts ? reset($scripts) : null));
+	foreach ($hosts as $host) {
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+		$hostNames[] = $hostName;
+		$hostNames[] = ', ';
+	}
+	array_pop($hostNames);
 
 	$table = new CTableInfo();
-
 	if (is_show_all_nodes()) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
-
-	$table->addRow(array(_('Host'), $hostName));
-	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
+	$table->addRow(array(_n('Host', 'Hosts', count($hosts)), $hostNames));
+	$table->addRow(array(
+		new CCol(_('Trigger')),
+		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
+	));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
-	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
+	$table->addRow(array(
+		new CCol(_('Expression')),
+		new CCol(explode_exp($trigger['expression'], true, true), 'wraptext')
+	));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
 	$table->addRow(array(_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])

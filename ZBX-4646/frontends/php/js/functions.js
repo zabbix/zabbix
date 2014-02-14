@@ -882,7 +882,7 @@ function stripslashes(str) {
 function executeScript(hostId, scriptId, confirmation) {
 	var execute = function() {
 		if (!empty(hostId)) {
-			openWinCentered('scripts_exec.php?execute=1&hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
+			openWinCentered('scripts_exec.php?hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 		}

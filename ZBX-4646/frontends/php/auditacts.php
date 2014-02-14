@@ -144,7 +144,7 @@ if ($queryData) {
 	}
 }
 
-// padding
+// paging
 $data['paging'] = getPagingLine($data['alerts']);
 
 // timeline

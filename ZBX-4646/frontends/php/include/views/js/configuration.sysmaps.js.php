@@ -90,17 +90,15 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div style="position: absolute;">
-						<div id="elementNameHostGroup" class="multiselect" style="top: -20px; width: 312px;"></div>
+					<div>
+						<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
 					</div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<div style="position: absolute;">
-						<div id="elementNameHost" class="multiselect" style="top: -20px; width: 312px;"></div>
-					</div>
+					<div id="elementNameHost" class="multiselect" style="width: 312px;"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
@@ -116,6 +114,13 @@
 				<td>
 					<input readonly="readonly" size="50" id="elementNameMap" name="elementName" class="input">
 					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}", 450, 450)'><?php echo _('Select'); ?></span>
+				</td>
+			</tr>
+			<tr id="application-select-row">
+				<td><?php echo _('Application'); ?></td>
+				<td>
+					<input size="50" id="application" name="application" class="input">
+					<span id="application-select" class="link"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 

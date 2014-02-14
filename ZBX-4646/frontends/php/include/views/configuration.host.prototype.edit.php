@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$interfaces[$interface['interfaceid']] = $interface;
 	}
 	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
-	zbx_add_post_js('hostInterfacesManager.disable()');
+	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
 	$ifTab = new CTable(null, 'formElementTable');

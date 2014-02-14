@@ -3575,6 +3575,12 @@ return array(
 				'length' => 10,
 				'default' => '1',
 			),
+			'application' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'sysmaps_links' => array(
@@ -5184,13 +5190,8 @@ return array(
 	),
 	'graph_discovery' => array(
 		'type' => DB::TABLE_TYPE_CONFIG,
-		'key' => 'graphdiscoveryid',
+		'key' => 'graphid',
 		'fields' => array(
-			'graphdiscoveryid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			),
 			'graphid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -5204,12 +5205,6 @@ return array(
 				'length' => 20,
 				'ref_table' => 'graphs',
 				'ref_field' => 'graphid',
-			),
-			'name' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
-				'default' => '',
 			),
 		),
 	),

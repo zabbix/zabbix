@@ -123,6 +123,94 @@ static int	DBpatch_2030010(void)
 	return DBdrop_table("trigger_discovery_tmp");
 }
 
+static int	DBpatch_2030011(void)
+{
+	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_2030012(void)
+{
+	const ZBX_TABLE table =
+			{"graph_discovery_tmp", "", 0,
+				{
+					{"graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030013(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_discovery_tmp (select graphid,parent_graphid from graph_discovery)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030014(void)
+{
+	return DBdrop_table("graph_discovery");
+}
+
+static int	DBpatch_2030015(void)
+{
+	const ZBX_TABLE table =
+			{"graph_discovery", "graphid", 0,
+				{
+					{"graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030016(void)
+{
+	return DBcreate_index("graph_discovery", "graph_discovery_1", "parent_graphid", 0);
+}
+
+static int	DBpatch_2030017(void)
+{
+	const ZBX_FIELD	field = {"graphid", NULL, "graphs", "graphid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("graph_discovery", 1, &field);
+}
+
+static int	DBpatch_2030018(void)
+{
+	const ZBX_FIELD	field = {"parent_graphid", NULL, "graphs", "graphid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("graph_discovery", 2, &field);
+}
+
+static int	DBpatch_2030019(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_discovery (select graphid,parent_graphid from graph_discovery_tmp)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030020(void)
+{
+	return DBdrop_table("graph_discovery_tmp");
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -140,5 +228,15 @@ DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
 DBPATCH_ADD(2030009, 0, 1)
 DBPATCH_ADD(2030010, 0, 1)
+DBPATCH_ADD(2030011, 2020001, 1)
+DBPATCH_ADD(2030012, 0, 1)
+DBPATCH_ADD(2030013, 0, 1)
+DBPATCH_ADD(2030014, 0, 1)
+DBPATCH_ADD(2030015, 0, 1)
+DBPATCH_ADD(2030016, 0, 1)
+DBPATCH_ADD(2030017, 0, 1)
+DBPATCH_ADD(2030018, 0, 1)
+DBPATCH_ADD(2030019, 0, 1)
+DBPATCH_ADD(2030020, 0, 1)
 
 DBPATCH_END()
