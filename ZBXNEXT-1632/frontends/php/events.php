@@ -663,9 +663,11 @@ else {
 				$hosts[] = reset($trigger['hosts']);
 			}
 			$hostids = zbx_objectValues($hosts, 'hostid');
+
 			$hosts = API::Host()->get(array(
 				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
+				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'preservekeys' => true
 			));

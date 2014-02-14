@@ -194,6 +194,7 @@ $tranStrings = array(
 		'Go to' => _('Go to'),
 		'Scripts' => _('History'),
 		'Host inventory' => _('Host inventory'),
+		'Host graphs' => _('Host graphs'),
 		'Host screens' => _('Host screens'),
 		'Latest data' => _('Latest data'),
 		'Latest events' => _('Latest events'),

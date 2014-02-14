@@ -980,6 +980,7 @@ function make_latest_issues(array $filter = array()) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
 		'output' => array('hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'preservekeys' => true
 	));
