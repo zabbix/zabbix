@@ -2543,6 +2543,21 @@ clean:
 	return res;
 }
 
+typedef struct
+{
+	zbx_uint64_t		applicationid;
+	char			*name;
+	zbx_vector_uint64_t	templateids;
+}
+zbx_application_t;
+
+void	zbx_application_clean(zbx_application_t *application)
+{
+	zbx_vector_uint64_destroy(&application->templateids);
+	zbx_free(application->name);
+	zbx_free(application);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBcopy_template_applications                                     *
@@ -2552,139 +2567,170 @@ clean:
  * Parameters: hostid      - [IN] host id                                     *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	typedef struct
-	{
-		zbx_uint64_t	applicationid;
-		zbx_uint64_t	templateid;
-		char		*name_esc;
-	}
-	zbx_app_t;
-
-	const char	*__function_name = "DBcopy_template_applications";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
-	zbx_app_t	*app = NULL;
-	size_t		app_alloc = 0, app_num = 0;
-	int		new_applications = 0;
+	const char		*__function_name = "DBcopy_template_applications";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
+	zbx_application_t	*application;
+	zbx_vector_ptr_t	applications;
+	int			i, j, new_applications = 0, new_application_templates = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&applications);
+
 	sql = zbx_malloc(sql, sql_alloc);
+
+	/* selecting existing applications */
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ta.applicationid,ta.name,ha.applicationid"
-			" from applications ta"
-			" left join applications ha"
-				" on ha.name=ta.name"
-					" and ha.hostid=" ZBX_FS_UI64
-			" where",
-			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ha.applicationid");
+			"select applicationid,name"
+			" from applications"
+			" where hostid=" ZBX_FS_UI64, hostid);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (app_num == app_alloc)
-		{
-			app_alloc += 16;
-			app = zbx_realloc(app, app_alloc * sizeof(zbx_app_t));
-		}
+		application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
 
-		ZBX_STR2UINT64(app[app_num].templateid, row[0]);
+		ZBX_STR2UINT64(application->applicationid, row[0]);
+		application->name = zbx_strdup(NULL, row[1]);
+		zbx_vector_uint64_create(&application->templateids);
 
-		if (SUCCEED != DBis_null(row[2]))
-		{
-			ZBX_STR2UINT64(app[app_num].applicationid, row[2]);
-			app[app_num].name_esc = NULL;
-		}
-		else
-		{
-			app[app_num].applicationid = 0;
-			app[app_num].name_esc = DBdyn_escape_string(row[1]);
-			new_applications++;
-		}
-		app_num++;
+		zbx_vector_ptr_append(&applications, application);
 	}
 	DBfree_result(result);
 
-	if (0 != app_num)
+	/* adding applications from templates */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select applicationid,name"
+			" from applications"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	applicationid = 0, application_templateid = 0;
-		size_t		i;
-		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
-		const char	*ins_application_template_sql =
-				"insert into application_template"
-				" (application_templateid,applicationid,templateid)"
-				" values ";
+		zbx_uint64_t	templateid;
 
-		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (0 != new_applications)
+		for (i = 0; i < applications.values_num; i++)
 		{
-			applicationid = DBget_maxid_num("applications", new_applications);
-#ifdef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
-#endif
-			for (i = 0; i < app_num; i++)
-			{
-				if (0 != app[i].applicationid)
-					continue;
+			application = (zbx_application_t *)applications.values[i];
 
-				app[i].applicationid = applicationid++;
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
-#endif
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-						app[i].applicationid, hostid, app[i].name_esc);
-
-				zbx_free(app[i].name_esc);
-			}
-
-#ifdef HAVE_MULTIROW_INSERT
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
+			if (0 == strcmp(application->name, row[1]))
+				break;
 		}
 
-		application_templateid = DBget_maxid_num("application_template", app_num);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
-#endif
-		for (i = 0; i < app_num; i++)
+		if (i == applications.values_num)
 		{
+			application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
+
+			application->applicationid = 0;
+			application->name = zbx_strdup(NULL, row[1]);
+			zbx_vector_uint64_create(&application->templateids);
+
+			zbx_vector_ptr_append(&applications, application);
+			new_applications++;
+		}
+
+		ZBX_STR2UINT64(templateid, row[0]);
+
+		zbx_vector_uint64_append(&application->templateids, templateid);
+		new_application_templates++;
+	}
+	DBfree_result(result);
+
+	if (0 == new_applications && 0 == new_application_templates)
+		goto clean;
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (0 != new_applications)
+	{
+		zbx_uint64_t	applicationid = 0;
+		char		*name_esc;
+		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
+
+		applicationid = DBget_maxid_num("applications", new_applications);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
+#endif
+		for (i = 0; i < applications.values_num; i++)
+		{
+			application = (zbx_application_t *)applications.values[i];
+
+			if (0 != application->applicationid)
+				continue;
+
+			name_esc = DBdyn_escape_string(application->name);
+
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					application_templateid++, app[i].applicationid, app[i].templateid);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
+					applicationid, hostid, name_esc);
+
+			zbx_free(name_esc);
+
+			application->applicationid = applicationid++;
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
 		sql_offset--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		DBexecute("%s", sql);
-
-		zbx_free(app);
 	}
 
+	if (0 != new_application_templates)
+	{
+		zbx_uint64_t	application_templateid = 0;
+		const char	*ins_application_template_sql =
+				"insert into application_template"
+				" (application_templateid,applicationid,templateid)"
+				" values ";
+
+		application_templateid = DBget_maxid_num("application_template", new_application_templates);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+#endif
+		for (i = 0; i < applications.values_num; i++)
+		{
+			application = (zbx_application_t *)applications.values[i];
+
+			for (j = 0; j < application->templateids.values_num; j++)
+			{
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+#endif
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						application_templateid++, application->applicationid,
+						application->templateids.values[j]);
+			}
+		}
+
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBexecute("%s", sql);
+clean:
+	zbx_vector_ptr_clean (&applications, (zbx_mem_free_func_t)zbx_application_clean);
+	zbx_vector_ptr_destroy(&applications);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
