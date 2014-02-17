@@ -1300,7 +1300,7 @@ int	get_host_availability_data(struct zbx_json *j)
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
 			" from hosts"
-			" where status in (%d,%d)",
+			" where status in (%d,%d) order by hostid asc",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
