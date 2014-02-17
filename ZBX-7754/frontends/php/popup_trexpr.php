@@ -772,7 +772,9 @@ if (isset($data['insert'])) {
 	}
 }
 
-show_messages();
+if (hasErrorMesssages()) {
+	show_messages();
+}
 
 // render view
 $expressionView = new CView('configuration.triggers.expression', $data);
