@@ -508,19 +508,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 	regfree(&re);
 
-	if (1 == *skip_old_data)
-		i = (0 < logfiles_num) ? logfiles_num - 1 : 0;
-	else
-		i = 0;
-
-	/* find the oldest file that match */
-	for ( ; i < logfiles_num; i++)
-	{
-		if (logfiles[i].mtime < *mtime)
-			continue;	/* not interested in mtimes less than the given mtime */
-		else
-			break;	/* the first occurrence is found */
-	}
+	i = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
 
 	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
 	for (j = i + 1; j < logfiles_num; j++)
@@ -531,7 +519,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 			break;	/* all next mtimes are bigger */
 	}
 
-	/* processing matched or moving to the newer one and repeating the cycle */
+	/* processing matched logfiles starting from the older one to the newer one */
 	for (; i < logfiles_num; i++)
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
@@ -540,7 +528,10 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
 				hostname, key)))
 		{
-			break;	/* must return, situation could have changed */
+			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
+			/* (can happen during a rotation). Maybe during the next check all will be well. */
+			ret = SUCCEED;
+			break;
 		}
 
 		if (i != logfiles_num - 1)
@@ -548,7 +539,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 			zbx_free(logfile_candidate);
 			*lastlogsize = 0;
 		}
-	}	/* trying to read from logfiles */
+	}
 
 	if (0 == logfiles_num)
 	{
