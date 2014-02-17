@@ -338,7 +338,8 @@ if (!empty($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid())
+		'displayNodes' => is_array(get_current_nodeid()),
+		'config' => $config
 	);
 
 	// get user groups

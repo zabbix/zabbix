@@ -71,49 +71,56 @@ foreach ($this->data['groups'] as $group) {
 		$i++;
 
 		if ($i > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = '...';
-			$hostsOutput[] = '//empty for array_pop';
+			$hostsOutput[] = ' &hellip;';
+
 			break;
 		}
 
 		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
 
+		if ($i > 1) {
+			$hostsOutput[] = ', ';
+		}
+
 		$hostsOutput[] = new CLink($template['name'], $url, 'unknown');
-		$hostsOutput[] = ', ';
 	}
 
-	if ($hostsOutput) {
-		array_pop($hostsOutput);
-
-		$hostsOutput[] = BR();
-		$hostsOutput[] = BR();
-	}
-
-	foreach ($group['hosts'] as $host) {
-		$i++;
-
-		if ($i > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = '...';
-			$hostsOutput[] = '//empty for array_pop';
-			break;
+	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
+		if ($hostsOutput) {
+			$hostsOutput[] = BR();
+			$hostsOutput[] = BR();
 		}
 
-		switch ($host['status']) {
-			case HOST_STATUS_NOT_MONITORED:
-				$style = 'on';
-				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+		$n = 0;
+
+		foreach ($group['hosts'] as $host) {
+			$i++;
+			$n++;
+
+			if ($i > $this->data['config']['max_in_table']) {
+				$hostsOutput[] = ' &hellip;';
+
 				break;
+			}
 
-			default:
-				$style = null;
-				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-			break;
+			switch ($host['status']) {
+				case HOST_STATUS_NOT_MONITORED:
+					$style = 'on';
+					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+					break;
+
+				default:
+					$style = null;
+					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+			}
+
+			if ($n > 1) {
+				$hostsOutput[] = ', ';
+			}
+
+			$hostsOutput[] = new CLink($host['name'], $url, $style);
 		}
-
-		$hostsOutput[] = new CLink($host['name'], $url, $style);
-		$hostsOutput[] = ', ';
 	}
-	array_pop($hostsOutput);
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];
 	$templateCount = $this->data['groupCounts'][$group['groupid']]['templates'];
