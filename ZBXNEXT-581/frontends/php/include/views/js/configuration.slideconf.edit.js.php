@@ -130,5 +130,4 @@
 	}
 
 	initSortable();
-	createPlaceholders();
 </script>

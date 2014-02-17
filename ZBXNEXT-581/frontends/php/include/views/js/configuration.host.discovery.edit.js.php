@@ -1,12 +1,11 @@
 <?php
-	$counter = null;
-	if (hasRequest('conditions')) {
-		$conditions = getRequest('conditions');
-		krsort($conditions);
-		$counter = key($conditions) + 1;
-	}
-?>
-<?php
+$counter = null;
+if (hasRequest('conditions')) {
+	$conditions = getRequest('conditions');
+	krsort($conditions);
+	$counter = key($conditions) + 1;
+}
+
 include dirname(__FILE__).'/common.item.edit.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">

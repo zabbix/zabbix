@@ -302,11 +302,9 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-			if (!$update) {
-				// set default formula value
-				if (!isset($item['formula'])) {
-					$item['formula'] = '1';
-				}
+			// set default formula value
+			if (!$update && !isset($item['formula'])) {
+				$item['formula'] = '1';
 			}
 		}
 		unset($item);
