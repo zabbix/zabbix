@@ -23,6 +23,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ....I..... [ZBX-5789] removed unused fields in graph_discovery table (Sasha)
 ..F....... [ZBX-6350] fixed incorrectly displayed table cell width in Event source details and Event details blocks (Ivo)
 ..F....... [ZBX-7095] fixed dashboard filter name to show pointer cursor (Ivo)
@@ -48,6 +49,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 ..F....... [ZBX-7772] fixed HTTP authentication error (Eduard)
