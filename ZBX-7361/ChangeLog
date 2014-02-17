@@ -2,6 +2,9 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-1632] added goto graphs link in host menu popup (Eduard)
+..F....... [ZBXNEXT-1735] removed graph and history link from items in lates data page, if history and trends are disabled (Oleg)
+..F....... [ZBXNEXT-1910] added active since and active till columns in maintenance page (Eduard)
 ..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
 ..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
@@ -20,6 +23,12 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
+........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
+...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
+..F....... [ZBX-7786] fixed cell limit formating with ellipsis (Eduard)
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
+....I..... [ZBX-5789] removed unused fields in graph_discovery table (Sasha)
 ..F....... [ZBX-6350] fixed incorrectly displayed table cell width in Event source details and Event details blocks (Ivo)
 ..F....... [ZBX-7095] fixed dashboard filter name to show pointer cursor (Ivo)
 ..F....... [ZBX-7773] fixed jquery buttonset initializing (Eduard)
@@ -44,6 +53,8 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7768] fixed item valuemap import (Eduard)
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 ..F....... [ZBX-7772] fixed HTTP authentication error (Eduard)
