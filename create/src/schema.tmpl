@@ -1134,13 +1134,10 @@ TABLE|globalvars|globalvarid|0
 FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
 FIELD		|snmp_lastsize	|t_integer	|'0'	|NOT NULL	|0
 
-TABLE|graph_discovery|graphdiscoveryid|ZBX_SYNC
-FIELD		|graphdiscoveryid|t_id		|	|NOT NULL	|0
+TABLE|graph_discovery|graphid|ZBX_SYNC
 FIELD		|graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|graphs
-FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid
-FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
-UNIQUE		|1		|graphid,parent_graphid
-INDEX		|2		|parent_graphid
+FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid	|RESTRICT
+INDEX		|1		|parent_graphid
 
 TABLE|host_inventory|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
@@ -1301,4 +1298,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030011	|2030011
+ROW		|2030020	|2030020

@@ -61,6 +61,6 @@ class CMultiSelect extends CTag {
 			'addNew' => isset($options['addNew']) ? $options['addNew'] : false
 		);
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
 	}
 }
