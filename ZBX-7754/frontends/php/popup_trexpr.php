@@ -690,23 +690,21 @@ if ($itemId) {
 }
 
 $submittedFunction = $data['function'].'['.$data['operator'].']';
-$selectedFunction = null;
+$data['selectedFunction'] = null;
 
 // check if submitted function is usable with selected item
 foreach ($data['functions'] as $id => $f) {
 	if ((!$data['itemValueType'] || isset($f['allowed_types'][$data['itemValueType']])) && $id == $submittedFunction) {
-		$selectedFunction = $id;
+		$data['selectedFunction'] = $id;
 		break;
 	}
 }
-$data['selectedFunction'] = $selectedFunction;
 
-if ($selectedFunction === null) {
+if ($data['selectedFunction'] === null) {
 	error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
 		$data['functions'][$submittedFunction]['description'],
 		$data['description']
 	));
-	show_messages();
 }
 
 // remove functions that not correspond to chosen item
@@ -758,15 +756,11 @@ if (isset($data['insert'])) {
 		));
 		if (!$isValid) {
 			error($triggerFunctionValidator->getError());
-			show_messages();
-
 			unset($data['insert']);
 		}
 	}
 	else {
 		error($triggerExpression->error);
-		show_messages();
-
 		unset($data['insert']);
 	}
 
@@ -777,6 +771,8 @@ if (isset($data['insert'])) {
 		}
 	}
 }
+
+show_messages();
 
 // render view
 $expressionView = new CView('configuration.triggers.expression', $data);
