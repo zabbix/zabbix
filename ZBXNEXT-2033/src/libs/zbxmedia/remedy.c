@@ -87,6 +87,13 @@
 #define ZBX_REMEDY_INCIDENT_REOPEN	2
 #define ZBX_REMEDY_INCIDENT_UPDATE	3
 
+/* Service CI values for network and server services */
+#define ZBX_REMEDY_SERVICECI_NETWORK		"Networks & Telecomms"
+#define ZBX_REMEDY_SERVICECI_RID_NETWORK	"REGAA5V0BLLZRAMO2G4KO1499OT4JQ"
+#define ZBX_REMEDY_SERVICECI_SERVER		"Server & Storage"
+#define ZBX_REMEDY_SERVICECI_RID_SERVER		"OI-f9bee1dac03044f894ed43937bdc52dc"
+
+
 typedef struct
 {
 	char	*name;
@@ -546,7 +553,7 @@ out:
 	zbx_free(service_url);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s externalid:%s", __function_name, zbx_result_string(ret),
-			*externalid);
+			SUCCEED == ret ? *externalid : "(null)");
 
 	return ret;
 }
@@ -853,47 +860,39 @@ static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const cha
  *           The name of this mapping must be stored in Remedy media type.    *
  *                                                                            *
  ******************************************************************************/
-static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *valuemap, char **service_name,
+static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_name, char **service_name,
 		char **service_id)
 {
-	char		*valuemap_esc;
+	char		*group_name_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	valuemap_esc = DBdyn_escape_string(valuemap);
+	group_name_esc = DBdyn_escape_string(group_name);
 
 	result = DBselect(
-			"select m.newvalue"
-			" from mappings m,valuemaps vm,groups g,hosts_groups hg"
+			"select g.name"
+			" from groups g,hosts_groups hg"
 			" where hg.hostid=" ZBX_FS_UI64
 				" and g.groupid=hg.groupid"
-				" and g.name=m.value"
-				" and m.valuemapid=vm.valuemapid"
-				" and vm.name='%s'",
-			hostid, valuemap_esc);
+				" and g.name='%s'",
+			hostid, group_name_esc);
 
+	/* If the host group name matches the specified service mapping value from remedy configuration */
+	/* use predefined network service CI. Otherwise use predefined server service CI.               */
 	if (NULL != (row = DBfetch(result)))
 	{
-		char	*ptr;
-
-		if (NULL != (ptr = strrchr(row[0], ':')))
-		{
-			*ptr++ = '\0';
-			*service_name = zbx_strdup(*service_name, row[0]);
-			*service_id = zbx_strdup(*service_id, ptr);
-
-			goto out;
-		}
-
+		*service_name = zbx_strdup(NULL, ZBX_REMEDY_SERVICECI_NETWORK);
+		*service_id = zbx_strdup(NULL, ZBX_REMEDY_SERVICECI_RID_NETWORK);
+	}
+	else
+	{
+		*service_name = zbx_strdup(NULL, ZBX_REMEDY_SERVICECI_SERVER);
+		*service_id = zbx_strdup(NULL, ZBX_REMEDY_SERVICECI_RID_SERVER);
 	}
 
-	*service_name = zbx_strdup(NULL, "");
-	*service_id = zbx_strdup(NULL, "");
-
-out:
 	DBfree_result(result);
 
-	zbx_free(valuemap_esc);
+	zbx_free(group_name_esc);
 }
 
 /******************************************************************************
@@ -922,13 +921,13 @@ int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const ch
 	switch (status)
 	{
 		case ZBX_REMEDY_INCIDENT_CREATE:
-			message = zbx_dsprintf(NULL, "Created a new incident %", ticketnumber);
+			message = zbx_dsprintf(NULL, "Created a new incident %s", ticketnumber);
 			break;
 		case ZBX_REMEDY_INCIDENT_REOPEN:
-			message = zbx_dsprintf(NULL, "Reopened resolved incident %", ticketnumber);
+			message = zbx_dsprintf(NULL, "Reopened resolved incident %s", ticketnumber);
 			break;
 		case ZBX_REMEDY_INCIDENT_UPDATE:
-			message = zbx_dsprintf(NULL, "Updated new or assigned incident %", ticketnumber);
+			message = zbx_dsprintf(NULL, "Updated new or assigned incident %s", ticketnumber);
 			break;
 		default:
 			goto out;
@@ -937,7 +936,7 @@ int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const ch
 	ackid = DBget_maxid("acknowledges");
 	message_esc = DBdyn_escape_string(message);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into acknowledgments"
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into acknowledges"
 			" (acknowledgeid,userid,eventid,clock,message) values"
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
 			ackid, userid, eventid, time(NULL), message);
