@@ -531,7 +531,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	for (; i < logfiles_num; i++)
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
-		if (0 != zbx_stat(logfile_candidate, &file_buf))/* situation could have changed */
+		if (0 != zbx_stat(logfile_candidate, &file_buf))	/* situation could have changed */
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", logfile_candidate, zbx_strerror(errno));
 			break;	/* must return, situation could have changed */
@@ -694,8 +694,11 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
 	{
-		ret = zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, regexps_num, pattern,
-				p_count, s_count, process_value, server, port, hostname, key);
+		*lastlogsize = l_size;
+		*skip_old_data = 0;
+
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, encoding, regexps, regexps_num, pattern, p_count,
+				s_count, process_value, server, port, hostname, key);
 	}
 	else
 	{

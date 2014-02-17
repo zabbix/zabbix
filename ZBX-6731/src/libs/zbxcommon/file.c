@@ -216,12 +216,12 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key)
 {
-	int		ret = FAIL, nbytes;
+	int		ret, nbytes;
 	const char	*cr, *lf, *p_end;
 	char		*p_start, *p, *p_nl, *p_next;
 	size_t		szbyte;
@@ -252,6 +252,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		{
 			*big_rec = 0;
+			ret = FAIL;
 			goto out;
 		}
 
@@ -261,6 +262,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 		{
 			/* error on read */
 			*big_rec = 0;
+			ret = FAIL;
 			goto out;
 		}
 
@@ -283,20 +285,20 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 				/* Do not analyze it now, keep the same position in the file and wait the next check, */
 				/* maybe more data will come. */
 
-				if ((zbx_offset_t)0 <= zbx_lseek(fd, offset, SEEK_SET))
-					ret = SUCCEED;
-
+				*lastlogsize = (zbx_uint64_t)offset;
+				ret = SUCCEED;
 				goto out;
 			}
 			else
 			{
-				/* Buffer is full and there is no "newline" in it. It could be the beginning of */
-				/* a long record or the middle part of a long record. If it is the beginning part */
-				/* then analyze it now (as our buffer length corresponds to what we can save in the */
-				/* database), otherwise ignore it. */
+				/* buffer is full and there is no "newline" in it */
 
 				if (0 == *big_rec)
 				{
+					/* It is the first, beginning part of a long record. Match it against the */
+					/* regexp now (our buffer length corresponds to what we can save in the */
+					/* database). */
+
 					char	*value = NULL;
 
 					buf[BUF_SIZE] = '\0';
@@ -325,21 +327,25 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
-					{
 						*lastlogsize = lastlogsize1;
-						*skip_old_data = 0;
-					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
 
 					*big_rec = 1;	/* ignore the rest of this record */
 				}
+				else
+				{
+					/* It is a middle part of a long record. Ignore it. We have already */
+					/* checked the first part against the regexp. */
+
+					*lastlogsize = (size_t)offset + (size_t)nbytes;
+				}
 			}
 		}
 		else
 		{
-			/* the "newline" was found, so there is at least one record */
+			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
 
 			while (p < p_end)
@@ -376,10 +382,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
-					{
 						*lastlogsize = lastlogsize1;
-						*skip_old_data = 0;
-					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -391,6 +394,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 					*big_rec = 0;
 				}
 
+				/* move to the next record in the buffer */
 				p_start = p_next;
 				p = p_next;
 
@@ -398,13 +402,13 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
-					if ((zbx_offset_t)0 <= zbx_lseek(fd, *lastlogsize, SEEK_SET))
+					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
-						ret = SUCCEED;
-						break;
+						ret = FAIL;
+						goto out;
 					}
 					else
-						goto out;
+						break;
 				}
 			}
 		}
