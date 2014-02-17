@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
 ..F....... [ZBX-7768] fixed item valuemap import (Eduard)
 ..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
