@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7361] implemented alphabetic host ordering when trigger has many hosts (Ivo)
 ..F....... [ZBXNEXT-1632] added goto graphs link in host menu popup (Eduard)
 ..F....... [ZBXNEXT-1735] removed graph and history link from items in lates data page, if history and trends are disabled (Oleg)
 ..F....... [ZBXNEXT-1910] added active since and active till columns in maintenance page (Eduard)
