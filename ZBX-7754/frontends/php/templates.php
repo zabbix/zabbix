@@ -99,10 +99,10 @@ if ($exportData) {
 	$exportData = $export->export();
 
 	if (hasErrorMesssages()) {
-		print($exportData);
+		show_messages();
 	}
 	else {
-		show_messages();
+		print($exportData);
 	}
 	exit();
 }
