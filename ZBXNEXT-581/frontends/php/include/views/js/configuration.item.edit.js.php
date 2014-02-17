@@ -76,6 +76,7 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 	}
 
 	jQuery(document).ready(function() {
+		// field switchers
 		<?php if (!empty($this->data['dataTypeVisibility'])) { ?>
 		var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
 			<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
@@ -86,7 +87,9 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
 		<?php } ?>
 
+		// multiplier
 		var multpStat = document.getElementById('multiplier');
+
 		if (multpStat && multpStat.onclick) {
 			multpStat.onclick();
 		}

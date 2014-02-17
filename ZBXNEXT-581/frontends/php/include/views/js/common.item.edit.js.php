@@ -218,5 +218,16 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			jQuery('#row-new-delay-flex-fields').hide();
 			jQuery('#row-new-delay-flex-max-reached').show();
 		}
+
+		// add flexible interval
+		jQuery('#add_delay_flex').click(function() {
+			var addDelayFlex = jQuery('<input>', {
+				type: 'hidden',
+				name: 'add_delay_flex',
+				value: 'add'
+			});
+
+			jQuery('form[name="itemForm"]').append(addDelayFlex).submit();
+		});
 	});
 </script>

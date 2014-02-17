@@ -426,8 +426,6 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
-			PARM_OPT,	0,			1},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
@@ -438,6 +436,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
