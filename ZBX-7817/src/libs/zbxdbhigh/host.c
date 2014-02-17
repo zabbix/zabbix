@@ -2574,7 +2574,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_application_t	*application;
 	zbx_vector_ptr_t	applications;
 	int			i, j, new_applications = 0, new_application_templates = 0;
@@ -2585,48 +2585,27 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	/* selecting existing applications */
-
-	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,name"
+			"select applicationid,hostid,name"
 			" from applications"
-			" where hostid=" ZBX_FS_UI64, hostid);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
-
-		ZBX_STR2UINT64(application->applicationid, row[0]);
-		application->name = zbx_strdup(NULL, row[1]);
-		zbx_vector_uint64_create(&application->templateids);
-
-		zbx_vector_ptr_append(&applications, application);
-	}
-	DBfree_result(result);
-
-	/* adding applications from templates */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,name"
-			" from applications"
-			" where");
+			" where hostid=" ZBX_FS_UI64
+				" or", hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values, templateids->values_num);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	templateid;
+		zbx_uint64_t	db_applicationid, db_hostid;
+
+		ZBX_STR2UINT64(db_applicationid, row[0]);
+		ZBX_STR2UINT64(db_hostid, row[1]);
 
 		for (i = 0; i < applications.values_num; i++)
 		{
 			application = (zbx_application_t *)applications.values[i];
 
-			if (0 == strcmp(application->name, row[1]))
+			if (0 == strcmp(application->name, row[2]))
 				break;
 		}
 
@@ -2635,19 +2614,28 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 			application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
 
 			application->applicationid = 0;
-			application->name = zbx_strdup(NULL, row[1]);
+			application->name = zbx_strdup(NULL, row[2]);
 			zbx_vector_uint64_create(&application->templateids);
 
 			zbx_vector_ptr_append(&applications, application);
-			new_applications++;
 		}
 
-		ZBX_STR2UINT64(templateid, row[0]);
-
-		zbx_vector_uint64_append(&application->templateids, templateid);
-		new_application_templates++;
+		if (db_hostid == hostid)
+			application->applicationid = db_applicationid;
+		else
+			zbx_vector_uint64_append(&application->templateids, db_applicationid);
 	}
 	DBfree_result(result);
+
+	for (i = 0; i < applications.values_num; i++)
+	{
+		application = (zbx_application_t *)applications.values[i];
+
+		if (0 == application->applicationid)
+			new_applications++;
+
+		new_application_templates += application->templateids.values_num;
+	}
 
 	if (0 == new_applications && 0 == new_application_templates)
 		goto clean;
