@@ -23,6 +23,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
 ..F....... [ZBX-7786] fixed cell limit formating with ellipsis (Eduard)
 ..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ....I..... [ZBX-5789] removed unused fields in graph_discovery table (Sasha)
