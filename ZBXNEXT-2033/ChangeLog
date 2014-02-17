@@ -1,3 +1,8 @@
+Changes for 2.2.2
+
+2.2.2rc3 was released as 2.2.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.2rc3
 
 Bug fixes:
@@ -788,6 +793,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.11
+
+2.0.11rc2 was released as 2.0.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.11rc2
@@ -2274,6 +2284,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.20
+
+1.8.20rc2 was released as 1.8.20 without any changes
+
 Changes for 1.8.20rc2
 
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
