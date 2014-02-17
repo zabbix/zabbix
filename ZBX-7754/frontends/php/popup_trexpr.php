@@ -588,6 +588,9 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 		if (isset($myItem['itemid'])) {
 			$_REQUEST['itemid'] = $myItem['itemid'];
 		}
+		else {
+			error(_('Unknown host item, no such item in selected host'));
+		}
 	}
 }
 
