@@ -206,6 +206,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['name']			script name
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
+ * @param bool   options['hasGraphs']		link to host graphs page
  * @param bool   options['hasScreens']		link to host screen page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
@@ -238,6 +239,14 @@ function getMenuPopupHost(options) {
 			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
 		};
 
+		// graphs
+		if (options.hasGraphs) {
+			gotos[gotos.length] = {
+				label: t('Graphs'),
+				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
+			};
+		}
+
 		// screens
 		if (options.hasScreens) {
 			gotos[gotos.length] = {
@@ -265,6 +274,7 @@ function getMenuPopupHost(options) {
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
  * @param array  options['gotos']['inventory']		link to host inventory page
+ * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
@@ -302,6 +312,20 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host inventory'),
+				url: url.getUrl()
+			};
+		}
+
+		// graphs
+		if (typeof options.gotos.graphs !== 'undefined') {
+			var url = new Curl('charts.php');
+
+			jQuery.each(options.gotos.graphs, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Graphs'),
 				url: url.getUrl()
 			};
 		}

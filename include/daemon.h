@@ -24,8 +24,6 @@
 #	error "This module allowed only for Unix OS"
 #endif
 
-#define USE_PID_FILE	1
-
 extern char	*CONFIG_PID_FILE;
 
 #include "threads.h"

@@ -173,6 +173,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
 frontends/php/include/views/configuration.host.discovery.edit.php -text
+frontends/php/include/views/js/common.init.js.php -text
 frontends/php/include/views/js/monitoring.slides.js.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/menupopup.js -text svneol=unset#text/plain

@@ -563,28 +563,29 @@ else {
 
 		order_result($template['parentTemplates'], 'name');
 
+		$linkedTemplatesOutput = $linkedToOutput = $linkedToObjects = array();
+
 		$i = 0;
-		$linkedTemplatesOutput = array();
 
 		foreach ($template['parentTemplates'] as $linkedTemplate) {
 			$i++;
 
 			if ($i > $config['max_in_table']) {
-				$linkedTemplatesOutput[] = '...';
-				$linkedTemplatesOutput[] = '//empty element for array_pop';
+				$linkedTemplatesOutput[] = ' &hellip;';
+
 				break;
 			}
 
 			$url = 'templates.php?form=update&templateid='.$linkedTemplate['templateid'].url_param('groupid');
 
+			if ($linkedTemplatesOutput) {
+				$linkedTemplatesOutput[] = ', ';
+			}
+
 			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, 'unknown');
-			$linkedTemplatesOutput[] = ', ';
 		}
-		array_pop($linkedTemplatesOutput);
 
 		$i = 0;
-		$linkedToOutput = array();
-		$linkedToObjects = array();
 
 		foreach ($template['hosts'] as $h) {
 			$h['objectid'] = $h['hostid'];
@@ -600,8 +601,8 @@ else {
 
 		foreach ($linkedToObjects as $linkedToHost) {
 			if (++$i > $config['max_in_table']) {
-				$linkedToOutput[] = '...';
-				$linkedToOutput[] = '//empty element for array_pop';
+				$linkedToOutput[] = ' &hellip;';
+
 				break;
 			}
 
@@ -621,10 +622,12 @@ else {
 					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
 			}
 
+			if ($linkedToOutput) {
+				$linkedToOutput[] = ', ';
+			}
+
 			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
-			$linkedToOutput[] = ', ';
 		}
-		array_pop($linkedToOutput);
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
