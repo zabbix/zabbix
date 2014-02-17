@@ -114,13 +114,17 @@ foreach ($this->data['alerts'] as $alert) {
 			zbx_nl2br($alert['message'])
 		);
 
+	$recipient = (isset($alert['userid']) && $alert['userid'])
+		? array(bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto'])
+		: $alert['sendto'];
+
 	$auditTable->addRow(array(
 		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
 		new CCol($mediatype['description'], 'top'),
 		new CCol($status, 'top'),
 		new CCol($retries, 'top'),
-		new CCol(array(bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto']), 'top'),
+		new CCol($recipient, 'top'),
 		new CCol($message, 'wraptext top'),
 		new CCol($alert['error'] ? new CSpan($alert['error'], 'on') : SPACE, 'wraptext top')
 	));
