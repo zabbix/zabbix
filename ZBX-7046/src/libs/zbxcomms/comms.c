@@ -1090,7 +1090,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 		goto out;
 	}
 
-	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, (ZBX_SIZE_T)sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
@@ -1276,7 +1276,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == zbx_getnameinfo((struct sockaddr *)&name, sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+	if (0 == zbx_getnameinfo((struct sockaddr *)&name, sname, (ZBX_SIZE_T)sizeof(sname), NULL, 0, NI_NUMERICHOST))
 		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 	else
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
@@ -1305,25 +1305,17 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
  *                                                                            *
  ******************************************************************************/
 
-int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, size_t hlen, char *sbuf, size_t slen, int flags)
+int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, ZBX_SIZE_T hlen, char *sbuf, ZBX_SIZE_T slen, ZBX_SOCK_FLAGS flags)
 {
-	switch((unsigned short)sa->sa_family)
+	switch ((unsigned short)sa->sa_family)
 	{
 #if defined(HAVE_IPV6)
-	case AF_INET6:
-	{
-		const struct sockaddr_in6 *sin6 = (const struct sockaddr_in6 *)sa;
-
-		return getnameinfo(&(sin6->sin6_addr), sizeof(sin6->sin6_addr), hbuf, hlen, sbuf, slen, flags);
-	}
+		case AF_INET6:
+			return getnameinfo(sa, (socklen_t)sizeof(struct sockaddr_in6), hbuf, hlen, sbuf, slen, flags);
 #endif
-	case AF_INET:
-	{
-		const struct sockaddr_in *sin = (const struct sockaddr_in *)sa;
-
-		return getnameinfo(&(sin->sin_addr), sizeof(sin->sin_addr), hbuf, hlen, sbuf, slen, flags);
-	}
-	default:
-		return EAI_FAMILY;
+		case AF_INET:
+			return getnameinfo(sa, (socklen_t)sizeof(struct sockaddr_in), hbuf, hlen, sbuf, slen, flags);
+		default:
+			return EAI_FAMILY;
 	}
 }
