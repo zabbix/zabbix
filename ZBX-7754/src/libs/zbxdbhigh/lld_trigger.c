@@ -290,12 +290,11 @@ static void	lld_functions_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *f
  ******************************************************************************/
 static void	lld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *items)
 {
-	const char		*__function_name = "lld_items_get";
+	const char	*__function_name = "lld_items_get";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_lld_item_t		*item;
-	zbx_vector_uint64_t	parent_itemids;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_lld_item_t	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -306,8 +305,6 @@ static void	lld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *items
 				" and f.triggerid=" ZBX_FS_UI64,
 			parent_triggerid);
 
-	zbx_vector_uint64_create(&parent_itemids);
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
@@ -316,47 +313,8 @@ static void	lld_items_get(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *items
 		ZBX_STR2UCHAR(item->flags, row[1]);
 
 		zbx_vector_ptr_append(items, item);
-
-		if (0 != (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			zbx_vector_uint64_append(&parent_itemids, item->itemid);
 	}
 	DBfree_result(result);
-
-	if (0 != parent_itemids.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 128, sql_offset = 0;
-
-		zbx_vector_uint64_sort(&parent_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&parent_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		sql = zbx_malloc(sql, sql_alloc);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,i.flags"
-				" from items i,item_discovery id"
-				" where i.itemid=id.itemid"
-					" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.parent_itemid",
-				parent_itemids.values, parent_itemids.values_num);
-
-		result = DBselect("%s", sql);
-
-		zbx_free(sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
-
-			ZBX_STR2UINT64(item->itemid, row[0]);
-			ZBX_STR2UCHAR(item->flags, row[1]);
-
-			zbx_vector_ptr_append(items, item);
-		}
-		DBfree_result(result);
-	}
-
-	zbx_vector_uint64_destroy(&parent_itemids);
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -1492,11 +1450,10 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&triggers);	/* list of triggers which were created or will be created or */
-						/* updated by the trigger prototype */
-	zbx_vector_ptr_create(&functions_proto);/* list of functions which are used by all triggers */
-						/* in the host of the trigger prototype */
-	zbx_vector_ptr_create(&items);		/* list of items which are related to the trigger prototype */
+	zbx_vector_ptr_create(&triggers);		/* list of triggers which were created or will be created or */
+							/* updated by the trigger prototype */
+	zbx_vector_ptr_create(&functions_proto);	/* list of functions which are used by the trigger prototype */
+	zbx_vector_ptr_create(&items);			/* list of items which are related to the trigger prototype */
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
