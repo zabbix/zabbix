@@ -20,7 +20,6 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "json_parser.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *
