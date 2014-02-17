@@ -156,15 +156,6 @@ elseif (isset($_REQUEST['save'])) {
 			$templateId = null;
 		}
 
-		if ($templateId) {
-			$msgOk = _('Template updated');
-			$msgFail = _('Cannot update template');
-		}
-		else {
-			$msgOk = _('Template added');
-			$msgFail = _('Cannot add template');
-		}
-
 		foreach ($macros as $key => $macro) {
 			if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 				unset($macros[$key]);
@@ -226,16 +217,23 @@ elseif (isset($_REQUEST['save'])) {
 
 		// create/update template
 		if ($templateId) {
-			$created = false;
 			$template['templateid'] = $templateId;
 			$template['templates_clear'] = $templatesClear;
 
-			if (!API::Template()->update($template)) {
+			$messageSuccess = _('Template updated');
+			$messageFailed = _('Cannot update template');
+			$auditAction = AUDIT_ACTION_UPDATE;
+
+			$result = API::Template()->update($template);
+			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$created = true;
+			$messageSuccess = _('Template added');
+			$messageFailed = _('Cannot add template');
+			$auditAction = AUDIT_ACTION_ADD;
+
 			$result = API::Template()->create($template);
 
 			if ($result) {
@@ -263,7 +261,8 @@ elseif (isset($_REQUEST['save'])) {
 				'inherited' => false
 			));
 			if ($triggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateId, $cloneTemplateId)) {
+				$result &= copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateId, $cloneTemplateId);
+				if (!$result) {
 					throw new Exception();
 				}
 			}
@@ -275,7 +274,6 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => array('graphid')
 			));
 
-			$result = true;
 			foreach ($dbGraphs as $dbGraph) {
 				$result &= (bool) copyGraphToHost($dbGraph['graphid'], $templateId);
 			}
@@ -291,12 +289,12 @@ elseif (isset($_REQUEST['save'])) {
 				'inherited' => false
 			));
 			if ($discoveryRules) {
-				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+				$result &= API::DiscoveryRule()->copy(array(
 					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 					'hostids' => array($templateId)
 				));
 
-				if (!$copyDiscoveryRules) {
+				if (!$result) {
 					throw new Exception();
 				}
 			}
@@ -309,32 +307,29 @@ elseif (isset($_REQUEST['save'])) {
 				'inherited' => false
 			));
 			if ($screens) {
-				$screensCopied = API::TemplateScreen()->copy(array(
+				$result &= API::TemplateScreen()->copy(array(
 					'screenIds' => zbx_objectValues($screens, 'screenid'),
 					'templateIds' => $templateId
 				));
 
-				if (!$screensCopied) {
+				if (!$result) {
 					throw new Exception();
 				}
 			}
 		}
 
-		DBend(true);
-
-		show_messages(true, $msgOk, $msgFail);
-		clearCookies(true);
-
-		if ($created) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
+		if ($result) {
+			add_audit_ext($auditAction, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 
+		$result = DBend($result);
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 	catch (Exception $e) {
 		DBend(false);
-
-		show_messages(false, $msgOk, $msgFail);
+		show_error_message($messageFailed);
 	}
 	unset($_REQUEST['save']);
 }

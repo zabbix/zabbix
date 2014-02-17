@@ -66,41 +66,45 @@ if (get_request('nodeid')) {
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (get_request('nodeid')) {
-		$nodeid = get_request('nodeid');
+	DBstart();
 
-		DBstart();
+	if (hasRequest('nodeid')) {
+		$nodeid = getRequest('nodeid');
+
 		$result = update_node($nodeid, get_request('name'), get_request('ip'), get_request('port'));
-		$result = DBend($result);
 
-		show_messages($result, _('Node updated'), _('Cannot update node'));
-		$audit_action = AUDIT_ACTION_UPDATE;
+		$messageSuccess = _('Node updated');
+		$messageFailed = _('Cannot update node');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		DBstart();
 		$nodeid = add_node(get_request('new_nodeid'), get_request('name'), get_request('ip'), get_request('port'), get_request('nodetype'), get_request('masterid'));
-		$result = DBend($nodeid);
 
-		show_messages($result, _('Node added'), _('Cannot add node'));
-		$audit_action = AUDIT_ACTION_ADD;
+		$messageSuccess = _('Node added');
+		$messageFailed = _('Cannot add node');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($audit_action, AUDIT_RESOURCE_NODE, 'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
+		add_audit($auditAction, AUDIT_RESOURCE_NODE, 'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
 		unset($_REQUEST['form']);
 	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
-	$result = delete_node($_REQUEST['nodeid']);
-	$result = DBend($result);
 
-	show_messages($result, _('Node deleted'), _('Cannot delete node'));
+	$result = delete_node($_REQUEST['nodeid']);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_NODE, 'Node ['.$node['name'].'] id ['.$node['nodeid'].']');
 		unset($_REQUEST['form'], $node);
 	}
+
+	$result = DBend($result);
+	show_messages($result, _('Node deleted'), _('Cannot delete node'));
 }
 
 /*
