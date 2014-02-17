@@ -23,7 +23,6 @@ sub new
 	      'timeout' => 30,
 	      'interval' => 1,
 	      'retries' => 1,
-	      'zabbix_template_1_8' => "a4 b C4 C4 a*",
 	      'keepalive' => 0,
 	      '_last_sent' => 0);
 
@@ -45,7 +44,6 @@ sub retries { return $ZOPTS{'retries'} }
 sub timeout { return $ZOPTS{'timeout'} }
 sub interval { return $ZOPTS{'interval'} }
 sub keepalive { return $ZOPTS{'keepalive'} }
-sub zabbix_template_1_8 { return $ZOPTS{'zabbix_template_1_8'} }
 sub _last_sent { return $ZOPTS{'_last_sent'} }
 sub _json { return $ZOPTS{'_json'} }
 
@@ -92,13 +90,12 @@ sub _encode_request {
 
     ## no critic (ProhibitBitwiseOperators)
     $output = pack(
-        $self->zabbix_template_1_8(),
-        "ZBXD", 0x01,
-        ( $length & 0xFF ),
-        ( $length & 0x00FF ) >> 8,
-        ( $length & 0x0000FF ) >> 16,
-        ( $length & 0x000000FF ) >> 24,
-        0x00, 0x00, 0x00, 0x00, $json
+        "a4 b l l a*",
+        "ZBXD",
+        0x01,
+        $length,
+        0x00,
+        $json
     );
     ## use critic
 
@@ -130,7 +127,7 @@ sub _decode_answer {
 ## no critic (ProhibitBuiltinHomonyms)
 sub send_arrref {
 ## use critic
-    my $self  = shift;
+    my $self = shift;
     my $data_ref = shift;
 
     my $status = 0;
@@ -264,18 +261,6 @@ So this initializes the JSON object.
 The hostname of the sending instance may be given in the constructor.
 
 If not it is detected here.
-
-=head2 zabbix_template_1_8
-
-ZABBIX 1.8 TEMPLATE
-
-a4 - ZBXD
-b  - 0x01
-c4 - Length of Request in Bytes (64-bit integer), aligned left, padded with 0x00
-c4 - dito
-a* - JSON encoded request
-
-This may be changed to a HashRef if future version of zabbix change the header template.
 
 =head2 _encode_request
 
