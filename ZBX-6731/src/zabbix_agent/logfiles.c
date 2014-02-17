@@ -658,6 +658,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	if (0 != zbx_stat(filename, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
+			__function_name, filename, *lastlogsize, zbx_result_string(ret));
 		return ret;
 	}
 
@@ -665,14 +667,16 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	{
 		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' logsize has not changed",
-				__function_name, filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " (not changed) "
+			"ret:SUCCEED", __function_name, filename, *lastlogsize);
 		return SUCCEED;
 	}
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
+			__function_name, filename, *lastlogsize, zbx_result_string(ret));
 		return ret;
 	}
 
@@ -690,11 +694,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
 	{
-		if (SUCCEED == zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, regexps_num,
-				pattern, p_count, s_count, process_value, server, port, hostname, key))
-		{
-			ret = SUCCEED;
-		}
+		ret = zbx_read2(f, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps, regexps_num, pattern,
+				p_count, s_count, process_value, server, port, hostname, key);
 	}
 	else
 	{
@@ -705,8 +706,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	if (0 != close(f))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64,
-			__function_name, filename, *lastlogsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
+			__function_name, filename, *lastlogsize, zbx_result_string(ret));
 
 	return ret;
 }
