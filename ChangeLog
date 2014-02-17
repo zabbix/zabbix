@@ -23,6 +23,7 @@ New features:
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
 ..F....... [ZBX-7786] fixed cell limit formating with ellipsis (Eduard)
 ..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
