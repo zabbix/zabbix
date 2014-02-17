@@ -531,23 +531,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	for (; i < logfiles_num; i++)
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
-		if (0 != zbx_stat(logfile_candidate, &file_buf))	/* situation could have changed */
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
-		}
-
-		if (1 == *skip_old_data)
-		{
-			*lastlogsize = (zbx_uint64_t)file_buf.st_size;
-			zabbix_log(LOG_LEVEL_DEBUG, "skipping existing filename:'%s' lastlogsize:" ZBX_FS_UI64,
-					logfile_candidate, *lastlogsize);
-		}
-
-		*mtime = (int)file_buf.st_mtime;	/* must contain the latest mtime as possible */
-
-		if ((zbx_uint64_t)file_buf.st_size < *lastlogsize)
-			*lastlogsize = 0;	/* maintain backward compatibility */
 
 		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
 				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
@@ -697,6 +680,9 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
 
+		if (NULL != mtime)
+			*mtime = (int)buf.st_mtime;
+
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, encoding, regexps, regexps_num, pattern, p_count,
 				s_count, process_value, server, port, hostname, key);
 	}
@@ -709,8 +695,16 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	if (0 != close(f))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
-			__function_name, filename, *lastlogsize, zbx_result_string(ret));
+	if (NULL != mtime)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+				__function_name, filename, *lastlogsize, *mtime, zbx_result_string(ret));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: NULL ret:%s",
+				__function_name, filename, *lastlogsize, zbx_result_string(ret));
+	}
 
 	return ret;
 }
