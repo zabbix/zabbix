@@ -360,7 +360,6 @@ if (isset($_REQUEST['form'])) {
 	// clone form
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
-		unset($condition);
 		$data['form'] = 'clone';
 	}
 
