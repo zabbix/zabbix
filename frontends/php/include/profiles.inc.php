@@ -449,21 +449,14 @@ function addUserHistory($title, $url) {
 		' WHERE uh.userid='.$userId
 	));
 
-	if ($history5 && ($history5['title5'] === $title)) {
-		if ($history5['url5'] !== $url) {
-			// title same, url isnt, change only url
-			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
-		}
-		else {
-			return true;
-		}
-	}
-	else {
-		// new page with new title is added
-		if ($history5 === false) {
-			$userhistoryid = get_dbid('user_history', 'userhistoryid');
-			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
-					' VALUES('.$userhistoryid.', '.$userId.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+	if ($history5) {
+		if ($history5['title5'] === $title) {
+			if ($history5['url5'] === $url) {
+				return true;
+			}
+			else {
+				$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
+			}
 		}
 		else {
 			$sql = 'UPDATE user_history'.
@@ -479,6 +472,12 @@ function addUserHistory($title, $url) {
 						' url5='.zbx_dbstr($url).
 					' WHERE userid='.$userId;
 		}
+	}
+	else {
+		$userHistoryId = get_dbid('user_history', 'userhistoryid');
+
+		$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
+				' VALUES('.$userHistoryId.', '.$userId.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
 	}
 
 	return DBexecute($sql);
