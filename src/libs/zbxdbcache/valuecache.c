@@ -563,12 +563,12 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -1015,7 +1015,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	(*(uint32_t *)ptr)++;
 
-	return ptr + REFCOUNT_FIELD_SIZE;
+	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
 /******************************************************************************

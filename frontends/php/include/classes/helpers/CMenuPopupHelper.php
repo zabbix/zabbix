@@ -218,6 +218,7 @@ class CMenuPopupHelper {
 	 *
 	 * @param array  $host						host data
 	 * @param string $host['hostid']			host id
+	 * @param array  $host['graphs']			host graphs (optional)
 	 * @param array  $host['screens']			host screens (optional)
 	 * @param array  $scripts					host scripts (optional)
 	 * @param string $scripts[]['name']			script name
@@ -231,6 +232,7 @@ class CMenuPopupHelper {
 		$data = array(
 			'type' => 'host',
 			'hostid' => $host['hostid'],
+			'hasGraphs' => (isset($host['graphs']) && $host['graphs']),
 			'hasScreens' => (isset($host['screens']) && $host['screens']),
 			'hasGoTo' => $hasGoTo
 		);
@@ -259,6 +261,7 @@ class CMenuPopupHelper {
 	 * @param string $scripts[]['scriptid']		script id
 	 * @param string $scripts[]['confirmation']	confirmation text
 	 * @param array  $gotos						goto links (optional)
+	 * @param array  $gotos['graphs']			link to host graphs page with url parameters ("name" => "value") (optional)
 	 * @param array  $gotos['screens']			link to host screen page with url parameters ("name" => "value") (optional)
 	 * @param array  $gotos['triggerStatus']	link to trigger status page with url parameters ("name" => "value") (optional)
 	 * @param array  $gotos['submap']			link to submap page with url parameters ("name" => "value") (optional)

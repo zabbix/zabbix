@@ -346,7 +346,7 @@ if(isset($_REQUEST['sform'])){
 
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}
-	zbx_add_post_js('logexpr_count='.($maxid+1));
+	zbx_add_post_js('logexpr_count='.($maxid+1).';');
 
 	$maxid=0;
 	foreach($keys as $id => $val){
@@ -360,7 +360,7 @@ if(isset($_REQUEST['sform'])){
 
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}
-	zbx_add_post_js('key_count='.($maxid+1));
+	zbx_add_post_js('key_count='.($maxid+1).';');
 
 	$frmTRLog->addRow(SPACE, $keyTable);
 	$frmTRLog->addRow(SPACE, $table);

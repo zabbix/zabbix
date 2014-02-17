@@ -38,7 +38,7 @@ if (isset($this->data['iconmapid'])) {
 }
 
 // header
-$iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
+$iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE), 'header');
 
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;

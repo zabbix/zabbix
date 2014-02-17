@@ -140,7 +140,6 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
-		$_REQUEST['triggerid'] = 0;
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
 		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
 		$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
@@ -277,6 +276,7 @@ $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addVar('stime', get_request('stime'));
 $r_form->addVar('period', get_request('period'));
+$r_form->addVar('triggerid', 0);
 
 // add host and group filters to the form
 if ($source == EVENT_SOURCE_TRIGGERS) {
@@ -346,7 +346,9 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 					'&srcfld2=description'.
 					'&real_hosts=1'.
 					'&monitored_hosts=1'.
-					'&with_monitored_triggers=1");',
+					'&with_monitored_triggers=1'.
+					($_REQUEST['hostid'] ? '&only_hostid='.$_REQUEST['hostid'] : '').
+					'");',
 				'T'
 			)
 		), 'form_row_r')
@@ -661,9 +663,11 @@ else {
 				$hosts[] = reset($trigger['hosts']);
 			}
 			$hostids = zbx_objectValues($hosts, 'hostid');
+
 			$hosts = API::Host()->get(array(
 				'output' => array('name', 'hostid', 'status'),
 				'hostids' => $hostids,
+				'selectGraphs' => API_OUTPUT_COUNT,
 				'selectScreens' => API_OUTPUT_COUNT,
 				'preservekeys' => true
 			));
