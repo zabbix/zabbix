@@ -44,7 +44,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
