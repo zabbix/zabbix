@@ -1170,8 +1170,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @param array  $selement
 	 * @param string $selement['label']						label to expand
-	 * @param int    $selement['elementtype']				type of element: trigger, host, ...
-	 * @param int    $selement['elementid']					element id in DB
+	 * @param int    $selement['elementtype']				element type
+	 * @param int    $selement['elementid']					element id
 	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
 	 *
 	 * @return string
