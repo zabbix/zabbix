@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,8 @@ if (isset($_REQUEST['usrgrpid'])) {
 		'usrgrpids' => $_REQUEST['usrgrpid'],
 		'output' => API_OUTPUT_EXTEND
 	));
-	if (empty($dbUserGroup)) {
+
+	if (!$dbUserGroup) {
 		access_deny();
 	}
 }
@@ -96,11 +97,12 @@ elseif (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbUserGroupChk = API::UserGroup()->get(array(
+		$dbUserGroupCount = API::UserGroup()->get(array(
 			'usrgrpids' => $_REQUEST['group_groupid'],
 			'countOutput' => true
 		));
-		if ($dbUserGroupChk != count($_REQUEST['group_groupid'])) {
+
+		if ($dbUserGroupCount != count($_REQUEST['group_groupid'])) {
 			access_deny();
 		}
 	}
@@ -193,7 +195,7 @@ elseif (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 
-	$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
+	$result = API::UserGroup()->delete(array($_REQUEST['usrgrpid']));
 	$result = DBend($result);
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
@@ -301,13 +303,15 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		clearCookies($goResult);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status'))) {
-	$groupIds = get_request('group_groupid', get_request('usrgrpid'));
+elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))) {
+	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
-	$setUsersStatus = ($_REQUEST['go'] == 'enable_status') ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
-
+	$enable = (getRequest('go') == 'enable_status');
+	$status = $enable ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
+	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$groups = array();
+
 	$dbGroups = DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
@@ -317,23 +321,29 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 	while ($group = DBfetch($dbGroups)) {
 		$groups[$group['usrgrpid']] = $group;
 	}
+	$updated = count($groups);
 
 	if ($groups) {
 		DBstart();
 
-		$goResult = change_group_status($groupIds, $setUsersStatus);
-		$goResult = DBend($goResult);
+		$result = change_group_status($groupIds, $status);
+		$result = DBend($result);
 
-		if ($goResult) {
-			$auditAction = ($setUsersStatus == GROUP_STATUS_ENABLED) ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
-
-			foreach ($groups as $groupId => $group) {
+		if ($result) {
+			foreach ($groups as $group) {
 				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'User status for group name ['.$group['name'].']');
 			}
 		}
 
-		show_messages($goResult, _('Users status updated'), _('Cannot update users status'));
-		clearCookies($goResult);
+		$messageSuccess = $enable
+			? _n('User group enabled', 'User groups enabled', $updated)
+			: _n('User group disabled', 'User groups disabled', $updated);
+		$messageFailed = $enable
+			? _n('Cannot enable user group', 'Cannot enable user groups', $updated)
+			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
+
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 }
 

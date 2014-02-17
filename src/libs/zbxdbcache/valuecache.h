@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@
 typedef struct
 {
 	zbx_timespec_t	timestamp;
-
 	history_value_t	value;
 }
 zbx_history_record_t;
@@ -108,6 +107,6 @@ void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value,
 /* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
 /* value vector filled by zbx_vc_get_value* functions. This define simply better          */
 /* mirrors the vector creation function to vector destroying function.                    */
-#define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector);
+#define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
 #endif	/* ZABBIX_VALUECACHE_H */

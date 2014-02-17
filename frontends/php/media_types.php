@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,39 +143,30 @@ elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 	clearCookies($result);
 }
-elseif ($_REQUEST['go'] == 'activate') {
-	$mediaTypeIds = get_request('mediatypeids', array());
-
-	$options = array();
-
-	foreach ($mediaTypeIds as $mediaTypeId) {
-		$options[] = array(
-			'mediatypeid' => $mediaTypeId,
-			'status' => MEDIA_TYPE_STATUS_ACTIVE
-		);
-	}
-
-	$goResult = API::Mediatype()->update($options);
-
-	show_messages($goResult, _('Media type enabled'), _('Cannot enable media type'));
-	clearCookies($goResult);
-}
-elseif ($_REQUEST['go'] == 'disable') {
-	$mediaTypeIds = get_request('mediatypeids', array());
-
-	$options = array();
+elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+	$mediaTypeIds = getRequest('mediatypeids', array());
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
+	$update = array();
 
 	foreach ($mediaTypeIds as $mediaTypeId) {
-		$options[] = array(
+		$update[] = array(
 			'mediatypeid' => $mediaTypeId,
-			'status' => MEDIA_TYPE_STATUS_DISABLED
+			'status' => $status
 		);
 	}
+	$result = API::Mediatype()->update($update);
 
-	$goResult = API::Mediatype()->update($options);
+	$updated = count($update);
+	$messageSuccess = $enable
+		? _n('Media type enabled', 'Media types enabled', $updated)
+		: _n('Media type disabled', 'Media types disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable media type', 'Cannot enable media types', $updated)
+		: _n('Cannot disable media type', 'Cannot disable media types', $updated);
 
-	show_messages($goResult, _('Media type disabled'), _('Cannot disable media type'));
-	clearCookies($goResult);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$goResult = API::Mediatype()->delete(get_request('mediatypeids', array()));

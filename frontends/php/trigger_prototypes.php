@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,8 +213,10 @@ elseif (getRequest('go') == 'massupdate' && hasRequest('mass_save') && hasReques
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
-	$status = (getRequest('go') == 'activate') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$update = array();
 
 	// get requested triggers with permission check
 	$dbTriggerPrototypes = API::TriggerPrototype()->get(array(
@@ -224,22 +226,29 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	));
 
 	if ($dbTriggerPrototypes) {
-		$updateTriggerPrototypes = array();
 		foreach ($dbTriggerPrototypes as $dbTriggerPrototype) {
-			$updateTriggerPrototypes[] = array(
+			$update[] = array(
 				'triggerid' => $dbTriggerPrototype['triggerid'],
 				'status' => $status
 			);
 		}
 
-		$goResult = API::TriggerPrototype()->update($updateTriggerPrototypes);
+		$result = API::TriggerPrototype()->update($update);
 	}
 	else {
-		$goResult = true;
+		$result = true;
 	}
 
-	show_messages($goResult, _('Status updated'), _('Cannot update status'));
-	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
+	$updated = count($update);
+	$messageSuccess = $enable
+		? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
+		: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
+		: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));

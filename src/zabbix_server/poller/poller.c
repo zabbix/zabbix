@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ static int	db_host_update_availability(const zbx_host_availability_t *in, const 
 			sqlset_prefix = "snmp_";
 			break;
 		case ITEM_TYPE_IPMI:
-			sqlset_prefix = "impi_";
+			sqlset_prefix = "ipmi_";
 			break;
 		case ITEM_TYPE_JMX:
 			sqlset_prefix = "jmx_";

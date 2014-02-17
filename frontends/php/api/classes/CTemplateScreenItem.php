@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class CTemplateScreenItem extends CZBXAPI {
 	}
 
 	/**
-	 * Get ScreemItem data
+	 * Get screem item data.
 	 *
 	 * @param array $options
 	 * @param array $options['nodeids']			Node IDs
@@ -85,7 +85,7 @@ class CTemplateScreenItem extends CZBXAPI {
 	 * @param array $options['filter']			Result filter
 	 * @param array $options['limit']			The size of the result set
 	 *
-	 * @return array|boolean Host data as array or false if error
+	 * @return array
 	 */
 	public function get(array $options = array()) {
 		$options = zbx_array_merge($this->getOptions, $options);
@@ -113,27 +113,29 @@ class CTemplateScreenItem extends CZBXAPI {
 		}
 
 		// fill result with real resourceid
-		if (!is_null($options['hostids']) && !empty($result)) {
+		if ($options['hostids'] && $result) {
 			if (empty($options['screenitemid'])) {
 				$options['screenitemid'] = zbx_objectValues($result, 'screenitemid');
 			}
 
-			$templateScreens = API::TemplateScreen()->get(array(
+			$dbTemplateScreens = API::TemplateScreen()->get(array(
 				'screenitemids' => $options['screenitemid'],
 				'hostids' => $options['hostids'],
 				'selectScreenItems' => API_OUTPUT_EXTEND
 			));
-			if (!empty($templateScreens)) {
-				foreach ($result as &$resultScreenitem) {
-					foreach ($templateScreens as $templateScreen) {
-						foreach ($templateScreen['screenitems'] as $screenitem) {
-							if ($resultScreenitem['screenitemid'] == $screenitem['screenitemid'] && !empty($screenitem['real_resourceid'])) {
-								$resultScreenitem['real_resourceid'] = $screenitem['real_resourceid'];
+
+			if ($dbTemplateScreens) {
+				foreach ($result as &$screenItem) {
+					foreach ($dbTemplateScreens as $dbTemplateScreen) {
+						foreach ($dbTemplateScreen['screenitems'] as $dbScreenItem) {
+							if ($screenItem['screenitemid'] == $dbScreenItem['screenitemid']
+									&& isset($dbScreenItem['real_resourceid']) && $dbScreenItem['real_resourceid']) {
+								$screenItem['real_resourceid'] = $dbScreenItem['real_resourceid'];
 							}
 						}
 					}
 				}
-				unset($resultScreenitem);
+				unset($screenItem);
 			}
 		}
 

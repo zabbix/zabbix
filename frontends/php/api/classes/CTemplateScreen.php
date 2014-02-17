@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,17 +31,18 @@ class CTemplateScreen extends CScreen {
 	protected $sortColumns = array('screenid', 'name');
 
 	/**
-	 * Get Screen data
+	 * Get screen data.
 	 *
-	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
-	 * @param boolean $options['with_items'] only with items
-	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
-	 * @param int $options['count'] count Hosts, returned column name is rowscount
-	 * @param string $options['pattern'] search hosts by pattern in host names
-	 * @param int $options['limit'] limit selection
-	 * @param string $options['order'] deprecated parameter (for now)
-	 * @return array|boolean Host data as array or false if error
+	 * @param array  $options
+	 * @param array  $options['nodeids']		Node IDs
+	 * @param bool   $options['with_items']		only with items
+	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
+	 * @param int    $options['count']			count Hosts, returned column name is rowscount
+	 * @param string $options['pattern']		search hosts by pattern in host names
+	 * @param int    $options['limit']			limit selection
+	 * @param string $options['order']			deprecated parameter (for now)
+	 *
+	 * @return array
 	 */
 	public function get($options = array()) {
 		$result = array();
@@ -424,89 +425,6 @@ class CTemplateScreen extends CScreen {
 		return !empty($screens);
 	}
 
-	/**
-	 * Create Screen
-	 *
-	 * @param array $screens
-	 * @param string $screens['name']
-	 * @param array $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return array
-	 */
-	public function create(array $screens) {
-		$screens = zbx_toArray($screens);
-		$this->validateCreate($screens);
-
-		$insertScreenItems = array();
-
-		$screenids = DB::insert('screens', $screens);
-
-		foreach ($screens as $snum => $screen) {
-			if (isset($screen['screenitems'])) {
-				foreach ($screen['screenitems'] as $screenitem) {
-					$screenitem['screenid'] = $screenids[$snum];
-					$insertScreenItems[] = $screenitem;
-				}
-			}
-		}
-		API::ScreenItem()->create($insertScreenItems);
-
-		return array('screenids' => $screenids);
-	}
-
-	/**
-	 * Update Screen
-	 *
-	 * @param array $screens multidimensional array with Hosts data
-	 * @param string $screens['screenid']
-	 * @param int $screens['name']
-	 * @param int $screens['hsize']
-	 * @param int $screens['vsize']
-	 * @return boolean
-	 */
-	public function update(array $screens) {
-		$screens = zbx_toArray($screens);
-		$update = array();
-		$this->validateUpdate($screens);
-
-		foreach ($screens as $screen) {
-			$screenid = $screen['screenid'];
-			unset($screen['screenid']);
-			if (!empty($screen)) {
-				$update[] = array(
-					'values' => $screen,
-					'where' => array('screenid' => $screenid)
-				);
-			}
-
-			if (isset($screen['screenitems'])) {
-				$this->replaceItems($screenid, $screen['screenitems']);
-			}
-		}
-		DB::update('screens', $update);
-
-		return  array('screenids' => zbx_objectValues($screens, 'screenid'));
-	}
-
-	/**
-	 * Delete Screen
-	 *
-	 * @param array $screenids
-	 * @return boolean
-	 */
-	public function delete($screenIds) {
-		$screenIds = zbx_toArray($screenIds);
-
-		$this->validateDelete($screenIds);
-
-		DB::delete('screens_items', array('screenid' => $screenIds));
-		DB::delete('screens_items', array('resourceid' => $screenIds, 'resourcetype' => SCREEN_RESOURCE_SCREEN));
-		DB::delete('slides', array('screenid' => $screenIds));
-		DB::delete('screens', array('screenid' => $screenIds));
-
-		return array('screenids' => $screenIds);
-	}
-
 	public function copy(array $data) {
 		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
 		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);
@@ -540,15 +458,14 @@ class CTemplateScreen extends CScreen {
 			}
 			unset($screen);
 
-
 			// get same items on destination template
 			$resourceItemsMap = array();
 			$dbItems = DBselect(
 				'SELECT src.itemid AS srcid,dest.itemid as destid'.
-						' FROM items dest,items src'.
-						' WHERE dest.key_=src.key_'.
-						' AND dest.hostid='.zbx_dbstr($templateId).
-						' AND '.dbConditionInt('src.itemid', $resourceItemIds)
+				' FROM items dest,items src'.
+				' WHERE dest.key_=src.key_'.
+					' AND dest.hostid='.zbx_dbstr($templateId).
+					' AND '.dbConditionInt('src.itemid', $resourceItemIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
 				$resourceItemsMap[$dbItem['srcid']] = $dbItem['destid'];
@@ -558,17 +475,16 @@ class CTemplateScreen extends CScreen {
 			$resourceGraphsMap = array();
 			$dbItems = DBselect(
 				'SELECT src.graphid AS srcid,dest.graphid as destid'.
-						' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
-						' WHERE dest.name=src.name'.
-						' AND destgi.graphid=dest.graphid'.
-						' AND destgi.itemid=desti.itemid'.
-						' AND desti.hostid='.zbx_dbstr($templateId).
-						' AND '.dbConditionInt('src.graphid', $resourceGraphIds)
+				' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
+				' WHERE dest.name=src.name'.
+					' AND destgi.graphid=dest.graphid'.
+					' AND destgi.itemid=desti.itemid'.
+					' AND desti.hostid='.zbx_dbstr($templateId).
+					' AND '.dbConditionInt('src.graphid', $resourceGraphIds)
 			);
 			while ($dbItem = DBfetch($dbItems)) {
 				$resourceGraphsMap[$dbItem['srcid']] = $dbItem['destid'];
 			}
-
 
 			$newScreenIds = DB::insert('screens', $screens);
 
@@ -584,23 +500,29 @@ class CTemplateScreen extends CScreen {
 							if ($rid && !isset($resourceGraphsMap[$rid])) {
 								$graph = DBfetch(DBselect('SELECT g.name FROM graphs g WHERE g.graphid='.zbx_dbstr($rid)));
 								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" does not exist on template "%2$s".',
-									$graph['name'], $template['name']));
+
+								self::exception(
+									ZBX_API_ERROR_PARAMETERS,
+									_s('Graph "%1$s" does not exist on template "%2$s".', $graph['name'], $template['name'])
+								);
 							}
 
 							$screenItem['resourceid'] = $resourceGraphsMap[$rid];
 							break;
+
 						default:
 							if ($rid && !isset($resourceItemsMap[$rid])) {
 								$item = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($rid)));
 								$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($templateId)));
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" does not exist on template "%2$s".',
-									$item['name'], $template['name']));
+
+								self::exception(
+									ZBX_API_ERROR_PARAMETERS,
+									_s('Item "%1$s" does not exist on template "%2$s".', $item['name'], $template['name'])
+								);
 							}
 
 							$screenItem['resourceid'] = $resourceItemsMap[$rid];
 					}
-
 
 					$insertScreenItems[] = $screenItem;
 				}
@@ -613,115 +535,126 @@ class CTemplateScreen extends CScreen {
 	}
 
 	/**
-	 * Validate input for create method.
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $screens
 	 */
 	protected function validateCreate(array $screens) {
-		$screenNames = zbx_objectValues($screens, 'name');
-		$templateids = zbx_objectValues($screens, 'templateid');
+		$screenDbFields = array('name' => null, 'templateid' => null);
+
+		foreach ($screens as $screen) {
+			if (!check_db_fields($screenDbFields, $screen)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+		}
+
+		$templateIds = zbx_objectValues($screens, 'templateid');
 
 		$dbScreens = $this->get(array(
 			'filter' => array(
-				'name' => $screenNames,
-				'templateid' => $templateids
+				'name' => zbx_objectValues($screens, 'name'),
+				'templateid' => $templateIds
 			),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name', 'templateid'),
 			'nopermissions' => true
 		));
-		foreach ($screens as $screen) {
-			$screenDbFields = array('name' => null, 'templateid' => null);
-			if (!check_db_fields($screenDbFields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
-			}
 
+		$dbTemplates = API::Template()->get(array(
+			'templateids' => $templateIds,
+			'output' => array('name', 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($templateIds as $templateId) {
+			if (!isset($dbTemplates[$templateId])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		foreach ($screens as $screen) {
 			foreach ($dbScreens as $dbScreen) {
 				if ($dbScreen['name'] == $screen['name'] && bccomp($dbScreen['templateid'], $screen['templateid']) == 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $screen['name']));
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Template screen "%1$s" already exists.', $screen['name'])
+					);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Validate input for update method.
+	 * Validates the input parameters for the update() method.
+	 *
+	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $screens
 	 */
 	protected function validateUpdate(array $screens) {
-		$updScreens = $this->get(array(
+		$dbScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('screenid', 'templateid'),
 			'preservekeys' => true
 		));
+
+		foreach ($screens as $screen) {
+			if (!isset($dbScreens[$screen['screenid']])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
 
 		$screens = $this->extendObjects($this->tableName(), $screens, array('name'));
 
 		foreach ($screens as $screen) {
-			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-
-			// check for "templateid", because it is not allowed
+			// "templateid" is not allowed
 			if (array_key_exists('templateid', $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for screen "%1$s".', $screen['name']));
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "templateid" for template screen "%1$s".', $screen['name'])
+				);
 			}
-
-			$screenDbFields = array('screenid' => null);
-			if (!check_db_fields($screenDbFields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
-			}
-
-			$dbScreen = $updScreens[$screen['screenid']];
 
 			if (isset($screen['name'])) {
-				$existScreens = $this->get(array(
+				$dbScreenExist = $this->get(array(
 					'filter' => array(
 						'name' => $screen['name'],
-						'templateid' => $dbScreen['templateid']
+						'templateid' => $dbScreens[$screen['screenid']]['templateid']
 					),
-					'preservekeys' => true,
 					'nopermissions' => true,
 					'output' => array('screenid')
 				));
-				$existScreen = reset($existScreens);
+				$dbScreenExist = reset($dbScreenExist);
 
-				if ($existScreen && bccomp($existScreen['screenid'], $screen['screenid']) != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Screen "%1$s" already exists.', $screen['name']));
+				if ($dbScreenExist && bccomp($dbScreenExist['screenid'], $screen['screenid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template screen "%1$s" already exists.', $screen['name']));
 				}
 			}
-		}
-	}
-
-	/**
-	 * Validate input for delete method.
-	 *
-	 * @param array $screenIds
-	 */
-	protected function validateDelete(array $screenIds) {
-		if (!$this->isWritable($screenIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	/**
 	 * Validate input for copy method.
 	 *
-	 * @param array $data
+	 * @param array $data['screenIds']
+	 * @param array $data['templateIds']
 	 */
 	protected function validateCopy(array $data) {
 		$screenIds = $data['screenIds'];
 		$templateIds = $data['templateIds'];
 
-		$screens = $this->get(array(
+		$dbScreens = $this->get(array(
 			'screenids' => $screenIds,
 			'output' => array('screenid', 'name', 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
+
 		foreach ($screenIds as $screenId) {
-			if (!isset($screens[$screenId])) {
+			if (!isset($dbScreens[$screenId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -732,66 +665,23 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// check if screen with same name exists
-		$existingScreens = $this->get(array(
+		$dbExistingScreens = $this->get(array(
 			'filter' => array(
-				'name' => zbx_objectValues($screens, 'name'),
+				'name' => zbx_objectValues($dbScreens, 'name'),
 				'templateid' => $templateIds
 			),
-			'output' => array('screenid', 'name', 'templateid'),
+			'output' => array('name', 'templateid'),
 			'preservekeys' => true
 		));
-		foreach ($existingScreens as $existingScreen) {
-			$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$existingScreen['templateid']));
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists on template "%2$2".',
-				$existingScreen['name'], $template['name']));
+
+		foreach ($dbExistingScreens as $dbExistingScreen) {
+			$dbTemplate = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$dbExistingScreen['templateid']));
+
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Screen "%1$s" already exists on template "%2$2".', $dbExistingScreen['name'], $dbTemplate['name'])
+			);
 		}
-	}
-
-	/**
-	 * Check if user has read access to screens.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isReadable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'screenids' => $ids,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
-
-	/**
-	 * Check if user has write access to screens.
-	 *
-	 * @param array $ids
-	 *
-	 * @return bool
-	 */
-	public function isWritable(array $ids) {
-		if (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'screenids' => $ids,
-			'editable' => true,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

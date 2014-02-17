@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum
 {
@@ -497,8 +496,6 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
-
-#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
@@ -572,5 +569,10 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 int	get_nodeid_by_id(zbx_uint64_t id);
+
+#ifdef HAVE_POSTGRESQL
+#	define DBbytea_escape	zbx_db_bytea_escape
+size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
+#endif
 
 #endif

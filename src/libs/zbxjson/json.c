@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 static char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
-const char	*zbx_json_strerror()
+const char	*zbx_json_strerror(void)
 {
 	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_json_strerror_message[0]);
@@ -164,7 +164,7 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 				len += 2;
 				break;
 			default:
-				if ((u_char)*sptr < 32)
+				if (0 != iscntrl(*sptr))
 					len += 6;
 				else
 					len++;
@@ -222,7 +222,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = 't';
 				break;
 			default:
-				if ((u_char)*sptr < 32)
+				if (0 != iscntrl(*sptr))
 				{
 					*p++ = '\\';
 					*p++ = 'u';
@@ -491,11 +491,11 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 	{
 		if (NULL != error)
 		{
-			zbx_set_json_strerror("cannot open JSON object: %s", error);
+			zbx_set_json_strerror("cannot parse as a valid JSON object: %s", error);
 			zbx_free(error);
 		}
 		else
-			zbx_set_json_strerror("cannot open JSON object \"%.64s\"", buffer);
+			zbx_set_json_strerror("cannot parse as a valid JSON object \"%.64s\"", buffer);
 
 		return FAIL;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -437,7 +437,7 @@ elseif (isset($_REQUEST['form'])) {
 		if (!empty($data['templateid'])) {
 			$parentGraphid = $data['templateid'];
 			do {
-				$parentGraph = get_graph_by_graphid($parentGraphid);
+				$parentGraph = getGraphByGraphId($parentGraphid);
 
 				// parent graph prototype link
 				if (get_request('parent_discoveryid')) {
@@ -476,10 +476,11 @@ elseif (isset($_REQUEST['form'])) {
 
 		// items
 		$data['items'] = API::GraphItem()->get(array(
+			'output' => array(
+				'gitemid', 'graphid', 'itemid', 'type', 'drawtype', 'yaxisside', 'calc_fnc', 'color', 'sortorder'
+			),
 			'graphids' => $data['graphid'],
-			'sortfield' => 'gitemid',
-			'output' => API_OUTPUT_EXTEND,
-			'expandData' => true
+			'sortfield' => 'gitemid'
 		));
 	}
 	else {
@@ -523,6 +524,33 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
 		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
+	}
+
+	// items
+	if ($data['items']) {
+		$items = API::Item()->get(array(
+			'output' => array('itemid', 'hostid', 'name', 'key_', 'flags'),
+			'selectHosts' => array('hostid', 'name'),
+			'itemids' => zbx_objectValues($data['items'], 'itemid'),
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+			),
+			'webitems' => true,
+			'preservekeys' => true
+		));
+
+		foreach ($data['items'] as &$item) {
+			$host = reset($items[$item['itemid']]['hosts']);
+
+			$item['host'] = $host['name'];
+			$item['hostid'] = $items[$item['itemid']]['hostid'];
+			$item['name'] = $items[$item['itemid']]['name'];
+			$item['key_'] = $items[$item['itemid']]['key_'];
+			$item['flags'] = $items[$item['itemid']]['flags'];
+		}
+		unset($item);
+
+		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
 
 	$_REQUEST['items'] = $data['items'];

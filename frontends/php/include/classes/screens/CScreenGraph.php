@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CScreenGraph extends CScreenBase {
 		$graphDims = getGraphDims($resourceid);
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];
-		$graph = get_graph_by_graphid($resourceid);
+		$graph = getGraphByGraphId($resourceid);
 		$graphid = $graph['graphid'];
 		$legend = $graph['show_legend'];
 		$graph3d = $graph['show_3d'];

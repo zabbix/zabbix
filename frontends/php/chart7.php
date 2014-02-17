@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,11 +50,15 @@ asort_by_key($items, 'sortorder');
  * Permissions
  */
 $dbItems = API::Item()->get(array(
+	'itemids' => zbx_objectValues($items, 'itemid'),
+	'filter' => array(
+		'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+	),
+	'output' => array('itemid'),
 	'webitems' => true,
-	'itemids' => zbx_objectValues($items, 'itemid')
+	'preservekeys' => true
 ));
 
-$dbItems = zbx_toHash($dbItems, 'itemid');
 foreach ($items as $item) {
 	if (!isset($dbItems[$item['itemid']])) {
 		access_deny();
@@ -90,8 +94,6 @@ if ($isDataValid) {
 		$graph->switchPie3D();
 	}
 	$graph->showLegend(getRequest('legend', 0));
-
-	unset($host);
 
 	if (isset($_REQUEST['period'])) {
 		$graph->setPeriod($_REQUEST['period']);

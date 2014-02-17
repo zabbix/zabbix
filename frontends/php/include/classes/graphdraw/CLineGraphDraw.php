@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,20 +100,24 @@ class CLineGraphDraw extends CGraphDraw {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
 
-		$item = get_item_by_itemid($itemid);
+		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
+		$item = reset($items);
+
+		$item['name'] = $item['name_expanded'];
+
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['name'] = itemName($item);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
-		if (strpos($item['units'], ',') !== false) {
-			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $item['units']);
+		if (strpos($item['units'], ',') === false) {
+			$this->items[$this->num]['unitsLong'] = '';
 		}
 		else {
-			$this->items[$this->num]['unitsLong'] = '';
+			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $item['units']);
 		}
 
 		$host = get_host_by_hostid($item['hostid']);
 
+		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
@@ -128,6 +132,7 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
 			$this->yaxisright = 1;
 		}
+
 		$this->num++;
 	}
 
@@ -389,7 +394,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		// calculte shift for stacked graphs
+		// calculate shift for stacked graphs
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			for ($i = 1; $i < $this->num; $i++) {
 				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
@@ -457,7 +462,8 @@ class CLineGraphDraw extends CGraphDraw {
 					continue;
 				}
 
-				$trigger = API::UserMacro()->resolveTrigger($trigger);
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
+
 				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([\-0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
 					continue;
 				}
@@ -1834,17 +1840,15 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$colorSquare = imagecreate(11, 11);
 			}
+
 			imagefill($colorSquare, 0, 0, $this->getColor($this->graphtheme['backgroundcolor'], 0));
 			imagefilledrectangle($colorSquare, 0, 0, 10, 10, $color);
 			imagerectangle($colorSquare, 0, 0, 10, 10, $this->getColor('Black'));
 
-			// item caption
-			if ($this->itemsHost) {
-				$item_caption = $this->items[$i]['name'];
-			}
-			else {
-				$item_caption = $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name'];
-			}
+			// caption
+			$itemCaption = $this->itemsHost
+				? $this->items[$i]['name_expanded']
+				: $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name_expanded'];
 
 			// draw legend of an item with data
 			if (isset($data) && isset($data['min'])) {
@@ -1856,7 +1860,7 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
-				$legend->addCell($rowNum, array('text' => $item_caption));
+				$legend->addCell($rowNum, array('text' => $itemCaption));
 				$legend->addCell($rowNum, array('text' => '['.$fncRealName.']'));
 				$legend->addCell($rowNum, array(
 					'text' => convert_units(array(
@@ -1894,7 +1898,7 @@ class CLineGraphDraw extends CGraphDraw {
 			// draw legend of an item without data
 			else {
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
-				$legend->addCell($rowNum, array('text' => $item_caption));
+				$legend->addCell($rowNum, array('text' => $itemCaption));
 				$legend->addCell($rowNum, array('text' => '[ '._('no data').' ]'));
 			}
 
@@ -1907,6 +1911,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$i++;
 			}
 		}
+
 		$legend->draw();
 
 		// if graph is small, we are not drawing percent line and trigger legends

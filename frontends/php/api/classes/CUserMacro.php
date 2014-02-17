@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -576,143 +576,6 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Get macros
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function getMacros($data) {
-		$macros = $data['macros'];
-		$hostIds = isset($data['hostid']) ? zbx_toArray($data['hostid']) : null;
-
-		$result = array();
-		zbx_value2array($macros);
-		$macros = array_unique($macros);
-
-		if (!$hostIds) {
-			$itemid = isset($data['itemid']) ? $data['itemid'] : null;
-			$triggerid = isset($data['triggerid']) ? $data['triggerid'] : null;
-
-			$hosts = API::Host()->get(array(
-				'itemids' => $itemid,
-				'triggerids' => $triggerid,
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'output' => array('hostid'),
-				'templated_hosts' => true
-			));
-			$hostIds = array_keys($hosts);
-		}
-
-		do {
-			$hostMacros = $this->get(array(
-				'hostids' => $hostIds,
-				'macros' => $macros,
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			order_result($hostMacros, 'hostid');
-
-			foreach ($macros as $mnum => $macro) {
-				foreach ($hostMacros as $hmnum => $hmacro) {
-					if ($macro == $hmacro['macro']) {
-						$result[$macro] = $hmacro['value'];
-						unset($hostMacros[$hmnum], $macros[$mnum]);
-						break;
-					}
-				}
-			}
-
-			if (!empty($macros)) {
-				$hosts = API::Template()->get(array(
-					'hostids' => $hostIds,
-					'nopermissions' => true,
-					'preservekeys' => true,
-					'output' => array('templateid')
-				));
-				$hostIds = array_keys($hosts);
-			}
-		} while (!empty($macros) && !empty($hostIds));
-
-
-		if (!empty($macros)) {
-			$gmacros = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'globalmacro' => true,
-				'nopermissions' => true,
-				'macros' => $macros
-			));
-
-			foreach ($macros as $macro) {
-				foreach ($gmacros as $mid => $gmacro) {
-					if ($macro == $gmacro['macro']) {
-						$result[$macro] = $gmacro['value'];
-						unset($gmacros[$mid]);
-						break;
-					}
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	public function resolveTrigger($triggers) {
-		$single = false;
-		if (isset($triggers['triggerid'])) {
-			$single = true;
-			$triggers = array($triggers);
-		}
-
-		foreach ($triggers as $num => $trigger) {
-			if (!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
-
-			if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)) {
-				$macros = $this->getMacros(array('macros' => $arr[1], 'triggerid' => $trigger['triggerid']));
-
-				$search = array_keys($macros);
-				$values = array_values($macros);
-
-				$triggers[$num]['expression'] = str_replace($search, $values, $trigger['expression']);
-			}
-		}
-
-		if ($single) {
-			$triggers = reset($triggers);
-		}
-
-		return $triggers;
-	}
-
-	public function resolveItem($items) {
-		$single = false;
-		if (isset($items['itemid'])) {
-			$single = true;
-			$items = array($items);
-		}
-
-		foreach ($items as $num => $item) {
-			if (!isset($item['itemid']) || !isset($item['key_'])) continue;
-
-			if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)) {
-				$macros = $this->getMacros(array('macros' => $arr[1],'itemid' => $item['itemid']));
-
-				$search = array_keys($macros);
-				$values = array_values($macros);
-				$items[$num]['key_'] = str_replace($search, $values, $item['key_']);
-			}
-		}
-
-		if ($single) {
-			$items = $items[0];
-		}
-
-		return $items;
-	}
-
-	/**
 	 * Replace macros on hosts/templates.
 	 * $macros input array has hostid as key and array of that host macros as value.
 	 *
@@ -751,7 +614,7 @@ class CUserMacro extends CZBXAPI {
 				}
 			}
 
-			// if macro has hostmacrid it should be updated otherwise created as new
+			// if macro has hostmacroid it should be updated otherwise created as new
 			foreach ($hostMacros as $hostMacro) {
 				if (isset($hostMacro['hostmacroid']) && isset($dbHostMacros[$hostMacro['hostmacroid']])) {
 					$macrosToUpdate[] = $hostMacro;

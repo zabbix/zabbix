@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ function get_graphs_by_hostid($hostid) {
 }
 
 function get_realhosts_by_graphid($graphid) {
-	$graph = get_graph_by_graphid($graphid);
+	$graph = getGraphByGraphId($graphid);
 	if (!empty($graph['templateid'])) {
 		return get_realhosts_by_graphid($graph['templateid']);
 	}
@@ -284,14 +284,14 @@ function get_min_itemclock_by_itemid($itemIds) {
 	return $min ? $min: $result;
 }
 
-function get_graph_by_graphid($graphid) {
-	$dbGraphs = DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphid));
-	$dbGraphs = DBfetch($dbGraphs);
-	if (!empty($dbGraphs)) {
-		return $dbGraphs;
+function getGraphByGraphId($graphId) {
+	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
+
+	if ($dbGraph) {
+		return $dbGraph;
 	}
 
-	error(_s('No graph item with graphid "%s".', $graphid));
+	error(_s('No graph item with graphid "%s".', $graphId));
 
 	return false;
 }

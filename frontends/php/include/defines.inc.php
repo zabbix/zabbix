@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.2.1');
-define('ZABBIX_API_VERSION', '2.2.1');
+define('ZABBIX_VERSION',     '2.2.2');
+define('ZABBIX_API_VERSION', '2.2.2');
 define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2013');
+define('ZABBIX_COPYRIGHT_TO',   '2014');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
 define('ZBX_MIN_PERIOD',		3600); // 1 hour
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
 define('ZBX_WIDGET_ROWS', 20);
@@ -62,10 +63,10 @@ define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 
-define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0); // a normal item
-define('ZBX_FLAG_DISCOVERY_RULE',		0x1); // a low level discovery rule
-define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2); // an item prototype
-define('ZBX_FLAG_DISCOVERY_CREATED',	0x4); // an item created via a discovery rule
+define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
+define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
+define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2);
+define('ZBX_FLAG_DISCOVERY_CREATED',	0x4);
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
@@ -136,14 +137,11 @@ define('IMAGE_FORMAT_PNG',	'PNG');
 define('IMAGE_FORMAT_JPEG',	'JPEG');
 define('IMAGE_FORMAT_TEXT',	'JPEG');
 
-define('IMAGE_TYPE_UNKNOWN',		0);
 define('IMAGE_TYPE_ICON',			1);
 define('IMAGE_TYPE_BACKGROUND',		2);
 
 define('ITEM_CONVERT_WITH_UNITS',	0); // - do not convert empty units
 define('ITEM_CONVERT_NO_UNITS',		1); // - no units
-define('ITEM_CONVERT_SHORT_UNITS',	2); // - to short units
-define('ITEM_CONVERT_LONG_UNITS',	3); // - to long units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
@@ -306,12 +304,6 @@ define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 define('SYSMAP_HIGHLIGHT_OFF',	0);
 define('SYSMAP_HIGHLIGHT_ON',	1);
 
-define('SYSMAP_EXPANDPROBLEM_OFF',	0);
-define('SYSMAP_EXPANDPROBLEM_ON',	1);
-
-define('SYSMAP_MARKELEMENTS_OFF',	0);
-define('SYSMAP_MARKELEMENTS_ON',	1);
-
 define('SYSMAP_GRID_SHOW_ON',	1);
 define('SYSMAP_GRID_SHOW_OFF',	0);
 
@@ -425,7 +417,6 @@ define('TRIGGER_STATUS_DISABLED',	1);
 
 define('TRIGGER_VALUE_FALSE',	0);
 define('TRIGGER_VALUE_TRUE',	1);
-define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
 define('TRIGGER_STATE_NORMAL',	0);
 define('TRIGGER_STATE_UNKNOWN',	1);
@@ -496,18 +487,6 @@ define('ACTION_EVAL_TYPE_AND_OR',	0);
 define('ACTION_EVAL_TYPE_AND',		1);
 define('ACTION_EVAL_TYPE_OR',		2);
 
-define('OPERATION_OBJECT_USER',		0);
-define('OPERATION_OBJECT_GROUP',	1);
-
-define('LOGFILE_SEVERITY_NOT_CLASSIFIED',	0);
-define('LOGFILE_SEVERITY_INFORMATION',		1);
-define('LOGFILE_SEVERITY_WARNING',			2);
-define('LOGFILE_SEVERITY_AVERAGE',			3);
-define('LOGFILE_SEVERITY_HIGH',				4);
-define('LOGFILE_SEVERITY_DISASTER',			5);
-define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
-define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
-
 // screen
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
@@ -548,9 +527,6 @@ define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
 define('SCREEN_MODE_SLIDESHOW',		2);
 define('SCREEN_MODE_JS',		3);
-
-define('SCREEN_TYPE_NORMAL',	0);
-define('SCREEN_TYPE_TEMPLATED',	1);
 
 define('SCREEN_SIMPLE_ITEM',	0);
 define('SCREEN_DYNAMIC_ITEM',	1);
@@ -593,13 +569,9 @@ define('MARK_COLOR_RED',	1);
 define('MARK_COLOR_GREEN',	2);
 define('MARK_COLOR_BLUE',	3);
 
-define('PROFILE_TYPE_UNKNOWN',		0);
 define('PROFILE_TYPE_ID',			1);
 define('PROFILE_TYPE_INT',			2);
 define('PROFILE_TYPE_STR',			3);
-define('PROFILE_TYPE_ARRAY_ID',		4);
-define('PROFILE_TYPE_ARRAY_INT',	5);
-define('PROFILE_TYPE_ARRAY_STR',	6);
 
 define('CALC_FNC_MIN', 1);
 define('CALC_FNC_AVG', 2);
@@ -629,9 +601,6 @@ define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);
 define('GROUP_GUI_ACCESS_DISABLED', 2);
 
-define('GROUP_API_ACCESS_DISABLED', 0);
-define('GROUP_API_ACCESS_ENABLED',	1);
-
 /**
  * @see access_deny()
  */
@@ -648,18 +617,12 @@ define('PERM_DENY',			0);
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
 define('PERM_RES_DATA_ARRAY',	2);
 
-define('RESOURCE_TYPE_NODE',	0);
-define('RESOURCE_TYPE_GROUP',	1);
-
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);
 define('ZBX_NODE_LOCAL',	1);
 define('ZBX_NODE_MASTER',	2);
-
-define('ZBX_FLAG_TRIGGER',	0);
-define('ZBX_FLAG_EVENT',	1);
 
 define('HTTPTEST_AUTH_NONE',	0);
 define('HTTPTEST_AUTH_BASIC',	1);
@@ -679,10 +642,6 @@ define('EVENT_ACK_ENABLED',		'1');
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
-
-define('EVENTS_NOFALSEFORB_STATUS_ALL',		0); // used with TRIGGERS_OPTION_NOFALSEFORB
-define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1); // used with TRIGGERS_OPTION_NOFALSEFORB
-define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2); // used with TRIGGERS_OPTION_NOFALSEFORB
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
@@ -781,19 +740,12 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',	'#ERROR_FUNCTION#');
 
-define('AVAILABLE_NOCACHE', 0);	// take available objects not from cache
-
 define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
-
-// affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
-if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
-	define('ZBX_MBSTRINGS_OVERLOADED', 1);
-}
 
 define('REGEXP_INCLUDE', 0);
 define('REGEXP_EXCLUDE', 1);
@@ -808,15 +760,12 @@ define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
-define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 
 // !!! should be used with "x" modifier
@@ -850,17 +799,8 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 ))*? # matches non comma seperated brackets with parameters zero or more times
 )');
 
-// regexp ids
-define('ZBX_KEY_ID',		1);
-define('ZBX_KEY_NAME_ID',	2);
-define('ZBX_KEY_PARAM_ID',	6);
-
-define('ZBX_HISTORY_COUNT', 5);
-
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
-
-define('ZBX_FAVORITES_ALL', -1);
 
 // IPMI
 define('IPMI_AUTHTYPE_DEFAULT',		-1);
@@ -914,6 +854,8 @@ define('SEC_PER_DAY',	86400);
 define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+
+define('ZBX_JAN_2038', 2145916800);
 
 define('DAY_IN_YEAR', 365);
 

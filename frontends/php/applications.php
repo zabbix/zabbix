@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,42 +179,39 @@ elseif ($_REQUEST['go'] == 'delete') {
 	show_messages($goResult, _('Application deleted'), _('Cannot delete application'));
 	clearCookies($goResult, $_REQUEST['hostid']);
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$goResult = true;
-	$applications = get_request('applications', array());
+elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+	$result = true;
+	$hostId = getRequest('hostid');
+	$enable = (getRequest('go') == 'activate');
+	$updated = 0;
 
 	DBstart();
-
-	foreach ($applications as $id => $appid) {
-		$db_items = DBselect(
+	foreach (getRequest('applications') as $id => $appid) {
+		$dbItems = DBselect(
 			'SELECT ia.itemid,i.hostid,i.key_'.
 			' FROM items_applications ia'.
 				' LEFT JOIN items i ON ia.itemid=i.itemid'.
 			' WHERE ia.applicationid='.zbx_dbstr($appid).
-				' AND i.hostid='.zbx_dbstr($_REQUEST['hostid']).
+				' AND i.hostid='.zbx_dbstr($hostId).
 				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
 				andDbNode('ia.applicationid')
 		);
-		while ($item = DBfetch($db_items)) {
-			if ($_REQUEST['go'] == 'activate') {
-				$goResult &= activate_item($item['itemid']);
-			}
-			else {
-				$goResult &= disable_item($item['itemid']);
-			}
+		while ($item = DBfetch($dbItems)) {
+			$result &= $enable ? activate_item($item['itemid']) : disable_item($item['itemid']);
+			$updated++;
 		}
 	}
+	$result = DBend($result);
 
-	$goResult = DBend($goResult);
+	$messageSuccess = $enable
+		? _n('Item enabled', 'Items enabled', $updated)
+		: _n('Item disabled', 'Items disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable item', 'Cannot enable items', $updated)
+		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
-	if ($_REQUEST['go'] == 'activate') {
-		show_messages($goResult, _('Items activated'), null);
-	}
-	else {
-		show_messages($goResult, _('Items disabled'), null);
-	}
-
-	clearCookies($goResult, $_REQUEST['hostid']);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, $hostId);
 }
 
 /*

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -480,7 +480,7 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		foreach ($groups as $group) {
-			if (empty($group['name'])) {
+			if (!isset($group['name']) || zbx_empty($group['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {

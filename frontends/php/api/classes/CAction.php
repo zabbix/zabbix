@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -643,26 +643,36 @@ class CAction extends CZBXAPI {
 		// check fields
 		$duplicates = array();
 		foreach ($actions as $action) {
+			$actionName = isset($action['name']) ? $action['name'] : $updActions[$action['actionid']]['name'];
+
 			if (!check_db_fields(array('actionid' => null), $action)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters for action update method "%s".', $action['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Incorrect parameters for action update method "%1$s".',
+					$actionName
+				));
 			}
 
-			// check if user changed esc_period or eventsource
-			if (isset($action['esc_period']) || isset($action['eventsource'])) {
-				$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
-				$escPeriod = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
-
-				if ($escPeriod < SEC_PER_MIN && EVENT_SOURCE_TRIGGERS == $eventsource) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).', $action['name'], SEC_PER_MIN));
-				}
+			// check if user changed esc_period for trigger eventsource
+			if (isset($action['esc_period'])
+					&& $action['esc_period'] < SEC_PER_MIN
+					&& $updActions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).',
+					$actionName,
+					SEC_PER_MIN
+				));
 			}
+
+			$this->checkNoParameters($action, array('eventsource'), _('Cannot update "%1$s" for action "%2$s".'),
+				$actionName
+			);
 
 			if (!isset($action['name'])) {
 				continue;
 			}
 
 			if (isset($duplicates[$action['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
 			}
 			else {
 				$duplicates[$action['name']] = $action['name'];
@@ -673,8 +683,10 @@ class CAction extends CZBXAPI {
 		$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
 		foreach ($actions as $action) {
 			if (isset($action['name'])) {
+				$actionName = $action['name'];
+
 				$actionExists = $this->get(array(
-					'filter' => array('name' => $action['name']),
+					'filter' => array('name' => $actionName),
 					'output' => array('actionid'),
 					'editable' => true,
 					'nopermissions' => true,
@@ -682,14 +694,17 @@ class CAction extends CZBXAPI {
 				));
 				if (($actionExist = reset($actionExists))
 						&& (bccomp($actionExist['actionid'], $action['actionid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $actionName));
 				}
+			}
+			else {
+				$actionName = $updActions[$action['actionid']]['name'];
 			}
 
 			if (isset($action['conditions'])) {
 				if (!is_array($action['conditions'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect action conditions for action "%1$s".', $updActions[$action['actionid']]['name']));
+						_s('Incorrect action conditions for action "%1$s".', $actionName));
 				}
 
 				$conditionsDb = isset($updActions[$action['actionid']]['conditions'])
@@ -724,7 +739,7 @@ class CAction extends CZBXAPI {
 			}
 
 			if (isset($action['operations']) && empty($action['operations'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $actionName));
 			}
 			elseif (isset($action['operations'])) {
 				$this->validateOperations($action['operations']);

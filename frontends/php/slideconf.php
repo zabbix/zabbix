@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,8 +59,10 @@ if (isset($_REQUEST['slideshowid'])) {
 	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
 		access_deny();
 	}
+
 	$dbSlideshow = get_slideshow_by_slideshowid(get_request('slideshowid'));
-	if (empty($dbSlideshow)) {
+
+	if (!$dbSlideshow) {
 		access_deny();
 	}
 }
@@ -69,8 +71,11 @@ if (isset($_REQUEST['go'])) {
 		access_deny();
 	}
 	else {
-		$dbSlideshowChk = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', $_REQUEST['shows'])));
-		if ($dbSlideshowChk['cnt'] != count($_REQUEST['shows'])) {
+		$dbSlideshowCount = DBfetch(DBselect(
+			'SELECT COUNT(*) AS cnt FROM slideshows s WHERE '.dbConditionInt('s.slideshowid', $_REQUEST['shows'])
+		));
+
+		if ($dbSlideshowCount['cnt'] != count($_REQUEST['shows'])) {
 			access_deny();
 		}
 	}
@@ -192,6 +197,13 @@ else {
 			whereDbNode('s.slideshowid').
 			' GROUP BY s.slideshowid,s.name,s.delay'
 	));
+
+	foreach ($data['slides'] as $key => $slide) {
+		if (!slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
+			unset($data['slides'][$key]);
+		}
+	}
+
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 
 	$data['paging'] = getPagingLine($data['slides'], array('slideshowid'));
@@ -211,4 +223,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

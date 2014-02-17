@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,9 +115,7 @@ void	zbx_vector_ ## __id ## _remove(zbx_vector_ ## __id ## _t *vector, int index
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
 	if (2 <= vector->values_num)										\
-	{													\
 		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
-	}													\
 }														\
 														\
 void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
@@ -134,6 +132,32 @@ void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare
 														\
 		vector->values_num = j;										\
 	}													\
+}														\
+														\
+int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, __type value,			\
+									zbx_compare_func_t compare_func)	\
+{														\
+	int	lo = 0, hi = vector->values_num, mid, c;							\
+														\
+	while (1 <= hi - lo)											\
+	{													\
+		mid = (lo + hi) / 2;										\
+														\
+		c = compare_func(&vector->values[mid], &value);							\
+														\
+		if (0 > c)											\
+		{												\
+			lo = mid + 1;										\
+		}												\
+		else if (0 == c)										\
+		{												\
+			return mid;										\
+		}												\
+		else												\
+			hi = mid;										\
+	}													\
+														\
+	return hi;												\
 }														\
 														\
 int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type value,			\
@@ -205,4 +229,5 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 		vector->values_alloc = 0;									\
 	}													\
 }
+
 #endif	/* ZABBIX_VECTORIMPL_H */

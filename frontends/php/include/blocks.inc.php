@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,42 +56,52 @@ function make_favorite_graphs() {
 	}
 
 	if ($itemids) {
-		$options = array(
+		$items = API::Item()->get(array(
 			'itemids' => $itemids,
 			'selectHosts' => array('hostid', 'name'),
-			'output' => array('itemid', 'name', 'key_'),
+			'output' => array('itemid', 'hostid', 'name', 'key_'),
 			'webitems' => true
-		);
-		$items = API::Item()->get($options);
+		));
 		$items = zbx_toHash($items, 'itemid');
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 	}
 
 	foreach ($fav_graphs as $favorite) {
 		$sourceid = $favorite['value'];
 
-		if ('itemid' == $favorite['source']) {
+		if ($favorite['source'] == 'itemid') {
 			if (!isset($items[$sourceid])) {
 				continue;
 			}
+
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = itemName($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name_expanded'],
+				'history.php?action=showgraph&itemid='.$sourceid
+			);
 			$link->setTarget('blank');
 		}
 		else {
 			if (!isset($graphs[$sourceid])) {
 				continue;
 			}
+
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'], 'charts.php?graphid='.$sourceid);
+			$link = new CLink(
+				get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'],
+				'charts.php?graphid='.$sourceid
+			);
 			$link->setTarget('blank');
 		}
+
 		$favList->addItem($link, 'nowrap');
 	}
+
 	return $favList;
 }
 
@@ -799,11 +809,13 @@ function make_latest_issues(array $filter = array()) {
 	// hide the sort indicator if no sortfield and sortorder are given
 	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
 
-	if (!isset($filter['sortfield'])) {
-		$filter['sortfield'] = 'lastchange';
+	if (isset($filter['sortfield']) && $filter['sortfield'] !== 'lastchange') {
+		$sortField = array($filter['sortfield'], 'lastchange');
+		$sortOrder = array($filter['sortorder'], ZBX_SORT_DOWN);
 	}
-	if (!isset($filter['sortorder'])) {
-		$filter['sortorder'] = ZBX_SORT_DOWN;
+	else {
+		$sortField = array('lastchange');
+		$sortOrder = array(ZBX_SORT_DOWN);
 	}
 
 	$options = array(
@@ -825,8 +837,8 @@ function make_latest_issues(array $filter = array()) {
 		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'),
 		'selectHosts' => array('hostid', 'name'),
 		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
-		'sortfield' => $filter['sortfield'],
-		'sortorder' => $filter['sortorder'],
+		'sortfield' => $sortField,
+		'sortorder' => $sortOrder,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
 	)));
 
@@ -1195,13 +1207,13 @@ function make_graph_menu(&$menu, &$submenu) {
 
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Graph'),
-		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&multiselect=1&real_hosts=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Simple graph'),
-		'javascript: PopUp(\'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid'.
+		'javascript: PopUp(\'popup.php?srctbl=items&srcfld1=itemid&reference=itemid&real_hosts=1'.
 			'&multiselect=1&numeric=1&templated=0&with_simple_graph_items=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
@@ -1246,31 +1258,32 @@ function make_graph_submenu() {
 	}
 
 	if ($itemids) {
-		$options = array(
-			'itemids' => $itemids,
+		$items = API::Item()->get(array(
+			'output' => array('itemid', 'hostid', 'name', 'key_'),
 			'selectHosts' => array('hostid', 'host'),
-			'output' => array('itemid', 'name', 'key_'),
-			'webitems' => 1
-		);
-		$items = API::Item()->get($options);
-		$items = zbx_toHash($items, 'itemid');
-	}
+			'itemids' => $itemids,
+			'webitems' => true,
+			'preservekeys' => true
+		));
 
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+	}
 
 	foreach ($fav_graphs as $favorite) {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
-		if ('itemid' == $source) {
+		if ($source == 'itemid') {
 			if (!isset($items[$sourceid])) {
 				continue;
 			}
+
 			$item_added = true;
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			$item['name'] = itemName($item);
+
 			$favGraphs[] = array(
-				'name' => $host['host'].NAME_DELIMITER.$item['name'],
+				'name' => $host['host'].NAME_DELIMITER.$item['name_expanded'],
 				'favobj' => 'itemid',
 				'favid' => $sourceid,
 				'favaction' => 'remove'
@@ -1280,6 +1293,7 @@ function make_graph_submenu() {
 			if (!isset($graphs[$sourceid])) {
 				continue;
 			}
+
 			$graph_added = true;
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
@@ -1309,6 +1323,7 @@ function make_graph_submenu() {
 			'favaction' => 'remove'
 		);
 	}
+
 	return $favGraphs;
 }
 

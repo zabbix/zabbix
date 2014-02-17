@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,8 +35,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,
-		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)), null),
+	'eventsource' =>		array(T_ZBX_INT, O_OPT, null,
+		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)),
+		null
+	),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
 		IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
@@ -73,12 +75,16 @@ $fields = array(
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}')
 );
-$_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
-check_fields($fields);
+$dataValid = check_fields($fields);
+
+if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
+	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
+}
+
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = getRequest('go', 'none');
 
 /*
  * Ajax
@@ -102,8 +108,6 @@ if (isset($_REQUEST['actionid'])) {
 	}
 }
 
-CProfile::update('web.actionconf.eventsource', $_REQUEST['eventsource'], PROFILE_TYPE_INT);
-
 /*
  * Actions
  */
@@ -117,10 +121,9 @@ elseif (isset($_REQUEST['cancel_new_operation'])) {
 elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
-elseif (isset($_REQUEST['save'])) {
+elseif (hasRequest('save')) {
 	$action = array(
 		'name'			=> get_request('name'),
-		'eventsource'	=> get_request('eventsource', 0),
 		'evaltype'		=> get_request('evaltype', 0),
 		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
 		'esc_period'	=> get_request('esc_period', 0),
@@ -138,14 +141,19 @@ elseif (isset($_REQUEST['save'])) {
 			$action['operations'][$num]['opmessage']['default_msg'] = 0;
 		}
 	}
+
 	DBstart();
-	if (isset($_REQUEST['actionid'])) {
-		$action['actionid'] = $_REQUEST['actionid'];
+	if (hasRequest('actionid')) {
+		$action['actionid'] = getRequest('actionid');
 
 		$result = API::Action()->update($action);
 		show_messages($result, _('Action updated'), _('Cannot update action'));
 	}
 	else {
+		$action['eventsource'] = getRequest('eventsource',
+			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+		);
+
 		$result = API::Action()->create($action);
 		show_messages($result, _('Action added'), _('Cannot add action'));
 	}
@@ -153,9 +161,9 @@ elseif (isset($_REQUEST['save'])) {
 	$result = DBend($result);
 	if ($result) {
 		add_audit(
-			isset($_REQUEST['actionid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
+			hasRequest('actionid') ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
 			AUDIT_RESOURCE_ACTION,
-			_('Name').NAME_DELIMITER.$_REQUEST['name']
+			_('Name').NAME_DELIMITER.$action['name']
 		);
 
 		unset($_REQUEST['form']);
@@ -280,7 +288,10 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
-				sortOperations($_REQUEST['eventsource'], $_REQUEST['operations']);
+				$eventsource = getRequest('eventsource',
+					CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+				);
+				sortOperations($eventsource, $_REQUEST['operations']);
 			}
 		}
 
@@ -298,32 +309,46 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 		$_REQUEST['new_operation']['action'] = 'update';
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
-	$statusName = $status ? 'disabled' : 'enabled';
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_actionid')) {
+	$result = true;
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
+	$statusName = $enable ? 'enabled' : 'disabled';
+	$actionIds = array();
+	$updated = 0;
 
 	DBstart();
-	$actionIds = array();
-
-	$goResult = DBselect(
+	$dbActions = DBselect(
 		'SELECT a.actionid'.
 		' FROM actions a'.
 		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
-	while ($row = DBfetch($goResult)) {
-		$res = DBexecute('UPDATE actions SET status='.zbx_dbstr($status).' WHERE actionid='.zbx_dbstr($row['actionid']));
-		if ($res) {
+	while ($row = DBfetch($dbActions)) {
+		$result &= DBexecute(
+			'UPDATE actions'.
+			' SET status='.zbx_dbstr($status).
+			' WHERE actionid='.zbx_dbstr($row['actionid'])
+		);
+		if ($result) {
 			$actionIds[] = $row['actionid'];
 		}
+		$updated++;
 	}
-	$goResult = DBend($res);
+	$result = DBend($result);
 
-	if ($goResult && isset($res)) {
-		show_messages($goResult, _('Status updated'), _('Cannot update status'));
+	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
 
-	clearCookies($goResult);
+	$messageSuccess = $enable
+		? _n('Action enabled', 'Actions enabled', $updated)
+		: _n('Action disabled', 'Actions disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable action', 'Cannot enable actions', $updated)
+		: _n('Cannot disable action', 'Cannot disable actions', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
@@ -337,18 +362,16 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
  */
 show_messages();
 
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 	$data = array(
 		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh', 0),
 		'actionid' => get_request('actionid'),
-		'eventsource' => get_request('eventsource'),
 		'new_condition' => get_request('new_condition', array()),
 		'new_operation' => get_request('new_operation', null)
 	);
 
 	$action = null;
-	if (!empty($data['actionid'])) {
+	if ($data['actionid']) {
 		$data['action'] = API::Action()->get(array(
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
@@ -357,29 +380,31 @@ if (isset($_REQUEST['form'])) {
 			'editable' => true
 		));
 		$data['action'] = reset($data['action']);
+		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
-		$data['eventsource'] = get_request('eventsource');
-		$data['evaltype'] = get_request('evaltype');
-		$data['esc_period'] = get_request('esc_period');
+		$data['eventsource'] = getRequest('eventsource',
+			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+		);
+		$data['evaltype'] = getRequest('evaltype');
+		$data['esc_period'] = getRequest('esc_period');
 	}
 
-	if (isset($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
-		sortOperations($data['action']['eventsource'], $data['action']['operations']);
+	if (isset($data['action']['actionid']) && !hasRequest('form_refresh')) {
+		sortOperations($data['eventsource'], $data['action']['operations']);
 	}
 	else {
 		$data['action']['name'] = get_request('name');
-		$data['action']['eventsource'] = get_request('eventsource');
 		$data['action']['evaltype'] = get_request('evaltype', 0);
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
-		$data['action']['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
+		$data['action']['status'] = get_request('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
 
-		sortOperations($data['action']['eventsource'], $data['action']['operations']);
+		sortOperations($data['eventsource'], $data['action']['operations']);
 
-		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
+		if ($data['actionid'] && hasRequest('form_refresh')) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');
 			$data['action']['def_longdata'] = get_request('def_longdata');
 		}
@@ -407,9 +432,7 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	if (empty($data['action']['actionid'])
-			&& !isset($_REQUEST['form_refresh'])
-			&& $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
@@ -467,7 +490,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'eventsource' => get_request('eventsource'),
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
 		'displayNodes' => is_array(get_current_nodeid())
 	);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// filter
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,			null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
@@ -247,6 +247,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new or existing host groups
+		$newHostGroupIds = array();
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
@@ -254,7 +255,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$existGroups[] = $newGroup;
+						$newHostGroupIds[] = $newGroup;
 					}
 				}
 
@@ -263,22 +264,24 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						throw new Exception();
 					}
 
-					$existGroups = isset($existGroups)
-						? array_merge($existGroups, $createdGroups['groupids']) : $createdGroups['groupids'];
+					$newHostGroupIds = $newHostGroupIds
+						? array_merge($newHostGroupIds, $createdGroups['groupids'])
+						: $createdGroups['groupids'];
 				}
 			}
 			else {
-				$existGroups = $_REQUEST['new_groups'];
+				$newHostGroupIds = getRequest('new_groups');
 			}
 		}
 
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
-				$replaceHostGroupsIds = isset($existGroups)
-					? array_unique(array_merge($_REQUEST['groups'], $existGroups)) : $_REQUEST['groups'];
+				$replaceHostGroupsIds = $newHostGroupIds
+					? array_unique(array_merge(getRequest('groups'), $newHostGroupIds))
+					: $_REQUEST['groups'];
 			}
-			elseif (isset($existGroups)) {
-				$replaceHostGroupsIds = $existGroups;
+			elseif ($newHostGroupIds) {
+				$replaceHostGroupsIds = $newHostGroupIds;
 			}
 
 			if (isset($replaceHostGroupsIds)) {
@@ -292,9 +295,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				$hosts['groups'] = array();
 			}
 		}
-		elseif (isset($existGroups)) {
-			$existGroups = API::HostGroup()->get(array(
-				'groupids' => $existGroups,
+		elseif ($newHostGroupIds) {
+			$newHostGroups = API::HostGroup()->get(array(
+				'groupids' => $newHostGroupIds,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -326,8 +329,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
-			$add['groups'] = $existGroups;
+		if ($newHostGroupIds && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = zbx_toObject($newHostGroupIds, 'groupid');
 		}
 
 		if ($add) {
@@ -592,13 +595,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
 	clearCookies($goResult);
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-	$hosts = get_request('hosts', array());
+elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+	$enable =(getRequest('go') == 'activate');
+	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$hosts = getRequest('hosts', array());
+
 	$actHosts = API::Host()->get(array(
 		'hostids' => $hosts,
 		'editable' => true,
-		'templated_hosts' => 1,
+		'templated_hosts' => true,
 		'output' => array('hostid')
 	));
 	$actHosts = zbx_objectValues($actHosts, 'hostid');
@@ -606,11 +611,20 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	if ($actHosts) {
 		DBstart();
 
-		$goResult = updateHostStatus($actHosts, $status);
-		$goResult = DBend($goResult);
+		$result = updateHostStatus($actHosts, $status);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
-		clearCookies($goResult);
+		$updated = count($actHosts);
+
+		$messageSuccess = $enable
+			? _n('Host enabled', 'Hosts enabled', $updated)
+			: _n('Host disabled', 'Hosts disabled', $updated);
+		$messageFailed = $enable
+			? _n('Cannot enable host', 'Cannot enable hosts', $updated)
+			: _n('Cannot disable host', 'Cannot disable hosts', $updated);
+
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 }
 

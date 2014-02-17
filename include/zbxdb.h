@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 void	zbx_create_sqlite3_mutex(const char *dbname);
 void	zbx_remove_sqlite3_mutex();
 #endif
-void	zbx_db_init(char *dbname);
+void	zbx_db_init(const char *dbname, const char *const db_schema);
 void    zbx_db_close();
 
 int	zbx_db_begin();
@@ -181,5 +181,10 @@ DB_RESULT	zbx_db_select_n(const char *query, int n);
 
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 int		zbx_db_is_null(const char *field);
+
+char		*zbx_db_dyn_escape_string(const char *src);
+char		*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len);
+#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
+char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 #endif

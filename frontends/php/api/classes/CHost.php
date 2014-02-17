@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['select']['templateid'] = 'ht.templateid';
+			$sqlParts['select']['parent_templateid'] = 'ht.templateid as parent_templateid';
 			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
 			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
@@ -453,16 +453,16 @@ class CHost extends CHostGeneral {
 				}
 
 				// templateids
-				if (isset($host['templateid'])) {
+				if (isset($host['parent_templateid'])) {
 					if (!isset($result[$host['hostid']]['templates'])) {
 						$result[$host['hostid']]['templates'] = array();
 					}
 
 					$result[$host['hostid']]['templates'][] = array(
-						'templateid' => $host['templateid'],
-						'hostid' => $host['templateid']
+						'templateid' => $host['parent_templateid'],
+						'hostid' => $host['parent_templateid']
 					);
-					unset($host['templateid']);
+					unset($host['parent_templateid']);
 				}
 
 				// triggerids
@@ -688,7 +688,7 @@ class CHost extends CHostGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				// cannot update certain fields for discoverd hosts
+				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
 			}
 			else {
@@ -1135,12 +1135,12 @@ class CHost extends CHostGeneral {
 
 		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
-			$updateInventory = $data['inventory'];
-			$updateInventory['inventory_mode'] = null;
-
 			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
 			}
+
+			$updateInventory = $data['inventory'];
+			$updateInventory['inventory_mode'] = null;
 		}
 
 		if (isset($data['inventory_mode'])) {
@@ -1280,93 +1280,84 @@ class CHost extends CHostGeneral {
 		 * Inventory
 		 */
 		if (isset($updateInventory)) {
+			// disabling inventory
 			if ($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				$sql = 'DELETE FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids);
 				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 				}
 			}
+			// changing inventory mode or setting inventory fields
 			else {
-				$hostsWithInventories = array();
 				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
-					'SELECT hostid'.
+					'SELECT hostid,inventory_mode'.
 					' FROM host_inventory'.
 					' WHERE '.dbConditionInt('hostid', $hostids)
 				), 'hostid');
 
-				// check for hosts with disabled inventory mode
-				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
+				// check existing host inventory data
+				$automaticHostIds = array();
+				if ($updateInventory['inventory_mode'] === null) {
 					foreach ($hostids as $hostId) {
+						// if inventory is disabled for one of the updated hosts, throw an exception
 						if (!isset($existingInventoriesDb[$hostId])) {
 							$host = get_host_by_hostid($hostId);
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Inventory disabled for host "%s".', $host['host']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Inventory disabled for host "%1$s".', $host['host']
+							));
+						}
+						// if inventory mode is set to automatic, save its ID for later usage
+						elseif ($existingInventoriesDb[$hostId]['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
+							$automaticHostIds[] = $hostId;
 						}
 					}
 				}
-				foreach ($existingInventoriesDb as $existingInventory) {
-					$hostsWithInventories[] = $existingInventory['hostid'];
+
+				$inventoriesToSave = array();
+				foreach ($hostids as $hostId) {
+					$hostInventory = $updateInventory;
+					$hostInventory['hostid'] = $hostId;
+
+					// if no 'inventory_mode' has been passed, set inventory 'inventory_mode' from DB
+					if ($updateInventory['inventory_mode'] === null) {
+						$hostInventory['inventory_mode'] = $existingInventoriesDb[$hostId]['inventory_mode'];
+					}
+
+					$inventoriesToSave[$hostId] = $hostInventory;
 				}
 
-				// when hosts are being updated to use automatic mode for host inventories,
-				// we must check if some items are set to populate inventory fields of every host.
-				// if they do, mass update for those fields should be ignored
-				if ($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
-					// getting all items on all affected hosts
+				// when updating automatic inventory, ignore fields that have items linked to them
+				if ($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC
+						|| ($updateInventory['inventory_mode'] === null && $automaticHostIds)) {
+
 					$itemsToInventories = API::item()->get(array(
 						'output' => array('inventory_link', 'hostid'),
-						'filter' => array('hostid' => $hostids),
+						'hostids' => $automaticHostIds ? $automaticHostIds : $hostids,
 						'nopermissions' => true
 					));
 
-					// gathering links to array: 'hostid'=>array('inventory_name_1'=>true, 'inventory_name_2'=>true)
-					$inventoryLinksOnHosts = array();
 					$inventoryFields = getHostInventories();
 					foreach ($itemsToInventories as $hinv) {
-						if ($hinv['inventory_link'] != 0) { // 0 means 'no link'
-							if (isset($inventoryLinksOnHosts[$hinv['hostid']])) {
-								$inventoryLinksOnHosts[$hinv['hostid']][$inventoryFields[$hinv['inventory_link']]['db_field']] = true;
-							}
-							else {
-								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryFields[$hinv['inventory_link']]['db_field'] => true);
-							}
-						}
-					}
-
-					// now we have all info we need to determine, which inventory fields should be saved
-					$inventoriesToSave = array();
-					foreach ($hostids as $hostid) {
-						$inventoriesToSave[$hostid] = $updateInventory;
-						$inventoriesToSave[$hostid]['hostid'] = $hostid;
-						foreach ($updateInventory as $inventoryName => $hinv) {
-							if (isset($inventoryLinksOnHosts[$hostid][$inventoryName])) {
-								unset($inventoriesToSave[$hostid][$inventoryName]);
-							}
+						// 0 means 'no link'
+						if ($hinv['inventory_link'] != 0) {
+							$inventoryName = $inventoryFields[$hinv['inventory_link']]['db_field'];
+							unset($inventoriesToSave[$hinv['hostid']][$inventoryName]);
 						}
 					}
 				}
-				else {
-					// if mode is not automatic, all fields can be saved
-					$inventoriesToSave = array();
-					foreach ($hostids as $hostid) {
-						$inventoriesToSave[$hostid] = $updateInventory;
-						$inventoriesToSave[$hostid]['hostid'] = $hostid;
+
+				// save inventory data
+				foreach ($inventoriesToSave as $inventory) {
+					$hostId = $inventory['hostid'];
+					if (isset($existingInventoriesDb[$hostId])) {
+						DB::update('host_inventory', array(
+							'values' => $inventory,
+							'where' => array('hostid' => $hostId)
+						));
 					}
-				}
-
-				$hostsWithoutInventory = array_diff($hostids, $hostsWithInventories);
-
-				// hosts that have no inventory yet, need it to be inserted
-				foreach ($hostsWithoutInventory as $hostid) {
-					DB::insert('host_inventory', array($inventoriesToSave[$hostid]), false);
-				}
-
-				// those hosts that already have an inventory, need it to be updated
-				foreach ($hostsWithInventories as $hostid) {
-					DB::update('host_inventory', array(
-						'values' => $inventoriesToSave[$hostid],
-						'where' => array('hostid' => $hostid)
-					));
+					else {
+						DB::insert('host_inventory', array($inventory), false);
+					}
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ foreach ($this->data['slides'] as $step => $slides) {
 	$name = '';
 	if (!empty($slides['screenid'])) {
 		$screen = get_screen_by_screenid($slides['screenid']);
-		if (!empty($screen['name'])) {
+		if ($screen) {
 			$name = $screen['name'];
 		}
 	}
@@ -86,7 +86,7 @@ $addButtonColumn = new CCol(
 	empty($this->data['work_slide'])
 		? new CButton('add', _('Add'),
 			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
-				'&multiselect=1", 450, 450)',
+				'&multiselect=1&writeonly=1", 450, 450)',
 			'link_menu')
 		: null,
 	null,

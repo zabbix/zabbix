@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ $fields = array(
 	'new_media' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'disable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'lang' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'theme' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $themes).'"'), 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
 	'autologout' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
@@ -179,12 +179,15 @@ elseif (isset($_REQUEST['save'])) {
 		$user['url'] = get_request('url');
 		$user['autologin'] = get_request('autologin', 0);
 		$user['autologout'] = get_request('autologout', 0);
-		$user['lang'] = get_request('lang');
 		$user['theme'] = get_request('theme');
 		$user['refresh'] = get_request('refresh');
 		$user['rows_per_page'] = get_request('rows_per_page');
 		$user['type'] = get_request('user_type');
 		$user['user_medias'] = get_request('user_medias', array());
+
+		if (hasRequest('lang')) {
+			$user['lang'] = getRequest('lang');
+		}
 
 		$usrgrps = get_request('user_groups', array());
 		$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
@@ -198,7 +201,10 @@ elseif (isset($_REQUEST['save'])) {
 
 			$result = API::User()->update(array($user));
 			if ($result) {
-				$result = API::User()->updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = API::User()->updateMedia(array(
+					'users' => $user,
+					'medias' => $user['user_medias']
+				));
 			}
 			$result = DBend($result);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,7 +294,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
  *                                    string is constructed from the template by  *
  *                                    replacing \<n> sequences with the captured  *
  *                                    regexp group.                               *
- *                                    If output_template is NULL the the whole    *
+ *                                    If output_template is NULL the whole        *
  *                                    matched string is returned.                 *
  *             output         - [OUT] a reference to the variable where allocated *
  *                                    memory containing the resulting value       *

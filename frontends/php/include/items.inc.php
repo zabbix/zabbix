@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -549,133 +549,6 @@ function get_same_item_for_host($item, $dest_hostids) {
 	return false;
 }
 
-/**
- * Resolve macros in item key.
- * Resolve {HOSTNAME}, {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}, {HOST.HOST}, {HOST.NAME} and user macros.
- * Macros related to interface resolved only for host items.
- *
- * @param array $item
- * @param string $item['key_']
- * @param string $item['itemid']
- *
- * @return string
- */
-function resolveItemKeyMacros(array $item) {
-	$key =& $item['key_'];
-	$macStack = array();
-	$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}');
-
-	foreach ($macros as $macro) {
-		if (zbx_strpos($key, $macro) !== false) {
-			$macStack[] = $macro;
-		}
-	}
-
-	if (!empty($macStack)) {
-		$dbItem = API::Item()->get(array(
-			'itemids' => $item['itemid'],
-			'selectInterfaces' => array('ip', 'dns', 'useip'),
-			'selectHosts' => array('host', 'name'),
-			'webitems' => true,
-			'output' => array('itemid'),
-			'filter' => array('flags' => null)
-		));
-
-		if (!empty($dbItem)) {
-			$dbItem = reset($dbItem);
-			$host = reset($dbItem['hosts']);
-			$interface = reset($dbItem['interfaces']);
-
-			// if item without interface or template item, resolve interface related macros to *UNKNOWN*
-			if (!$interface) {
-				$interface = array(
-					'ip' => UNRESOLVED_MACRO_STRING,
-					'dns' => UNRESOLVED_MACRO_STRING,
-					'useip' => false
-				);
-			}
-
-			foreach ($macStack as $macro) {
-				switch ($macro) {
-					case '{HOST.NAME}':
-						$key = str_replace('{HOST.NAME}', $host['name'], $key);
-						break;
-					case '{HOSTNAME}': // deprecated
-						$key = str_replace('{HOSTNAME}', $host['host'], $key);
-						break;
-					case '{HOST.HOST}':
-						$key = str_replace('{HOST.HOST}', $host['host'], $key);
-						break;
-					case '{HOST.IP}':
-						$key = str_replace('{HOST.IP}', $interface['ip'], $key);
-						break;
-					case '{IPADDRESS}': // deprecated
-						$key = str_replace('{IPADDRESS}', $interface['ip'], $key);
-						break;
-					case '{HOST.DNS}':
-						$key = str_replace('{HOST.DNS}', $interface['dns'], $key);
-						break;
-					case '{HOST.CONN}':
-						$key = str_replace('{HOST.CONN}', $interface['useip'] ? $interface['ip'] : $interface['dns'], $key);
-						break;
-				}
-			}
-		}
-	}
-
-	if (preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $key)) {
-		$item = API::UserMacro()->resolveItem($item);
-	}
-
-	return $item['key_'];
-}
-
-/**
- * Expand macros inside key name and return it
- * Example:
- *	key: 'test.key[a, b, "{HOSTNAME}"]'
- *	name: 'Test item $1, $2, $3'
- *	result: 'Test item a, b, Zabbix-server'
- *
- * @param array $item
- * @param string $item['key_']
- * @param string $item['itemid']
- * @param string $item['name']
- *
- * @return string
- */
-function itemName($item) {
-	$name = $item['name'];
-
-	// if item name contains $1..$9 macros, we need to expand them
-	if (preg_match('/\$[1-9]/', $name)) {
-		$key = resolveItemKeyMacros($item);
-
-		// parsing key to get the parameters out of it
-		$ItemKey = new CItemKey($key);
-		if ($ItemKey->isValid()) {
-			$keyParameters = $ItemKey->getParameters();
-			$searchOffset = 0;
-			while (preg_match('/\$[1-9]/', $name, $matches, PREG_OFFSET_CAPTURE, $searchOffset)) {
-				// matches[0][0] - matched param, [1] - second character of it
-				$paramNumber = $matches[0][0][1] - 1;
-				$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
-
-				$name = substr_replace($name, $replaceString, $matches[0][1], 2);
-				$searchOffset = $matches[0][1] + strlen($replaceString);
-			}
-		}
-	}
-	if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)) {
-		$macros = API::UserMacro()->getMacros(array(
-			'macros' => $arr[1],
-			'itemid' => $item['itemid']
-		));
-		$name = str_replace(array_keys($macros), array_values($macros), $name);
-	}
-	return $name;
-}
-
 function get_realhost_by_itemid($itemid) {
 	$item = get_item_by_itemid($itemid);
 	if ($item['templateid'] <> 0) {
@@ -743,8 +616,10 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 				$sqlWhere
 	));
 
+	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+
 	CArrayHelper::sort($dbItems, array(
-		array('field' => 'name', 'order' => ZBX_SORT_UP),
+		array('field' => 'name_expanded', 'order' => ZBX_SORT_UP),
 		array('field' => 'itemid', 'order' => ZBX_SORT_UP)
 	));
 
@@ -762,28 +637,28 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	$items = array();
-	foreach ($dbItems as $row) {
-		$descr = itemName($row);
-		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
-		$hostNames[$row['hostid']] = $row['hostname'];
+	foreach ($dbItems as $dbItem) {
+		$name = $dbItem['name_expanded'];
+
+		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
+		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($items[$descr][$row['hostname']])
-				|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $row['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
-
-			$items[$descr][$row['hostname']] = array(
-				'itemid' => $row['itemid'],
-				'value_type' => $row['value_type'],
-				'value' => isset($history[$row['itemid']]) ? $history[$row['itemid']][0]['value'] : null,
-				'units' => $row['units'],
-				'name' => $row['name'],
-				'valuemapid' => $row['valuemapid'],
-				'severity' => $row['priority'],
-				'tr_value' => $row['tr_value'],
-				'triggerid' => $row['triggerid']
+		if (!isset($items[$name][$dbItem['hostname']])
+				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
+			$items[$name][$dbItem['hostname']] = array(
+				'itemid' => $dbItem['itemid'],
+				'value_type' => $dbItem['value_type'],
+				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
+				'units' => $dbItem['units'],
+				'name' => $name,
+				'valuemapid' => $dbItem['valuemapid'],
+				'severity' => $dbItem['priority'],
+				'tr_value' => $dbItem['tr_value'],
+				'triggerid' => $dbItem['triggerid']
 			);
 		}
 	}
@@ -1008,18 +883,24 @@ function formatHistoryValue($value, array $item, $trim = true) {
  * Retrieves from DB historical data for items and applies functional calculations.
  * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
  *
- * @param type $item
- * @param type $item['value_type'] type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
- * @param type $item['itemid'] id of item
- * @param type $item['units'] units of item
- * @param type $function function to apply to time period from param, allowed: min, max and avg
- * @param type $param formatted parameter for function, example: "2w" meaning 2 weeks
+ * @param array		$item
+ * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
+ * @param string	$item['itemid']		ID of item
+ * @param string	$item['units']		units of item
+ * @param string	$function			function to apply to time period from param, allowed: min, max and avg
+ * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
  *
  * @return string item functional value from history
  */
-function getItemFunctionalValue($item, $function, $param) {
+function getItemFunctionalValue($item, $function, $parameter) {
 	// check whether function is allowed
-	if (!in_array($function, array('min', 'max', 'avg'))) {
+	if (!in_array($function, array('min', 'max', 'avg')) || $parameter === '') {
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	$parameter = convertFunctionValue($parameter);
+
+	if (bccomp($parameter, 0) == 0) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
@@ -1034,7 +915,7 @@ function getItemFunctionalValue($item, $function, $param) {
 		$result = DBselect(
 			'SELECT '.$function.'(value) AS value'.
 			' FROM '.$historyTables[$item['value_type']].
-			' WHERE clock>'.(time() - convertFunctionValue($param)).
+			' WHERE clock>'.(time() - $parameter).
 			' AND itemid='.zbx_dbstr($item['itemid']).
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
@@ -1178,22 +1059,22 @@ function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
 		return $delay;
 	}
 
-	$currentDelay = SEC_PER_YEAR;
+	$currentDelay = -1;
 
 	foreach ($arrOfFlexIntervals as $flexInterval) {
 		if (sscanf($flexInterval, '%d/%29s', $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
-		if ($flexDelay < $currentDelay && checkTimePeriod($flexPeriod, $now)) {
+		if (($currentDelay == -1 || $flexDelay < $currentDelay) && checkTimePeriod($flexPeriod, $now)) {
 			$currentDelay = $flexDelay;
 		}
 	}
 
-	if ($currentDelay == SEC_PER_YEAR) {
+	if ($currentDelay == -1) {
 		return $delay;
 	}
 
-	return $currentDelay == 0 ? SEC_PER_YEAR : $currentDelay;
+	return $currentDelay;
 }
 
 /**
@@ -1288,49 +1169,53 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         hh      - hours (0-24)
  *         mm      - minutes (0-59)
  *
- * @param string $interfaceid
- * @param string $itemid
+ * @param string $seed               seed value applied to delay to spread item checks over the delay period
  * @param int $itemType
- * @param int $delay                 default delay
+ * @param int $delay                 default delay, can be overriden
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
  * @return array
  */
-function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexIntervals, $now) {
-	if ($delay == 0) {
-		$delay = SEC_PER_YEAR;
-	}
-
+function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
 	// special processing of active items to see better view in queue
 	if ($itemType == ITEM_TYPE_ZABBIX_ACTIVE) {
-		$nextcheck = $now + $delay;
+		if ($delay != 0) {
+			$nextcheck = $now + $delay;
+		}
+		else {
+			$nextcheck = ZBX_JAN_2038;
+		}
 	}
 	else {
 		// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+		// if it is not possible to check the item within a year, fail
 
 		$arrOfFlexIntervals = explode(';', $flexIntervals);
 		$t = $now;
 		$tmax = $now + SEC_PER_YEAR;
 		$try = 0;
 
-		$shift = ($itemType == ITEM_TYPE_JMX) ? $interfaceid : $itemid;
-
 		while ($t < $tmax) {
 			// calculate 'nextcheck' value for the current interval
 			$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
 
-			$nextcheck = $currentDelay * floor($t / $currentDelay) + ($shift % $currentDelay);
+			if ($currentDelay != 0) {
+				$nextcheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
 
-			if ($try == 0) {
-				while ($nextcheck <= $t) {
-					$nextcheck += $currentDelay;
+				if ($try == 0) {
+					while ($nextcheck <= $t) {
+						$nextcheck += $currentDelay;
+					}
+				}
+				else {
+					while ($nextcheck < $t) {
+						$nextcheck += $currentDelay;
+					}
 				}
 			}
 			else {
-				while ($nextcheck < $t) {
-					$nextcheck += $currentDelay;
-				}
+				$nextcheck = ZBX_JAN_2038;
 			}
 
 			// 'nextcheck' < end of the current interval ?
@@ -1344,10 +1229,9 @@ function calculateItemNextcheck($interfaceid, $itemid, $itemType, $delay, $flexI
 				break;
 			}
 		}
-		$delay = $currentDelay;
 	}
 
-	return array('nextcheck' => $nextcheck, 'delay' => $delay);
+	return $nextcheck;
 }
 
 /**

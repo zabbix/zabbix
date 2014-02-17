@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 $discoveryWidget = new CWidget();
 
@@ -57,19 +58,21 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status', $sortLink),
 	$data['showErrorColumn'] ? _('Error') : null
 ));
+
 foreach ($data['discoveries'] as $discovery) {
 	$description = array();
+
 	if ($discovery['templateid']) {
 		$template_host = get_realhost_by_itemid($discovery['templateid']);
 		$description[] = new CLink($template_host['name'], '?hostid='.$template_host['hostid'], 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
-	$discovery['name_expanded'] = itemName($discovery);
+
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate':'disable'),
+		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate' : 'disable'),
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
@@ -98,9 +101,27 @@ foreach ($data['discoveries'] as $discovery) {
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
-		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
-		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
-		array(new CLink(_('Graph prototypes'), 'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
+		array(
+			new CLink(
+				_('Item prototypes'),
+				'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+			),
+			' ('.$discovery['items'].')'
+		),
+		array(
+			new CLink(
+				_('Trigger prototypes'),
+				'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+			),
+			' ('.$discovery['triggers'].')'
+		),
+		array(
+			new CLink(
+				_('Graph prototypes'),
+				'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']
+			),
+			' ('.$discovery['graphs'].')'
+		),
 		$hostPrototypeLink,
 		$discovery['key_'],
 		$discovery['delay'],
@@ -136,4 +157,5 @@ $discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->dat
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);
+
 return $discoveryWidget;

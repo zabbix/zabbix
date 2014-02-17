@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,14 +100,16 @@ elseif ($items = getRequest('items', array())) {
 	asort_by_key($items, 'sortorder');
 
 	$dbItems = API::Item()->get(array(
-		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
 		'output' => array('itemid'),
+		'filter' => array(
+			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+		),
+		'webitems' => true,
 		'preservekeys' => true
 	));
 
-	$dbItems = zbx_toHash($dbItems, 'itemid');
 	foreach ($items as $item) {
 		if (!isset($dbItems[$item['itemid']])) {
 			access_deny();

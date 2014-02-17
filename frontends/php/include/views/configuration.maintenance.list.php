@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ foreach ($this->data['maintenances'] as $maintenance) {
 	$maintenanceTable->addRow(array(
 		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
 		$this->data['displayNodes'] ? $maintenance['nodename'] : null,
-		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
+		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		$maintenanceStatus,
 		$maintenance['description']

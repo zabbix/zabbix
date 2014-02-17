@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $slideWidget = new CWidget();
 
 // create new hostgroup button
@@ -44,9 +44,6 @@ $slidesTable->setHeader(array(
 ));
 
 foreach ($this->data['slides'] as $slide) {
-	if (!slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
-		continue;
-	}
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		$this->data['displayNodes'] ? $slide['nodename'] : null,
@@ -70,5 +67,5 @@ $slideForm->addItem(array($this->data['paging'], $slidesTable, $this->data['pagi
 
 // append form to widget
 $slideWidget->addItem($slideForm);
+
 return $slideWidget;
-?>

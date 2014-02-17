@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,17 +31,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-	'hostid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+	'groupid' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	// filter
-	'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
-	'filter_field'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
-	'filter_field_value'=>	array(T_ZBX_STR, O_OPT,  null,	null,	null),
-	'filter_exact'=>        array(T_ZBX_INT, O_OPT,  null,	'IN(0,1)',	null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+	'filter_field'=>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_field_value'=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_exact'=>        array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
 	//ajax
-	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
+	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 

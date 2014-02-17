@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ class CTrigger extends CTriggerGeneral {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->checkDeprecatedParam($options, 'output', 'value_flag');
+		$this->checkDeprecatedParam($options, 'output', 'value_flags');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -453,9 +453,6 @@ class CTrigger extends CTriggerGeneral {
 			return count($triggers);
 		}
 
-		$triggerids = array_keys($triggers);
-		sort($triggerids);
-
 		foreach ($triggers as $trigger) {
 			if (!isset($result[$trigger['triggerid']])) {
 				$result[$trigger['triggerid']] = array();
@@ -482,9 +479,8 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
-
 		// expandComment
-		if (!is_null($options['expandComment']) && $result && array_key_exists('comment', reset($result))) {
+		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 		}
 
@@ -504,7 +500,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// deprecated fields
-		$result = $this->handleDeprecatedOutput($result, 'value_flag', 'state', $options['output']);
+		$result = $this->handleDeprecatedOutput($result, 'value_flags', 'state', $options['output']);
 
 		// unset extra fields
 		$extraFields = array('state', 'expression');
@@ -659,7 +655,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$this->checkNoParameters(
 				$trigger,
-				array('templateid', 'state', 'value', 'value_flag'),
+				array('templateid', 'state', 'value', 'value_flags'),
 				($update ? _('Cannot update "%1$s" for trigger "%2$s".') : _('Cannot set "%1$s" for trigger "%2$s".')),
 				$trigger['description']
 			);
@@ -1723,8 +1719,8 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 			}
 
-			// select the state field to be able to return the deprecated value_flag property
-			if ($this->outputIsRequested('value_flag', $options['output'])) {
+			// select the state field to be able to return the deprecated value_flags property
+			if ($this->outputIsRequested('value_flags', $options['output'])) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('state'), $sqlParts);
 			}
 		}
@@ -1826,8 +1822,6 @@ class CTrigger extends CTriggerGeneral {
 			if (isset($sqlParts['select']['hostname'])) {
 				$sqlParts['select']['hostname'] = 'h.name as hostname';
 			}
-
-			$sqlParts = $this->addQueryOrder('t.lastchange', $sqlParts, ZBX_SORT_DOWN);
 		}
 
 		return $sqlParts;

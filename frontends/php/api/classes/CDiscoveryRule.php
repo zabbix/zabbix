@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
 			self::ERROR_EXISTS_TEMPLATE => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s"')
+			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s".'),
+			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for discovery rule "%2$s" on "%3$s": %4$s.')
 		));
 	}
 

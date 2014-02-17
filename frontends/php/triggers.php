@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,8 +241,10 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 	}
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
-	$status = (getRequest('go') == 'activate') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('g_triggerid')) {
+	$enable = (getRequest('go') == 'activate');
+	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$update = array();
 
 	// get requested triggers with permission check
 	$dbTriggers = API::Trigger()->get(array(
@@ -252,22 +254,29 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	));
 
 	if ($dbTriggers) {
-		$updateTriggers = array();
 		foreach ($dbTriggers as $dbTrigger) {
-			$updateTriggers[] = array(
+			$update[] = array(
 				'triggerid' => $dbTrigger['triggerid'],
 				'status' => $status
 			);
 		}
 
-		$goResult = API::Trigger()->update($updateTriggers);
+		$result = API::Trigger()->update($update);
 	}
 	else {
-		$goResult = true;
+		$result = true;
 	}
 
-	show_messages($goResult, _('Status updated'), _('Cannot update status'));
-	clearCookies($goResult, getRequest('hostid'));
+	$updated = count($update);
+	$messageSuccess = $enable
+		? _n('Trigger enabled', 'Triggers enabled', $updated)
+		: _n('Trigger disabled', 'Triggers disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable trigger', 'Cannot enable triggers', $updated)
+		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result, getRequest('hostid'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {

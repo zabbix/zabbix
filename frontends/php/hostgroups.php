@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,10 +179,12 @@ elseif ($_REQUEST['go'] == 'delete') {
 	show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
 	clearCookies($goResult);
 }
-elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
+	$enable =(getRequest('go') == 'activate');
+	$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
-	$groups = get_request('groups', array());
+	$groups = getRequest('groups', array());
 
 	if ($groups) {
 		DBstart();
@@ -194,15 +196,15 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		));
 
 		if ($hosts) {
-			$goResult = API::Host()->massUpdate(array(
+			$result = API::Host()->massUpdate(array(
 				'hosts' => $hosts,
 				'status' => $status
 			));
 
-			if ($goResult) {
+			if ($result) {
 				foreach ($hosts as $host) {
 					add_audit_ext(
-						AUDIT_ACTION_UPDATE,
+						$auditAction,
 						AUDIT_RESOURCE_HOST,
 						$host['hostid'],
 						$host['host'],
@@ -214,13 +216,22 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 			}
 		}
 		else {
-			$goResult = true;
+			$result = true;
 		}
 
-		$goResult = DBend($goResult);
+		$result = DBend($result);
 
-		show_messages($goResult, _('Host status updated'), _('Cannot update host'));
-		clearCookies($goResult);
+		$updated = count($hosts);
+
+		$messageSuccess = $enable
+			? _n('Host enabled', 'Hosts enabled', $updated)
+			: _n('Host disabled', 'Hosts disabled', $updated);
+		$messageFailed = $enable
+			? _n('Cannot enable host', 'Cannot enable hosts', $updated)
+			: _n('Cannot disable host', 'Cannot disable hosts', $updated);
+
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 }
 

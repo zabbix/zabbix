@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2001-2014 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
@@ -282,8 +282,8 @@ elseif (hasRequest('save')) {
 	if (hasRequest('itemid')) {
 		$itemId = getRequest('itemid');
 
-		$db_item = get_item_by_itemid_limited($itemId);
-		$db_item['applications'] = get_applications_by_itemid($itemId);
+		$dbItem = get_item_by_itemid_limited($itemId);
+		$dbItem['applications'] = get_applications_by_itemid($itemId);
 
 		// unset snmpv3 fields
 		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
@@ -294,13 +294,7 @@ elseif (hasRequest('save')) {
 			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		// unset fields without changes
-		foreach ($item as $field => $value) {
-			if (isset($db_item[$field]) && ($item[$field] == $db_item[$field])) {
-				unset($item[$field]);
-			}
-		}
-
+		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
 		$item['itemid'] = $itemId;
 
 		$result = API::Itemprototype()->update($item);
@@ -318,16 +312,23 @@ elseif (hasRequest('save')) {
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_itemid')) {
-	$itemId = getRequest('group_itemid');
+	$groupItemId = getRequest('group_itemid');
+	$enable = (getRequest('go') == 'activate');
 
 	DBstart();
-
-	$isActivated = (getRequest('go') == 'activate');
-
-	$result = $isActivated ? activate_item($itemId) : disable_item($itemId);
+	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
 	$result = DBend($result);
 
-	show_messages($result, $isActivated ? _('Item prototypes activated') : _('Item prototypes disabled'));
+	$updated = count($groupItemId);
+
+	$messageSuccess = $enable
+		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
+		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
+	$messageFailed = $enable
+		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
+		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('parent_discoveryid'));
 }
 elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
@@ -361,8 +362,8 @@ else {
 		'discovery_rule' => $discovery_rule
 	);
 
-	// get items
 	$sortfield = getPageSortField('name');
+
 	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -372,9 +373,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if (!empty($data['items'])) {
-		order_result($data['items'], $sortfield, getPageSortOrder());
-	}
+	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+
+	order_result($data['items'], $sortfield, getPageSortOrder());
 
 	$data['paging'] = getPagingLine(
 		$data['items'],
