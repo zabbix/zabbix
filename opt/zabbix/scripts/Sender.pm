@@ -121,7 +121,6 @@ sub _decode_answer {
     return;
 }
 
-
 # DGR: Anything but send just doesn't makes sense here. And since this is a pure-OO module
 # and if the implementor avoids indirect object notation you should be fine.
 ## no critic (ProhibitBuiltinHomonyms)
@@ -146,8 +145,6 @@ sub send_arrref {
     }
 
 }
-
-
 
 sub _send {
     my $self  = shift;
@@ -208,7 +205,6 @@ sub _disconnect {
 
     return 1;
 }
-
 
 sub DEMOLISH {
     my $self = shift;
