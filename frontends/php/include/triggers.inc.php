@@ -1215,6 +1215,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostIds,
 		'preservekeys' => true,
+		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
 	));
 
