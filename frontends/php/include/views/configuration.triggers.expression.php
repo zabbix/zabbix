@@ -56,20 +56,14 @@ if (!empty($this->data['parent_discoveryid'])) {
 
 $expressionFormList->addRow(_('Item'), $item);
 
-// append function to form list
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
-
 foreach ($this->data['functions'] as $id => $f) {
-	// if user has selected an item, we are filtering out the triggers that can't work with it
-	if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
-		$functionComboBox->addItem($id, $f['description']);
-	}
+	$functionComboBox->addItem($id, $f['description']);
 }
-
 $expressionFormList->addRow(_('Function'), $functionComboBox);
 
-if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
-	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $paramId => $paramFunction) {
+if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) {
+	foreach ($this->data['functions'][$this->data['selectedFunction']]['params'] as $paramId => $paramFunction) {
 		$paramValue = isset($this->data['param'][$paramId]) ? $this->data['param'][$paramId] : null;
 
 		if ($paramFunction['T'] == T_ZBX_INT) {
@@ -110,6 +104,7 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'], new CTextBox('param['.$paramId.']', $paramValue, 30));
+			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
 }
