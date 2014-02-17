@@ -154,6 +154,7 @@ CArrayHelper::sort($triggers, array(
 $hosts = API::Host()->get(array(
 	'output' => array('hostid'),
 	'hostids' => $hostIds,
+	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'preservekeys' => true
 ));

@@ -541,6 +541,7 @@ $hosts = API::Host()->get(array(
 	'output' => array('hostid'),
 	'hostids' => $hostIds,
 	'preservekeys' => true,
+	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT
 ));
 

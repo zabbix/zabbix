@@ -164,6 +164,7 @@ else {
 $hosts = API::Host()->get(array(
 	'output' => array('name', 'hostid', 'status'),
 	'hostids' => $availableHostIds,
+	'selectGraphs' => API_OUTPUT_COUNT,
 	'with_monitored_items' => true,
 	'preservekeys' => true
 ));
