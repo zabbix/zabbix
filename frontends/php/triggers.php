@@ -397,6 +397,13 @@ else {
 	));
 	order_result($data['triggers'], $sortfield, getPageSortOrder());
 
+	foreach ($data['triggers'] as &$trigger) {
+		if (count($trigger['dependencies']) > 1) {
+			order_result($trigger['dependencies'], 'hostname', ZBX_SORT_UP);
+		}
+	}
+	unset($trigger);
+
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
