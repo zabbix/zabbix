@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "json_parser.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -246,16 +247,11 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 {
 	size_t	len = 2; /* brackets */
 	char	*p, *psrc, *pdst;
-	int	i;
 
 	assert(j);
 
 	if (ZBX_JSON_COMMA == j->status)
 		len++; /* , */
-
-	if (0 != j->level)
-		len++;
-	len += j->level;
 
 	if (NULL != name)
 	{
@@ -274,11 +270,6 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 
 	if (ZBX_JSON_COMMA == j->status)
 		*p++ = ',';
-
-	if (0 != j->level)
-		*p++ = '\n';
-	for (i = 0; i < j->level; i++)
-		*p++ = '\t';
 
 	if (NULL != name)
 	{
@@ -309,7 +300,6 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 {
 	size_t	len = 0;
 	char	*p, *psrc, *pdst;
-	int	i;
 
 	assert(j);
 
@@ -318,7 +308,6 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 
 	if (NULL != name)
 	{
-		len += 1 + j->level;
 		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
 		len += 1; /* : */
 	}
@@ -338,9 +327,6 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 
 	if (NULL != name)
 	{
-		*p++ = '\n';
-		for (i = 0; i < j->level; i++)
-			*p++ = '\t';
 		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
 		*p++ = ':';
 	}
