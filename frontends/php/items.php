@@ -491,13 +491,13 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	if ($result) {
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
-			_('Host').' ['.$host['name'].'] '._('History cleared'));
+			_('Host').' ['.$host['name'].'] '._('History cleared')
+		);
 	}
 
 	$result = DBend($result);
-
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, get_request('hostid'));
+	clearCookies($result, getRequest('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -749,18 +749,20 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$goResult = API::Item()->delete($group_itemid);
+	$result = API::Item()->delete($group_itemid);
 
-	if ($goResult) {
+	if ($result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
-				_('Host').' ['.$host['name'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
+				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
+			);
 		}
 	}
 
-	show_messages(DBend($goResult), _('Items deleted'), _('Cannot delete items'));
-	clearCookies($goResult, get_request('hostid'));
+	$result = DBend($result);
+	show_messages($result, _('Items deleted'), _('Cannot delete items'));
+	clearCookies($result, getRequest('hostid'));
 }
 
 /*
