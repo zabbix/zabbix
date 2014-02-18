@@ -113,6 +113,48 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
+// check if current user has Remedy Service media type set up
+$remedyServiceAvailable = API::MediaType()->get(array(
+	'userids' => CWebUser::$data['userid'],
+	'filter' => array('type' => MEDIA_TYPE_REMEDY),
+	'output' => array('mediatypeid'),
+	'limit' => 1
+));
+$remedyServiceAvailable = reset($remedyServiceAvailable);
+
+if ($remedyServiceAvailable) {
+	// check if current event has Remedy connected
+	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_REMEDY_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$incident = $zabbixServer->mediaQuery(array($event['eventid']), get_cookie('zbx_sessionid'));
+
+	$errorMessage = $zabbixServer->getError();
+	if ($errorMessage) {
+		error($errorMessage);
+	}
+	elseif ($incident) {
+		$incident = zbx_toHash($incident, 'eventid');
+		$eventId = $event['eventid'];
+
+		// something went wrong getting that ticket
+		if (isset($incident[$eventId]['error']) && $incident[$eventId]['error']) {
+			error($incident[$eventId]['error']);
+		}
+		// ticket exists. Create link to ticket and label "Update ticket"
+		elseif (isset($incident[$eventId]['externalid']) && $incident[$eventId]['externalid']) {
+			$ticketTable = new CTableInfo();
+			$ticketTable->addRow(array(_('Ticket ID'), new CLink($incident[$eventId]['externalid'],
+				REMEDY_SERVICE_WEB_URL.'"'.$incident[$eventId]['externalid'].'"'
+			)));
+			$ticketTable->addRow(array(_('Created'), zbx_date2str(_('d M Y H:i:s'), $incident[$eventId]['clock'])));
+
+			$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
+			$ticketDetails->setHeader(_('Ticket details'));
+
+			$left_col[] = $ticketDetails;
+		}
+	}
+}
+
 $right_col = array();
 
 // if acknowledges are not disabled in configuration, let's show them
