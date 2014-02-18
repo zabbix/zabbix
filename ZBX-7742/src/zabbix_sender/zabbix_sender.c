@@ -438,6 +438,8 @@ int	main(int argc, char **argv)
 
 			total_count++; /* also used as inputline */
 
+			zbx_rtrim(in_line, "\r\n");
+
 			p = in_line;
 
 			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
@@ -476,8 +478,6 @@ int	main(int argc, char **argv)
 					break;
 				}
 			}
-
-			zbx_rtrim(p, "\r\n");
 
 			if ('\0' != *p && '"' != *p)
 			{
