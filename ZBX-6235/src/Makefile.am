@@ -11,13 +11,16 @@ DIST_SUBDIRS = \
 
 if AGENT
 AGENT_SUBDIRS = \
+	libs \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender
 endif
 
 if SERVER
-SERVER_SUBDIRS = zabbix_server
+SERVER_SUBDIRS = \
+	libs \
+	zabbix_server
 endif
 
 if PROXY
@@ -26,6 +29,7 @@ PROXY_SUBDIRS = \
 	zabbix_proxy
 else
 PROXY_SUBDIRS = \
+	libs \
 	zabbix_server/dbsyncer \
 	zabbix_server/dbconfig \
 	zabbix_server/discoverer \
@@ -47,7 +51,6 @@ JAVA_SUBDIRS = \
 endif
 
 SUBDIRS = \
-	libs \
 	$(AGENT_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
