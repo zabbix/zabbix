@@ -301,6 +301,11 @@ class CItemPrototype extends CItemGeneral {
 		// set proper flags to divide normal and discovered items in future processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+			// set default formula value
+			if (!$update && !isset($item['formula'])) {
+				$item['formula'] = '1';
+			}
 		}
 		unset($item);
 	}

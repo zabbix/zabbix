@@ -151,5 +151,4 @@
 		});
 	});
 
-	createPlaceholders();
 </script>

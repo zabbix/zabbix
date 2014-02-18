@@ -81,7 +81,9 @@ $availableJScripts = array(
 	'class.cviewswitcher.js' => '',
 	'init.js' => '',
 	// templates
-	'sysmap.tpl.js' => 'templates/'
+	'sysmap.tpl.js' => 'templates/',
+	// page-specific scripts
+	'items.js' => 'pages/',
 );
 
 $tranStrings = array(
@@ -219,6 +221,10 @@ $tranStrings = array(
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
+	),
+	'items.js' => array(
+		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
+		'No interface found' => _('No interface found')
 	)
 );
 
