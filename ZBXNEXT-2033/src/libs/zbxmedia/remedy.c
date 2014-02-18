@@ -820,7 +820,7 @@ out:
 static int	remedy_read_last_ticket(zbx_uint64_t triggerid, const char *url, const char *proxy, const char *user,
 		const char *password, zbx_remedy_field_t *fields, int fields_num, char **error)
 {
-	const char	*__function_name = "remedy_read_ticket";
+	const char	*__function_name = "remedy_read_last_ticket";
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1402,23 +1402,28 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 out:
 	DBfree_result(result);
 
-	if (SUCCEED == ret && ZBX_REMEDY_ACK_UNKNOWN != acknowledge_status)
+	if (SUCCEED == ret)
 	{
 		int	is_new;
 
-		if (state == ZBX_REMEDY_PROCESS_AUTOMATED && ZBX_REMEDY_ACK_NONE != acknowledge_status)
-			remedy_acknowledge_event(eventid, userid, incident_number, acknowledge_status);
-
 		is_new = ZBX_REMEDY_ACK_CREATE == acknowledge_status ? 1 : 0;
 
-		remedy_register_ticket(incident_number, eventid, is_new);
+		if (ZBX_REMEDY_ACK_UNKNOWN != acknowledge_status)
+		{
+			if (state == ZBX_REMEDY_PROCESS_AUTOMATED && ZBX_REMEDY_ACK_NONE != acknowledge_status)
+				remedy_acknowledge_event(eventid, userid, incident_number, acknowledge_status);
+
+			remedy_register_ticket(incident_number, eventid, is_new);
+		}
 
 		if (NULL != ticket)
 		{
 			ticket->eventid = eventid;
 			ticket->is_new = is_new;
-			ticket->status = zbx_strdup(NULL, incident_status);
-			ticket->ticketid = zbx_strdup(NULL, incident_number);
+			if (NULL != incident_status)
+				ticket->status = zbx_strdup(NULL, incident_status);
+			if (NULL != incident_number)
+				ticket->ticketid = zbx_strdup(NULL, incident_number);
 		}
 	}
 
