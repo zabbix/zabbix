@@ -1450,20 +1450,29 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 	return $column;
 }
-
-function calculate_availability($triggerid, $period_start, $period_end) {
+/**
+ * Calculate trigger availability
+ *
+ * @param int $triggerid		trigger id
+ * @param int $startTime		begin period
+ * @param int $endTime			end period
+ *
+ * @return array
+ */
+function calculate_availability($triggerid, $startTime, $endTime) {
 	$start_value = TRIGGER_VALUE_FALSE;
-	if ($period_start > 0 && $period_start <= time()) {
+
+	if ($startTime > 0 && $startTime <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
 				' WHERE e.objectid='.zbx_dbstr($triggerid).
 					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.clock<'.zbx_dbstr($period_start).
+					' AND e.clock<'.zbx_dbstr($startTime).
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
 			$start_value = $row['value'];
-			$min = $period_start;
+			$min = $startTime;
 		}
 	}
 
@@ -1472,11 +1481,11 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			' WHERE e.objectid='.zbx_dbstr($triggerid).
 				' AND e.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
-	if ($period_start != 0) {
-		$sql .= ' AND clock>='.zbx_dbstr($period_start);
+	if ($startTime) {
+		$sql .= ' AND e.clock>='.zbx_dbstr($startTime);
 	}
-	if ($period_end != 0) {
-		$sql .= ' AND clock<='.zbx_dbstr($period_end);
+	if ($endTime) {
+		$sql .= ' AND e.clock<='.zbx_dbstr($endTime);
 	}
 
 	$db_events = DBfetch(DBselect($sql));
@@ -1487,7 +1496,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$max = $db_events['max_clock'];
 	}
 	else {
-		if ($period_start == 0 && $period_end == 0) {
+		if ($startTime == 0 && $endTime == 0) {
 			$max = time();
 			$min = $max - SEC_PER_DAY;
 		}
@@ -1504,11 +1513,11 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$true_time = 0;
 	$false_time = 0;
 	$time = $min;
-	if ($period_start == 0 && $period_end == 0) {
+	if ($startTime == 0 && $endTime == 0) {
 		$max = time();
 	}
-	if ($period_end == 0) {
-		$period_end = $max;
+	if ($endTime == 0) {
+		$endTime = $max;
 	}
 
 	$rows = 0;
@@ -1545,10 +1554,10 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	}
 
 	if ($state == TRIGGER_VALUE_FALSE) {
-		$false_time = $false_time + $period_end - $time;
+		$false_time = $false_time + $endTime - $time;
 	}
 	elseif ($state == TRIGGER_VALUE_TRUE) {
-		$true_time = $true_time + $period_end - $time;
+		$true_time = $true_time + $endTime - $time;
 	}
 	$total_time = $true_time + $false_time;
 
