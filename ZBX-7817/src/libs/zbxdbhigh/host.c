@@ -2551,7 +2551,7 @@ typedef struct
 }
 zbx_application_t;
 
-void	zbx_application_clean(zbx_application_t *application)
+static void	zbx_application_clean(zbx_application_t *application)
 {
 	zbx_vector_uint64_destroy(&application->templateids);
 	zbx_free(application->name);
@@ -2645,7 +2645,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 
 	if (0 != new_applications)
 	{
-		zbx_uint64_t	applicationid = 0;
+		zbx_uint64_t	applicationid;
 		char		*name_esc;
 		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
 
@@ -2682,7 +2682,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 
 	if (0 != new_application_templates)
 	{
-		zbx_uint64_t	application_templateid = 0;
+		zbx_uint64_t	application_templateid;
 		const char	*ins_application_template_sql =
 				"insert into application_template"
 				" (application_templateid,applicationid,templateid)"
@@ -2717,7 +2717,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 	DBexecute("%s", sql);
 clean:
-	zbx_vector_ptr_clean (&applications, (zbx_mem_free_func_t)zbx_application_clean);
+	zbx_vector_ptr_clean(&applications, (zbx_mem_free_func_t)zbx_application_clean);
 	zbx_vector_ptr_destroy(&applications);
 	zbx_free(sql);
 
