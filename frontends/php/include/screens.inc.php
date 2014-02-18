@@ -313,7 +313,7 @@ function delete_slideshow($slideshowid) {
 	$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
 	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
 
-	return $result;
+	return (bool) $result;
 }
 
 // check whether there are dynamic items in the screen, if so return TRUE, else FALSE

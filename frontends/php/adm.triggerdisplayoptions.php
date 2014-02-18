@@ -61,8 +61,9 @@ if (isset($_REQUEST['save'])) {
 		'ok_ack_style' => get_request('ok_ack_style', 0)
 	);
 
+	DBstart();
 	$result = update_config($configs);
-
+	$result = DBend($result);
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 }
 

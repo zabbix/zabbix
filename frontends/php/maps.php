@@ -52,6 +52,8 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'sysmapid') {
 		$result = false;
 
+		DBstart();
+
 		if ($_REQUEST['favaction'] == 'add') {
 			$result = CFavorite::add('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
@@ -66,6 +68,8 @@ if (isset($_REQUEST['favobj'])) {
 					'$("addrm_fav").onclick = function() { add2favorites("sysmapid", "'.$_REQUEST['favid'].'"); }'."\n";
 			}
 		}
+
+		$result = DBend($result);
 
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';

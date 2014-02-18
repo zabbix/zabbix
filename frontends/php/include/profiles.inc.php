@@ -51,21 +51,24 @@ class CProfile {
 		}
 	}
 
+	/**
+	 * Check if data needs to be inserted or updated.
+	 *
+	 * @return bool
+	 */
+	public static function isModified() {
+		return (self::$insert || self::$update);
+	}
+
 	public static function flush() {
-		// if not initialised, no changes were made
-		if (is_null(self::$profiles)) {
-			return true;
-		}
+		$result = false;
 
-		if (self::$userDetails['userid'] <= 0) {
-			return null;
-		}
+		if (self::$profiles !== null && self::$userDetails['userid'] > 0 && self::isModified()) {
+			$result = true;
 
-		if (!empty(self::$insert) || !empty(self::$update)) {
-			DBstart();
 			foreach (self::$insert as $idx => $profile) {
 				foreach ($profile as $idx2 => $data) {
-					self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					$result &= self::insertDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
 
@@ -73,11 +76,12 @@ class CProfile {
 			foreach (self::$update as $idx => $profile) {
 				ksort($profile);
 				foreach ($profile as $idx2 => $data) {
-					self::updateDB($idx, $data['value'], $data['type'], $idx2);
+					$result &= self::updateDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
-			DBend();
 		}
+
+		return $result;
 	}
 
 	public static function clear() {
@@ -402,20 +406,28 @@ function get_user_history() {
 	return $result;
 }
 
-function add_user_history($page) {
-	$userid = CWebUser::$data['userid'];
-	$title = $page['title'];
-
+/**
+ * Check if url length is greater than DB field size. If size is OK, return URL string.
+ *
+ * @param string $page['hist_arg']
+ * @param string $page['file']
+ *
+ * @return string
+ */
+function getHistoryUrl($page) {
 	if (isset($page['hist_arg']) && is_array($page['hist_arg'])) {
 		$url = '';
+
 		foreach ($page['hist_arg'] as $arg) {
 			if (isset($_REQUEST[$arg])) {
 				$url .= url_param($arg, true);
 			}
 		}
-		if (!empty($url)) {
+
+		if ($url) {
 			$url[0] = '?';
 		}
+
 		$url = $page['file'].$url;
 	}
 	else {
@@ -424,34 +436,27 @@ function add_user_history($page) {
 
 	// if url length is greater than db field size, skip history update
 	$historyTableSchema = DB::getSchema('user_history');
-	if (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) {
-		return false;
-	}
+
+	return (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
+}
+
+function addUserHistory($title, $url) {
+	$userId = CWebUser::$data['userid'];
 
 	$history5 = DBfetch(DBSelect(
 		'SELECT uh.title5,uh.url5'.
 		' FROM user_history uh'.
-		' WHERE uh.userid='.$userid
+		' WHERE uh.userid='.$userId
 	));
 
-	if ($history5 && ($history5['title5'] == $title)) {
-		if ($history5['url5'] != $url) {
-			// title same, url isnt, change only url
-			$sql = 'UPDATE user_history'.
-					' SET url5='.zbx_dbstr($url).
-					' WHERE userid='.$userid;
-		}
-		else {
-			// no need to change anything;
-			return null;
-		}
-	}
-	else {
-		// new page with new title is added
-		if ($history5 === false) {
-			$userhistoryid = get_dbid('user_history', 'userhistoryid');
-			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
-					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+	if ($history5) {
+		if ($history5['title5'] === $title) {
+			if ($history5['url5'] === $url) {
+				return true;
+			}
+			else {
+				$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
+			}
 		}
 		else {
 			$sql = 'UPDATE user_history'.
@@ -465,8 +470,15 @@ function add_user_history($page) {
 						' url4=url5,'.
 						' title5='.zbx_dbstr($title).','.
 						' url5='.zbx_dbstr($url).
-					' WHERE userid='.$userid;
+					' WHERE userid='.$userId;
 		}
 	}
+	else {
+		$userHistoryId = get_dbid('user_history', 'userhistoryid');
+
+		$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
+				' VALUES('.$userHistoryId.', '.$userId.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+	}
+
 	return DBexecute($sql);
 }

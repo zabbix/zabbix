@@ -64,8 +64,10 @@ if (isset($_REQUEST['save'])) {
 		'severity_name_5' => get_request('severity_name_5', _('Disaster')),
 		'severity_color_5' => get_request('severity_color_5', '')
 	);
-	$result = update_config($configs);
 
+	DBstart();
+	$result = update_config($configs);
+	$result = DBend($result);
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 }
 
