@@ -802,7 +802,7 @@ sub create_items_rdds {
 
     $item_key = 'dnstest.rdds[{$DNSTEST.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
 
-    $options = {'name' => 'Number of working RDDS services (43, 80) of $1',
+    $options = {'name' => 'RDDS availability of $1',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('RDDS', $templateid)],
