@@ -27,8 +27,17 @@ $pageHeader->display();
 <?php
 // check if a CWarning object is passed
 if(!$warning = $this->get('warning')) {
+	$message = $this->get('message');
+
+	if (isset($message['header'])) {
+		$message = array(bold($message['header']), BR(), $message['text']);
+	}
+	else {
+		$message = $this->get('message');
+	}
+
 	// if not - render a standard warning with a message
-	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $this->get('message'));
+	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $message);
 	$warning->setButtons(array(
 		new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
 	));
