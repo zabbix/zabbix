@@ -600,7 +600,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	int		res = SUCCEED;
+	int		res = SUCCEED, i = 0;
 	zbx_uint64_t	graphid, interfaceids[4];
 	unsigned char	t_flags, h_flags, type;
 
@@ -690,6 +690,8 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 						trow[1]);
 				break;
 			}
+			zbx_free(gitems);
+			zbx_free(chd_gitems);
 		}
 		DBfree_result(hresult);
 	}
@@ -742,6 +744,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		}
 		DBfree_result(tresult);
 
+		for (i = 0; 4 > i; i++)
+			if (0 != interfaceids[i])
+				break;
+
+		if (4 == i)
+		{
+			res = FAIL;
+			zbx_snprintf(error, max_error_len, "could not find any interfaces on host");
+		}
+
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
@@ -770,10 +782,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		DBfree_result(tresult);
 	}
 
-	zbx_free(sql);
-	zbx_free(gitems);
-	zbx_free(chd_gitems);
 out:
+	if (NULL != sql)
+		zbx_free(sql);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
