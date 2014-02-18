@@ -100,15 +100,6 @@ static int	json_parse_string(const char *start, char **error)
 
 			switch (*ptr)
 			{
-				case '"':
-				case '\\':
-				case '/':
-				case 'b':
-				case 'f':
-				case 'n':
-				case 'r':
-				case 't':
-					break;
 				case 'u':
 					/* check if the \u is followed with 4 hex digits */
 					for (i = 0; i < 4; i++)
@@ -119,11 +110,8 @@ static int	json_parse_string(const char *start, char **error)
 									escape_start, error);
 						}
 					}
-
-					break;
 				default:
-					return json_error("invalid escape sequence in string data",
-							escape_start, error);
+					break;
 			}
 		}
 
