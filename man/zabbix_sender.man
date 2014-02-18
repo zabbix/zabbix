@@ -59,7 +59,7 @@ Send a timestamped value from the commandline to Zabbix server, specified in the
 
 .B echo '"Zabbix server" trapper.item \&"\&"' | zabbix_sender -z 192.168.1.113 -p 10000 -i -
 
-Send empty value of an item to the Zabbix server with IP address \fB192.168.1.113\fR on port \fB10000\fR from the commandline. Empty values must be indicated by double empty double quotes.
+Send empty value of an item to the Zabbix server with IP address \fB192.168.1.113\fR on port \fB10000\fR from the commandline. Empty values must be indicated by empty double quotes.
 
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),

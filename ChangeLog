@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+...G...... [ZBX-7742] added error message upon encountering trailing data for zabbix_sender when reading from file (Juris)
 A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macros (Pavels, wiper)
 ..F....... [ZBX-7361] implemented alphabetic host ordering when trigger has many hosts (Ivo)
 ..F....... [ZBXNEXT-1632] added goto graphs link in host menu popup (Eduard)
