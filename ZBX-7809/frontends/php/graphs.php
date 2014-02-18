@@ -194,22 +194,22 @@ elseif (hasRequest('save')) {
 	unset($item);
 
 	$graph = array(
-		'name' => $_REQUEST['name'],
-		'width' => $_REQUEST['width'],
-		'height' => $_REQUEST['height'],
-		'ymin_type' => get_request('ymin_type', 0),
-		'ymax_type' => get_request('ymax_type', 0),
-		'yaxismin' => get_request('yaxismin', 0),
-		'yaxismax' => get_request('yaxismax', 0),
-		'ymin_itemid' => $_REQUEST['ymin_itemid'],
-		'ymax_itemid' => $_REQUEST['ymax_itemid'],
-		'show_work_period' => get_request('show_work_period', 0),
-		'show_triggers' => get_request('show_triggers', 0),
-		'graphtype' => $_REQUEST['graphtype'],
-		'show_legend' => get_request('show_legend', 1),
-		'show_3d' => get_request('show_3d', 0),
-		'percent_left' => get_request('percent_left', 0),
-		'percent_right' => get_request('percent_right', 0),
+		'name' => getRequest('name'),
+		'width' => getRequest('width'),
+		'height' => getRequest('height'),
+		'ymin_type' => getRequest('ymin_type', 0),
+		'ymax_type' => getRequest('ymax_type', 0),
+		'yaxismin' => getRequest('yaxismin', 0),
+		'yaxismax' => getRequest('yaxismax', 0),
+		'ymin_itemid' => getRequest('ymin_itemid'),
+		'ymax_itemid' => getRequest('ymax_itemid'),
+		'show_work_period' => getRequest('show_work_period', 0),
+		'show_triggers' => getRequest('show_triggers', 0),
+		'graphtype' => getRequest('graphtype'),
+		'show_legend' => getRequest('show_legend', 1),
+		'show_3d' => getRequest('show_3d', 0),
+		'percent_left' => getRequest('percent_left', 0),
+		'percent_right' => getRequest('percent_right', 0),
 		'gitems' => $items
 	);
 

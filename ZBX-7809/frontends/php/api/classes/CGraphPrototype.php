@@ -506,7 +506,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $data
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
@@ -671,8 +671,6 @@ class CGraphPrototype extends CGraphGeneral {
 	 * and check for numeric item types.
 	 *
 	 * @param array $graphs
-	 *
-	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
@@ -731,8 +729,6 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 *
-	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$itemIds = $this->validateItemsUpdate($graphs);
@@ -756,6 +752,7 @@ class CGraphPrototype extends CGraphGeneral {
 		foreach ($graphs as $graph) {
 			if (isset($graph['gitems'])) {
 				$hasPrototype = false;
+
 				if ($graph['gitems']) {
 					// check if the graph has at least one prototype
 					foreach ($graph['gitems'] as $gitem) {

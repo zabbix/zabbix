@@ -726,9 +726,10 @@ class CGraph extends CGraphGeneral {
 			}
 
 			// Y axis min/max
-			foreach (array('ymin_itemid', 'ymax_itemid') as $field) {
-				if (isset($graph[$field]) && $graph[$field]) {
-					$item = $dbItems[$graph[$field]];
+			foreach (array('ymin', 'ymax') as $field) {
+				if (isset($graph[$field.'_itemid']) && $graph[$field.'_itemid']
+						&& isset($graph[$field.'_type']) && $graph[$field.'_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$item = $dbItems[$graph[$field.'_itemid']];
 
 					if (!in_array($item['value_type'], $allowedValueTypes)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
