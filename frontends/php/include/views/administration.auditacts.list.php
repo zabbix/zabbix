@@ -73,7 +73,7 @@ $auditTable->setHeader(array(
 	_('Recipient(s)'),
 	_('Message'),
 	_('Status'),
-	_('Error')
+	SPACE
 ));
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
