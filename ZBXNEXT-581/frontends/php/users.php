@@ -192,38 +192,41 @@ elseif (isset($_REQUEST['save'])) {
 			$user['lang'] = getRequest('lang');
 		}
 
+		DBstart();
+
 		if (isset($_REQUEST['userid'])) {
-			$action = AUDIT_ACTION_UPDATE;
 			$user['userid'] = $_REQUEST['userid'];
-
-			DBstart();
-
 			$result = API::User()->update(array($user));
+
 			if ($result) {
 				$result = API::User()->updateMedia(array(
 					'users' => $user,
 					'medias' => $user['user_medias']
 				));
 			}
-			$result = DBend($result);
 
-			show_messages($result, _('User updated'), _('Cannot update user'));
+			$messageSuccess = _('User updated');
+			$messageFailed = _('Cannot update user');
+			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 		else {
-			DBstart();
+			$result = API::User()->create($user);
 
-			$result = DBend(API::User()->create($user));
-
-			$action = AUDIT_ACTION_ADD;
-
-			show_messages($result, _('User added'), _('Cannot add user'));
+			$messageSuccess = _('User added');
+			$messageFailed = _('Cannot add user');
+			$auditAction = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
-			add_audit($action, AUDIT_RESOURCE_USER, 'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']');
+			add_audit($auditAction, AUDIT_RESOURCE_USER,
+				'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']'
+			);
 			unset($_REQUEST['form']);
-			clearCookies($result);
 		}
+
+		$result = DBend($result);
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['del_user_media'])) {
@@ -243,25 +246,27 @@ elseif (isset($_REQUEST['del_user_group'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	$user = reset($users);
 
-	$result = API::User()->delete(array($user['userid']));
+	DBstart();
 
-	show_messages($result, _('User deleted'), _('Cannot delete user'));
-	clearCookies($result);
+	$result = API::User()->delete(array($user['userid']));
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 		unset($_REQUEST['userid'], $_REQUEST['form']);
 	}
+
+	$result = DBend($result);
+	show_messages($result, _('User deleted'), _('Cannot delete user'));
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	$groupUserId = get_request('group_userid', array());
 
 	DBstart();
 
-	$goResult = unblock_user_login($groupUserId);
-	$goResult = DBend($goResult);
+	$result = unblock_user_login($groupUserId);
 
-	if ($goResult) {
+	if ($result) {
 		$users = API::User()->get(array(
 			'userids' => $groupUserId,
 			'output' => API_OUTPUT_EXTEND
@@ -273,8 +278,9 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 		}
 	}
 
-	show_messages($goResult, _('Users unblocked'), _('Cannot unblock users'));
-	clearCookies($goResult);
+	$result = DBend($result);
+	show_messages($result, _('Users unblocked'), _('Cannot unblock users'));
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 	$goResult = false;

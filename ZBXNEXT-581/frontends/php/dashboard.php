@@ -204,6 +204,10 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 	$favouriteAction = getRequest('favaction');
 	$favouriteId = getRequest('favid');
 
+	$result = true;
+
+	DBstart();
+
 	switch ($favouriteObject) {
 		// favourite graphs
 		case 'itemid':
@@ -212,11 +216,11 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				zbx_value2array($favouriteId);
 
 				foreach ($favouriteId as $id) {
-					CFavorite::add('web.favorite.graphids', $id, $favouriteObject);
+					$result &= CFavorite::add('web.favorite.graphids', $id, $favouriteObject);
 				}
 			}
 			elseif ($favouriteAction == 'remove') {
-				CFavorite::remove('web.favorite.graphids', $favouriteId, $favouriteObject);
+				$result &= CFavorite::remove('web.favorite.graphids', $favouriteId, $favouriteObject);
 			}
 
 			$data = getFavouriteGraphs();
@@ -234,11 +238,11 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				zbx_value2array($favouriteId);
 
 				foreach ($favouriteId as $id) {
-					CFavorite::add('web.favorite.sysmapids', $id, $favouriteObject);
+					$result &= CFavorite::add('web.favorite.sysmapids', $id, $favouriteObject);
 				}
 			}
 			elseif ($favouriteAction == 'remove') {
-				CFavorite::remove('web.favorite.sysmapids', $favouriteId, $favouriteObject);
+				$result &= CFavorite::remove('web.favorite.sysmapids', $favouriteId, $favouriteObject);
 			}
 
 			$data = getFavouriteMaps();
@@ -257,11 +261,11 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				zbx_value2array($favouriteId);
 
 				foreach ($favouriteId as $id) {
-					CFavorite::add('web.favorite.screenids', $id, $favouriteObject);
+					$result &= CFavorite::add('web.favorite.screenids', $id, $favouriteObject);
 				}
 			}
 			elseif ($favouriteAction == 'remove') {
-				CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
+				$result &= CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
 			}
 
 			$data = getFavouriteScreens();
@@ -273,6 +277,8 @@ if (hasRequest('favobj') && hasRequest('favaction')) {
 				jQuery("#favouriteScreens").data("menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteScreens()).');';
 			break;
 	}
+
+	DBend($result);
 }
 
 if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
