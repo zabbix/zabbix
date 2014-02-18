@@ -187,7 +187,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		'monitored' => true,
 		'selectHosts' => API_OUTPUT_EXTEND, // rquired for getting visible host name
 		'filter' => array(),
-		'hostids' => null
+		'hostids' => null,
+		'limit' => $config['search_limit'] + 1
 	);
 
 	/*
@@ -404,7 +405,11 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	));
 
 	$triggers = API::Trigger()->get($triggerOptions);
+
 	CArrayHelper::sort($triggers, array('host', 'description'));
+
+	// padding
+	$paging = getPagingLine($triggers);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculate_availability($trigger['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
@@ -422,7 +427,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	$reportWidget->addItem(BR());
-	$reportWidget->addItem($triggerTable);
+	$reportWidget->addItem(array($paging, $triggerTable, $paging));
 	$reportWidget->show();
 }
 
