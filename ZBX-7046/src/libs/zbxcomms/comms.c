@@ -1090,11 +1090,15 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 		goto out;
 	}
 
+#if defined(HAVE_IPV6)
 	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
 	}
+#else
+	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
+#endif
 out:
 	if (NULL != error_message)
 	{
@@ -1283,5 +1287,5 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #else
 	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 #endif
-	return	FAIL;
+	return FAIL;
 }
