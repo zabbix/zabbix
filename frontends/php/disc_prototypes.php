@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'items.js');
 $page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -340,7 +340,23 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_itemid')) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = getItemFormData();
+	$itemPrototype = array();
+	if (hasRequest('itemid')) {
+		$itemPrototype = API::ItemPrototype()->get(array(
+			'itemids' => getRequest('itemid'),
+			'output' => array(
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+			)
+		));
+		$itemPrototype = reset($itemPrototype);
+	}
+
+	$data = getItemFormData($itemPrototype);
 	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
 	$data['is_item_prototype'] = true;
 

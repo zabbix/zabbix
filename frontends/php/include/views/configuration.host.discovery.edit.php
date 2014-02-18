@@ -22,7 +22,7 @@
 $itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid'],
+	$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
 		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : null
 	));
 }
@@ -44,7 +44,7 @@ if (!empty($this->data['itemid'])) {
 // create form list
 $itemFormList = new CFormList('itemFormList');
 if (!empty($this->data['templates'])) {
-	$itemFormList->addRow(_('Parent items'), $this->data['templates']);
+	$itemFormList->addRow(_('Parent discovery rules'), $this->data['templates']);
 }
 
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
@@ -66,13 +66,7 @@ else {
 
 // append key to form list
 $itemFormList->addRow(_('Key'), array(
-	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-		? new CButton('keyButton', _('Select'),
-			'return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
-				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-			'formlist')
-		: null
+	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited'])
 ));
 
 // append interfaces to form list
@@ -194,67 +188,6 @@ $itemFormList->addRow(_('SQL query'),
 	false,
 	'label_params'
 );
-$itemFormList->addRow(_('Formula'),
-	new CTextArea('params_f', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
-	false, 'label_formula'
-);
-
-// append value type to form list
-if ($this->data['limited']) {
-	$itemForm->addVar('value_type', $this->data['value_type']);
-	$itemFormList->addRow(_('Type of information'),
-		new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
-	);
-}
-else {
-	$valueTypeComboBox = new CComboBox('value_type', $this->data['value_type']);
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_UINT64, _('Numeric (unsigned)'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_FLOAT, _('Numeric (float)'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_STR, _('Character'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_LOG, _('Log'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_TEXT, _('Text'));
-	$itemFormList->addRow(_('Type of information'), $valueTypeComboBox);
-}
-
-// append data type to form list
-if ($this->data['limited']) {
-	$itemForm->addVar('data_type', $this->data['data_type']);
-	$dataType = new CTextBox('data_type_name', item_data_type2str($this->data['data_type']), ZBX_TEXTBOX_SMALL_SIZE, 'yes');
-}
-else {
-	$dataType = new CComboBox('data_type', $this->data['data_type']);
-	$dataType->addItems(item_data_type2str());
-}
-$itemFormList->addRow(_('Data type'), $dataType, false, 'row_data_type');
-$itemFormList->addRow(_('Units'),
-	new CTextBox('units', $this->data['units'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']), false, 'row_units'
-);
-
-// append multiplier to form list
-$multiplier = array();
-if ($this->data['limited']) {
-	$itemForm->addVar('multiplier', $this->data['multiplier']);
-
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
-	$multiplierCheckBox->setAttribute('disabled', 'disabled');
-	$multiplier[] = $multiplierCheckBox;
-
-	$multiplier[] = SPACE;
-	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
-	$formulaTextBox->setAttribute('style', 'text-align: right;');
-	$multiplier[] = $formulaTextBox;
-}
-else {
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
-		'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
-	);
-	$multiplier[] = $multiplierCheckBox;
-	$multiplier[] = SPACE;
-	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
-	$formulaTextBox->setAttribute('style', 'text-align: right;');
-	$multiplier[] = $formulaTextBox;
-}
-$itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multiplier');
 
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
@@ -301,7 +234,7 @@ $newFlexInt = new CSpan(array(
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'formlist')
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 
@@ -311,128 +244,11 @@ $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
-$dataConfig = select_config();
-$keepHistory = array();
-$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
-	$keepHistory[] = SPACE;
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$keepHistory[] = new CSpan(_x('Overridden by', 'item_form'));
-		$keepHistory[] = SPACE;
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepHistory[] =  $link;
-		$keepHistory[] = SPACE;
-		$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
-	}
-	else {
-		$keepHistory[] = new CSpan(_('Overriden by global housekeeping settings').
-			'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
-		);
-	}
-}
-$itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
+$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
 
-$keepTrend = array();
-$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
-	$keepTrend[] = SPACE;
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$keepTrend[] = new CSpan(_x('Overridden by', 'item_form'));
-		$keepTrend[] = SPACE;
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepTrend[] =  $link;
-		$keepTrend[] = SPACE;
-		$keepTrend[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')');
-	}
-	else {
-		$keepTrend[] = new CSpan(_('Overriden by global housekeeping settings').
-			'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
-		);
-	}
-}
-
-$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
-$itemFormList->addRow(_('Log time format'),
-	new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE, $this->data['limited'], 64),
-	false, 'row_logtimefmt'
-);
-
-// append delta to form list
-$deltaOptions = array(
-	0 => _('As is'),
-	1 => _('Delta (speed per second)'),
-	2 => _('Delta (simple change)')
-);
-if ($this->data['limited']) {
-	$itemForm->addVar('delta', $this->data['delta']);
-	$deltaComboBox = new CTextBox('delta_name', $deltaOptions[$this->data['delta']], null, 'yes');
-}
-else {
-	$deltaComboBox= new CComboBox('delta', $this->data['delta']);
-	$deltaComboBox->addItems($deltaOptions);
-}
-$itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
-
-// append valuemap to form list
-if ($this->data['limited']) {
-	$itemForm->addVar('valuemapid', $this->data['valuemapid']);
-	$valuemapComboBox = new CTextBox('valuemap_name', !empty($this->data['valuemaps']) ? $this->data['valuemaps'] : _('As is'), ZBX_TEXTBOX_SMALL_SIZE, 'yes');
-}
-else {
-	$valuemapComboBox = new CComboBox('valuemapid', $this->data['valuemapid']);
-	$valuemapComboBox->addItem(0, _('As is'));
-	foreach ($this->data['valuemaps'] as $valuemap) {
-		$valuemapComboBox->addItem(
-			$valuemap['valuemapid'],
-			get_node_name_by_elid($valuemap['valuemapid'], null, NAME_DELIMITER).CHtml::encode($valuemap['name'])
-		);
-	}
-}
-$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-$link->setAttribute('target', '_blank');
-$itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'),
 	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
 	false, 'row_trapper_hosts');
-
-// append applications to form list
-$itemFormList->addRow(_('New application'),
-	new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new'
-);
-$applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);
-$applicationComboBox->addItem(0, '-'._('None').'-');
-foreach ($this->data['db_applications'] as $application) {
-	$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
-}
-$itemFormList->addRow(_('Applications'), $applicationComboBox);
-
-// append populate host to form list
-if (empty($this->data['parent_discoveryid'])) {
-	$itemCloned = isset($_REQUEST['clone']);
-	$hostInventoryFieldComboBox = new CComboBox('inventory_link');
-	$hostInventoryFieldComboBox->addItem(0, '-'._('None').'-', $this->data['inventory_link'] == '0' ? 'yes' : null);
-
-	// a list of available host inventory fields
-	foreach ($this->data['possibleHostInventories'] as $fieldNo => $fieldInfo) {
-		if (isset($this->data['alreadyPopulated'][$fieldNo])) {
-			$enabled = isset($this->data['item']['inventory_link'])
-				? $this->data['item']['inventory_link'] == $fieldNo
-				: $this->data['inventory_link'] == $fieldNo && !$itemCloned;
-		}
-		else {
-			$enabled = true;
-		}
-		$hostInventoryFieldComboBox->addItem(
-			$fieldNo,
-			$fieldInfo['title'],
-			$this->data['inventory_link'] == $fieldNo && $enabled ? 'yes' : null,
-			$enabled ? 'yes' : 'no'
-		);
-	}
-	$itemFormList->addRow(_('Populates host inventory field'), $hostInventoryFieldComboBox, false, 'row_inventory_link');
-}
 
 // append description to form list
 $description = new CTextArea('description', $this->data['description']);
@@ -443,9 +259,100 @@ $itemFormList->addRow(_('Description'), $description);
 $enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
+/*
+ * Condition tab
+ */
+$conditionFormList = new CFormList('conditionlist');
+
+// type of calculation
+$formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
+$formula->attr('id', 'formula');
+$formula->attr('placeholder', 'A or (B and C) &hellip;');
+if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
+	$formula->addClass('hidden');
+}
+$conditionFormList->addRow(_('Type of calculation'),
+	array(
+		new CComboBox('evaltype', $this->data['evaltype'], null, array(
+			CONDITION_EVAL_TYPE_AND_OR => _('And / or'),
+			CONDITION_EVAL_TYPE_AND => _('And'),
+			CONDITION_EVAL_TYPE_OR => _('Or'),
+			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+		)),
+		new CSpan('', ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
+		$formula
+	),
+	(count($this->data['conditions']) < 2), 'conditionRow'
+);
+
+// macros
+$conditionTable = new CTable('', 'formElementTable');
+$conditionTable->attr('id', 'conditions');
+$conditionTable->addRow(array(_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE));
+
+$conditions = $this->data['conditions'];
+if (!$conditions) {
+	$conditions = array(array('macro' => '', 'value' => '', 'formulaid' => num2letter(0)));
+}
+else {
+	// sort conditions by formula id as if they were numbers
+	uasort($conditions, function($condition1, $condition2) {
+		$len1 = strlen($condition1['formulaid']);
+		$len2 = strlen($condition2['formulaid']);
+
+		if (strlen($condition1['formulaid']) == strlen($condition2['formulaid'])) {
+			return strcmp($condition1['formulaid'], $condition2['formulaid']);
+		}
+
+		return ($len1 < $len2) ? -1 : 1;
+	});
+}
+
+// fields
+foreach ($conditions as $i => $condition) {
+	// formula id
+	$formulaId = array(
+		new CSpan($condition['formulaid']),
+		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
+	);
+
+	// macro
+	$macro = new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64);
+	$macro->addClass('macro');
+	$macro->setAttribute('placeholder', '{#MACRO}');
+	$macro->setAttribute('data-formulaid', $condition['formulaid']);
+
+	// value
+	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
+	$value->setAttribute('placeholder', _('regular expression'));
+
+	// delete button
+	$deleteButtonCell = array(new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove'));
+
+	$row = array($formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell);
+	$conditionTable->addRow($row, 'form_row');
+}
+
+$addButton = new CButton('macro_add', _('Add'), null, 'link_menu element-table-add');
+$buttonColumn = new CCol($addButton);
+$buttonColumn->setAttribute('colspan', 5);
+
+$buttonRow = new CRow();
+$buttonRow->setAttribute('id', 'row_new_macro');
+$buttonRow->addItem($buttonColumn);
+
+$conditionTable->addRow($buttonRow);
+
+$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+
+
 // append tabs to form
 $itemTab = new CTabView();
+if (!hasRequest('form_refresh')) {
+	$itemTab->setSelected(0);
+}
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
+$itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
@@ -453,15 +360,9 @@ $buttons = array();
 if (!empty($this->data['itemid'])) {
 	array_push($buttons, new CSubmit('clone', _('Clone')));
 
-	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
-		array_push($buttons,
-			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
-		);
-	}
 	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(
-			$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
+		array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
+			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
 		);
 	}
 }
@@ -469,6 +370,6 @@ array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_di
 $itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 $itemWidget->addItem($itemForm);
 
-require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
 return $itemWidget;

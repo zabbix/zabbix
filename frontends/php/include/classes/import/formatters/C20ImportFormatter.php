@@ -365,6 +365,34 @@ class C20ImportFormatter extends CImportFormatter {
 			$discoveryRule['host_prototypes'] = array();
 		}
 
+		if (!empty($discoveryRule['filter'])) {
+			// array filter structure
+			if (is_array($discoveryRule['filter'])) {
+				CArrayHelper::convertFieldToArray($discoveryRule['filter'], 'conditions');
+			}
+			// string {#MACRO}:value syntax
+			else {
+				list ($filterMacro, $filterValue) = explode(':', $discoveryRule['filter']);
+				if ($filterMacro) {
+					$discoveryRule['filter'] = array(
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'formula' => '',
+						'conditions' => array(
+							array(
+								'macro' => $filterMacro,
+								'value' => $filterValue,
+								'operator' => CONDITION_OPERATOR_REGEXP,
+							)
+						)
+					);
+				}
+				// if the macro is empty, ignore the filter
+				else {
+					unset($discoveryRule['filter']);
+				}
+			}
+		}
+
 		return $discoveryRule;
 	}
 

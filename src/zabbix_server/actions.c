@@ -1335,7 +1335,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_CONDITION	condition;
-	int		cond, exit = 0, ret = SUCCEED;	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
+	int		cond, exit = 0, ret = SUCCEED;	/* SUCCEED required for CONDITION_EVAL_TYPE_AND_OR */
 	unsigned char	old_type = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
@@ -1357,7 +1357,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 
 		switch (evaltype)
 		{
-			case ACTION_EVAL_TYPE_AND_OR:
+			case CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
 					if (SUCCEED == check_action_condition(event, &condition))
@@ -1374,7 +1374,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 				old_type = condition.conditiontype;
 
 				break;
-			case ACTION_EVAL_TYPE_AND:
+			case CONDITION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 
 				if (FAIL == cond)	/* break if any AND condition is FALSE */
@@ -1386,7 +1386,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 					ret = SUCCEED;
 
 				break;
-			case ACTION_EVAL_TYPE_OR:
+			case CONDITION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 
 				if (SUCCEED == cond)	/* break if any OR condition is TRUE */

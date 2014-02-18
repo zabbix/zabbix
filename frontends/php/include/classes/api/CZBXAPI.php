@@ -227,8 +227,11 @@ class CZBXAPI {
 	 * @return mixed
 	 */
 	protected function outputExtend($output, array $fields) {
+		if ($output === null) {
+			return $fields;
+		}
 		// if output is set to extend, it already contains that field; return it as is
-		if ($output === API_OUTPUT_EXTEND) {
+		elseif ($output === API_OUTPUT_EXTEND) {
 			return $output;
 		}
 
@@ -250,11 +253,12 @@ class CZBXAPI {
 			case API_OUTPUT_EXTEND:
 				return true;
 
-			// if the number of objects is requested, return false
+			// return false if nothing or an object count is requested
 			case API_OUTPUT_COUNT:
+			case null:
 				return false;
 
-			// if an array of fields is passed, check if the field is present in the array
+				// if an array of fields is passed, check if the field is present in the array
 			default:
 				return in_array($field, $output);
 		}

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js');
+$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js', 'items.js');
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -769,8 +769,30 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create item'), 'update', 'clone'))) {
-	$data = getItemFormData();
+	$item = array();
+	if (hasRequest('itemid')) {
+		$item = API::Item()->get(array(
+			'itemids' => getRequest('itemid'),
+			'output' => array(
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname'
+			)
+		));
+		$item = reset($item);
+	}
+
+	$data = getItemFormData($item);
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
+	$data['inventory_link'] = getRequest('inventory_link');
+
+	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['inventory_link'] = $item['inventory_link'];
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
