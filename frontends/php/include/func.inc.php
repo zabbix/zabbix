@@ -1223,7 +1223,7 @@ function order_by($def, $allways = '') {
 }
 
 /**
- * Sorts the macros in the given order.
+ * Sorts the macros in the given order. Supports user and LLD macros.
  *
  * order_result() is not suitable for sorting macros, because it treats the "}" as a symbol with a lower priority
  * then any alphanumeric character, and the result will be invalid.
@@ -1240,7 +1240,7 @@ function order_by($def, $allways = '') {
 function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	$temp = array();
 	foreach ($macros as $key => $macro) {
-		$temp[$key] = preg_replace(ZBX_PREG_EXPRESSION_USER_MACROS, '$1', $macro[$sortfield]);
+		$temp[$key] = substr($macro[$sortfield], 2, strlen($macro[$sortfield]) - 3);
 	}
 	order_result($temp, null, $order);
 
@@ -1844,6 +1844,8 @@ function bcceil($number) {
  * Converts number to letter representation.
  * From A to Z, then from AA to ZZ etc.
  * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
+ *
+ * Keep in sync with JS num2letter().
  *
  * @param int $number
  *

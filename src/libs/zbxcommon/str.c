@@ -1387,7 +1387,8 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 }
 
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	array, idx = 1, buf_i = 0;
+	int	array, idx = 1;
+	size_t	buf_i = 0;
 
 	if (0 == max_len)
 		return 1;	/* buffer overflow */
@@ -2387,7 +2388,7 @@ char	*zbx_time2str(time_t time)
 	return buffer;
 }
 
-static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
+int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 {
 	if (NULL == s1 && NULL == s2)
 		return 0;

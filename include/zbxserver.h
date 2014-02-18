@@ -65,4 +65,6 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t mexerrlen);
 
+int	translate_expression(const char *expression, char **opcode, char **error);
+
 #endif

@@ -944,37 +944,238 @@ function sendAjaxData(options) {
 	jQuery.ajax(jQuery.extend({}, defaults, options));
 }
 
+/**
+ * Finds all elements with a 'placeholder' attribute and emulates the placeholder in IE.
+ */
 function createPlaceholders() {
 	if (IE) {
-		jQuery(document).ready(function() {
-			jQuery('[placeholder]')
-				.focus(function() {
-					var obj = jQuery(this);
+		jQuery('[placeholder]')
+			.focus(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-						obj.removeClass('placeholder');
-					}
-				})
-				.blur(function() {
-					var obj = jQuery(this);
+				if (obj.val() == obj.attr('placeholder')) {
+					obj.val('');
+					obj.removeClass('placeholder');
+				}
+			})
+			.blur(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
-						obj.val(obj.attr('placeholder'));
-						obj.addClass('placeholder');
-					}
-				})
-				.blur();
+				if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
+					obj.val(obj.attr('placeholder'));
+					obj.addClass('placeholder');
+				}
+			})
+			.blur();
 
-			jQuery('form').submit(function() {
-				jQuery('.placeholder').each(function() {
-					var obj = jQuery(this);
+		jQuery('form').submit(function() {
+			jQuery('.placeholder').each(function() {
+				var obj = jQuery(this);
 
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-					}
-				});
+				if (obj.val() == obj.attr('placeholder')) {
+					obj.val('');
+				}
 			});
 		});
 	}
 }
+
+/**
+ * Converts number to letter representation.
+ * From A to Z, then from AA to ZZ etc.
+ * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
+ *
+ * Keep in sync with PHP num2letter().
+ *
+ * @param {int} number
+ *
+ * @return {string}
+ */
+function num2letter(number) {
+	var start = 'A'.charCodeAt(0);
+	var base = 26;
+	var str = '';
+	var level = 0;
+
+	do {
+		if (level++ > 0) {
+			number--;
+		}
+		var remainder = number % base;
+		number = (number - remainder) / base;
+		str = String.fromCharCode(start + remainder) + str;
+	} while (number);
+
+	return str;
+}
+
+/**
+ * Generate a formula from the given conditions with respect to the given evaluation type.
+ * Each condition must have a condition type, that will be used for grouping.
+ *
+ * Each condition object must have the following properties:
+ * - id		- ID used in the formula
+ * - type	- condition type used for grouping
+ *
+ * Supported evalType values:
+ * - 1 - or
+ * - 2 - and
+ * - 3 - and/or
+ *
+ * Example:
+ * getConditionFormula([{'id': 'A', 'type': '1'}, {'id': 'B', 'type': '1'}, {'id': 'C', 'type': '2'}], '1');
+ *
+ * // (A and B) and C
+ *
+ * Keep in sync with PHP CConditionHelper::getFormula().
+ *
+ * @param {array} 	conditions	array of condition objects
+ * @param {string} 	evalType
+ *
+ * @returns {string}
+ */
+function getConditionFormula(conditions, evalType) {
+	var conditionOperator, groupOperator;
+
+	switch (evalType) {
+		// and
+		case 1:
+			conditionOperator = 'and';
+			groupOperator = conditionOperator;
+
+			break;
+		// or
+		case 2:
+			conditionOperator = 'or';
+			groupOperator = conditionOperator;
+
+			break;
+		// and/or
+		default:
+			conditionOperator = 'or';
+			groupOperator = 'and';
+	}
+
+	var groupedFormulas = [];
+	for (var i = 0; i < conditions.length; i++) {
+		if (typeof conditions[i] === 'undefined') {
+			continue;
+		}
+
+		var groupedConditions = [];
+		groupedConditions.push(conditions[i].id);
+
+		// search for other conditions of the same type
+		for (var n = i + 1; n < conditions.length; n++) {
+			if (typeof conditions[n] !== 'undefined' && conditions[i].type == conditions[n].type) {
+				groupedConditions.push(conditions[n].id);
+				delete conditions[n];
+			}
+		}
+
+		// join conditions of the same type
+		if (groupedConditions.length > 1) {
+			groupedFormulas.push('(' + groupedConditions.join(' ' + conditionOperator + ' ') + ')');
+		}
+		else {
+			groupedFormulas.push(groupedConditions[0]);
+		}
+	}
+
+	var formula = groupedFormulas.join(' ' + groupOperator + ' ');
+
+	// strip parentheses if there's only one condition group
+	if (groupedFormulas.length == 1) {
+		formula = formula.substr(1, formula.length - 2);
+	}
+
+	return formula;
+}
+
+(function($) {
+	/**
+	 * Creates a table with dynamic add/remove row buttons.
+	 *
+	 * Supported options:
+	 * - template		- row template selector
+	 * - row			- element row selector
+	 * - add			- add row button selector
+	 * - remove			- remove row button selector
+	 * - counter 		- number to start row enumeration from
+	 * - dataCallback	- function to generate the data passed to the template
+	 *
+	 * Triggered events:
+	 * - rowremove.dynamicRows 	- after removing a row (triggered before tableupdate.dynamicRows)
+	 * - tableupdate.dynamicRows 	- after adding or removing a row
+	 *
+	 * @param options
+	 */
+	$.fn.dynamicRows = function(options) {
+		options = $.extend({}, {
+			template: '',
+			row: '.form_row',
+			add: '.element-table-add',
+			remove: '.element-table-remove',
+			counter: null,
+			dataCallback: function(data) {
+				return {};
+			}
+		}, options);
+
+		return this.each(function() {
+			var table = $(this);
+
+			table.data('dynamicRows', {
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
+			});
+
+			// add buttons
+			table.on('click', options.add, function() {
+				// add the new row before the row with the "Add" button
+				addRow(table, $(this).closest('tr'), options);
+			});
+
+			// remove buttons
+			table.on('click', options.remove, function() {
+				// remove the parent row
+				removeRow(table, $(this).closest(options.row), options);
+			});
+		});
+	};
+
+	/**
+	 * Adds a row before the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} beforeRow
+	 * @param {object} options
+	 */
+	function addRow(table, beforeRow, options) {
+		var data = {
+			rowNum: table.data('dynamicRows').counter
+		};
+		data = $.extend(data, options.dataCallback(data));
+
+		var template = new Template($(options.template).html());
+		beforeRow.before(template.evaluate(data));
+		table.data('dynamicRows').counter++;
+
+		createPlaceholders();
+
+		table.trigger('tableupdate.dynamicRows', options);
+	}
+
+	/**
+	 * Removes the given row.
+	 *
+	 * @param {jQuery} table
+	 * @param {jQuery} row
+	 * @param {object} options
+	 */
+	function removeRow(table, row, options) {
+		row.remove();
+
+		table.trigger('rowremove.dynamicRows', options);
+		table.trigger('tableupdate.dynamicRows', options);
+	}
+}(jQuery));

@@ -4341,3 +4341,195 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 	return ret;
 }
+
+#define ZBX_OPCODE_AND		'&'
+#define ZBX_OPCODE_OR		'|'
+#define ZBX_OPCODE_OPEN		'('
+#define ZBX_OPCODE_CLOSE	')'
+
+#define ZBX_OPCODE_CLASS_NONE		0
+#define ZBX_OPCODE_CLASS_OP_BINARY	1
+#define ZBX_OPCODE_CLASS_VALUE		2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: expression_get_token                                             *
+ *                                                                            *
+ * Purpose: return the first token from an expression                         *
+ *                                                                            *
+ * Parameters: expression  - [IN] the source expression                       *
+ *             start       - [OUT] a pointer to the token start (the first    *
+ *                                 token character)                           *
+ *             end         - [OUT] a pointer to the token end (the next after *
+ *                                 last token character)                      *
+ *                                                                            *
+ * Comments: A token is either a sequence of alphanumeric and '_', '{', '}'   *
+ *           characters or any other non whitespace character.                *
+ *                                                                            *
+ ******************************************************************************/
+static void	expression_get_token(const char *expression, char const **start, char const **end)
+{
+	const char	*pstart = expression, *pend;
+	int		token_class;
+
+	/* strip leading whitespace */
+	while (' ' == *pstart)
+		pstart++;
+
+	pend = pstart;
+
+	if ('\0' == *pend)
+		goto out;
+
+	/* get the token class */
+	if ('{' == *pend)
+		token_class = ZBX_OPCODE_CLASS_VALUE;
+	else if (0 != islower(*pend))
+		token_class = ZBX_OPCODE_CLASS_OP_BINARY;
+	else
+		token_class = ZBX_OPCODE_CLASS_NONE;
+
+	pend++;
+
+	/* find the next token */
+	while('\0' != *pend)
+	{
+		switch (token_class)
+		{
+			case ZBX_OPCODE_CLASS_NONE:
+				goto out;
+			case ZBX_OPCODE_CLASS_VALUE:
+				if ('}' == *pend)
+				{
+					pend++;
+					goto out;
+				}
+				if (0 == isdigit(*pend))
+					goto out;
+				break;
+			case ZBX_OPCODE_CLASS_OP_BINARY:
+				if (0 == islower(*pend))
+					goto out;
+		}
+		pend++;
+	}
+out:
+	*start = pstart;
+	*end = pend;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: translate_expression                                             *
+ *                                                                            *
+ * Purpose: translate logical expression containing AND/OR operators into     *
+ *          internal format with &/| operators and remove whitespace.         *
+ *                                                                            *
+ * Parameters: expression  - [IN] the source expression                       *
+ *             out         - [OUT] the resulting expression                   *
+ *             error       - [OUT] a short error description                  *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was translated successfully         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function allocates memory for output expression which must  *
+ *           be freed by the caller.                                          *
+ *           In the case of failure the error description is allocated by     *
+ *           this function and must be freed by the caller.                   *
+ *                                                                            *
+ ******************************************************************************/
+int	translate_expression(const char *expression, char **out, char **error)
+{
+	const char	*__function_name = "translate_expression";
+
+	const char	*start, *end = expression;
+	int		level = 0, last_op = 0, ret = FAIL;
+	size_t		token_len, out_offset = 0, out_alloc = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while ('\0' != *end)
+	{
+		expression_get_token(end, &start, &end);
+
+		token_len = end - start;
+
+		if (3 == token_len && 0 == strncmp(start, "and", token_len))
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+				goto out;
+
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_AND);
+			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
+		}
+		else if (2 == token_len && 0 == strncmp(start, "or", token_len))
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+				goto out;
+
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OR);
+			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
+		}
+		else if (1 == token_len && '(' == *start)
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE == last_op)
+				goto out;
+
+			level++;
+
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OPEN);
+			last_op = ZBX_OPCODE_CLASS_NONE;
+		}
+		else if (1 == token_len && ')' == *start)
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE != last_op)
+				goto out;
+
+			/* check for matching parentheses */
+			if (0 >= level)
+				goto out;
+
+			level--;
+
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_CLOSE);
+			last_op = ZBX_OPCODE_CLASS_VALUE;
+		}
+		else if (2 < token_len && '{' == *start && '}' == start[token_len - 1])
+		{
+			/* check if the previous op was a logical value */
+			if (ZBX_OPCODE_CLASS_VALUE == last_op)
+				goto out;
+
+			zbx_strncpy_alloc(out, &out_alloc, &out_offset, start, token_len);
+			last_op = ZBX_OPCODE_CLASS_VALUE;
+		}
+		else
+		{
+			if (start != end)
+				goto out;
+		}
+	}
+
+	/* check for matching parentheses */
+	if (0 != level)
+		goto out;
+
+	zbx_strncpy_alloc(out, &out_alloc, &out_offset, "", 0);
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid expression '%s': error at position " ZBX_FS_SIZE_T,
+				expression, (zbx_fs_size_t)(start - expression));
+		*error = zbx_strdup(*error, "Invalid formula expression.");
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}

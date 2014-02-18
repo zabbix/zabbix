@@ -87,9 +87,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	}
 
 	$label = num2letter($i);
-	$labelSpan = new CSpan('('.$label.')', 'label');
+	$labelSpan = new CSpan($label, 'label');
 	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-label', $label);
+	$labelSpan->setAttribute('data-formulaid', $label);
 
 	$conditionTable->addRow(
 		array(
@@ -107,9 +107,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 }
 
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 $conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
@@ -933,10 +933,10 @@ if (!empty($this->data['new_operation'])) {
 
 		if ($operationConditionsTable->itemsCount() > 1) {
 			switch ($this->data['new_operation']['evaltype']) {
-				case ACTION_EVAL_TYPE_AND:
+				case CONDITION_EVAL_TYPE_AND:
 					$group_op = $glog_op = _('and');
 					break;
-				case ACTION_EVAL_TYPE_OR:
+				case CONDITION_EVAL_TYPE_OR:
 					$group_op = $glog_op = _('or');
 					break;
 				default:
@@ -951,9 +951,9 @@ if (!empty($this->data['new_operation'])) {
 			$grouped_opconditions = implode(' '.$glog_op.' ', $grouped_opconditions);
 
 			$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 
 			$newOperationsTable->addRow(array(
 				_('Type of calculation'),
@@ -964,7 +964,7 @@ if (!empty($this->data['new_operation'])) {
 			));
 		}
 		else {
-			$operationConditionsTable->addItem(new CVar('new_operation[evaltype]', ACTION_EVAL_TYPE_AND_OR));
+			$operationConditionsTable->addItem(new CVar('new_operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR));
 		}
 
 		if (!isset($_REQUEST['new_opcondition'])) {
