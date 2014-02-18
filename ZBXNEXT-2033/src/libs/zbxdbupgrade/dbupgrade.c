@@ -2404,6 +2404,7 @@ static int	DBpatch_2020002(void)
 			{"externalid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 			{"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
 			{"clock", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+			{"new", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 			{NULL}
 		},
 		NULL
@@ -2414,8 +2415,14 @@ static int	DBpatch_2020002(void)
 
 static int	DBpatch_2020003(void)
 {
-	return DBcreate_index("ticket", "ticket_1", "clock", 0);
+	return DBcreate_index("ticket", "ticket_1", "eventid,new,clock", 0);
 }
+
+static int	DBpatch_2020004(void)
+{
+	return DBcreate_index("ticket", "ticket_2", "externalid,new", 0);
+}
+
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
@@ -2664,9 +2671,10 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
+	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
 	DBPATCH_ADD(2020002, 0, 1)
 	DBPATCH_ADD(2020003, 0, 1)
-	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
+	DBPATCH_ADD(2020004, 0, 1)
 
 	DBPATCH_END()
 

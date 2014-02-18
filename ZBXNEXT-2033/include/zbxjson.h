@@ -83,6 +83,8 @@
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 #define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+#define ZBX_PROTO_VALUE_MEDIA_QUERY		"media.query"
+#define ZBX_PROTO_VALUE_MEDIA_ACKNOWLEDGE	"media.acknowledge"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"

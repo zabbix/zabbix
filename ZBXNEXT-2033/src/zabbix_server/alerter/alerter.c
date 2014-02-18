@@ -124,7 +124,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	{
 		char	*error_dyn  = NULL;
 
-		res = remedy_process_alert(alert, mediatype, &error_dyn);
+		res = zbx_remedy_process_alert(alert, mediatype, &error_dyn);
 
 		if (NULL != error_dyn)
 		{

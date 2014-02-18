@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxmedia.h"
+#include "zbxserver.h"
 
 
 #include "../../zabbix_server/vmware/vmware.h"
@@ -83,9 +84,11 @@
 #define ZBX_REMEDY_CI_ID_FIELD		"tag"
 
 /* incident status for automatic event acknowledgement */
-#define ZBX_REMEDY_INCIDENT_CREATE	1
-#define ZBX_REMEDY_INCIDENT_REOPEN	2
-#define ZBX_REMEDY_INCIDENT_UPDATE	3
+#define ZBX_REMEDY_ACK_UNKNOWN	0
+#define ZBX_REMEDY_ACK_CREATE	1
+#define ZBX_REMEDY_ACK_REOPEN	2
+#define ZBX_REMEDY_ACK_UPDATE	3
+#define ZBX_REMEDY_ACK_NONE	4
 
 /* Service CI values for network and server services */
 #define ZBX_REMEDY_SERVICECI_NETWORK		"Networks & Telecomms"
@@ -93,6 +96,9 @@
 #define ZBX_REMEDY_SERVICECI_SERVER		"Server & Storage"
 #define ZBX_REMEDY_SERVICECI_RID_SERVER		"OI-f9bee1dac03044f894ed43937bdc52dc"
 
+/* defines current state of event processing - automated (alerts) or manual (frontend) */
+#define ZBX_REMEDY_PROCESS_MANUAL	0
+#define ZBX_REMEDY_PROCESS_AUTOMATED	1
 
 typedef struct
 {
@@ -787,9 +793,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: remedy_read_ticket                                               *
+ * Function: remedy_read_last_ticket                                          *
  *                                                                            *
- * Purpose: reads a Remedy service ticket                                     *
+ * Purpose: reads last Remedy service ticket created in response to the       *
+ *          specified trigger                                                 *
  *                                                                            *
  * Parameters: triggerid  - [IN] the trigger that generated event             *
  *             url        - [IN] the Remedy service URL                       *
@@ -810,24 +817,30 @@ out:
  * Comments: The caller must free the error description if it was set.        *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_read_ticket(zbx_uint64_t triggerid, const char *url, const char *proxy, const char *user,
+static int	remedy_read_last_ticket(zbx_uint64_t triggerid, const char *url, const char *proxy, const char *user,
 		const char *password, zbx_remedy_field_t *fields, int fields_num, char **error)
 {
 	const char	*__function_name = "remedy_read_ticket";
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* find the latest ticket id which was created for the specified trigger */
-	result = DBselect("select t.externalid,t.clock from ticket t,events e"
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select tk.externalid,tk.clock from ticket tk,events e"
 				" where e.source=%d"
 					" and e.object=%d"
 					" and e.objectid=" ZBX_FS_UI64
-					" and e.eventid=t.eventid"
-				" order by t.clock desc",
+					" and e.eventid=tk.eventid"
+					" and tk.new=1"
+				" order by tk.clock desc",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 		ret = remedy_query_ticket(url, proxy, user, password, row[0], fields, fields_num, error);
@@ -905,13 +918,14 @@ static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_na
  *             userid        - [IN] the user the alert is assigned to         *
  *             ticketnumber  - [IN] the number of corresponding incident in   *
  *             status        - [IN] the incident status, see                  *
- *                                  ZBX_REMEDY_INCIDENT_* defines             *
+ *                                  ZBX_REMEDY_ACK_* defines             *
  *                                                                            *
  * Return Value: SUCCEED - the event was acknowledged                         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const char *ticketnumber, int status)
+static int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const char *ticketnumber,
+		int status)
 {
 	int		ret = FAIL;
 	char		*sql = NULL, *message, *message_esc;
@@ -920,13 +934,13 @@ int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const ch
 
 	switch (status)
 	{
-		case ZBX_REMEDY_INCIDENT_CREATE:
+		case ZBX_REMEDY_ACK_CREATE:
 			message = zbx_dsprintf(NULL, "Created a new incident %s", ticketnumber);
 			break;
-		case ZBX_REMEDY_INCIDENT_REOPEN:
+		case ZBX_REMEDY_ACK_REOPEN:
 			message = zbx_dsprintf(NULL, "Reopened resolved incident %s", ticketnumber);
 			break;
-		case ZBX_REMEDY_INCIDENT_UPDATE:
+		case ZBX_REMEDY_ACK_UPDATE:
 			message = zbx_dsprintf(NULL, "Updated new or assigned incident %s", ticketnumber);
 			break;
 		default:
@@ -954,17 +968,207 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: remedy_register_ticket                                           *
+ *                                                                            *
+ * Purpose: registers external ticket to zabbix event                         *
+ *                                                                            *
+ * Parameters: ticketnumber   - [IN] the ticket number                        *
+ *             eventid        - [IN] the associated event id                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	remedy_register_ticket(const char *ticketnumber, zbx_uint64_t eventid, int is_new)
+{
+	zbx_uint64_t	ticketid;
+	char 		*ticketnumber_esc;
+
+	ticketid = DBget_maxid_num("ticket", 1);
+	ticketnumber_esc = DBdyn_escape_string(ticketnumber);
+
+	DBexecute("insert into ticket (ticketid,externalid,eventid,clock,new) values"
+					" (" ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",%d,%d)",
+					ticketid, ticketnumber_esc, eventid, time(NULL), is_new);
+	zbx_free(ticketnumber_esc);
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: remedy_process_alert                                             *
+ * Function: remedy_clean_mediatype                                           *
  *                                                                            *
- * Purpose: processes alert by either creating or closing ticket in Remedy    *
- *          service                                                           *
+ * Purpose: releases resource allocated to store mediatype properties         *
  *                                                                            *
- * Parameters: alert      - [IN] the alert to process                         *
+ * Parameters: media   - [IN] the mediatype data                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	remedy_clean_mediatype(DB_MEDIATYPE *media)
+{
+	zbx_free(media->description);
+	zbx_free(media->exec_path);
+	zbx_free(media->gsm_modem);
+	zbx_free(media->smtp_server);
+	zbx_free(media->smtp_helo);
+	zbx_free(media->smtp_email);
+	zbx_free(media->username);
+	zbx_free(media->passwd);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: remedy_get_mediatype                                             *
+ *                                                                            *
+ * Purpose: reads the first active remedy media type from database            *
+ *                                                                            *
+ * Parameters: media   - [IN] the mediatype data                              *
+ *                                                                            *
+ * Return Value: SUCCEED - the media type was read successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: This function allocates memory to store mediatype properties     *
+ *           which must be freed later with remedy_clean_mediatype() function.*
+ *                                                                            *
+ ******************************************************************************/
+static int	remedy_get_mediatype(DB_MEDIATYPE *media)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect("select smtp_server,smtp_helo,smtp_email,username,passwd,mediatypeid,exec_path"
+				" from media_type"
+				" where type=%d and status=%d",
+				MEDIA_TYPE_REMEDY, MEDIA_TYPE_STATUS_ACTIVE);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		media->description = NULL;
+		media->gsm_modem = NULL;
+		media->smtp_server = zbx_strdup(media->smtp_server, row[0]);
+		media->smtp_helo = zbx_strdup(media->smtp_helo, row[1]);
+		media->smtp_email = zbx_strdup(media->smtp_email, row[2]);
+		media->username = zbx_strdup(media->username, row[3]);
+		media->passwd = zbx_strdup(media->passwd, row[4]);
+		ZBX_STR2UINT64(media->mediatypeid, row[5]);
+		media->exec_path = zbx_strdup(media->exec_path, row[6]);
+
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: remedy_get_last_ticket                                           *
+ *                                                                            *
+ * Purpose: retrieves either the ticket directly linked to the specified      *
+ *          event or the last ticket created in response to the event         *
+ *          source trigger                                                    *
+ *                                                                            *
+ * Parameters: eventid         - [IN] the event                               *
+ *             incident_number - [OUT] the linked incident number             *
+ *             clock           - [OUT] the incident creation time             *
+ *                                                                            *
+ * Return Value: SUCCEED - the incident was retrieved successfully            *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: This function allocates memory to store incident number          *
+ *           which must be freed later.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	remedy_get_last_ticket(zbx_uint64_t eventid, char **externalid, int *clock)
+{
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	/* first check if the event is linked to an incident */
+	result = DBselect("select externalid from ticket where eventid=" ZBX_FS_UI64, eventid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		char	*incident_number;
+
+		incident_number = DBdyn_escape_string(row[0]);
+
+		DBfree_result(result);
+
+		/* read the incident creation time */
+		result = DBselect("select externalid,clock from ticket where externalid='%s' and new=1",
+				incident_number);
+
+		zbx_free(incident_number);
+	}
+	else
+	{
+		zbx_uint64_t	triggerid;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		DBfree_result(result);
+
+		/* get the event source trigger id */
+		result = DBselect("select e.objectid from events e,triggers t"
+				" where e.source=%d"
+					" and e.object=%d"
+					" and e.eventid=" ZBX_FS_UI64,
+					EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, eventid);
+
+		if (NULL == (row = DBfetch(result)))
+			goto out;
+
+		ZBX_STR2UINT64(triggerid, row[0]);
+
+		DBfree_result(result);
+
+		/* find the latest ticked created in response to the event source trigger */
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select tk.externalid,tk.clock from ticket tk,events e"
+				" where e.source=%d"
+					" and e.object=%d"
+					" and e.objectid=" ZBX_FS_UI64
+					" and e.eventid=tk.eventid"
+					" and tk.new=1"
+				" order by tk.clock desc",
+				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
+
+		result = DBselectN(sql, 1);
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*clock = atoi(row[1]);
+		*externalid = zbx_strdup(*externalid, row[0]);
+
+		ret = SUCCEED;
+	}
+out:
+	DBfree_result(result);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: remedy_process_event                                             *
+ *                                                                            *
+ * Purpose: processes event by either creating, reopening or just updating    *
+ *          an incident in Remedy service                                     *
+ *                                                                            *
+ * Parameters: eventid    - [IN] the event to process                         *
+ *             userid     - [IN] the user processing the event                *
+ *             loginid    - [IN] the Remedy loginid field (Customer)          *
+ *             subject    - [IN] the message subject                          *
+ *             message    - [IN] the message contents                         *
  *             media      - [IN] the media object containing Remedy service   *
  *                               and ticket information                       *
+ *             state      - [IN] the processing state automatic/manual -      *
+ *                               (ZBX_REMEDY_PROCESS_*).                      *
+ *                               During manual processing events aren't       *
+ *                               acknowledged and the message is used instead *
+ *                               of subject when updating incident.           *
+ *             ticket     - [OUT] the updated/created ticket data (optional)  *
  *             error      - [OUT] the error description                       *
  *                                                                            *
  * Return Value: SUCCEED - the alert was processed successfully               *
@@ -974,19 +1178,21 @@ out:
  * Comments: The caller must free the error description if it was set.        *
  *                                                                            *
  ******************************************************************************/
-int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
+static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const char *loginid, const char *subject,
+		const char *message, const DB_MEDIATYPE *media, int state, zbx_ticket_t *ticket, char **error)
 {
 #define ZBX_EVENT_REMEDY_WARNING	0
 #define ZBX_EVENT_REMEDY_CRITICAL	1
 
 #define ZBX_REMEDY_DEFAULT_SERVICECI	""
 
-	const char	*__function_name = "remedy_process_alert";
-	int		ret = FAIL;
+	const char	*__function_name = "remedy_process_event";
+	int		ret = FAIL, acknowledge_status = ZBX_REMEDY_ACK_UNKNOWN, event_value, trigger_severity;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid, hostid;
-	const char	*status;
+	const char	*status, *ticketnumber;
+	char		*incident_number = NULL, *incident_status = NULL, *trigger_expression = NULL;
 
 	zbx_remedy_field_t	fields[] = {
 			{"Categorization_Tier_1", NULL},
@@ -1042,40 +1248,39 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 	DBbegin();
 
-	result = DBselect("select e.value,t.priority,t.triggerid,h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
-			" from triggers t,hosts h,items i,functions f,events e,host_inventory hi"
-			" where e.eventid=" ZBX_FS_UI64
-				" and e.source=%d"
-				" and e.object=%d"
-				" and e.objectid=t.triggerid"
-				" and t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.hostid=h.hostid"
-				" and hi.hostid=h.hostid",
-				alert->eventid, EVENT_SOURCE_TRIGGERS,  EVENT_OBJECT_TRIGGER);
+	result = DBselect("select e.value,t.priority,t.triggerid,t.expression from events e,triggers t"
+				" where e.eventid=" ZBX_FS_UI64
+					" and e.source=%d"
+					" and e.object=%d"
+					" and t.triggerid=e.objectid",
+				eventid, EVENT_SOURCE_TRIGGERS,  EVENT_OBJECT_TRIGGER);
 
 	if (NULL == (row = DBfetch(result)))
 		goto out;
 
+	event_value = atoi(row[0]);
+	trigger_severity = atoi(row[1]);
 	ZBX_STR2UINT64(triggerid, row[2]);
+	trigger_expression = zbx_strdup(NULL, row[3]);
 
 	/* retrieve the last incident triggered by the event source trigger */
-	if (FAIL == remedy_read_ticket(triggerid, media->smtp_server, media->smtp_helo, media->username, media->passwd,
-			fields, ARRSIZE(fields), error))
+	if (SUCCEED != remedy_read_last_ticket(triggerid, media->smtp_server, media->smtp_helo, media->username,
+			media->passwd, fields, ARRSIZE(fields), error))
 	{
 		goto out;
 	}
 
-	if (TRIGGER_VALUE_OK != atoi(row[0]))
-	{
-		char		*ticketnumber, *service_name = NULL, *service_id = NULL;
-		int		remedy_event;
-		char		*impact_map[] = {"3-Medium", "2-Significant/Large"};
-		char		*urgency_map[] = {"3-Moderate/Limited", "2-High"};
-		const char	*incident_number;
+	if (NULL != (ticketnumber = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER)))
+		incident_number = zbx_strdup(NULL, ticketnumber);
 
-		/* check if the ticket should be reopened */
-		incident_number = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER);
+	/* check if the ticket should be reopened */
+	if (TRIGGER_VALUE_OK != event_value)
+	{
+		char		*service_name = NULL, *service_id = NULL;
+		int		remedy_event;
+		char		*impact_map[] = {"3-Moderate/Limited", "2-Significant/Large"};
+		char		*urgency_map[] = {"3-Medium", "2-High"};
+		zbx_uint64_t	functionid;
 
 		if (NULL != incident_number)
 		{
@@ -1083,18 +1288,17 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 
 			if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED))
 			{
+				acknowledge_status = ZBX_REMEDY_ACK_REOPEN;
+				incident_status = zbx_strdup(NULL, ZBX_REMEDY_STATUS_ASSIGNED);
+
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS,
 						ZBX_REMEDY_STATUS_ASSIGNED);
 
 				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
-						alert->subject);
+						ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
 
-				if (SUCCEED == (ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo,
-						media->username, media->passwd, fields, ARRSIZE(fields), error)))
-				{
-					remedy_acknowledge_event(alert->eventid, alert->userid, incident_number,
-						ZBX_REMEDY_INCIDENT_REOPEN);
-				}
+				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
+						media->passwd, fields, ARRSIZE(fields), error);
 
 				goto out;
 			}
@@ -1103,22 +1307,40 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 			if (0 != strcmp(status, ZBX_REMEDY_STATUS_CLOSED) &&
 					0 != strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
 			{
-				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
-						alert->subject);
+				acknowledge_status = ZBX_REMEDY_ACK_UPDATE;
+				incident_status = zbx_strdup(NULL, status);
 
-				if (SUCCEED == (ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo,
-						media->username, media->passwd, fields, ARRSIZE(fields), error)))
-				{
-					remedy_acknowledge_event(alert->eventid, alert->userid, incident_number,
-						ZBX_REMEDY_INCIDENT_UPDATE);
-				}
+				remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
+						ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
+
+				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
+						media->passwd, fields, ARRSIZE(fields), error);
 
 				goto out;
 			}
 		}
 
 		/* create a new ticket */
-		switch (atoi(row[1]))
+
+		if (SUCCEED != get_N_functionid(trigger_expression, 1, &functionid, NULL))
+			goto out;
+
+		DBfree_result(result);
+
+		/* find the host */
+		result = DBselect("select h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
+				" from hosts h,items i,functions f,host_inventory hi"
+				" where f.functionid=" ZBX_FS_UI64
+					" and f.itemid=i.itemid"
+					" and i.hostid=h.hostid"
+					" and hi.hostid=h.hostid",
+				functionid);
+
+		if (NULL == (row = DBfetch(result)))
+			goto out;
+
+		/* map trigger severity */
+		switch (trigger_severity)
 		{
 			case  TRIGGER_SEVERITY_WARNING:
 				remedy_event = ZBX_EVENT_REMEDY_WARNING;
@@ -1132,62 +1354,46 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 				goto out;
 		}
 
-		ZBX_STR2UINT64(hostid, row[4]);
+		ZBX_STR2UINT64(hostid, row[1]);
 
 		remedy_get_service_by_host(hostid, media->smtp_email, &service_name, &service_id);
 
-		if (SUCCEED == (ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username,
-				media->passwd, alert->sendto, service_name, service_id, row[3], row[5], alert->subject,
-				alert->message, impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
-				&ticketnumber, error)))
-		{
-			zbx_uint64_t	ticketid;
-			char		*ticketnumber_dyn;
+		acknowledge_status = ZBX_REMEDY_ACK_CREATE;
+		incident_status = zbx_strdup(NULL, ZBX_REMEDY_STATUS_NEW);
 
-			ticketid = DBget_maxid_num("ticket", 1);
-			ticketnumber_dyn = DBdyn_escape_string(ticketnumber);
-
-			if (ZBX_DB_OK > DBexecute("insert into ticket (ticketid,externalid,eventid,clock) values"
-					" (" ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",%d)",
-					ticketid, ticketnumber_dyn, alert->eventid, time(NULL)))
-			{
-				ret = FAIL;
-			}
-			else
-			{
-				ret = remedy_acknowledge_event(alert->eventid, alert->userid, ticketnumber,
-						ZBX_REMEDY_INCIDENT_CREATE);
-			}
-
-			zbx_free(ticketnumber_dyn);
-			zbx_free(ticketnumber);
-		}
+		ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd,
+				loginid, service_name, service_id, row[0], row[2], subject, message,
+				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
+				&incident_number, error);
 
 		zbx_free(service_name);
 		zbx_free(service_id);
 	}
 	else
 	{
-		if (NULL == remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_INCIDENT_NUMBER))
+		if (NULL == incident_number)
 		{
-			/* trigger without associated ticket was switched to OK state */
+			/* trigger without an associated ticket was switched to OK state */
 			ret = SUCCEED;
 			goto out;
 		}
 
-		status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+		incident_status = zbx_strdup(NULL, remedy_fields_get_value(fields, ARRSIZE(fields),
+				ZBX_REMEDY_FIELD_STATUS));
 
-		if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED) ||
-				0 == strcmp(status, ZBX_REMEDY_STATUS_CLOSED) ||
-				0 == strcmp(status, ZBX_REMEDY_STATUS_CANCELLED))
+		if (0 == strcmp(incident_status, ZBX_REMEDY_STATUS_RESOLVED) ||
+				0 == strcmp(incident_status, ZBX_REMEDY_STATUS_CLOSED) ||
+				0 == strcmp(incident_status, ZBX_REMEDY_STATUS_CANCELLED))
 		{
 			/* don't update already resolved, closed or canceled incidents */
 			ret = SUCCEED;
 			goto out;
 		}
 
+		acknowledge_status = ZBX_REMEDY_ACK_NONE;
+
 		remedy_fields_set_value(fields, ARRSIZE(fields), ZBX_REMEDY_STATUS_WORK_INFO_SUMMARY,
-				alert->subject);
+				ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
 
 		ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd, fields,
 				ARRSIZE(fields), error);
@@ -1196,7 +1402,31 @@ int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
 out:
 	DBfree_result(result);
 
+	if (SUCCEED == ret && ZBX_REMEDY_ACK_UNKNOWN != acknowledge_status)
+	{
+		int	is_new;
+
+		if (state == ZBX_REMEDY_PROCESS_AUTOMATED && ZBX_REMEDY_ACK_NONE != acknowledge_status)
+			remedy_acknowledge_event(eventid, userid, incident_number, acknowledge_status);
+
+		is_new = ZBX_REMEDY_ACK_CREATE == acknowledge_status ? 1 : 0;
+
+		remedy_register_ticket(incident_number, eventid, is_new);
+
+		if (NULL != ticket)
+		{
+			ticket->eventid = eventid;
+			ticket->is_new = is_new;
+			ticket->status = zbx_strdup(NULL, incident_status);
+			ticket->ticketid = zbx_strdup(NULL, incident_number);
+		}
+	}
+
 	DBcommit();
+
+	zbx_free(incident_number);
+	zbx_free(incident_status);
+	zbx_free(trigger_expression);
 
 	remedy_fields_clean_values(fields, ARRSIZE(fields));
 
@@ -1205,12 +1435,253 @@ out:
 	return ret;
 }
 
+/*
+ * Public API
+ */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_remedy_process_alert                                         *
+ *                                                                            *
+ * Purpose: processes an alert by either creating, reopening or just updating *
+ *          an incident in Remedy service                                     *
+ *                                                                            *
+ * Parameters: alert      - [IN] the alert to process                         *
+ *             media      - [IN] the media object containing Remedy service   *
+ *                               and ticket information                       *
+ *             error      - [OUT] the error description                       *
+ *                                                                            *
+ * Return Value: SUCCEED - the alert was processed successfully               *
+ *               FAIL - alert processing failed, error contains               *
+ *                      allocated string with error description               *
+ *                                                                            *
+ * Comments: The caller must free the error description if it was set.        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_remedy_process_alert(const DB_ALERT *alert, const DB_MEDIATYPE *mediatype, char **error)
+{
+	const char		*__function_name = "zbx_remedy_process_alert";
+
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	ret = remedy_process_event(alert->eventid, alert->userid, alert->sendto, alert->subject,
+		alert->message, mediatype, ZBX_REMEDY_PROCESS_AUTOMATED, NULL, error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_remedy_query_events                                          *
+ *                                                                            *
+ * Purpose: retrieves status of Remedy incidents associated to the specified  *
+ *          events                                                            *
+ *                                                                            *
+ * Parameters: eventids   - [IN] the events to query                          *
+ *             tickets    - [OUT] the incident data                           *
+ *             error      - [OUT] the error description                       *
+ *                                                                            *
+ * Return Value: SUCCEED - the operation was completed successfully.          *
+ *                         Per event query status can be determined by        *
+ *                         inspecting ticketids contents.                     *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: The caller must free the error description if it was set and     *
+ *           tickets vector contents.                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tickets, char **error)
+{
+	const char		*__function_name = "zbx_remedy_query_events";
+
+	int			ret = FAIL, i;
+	DB_MEDIATYPE		mediatype = {0};
+
+	zbx_remedy_field_t	fields[] = {
+			{ZBX_REMEDY_FIELD_STATUS, NULL}
+	};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != remedy_get_mediatype(&mediatype))
+	{
+		*error = zbx_dsprintf(*error, "Failed to find apropriate media type");
+		goto out;
+	}
+
+	for (i = 0; i < eventids->values_num; i++)
+	{
+		zbx_ticket_t	*ticket;
+
+		ticket = zbx_malloc(NULL, sizeof(zbx_ticket_t));
+		memset(ticket, 0, sizeof(zbx_ticket_t));
+
+		ticket->eventid = eventids->values[i];
+
+		if (SUCCEED == remedy_get_last_ticket(ticket->eventid, &ticket->ticketid, &ticket->clock) &&
+				SUCCEED == remedy_query_ticket(mediatype.smtp_server, mediatype.smtp_helo,
+				mediatype.username, mediatype.passwd, ticket->ticketid, fields, ARRSIZE(fields),
+				&ticket->error))
+		{
+			const char *status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+
+			if (NULL != status)
+				ticket->status = zbx_strdup(NULL, status);
+		}
+
+		zbx_vector_ptr_append(tickets, ticket);
+	}
+
+	ret = SUCCEED;
+
+	remedy_clean_mediatype(&mediatype);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_remedy_acknowledge_events                                    *
+ *                                                                            *
+ * Purpose: acknowledges events in Remedy service with specified message      *
+ *          subjects and contents                                             *
+ *                                                                            *
+ * Parameters: userid        - [IN] the user acknowledging events             *
+ *             acknowledges  - [IN] the event acknowledgment data             *
+ *             tickets       - [OUT] the incident data                        *
+ *             error         - [OUT] the error description                    *
+ *                                                                            *
+ * Return Value: SUCCEED - the events were acknowledged successfully          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: The caller must free the error description if it was set and     *
+ *           tickets vector contents.                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_remedy_acknowledge_events(zbx_uint64_t userid, zbx_vector_ptr_t *acknowledges, zbx_vector_ptr_t *tickets,
+		char **error)
+{
+	const char	*__function_name = "zbx_remedy_acknowledge_events";
+
+	int		i, ret = FAIL;
+	DB_MEDIATYPE	mediatype = {0};
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != remedy_get_mediatype(&mediatype))
+	{
+		*error = zbx_dsprintf(*error, "Failed to find apropriate media type");
+		goto out;
+	}
+
+	result = DBselect("select sendto from media"
+			" where mediatypeid=" ZBX_FS_UI64
+				" and userid=" ZBX_FS_UI64,
+				mediatype.mediatypeid, userid);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		*error = zbx_dsprintf(*error, "Failed to find apropriate media type for current user");
+		DBfree_result(result);
+		goto out;
+	}
+
+	for (i = 0; i < acknowledges->values_num; i++)
+	{
+		zbx_acknowledge_t	*ack = acknowledges->values[i];
+		zbx_ticket_t	*ticket;
+
+		ticket = zbx_malloc(NULL, sizeof(zbx_ticket_t));
+		memset(ticket, 0, sizeof(zbx_ticket_t));
+
+		remedy_process_event(ack->eventid, userid, row[0], ack->subject, ack->message, &mediatype,
+				ZBX_REMEDY_PROCESS_MANUAL, ticket, &ticket->error);
+
+		zbx_vector_ptr_append(tickets, ticket);
+	}
+
+	DBfree_result(result);
+
+	ret = SUCCEED;
+out:
+	remedy_clean_mediatype(&mediatype);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_ticket                                                  *
+ *                                                                            *
+ * Purpose: frees the ticket data                                             *
+ *                                                                            *
+ * Parameters: ticket   - [IN] the ticket to free                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_free_ticket(zbx_ticket_t *ticket)
+{
+	zbx_free(ticket->ticketid);
+	zbx_free(ticket->status);
+	zbx_free(ticket->error);
+	zbx_free(ticket);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_acknowledge                                             *
+ *                                                                            *
+ * Purpose: frees the acknowledgment data                                     *
+ *                                                                            *
+ * Parameters: ack   - [IN] the acknowledgment to free                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_free_acknowledge(zbx_acknowledge_t *ack)
+{
+	zbx_free(ack->subject);
+	zbx_free(ack->message);
+	zbx_free(ack);
+}
+
 #else
 
-int	remedy_process_alert(DB_ALERT *alert, DB_MEDIATYPE *media, char **error)
+int	zbx_remedy_process_alert(const DB_ALERT *alert, const DB_MEDIATYPE *mediatype, char **error)
 {
 	*error = zbx_dsprintf(*error, "Zabbix server is built without Remedy ticket support");
 	return FAIL;
 }
 
+
+int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tickets, char **error)
+{
+	*error = zbx_dsprintf(*error, "Zabbix server is built without Remedy ticket support");
+	return FAIL;
+}
+
+int	zbx_remedy_acknowledge_events(zbx_uint64_t userid, zbx_vector_ptr_t *acknowledges, zbx_vector_ptr_t *tickets,
+		char **error)
+{
+	*error = zbx_dsprintf(*error, "Zabbix server is built without Remedy ticket support");
+	return FAIL;
+}
+
+void	zbx_free_ticket(zbx_ticket_t *ticket)
+{
+}
+
+void	zbx_free_acknowledge(zbx_acknowledge_t *ack)
+{
+}
+
 #endif
+
+
