@@ -211,45 +211,6 @@ else
   AC_MSG_RESULT(leaving undefined)
 fi
 
-AC_MSG_CHECKING(for size_t)
-AC_TRY_COMPILE([
-#include <sys/socket.h>
-#include <netdb.h>
-],[size_t siz;],
-AC_MSG_RESULT(yes),
-[AC_DEFINE(size_t, unsigned long int, [Define size_t type.])
-AC_MSG_RESULT(no)])
-
-AC_MSG_CHECKING(for actual size_t parameter type in socket functions)
-zbx_size_t=
-zbx_sock_flags=
-for arg1 in size_t socklen_t; do
-  for arg2 in int "unsigned int"; do
-    AC_TRY_COMPILE([
-#ifdef HAVE_SYS_SOCKET_H
-#  include <sys/socket.h>
-#endif
-#ifdef HAVE_NETDB_H
-#  include <netdb.h>
-#endif
-      extern int getnameinfo(const struct sockaddr *sa, socklen_t salen, char *host, $arg1 hostlen, char *serv, $arg1 servlen, $arg2 flags);
-    ],[
-      getnameinfo((void *)0x0, 0, (void *)0x0, 0, (void *)0x0, 0, 0);
-    ],[
-      zbx_size_t="$arg1"
-      zbx_sock_flags="$arg2"
-      break
-    ])
-  done
-done
-if test "x$zbx_size_t" != "x"; then
-  AC_MSG_RESULT($zbx_size_t)
-  AC_DEFINE_UNQUOTED(ZBX_SIZE_T, $zbx_size_t, [Define actual size_t parameter in socket functions.])
-  AC_DEFINE_UNQUOTED(ZBX_SOCK_FLAGS, $zbx_sock_flags, [Define signedness of flags parameter in socket related functions (getnameinfo).])
-else
-  AC_MSG_RESULT(leaving undefined)
-fi
-
 AC_MSG_CHECKING(for integer field name in union sigval of struct siginfo_t)
 zbx_sival_int=
 for field in sival_int sigval_int; do

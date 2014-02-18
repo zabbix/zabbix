@@ -122,7 +122,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
-int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, ZBX_SIZE_T hlen, char *sbuf, ZBX_SIZE_T slen, ZBX_SOCK_FLAGS flags);
 
 #define ZBX_DEFAULT_FTP_PORT		21
 #define ZBX_DEFAULT_SSH_PORT		22
@@ -145,5 +144,9 @@ int	zbx_getnameinfo(const struct sockaddr *sa, char *hbuf, ZBX_SIZE_T hlen, char
 
 int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout);
 int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
+
+#define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags) \
+	getnameinfo(sa, (AF_INET == (sa)->sa_family ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6)), \
+			host, hostlen, serv, servlen, flags)
 
 #endif
