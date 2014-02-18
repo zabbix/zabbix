@@ -155,7 +155,6 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 		{
 			case '"':  /* quotation mark */
 			case '\\': /* reverse solidus */
-			case '/':  /* solidus */
 			case '\b': /* backspace */
 			case '\f': /* formfeed */
 			case '\n': /* newline */
@@ -196,10 +195,6 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 			case '\\':		/* reverse solidus */
 				*p++ = '\\';
 				*p++ = '\\';
-				break;
-			case '/':		/* solidus */
-				*p++ = '\\';
-				*p++ = '/';
 				break;
 			case '\b':		/* backspace */
 				*p++ = '\\';
@@ -578,26 +573,10 @@ static size_t	zbx_json_string_size(const char *p)
 		{
 			if (*p == '\\')
 			{
-				switch (*++p)
-				{
-					case 'u':
-						p += 2;
-					case '"':
-					case '\\':
-					case '/':
-					case 'b':
-					case 'f':
-					case 'n':
-					case 'r':
-					case 't':
-						sz++;
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-				}
+				if('u' == *++p)
+					p+=4;
 			}
-			else
-				sz++;
+			sz++;
 		}
 		p++;
 	}
@@ -631,11 +610,6 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 			{
 				switch (*++p)
 				{
-					case '"':
-					case '\\':
-					case '/':
-						*o++ = *p;
-						break;
 					case 'b':
 						*o++ = '\b';
 						break;
@@ -658,7 +632,8 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 						*o++ = (char)c;
 						break;
 					default:
-						THIS_SHOULD_NEVER_HAPPEN;
+						*o++ = *p;
+						break;
 				}
 			}
 			else
