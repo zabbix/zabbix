@@ -25,11 +25,11 @@ $auditWidget = new CWidget();
 $configForm = new CForm('get');
 $configComboBox = new CComboBox('config', 'auditlogs.php');
 $configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('auditlogs.php', _('Audit logs'));
-$configComboBox->addItem('auditacts.php', _('Audit alerts'));
+$configComboBox->addItem('auditlogs.php', _('Audit log'));
+$configComboBox->addItem('auditacts.php', _('Action log'));
 $configForm->addItem($configComboBox);
-$auditWidget->addPageHeader(_('AUDIT LOGS'), $configForm);
-$auditWidget->addHeader(_('Audit logs'));
+$auditWidget->addPageHeader(_('AUDIT LOG'), $configForm);
+$auditWidget->addHeader(_('Audit log'));
 $auditWidget->addHeaderRowNumber();
 
 // create filter
