@@ -3005,7 +3005,7 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	static char		cert_file[512], key_file[512];
 
 	ldns_resolver		*res = NULL;
-	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str, *res_ip;
+	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str, *res_ip = NULL;
 	short			epp_port = 700;
 	X509			*cert = NULL;
 	const SSL_METHOD	*method;
