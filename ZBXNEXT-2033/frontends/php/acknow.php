@@ -148,10 +148,7 @@ if (!$bulk) {
 				$mediaQuery = $zabbixServer->mediaQuery(array($eventId), get_cookie('zbx_sessionid'));
 
 				$zabbixServerError = $zabbixServer->getError();
-				if ($zabbixServerError) {
-					error($zabbixServerError);
-				}
-				elseif ($mediaQuery) {
+				if (!$zabbixServerError) {
 					$mediaQuery = zbx_toHash($mediaQuery, 'eventid');
 
 					// something went wrong getting that ticket
