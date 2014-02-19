@@ -546,6 +546,11 @@ function _llnw_allow_DBexecute($query) {
 		"UPDATE profiles",
 		// login related queries that drop into infinite look on failure.
 		"UPDATE ids SET nextid=nextid+1 WHERE nodeid=1 AND table_name='user_history' AND field_name='userhistoryid'",
+		// Allow ack's in the UI (regular, bulk, and commentary).
+		"WHERE nodeid=1 AND table_name='acknowledges' AND field_name='acknowledgeid'",
+		"SET acknowledged=1",
+		"INSERT INTO acknowledges",
+
 	);
 	foreach ($whitelist as $allow) {
 		if (stripos($query, $allow) !== FALSE) {
