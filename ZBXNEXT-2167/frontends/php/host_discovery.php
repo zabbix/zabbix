@@ -372,7 +372,7 @@ else {
 	$data = array(
 		'hostid' => get_request('hostid', 0),
 		'host' => $host,
-		'showErrorColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
+		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
 	);
 
 	$sortfield = getPageSortField('name');

@@ -19,7 +19,7 @@
 **/
 
 
-$triggersWidget = new CWidget();
+$triggersWidget = new CWidget(null, 'trigger-list');
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -110,8 +110,9 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showInfoColumn'] ? new CCol(_('Info'), 'trigger-info') : null
 ));
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
@@ -194,15 +195,16 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
-	if ($data['showErrorColumn']) {
-		$error = '';
+	if ($data['showInfoColumn']) {
+		$info = '';
+
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			if (!zbx_empty($trigger['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($trigger['error'], '', 'on');
+			if (zbx_empty($trigger['error'])) {
+				$info = SPACE;
 			}
 			else {
-				$error = new CDiv(SPACE, 'status_icon iconok');
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($trigger['error'], '', 'on');
 			}
 		}
 	}
@@ -254,7 +256,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expressionColumn,
 		$status,
-		$data['showErrorColumn'] ? $error : null
+		$data['showInfoColumn'] ? $info : null
 	));
 	$triggers[$tnum] = $trigger;
 }

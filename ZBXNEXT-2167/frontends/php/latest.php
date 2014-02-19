@@ -334,7 +334,7 @@ if ($filterShowDetails) {
 		new CSpan(_('Last value')),
 		new CSpan(_x('Change', 'noun in latest data')),
 		new CCol(SPACE, 'latest-actions'),
-		new CCol(new CSpan(_('Error')), 'latest-error')
+		new CCol(_('Info'), 'latest-info')
 	));
 }
 else {
@@ -424,13 +424,13 @@ foreach ($items as $key => $item){
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
 			if (zbx_empty($item['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
+				$info = SPACE;
 			}
 			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($item['error'], '', 'on');
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($item['error'], '', 'on');
 			}
-			$statusIcons[] = $error;
+			$statusIcons[] = $info;
 		}
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
@@ -605,13 +605,13 @@ foreach ($items as $item) {
 		$statusIcons = array();
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
 			if (zbx_empty($item['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
+				$info = SPACE;
 			}
 			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($item['error'], '', 'on');
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($item['error'], '', 'on');
 			}
-			$statusIcons[] = $error;
+			$statusIcons[] = $info;
 		}
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {

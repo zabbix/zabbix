@@ -70,7 +70,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showInfoColumn'] ? new CCol(new CSpan(_('Info')), 'item-info') : null
 ));
 
 foreach ($this->data['items'] as $item) {
@@ -107,17 +107,18 @@ foreach ($this->data['items'] as $item) {
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
-	if ($data['showErrorColumn']) {
+	if ($data['showInfoColumn']) {
 		$statusIcons = array();
+
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
 			if (zbx_empty($item['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
+				$info = SPACE;
 			}
 			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($item['error'], '', 'on');
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($item['error'], '', 'on');
 			}
-			$statusIcons[] = $error;
+			$statusIcons[] = $info;
 		}
 
 		// discovered item lifetime indicator
@@ -128,6 +129,7 @@ foreach ($this->data['items'] as $item) {
 					zbx_date2age($item['itemDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $item['itemDiscovery']['ts_delete']),
 					zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
 			));
+
 			$statusIcons[] = $deleteError;
 		}
 	}
@@ -246,7 +248,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$data['showErrorColumn'] ? $statusIcons : null
+		$data['showInfoColumn'] ? $statusIcons : null
 	));
 }
 

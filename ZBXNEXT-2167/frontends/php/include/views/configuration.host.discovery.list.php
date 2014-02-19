@@ -19,7 +19,7 @@
 **/
 
 
-$discoveryWidget = new CWidget();
+$discoveryWidget = new CWidget(null, 'host-discovery-list');
 
 // create new discovery rule button
 $createForm = new CForm('get');
@@ -56,7 +56,7 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showInfoColumn'] ? new CCol(new CSpan(_('Info')), 'discovery-info') : null
 ));
 
 foreach ($data['discoveries'] as $discovery) {
@@ -76,15 +76,16 @@ foreach ($data['discoveries'] as $discovery) {
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
-	if ($data['showErrorColumn']) {
-		$error = '';
+	if ($data['showInfoColumn']) {
+		$info = '';
+
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
 			if (zbx_empty($discovery['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
+				$info = SPACE;
 			}
 			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($discovery['error'], '', 'on');
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($discovery['error'], '', 'on');
 			}
 		}
 	}
@@ -127,7 +128,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$data['showErrorColumn'] ? $error : null
+		$data['showInfoColumn'] ? $info : null
 	));
 }
 
