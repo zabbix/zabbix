@@ -155,17 +155,17 @@ static void	clean_itservice_set(zbx_itservices_set_t *set)
  *                                                                            *
  * Parameters: set         - [IN] the IT services data set                    *
  *             serviceid   - [IN] the service id                              *
- *             algo        - [IN] the service status calculation mode         *
+ *             algorithm   - [IN] the service status calculation mode         *
  *             triggerid   - [IN] the source trigger id for leaf nodes        *
  *             status      - [IN] the initial service status                  *
  *                                                                            *
  * Return value: the created service node                                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_itservice_t	*create_service(zbx_itservices_set_t *set, zbx_uint64_t serviceid, int algo, zbx_uint64_t
-		triggerid, int status)
+static zbx_itservice_t	*create_service(zbx_itservices_set_t *set, zbx_uint64_t serviceid, zbx_uint64_t triggerid,
+		int status, int algorithm)
 {
-	zbx_itservice_t		service = {serviceid, triggerid, status, status, algo}, *pservice;
+	zbx_itservice_t		service = {serviceid, triggerid, status, status, algorithm}, *pservice;
 	zbx_itservice_index_t	*pindex;
 
 	zbx_vector_ptr_create(&service.children);
@@ -228,15 +228,21 @@ static void	updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid, int
  ******************************************************************************/
 static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *service)
 {
+	const char	*__function_name = "load_service_parents";
+
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row;
 	zbx_itservice_t	*parent, *sibling;
 	zbx_uint64_t	parentid, siblingid;
 
-	result = DBselect("select s.serviceid,s.algorithm,s.status from services s,services_links sl"
-			" where sl.servicedownid=" ZBX_FS_UI64
-			" and s.serviceid=sl.serviceupid", service->serviceid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select s.serviceid,s.status,s.algorithm"
+			" from services s,services_links sl"
+			" where s.serviceid=sl.serviceupid"
+				" and sl.servicedownid=" ZBX_FS_UI64, service->serviceid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -244,7 +250,7 @@ static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *ser
 
 		/* find/load the parent service */
 		if (NULL == (parent = zbx_hashset_search(&set->services, &parentid)))
-			parent = create_service(set, parentid, atoi(row[1]), 0, atoi(row[2]));
+			parent = create_service(set, parentid, 0, atoi(row[1]), atoi(row[2]));
 
 		/* for newly created or indirectly linked parent services we must load */
 		/* their parents until we reach the root service                       */
@@ -259,10 +265,11 @@ static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *ser
 			zbx_vector_ptr_append(&service->parents, parent);
 
 		/* load the sibling services */
-		result2 = DBselect("select s.serviceid,s.algorithm,s.status,s.triggerid"
+		result2 = DBselect(
+				"select s.serviceid,s.triggerid,s.status,s.algorithm"
 				" from services s,services_links sl"
-					" where sl.serviceupid=" ZBX_FS_UI64
-					" and s.serviceid=sl.servicedownid", parentid);
+				" where s.serviceid=sl.servicedownid"
+					" and sl.serviceupid=" ZBX_FS_UI64, parentid);
 
 		while (NULL != (row = DBfetch(result2)))
 		{
@@ -273,12 +280,11 @@ static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *ser
 
 			if (NULL == (sibling = zbx_hashset_search(&set->services, &siblingid)))
 			{
-				zbx_uint64_t	triggerid = 0;
+				zbx_uint64_t	triggerid;
 
-				if (SUCCEED != DBis_null(row[3]))
-					ZBX_STR2UINT64(triggerid, row[3]);
+				ZBX_DBROW2UINT64(triggerid, row[1]);
 
-				sibling = create_service(set, siblingid, atoi(row[1]), triggerid, atoi(row[2]));
+				sibling = create_service(set, siblingid, triggerid, atoi(row[2]), atoi(row[3]));
 			}
 
 			if (FAIL == zbx_vector_ptr_search(&parent->children, sibling, ZBX_DEFAULT_PTR_COMPARE_FUNC))
@@ -289,34 +295,53 @@ static void	load_service_parents(zbx_itservices_set_t *set, zbx_itservice_t *ser
 	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: load_services_by_triggerd                                        *
+ * Function: load_services_by_triggerids                                      *
  *                                                                            *
  * Purpose: loads services that might be affected by the specified triggerid  *
  *          or are required to calculate status of loaded services            *
  *                                                                            *
  * Parameters: set        - [IN] the IT services data set                     *
- *             triggerid  - [IN] the source trigger id                        *
+ *             triggerids - [IN] the sorted list of trigger ids               *
  *                                                                            *
  ******************************************************************************/
-static void	load_services_by_triggerd(zbx_itservices_set_t *set, zbx_uint64_t triggerid)
+static void	load_services_by_triggerids(zbx_itservices_set_t *set, const zbx_vector_uint64_t *triggerids)
 {
+	const char	*__function_name = "load_services_by_triggerids";
+
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	serviceid, *pserviceid = &serviceid;
+	zbx_uint64_t	serviceid, triggerid;
 	zbx_itservice_t	*service;
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
 
-	result = DBselect("select serviceid,status,algorithm from services where triggerid=" ZBX_FS_UI64, triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select serviceid,triggerid,status,algorithm"
+			" from services"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
+		ZBX_STR2UINT64(triggerid, row[1]);
 
-		if (NULL == (service = zbx_hashset_search(&set->services, &pserviceid)))
-			service = create_service(set, serviceid, atoi(row[2]), triggerid, atoi(row[1]));
+		if (NULL == (service = zbx_hashset_search(&set->services, &serviceid)))
+			service = create_service(set, serviceid, triggerid, atoi(row[2]), atoi(row[3]));
 
 		/* Even if the service already exists it might be loaded only to calculate value */
 		/* of parent service (indirectly linked). In this case we also must load its     */
@@ -324,8 +349,9 @@ static void	load_services_by_triggerd(zbx_itservices_set_t *set, zbx_uint64_t tr
 		if (0 == service->parents.values_num)
 			load_service_parents(set, service);
 	}
-
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -445,7 +471,6 @@ static int	write_service_changes_and_alarms(zbx_itservices_set_t *set, zbx_vecto
 	{
 		if (service->old_status != service->status)
 			updates_append(&updates, service->serviceid, service->status, 0);
-
 	}
 
 	zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)compare_updates);
@@ -537,27 +562,36 @@ out:
  ******************************************************************************/
 int	flush_service_updates(zbx_vector_ptr_t *service_updates)
 {
+	const char		*__function_name = "flush_service_updates";
+
 	int			iupdate, iservice, i, ret = FAIL;
 	zbx_status_update_t	*update;
 	zbx_itservices_set_t	set;
 	zbx_vector_ptr_t	alarms;
 	zbx_itservice_index_t	*index;
+	zbx_vector_uint64_t	triggerids;
 
-	if (NULL == service_updates->values)
-		return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	init_itservice_set(&set);
 
 	zbx_vector_ptr_create(&alarms);
+	zbx_vector_uint64_create(&triggerids);
+
+	for (i = 0; i < service_updates->values_num; i++)
+	{
+		update = (zbx_status_update_t *)service_updates->values[i];
+
+		zbx_vector_uint64_append(&triggerids, update->sourceid);
+	}
+
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* load all services affected by the trigger status change and      */
 	/* the services that are required for resulting status calculations */
-	for (iupdate = 0; iupdate < service_updates->values_num; iupdate++)
-	{
-		update = service_updates->values[iupdate];
+	load_services_by_triggerids(&set, &triggerids);
 
-		load_services_by_triggerd(&set, update->sourceid);
-	}
+	zbx_vector_uint64_destroy(&triggerids);
 
 	/* apply status updates */
 	for (iupdate = 0; iupdate < service_updates->values_num; iupdate++)
@@ -598,6 +632,8 @@ int	flush_service_updates(zbx_vector_ptr_t *service_updates)
 	zbx_vector_ptr_destroy(&alarms);
 
 	clean_itservice_set(&set);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
