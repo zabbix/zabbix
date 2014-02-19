@@ -823,6 +823,8 @@ define('ZBX_HAVE_IPV6', 1);
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
 define('ZBX_SOCKET_REMEDY_TIMEOUT',	60);
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
+
+define('REMEDY_SERVICE_MINIMUM_SEVERITY', TRIGGER_SEVERITY_WARNING);
 define('REMEDY_SERVICE_WEB_URL',    'https://bt-dev.onbmc.com/arsys/'. // server
 	'forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'. // link to web form in remedy
 		'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'. // additional params

@@ -113,44 +113,51 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
-// check if current user has Remedy Service media type set up
-$remedyServiceAvailable = API::MediaType()->get(array(
-	'userids' => CWebUser::$data['userid'],
-	'filter' => array('type' => MEDIA_TYPE_REMEDY),
-	'output' => array('mediatypeid'),
-	'limit' => 1
-));
-$remedyServiceAvailable = reset($remedyServiceAvailable);
+if ($trigger['priority'] >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
+	// check if current user has Remedy Service media type set up
+	$remedyService = API::MediaType()->get(array(
+		'userids' => CWebUser::$data['userid'],
+		'filter' => array('type' => MEDIA_TYPE_REMEDY),
+		'output' => array('mediatypeid'),
+		'limit' => 1
+	));
+	$remedyService = reset($remedyService);
 
-if ($remedyServiceAvailable) {
-	// check if current event has Remedy connected
-	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_REMEDY_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$incident = $zabbixServer->mediaQuery(array($event['eventid']), get_cookie('zbx_sessionid'));
+	if ($remedyService) {
+		// check if current event has Remedy connected
+		$zabbixServer = new CZabbixServer(
+			$ZBX_SERVER,
+			$ZBX_SERVER_PORT,
+			ZBX_SOCKET_REMEDY_TIMEOUT,
+			ZBX_SOCKET_BYTES_LIMIT
+		);
+		$ticket = $zabbixServer->mediaQuery(array($event['eventid']), get_cookie('zbx_sessionid'));
 
-	$errorMessage = $zabbixServer->getError();
-	if ($errorMessage) {
-		error($errorMessage);
-	}
-	elseif ($incident) {
-		$incident = zbx_toHash($incident, 'eventid');
-		$eventId = $event['eventid'];
-
-		// something went wrong getting that ticket
-		if (isset($incident[$eventId]['error']) && $incident[$eventId]['error']) {
-			error($incident[$eventId]['error']);
+		$zabbixServerError = $zabbixServer->getError();
+		if ($zabbixServerError) {
+			error($zabbixServerError);
 		}
-		// ticket exists. Create link to ticket and label "Update ticket"
-		elseif (isset($incident[$eventId]['externalid']) && $incident[$eventId]['externalid']) {
-			$ticketTable = new CTableInfo();
-			$ticketTable->addRow(array(_('Ticket ID'), new CLink($incident[$eventId]['externalid'],
-				REMEDY_SERVICE_WEB_URL.'"'.$incident[$eventId]['externalid'].'"'
-			)));
-			$ticketTable->addRow(array(_('Created'), zbx_date2str(_('d M Y H:i:s'), $incident[$eventId]['clock'])));
+		elseif ($ticket) {
+			$ticket = zbx_toHash($ticket, 'eventid');
+			$eventId = $event['eventid'];
 
-			$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
-			$ticketDetails->setHeader(_('Ticket details'));
+			// something went wrong getting that ticket
+			if (isset($ticket[$eventId]['error']) && $ticket[$eventId]['error']) {
+				error($ticket[$eventId]['error']);
+			}
+			// ticket exists. Create link to ticket and label "Update ticket"
+			elseif (isset($ticket[$eventId]['externalid']) && $ticket[$eventId]['externalid']) {
+				$ticketTable = new CTableInfo();
+				$ticketTable->addRow(array(_('Ticket ID'), new CLink($ticket[$eventId]['externalid'],
+					REMEDY_SERVICE_WEB_URL.'"'.$ticket[$eventId]['externalid'].'"'
+				)));
+				$ticketTable->addRow(array(_('Created'), zbx_date2str(_('d M Y H:i:s'), $ticket[$eventId]['clock'])));
 
-			$left_col[] = $ticketDetails;
+				$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
+				$ticketDetails->setHeader(_('Ticket details'));
+
+				$left_col[] = $ticketDetails;
+			}
 		}
 	}
 }
