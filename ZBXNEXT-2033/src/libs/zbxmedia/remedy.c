@@ -768,9 +768,6 @@ static int	remedy_modify_ticket(const char *url, const char *proxy, const char *
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] modify: %s", xml);
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] response: %s", page.data);
-
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
@@ -847,6 +844,8 @@ static int	remedy_read_last_ticket(zbx_uint64_t triggerid, const char *url, cons
 
 	DBfree_result(result);
 
+	zbx_free(sql);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -876,9 +875,12 @@ static int	remedy_read_last_ticket(zbx_uint64_t triggerid, const char *url, cons
 static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_name, char **service_name,
 		char **service_id)
 {
+	const char	*__function_name = "remedy_get_service_by_host";
 	char		*group_name_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s", __function_name, group_name);
 
 	group_name_esc = DBdyn_escape_string(group_name);
 
@@ -906,6 +908,8 @@ static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_na
 	DBfree_result(result);
 
 	zbx_free(group_name_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s (%s)", __function_name, *service_name, *service_id);
 }
 
 /******************************************************************************
@@ -927,10 +931,14 @@ static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_na
 static int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, const char *ticketnumber,
 		int status)
 {
+	const char	*__function_name = "remedy_acknowledge_event";
+
 	int		ret = FAIL;
 	char		*sql = NULL, *message, *message_esc;
 	size_t		sql_offset = 0, sql_alloc = 0;
 	zbx_uint64_t	ackid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	switch (status)
 	{
@@ -965,6 +973,8 @@ static int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, c
 	zbx_free(message_esc);
 	zbx_free(message);
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -1030,9 +1040,12 @@ static void	remedy_clean_mediatype(DB_MEDIATYPE *media)
  ******************************************************************************/
 static int	remedy_get_mediatype(DB_MEDIATYPE *media)
 {
+	const char	*__function_name = "remedy_get_mediatype";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select smtp_server,smtp_helo,smtp_email,username,passwd,mediatypeid,exec_path"
 				" from media_type"
@@ -1055,6 +1068,8 @@ static int	remedy_get_mediatype(DB_MEDIATYPE *media)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1358,6 +1373,8 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 
 		remedy_get_service_by_host(hostid, media->smtp_email, &service_name, &service_id);
 
+		zbx_free(incident_number);
+
 		acknowledge_status = ZBX_REMEDY_ACK_CREATE;
 		incident_status = zbx_strdup(NULL, ZBX_REMEDY_STATUS_NEW);
 
@@ -1544,6 +1561,7 @@ int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tic
 	ret = SUCCEED;
 
 	remedy_clean_mediatype(&mediatype);
+	remedy_fields_clean_values(fields, ARRSIZE(fields));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
