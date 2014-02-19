@@ -271,6 +271,25 @@ static int	file_part_md5sum(const char *filename, zbx_uint64_t offset, int lengt
 	return ret;
 }
 
+static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
+{
+	int	i;
+
+	for (i = 0; i < logfiles_num; i++)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
+				ZBX_FS_UI64 " md5size:%d "
+				"md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
+				logfiles[i].processed_size, logfiles[i].md5size, logfiles[i].md5buf[0],
+				logfiles[i].md5buf[1], logfiles[i].md5buf[2], logfiles[i].md5buf[3],
+				logfiles[i].md5buf[4], logfiles[i].md5buf[5], logfiles[i].md5buf[6],
+				logfiles[i].md5buf[7], logfiles[i].md5buf[8], logfiles[i].md5buf[9],
+				logfiles[i].md5buf[10], logfiles[i].md5buf[11], logfiles[i].md5buf[12],
+				logfiles[i].md5buf[13], logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_logfile                                                      *
@@ -546,6 +565,18 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	regfree(&re);
 
 	i = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
+	if (NULL != *logfiles_old)
+		print_logfile_list(*logfiles_old, *logfiles_num_old);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list:");
+	if (NULL != logfiles)
+		print_logfile_list(logfiles, logfiles_num);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
 	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
 	for (j = i + 1; j < logfiles_num; j++)
