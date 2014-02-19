@@ -73,7 +73,7 @@ $auditTable->setHeader(array(
 	_('Recipient(s)'),
 	_('Message'),
 	_('Status'),
-	SPACE
+	_('Error')
 ));
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
@@ -82,16 +82,17 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
-		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-			$status = new CSpan(_('Sent'), 'green');
-		}
-		else {
-			$status = new CSpan(_('Executed'), 'green');
-		}
+		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+			? new CSpan(_('Sent'), 'green')
+			: new CSpan(_('Executed'), 'green');
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-		$retries = ALERT_MAX_RETRIES - $alert['retries'];
-		$status = new CSpan(_n('In progress: %1$s retry left', 'In progress: %1$s retries left', $retries), 'orange');
+		$status = new CSpan(array(
+			_('In progress'),
+			NAME_DELIMITER,
+			BR(),
+			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
+		), 'orange');
 	}
 	else {
 		$status = new CSpan(_('Not sent'), 'red');
