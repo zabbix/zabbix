@@ -25,6 +25,8 @@
 #	include "gnuregex.h"
 #endif /* _WINDOWS */
 
+#define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate md5 sum for */
+
 /******************************************************************************
  *                                                                            *
  * Function: split_string                                                     *
@@ -212,44 +214,61 @@ out:
 	return ret;
 }
 
-struct st_logfile
-{
-	char	*filename;
-	int	mtime;
-};
-
 /******************************************************************************
  *                                                                            *
- * Function: free_logfiles                                                    *
+ * Function: file_part_md5sum                                                 *
  *                                                                            *
- * Purpose: releases memory allocated for logfiles                            *
+ * Purpose: calculate md5sum of specified part of the file                    *
  *                                                                            *
- * Parameters: logfiles - pointer to the list of logfiles                     *
- *             logfiles_alloc - number of logfiles memory was allocated for   *
- *             logfiles_num - number of already inserted logfiles             *
+ * Parameters:                                                                *
+ *     filename - [IN] full pathname                                          *
+ *     offset   - [IN] offset from the beginning of the file                  *
+ *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
+ *     md5buf   - [OUT] output buffer, 16-bytes long, where the calculated    *
+ *                md5 sum is placed                                           *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments: none                                                             *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+static int	file_part_md5sum(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf)
 {
-	const char	*__function_name = "free_logfiles";
-	int		i;
+	int		ret = FAIL, f;
+	md5_state_t	state;
+	char		buf[MAX_LEN_MD5];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() logfiles_num:%d", __function_name, *logfiles_num);
+	if (MAX_LEN_MD5 < length)
+		return ret;
 
-	for (i = 0; i < *logfiles_num; i++)
-		zbx_free((*logfiles)[i].filename);
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		return ret;
+	}
 
-	zbx_free(*logfiles);
-	*logfiles_alloc = 0;
-	*logfiles_num = 0;
+	if (0 < offset && (zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for file \"%s\": %s",
+				offset, filename, zbx_strerror(errno));
+		return ret;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	if (length != (int)read(f, buf, length))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
+				(zbx_fs_size_t)length, filename, zbx_strerror(errno));
+		return ret;
+	}
+
+	md5_init(&state);
+	md5_append(&state, (const md5_byte_t *)buf, length);
+	md5_finish(&state, md5buf);
+
+	ret = SUCCEED;
+
+	if (0 != close(f))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -263,26 +282,23 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  *             logfiles_num - number of already inserted logfiles             *
  *             filename - name of a logfile (without a path)                  *
  *             mtime - modification time of a logfile                         *
+ *             size  - logfile size in bytes                                  *
  *                                                                            *
  * Return value: none                                                         *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
- * Comments: Must change sorting order to decrease a number of memory moves!  *
- *           Do not forget to change process_log() accordingly!               *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, int mtime)
+static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
+		int mtime, zbx_uint64_t size)
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
 
-	assert(NULL != logfiles);
-	assert(NULL != logfiles_alloc);
-	assert(NULL != logfiles_num);
-	assert(0 <= *logfiles_num);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d", __function_name, filename, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __function_name, filename,
+			mtime, size);
 
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
@@ -341,8 +357,15 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
 
-	(*logfiles)[i].filename = strdup(filename);
+	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
 	(*logfiles)[i].mtime = mtime;
+	(*logfiles)[i].size = size;
+	(*logfiles)[i].processed_size = 0;
+	(*logfiles)[i].md5size = (zbx_uint64_t)MAX_LEN_MD5 > size ? (int)size : MAX_LEN_MD5;
+
+	if (SUCCEED != file_part_md5sum(filename, (zbx_uint64_t)0,  (*logfiles)[i].md5size, (*logfiles)[i].md5buf))
+		(*logfiles)[i].md5size = -1;
+
 	++(*logfiles_num);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -355,26 +378,29 @@ out:
  * Purpose: Find new records in logfiles with rotation                        *
  *                                                                            *
  * Parameters:                                                                *
- *     filename       - [IN] logfile name (regular expression with a path)    *
- *     lastlogsize    - [IN/OUT] offset from the beginning of the file        *
- *     mtime          - [IN/OUT] last modification time of the file           *
- *     skip_old_data  - [IN/OUT] start from the beginning of the file or      *
- *                      jump to the end                                       *
- *     big_rec        - [IN/OUT] state variable to remember whether a long    *
- *                      record is being processed                             *
- *     encoding       - [IN] text string describing encoding.                 *
- *                        The following encodings are recognized:             *
- *                          "UNICODE"                                         *
- *                          "UNICODEBIG"                                      *
- *                          "UNICODEFFFE"                                     *
- *                          "UNICODELITTLE"                                   *
- *                          "UTF-16"   "UTF16"                                *
- *                          "UTF-16BE" "UTF16BE"                              *
- *                          "UTF-16LE" "UTF16LE"                              *
- *                          "UTF-32"   "UTF32"                                *
- *                          "UTF-32BE" "UTF32BE"                              *
- *                          "UTF-32LE" "UTF32LE".                             *
- *                        "" (empty string) means a single-byte character set.*
+ *     filename         - [IN] logfile name (regular expression with a path)  *
+ *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
+ *     mtime            - [IN/OUT] last modification time of the file         *
+ *     skip_old_data    - [IN/OUT] start from the beginning of the file or    *
+ *                        jump to the end                                     *
+ *     big_rec          - [IN/OUT] state variable to remember whether a long  *
+ *                        record is being processed                           *
+ *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
+ *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
+ *     encoding         - [IN] text string describing encoding.               *
+ *                          The following encodings are recognized:           *
+ *                            "UNICODE"                                       *
+ *                            "UNICODEBIG"                                    *
+ *                            "UNICODEFFFE"                                   *
+ *                            "UNICODELITTLE"                                 *
+ *                            "UTF-16"   "UTF16"                              *
+ *                            "UTF-16BE" "UTF16BE"                            *
+ *                            "UTF-16LE" "UTF16LE"                            *
+ *                            "UTF-32"   "UTF32"                              *
+ *                            "UTF-32BE" "UTF32BE"                            *
+ *                            "UTF-32LE" "UTF32LE".                           *
+ *                          "" (empty string) means a single-byte character   *
+ *                             set.                                           *
  *     regexps        - [IN] array of regexps                                 *
  *     regexps_num    - [IN] number of regexp                                 *
  *     pattern        - [IN] pattern to match                                 *
@@ -397,9 +423,10 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		int *big_rec, struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
+		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;
@@ -449,7 +476,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		zbx_free(find_path);
 		goto out;
 	}
-	zbx_free(find_path);
 
 	do
 	{
@@ -462,17 +488,24 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 					0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name,
-						(int)file_buf.st_mtime);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate,
+						(int)file_buf.st_mtime, (zbx_uint64_t)file_buf.st_size);
 			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 		zbx_free(logfile_candidate);
-
 	}
 	while (0 == _findnext(find_handle, &find_data));
+
+	if (-1 == _findclose(find_handle))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
+				zbx_strerror(errno));
+	}
+
+	zbx_free(find_path);
 
 #else	/* _WINDOWS */
 	if (NULL == (dir = opendir(directory)))
@@ -495,8 +528,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name,
-						(int)file_buf.st_mtime);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate,
+						(int)file_buf.st_mtime, (zbx_uint64_t)file_buf.st_size);
 			}
 		}
 		else
@@ -504,6 +537,10 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 		zbx_free(logfile_candidate);
 	}
+
+	if (-1 == closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
+
 #endif	/*_WINDOWS*/
 
 	regfree(&re);
@@ -522,9 +559,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	/* processing matched logfiles starting from the older one to the newer one */
 	for (; i < logfiles_num; i++)
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
-
-		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
+		if (SUCCEED != (ret = process_log(logfiles[i].filename, lastlogsize, mtime, skip_old_data, big_rec,
 				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
 				hostname, key)))
 		{
@@ -535,10 +570,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		}
 
 		if (i != logfiles_num - 1)
-		{
-			zbx_free(logfile_candidate);
 			*lastlogsize = 0;
-		}
 	}
 
 	if (0 == logfiles_num)
@@ -549,19 +581,19 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		ret = SUCCEED;
 	}
 
-	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-
-#ifdef _WINDOWS
-	if (0 != find_handle && -1 == _findclose(find_handle))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle: %s", zbx_strerror(errno));
-#else
-	if (NULL != dir && -1 == closedir(dir))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
-#endif
-
-	zbx_free(logfile_candidate);
 	zbx_free(directory);
 	zbx_free(format);
+
+	/* remember the composed list of log files for using in the next check */
+	if (NULL != *logfiles_old)
+	{
+		for (j = 0; j < *logfiles_num_old; j++)
+			zbx_free((*logfiles_old)[j].filename);
+
+		zbx_free(*logfiles_old);
+	}
+	*logfiles_old = logfiles;
+	*logfiles_num_old = logfiles_num;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
