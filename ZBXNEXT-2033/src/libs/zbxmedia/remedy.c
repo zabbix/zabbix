@@ -1261,8 +1261,6 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DBbegin();
-
 	result = DBselect("select e.value,t.priority,t.triggerid,t.expression from events e,triggers t"
 				" where e.eventid=" ZBX_FS_UI64
 					" and e.source=%d"
@@ -1423,6 +1421,8 @@ out:
 	{
 		int	is_new;
 
+		DBbegin();
+
 		is_new = ZBX_REMEDY_ACK_CREATE == acknowledge_status ? 1 : 0;
 
 		if (ZBX_REMEDY_ACK_UNKNOWN != acknowledge_status)
@@ -1442,9 +1442,9 @@ out:
 			if (NULL != incident_number)
 				ticket->ticketid = zbx_strdup(NULL, incident_number);
 		}
-	}
 
-	DBcommit();
+		DBcommit();
+	}
 
 	zbx_free(incident_number);
 	zbx_free(incident_status);
@@ -1706,5 +1706,4 @@ void	zbx_free_acknowledge(zbx_acknowledge_t *ack)
 }
 
 #endif
-
 
