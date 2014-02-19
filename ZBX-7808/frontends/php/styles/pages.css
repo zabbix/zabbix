@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 /* host edit */
 .host-edit .interface-group,
 .hostprototype-edit .interface-group { width: 750px; }
@@ -52,6 +53,9 @@
 .host-edit #linkedTemplateTable { min-width: 400px; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
 
+/* host discovery list */
+.host-discovery-list .discovery-state { width: 15px; }
+
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
 .hk .element-row-first { border-top-width: 1px; }
@@ -84,17 +88,23 @@
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
-.latest-mon .tableinfo td.latest-host { width: 10%; }
-.latest-mon .tableinfo td.latest-item { width: 25%; }
+.latest-mon .tableinfo td.latest-node { width: 4%; }
+.latest-mon .tableinfo td.latest-host { width: 9%; }
+.latest-mon .tableinfo td.latest-interval { width: 4%; }
+.latest-mon .tableinfo td.latest-history { width: 4%; }
+.latest-mon .tableinfo td.latest-trends { width: 4%; }
+.latest-mon .tableinfo td.latest-type { width: 8%; }
+.latest-mon .tableinfo td.latest-lastcheck { width: 12%; }
+.latest-mon .tableinfo td.latest-lastvalue { width: 8%; }
+.latest-mon .tableinfo td.latest-data { width: 8%; }
+.latest-mon .tableinfo td.latest-actions { width: 5%; }
+.latest-mon .tableinfo td.latest-status { width: 15px; }
 .latest-mon .tableinfo td,
-.latest-mon .tableinfo div.txt,
+.latest-mon .tableinfo td div.item,
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a { overflow: hidden; text-overflow: ellipsis; }
+.latest-mon .tableinfo td a { overflow: hidden; text-overflow: ellipsis; }
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a { float: left; max-width: 100%; }
-.latest-mon .tableinfo.latest-details td.latest-lastcheck { width: 9%; }
-.latest-mon .tableinfo.latest-details td.latest-error { width: 4%; }
-.latest-mon .tableinfo.latest-details td.latest-error div { float: left; }
+.latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
 /* regexp test result table, based on .tableinfo */
@@ -117,6 +127,7 @@
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
 .item-list .filter .multiselect { height: 10px; top: -10px; }
+.item-list .item-state { width: 15px; }
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -166,6 +177,9 @@
 
 /* administration of triggers */
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
+
+/* triggers list */
+.trigger-list .trigger-state { width: 15px; }
 
 /* triggers expression condition */
 .trigger-expression #expr_type { width: 605px; max-width: 605px; }

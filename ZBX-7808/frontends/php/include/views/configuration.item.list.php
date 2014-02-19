@@ -70,7 +70,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showErrorColumn'] ? new CCol(SPACE, 'item-state') : null
 ));
 
 foreach ($this->data['items'] as $item) {

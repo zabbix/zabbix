@@ -19,7 +19,7 @@
 **/
 
 
-$triggersWidget = new CWidget();
+$triggersWidget = new CWidget(null, 'trigger-list');
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -110,8 +110,9 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showErrorColumn'] ? new CCol(SPACE, 'trigger-state') : null
 ));
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
