@@ -230,8 +230,8 @@ static void	its_itservice_load_children(zbx_itservices_t *itservices)
 	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_itservice_t		*itservice;
-	zbx_uint64_t		serviceid;
+	zbx_itservice_t		*itservice, *parent;
+	zbx_uint64_t		serviceid, parentid;
 	zbx_vector_uint64_t	services;
 	zbx_hashset_iter_t	iter;
 
@@ -248,7 +248,7 @@ static void	its_itservice_load_children(zbx_itservices_t *itservices)
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select s.serviceid,s.status,s.algorithm"
+			"select s.serviceid,s.status,s.algorithm,sl.serviceupid"
 			" from services s,services_links sl"
 			" where s.serviceid=sl.servicedownid and");
 
@@ -259,9 +259,19 @@ static void	its_itservice_load_children(zbx_itservices_t *itservices)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
+		ZBX_STR2UINT64(parentid, row[3]);
+
+		if (NULL == (parent = zbx_hashset_search(&itservices->itservices, &parentid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 
 		if (NULL == (itservice = zbx_hashset_search(&itservices->itservices, &serviceid)))
 			itservice = its_itservice_create(itservices, serviceid, 0, atoi(row[1]), atoi(row[2]));
+
+		if (FAIL == zbx_vector_ptr_search(&parent->children, itservice, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			zbx_vector_ptr_append(&parent->children, itservice);
 	}
 
 	DBfree_result(result);
