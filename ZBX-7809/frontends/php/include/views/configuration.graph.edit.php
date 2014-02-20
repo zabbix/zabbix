@@ -96,7 +96,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxisMinData = array();
 
-	$yTypeComboBox = new CComboBox('ymin_type', $this->data['ymin_type'], 'submit();');
+	$yTypeComboBox = new CComboBox('ymin_type', $this->data['ymin_type']);
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_CALCULATED, _('Calculated'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_FIXED, _('Fixed'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE, _('Item'));
@@ -154,7 +154,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
 	$yaxisMaxData = array();
-	$yTypeComboBox = new CComboBox('ymax_type', $this->data['ymax_type'], 'submit()');
+	$yTypeComboBox = new CComboBox('ymax_type', $this->data['ymax_type']);
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_CALCULATED, _('Calculated'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_FIXED, _('Fixed'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE, _('Item'));

@@ -104,11 +104,24 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
 
-			if (isset($graph['ymin_type']) && $graph['ymin_type'] != GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$graph['ymin_itemid'] = null;
+			// Y axis min clean unused fields
+			if (isset($graph['ymin_type'])) {
+				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['yaxismin'] = null;
+				}
+				else {
+					$graph['ymin_itemid'] = null;
+				}
 			}
-			if (isset($graph['ymax_type']) && $graph['ymax_type'] != GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$graph['ymax_itemid'] = null;
+
+			// Y axis max clean unused fields
+			if (isset($graph['ymax_type'])) {
+				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['yaxismax'] = null;
+				}
+				else {
+					$graph['ymax_itemid'] = null;
+				}
 			}
 
 			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
