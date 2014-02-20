@@ -113,7 +113,7 @@ class CProfile {
 	 * @param string $idx	first identifier
 	 * @param mixed  $idx2	second identifier, which can be list of identifiers as well
 	 */
-	public static function delete($idx, $idx2 = 0) {
+	public static function delete($idx, $idx2) {
 		if (!is_array($idx2)) {
 			$idx2 = array($idx2);
 		}
