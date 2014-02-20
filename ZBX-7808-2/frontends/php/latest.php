@@ -318,44 +318,78 @@ $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('ful
 // table
 $table = new CTableInfo(_('No values found.'));
 
+if (is_show_all_nodes()) {
+	$nodeHeader = new CCol(new CSpan(_('Node')), 'latest-node');
+	$nodeHeader->setAttribute('title', _('Node'));
+}
+else {
+	$nodeHeader = null;
+}
+
 if ($displayHostColumn) {
 	$hostHeader = make_sorting_header(_('Host'), 'host');
 	$hostHeader->addClass('latest-host');
+	$hostHeader->setAttribute('title', _('Host'));
 }
 else {
 	$hostHeader = null;
 }
 
+$nameHeader = make_sorting_header(_('Name'), 'name');
+$nameHeader->setAttribute('title', _('Name'));
+
 $lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock');
 $lastCheckHeader->addClass('latest-lastcheck');
+$lastCheckHeader->setAttribute('title', _('Last check'));
+
+$lastValueHeader = new CCol(new CSpan(_('Last value')), 'latest-lastvalue');
+$lastValueHeader->setAttribute('title', _('Last value'));
+
+$lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
+$lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
 if ($filterShowDetails) {
+	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
+	$intervalHeader->setAttribute('title', _('Interval'));
+
+	$historyHeader = new CCol(new CSpan(_('History')), 'latest-history');
+	$historyHeader->setAttribute('title', _('History'));
+
+	$trendsHeader = new CCol(new CSpan(_('Trends')), 'latest-trends');
+	$trendsHeader->setAttribute('title', _('Trends'));
+
+	$typeHeader = new CCol(new CSpan(_('Type')), 'latest-type');
+	$typeHeader->setAttribute('title', _('Type'));
+
+	$infoHeader = new CCol(new CSpan(_('Info')), 'latest-info');
+	$infoHeader->setAttribute('title', _('Info'));
+
 	$table->addClass('latest-details');
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		is_show_all_nodes() ? new CCol(new CSpan(_('Node')), 'latest-node') : null,
+		$nodeHeader,
 		$hostHeader,
-		make_sorting_header(_('Name'), 'name'),
-		new CCol(new CSpan(_('Interval')), 'latest-interval'),
-		new CCol(new CSpan(_('History')), 'latest-history'),
-		new CCol(new CSpan(_('Trends')), 'latest-trends'),
-		new CCol(new CSpan(_('Type')), 'latest-type'),
+		$nameHeader,
+		$intervalHeader,
+		$historyHeader,
+		$trendsHeader,
+		$typeHeader,
 		$lastCheckHeader,
-		new CCol(new CSpan(_('Last value')), 'latest-lastvalue'),
-		new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data'),
+		$lastValueHeader,
+		$lastDataHeader,
 		new CCol(SPACE, 'latest-actions'),
-		new CCol(new CSpan(_('Info')), 'latest-info')
+		$infoHeader
 	));
 }
 else {
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		is_show_all_nodes() ? new CCol(new CSpan(_('Node')), 'latest-node') : null,
+		$nodeHeader,
 		$hostHeader,
-		make_sorting_header(_('Name'), 'name'),
+		$nameHeader,
 		$lastCheckHeader,
-		new CCol(new CSpan(_('Last value')), 'latest-lastvalue'),
-		new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data'),
+		$lastValueHeader,
+		$lastDataHeader,
 		new CCol(SPACE, 'latest-actions')
 	));
 }

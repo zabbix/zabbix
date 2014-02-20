@@ -87,9 +87,9 @@
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
 .latest-mon .tableinfo td.latest-node { width: 4%; }
 .latest-mon .tableinfo td.latest-host { width: 9%; }
-.latest-mon .tableinfo td.latest-interval { width: 4%; }
-.latest-mon .tableinfo td.latest-history { width: 4%; }
-.latest-mon .tableinfo td.latest-trends { width: 4%; }
+.latest-mon .tableinfo td.latest-interval { width: 5%; }
+.latest-mon .tableinfo td.latest-history { width: 5%; }
+.latest-mon .tableinfo td.latest-trends { width: 5%; }
 .latest-mon .tableinfo td.latest-type { width: 8%; }
 .latest-mon .tableinfo td.latest-lastcheck { width: 12%; }
 .latest-mon .tableinfo td.latest-lastvalue { width: 8%; }
