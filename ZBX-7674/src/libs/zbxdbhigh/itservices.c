@@ -41,7 +41,7 @@ typedef struct
 zbx_status_update_t;
 
 /* IT service node */
-typedef struct zbx_itservice_t
+typedef struct
 {
 	/* service id */
 	zbx_uint64_t		serviceid;
@@ -560,7 +560,7 @@ out:
  *              service alarm queue into database.                            *
  *                                                                            *
  ******************************************************************************/
-int	flush_service_updates(zbx_vector_ptr_t *service_updates)
+static int	flush_service_updates(zbx_vector_ptr_t *service_updates)
 {
 	const char		*__function_name = "flush_service_updates";
 
@@ -640,7 +640,6 @@ int	flush_service_updates(zbx_vector_ptr_t *service_updates)
 
 /*
  * Public API
- *
  */
 
 /******************************************************************************
@@ -678,7 +677,7 @@ int	DBflush_itservice_updates()
 {
 	int	i, ret = FAIL;
 
-	if (NULL == itservice_updates.values)
+	if (NULL == itservice_updates.values || 0 == itservice_updates.values_num)
 		return SUCCEED;
 
 	LOCK_SERVICES;
