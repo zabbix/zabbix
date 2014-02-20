@@ -190,7 +190,7 @@ class JMXItemChecker extends ItemChecker
 
 			JSONObject mapping = new JSONObject();
 			mapping.put(ItemChecker.JSON_TAG_DATA, counters);
-			return mapping.toString(2);
+			return mapping.toString();
 		}
 		else
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());

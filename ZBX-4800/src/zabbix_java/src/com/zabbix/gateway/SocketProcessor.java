@@ -66,7 +66,7 @@ class SocketProcessor implements Runnable
 			response.put(ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_SUCCESS);
 			response.put(ItemChecker.JSON_TAG_DATA, values);
 
-			speaker.sendResponse(response.toString(2));
+			speaker.sendResponse(response.toString());
 		}
 		catch (Exception e1)
 		{
@@ -74,7 +74,7 @@ class SocketProcessor implements Runnable
 
 			try
 			{
-				String response = new Formatter().format("{ \"%s\" : \"%s\", \"%s\" : %s }\n",
+				String response = new Formatter().format("{\"%s\":\"%s\",\"%s\":%s}\n",
 						ItemChecker.JSON_TAG_RESPONSE, ItemChecker.JSON_RESPONSE_FAILED,
 						ItemChecker.JSON_TAG_ERROR, JSONObject.quote(e1.getMessage())).toString();
 
