@@ -85,7 +85,7 @@
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
-.latest-mon .tableinfo td.latest-node { width: 4%; }
+.latest-mon .tableinfo td.latest-node { width: 5%; }
 .latest-mon .tableinfo td.latest-host { width: 9%; }
 .latest-mon .tableinfo td.latest-interval { width: 5%; }
 .latest-mon .tableinfo td.latest-history { width: 5%; }
@@ -95,7 +95,7 @@
 .latest-mon .tableinfo td.latest-lastvalue { width: 8%; }
 .latest-mon .tableinfo td.latest-data { width: 8%; }
 .latest-mon .tableinfo td.latest-actions { width: 5%; }
-.latest-mon .tableinfo td.latest-info { width: 26px; }
+.latest-mon .tableinfo td.latest-info { width: 27px; }
 .latest-mon .tableinfo td,
 .latest-mon .tableinfo td div.item,
 .latest-mon .tableinfo td span,
