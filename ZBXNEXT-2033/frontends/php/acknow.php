@@ -186,16 +186,9 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		));
 	}
 
-	DBstart();
+	$result = true;
 
-	$result = API::Event()->acknowledge(array(
-		'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
-		'message' => $_REQUEST['message']
-	));
-
-	if (!$bulk && isset($event) && isset($remedyService) && $remedyService && hasRequest('ticket_status') && $result) {
-		$result = true;
-
+	if (!$bulk && isset($event) && isset($remedyService) && $remedyService && hasRequest('ticket_status')) {
 		$event = array(
 			'eventid' => getRequest('eventid'),
 			'message' => getRequest('message'),
@@ -238,14 +231,22 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 
 	if ($result) {
+		DBstart();
+
+		$result = API::Event()->acknowledge(array(
+			'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
+			'message' => $_REQUEST['message']
+		));
+
 		$eventAcknowledged = true;
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, _('Acknowledge added').
 			' ['.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName).']'.
 			' ['.$_REQUEST['message'].']');
+
+		$result = DBend($result);
 	}
 
-	$result = DBend($result);
 	show_messages($result, _('Event acknowledged'), _('Cannot acknowledge event'));
 
 	if (isset($_REQUEST['saveandreturn'])) {
