@@ -9,6 +9,8 @@ EXTRA_DIST = \
 	shutdown.sh \
 	startup.sh
 
+SOURCE = 1.5
+
 ZJG = bin/zabbix-java-gateway-$(VERSION).jar
 LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
 JUNIT = tests/junit-4.8.2.jar
@@ -18,11 +20,11 @@ ZJG_DEST = $(DESTDIR)$(sbindir)/zabbix_java
 all: $(ZJG)
 
 $(ZJG): class src/com/zabbix/gateway/*.java
-	$(JAVAC) -d class/src -classpath $(LIB) src/com/zabbix/gateway/*.java
+	$(JAVAC) -d class/src -source $(SOURCE) -classpath $(LIB) src/com/zabbix/gateway/*.java
 	$(JAR) cf $(ZJG) -C class/src .
 
 test: class
-	$(JAVAC) -d class/tests -classpath class/src:$(JUNIT) tests/com/zabbix/gateway/*.java
+	$(JAVAC) -d class/tests -source $(SOURCE) -classpath class/src:$(JUNIT) tests/com/zabbix/gateway/*.java
 	java -classpath class/tests:$(LIB):$(ZJG):$(JUNIT) com.zabbix.gateway.AllTestRunner
 
 class:
