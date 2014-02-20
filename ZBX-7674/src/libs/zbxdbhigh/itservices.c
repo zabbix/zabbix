@@ -153,7 +153,7 @@ static void	its_itservices_clean(zbx_itservices_t *itservices)
  *                                                                            *
  * Purpose: creates a new IT service node                                     *
  *                                                                            *
- * Parameters: set         - [IN] the IT services data set                    *
+ * Parameters: itservices  - [IN] the IT services data                        *
  *             serviceid   - [IN] the service id                              *
  *             algorithm   - [IN] the service status calculation mode         *
  *             triggerid   - [IN] the source trigger id for leaf nodes        *
@@ -217,45 +217,119 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 
 /******************************************************************************
  *                                                                            *
+ * Function: its_itservice_load_children                                      *
+ *                                                                            *
+ * Purpose: loads all missing children of the specified services              *
+ *                                                                            *
+ * Parameters: itservices   - [IN] the IT services data                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	its_itservice_load_children(zbx_itservices_t *itservices)
+{
+	char			*sql;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_itservice_t		*itservice;
+	zbx_uint64_t		serviceid;
+	zbx_vector_uint64_t	services;
+	zbx_hashset_iter_t	iter;
+
+	zbx_vector_uint64_create(&services);
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	zbx_hashset_iter_reset(&itservices->itservices, &iter);
+
+	while (NULL != (itservice = zbx_hashset_iter_next(&iter)))
+	{
+		if (0 == itservice->triggerid)
+			zbx_vector_uint64_append(&services, itservice->serviceid);
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select s.serviceid,s.status,s.algorithm"
+			" from services s,services_links sl"
+			" where s.serviceid=sl.servicedownid and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.serviceupid", services.values, services.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceid, row[0]);
+
+		if (NULL == (itservice = zbx_hashset_search(&itservices->itservices, &serviceid)))
+			itservice = its_itservice_create(itservices, serviceid, 0, atoi(row[1]), atoi(row[2]));
+	}
+
+	DBfree_result(result);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&services);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: its_itservice_load_parents                                       *
  *                                                                            *
  * Purpose: recursively loads parent nodes of the specified service until the *
  *          root node                                                         *
  *                                                                            *
- * Parameters: set      - [IN] the IT services data set                       *
- *             service  - [IN] the service                                    *
+ * Parameters: itservices   - [IN] the IT services data                       *
+ *             services     - [IN] a vector containing ids of services to     *
+ *                                 load parents                               *
  *                                                                            *
  ******************************************************************************/
-static void	its_itservice_load_parents(zbx_itservices_t *itservices, zbx_itservice_t *itservice)
+static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector_uint64_t *services)
 {
-	const char	*__function_name = "load_service_parents";
+	const char		*__function_name = "its_itservices_load_parents";
 
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
-	zbx_itservice_t	*parent, *sibling;
-	zbx_uint64_t	parentid, siblingid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_itservice_t		*parent, *itservice;
+	zbx_uint64_t		parentid, serviceid;
+	zbx_vector_uint64_t	new_services;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
-			"select s.serviceid,s.status,s.algorithm"
+	zbx_vector_uint64_create(&new_services);
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	zbx_vector_uint64_sort(services, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(services, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select s.serviceid,s.status,s.algorithm,sl.servicedownid"
 			" from services s,services_links sl"
-			" where s.serviceid=sl.serviceupid"
-				" and sl.servicedownid=" ZBX_FS_UI64, itservice->serviceid);
+			" where s.serviceid=sl.serviceupid and ");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.servicedownid", services->values, services->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(parentid, row[0]);
+		ZBX_STR2UINT64(serviceid, row[3]);
+
+		/* find the service */
+		if (NULL == (itservice = zbx_hashset_search(&itservices->itservices, &serviceid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 
 		/* find/load the parent service */
 		if (NULL == (parent = zbx_hashset_search(&itservices->itservices, &parentid)))
+		{
 			parent = its_itservice_create(itservices, parentid, 0, atoi(row[1]), atoi(row[2]));
-
-		/* for newly created or indirectly linked parent services we must load */
-		/* their parents until we reach the root service                       */
-		if (0 == parent->parents.values_num && 0 == parent->children.values_num)
-			its_itservice_load_parents(itservices, parent);
+			zbx_vector_uint64_append(&new_services, parent->serviceid);
+		}
 
 		/* link the service as a parent's child */
 		if (FAIL == zbx_vector_ptr_search(&parent->children, itservice, ZBX_DEFAULT_PTR_COMPARE_FUNC))
@@ -264,37 +338,15 @@ static void	its_itservice_load_parents(zbx_itservices_t *itservices, zbx_itservi
 		if (FAIL == zbx_vector_ptr_search(&itservice->parents, parent, ZBX_DEFAULT_PTR_COMPARE_FUNC))
 			zbx_vector_ptr_append(&itservice->parents, parent);
 
-		/* load the sibling services */
-		result2 = DBselect(
-				"select s.serviceid,s.triggerid,s.status,s.algorithm"
-				" from services s,services_links sl"
-				" where s.serviceid=sl.servicedownid"
-					" and sl.serviceupid=" ZBX_FS_UI64, parentid);
-
-		while (NULL != (row = DBfetch(result2)))
-		{
-			ZBX_STR2UINT64(siblingid, row[0]);
-
-			if (siblingid == itservice->serviceid)
-				continue;
-
-			if (NULL == (sibling = zbx_hashset_search(&itservices->itservices, &siblingid)))
-			{
-				zbx_uint64_t	triggerid;
-
-				ZBX_DBROW2UINT64(triggerid, row[1]);
-
-				sibling = its_itservice_create(itservices, siblingid, triggerid, atoi(row[2]), atoi(row[3]));
-			}
-
-			if (FAIL == zbx_vector_ptr_search(&parent->children, sibling, ZBX_DEFAULT_PTR_COMPARE_FUNC))
-				zbx_vector_ptr_append(&parent->children, sibling);
-		}
-
-		DBfree_result(result2);
 	}
-
 	DBfree_result(result);
+
+	zbx_free(sql);
+
+	if (0 < new_services.values_num)
+		its_itservices_load_parents(itservices, &new_services);
+
+	zbx_vector_uint64_destroy(&new_services);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -306,22 +358,25 @@ static void	its_itservice_load_parents(zbx_itservices_t *itservices, zbx_itservi
  * Purpose: loads services that might be affected by the specified triggerid  *
  *          or are required to calculate status of loaded services            *
  *                                                                            *
- * Parameters: set        - [IN] the IT services data set                     *
+ * Parameters: itservices - [IN] the IT services data                         *
  *             triggerids - [IN] the sorted list of trigger ids               *
  *                                                                            *
  ******************************************************************************/
-static void	its_load_services_by_triggerids(zbx_itservices_t *set, const zbx_vector_uint64_t *triggerids)
+static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const zbx_vector_uint64_t *triggerids)
 {
-	const char	*__function_name = "load_services_by_triggerids";
+	const char	*__function_name = "its_load_services_by_triggerids";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	serviceid, triggerid;
-	zbx_itservice_t	*itservice;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		serviceid, triggerid;
+	zbx_itservice_t		*itservice;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	services;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&services);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -340,16 +395,18 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *set, const zbx_vec
 		ZBX_STR2UINT64(serviceid, row[0]);
 		ZBX_STR2UINT64(triggerid, row[1]);
 
-		if (NULL == (itservice = zbx_hashset_search(&set->itservices, &serviceid)))
-			itservice = its_itservice_create(set, serviceid, triggerid, atoi(row[2]), atoi(row[3]));
+		itservice = its_itservice_create(itservices, serviceid, triggerid, atoi(row[2]), atoi(row[3]));
 
-		/* Even if the service already exists it might be loaded only to calculate value */
-		/* of parent service (indirectly linked). In this case we also must load its     */
-		/* parent services.                                                              */
-		if (0 == itservice->parents.values_num)
-			its_itservice_load_parents(set, itservice);
+		zbx_vector_uint64_append(&services, itservice->serviceid);
 	}
 	DBfree_result(result);
+
+	if (0 != services.values_num)
+		its_itservices_load_parents(itservices, &services);
+
+	its_itservice_load_children(itservices);
+
+	zbx_vector_uint64_destroy(&services);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -442,8 +499,8 @@ static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_st
  * Purpose: writes service status changes and generated service alarms into   *
  *          database                                                          *
  *                                                                            *
- * Parameters: set     - [IN] the IT services data set                        *
- *             alarms  - [IN] the service alarms update queue                 *
+ * Parameters: itservices - [IN] the IT services data                         *
+ *             alarms     - [IN] the service alarms update queue              *
  *                                                                            *
  * Return value: SUCCEED - the data was written successfully                  *
  *               FAIL    - otherwise                                          *
@@ -562,7 +619,7 @@ out:
  ******************************************************************************/
 static int	its_flush_updates(zbx_vector_ptr_t *updates)
 {
-	const char		*__function_name = "flush_service_updates";
+	const char		*__function_name = "its_flush_updates";
 
 	int			j, i, ret = FAIL;
 	zbx_status_update_t	*update;
