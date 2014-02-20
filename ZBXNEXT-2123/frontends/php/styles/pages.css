@@ -57,6 +57,10 @@
 .hk .element-row-first { border-top-width: 1px; }
 .hk .element-row label { width: 270px; text-align: right; display: block; }
 
+/* host inventory list */
+.inventory-list #inventory-filter { margin: 0 auto; text-align: left; }
+.inventory-list #inventory-filter td { border: 0; padding-left: 0; }
+
 /* host inventory elements */
 .inventory-host .formlist .formrow .element-row { margin-top: -3px; border-top-width: 0; }
 .inventory-host .formlist .formrow .element-row-first { border-top-width: 1px; }
