@@ -1099,7 +1099,7 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 
 		if (!isset($processedItems[$expression['host']][$expression['item']])) {
 			$dbItems = DBselect(
-				'SELECT i.itemid,i.flags'.
+				'SELECT i.itemid,i.flags,h.hostid'.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($expression['item']).
 					' AND '.dbConditionInt('i.flags', array(

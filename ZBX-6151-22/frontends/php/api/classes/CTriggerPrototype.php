@@ -517,18 +517,25 @@ class CTriggerPrototype extends CTriggerGeneral {
 			// check item prototypes
 			$items = getExpressionItems($triggerExpression);
 
-			$hasPrototype = false;
+
+			$triggerPrototypes = array();
 			foreach ($items as $item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$hasPrototype = true;
-					break;
+					$triggerPrototypes[$item['hostid']] = true;
 				}
 			}
 
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-						$trigger['expression']));
+			if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
+					$trigger['expression']
+				));
+			}
+			elseif (!$triggerPrototypes) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" must contain at least one item prototype.',
+					$trigger['expression']
+				));
 			}
 		}
 
@@ -592,18 +599,24 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				$items = getExpressionItems($triggerExpression);
 
-				$hasPrototype = false;
+				$triggerPrototypes = array();
 				foreach ($items as $item) {
 					if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$hasPrototype = true;
-						break;
+						$triggerPrototypes[$item['hostid']] = true;
 					}
 				}
 
-				if (!$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-							$trigger['expression']));
+				if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
+						$trigger['expression']
+					));
+				}
+				elseif (!$triggerPrototypes) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Trigger prototype expression "%1$s" must contain at least one item prototype.',
+						$trigger['expression']
+					));
 				}
 			}
 
