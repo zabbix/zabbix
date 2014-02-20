@@ -2415,12 +2415,17 @@ static int	DBpatch_2020002(void)
 
 static int	DBpatch_2020003(void)
 {
-	return DBcreate_index("ticket", "ticket_1", "eventid,new,clock", 0);
+	return DBcreate_index("ticket", "ticket_1", "eventid", 0);
 }
 
 static int	DBpatch_2020004(void)
 {
-	return DBcreate_index("ticket", "ticket_2", "externalid,new", 0);
+	return DBcreate_index("ticket", "ticket_2", "triggerid,clock", 0);
+}
+
+static int	DBpatch_2020005(void)
+{
+	return DBcreate_index("ticket", "ticket_3", "externalid,new", 0);
 }
 
 
@@ -2675,6 +2680,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2020002, 0, 1)
 	DBPATCH_ADD(2020003, 0, 1)
 	DBPATCH_ADD(2020004, 0, 1)
+	DBPATCH_ADD(2020005, 0, 1)
 
 	DBPATCH_END()
 
