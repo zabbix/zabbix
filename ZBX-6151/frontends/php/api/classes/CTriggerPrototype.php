@@ -781,7 +781,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerPrototypes = array();
 			foreach ($createdTrigger['items'] as $titem) {
 				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$triggerPrototypes[$titem['hostid']] = $titem['hostid'];
+					$triggerPrototypes[$titem['hostid']] = true;
 				}
 			}
 
@@ -881,7 +881,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerPrototypes = array();
 			foreach ($updatedTrigger['items'] as $titem) {
 				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$triggerPrototypes[$titem['hostid']] = $titem['hostid'];
+					$triggerPrototypes[$titem['hostid']] = true;
 				}
 			}
 
