@@ -882,6 +882,7 @@ int	DBget_queue_count(int from, int to)
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
 				" and ("
@@ -898,6 +899,7 @@ int	DBget_queue_count(int from, int to)
 				" and i.flags not in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
 			now - from,
