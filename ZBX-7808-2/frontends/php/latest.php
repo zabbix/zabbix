@@ -288,8 +288,6 @@ if ($filterShowDetails) {
 	$config = select_config();
 }
 
-$displayHostColumn = !getRequest('hostid');
-
 /*
  * Display
  */
@@ -326,13 +324,16 @@ else {
 	$nodeHeader = null;
 }
 
-if ($displayHostColumn) {
+if (getRequest('hostid')) {
+	$hostHeader = null;
+	$hostColumn = null;
+}
+else {
 	$hostHeader = make_sorting_header(_('Host'), 'host');
 	$hostHeader->addClass('latest-host');
 	$hostHeader->setAttribute('title', _('Host'));
-}
-else {
-	$hostHeader = null;
+
+	$hostColumn = SPACE;
 }
 
 $nameHeader = make_sorting_header(_('Name'), 'name');
@@ -479,7 +480,7 @@ foreach ($items as $key => $item){
 		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
-			$displayHostColumn ? SPACE : null,
+			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
@@ -501,7 +502,7 @@ foreach ($items as $key => $item){
 		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? SPACE : null,
-			$displayHostColumn ? SPACE : null,
+			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
 			new CCol(new CSpan($lastValue, $stateCss)),
@@ -652,7 +653,7 @@ foreach ($items as $item) {
 		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
-			$displayHostColumn ? SPACE : null,
+			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
@@ -674,7 +675,7 @@ foreach ($items as $item) {
 		$row = new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
-			$displayHostColumn ? SPACE : null,
+			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
 			new CCol(new CSpan($lastValue, $stateCss)),
