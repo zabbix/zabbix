@@ -88,8 +88,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 		$status = new CSpan(array(
-			_('In progress'),
-			NAME_DELIMITER,
+			_('In progress').':',
 			BR(),
 			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
 		), 'orange');
@@ -100,17 +99,17 @@ foreach ($this->data['alerts'] as $alert) {
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
 		? array(
-			bold(_('Subject').NAME_DELIMITER),
+			bold(_('Subject').':'),
 			BR(),
 			$alert['subject'],
 			BR(),
 			BR(),
-			bold(_('Message').NAME_DELIMITER),
+			bold(_('Message').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
 		)
 		: array(
-			bold(_('Command').NAME_DELIMITER),
+			bold(_('Command').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
 		);
