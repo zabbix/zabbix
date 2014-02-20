@@ -601,8 +601,8 @@ int	DBtxn_ongoing();
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 
-void	zbx_create_services_lock();
-void	zbx_destroy_services_lock();
+void	zbx_create_itservices_lock();
+void	zbx_destroy_itservices_lock();
 
 #ifdef HAVE_POSTGRESQL
 size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
