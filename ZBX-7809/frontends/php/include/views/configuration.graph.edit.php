@@ -293,7 +293,7 @@ $graphTab->addTab(
 $chartImage = new CImg('chart3.php?period=3600');
 $chartImage->preload();
 
-$graphPreviewTable = new CTable(null, 'graph');
+$graphPreviewTable = new CTable(null, 'center maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 $graphForm->addItem($graphTab);
