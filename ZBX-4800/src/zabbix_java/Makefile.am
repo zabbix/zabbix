@@ -10,7 +10,7 @@ EXTRA_DIST = \
 	startup.sh
 
 ZJG = bin/zabbix-java-gateway-$(VERSION).jar
-LIB = lib/org-json-2010-12-28.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
+LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
 JUNIT = tests/junit-4.8.2.jar
 
 ZJG_DEST = $(DESTDIR)$(sbindir)/zabbix_java
