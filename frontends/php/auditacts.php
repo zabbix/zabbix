@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 
-$page['title'] = _('Audit actions');
+$page['title'] = _('Action log');
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
@@ -146,6 +146,15 @@ if ($queryData) {
 
 // padding
 $data['paging'] = getPagingLine($data['alerts']);
+
+// get actions names
+if ($data['alerts']) {
+	$data['actions'] = API::Action()->get(array(
+		'output' => array('actionid	', 'name'),
+		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
+		'preservekeys' => true
+	));
+}
 
 // timeline
 $data['timeline'] = array(

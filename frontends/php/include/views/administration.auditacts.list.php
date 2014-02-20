@@ -25,11 +25,11 @@ $auditWidget = new CWidget();
 $configForm = new CForm('get');
 $configComboBox = new CComboBox('config', 'auditacts.php');
 $configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('auditlogs.php', _('Logs'));
-$configComboBox->addItem('auditacts.php', _('Actions'));
+$configComboBox->addItem('auditlogs.php', _('Audit log'));
+$configComboBox->addItem('auditacts.php', _('Action log'));
 $configForm->addItem($configComboBox);
-$auditWidget->addPageHeader(_('AUDIT ACTIONS'), $configForm);
-$auditWidget->addHeader(_('Actions'));
+$auditWidget->addPageHeader(_('ACTION LOG'), $configForm);
+$auditWidget->addHeader(_('Action log'));
 $auditWidget->addHeaderRowNumber();
 
 // create filter
@@ -68,11 +68,11 @@ $auditTable = new CTableInfo(_('No audit entries found.'));
 $auditTable->setHeader(array(
 	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
+	_('Action'),
 	_('Type'),
-	_('Status'),
-	_('Retries left'),
 	_('Recipient(s)'),
 	_('Message'),
+	_('Status'),
 	_('Error')
 ));
 foreach ($this->data['alerts'] as $alert) {
@@ -82,51 +82,57 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
-		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-			$status = new CSpan(_('sent'), 'green');
-		}
-		else {
-			$status = new CSpan(_('executed'), 'green');
-		}
-		$retries = new CSpan(SPACE, 'green');
+		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+			? new CSpan(_('Sent'), 'green')
+			: new CSpan(_('Executed'), 'green');
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-		$status = new CSpan(_('In progress'), 'orange');
-		$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], 'orange');
+		$status = new CSpan(array(
+			_('In progress').':',
+			BR(),
+			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
+		), 'orange');
 	}
 	else {
-		$status = new CSpan(_('not sent'), 'red');
-		$retries = new CSpan(0, 'red');
+		$status = new CSpan(_('Not sent'), 'red');
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
 		? array(
-			bold(_('Subject').NAME_DELIMITER),
+			bold(_('Subject').':'),
 			BR(),
 			$alert['subject'],
 			BR(),
 			BR(),
-			bold(_('Message').NAME_DELIMITER),
+			bold(_('Message').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
 		)
 		: array(
-			bold(_('Command').NAME_DELIMITER),
+			bold(_('Command').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
 		);
 
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
+	if (!$alert['error']) {
+		$error = new CDiv(SPACE, 'status_icon iconok');
+	}
+	else {
+		$error = new CDiv(SPACE, 'status_icon iconerror');
+		$error->setHint($alert['error'], '', 'on');
+	}
+
 	$auditTable->addRow(array(
 		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
+		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol($mediatype['description'], 'top'),
-		new CCol($status, 'top'),
-		new CCol($retries, 'top'),
 		new CCol($alert['sendto'], 'top'),
 		new CCol($message, 'wraptext top'),
-		new CCol($error, 'wraptext top')
+		new CCol($status, 'top'),
+		new CCol($error, 'top')
 	));
 }
 
