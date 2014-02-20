@@ -114,6 +114,14 @@ class CProfile {
 	 * @param mixed  $idx2	second identifier, which can be list of identifiers as well
 	 */
 	public static function delete($idx, $idx2 = 0) {
+		if (is_null(self::$profiles)) {
+			self::init();
+		}
+
+		if (!isset(self::$profiles[$idx])) {
+			return;
+		}
+
 		if (!is_array($idx2)) {
 			$idx2 = array($idx2);
 		}
