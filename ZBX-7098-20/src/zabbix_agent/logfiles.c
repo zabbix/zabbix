@@ -572,7 +572,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list:");
+	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64 ")", *mtime,
+			*lastlogsize);
 	if (NULL != logfiles)
 		print_logfile_list(logfiles, logfiles_num);
 	else
@@ -590,9 +591,12 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	/* processing matched logfiles starting from the older one to the newer one */
 	for (; i < logfiles_num; i++)
 	{
-		if (SUCCEED != (ret = process_log(logfiles[i].filename, lastlogsize, mtime, skip_old_data, big_rec,
-				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
-				hostname, key)))
+		ret = process_log(logfiles[i].filename, lastlogsize, mtime, skip_old_data, big_rec, encoding, regexps,
+				regexps_num, pattern, p_count, s_count, process_value, server, port, hostname, key);
+
+		logfiles[i].processed_size = *lastlogsize;
+
+		if (SUCCEED != ret)
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
 			/* (can happen during a rotation). Maybe during the next check all will be well. */
