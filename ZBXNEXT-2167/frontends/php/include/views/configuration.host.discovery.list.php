@@ -19,7 +19,7 @@
 **/
 
 
-$discoveryWidget = new CWidget(null, 'host-discovery-list');
+$discoveryWidget = new CWidget();
 
 // create new discovery rule button
 $createForm = new CForm('get');
@@ -56,7 +56,7 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$data['showInfoColumn'] ? new CCol(new CSpan(_('Info')), 'discovery-info') : null
+	$data['showInfoColumn'] ? _('Info') : null
 ));
 
 foreach ($data['discoveries'] as $discovery) {

@@ -53,9 +53,6 @@
 .host-edit #linkedTemplateTable { min-width: 400px; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
 
-/* host discovery list */
-.host-discovery-list .discovery-info { width: 26px; }
-
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
 .hk .element-row-first { border-top-width: 1px; }
@@ -120,7 +117,6 @@
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
 .item-list .menuPopup { width: 200px; }
-.item-list .item-info { width: 26px; }
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -171,9 +167,6 @@
 
 /* administration of triggers */
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
-
-/* triggers list */
-.trigger-list .trigger-info { width: 26px; }
 
 /* triggers expression condition */
 .trigger-expression #expr_type { width: 605px; max-width: 605px; }

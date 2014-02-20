@@ -70,7 +70,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	$data['showInfoColumn'] ? new CCol(new CSpan(_('Info')), 'item-info') : null
+	$data['showInfoColumn'] ? _('Info') : null
 ));
 
 foreach ($this->data['items'] as $item) {
