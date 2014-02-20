@@ -97,10 +97,6 @@
 .latest-mon .tableinfo.latest-details td.latest-error div { float: left; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
-/* trigger monitoring */
-.trigger-mon #inventory-filter td { padding-left: 0; padding-right: 3px; }
-.trigger-mon .filter-button { height: 16px; }
-
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
 #testResultTable tr td { padding: 1px 3px; }

@@ -108,7 +108,6 @@ class CHost extends CHostGeneral {
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchInventory'			=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
@@ -397,23 +396,6 @@ class CHost extends CHostGeneral {
 				$sqlParts['from']['interface'] = 'interface hi';
 				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 			}
-		}
-
-		// search inventory
-		if ($options['searchInventory'] !== null) {
-			$sqlParts['from']['host_inventory'] = 'host_inventory hii';
-			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
-
-			zbx_db_search('host_inventory hii',
-				array(
-					'search' => $options['searchInventory'],
-					'startSearch' => $options['startSearch'],
-					'excludeSearch' => $options['excludeSearch'],
-					'searchWildcardsEnabled' => $options['searchWildcardsEnabled'],
-					'searchByAny' => $options['searchByAny']
-				),
-				$sqlParts
-			);
 		}
 
 		// filter
