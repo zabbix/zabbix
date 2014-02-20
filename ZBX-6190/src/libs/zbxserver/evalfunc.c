@@ -1119,7 +1119,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, char *error, size_t errsiz)
 {
 	const char			*__function_name = "evaluate_NODATA";
 	int				arg1, flag, now, ret = FAIL;
@@ -1130,10 +1130,18 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	zbx_history_record_vector_create(&values);
 
 	if (1 < num_param(parameters))
+	{
+		if (NULL != error && 0 < errsiz)
+			zbx_strlcpy(error, "Too many parameters", errsiz);
 		goto out;
+	}
 
 	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	{
+		if (NULL != error && 0 < errsiz)
+			zbx_strlcpy(error, "Could not retrieve function parameter", errsiz);
 		goto out;
+	}
 
 	if (ZBX_FLAG_SEC != flag)
 		goto out;
@@ -1149,8 +1157,21 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	{
 		int	seconds;
 
-		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds) || seconds + arg1 > now)
+		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
+		{
+			if (NULL != error && 0 < errsiz)
+				zbx_strlcpy(error, "Could not retrieve data for item", errsiz);
 			goto out;
+		}
+		else
+		{
+			if (seconds + arg1 > now)
+			{
+				if (NULL != error && 0 < errsiz)
+					zbx_strlcpy(error, "Not enough data for computation", errsiz);
+				goto out;
+			}
+		}
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 	}
@@ -1697,7 +1718,7 @@ clean:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
+int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now, char *error, size_t errsiz)
 {
 	const char	*__function_name = "evaluate_function";
 
@@ -1743,7 +1764,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter);
+		ret = evaluate_NODATA(value, item, function, parameter, error, errsiz);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
@@ -2196,7 +2217,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DB_ITEM		item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*host_esc, *key_esc;
+	char		*host_esc, *key_esc, error[MAX_STRING_LEN] = { 0 };
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
@@ -2226,7 +2247,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	DBget_item_from_db(&item, row);
 
-	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
+	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL), error, sizeof(error))))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
