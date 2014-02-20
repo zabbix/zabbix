@@ -225,7 +225,12 @@ div.footer .formrow { display: table-row; }
 div.footer .formrow .dt { width: 20%; display: table-cell; }
 div.footer .formrow .dd { margin-left: 10px; }
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
-div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
+div.footer .formrow .main:hover,
+div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main,
+input[type="button"].main,
+input[type="submit"].main {
+	border-color: #DD7711;
+}
 
 /* object list */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}

@@ -35,6 +35,7 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	// filter
 	'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 	'inventory'=>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	//ajax
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
@@ -64,6 +65,16 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 
 $hostid = getRequest('hostid', 0);
 
+// reset filter
+if (hasRequest('filter_rst')) {
+	$i = 0;
+	while (CProfile::get('web.hostinventories.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.hostinventories.filter.inventory.field', $i);
+		CProfile::delete('web.hostinventories.filter.inventory.value', $i);
+
+		$i++;
+	}
+}
 // update filter
 if (hasRequest('filter_set')) {
 	// update host inventory filter

@@ -57,12 +57,9 @@ $inventoryFilterTable->addRow(
 $filterTable = new CTable('', 'filter');
 $filterTable->addRow($inventoryFilterTable, 'host-inventories');
 
-$filter = new CButton('filter', _('Filter'),
-	"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
-);
+$filter = new CSubmit('filter_set', _('Filter'));
 $filter->useJQueryStyle('main');
-
-$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+$reset = new CSubmit('filter_rst', _('Reset'));
 $reset->useJQueryStyle();
 
 $divButtons = new CDiv(array($filter, SPACE, $reset));
