@@ -305,6 +305,21 @@ static int	DBpatch_2030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030029(void)
+{
+	const char	*sql = "delete from profiles"
+		" where idx in ("
+			"'web.hostinventories.filter_field',"
+			"'web.hostinventories.filter_field_value',"
+			"'web.hostinventories.filter_exact'"
+		")";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -340,5 +355,6 @@ DBPATCH_ADD(2030025, 0, 1)
 DBPATCH_ADD(2030026, 0, 1)
 DBPATCH_ADD(2030027, 0, 1)
 DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 0, 0)
 
 DBPATCH_END()
