@@ -778,18 +778,24 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectHosts' => array('name')
 		));
 		foreach ($createdTriggers as $createdTrigger) {
-			$hasPrototype = false;
-
+			$triggerPrototypes = array();
 			foreach ($createdTrigger['items'] as $titem) {
 				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
+					$triggerPrototypes[$titem['hostid']] = $titem['hostid'];
 				}
 			}
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-						$triggers[$createdTrigger['triggerid']]['expression']));
+
+			if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
+					$triggers[$createdTrigger['triggerid']]['expression']
+				));
+			}
+			elseif (!$triggerPrototypes) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" must contain at least one item prototype.',
+					$triggers[$createdTrigger['triggerid']]['expression']
+				));
 			}
 		}
 
@@ -872,17 +878,24 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectItems' => API_OUTPUT_EXTEND
 		));
 		foreach ($updatedTriggers as $updatedTrigger) {
-			$hasPrototype = false;
-
+			$triggerPrototypes = array();
 			foreach ($updatedTrigger['items'] as $titem) {
 				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
+					$triggerPrototypes[$titem['hostid']] = $titem['hostid'];
 				}
 			}
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-						sprintf(_('Trigger "%1$s" does not have item prototype.'), $trigger['description']));
+
+			if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
+					$trigger['expression']
+				));
+			}
+			elseif (!$triggerPrototypes) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype expression "%1$s" must contain at least one item prototype.',
+					$trigger['expression']
+				));
 			}
 		}
 
