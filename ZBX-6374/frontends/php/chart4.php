@@ -55,7 +55,7 @@ else {
 /*
  * Display
  */
-$start_time = microtime(true);
+$startTime = microtime(true);
 
 $sizeX		= 900;
 $sizeY		= 300;
@@ -106,10 +106,10 @@ $start = $start - ($wday - 1) * SEC_PER_DAY;
 $weeks = (int) (date('z') / 7 + 1);
 
 for ($i = 0; $i < $weeks; $i++) {
-	$period_start = $start + SEC_PER_WEEK * $i;
-	$period_end = $start + SEC_PER_WEEK * ($i + 1);
+	$periodStart = $start + SEC_PER_WEEK * $i;
+	$periodEnd = $start + SEC_PER_WEEK * ($i + 1);
 
-	$stat = calculateAvailability($_REQUEST['triggerid'], $period_start, $period_end);
+	$stat = calculateAvailability(getRequest('triggerid'), $periodStart, $periodEnd);
 	$true[$i] = $stat['true'];
 	$false[$i] = $stat['false'];
 	$count_now[$i] = 1;
@@ -119,11 +119,11 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
 }
 
-for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
+for ($i = 0, $periodStart = $start; $i <= $sizeX; $i += $sizeX / 52) {
 	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_('d.M'), $period_start));
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_('d.M'), $periodStart));
 
-	$period_start += SEC_PER_WEEK;
+	$periodStart += SEC_PER_WEEK;
 }
 
 $maxY = max(max($true), 100);
@@ -164,7 +164,7 @@ imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 45, $black, _('P
 
 imagestringup($im, 0, imagesx($im) - 10, imagesy($im) - 50, 'http://www.zabbix.com', $gray);
 
-$str = sprintf('%0.2f', microtime(true) - $start_time);
+$str = sprintf('%0.2f', microtime(true) - $startTime);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
 imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
