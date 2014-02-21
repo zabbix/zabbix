@@ -70,7 +70,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
 
 			// validate items on set or pass existing items from DB
-			if (isset($graph['gitems']) && $graph['gitems']) {
+			if (isset($graph['gitems'])) {
 				foreach ($graph['gitems'] as $item) {
 					if (isset($item['gitemid']) && !$item['gitemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "gitemid" field for item.'));
