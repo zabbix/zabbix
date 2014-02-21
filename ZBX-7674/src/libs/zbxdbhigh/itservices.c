@@ -314,29 +314,10 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_itservice_t	*parent, *itservice;
 	zbx_uint64_t	parentid, serviceid;
-	int		head, tail;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sql = zbx_malloc(NULL, sql_alloc);
-
-	/* filter out already processed services */
-	head = tail = 0;
-	while (tail < serviceids->values_num)
-	{
-		if (NULL != (itservice = zbx_hashset_search(&itservices->itservices, &serviceids->values[head])) &&
-				0 != itservice->parents.values_num)
-		{
-			head++;
-			continue;
-		}
-		serviceids->values[tail++] = serviceids->values[head++];
-	}
-
-	if (0 == tail)
-		goto out;
-
-	serviceids->values_num = tail;
 
 	zbx_vector_uint64_sort(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -383,7 +364,6 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	if (0 != serviceids->values_num)
 		its_itservices_load_parents(itservices, serviceids);
 
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
