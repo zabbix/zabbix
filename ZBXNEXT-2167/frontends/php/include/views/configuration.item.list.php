@@ -107,18 +107,15 @@ foreach ($this->data['items'] as $item) {
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
+	// info
 	if ($data['showInfoColumn']) {
-		$statusIcons = array();
+		$infoIcons = array();
 
-		if ($item['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($item['error'])) {
-				$info = SPACE;
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($item['error'], '', 'on');
-			}
-			$statusIcons[] = $info;
+		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($item['error'], '', 'on');
+
+			$infoIcons[] = $info;
 		}
 
 		// discovered item lifetime indicator
@@ -130,10 +127,18 @@ foreach ($this->data['items'] as $item) {
 					zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
 			));
 
-			$statusIcons[] = $deleteError;
+			$infoIcons[] = $deleteError;
+		}
+
+		if (!$infoIcons) {
+			$infoIcons[] = SPACE;
 		}
 	}
+	else {
+		$infoIcons = null;
+	}
 
+	// triggers info
 	$triggerHintTable = new CTableInfo();
 	$triggerHintTable->setHeader(array(
 		_('Severity'),
@@ -142,7 +147,6 @@ foreach ($this->data['items'] as $item) {
 		_('Status')
 	));
 
-	// triggers info
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
 		$triggerDescription = array();
@@ -248,7 +252,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$data['showInfoColumn'] ? $statusIcons : null
+		$infoIcons
 	));
 }
 

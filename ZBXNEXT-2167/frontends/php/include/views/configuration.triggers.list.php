@@ -116,6 +116,8 @@ $triggersTable->setHeader(array(
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
+
+	// description
 	$description = array();
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -195,20 +197,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
+	// info
 	if ($data['showInfoColumn']) {
-		$info = '';
-
-		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			if (zbx_empty($trigger['error'])) {
-				$info = SPACE;
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($trigger['error'], '', 'on');
-			}
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && !zbx_empty($trigger['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($trigger['error'], '', 'on');
+		}
+		else {
+			$info = SPACE;
 		}
 	}
+	else {
+		$info = null;
+	}
 
+	// status
 	$status = '';
 	if (!empty($this->data['parent_discoveryid'])) {
 		$status = new CLink(
@@ -232,6 +235,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
+	// hosts
 	$hosts = null;
 	if (empty($this->data['hostid'])) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
@@ -242,9 +246,11 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
+	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
+	// expression
 	$expressionColumn = new CCol(triggerExpression($trigger, true));
 	$expressionColumn->setAttribute('style', 'white-space: normal;');
 
@@ -256,9 +262,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expressionColumn,
 		$status,
-		$data['showInfoColumn'] ? $info : null
+		$info
 	));
-	$triggers[$tnum] = $trigger;
 }
 
 // create go button

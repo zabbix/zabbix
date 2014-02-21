@@ -462,22 +462,21 @@ foreach ($items as $key => $item){
 	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
 
 	if ($filterShowDetails) {
+		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
-		$statusIcons = array();
-		if ($item['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($item['error'])) {
-				$info = SPACE;
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($item['error'], '', 'on');
-			}
-			$statusIcons[] = $info;
+		// info
+		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($item['error'], '', 'on');
+		}
+		else {
+			$info = SPACE;
 		}
 
+		// trend value
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
 		}
@@ -503,7 +502,7 @@ foreach ($items as $key => $item){
 			new CCol(new CSpan($lastValue, $stateCss)),
 			new CCol(new CSpan($change, $stateCss)),
 			$actions,
-			$statusIcons
+			$info
 		));
 	}
 	else {
@@ -643,22 +642,21 @@ foreach ($items as $item) {
 
 	$host = $hosts[$item['hostid']];
 	if ($filterShowDetails) {
+		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
 
-		$statusIcons = array();
-		if ($item['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($item['error'])) {
-				$info = SPACE;
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($item['error'], '', 'on');
-			}
-			$statusIcons[] = $info;
+		// info
+		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($item['error'], '', 'on');
+		}
+		else {
+			$info = SPACE;
 		}
 
+		// trend value
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$trendValue = $config['hk_trends_global'] ? $config['hk_trends'] : $item['trends'];
 		}
@@ -684,7 +682,7 @@ foreach ($items as $item) {
 			new CCol(new CSpan($lastValue, $stateCss)),
 			new CCol(new CSpan($change, $stateCss)),
 			new CCol($actions, $stateCss),
-			$statusIcons
+			$info
 		));
 	}
 	else {
