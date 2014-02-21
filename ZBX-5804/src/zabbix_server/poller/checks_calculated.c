@@ -317,6 +317,15 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __function_name, value);
 
+	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+				"Received value [" ZBX_FS_DBL "] is not suitable for value type [%s] and data type [%s]",
+				value, zbx_item_value_type_string(dc_item->value_type),
+				zbx_item_data_type_string(dc_item->data_type)));
+		goto clean;
+	}
+
 	SET_DBL_RESULT(result, value);
 clean:
 	free_expression(&exp);
