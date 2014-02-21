@@ -831,7 +831,7 @@ function get_action_msgs_for_event($event) {
 		_('Retries left'),
 		_('Recipient(s)'),
 		_('Message'),
-		_('Error')
+		_('Info')
 	));
 
 	$alerts = $event['alerts'];
