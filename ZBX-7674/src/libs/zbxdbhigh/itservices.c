@@ -604,9 +604,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 out:
 	zbx_free(sql);
 
-	for (i = 0; i < updates.values_num; i++)
-		zbx_free(updates.values[i]);
-
+	zbx_vector_ptr_clean(&updates, free);
 	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
@@ -698,9 +696,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	ret = its_write_status_and_alarms(&itservices, &alarms);
 
-	for (i = 0; i < alarms.values_num; i++)
-		zbx_free(alarms.values[i]);
-
+	zbx_vector_ptr_clean(&alarms, free);
 	zbx_vector_ptr_destroy(&alarms);
 
 	its_itservices_clean(&itservices);
@@ -730,7 +726,6 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 	const DB_EVENT		*event;
 	zbx_vector_ptr_t	updates;
 
-
 	zbx_vector_ptr_create(&updates);
 
 	LOCK_ITSERVICES;
@@ -747,6 +742,9 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 	}
 
 	ret = its_flush_updates(&updates);
+
+	zbx_vector_ptr_clean(&updates, free);
+	zbx_vector_ptr_destroy(&updates);
 
 	UNLOCK_ITSERVICES;
 
@@ -798,9 +796,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 
 	zbx_free(sql);
 out:
-	for (i = 0; i < updates.values_num; i++)
-		zbx_free(updates.values[i]);
-
+	zbx_vector_ptr_clean(&updates, free);
 	zbx_vector_ptr_destroy(&updates);
 
 	UNLOCK_ITSERVICES;
