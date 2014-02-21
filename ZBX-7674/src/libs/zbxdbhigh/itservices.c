@@ -224,8 +224,8 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 {
 	const char		*__function_name = "its_itservices_load_children";
 
-	char			*sql;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_itservice_t		*itservice, *parent;
@@ -236,8 +236,6 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&serviceids);
-
-	sql = zbx_malloc(NULL, sql_alloc);
 
 	zbx_hashset_iter_reset(&itservices->itservices, &iter);
 
@@ -307,14 +305,12 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*sql;
-	size_t		sql_alloc = 256, sql_offset = 0;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_itservice_t	*parent, *itservice;
 	zbx_uint64_t	parentid, serviceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(NULL, sql_alloc);
 
 	zbx_vector_uint64_sort(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -384,14 +380,12 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const 
 	zbx_uint64_t		serviceid, triggerid;
 	zbx_itservice_t		*itservice;
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	serviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&serviceids);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select serviceid,triggerid,status,algorithm"
@@ -528,12 +522,10 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	const char		*ins_service_alarms =
 				"insert into service_alarms (servicealarmid,serviceid,value,clock) values ";
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		alarmid;
 	zbx_hashset_iter_t	iter;
 	zbx_itservice_t		*itservice;
-
-	sql = zbx_malloc(NULL, sql_alloc);
 
 	/* get a list of service status updates that must be written to database */
 	zbx_vector_ptr_create(&updates);
@@ -768,7 +760,7 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num)
 {
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	updates;
 	int			i, ret = FAIL;
 
@@ -784,8 +776,6 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 
 	if (FAIL == its_flush_updates(&updates))
 		goto out;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"update services set triggerid=null,showsla=0 where");
