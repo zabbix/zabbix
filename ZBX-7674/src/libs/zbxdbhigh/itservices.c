@@ -49,7 +49,6 @@ typedef struct
 	zbx_uint64_t		triggerid;
 	/* the initial service status */
 	int			old_status;
-
 	/* the calculated service status */
 	int			status;
 	/* the service status calculation algorithm, see SERVICE_ALGORITHM_* defines */
@@ -92,9 +91,9 @@ static zbx_vector_ptr_t	itservice_updates;
 typedef struct
 {
 	/* loaded IT services */
-	zbx_hashset_t		itservices;
+	zbx_hashset_t	itservices;
 	/* service index by triggerid */
-	zbx_hashset_t		index;
+	zbx_hashset_t	index;
 }
 zbx_itservices_t;
 
@@ -217,25 +216,29 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 
 /******************************************************************************
  *                                                                            *
- * Function: its_itservice_load_children                                      *
+ * Function: its_itservices_load_children                                     *
  *                                                                            *
  * Purpose: loads all missing children of the specified services              *
  *                                                                            *
  * Parameters: itservices   - [IN] the IT services data                       *
  *                                                                            *
  ******************************************************************************/
-static void	its_itservice_load_children(zbx_itservices_t *itservices)
+static void	its_itservices_load_children(zbx_itservices_t *itservices)
 {
+	const char		*__function_name = "its_itservices_load_children";
+
 	char			*sql;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_itservice_t		*itservice, *parent;
 	zbx_uint64_t		serviceid, parentid;
-	zbx_vector_uint64_t	services;
+	zbx_vector_uint64_t	serviceids;
 	zbx_hashset_iter_t	iter;
 
-	zbx_vector_uint64_create(&services);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&serviceids);
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
@@ -244,15 +247,18 @@ static void	its_itservice_load_children(zbx_itservices_t *itservices)
 	while (NULL != (itservice = zbx_hashset_iter_next(&iter)))
 	{
 		if (0 == itservice->triggerid)
-			zbx_vector_uint64_append(&services, itservice->serviceid);
+			zbx_vector_uint64_append(&serviceids, itservice->serviceid);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select s.serviceid,s.status,s.algorithm,sl.serviceupid"
 			" from services s,services_links sl"
-			" where s.serviceid=sl.servicedownid and");
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.serviceupid", services.values, services.values_num);
+			" where s.serviceid=sl.servicedownid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.serviceupid", serviceids.values,
+			serviceids.values_num);
 
 	result = DBselect("%s", sql);
 
@@ -273,52 +279,54 @@ static void	its_itservice_load_children(zbx_itservices_t *itservices)
 		if (FAIL == zbx_vector_ptr_search(&parent->children, itservice, ZBX_DEFAULT_PTR_COMPARE_FUNC))
 			zbx_vector_ptr_append(&parent->children, itservice);
 	}
-
 	DBfree_result(result);
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&services);
+	zbx_vector_uint64_destroy(&serviceids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: its_itservice_load_parents                                       *
+ * Function: its_itservices_load_parents                                      *
  *                                                                            *
  * Purpose: recursively loads parent nodes of the specified service until the *
  *          root node                                                         *
  *                                                                            *
  * Parameters: itservices   - [IN] the IT services data                       *
- *             services     - [IN] a vector containing ids of services to     *
+ *             serviceids   - [IN] a vector containing ids of services to     *
  *                                 load parents                               *
  *                                                                            *
  ******************************************************************************/
-static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector_uint64_t *services)
+static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector_uint64_t *serviceids)
 {
-	const char		*__function_name = "its_itservices_load_parents";
+	const char	*__function_name = "its_itservices_load_parents";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_itservice_t		*parent, *itservice;
-	zbx_uint64_t		parentid, serviceid;
-	zbx_vector_uint64_t	new_services;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	zbx_itservice_t	*parent, *itservice;
+	zbx_uint64_t	parentid, serviceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&new_services);
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_vector_uint64_sort(services, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(services, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select s.serviceid,s.status,s.algorithm,sl.servicedownid"
 			" from services s,services_links sl"
-			" where s.serviceid=sl.serviceupid and ");
+			" where s.serviceid=sl.serviceupid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.servicedownid", serviceids->values,
+			serviceids->values_num);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.servicedownid", services->values, services->values_num);
+	serviceids->values_num = 0;
 
 	result = DBselect("%s", sql);
 
@@ -338,7 +346,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 		if (NULL == (parent = zbx_hashset_search(&itservices->itservices, &parentid)))
 		{
 			parent = its_itservice_create(itservices, parentid, 0, atoi(row[1]), atoi(row[2]));
-			zbx_vector_uint64_append(&new_services, parent->serviceid);
+			zbx_vector_uint64_append(serviceids, parent->serviceid);
 		}
 
 		/* link the service as a parent's child */
@@ -347,16 +355,13 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 
 		if (FAIL == zbx_vector_ptr_search(&itservice->parents, parent, ZBX_DEFAULT_PTR_COMPARE_FUNC))
 			zbx_vector_ptr_append(&itservice->parents, parent);
-
 	}
 	DBfree_result(result);
 
 	zbx_free(sql);
 
-	if (0 < new_services.values_num)
-		its_itservices_load_parents(itservices, &new_services);
-
-	zbx_vector_uint64_destroy(&new_services);
+	if (0 != serviceids->values_num)
+		its_itservices_load_parents(itservices, serviceids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -374,7 +379,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
  ******************************************************************************/
 static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const zbx_vector_uint64_t *triggerids)
 {
-	const char	*__function_name = "its_load_services_by_triggerids";
+	const char		*__function_name = "its_load_services_by_triggerids";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -382,11 +387,11 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const 
 	zbx_itservice_t		*itservice;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_vector_uint64_t	services;
+	zbx_vector_uint64_t	serviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&services);
+	zbx_vector_uint64_create(&serviceids);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -407,16 +412,17 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const 
 
 		itservice = its_itservice_create(itservices, serviceid, triggerid, atoi(row[2]), atoi(row[3]));
 
-		zbx_vector_uint64_append(&services, itservice->serviceid);
+		zbx_vector_uint64_append(&serviceids, itservice->serviceid);
 	}
 	DBfree_result(result);
 
-	if (0 != services.values_num)
-		its_itservices_load_parents(itservices, &services);
+	if (0 != serviceids.values_num)
+	{
+		its_itservices_load_parents(itservices, &serviceids);
+		its_itservices_load_children(itservices);
+	}
 
-	its_itservice_load_children(itservices);
-
-	zbx_vector_uint64_destroy(&services);
+	zbx_vector_uint64_destroy(&serviceids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -470,6 +476,7 @@ static void	its_itservice_update_status(zbx_itservice_t *itservice, int clock, z
 					itservice->algorithm);
 			goto out;
 	}
+
 	if (itservice->status != status)
 	{
 		itservice->status = status;
@@ -480,8 +487,8 @@ static void	its_itservice_update_status(zbx_itservice_t *itservice, int clock, z
 		for (i = 0; i < itservice->parents.values_num; i++)
 			its_itservice_update_status(itservice->parents.values[i], clock, alarms);
 	}
-
-out:;
+out:
+	;
 }
 
 /******************************************************************************
@@ -520,10 +527,10 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 {
 	int			i, ret = FAIL;
 	zbx_vector_ptr_t	updates;
+	const char		*ins_service_alarms =
+				"insert into service_alarms (servicealarmid,serviceid,value,clock) values ";
 	char			*sql = NULL;
-	const char		*ins_service_alarms =	"insert into service_alarms"
-							" (servicealarmid,serviceid,value,clock) values ";
-	size_t			sql_offset = 0, sql_alloc = 256;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t		alarmid;
 	zbx_hashset_iter_t	iter;
 	zbx_itservice_t		*itservice;
@@ -551,8 +558,9 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 		zbx_status_update_t	*update = updates.values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update services set status=%d"
-					" where serviceid=" ZBX_FS_UI64 ";\n",
+				"update services"
+				" set status=%d"
+				" where serviceid=" ZBX_FS_UI64 ";\n",
 				update->status, update->sourceid);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
@@ -595,7 +603,6 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	}
 
 	ret = SUCCEED;
-
 out:
 	zbx_free(sql);
 
