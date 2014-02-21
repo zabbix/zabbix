@@ -42,6 +42,16 @@ $fields = array(
 );
 check_fields($fields);
 
+// validate host inventory filter fields
+if (hasRequest('inventory')) {
+	$inventoryFields = zbx_toHash(getHostInventories(), 'db_field');
+	foreach (getRequest('inventory') as $field) {
+		if (!isset($inventoryFields[$field['field']])) {
+			error(_s('Incorrect host inventory field "%1$s".', $field['field']));
+		}
+	}
+}
+
 /*
  * Permissions
  */
