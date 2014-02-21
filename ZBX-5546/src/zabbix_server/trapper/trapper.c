@@ -489,7 +489,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 
 	zbx_rtrim(s, " \r\n");
 
-	zabbix_log(LOG_LEVEL_WARNING, "trapper got '%s'", s);
+	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 
 	if ('{' == *s)	/* JSON protocol */
 	{
@@ -506,15 +506,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
 		{
-{
-	int	i;
-
-	for (i = 0; i < strlen(value); i++) {
-		if (i + 1 != (unsigned char)value[i])
-			zabbix_log(LOG_LEVEL_WARNING, "FAIL!!!");
-		zabbix_log(LOG_LEVEL_WARNING, "process_trap() %u", (unsigned int)(unsigned char)value[i]);
-	}
-}
 			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 			{
 				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))

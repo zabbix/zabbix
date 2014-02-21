@@ -561,7 +561,7 @@ static size_t	zbx_json_string_size(const char *p)
 	if ('"' != *p)
 		return (size_t)(-1);
 
-	while ('\0' != *p)	/* this should never happen */
+	while (*p != '\0')	/* this should never happen */
 	{
 		if (*p == '"')
 		{
@@ -571,8 +571,11 @@ static size_t	zbx_json_string_size(const char *p)
 		}
 		else if (state == 1)
 		{
-			if (*p == '\\' && 'u' == *++p)
-				p += 4;
+			if (*p == '\\')
+			{
+				if('u' == *++p)
+					p+=4;
+			}
 			sz++;
 		}
 		p++;
@@ -630,6 +633,7 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 						break;
 					default:
 						*o++ = *p;
+						break;
 				}
 			}
 			else
