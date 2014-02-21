@@ -4,7 +4,7 @@ cd `dirname $0`
 . ./settings.sh
 
 if [ -n "$PID_FILE" ]; then
-	if [ -e "$PID_FILE" ]; then
+	if [ -f "$PID_FILE" ]; then
 		PID=`cat "$PID_FILE"`
 		if ps -p "$PID" > /dev/null 2>&1; then
 			kill `cat $PID_FILE`

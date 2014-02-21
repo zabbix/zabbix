@@ -3,7 +3,7 @@
 cd `dirname $0`
 . ./settings.sh
 
-if [ -n "$PID_FILE" -a -e "$PID_FILE" ]; then
+if [ -n "$PID_FILE" -a -f "$PID_FILE" ]; then
 	PID=`cat "$PID_FILE"`
 	if ps -p "$PID" > /dev/null 2>&1; then
 		echo "Zabbix Java Gateway is already running"
@@ -52,7 +52,8 @@ if [ -n "$PID_FILE" ]; then
 	# verify that the gateway started successfully
 
 	PID=`cat "$PID_FILE"`
-	if ! ps -p "$PID" > /dev/null 2>&1; then
+	ps -p "$PID" > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
 		echo "Zabbix Java Gateway did not start"
 		rm -f "$PID_FILE"
 		exit 1
