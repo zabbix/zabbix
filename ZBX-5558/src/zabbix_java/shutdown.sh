@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-cd $(dirname $0)
-source settings.sh
+cd `dirname $0`
+. ./settings.sh
 
 if [ -n "$PID_FILE" ]; then
 	if [ -e "$PID_FILE" ]; then
