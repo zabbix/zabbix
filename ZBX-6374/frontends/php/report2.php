@@ -408,11 +408,12 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	CArrayHelper::sort($triggers, array('host', 'description'));
 
-	// paging
 	$paging = getPagingLine($triggers);
 
 	foreach ($triggers as $trigger) {
-		$availability = calculateAvailability($trigger['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
+		$availability = calculateAvailability($trigger['triggerid'], getRequest('filter_timesince'),
+			getRequest('filter_timetill')
+		);
 
 		$triggerTable->addRow(array(
 			get_node_name_by_elid($trigger['hostid']),
