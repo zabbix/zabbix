@@ -36,12 +36,12 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (!isset($_REQUEST['triggerid'])) {
+if (!hasRequest('triggerid')) {
 	fatal_error(_('No triggers defined.'));
 }
 
 $dbTrigger = API::Trigger()->get(array(
-	'triggerids' => $_REQUEST['triggerid'],
+	'triggerids' => getRequest('triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
 ));
@@ -55,30 +55,30 @@ else {
 /*
  * Display
  */
-$start_time = microtime(true);
+$startTime = microtime(true);
 
-$sizeX		= 900;
-$sizeY		= 300;
+$sizeX = 900;
+$sizeY = 300;
 
-$shiftX		= 12;
-$shiftYup	= 17;
-$shiftYdown	= 25 + 15 * 2;
+$shiftX = 12;
+$shiftYup = 17;
+$shiftYdown = 55;
 
 $im = imagecreate($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
 
-$red		= imagecolorallocate($im, 255, 0, 0);
-$darkred	= imagecolorallocate($im, 150, 0, 0);
-$green		= imagecolorallocate($im, 0, 255, 0);
-$darkgreen	= imagecolorallocate($im, 0, 150, 0);
-$bluei		= imagecolorallocate($im, 0, 0, 255);
-$darkblue	= imagecolorallocate($im, 0, 0, 150);
-$yellow		= imagecolorallocate($im, 255, 255, 0);
-$darkyellow	= imagecolorallocate($im, 150, 150, 0);
-$cyan		= imagecolorallocate($im, 0, 255, 255);
-$black		= imagecolorallocate($im, 0, 0, 0);
-$gray		= imagecolorallocate($im, 150, 150, 150);
-$white		= imagecolorallocate($im, 255, 255, 255);
-$bg			= imagecolorallocate($im, 6 + 6 * 16, 7 + 7 * 16, 8 + 8 * 16);
+$red = imagecolorallocate($im, 255, 0, 0);
+$darkred = imagecolorallocate($im, 150, 0, 0);
+$green = imagecolorallocate($im, 0, 255, 0);
+$darkgreen = imagecolorallocate($im, 0, 150, 0);
+$bluei = imagecolorallocate($im, 0, 0, 255);
+$darkblue = imagecolorallocate($im, 0, 0, 150);
+$yellow = imagecolorallocate($im, 255, 255, 0);
+$darkyellow = imagecolorallocate($im, 150, 150, 0);
+$cyan = imagecolorallocate($im, 0, 255, 255);
+$black = imagecolorallocate($im, 0, 0, 0);
+$gray = imagecolorallocate($im, 150, 150, 150);
+$white = imagecolorallocate($im, 255, 255, 255);
+$bg = imagecolorallocate($im, 102, 119, 136);
 
 $x = imagesx($im);
 $y = imagesy($im);
@@ -106,10 +106,10 @@ $start = $start - ($wday - 1) * SEC_PER_DAY;
 $weeks = (int) (date('z') / 7 + 1);
 
 for ($i = 0; $i < $weeks; $i++) {
-	$period_start = $start + SEC_PER_WEEK * $i;
-	$period_end = $start + SEC_PER_WEEK * ($i + 1);
+	$periodStart = $start + SEC_PER_WEEK * $i;
+	$periodEnd = $start + SEC_PER_WEEK * ($i + 1);
 
-	$stat = calculate_availability($_REQUEST['triggerid'], $period_start, $period_end);
+	$stat = calculateAvailability(getRequest('triggerid'), $periodStart, $periodEnd);
 	$true[$i] = $stat['true'];
 	$false[$i] = $stat['false'];
 	$count_now[$i] = 1;
@@ -119,11 +119,11 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
 }
 
-for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
+for ($i = 0, $periodStart = $start; $i <= $sizeX; $i += $sizeX / 52) {
 	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_('d.M'), $period_start));
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 30, $black, zbx_date2str(_('d.M'), $periodStart));
 
-	$period_start += SEC_PER_WEEK;
+	$periodStart += SEC_PER_WEEK;
 }
 
 $maxY = max(max($true), 100);
@@ -154,17 +154,17 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 	imageText($im, 7, 0, $sizeX + 5 + $shiftX, $sizeY - $i - 4 + $shiftYup + 8, $darkred, $i * ($maxY - $minY) / $sizeY + $minY);
 }
 
-imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 0, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 0, imagecolorallocate($im, 120, 235, 120));
-imagerectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 0, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 0, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 0 + 45, $black, _('OK').' (%)');
+imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 39, $shiftX + 5, $sizeY + $shiftYup + 44, imagecolorallocate($im, 120, 235, 120));
+imagerectangle($im, $shiftX, $sizeY + $shiftYup + 39, $shiftX + 5, $sizeY + $shiftYup + 44, $black);
+imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 45, $black, _('OK').' (%)');
 
-imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 1, imagecolorallocate($im, 235, 120, 120));
-imagerectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 15 + 9 + 35 * 1, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 45, $black, _('Problems').' (%)');
+imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 54, $shiftX + 5, $sizeY + $shiftYup + 59, imagecolorallocate($im, 235, 120, 120));
+imagerectangle($im, $shiftX, $sizeY + $shiftYup + 54, $shiftX + 5, $sizeY + $shiftYup + 59, $black);
+imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 60, $black, _('Problems').' (%)');
 
 imagestringup($im, 0, imagesx($im) - 10, imagesy($im) - 50, 'http://www.zabbix.com', $gray);
 
-$str = sprintf('%0.2f', microtime(true) - $start_time);
+$str = sprintf('%0.2f', microtime(true) - $startTime);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
 imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
