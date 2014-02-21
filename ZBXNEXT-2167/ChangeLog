@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-1533] added "Action name" in Audit->Action log (Oleg)
 ...G...... [ZBX-7742] added error message upon encountering trailing data for zabbix_sender when reading from file (Juris)
 A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macros (Pavels, wiper)
 ..F....... [ZBX-7361] implemented alphabetic host ordering when trigger has many hosts (Ivo)
@@ -56,6 +57,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
 ........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
 ..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
 ..F....... [ZBX-7768] fixed item valuemap import (Eduard)
