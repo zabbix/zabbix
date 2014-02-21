@@ -17,9 +17,7 @@ fi
 
 CLASSPATH="lib"
 for jar in {lib,bin}/*.jar; do
-	if [[ $jar != *junit* ]]; then
-		CLASSPATH="$CLASSPATH:$jar"
-	fi
+	CLASSPATH="$CLASSPATH:$jar"
 done
 
 ZABBIX_OPTIONS=""
@@ -39,13 +37,23 @@ fi
 COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabbix.gateway.JavaGateway"
 
 if [ -n "$PID_FILE" ]; then
-	PID=$(/bin/bash -c "$COMMAND_LINE > /dev/null 2>&1 & echo \$!")
-	if ps -p $PID > /dev/null 2>&1; then
-		echo $PID > $PID_FILE
-	else
+
+	# start the gateway and output pretty errors to the console
+
+	STDOUT=$($COMMAND_LINE & echo $! > "$PID_FILE")
+	if [ -n "$STDOUT" ]; then
+		echo "$STDOUT"
+	fi
+
+	# verify that the gateway started successfully
+
+	PID=$(cat "$PID_FILE")
+	if ! ps -p "$PID" > /dev/null 2>&1; then
 		echo "Zabbix Java Gateway did not start"
+		rm -f "$PID_FILE"
 		exit 1
 	fi
+
 else
 	exec $COMMAND_LINE
 fi
