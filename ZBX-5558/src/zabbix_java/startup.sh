@@ -4,8 +4,12 @@ cd $(dirname $0)
 source settings.sh
 
 if [ -n "$PID_FILE" -a -e "$PID_FILE" ]; then
-	echo "Zabbix Java Gateway is already running"
-	exit 1
+	PID=$(cat "$PID_FILE")
+	if ps -p "$PID" > /dev/null 2>&1; then
+		echo "Zabbix Java Gateway is already running"
+		exit 1
+	fi
+	rm -f "$PID_FILE"
 fi
 
 JAVA=${JAVA:-java}
