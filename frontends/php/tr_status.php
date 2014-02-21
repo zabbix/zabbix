@@ -293,14 +293,6 @@ if (get_request('show_events') != CProfile::get('web.tr_status.filter.show_event
 validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 
 /*
- * Play sound
- */
-$mute = CProfile::get('web.tr_status.mute', 0);
-if (isset($audio) && !$mute) {
-	play_sound($audio);
-}
-
-/*
  * Display
  */
 $displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
