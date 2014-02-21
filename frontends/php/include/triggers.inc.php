@@ -1450,35 +1450,36 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 	return $column;
 }
+
 /**
- * Calculate trigger availability
+ * Calculate trigger availability.
  *
- * @param int $triggerid		trigger id
+ * @param int $triggerId		trigger id
  * @param int $startTime		begin period
  * @param int $endTime			end period
  *
  * @return array
  */
-function calculate_availability($triggerid, $startTime, $endTime) {
-	$start_value = TRIGGER_VALUE_FALSE;
+function calculateAvailability($triggerId, $startTime, $endTime) {
+	$startValue = TRIGGER_VALUE_FALSE;
 
 	if ($startTime > 0 && $startTime <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
-				' WHERE e.objectid='.zbx_dbstr($triggerid).
+				' WHERE e.objectid='.zbx_dbstr($triggerId).
 					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.clock<'.zbx_dbstr($startTime).
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
-			$start_value = $row['value'];
+			$startValue = $row['value'];
 			$min = $startTime;
 		}
 	}
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
-			' WHERE e.objectid='.zbx_dbstr($triggerid).
+			' WHERE e.objectid='.zbx_dbstr($triggerId).
 				' AND e.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
 	if ($startTime) {
@@ -1488,12 +1489,12 @@ function calculate_availability($triggerid, $startTime, $endTime) {
 		$sql .= ' AND e.clock<='.zbx_dbstr($endTime);
 	}
 
-	$db_events = DBfetch(DBselect($sql));
-	if ($db_events['cnt'] > 0) {
+	$dbEvents = DBfetch(DBselect($sql));
+	if ($dbEvents['cnt'] > 0) {
 		if (!isset($min)) {
-			$min = $db_events['min_clock'];
+			$min = $dbEvents['min_clock'];
 		}
-		$max = $db_events['max_clock'];
+		$max = $dbEvents['max_clock'];
 	}
 	else {
 		if ($startTime == 0 && $endTime == 0) {
@@ -1503,13 +1504,13 @@ function calculate_availability($triggerid, $startTime, $endTime) {
 		else {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
-			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
-			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
+			$ret['true'] = (TRIGGER_VALUE_TRUE == $startValue) ? 100 : 0;
+			$ret['false'] = (TRIGGER_VALUE_FALSE == $startValue) ? 100 : 0;
 			return $ret;
 		}
 	}
 
-	$state = $start_value;
+	$state = $startValue;
 	$true_time = 0;
 	$false_time = 0;
 	$time = $min;
@@ -1521,16 +1522,16 @@ function calculate_availability($triggerid, $startTime, $endTime) {
 	}
 
 	$rows = 0;
-	$db_events = DBselect(
+	$dbEvents = DBselect(
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
-		' WHERE e.objectid='.zbx_dbstr($triggerid).
+		' WHERE e.objectid='.zbx_dbstr($triggerId).
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.eventid'
 	);
-	while ($row = DBfetch($db_events)) {
+	while ($row = DBfetch($dbEvents)) {
 		$clock = $row['clock'];
 		$value = $row['value'];
 
@@ -1549,7 +1550,7 @@ function calculate_availability($triggerid, $startTime, $endTime) {
 	}
 
 	if ($rows == 0) {
-		$trigger = get_trigger_by_triggerid($triggerid);
+		$trigger = get_trigger_by_triggerid($triggerId);
 		$state = $trigger['value'];
 	}
 

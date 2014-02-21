@@ -109,7 +109,7 @@ for ($i = 0; $i < $weeks; $i++) {
 	$period_start = $start + SEC_PER_WEEK * $i;
 	$period_end = $start + SEC_PER_WEEK * ($i + 1);
 
-	$stat = calculate_availability($_REQUEST['triggerid'], $period_start, $period_end);
+	$stat = calculateAvailability($_REQUEST['triggerid'], $period_start, $period_end);
 	$true[$i] = $stat['true'];
 	$false[$i] = $stat['false'];
 	$count_now[$i] = 1;
