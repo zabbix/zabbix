@@ -409,8 +409,17 @@ int	main(int argc, char **argv)
 	sentdval_args.server = ZABBIX_SERVER;
 	sentdval_args.port = ZABBIX_SERVER_PORT;
 
+{
+	int	i;
+
+	for (i = 0; i < 255; i++)
+	{
+		key_value[i] = (char)(i + 1);
+	}
+}
+
 	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, key_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
