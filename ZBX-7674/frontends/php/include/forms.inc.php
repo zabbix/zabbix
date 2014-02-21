@@ -1256,9 +1256,6 @@
 			);
 			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 			$data['trigger'] = reset($trigger);
-			if (!empty($data['trigger']['description'])) {
-				$data['description'] = $data['trigger']['description'];
-			}
 
 			// get templates
 			$tmp_triggerid = $data['triggerid'];
@@ -1303,6 +1300,7 @@
 			$data['expression'] = explode_exp($data['trigger']['expression']);
 
 			if (empty($data['limited']) || !isset($_REQUEST['form_refresh'])) {
+				$data['description'] = $data['trigger']['description'];
 				$data['type'] = $data['trigger']['type'];
 				$data['priority'] = $data['trigger']['priority'];
 				$data['status'] = $data['trigger']['status'];

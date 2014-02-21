@@ -19,14 +19,18 @@
 
 #include "common.h"
 
-#include "db.h"
 #include "zbxdb.h"
+#include "dbschema.h"
 #include "log.h"
-#include "mutexs.h"
+#if defined(HAVE_SQLITE3)
+#	include "mutexs.h"
+#endif
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
 static int	txn_init = 0;	/* connecting to db */
+
+extern int	CONFIG_LOG_SLOW_QUERIES;
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
@@ -128,6 +132,40 @@ out:
 
 #endif	/* HAVE_ORACLE */
 
+#ifdef HAVE___VA_ARGS__
+#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_db_execute		__zbx_zbx_db_execute
+#endif
+static int	__zbx_zbx_db_execute(const char *fmt, ...)
+{
+	va_list	args;
+	int	ret;
+
+	va_start(args, fmt);
+	ret = zbx_db_vexecute(fmt, args);
+	va_end(args);
+
+	return ret;
+}
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_db_select		__zbx_zbx_db_select
+#endif
+static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
+{
+	va_list		args;
+	DB_RESULT	result;
+
+	va_start(args, fmt);
+	result = zbx_db_vselect(fmt, args);
+	va_end(args);
+
+	return result;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_connect                                                   *
@@ -141,7 +179,7 @@ out:
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int		ret = ZBX_DB_OK;
+	int		rc, ret = ZBX_DB_OK;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
@@ -151,11 +189,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+#elif defined(HAVE_SQLITE3)
+	char		*p, *path = NULL;
 #endif
 
 	txn_init = 1;
-
-	assert(NULL != host);
 
 #if defined(HAVE_IBM_DB2)
 	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
@@ -207,10 +245,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = DBdyn_escape_string(dbschema);
-		DBexecute("set current schema='%s'", dbschema_esc);
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set current schema='%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
+			ret = rc;
 		zbx_free(dbschema_esc);
 	}
+
+	zbx_free(connect);
 
 	/* output error information */
 	if (ZBX_DB_OK != ret)
@@ -218,10 +259,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv);
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 
-		zbx_db_close();
 	}
-
-	zbx_free(connect);
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
 
@@ -231,18 +269,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret)
+	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
-		if (0 != mysql_select_db(conn, dbname))
-		{
-			zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
-			ret = ZBX_DB_FAIL;
-		}
-	}
-
-	if (ZBX_DB_OK == ret)
-	{
-		DBexecute("set names utf8");
+		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
+		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_FAIL == ret)
@@ -264,6 +294,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			default:
 				break;
 		}
+	}
+
+	if (ZBX_DB_OK == ret)
+	{
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set names utf8")) || ZBX_DB_FAIL == rc)
+			ret = rc;
 	}
 #elif defined(HAVE_ORACLE)
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
@@ -340,12 +376,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	if (ZBX_DB_OK == ret)
-		DBexecute("alter session set nls_numeric_characters='. '");
+	{
+		rc = zbx_db_execute("%s", "alter session set nls_numeric_characters='. '");
+
+		if (ZBX_DB_DOWN == rc || ZBX_DB_FAIL == rc)
+			ret = rc;
+	}
 
 	zbx_free(connect);
-
-	if (ZBX_DB_OK != ret)
-		zbx_db_close();
 #elif defined(HAVE_POSTGRESQL)
 	if (0 != port)
 		cport = zbx_dsprintf(cport, "%d", port);
@@ -359,31 +397,50 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
 		ret = ZBX_DB_DOWN;
+		goto out;
 	}
-	else
+
+	result = zbx_db_select("%s", "select oid from pg_type where typname='bytea'");
+
+	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
 	{
-		result = DBselect("select oid from pg_type where typname='bytea'");
-		if (NULL != (row = DBfetch(result)))
-			ZBX_PG_BYTEAOID = atoi(row[0]);
-		DBfree_result(result);
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
 	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		ZBX_PG_BYTEAOID = atoi(row[0]);
+	DBfree_result(result);
 
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
-	DBexecute("set escape_string_warning to off");
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set escape_string_warning to off")) || ZBX_DB_FAIL == rc)
+	{
+		ret = rc;
+		goto out;
+	}
 
-	result = DBselect("show standard_conforming_strings");
-	if (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", "show standard_conforming_strings");
+
+	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
 	DBfree_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */
-		DBexecute("set bytea_output=escape");
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set bytea_output=escape")) || ZBX_DB_FAIL == rc)
+			ret = rc;
 	}
+out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
@@ -392,29 +449,40 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
-		sqlite3_close(conn);
 		ret = ZBX_DB_DOWN;
+		goto out;
 	}
-	else
+
+	/* do not return SQLITE_BUSY immediately, wait for N ms */
+	sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
+
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "pragma synchronous=0")) || ZBX_DB_FAIL == rc)
 	{
-		char	*p, *path;
-
-		/* do not return SQLITE_BUSY immediately, wait for N ms */
-		sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
-
-		path = strdup(dbname);
-		if (NULL != (p = strrchr(path, '/')))
-			*++p = '\0';
-		else
-			*path = '\0';
-
-		DBexecute("PRAGMA synchronous = 0");	/* OFF */
-		DBexecute("PRAGMA temp_store = 2");	/* MEMORY */
-		DBexecute("PRAGMA temp_store_directory = '%s'", path);
-
-		zbx_free(path);
+		ret = rc;
+		goto out;
 	}
+
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "pragma temp_store=2")) || ZBX_DB_FAIL == rc)
+	{
+		ret = rc;
+		goto out;
+	}
+
+	path = zbx_strdup(NULL, dbname);
+
+	if (NULL != (p = strrchr(path, '/')))
+		*++p = '\0';
+	else
+		*path = '\0';
+
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("pragma temp_store_directory='%s'", path)) || ZBX_DB_FAIL == rc)
+		ret = rc;
+
+	zbx_free(path);
+out:
 #endif	/* HAVE_SQLITE3 */
+	if (ZBX_DB_OK != ret)
+		zbx_db_close();
 
 	txn_init = 0;
 
@@ -427,7 +495,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("cannot create mutex for SQLite3");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -437,7 +505,7 @@ void	zbx_remove_sqlite3_mutex()
 }
 #endif	/* HAVE_SQLITE3 */
 
-void	zbx_db_init(char *dbname)
+void	zbx_db_init(const char *dbname, const char *const db_schema)
 {
 #if defined(HAVE_SQLITE3)
 	struct stat	buf;
@@ -450,17 +518,16 @@ void	zbx_db_init(char *dbname)
 		if (SQLITE_OK != sqlite3_open(dbname, &conn))
 		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 		zbx_create_sqlite3_mutex(dbname);
 
-		DBexecute("%s", db_schema);
-		DBclose();
+		zbx_db_execute("%s", db_schema);
+		zbx_db_close();
 	}
 	else
 		zbx_create_sqlite3_mutex(dbname);
-
 #endif	/* HAVE_SQLITE3 */
 }
 
@@ -478,8 +545,11 @@ void	zbx_db_close()
 
 	memset(&ibm_db2, 0, sizeof(ibm_db2));
 #elif defined(HAVE_MYSQL)
-	mysql_close(conn);
-	conn = NULL;
+	if (NULL != conn)
+	{
+		mysql_close(conn);
+		conn = NULL;
+	}
 #elif defined(HAVE_ORACLE)
 	/* deallocate statement handle */
 	if (NULL != oracle.stmthp)
@@ -512,48 +582,18 @@ void	zbx_db_close()
 		oracle.srvhp = NULL;
 	}
 #elif defined(HAVE_POSTGRESQL)
-	PQfinish(conn);
-	conn = NULL;
+	if (NULL != conn)
+	{
+		PQfinish(conn);
+		conn = NULL;
+	}
 #elif defined(HAVE_SQLITE3)
-	sqlite3_close(conn);
-	conn = NULL;
+	if (NULL != conn)
+	{
+		sqlite3_close(conn);
+		conn = NULL;
+	}
 #endif
-}
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_execute		__zbx_zbx_db_execute
-#endif
-static int	__zbx_zbx_db_execute(const char *fmt, ...)
-{
-	va_list	args;
-	int	ret;
-
-	va_start(args, fmt);
-	ret = zbx_db_vexecute(fmt, args);
-	va_end(args);
-
-	return ret;
-}
-#endif /* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
-
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_select		__zbx_zbx_db_select
-#endif
-static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
-{
-	va_list		args;
-	DB_RESULT	result;
-
-	va_start(args, fmt);
-	result = zbx_db_vselect(fmt, args);
-	va_end(args);
-
-	return result;
 }
 
 /******************************************************************************
@@ -561,8 +601,6 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  * Function: zbx_db_begin                                                     *
  *                                                                            *
  * Purpose: start transaction                                                 *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -610,8 +648,6 @@ int	zbx_db_begin()
  * Function: zbx_db_commit                                                    *
  *                                                                            *
  * Purpose: commit transaction                                                *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -664,8 +700,6 @@ int	zbx_db_commit()
  * Function: zbx_db_rollback                                                  *
  *                                                                            *
  * Purpose: rollback transaction                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -861,7 +895,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
 	double	sec = 0;
-
 #if defined(HAVE_IBM_DB2)
 	SQLHANDLE	hstmt = 0;
 	SQLRETURN	ret1;
@@ -1023,7 +1056,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 lbl_exec:
@@ -1090,7 +1123,6 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	char		*sql = NULL;
 	DB_RESULT	result = NULL;
 	double		sec = 0;
-
 #if defined(HAVE_IBM_DB2)
 	int		i;
 	SQLRETURN	ret = SQL_SUCCESS;
@@ -1310,6 +1342,9 @@ error:
 					/* retrieve the column width in characters */
 					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+					/* adjust for UTF-8 */
+					col_width *= 4;
 				}
 				else
 				{
@@ -1374,7 +1409,7 @@ error:
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
@@ -1444,6 +1479,120 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 	return zbx_db_select("%s limit %d", query, n);
 #endif
 }
+
+#ifdef HAVE_POSTGRESQL
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_bytea_escape                                              *
+ *                                                                            *
+ * Purpose: converts from binary string to the null terminated escaped string *
+ *                                                                            *
+ * Transformations:                                                           *
+ *      <= 0x1f || '\'' || '\\' || >= 0x7f -> \\ooo (ooo is an octal number)  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      input - null terminated hexadecimal string                            *
+ *      output - pointer to buffer                                            *
+ *      olen - size of returned buffer                                        *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
+{
+	const u_char	*i = input;
+	char		*o;
+	size_t		len = 1;	/* '\0' */
+
+	while (i - input < ilen)
+	{
+		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
+		{
+			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
+				len++;
+			len += 4;
+		}
+		else
+			len++;
+		i++;
+	}
+
+	if (*olen < len)
+	{
+		*olen = len;
+		*output = zbx_realloc(*output, *olen);
+	}
+	o = *output;
+	i = input;
+
+	while (i - input < ilen)
+	{
+		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
+		{
+			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
+				*o++ = '\\';
+			*o++ = '\\';
+			*o++ = ((*i >> 6) & 0x7) + 0x30;
+			*o++ = ((*i >> 3) & 0x7) + 0x30;
+			*o++ = (*i & 0x7) + 0x30;
+		}
+		else
+			*o++ = *i;
+		i++;
+	}
+	*o = '\0';
+
+	return len - 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_bytea_unescape                                            *
+ *                                                                            *
+ * Purpose: converts the null terminated string into binary buffer            *
+ *                                                                            *
+ * Transformations:                                                           *
+ *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
+ *      \\   == \                                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      io - [IN/OUT] null terminated string / binary data                    *
+ *                                                                            *
+ * Return value: length of the binary buffer                                  *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_db_bytea_unescape(u_char *io)
+{
+	const u_char	*i = io;
+	u_char		*o = io;
+
+	while ('\0' != *i)
+	{
+		switch (*i)
+		{
+			case '\\':
+				i++;
+				if ('\\' == *i)
+				{
+					*o++ = *i++;
+				}
+				else
+				{
+					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
+					{
+						*o = (*i++ - 0x30) << 6;
+						*o += (*i++ - 0x30) << 3;
+						*o++ += *i++ - 0x30;
+					}
+				}
+				break;
+
+			default:
+				*o++ = *i++;
+		}
+	}
+
+	return o - io;
+}
+#endif
 
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
@@ -1569,7 +1718,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					DBbytea_unescape((u_char *)result->values[i]);
+					zbx_db_bytea_unescape((u_char *)result->values[i]);
 			}
 		}
 	}
@@ -1746,5 +1895,261 @@ ub4	OCI_DBserver_status()
 
 	return server_status;
 }
-
 #endif	/* HAVE_ORACLE */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_escape_string_len                                     *
+ *                                                                            *
+ * Return value: return length in bytes of escaped string                     *
+ *               with terminating '\0'                                        *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_escape_string'                         *
+ *           and 'zbx_db_dyn_escape_string_len'                               *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_db_get_escape_string_len(const char *src)
+{
+	const char	*s;
+	size_t		len = 1;	/* '\0' */
+
+	for (s = src; NULL != s && '\0' != *s; s++)
+	{
+		if ('\r' == *s)
+			continue;
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+			len++;
+
+		len++;
+	}
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_escape_string                                             *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_get_escape_string_len'                 *
+ *           and 'zbx_db_dyn_escape_string_len'                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_escape_string(const char *src, char *dst, size_t len)
+{
+	const char	*s;
+	char		*d;
+#if defined(HAVE_MYSQL)
+#	define ZBX_DB_ESC_CH	'\\'
+#elif !defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_ESC_CH	'\''
+#endif
+	assert(dst);
+
+	len--;	/* '\0' */
+
+	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
+	{
+		if ('\r' == *s)
+			continue;
+
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+		{
+			if (2 > len)
+				break;
+#if defined(HAVE_POSTGRESQL)
+			*d++ = *s;
+#else
+			*d++ = ZBX_DB_ESC_CH;
+#endif
+			len--;
+		}
+		*d++ = *s;
+		len--;
+	}
+	*d = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string                                         *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string(const char *src)
+{
+	size_t	len;
+	char	*dst = NULL;
+
+	len = zbx_db_get_escape_string_len(src);
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_string_len                                     *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len)
+{
+	const char	*s;
+	char		*dst = NULL;
+	size_t		len = 1;	/* '\0' */
+
+	max_src_len++;
+
+	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
+	{
+		if ('\r' == *s)
+			continue;
+
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
+			break;
+
+#if defined(HAVE_MYSQL)
+		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+#else
+		if ('\'' == *s)
+#endif
+			len++;
+
+		len++;
+	}
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_escape_like_pattern_len                               *
+ *                                                                            *
+ * Return value: return length of escaped LIKE pattern with terminating '\0'  *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_escape_like_pattern'                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_db_get_escape_like_pattern_len(const char *src)
+{
+	int		len;
+	const char	*s;
+
+	len = zbx_db_get_escape_string_len(src) - 1; /* minus '\0' */
+
+	for (s = src; s && *s; s++)
+	{
+		len += (*s == '_' || *s == '%' || *s == ZBX_SQL_LIKE_ESCAPE_CHAR);
+		len += 1;
+	}
+
+	len++; /* '\0' */
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_escape_like_pattern                                       *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ * Comments: sync changes with 'zbx_db_get_escape_like_pattern_len'           *
+ *                                                                            *
+ *           For instance, we wish to find string a_b%c\d'e!f in our database *
+ *           using '!' as escape character. Our queries then become:          *
+ *                                                                            *
+ *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (IBM DB2, Oracle, SQLite3) *
+ *                                                                            *
+ *           Using backslash as escape character in LIKE would be too much    *
+ *           trouble, because escaping backslashes would have to be escaped   *
+ *           as well, like so:                                                *
+ *                                                                            *
+ *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
+ *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (IBM DB2, Oracle, SQLite3) *
+ *                                                                            *
+ *           Hence '!' instead of backslash.                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_escape_like_pattern(const char *src, char *dst, int len)
+{
+	char		*d;
+	char		*tmp = NULL;
+	const char	*t;
+
+	assert(dst);
+
+	tmp = zbx_malloc(tmp, len);
+
+	zbx_db_escape_string(src, tmp, len);
+
+	len--; /* '\0' */
+
+	for (t = tmp, d = dst; t && *t && len; t++)
+	{
+		if (*t == '_' || *t == '%' || *t == ZBX_SQL_LIKE_ESCAPE_CHAR)
+		{
+			if (len <= 1)
+				break;
+			*d++ = ZBX_SQL_LIKE_ESCAPE_CHAR;
+			len--;
+		}
+		*d++ = *t;
+		len--;
+	}
+
+	*d = '\0';
+
+	zbx_free(tmp);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_dyn_escape_like_pattern                                   *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_dyn_escape_like_pattern(const char *src)
+{
+	int	len;
+	char	*dst = NULL;
+
+	len = zbx_db_get_escape_like_pattern_len(src);
+
+	dst = zbx_malloc(dst, len);
+
+	zbx_db_escape_like_pattern(src, dst, len);
+
+	return dst;
+}
+
+

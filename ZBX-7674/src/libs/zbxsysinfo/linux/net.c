@@ -280,7 +280,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], pattern[64], *port_str, *buffer = NULL;
+	char		tmp[MAX_STRING_LEN], pattern[64], *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
@@ -333,7 +333,7 @@ out:
 
 int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], pattern[64], *port_str, *buffer = NULL;
+	char		tmp[MAX_STRING_LEN], pattern[64], *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;

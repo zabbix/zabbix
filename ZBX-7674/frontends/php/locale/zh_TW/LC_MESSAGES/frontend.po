@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 20:23+0200\n"
+"POT-Creation-Date: 2014-02-13 01:24+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -201,7 +201,7 @@ msgstr "可接受的SLA"
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: api/classes/CUser.php:917
+#: api/classes/CUser.php:946
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
@@ -350,8 +350,8 @@ msgstr "作用中直到"
 
 #: dashconf.php:211 include/blocks.inc.php:1143 include/blocks.inc.php:1149
 #: include/blocks.inc.php:1263 include/blocks.inc.php:1308
-#: include/blocks.inc.php:1314 include/forms.inc.php:1705
-#: include/forms.inc.php:2009 include/reports.inc.php:332
+#: include/blocks.inc.php:1314 include/forms.inc.php:1703
+#: include/forms.inc.php:2007 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:112
@@ -453,7 +453,7 @@ msgstr "新增到主機群組"
 msgid "Added"
 msgstr "已新增"
 
-#: include/items.inc.php:1336 include/views/configuration.item.edit.php:190
+#: include/items.inc.php:1344 include/views/configuration.item.edit.php:190
 msgid "Additional parameters"
 msgstr "附加參數"
 
@@ -627,7 +627,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1556 include/func.inc.php:107
+#: include/forms.inc.php:1554 include/func.inc.php:107
 #: include/func.inc.php:238 jsLoader.php:117
 msgid "April"
 msgstr "四月"
@@ -668,7 +668,7 @@ msgstr "區域標籤"
 msgid "At"
 msgstr "於"
 
-#: include/forms.inc.php:1682
+#: include/forms.inc.php:1680
 msgid "At (hour:minute)"
 msgstr "於(時:分)"
 
@@ -700,7 +700,7 @@ msgstr "審計紀錄"
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1548 include/func.inc.php:111
+#: include/forms.inc.php:1546 include/func.inc.php:111
 #: include/func.inc.php:242 jsLoader.php:121
 msgid "August"
 msgstr "八月"
@@ -719,15 +719,15 @@ msgstr "認證法則"
 msgid "Authentication method"
 msgstr "認證方法"
 
-#: authentication.php:158 authentication.php:159
+#: authentication.php:184 authentication.php:186
 msgid "Authentication method changed to HTTP"
 msgstr "認證方式改為HTTP"
 
-#: authentication.php:121 authentication.php:122
+#: authentication.php:135
 msgid "Authentication method changed to LDAP"
 msgstr "認證方式改為LDAP"
 
-#: authentication.php:83 authentication.php:84
+#: authentication.php:89 authentication.php:92
 msgid "Authentication method changed to Zabbix internal"
 msgstr "認證方式改為系統內部"
 
@@ -820,8 +820,8 @@ msgstr "背景圖片"
 msgid "Bar reports"
 msgstr "條狀圖報表"
 
-#: authentication.php:39
-#: include/views/administration.authentication.edit.php:59
+#: authentication.php:42
+#: include/views/administration.authentication.edit.php:75
 msgid "Base DN"
 msgstr "Base DN"
 
@@ -829,12 +829,13 @@ msgstr "Base DN"
 msgid "Basic authentication"
 msgstr "基本認證方式"
 
-#: include/views/administration.authentication.edit.php:61
+#: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
 msgstr "Bind DN"
 
-#: authentication.php:49
-#: include/views/administration.authentication.edit.php:62
+#: authentication.php:45
+#: include/views/administration.authentication.edit.php:99
+#: include/views/administration.authentication.edit.php:105
 msgid "Bind password"
 msgstr "Bind密碼"
 
@@ -1100,7 +1101,7 @@ msgid "Canada (136 characters)"
 msgstr "加拿大 (136 字元)"
 
 #: include/classes/class.cbuttoncancel.php:25 include/config.inc.php:267
-#: include/forms.inc.php:1707 include/forms.inc.php:2010
+#: include/forms.inc.php:1705 include/forms.inc.php:2008
 #: include/js.inc.php:222 include/setup.inc.php:137
 #: include/views/configuration.action.edit.php:953
 #: include/views/configuration.action.edit.php:962
@@ -1245,15 +1246,19 @@ msgstr "無法新增用戶"
 msgid "Cannot add value map"
 msgstr "無法新增值對應"
 
-#: authentication.php:163
+#: authentication.php:148
+msgid "Cannot change authentication"
+msgstr ""
+
+#: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
 msgstr "無法改變授權方式為HTTP"
 
-#: authentication.php:126
+#: authentication.php:120 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
 msgstr "無法改變授權方式為LDAP"
 
-#: authentication.php:88
+#: authentication.php:95
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "無法改變授權方式為Zabbix內部"
 
@@ -1501,7 +1506,7 @@ msgstr "無法刪除模板化的項目"
 msgid "Cannot delete templated items."
 msgstr "無法刪除模板項目."
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:925
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "無法刪除模板化觸發器 \"%1$s:%2$s\"."
@@ -1522,7 +1527,7 @@ msgstr "無法刪除觸發器."
 msgid "Cannot delete triggers"
 msgstr "無法删除觸發器"
 
-#: api/classes/CTriggerPrototype.php:963
+#: api/classes/CTriggerPrototype.php:965
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "無法刪除由低階層發現所創建的觸發器."
 
@@ -1530,7 +1535,7 @@ msgstr "無法刪除由低階層發現所創建的觸發器."
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
-#: api/classes/CUser.php:787
+#: api/classes/CUser.php:816
 msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
@@ -1560,7 +1565,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選 \"%2$s\"中的圖形\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:723
-#: include/classes/import/importers/CMapImporter.php:210
+#: include/classes/import/importers/CMapImporter.php:209
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的群組\"%1$s\"."
@@ -1572,7 +1577,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的群組\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:734
-#: include/classes/import/importers/CMapImporter.php:218
+#: include/classes/import/importers/CMapImporter.php:217
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的主機\"%1$s\"."
@@ -1597,7 +1602,7 @@ msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:767
-#: include/classes/import/importers/CMapImporter.php:247
+#: include/classes/import/importers/CMapImporter.php:250
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖 \"%2$s\"中的圖示\"%1$s\"."
@@ -1619,7 +1624,7 @@ msgstr "無法找到用在篩選\"%2$s\"中的項目\"%1$s\"."
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "無法找到用在匯出的拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:202
+#: include/classes/import/importers/CMapImporter.php:201
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖\"%2$s\"中的拓墣圖\"%1$s\"."
@@ -1642,8 +1647,8 @@ msgstr "無法找到用在篩選 \"%2$s\"中的篩選\"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
-#: include/classes/import/importers/CMapImporter.php:227
-#: include/classes/import/importers/CMapImporter.php:268
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:271
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "無法找到用在拓墣圖 \"%2$s\"中的觸發器\"%1$s\"."
@@ -1661,8 +1666,8 @@ msgid "Cannot have empty visible template name"
 msgstr "不能有空白的可見模板名稱"
 
 #: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
-#: api/classes/CTriggerPrototype.php:1006
-#: api/classes/CTriggerPrototype.php:1064
+#: api/classes/CTriggerPrototype.php:1008
+#: api/classes/CTriggerPrototype.php:1066
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "不能合併表示式 \"%s\"."
@@ -1684,7 +1689,7 @@ msgstr[0] "不能輸模板 \"%2$s\", 連結的模板 \"%3$s\" 不存在."
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含檢視檔案\"%s\"."
 
-#: api/classes/CUser.php:816
+#: api/classes/CUser.php:845
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
@@ -1692,7 +1697,11 @@ msgstr "不能插入用戶示警媒介"
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
-#: api/classes/CUser.php:881
+#: api/classes/CUser.php:985
+msgid "Cannot login."
+msgstr ""
+
+#: api/classes/CUser.php:910
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -1844,7 +1853,7 @@ msgstr "無法更新\"templateid\"給篩選\"%1$s\"."
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "無法更新\"templateid\"給觸發器\"%1$s\"."
 
-#: api/classes/CTriggerPrototype.php:831
+#: api/classes/CTriggerPrototype.php:833
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "無法更新\"templateid\"給觸發器原型\"%1$s\"."
@@ -2001,7 +2010,7 @@ msgstr "無法更新觸發器"
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
-#: api/classes/CUser.php:808
+#: api/classes/CUser.php:837
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
@@ -2021,7 +2030,7 @@ msgstr "無法更新值對應"
 msgid "Caption"
 msgstr "提示"
 
-#: include/forms.inc.php:1908 include/forms.inc.php:2004
+#: include/forms.inc.php:1906 include/forms.inc.php:2002
 msgid "Case sensitive"
 msgstr "區分大小寫"
 
@@ -2030,7 +2039,7 @@ msgid "Center"
 msgstr "中"
 
 #: include/classes/screens/CScreenBase.php:258
-#: include/classes/screens/CScreenBuilder.php:419
+#: include/classes/screens/CScreenBuilder.php:417
 #: include/classes/screens/CScreenMap.php:54
 #: include/views/configuration.services.edit.php:48
 msgid "Change"
@@ -2041,6 +2050,7 @@ msgctxt "noun in latest data"
 msgid "Change"
 msgstr "更改"
 
+#: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
@@ -2151,7 +2161,7 @@ msgstr "清除當無連結時"
 msgid "Clock"
 msgstr "Clock"
 
-#: include/forms.inc.php:1872
+#: include/forms.inc.php:1870
 #: include/views/administration.general.iconmap.edit.php:141
 #: include/views/administration.proxy.edit.php:94
 #: include/views/administration.script.edit.php:121
@@ -2213,7 +2223,7 @@ msgstr ""
 msgid "Columns"
 msgstr "列數"
 
-#: include/forms.inc.php:1844
+#: include/forms.inc.php:1842
 msgid "Combined result"
 msgstr "合併的結果"
 
@@ -2523,7 +2533,7 @@ msgstr "複製"
 msgid "Copy selected to ..."
 msgstr "複製所選的到 ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:1030
 #, php-format
 msgid "Correct login \"%s\"."
 msgstr "正確登入\"%s\"."
@@ -2681,7 +2691,7 @@ msgstr "已創建: 項目原型 \"%1$s\" 於 \"%2$s\"."
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 觸發器 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1013
+#: api/classes/CTriggerPrototype.php:1015
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
@@ -2887,7 +2897,7 @@ msgstr "DNS名稱"
 msgid "DOWN"
 msgstr "斷線"
 
-#: include/forms.inc.php:1505 include/maintenances.inc.php:35
+#: include/forms.inc.php:1503 include/maintenances.inc.php:35
 #: include/reports.inc.php:219 include/reports.inc.php:665
 #: include/reports.inc.php:673 report3.php:60 report4.php:98
 msgid "Daily"
@@ -2977,7 +2987,7 @@ msgstr "資料庫類型"
 msgid "Database user"
 msgstr "資料庫用戶"
 
-#: include/forms.inc.php:1591 include/forms.inc.php:1676 jsrpc.php:137
+#: include/forms.inc.php:1589 include/forms.inc.php:1674 jsrpc.php:137
 msgid "Date"
 msgstr "日期"
 
@@ -2997,12 +3007,12 @@ msgstr "硬體維修過期日期"
 msgid "Date HW purchased"
 msgstr "硬體購買日期"
 
-#: include/forms.inc.php:1591 report3.php:126 report4.php:161 report5.php:45
+#: include/forms.inc.php:1589 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
 msgid "Day"
 msgstr "日"
 
-#: include/forms.inc.php:1619
+#: include/forms.inc.php:1617
 msgid "Day of month"
 msgstr "月中第幾日"
 
@@ -3022,8 +3032,8 @@ msgstr "月中第幾日是 > N"
 msgid "Day of month is NOT N"
 msgstr "月中第幾日不是 N"
 
-#: include/forms.inc.php:1534 include/forms.inc.php:1591
-#: include/forms.inc.php:1615
+#: include/forms.inc.php:1532 include/forms.inc.php:1589
+#: include/forms.inc.php:1613
 msgid "Day of week"
 msgstr "週中第幾日"
 
@@ -3043,7 +3053,7 @@ msgstr "週中第幾日是 > N"
 msgid "Day of week is NOT N"
 msgstr "週中第幾日不是 N"
 
-#: include/forms.inc.php:1697 tr_status.php:207 tr_status.php:209
+#: include/forms.inc.php:1695 tr_status.php:207 tr_status.php:209
 msgid "Days"
 msgstr "日數"
 
@@ -3065,7 +3075,7 @@ msgstr "調試模式已更新"
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1568 include/func.inc.php:115
+#: include/forms.inc.php:1566 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
 msgid "December"
 msgstr "十二"
@@ -3085,7 +3095,7 @@ msgstr "十進位數字"
 msgid "Default"
 msgstr "預設"
 
-#: include/views/administration.authentication.edit.php:41
+#: include/views/administration.authentication.edit.php:50
 msgid "Default authentication"
 msgstr "預設認證方式"
 
@@ -3129,7 +3139,7 @@ msgstr "延遲(秒計)"
 msgid "Delayed by"
 msgstr "延遲因"
 
-#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1938
+#: include/classes/class.cbuttondelete.php:25 include/forms.inc.php:1936
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:328 tr_logform.php:345
@@ -3206,7 +3216,7 @@ msgstr "刪除網路拓墣圖?"
 msgid "Delete proxy?"
 msgstr "刪除系統代理程式?"
 
-#: include/forms.inc.php:1874
+#: include/forms.inc.php:1872
 msgid "Delete regular expression?"
 msgstr "删除正規表示式?"
 
@@ -3448,13 +3458,13 @@ msgstr "已刪除: 模板 \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 觸發器 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:969
+#: api/classes/CTriggerPrototype.php:971
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 
-#: include/forms.inc.php:1835 include/forms.inc.php:1916
-#: include/forms.inc.php:1996
+#: include/forms.inc.php:1833 include/forms.inc.php:1914
+#: include/forms.inc.php:1994
 msgid "Delimiter"
 msgstr "分隔符"
 
@@ -3979,7 +3989,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每個URL必須是唯一的. 請確保僅有一個URL為名."
 
-#: include/forms.inc.php:1909 include/forms.inc.php:1923
+#: include/forms.inc.php:1907 include/forms.inc.php:1921
 #: include/views/administration.users.edit.php:164
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:377
@@ -4039,7 +4049,7 @@ msgstr "空的動作條件."
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:907
+#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4285,11 +4295,11 @@ msgstr "事件來源細節"
 msgid "Events"
 msgstr "事件"
 
-#: include/forms.inc.php:1517
+#: include/forms.inc.php:1515
 msgid "Every day(s)"
 msgstr "每日"
 
-#: include/forms.inc.php:1524
+#: include/forms.inc.php:1522
 msgid "Every week(s)"
 msgstr "每週"
 
@@ -4319,7 +4329,7 @@ msgstr "執行SQL錯誤[%1$s]於[%2$s]."
 msgid "Execute on"
 msgstr "執行在"
 
-#: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
+#: include/items.inc.php:1342 include/views/configuration.item.edit.php:186
 msgid "Executed script"
 msgstr "已執行的腳本"
 
@@ -4335,7 +4345,7 @@ msgstr "拓展巨集"
 msgid "Expand single problem"
 msgstr "展開單一問題"
 
-#: include/forms.inc.php:1776 include/forms.inc.php:1907
+#: include/forms.inc.php:1774 include/forms.inc.php:1905
 msgid "Expected result"
 msgstr "期望的結果"
 
@@ -4362,8 +4372,8 @@ msgstr "匯出所選的"
 msgid "Export to CSV"
 msgstr "匯出到CSV"
 
-#: include/forms.inc.php:1775 include/forms.inc.php:1906
-#: include/forms.inc.php:1979 include/triggers.inc.php:1646
+#: include/forms.inc.php:1773 include/forms.inc.php:1904
+#: include/forms.inc.php:1977 include/triggers.inc.php:1646
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/configuration.item.list.php:111
 #: include/views/configuration.triggers.edit.php:134
@@ -4373,8 +4383,8 @@ msgstr "匯出到CSV"
 msgid "Expression"
 msgstr "表示式"
 
-#: include/forms.inc.php:1341 include/forms.inc.php:1346
-#: include/forms.inc.php:1359
+#: include/forms.inc.php:1339 include/forms.inc.php:1344
+#: include/forms.inc.php:1357
 msgid "Expression Syntax Error."
 msgstr "表示式語法錯誤."
 
@@ -4390,7 +4400,7 @@ msgstr "表示式不能為空白"
 msgid "Expression constructor"
 msgstr "表示式建構子"
 
-#: include/forms.inc.php:1988
+#: include/forms.inc.php:1986
 msgid "Expression type"
 msgstr "表示式類型"
 
@@ -4413,7 +4423,7 @@ msgctxt "Friday short"
 msgid "F"
 msgstr "F"
 
-#: include/forms.inc.php:1831 include/forms.inc.php:1851
+#: include/forms.inc.php:1829 include/forms.inc.php:1849
 msgid "FALSE"
 msgstr "偽"
 
@@ -4464,7 +4474,7 @@ msgstr "常用的"
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1546 include/func.inc.php:105
+#: include/forms.inc.php:1544 include/func.inc.php:105
 #: include/func.inc.php:236 jsLoader.php:115
 msgid "February"
 msgstr "二月"
@@ -4541,7 +4551,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
-#: include/forms.inc.php:1597 include/maintenances.inc.php:103
+#: include/forms.inc.php:1595 include/maintenances.inc.php:103
 msgid "First"
 msgstr "首"
 
@@ -4568,11 +4578,11 @@ msgstr "彈性區間"
 msgid "For guest, password must be empty"
 msgstr "訪客的密碼必須為空"
 
-#: include/items.inc.php:1338 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1346 include/views/configuration.item.edit.php:200
 msgid "Formula"
 msgstr "公式"
 
-#: include/forms.inc.php:1600 include/maintenances.inc.php:106
+#: include/forms.inc.php:1598 include/maintenances.inc.php:106
 msgid "Fourth"
 msgstr "第四"
 
@@ -4584,7 +4594,7 @@ msgstr "法語 (fr_FR)"
 msgid "Fri"
 msgstr "週五"
 
-#: include/forms.inc.php:1531 include/forms.inc.php:1612
+#: include/forms.inc.php:1529 include/forms.inc.php:1610
 #: include/func.inc.php:127 include/func.inc.php:211
 msgid "Friday"
 msgstr "週五"
@@ -5003,12 +5013,12 @@ msgid "HOST INVENTORY OVERVIEW"
 msgstr "主機資產清單概覽"
 
 #: include/discovery.inc.php:61
-#: include/views/administration.authentication.edit.php:39
+#: include/views/administration.authentication.edit.php:48
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:188
+#: authentication.php:218
 msgid "HTTP authentication"
 msgstr "HTTP認證"
 
@@ -5182,7 +5192,7 @@ msgstr "主機(升冪)"
 msgid "Host IP"
 msgstr "主機IP地址"
 
-#: include/forms.inc.php:1717
+#: include/forms.inc.php:1715
 msgid "Host Inventory"
 msgstr "主機資產紀錄"
 
@@ -5388,7 +5398,7 @@ msgstr "主機已更新"
 msgid "Hourly"
 msgstr "每小時"
 
-#: include/forms.inc.php:1699
+#: include/forms.inc.php:1697
 msgid "Hours"
 msgstr "時"
 
@@ -6226,16 +6236,6 @@ msgstr "予服務\"%1$s\"不正確的狀態."
 msgid "Incorrect status."
 msgstr "不正確的狀態."
 
-#: api/classes/CItemKey.php:218
-#, php-format
-msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr "在位置\"%2$s\"近\"%1$s\"處的不正確句法."
-
-#: api/classes/CItemKey.php:162
-#, php-format
-msgid "Incorrect syntax near \"%1$s\"."
-msgstr "近\"%1$s\"處的不正確句法."
-
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
@@ -6294,12 +6294,6 @@ msgstr "用了不正確的觸發器方程式\"%1$s\"於表示式中."
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
 msgstr "不正確的asort_by_key類型."
-
-#: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
-#: api/classes/CItemKey.php:252
-#, php-format
-msgid "Incorrect usage of bracket symbols. \"%1$s\" found after final bracket."
-msgstr "括號標誌的不正確使用. 在右側括號後有\"%1$s\"."
 
 #: include/perm.inc.php:189
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
@@ -6370,7 +6364,7 @@ msgstr "資訊"
 msgid "Insert"
 msgstr "插入"
 
-#: include/forms.inc.php:1353 jsLoader.php:102
+#: include/forms.inc.php:1351 jsLoader.php:102
 msgid "Insert macro"
 msgstr "插入巨集"
 
@@ -6412,7 +6406,7 @@ msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "IP為\"%1$s\"的介面不能有空白的DNS名稱."
 
 #: include/users.inc.php:59
-#: include/views/administration.authentication.edit.php:35
+#: include/views/administration.authentication.edit.php:38
 msgid "Internal"
 msgstr "內部的"
 
@@ -6460,11 +6454,6 @@ msgstr ""
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "無效的主機ID予巨集 \"%1$s\"."
-
-#: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
-#: api/classes/CItemKey.php:266
-msgid "Invalid item key format."
-msgstr "無效的項目鍵值格式."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
@@ -6746,7 +6735,7 @@ msgstr "Jabber Identifier"
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1541 include/func.inc.php:104
+#: include/forms.inc.php:1539 include/func.inc.php:104
 #: include/func.inc.php:235 jsLoader.php:114
 msgid "January"
 msgstr "一月"
@@ -6759,7 +6748,7 @@ msgstr "日語 (ja_JP)"
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1543 include/func.inc.php:110
+#: include/forms.inc.php:1541 include/func.inc.php:110
 #: include/func.inc.php:241 jsLoader.php:120
 msgid "July"
 msgstr "七月"
@@ -6768,7 +6757,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1566 include/func.inc.php:109
+#: include/forms.inc.php:1564 include/func.inc.php:109
 #: include/func.inc.php:240 jsLoader.php:119
 msgid "June"
 msgstr "六月"
@@ -6817,10 +6806,6 @@ msgstr "鍵值"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "鍵值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: api/classes/CItemKey.php:50
-msgid "Key cannot be empty."
-msgstr "鍵值不能為空白."
-
 #: include/views/configuration.action.edit.php:717
 #: include/views/js/configuration.item.edit.js.php:127
 msgid "Key passphrase"
@@ -6843,25 +6828,29 @@ msgid "LATEST DATA"
 msgstr "最新數據"
 
 #: include/discovery.inc.php:58
-#: include/views/administration.authentication.edit.php:37
+#: include/views/administration.authentication.edit.php:43
 #: include/views/js/configuration.discovery.edit.js.php:126
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:185
+#: authentication.php:215
 msgid "LDAP authentication"
 msgstr "LDAP認證"
 
-#: authentication.php:35
-#: include/views/administration.authentication.edit.php:57
+#: authentication.php:136
+msgid "LDAP authentication changed"
+msgstr ""
+
+#: authentication.php:38
+#: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
 msgstr "LDAP主機"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login successful"
 msgstr "LDAP登入成功"
 
-#: authentication.php:138
+#: authentication.php:154
 msgid "LDAP login was not successful"
 msgstr "LDAP登入並不成功"
 
@@ -6890,7 +6879,7 @@ msgstr "標示位置"
 msgid "Language"
 msgstr "語言"
 
-#: include/forms.inc.php:1601 include/maintenances.inc.php:107
+#: include/forms.inc.php:1599 include/maintenances.inc.php:107
 msgid "Last"
 msgstr "末"
 
@@ -7171,7 +7160,7 @@ msgstr "登入為"
 #: auditlogs.php:143 include/config.inc.php:266 include/menu.inc.php:285
 #: include/page_header.php:271
 #: include/views/administration.auditlogs.list.php:43
-#: include/views/administration.authentication.edit.php:64
+#: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
 msgstr "登入"
@@ -7180,17 +7169,22 @@ msgstr "登入"
 msgid "Login as Guest"
 msgstr "登入為訪客"
 
-#: api/classes/CUser.php:978
+#: api/classes/CUser.php:1022
 #, php-format
 msgid "Login failed \"%s\"."
 msgstr "登入失敗\"%s\"."
 
-#: authentication.php:108 authentication.php:136
-msgid "Login name or password is incorrect"
+#: api/classes/CUser.php:990
+#, php-format
+msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
 
-#: api/classes/CUser.php:846 api/classes/CUser.php:864
-#: api/classes/CUser.php:911
+#: authentication.php:115
+msgid "Login name or password is incorrect!"
+msgstr ""
+
+#: api/classes/CUser.php:875 api/classes/CUser.php:893
+#: api/classes/CUser.php:940
 msgid "Login name or password is incorrect."
 msgstr "登入名稱或密碼是不正確的."
 
@@ -7325,7 +7319,7 @@ msgstr "維修已新增"
 msgid "Maintenance deleted"
 msgstr "維修已刪除"
 
-#: include/forms.inc.php:1694
+#: include/forms.inc.php:1692
 msgid "Maintenance period length"
 msgstr "維修期間長度"
 
@@ -7441,7 +7435,7 @@ msgstr "拓墣圖"
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1551 include/func.inc.php:106
+#: include/forms.inc.php:1549 include/func.inc.php:106
 #: include/func.inc.php:237 jsLoader.php:116
 msgid "March"
 msgstr "三月"
@@ -7537,7 +7531,7 @@ msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d cha
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] "最大的可見名稱長度是%2$d個字元, \"%3$s\" 是%1$d個字元."
 
-#: include/forms.inc.php:1561 include/func.inc.php:108
+#: include/forms.inc.php:1559 include/func.inc.php:108
 #: include/func.inc.php:239 jsLoader.php:118
 msgid "May"
 msgstr "五月"
@@ -7718,7 +7712,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1701
+#: include/forms.inc.php:1699
 msgid "Minutes"
 msgstr "分"
 
@@ -7762,7 +7756,7 @@ msgstr "模型"
 msgid "Mon"
 msgstr "一"
 
-#: include/forms.inc.php:1527 include/forms.inc.php:1608
+#: include/forms.inc.php:1525 include/forms.inc.php:1606
 #: include/func.inc.php:123 include/func.inc.php:207
 msgid "Monday"
 msgstr "週一"
@@ -7786,11 +7780,11 @@ msgstr "已監測的主機"
 msgid "Monitoring"
 msgstr "監測中"
 
-#: include/forms.inc.php:1570 report3.php:108 report4.php:143 report5.php:47
+#: include/forms.inc.php:1568 report3.php:108 report4.php:143 report5.php:47
 msgid "Month"
 msgstr "月"
 
-#: include/forms.inc.php:1507 include/maintenances.inc.php:39
+#: include/forms.inc.php:1505 include/maintenances.inc.php:39
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
@@ -7850,7 +7844,7 @@ msgstr "NTLM認證"
 #: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
-#: include/forms.inc.php:1770 include/hosts.inc.php:114
+#: include/forms.inc.php:1768 include/hosts.inc.php:114
 #: include/reports.inc.php:382 include/setup.inc.php:318
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
@@ -7939,7 +7933,7 @@ msgstr "從未"
 msgid "Never executed"
 msgstr "從未執行過"
 
-#: include/forms.inc.php:1937 include/views/configuration.action.edit.php:396
+#: include/forms.inc.php:1935 include/views/configuration.action.edit.php:396
 #: include/views/configuration.action.edit.php:603
 #: include/views/configuration.action.edit.php:903
 #: include/views/configuration.discovery.edit.php:54
@@ -8012,7 +8006,7 @@ msgid "Next check"
 msgstr "下個檢查"
 
 #: events.php:760 include/config.inc.php:568 include/events.inc.php:302
-#: include/events.inc.php:320 include/forms.inc.php:1922
+#: include/events.inc.php:320 include/forms.inc.php:1920
 #: include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
@@ -8417,7 +8411,7 @@ msgstr "不具拓墣圖\"%1$s\"的許可權."
 msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
 
-#: api/classes/CUser.php:925 api/classes/CUser.php:1035
+#: api/classes/CUser.php:954 api/classes/CUser.php:1079
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
@@ -8448,10 +8442,11 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:822
-#: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
-#: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
-#: include/config.inc.php:249 report6.php:159
+#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
+#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
+#: api/classes/CUser.php:743 api/classes/CUser.php:780
+#: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
 
@@ -8492,10 +8487,6 @@ msgstr "沒有已定義的正規表示式"
 #: popup_right.php:74
 msgid "No resources defined."
 msgstr "沒有已定義的資源"
-
-#: include/classes/screens/CScreenBuilder.php:293
-msgid "No rows in screen."
-msgstr "篩選中沒有行"
 
 #: api/classes/CScreenItem.php:468
 msgid "No screen ID provided for screen element."
@@ -8727,7 +8718,7 @@ msgstr "警報"
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1563 include/func.inc.php:114
+#: include/forms.inc.php:1561 include/func.inc.php:114
 #: include/func.inc.php:245 jsLoader.php:124
 msgid "November"
 msgstr "十一月"
@@ -8870,7 +8861,7 @@ msgstr "十月"
 msgid "Octal"
 msgstr "八進位"
 
-#: include/forms.inc.php:1558 include/func.inc.php:113
+#: include/forms.inc.php:1556 include/func.inc.php:113
 #: include/func.inc.php:244 jsLoader.php:123
 msgid "October"
 msgstr "十月"
@@ -8898,7 +8889,7 @@ msgstr "於狀態改變時, 觸發器因此閃爍於"
 msgid "Once"
 msgstr "一次"
 
-#: include/forms.inc.php:1504 include/maintenances.inc.php:33
+#: include/forms.inc.php:1502 include/maintenances.inc.php:33
 msgid "One time only"
 msgstr "一次性"
 
@@ -8960,11 +8951,11 @@ msgstr "只有超級管理員可以更新用戶群組."
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超級管理員可以新增用戶示警媒介."
 
-#: api/classes/CUser.php:753
+#: api/classes/CUser.php:774
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超級管理員可以用改變戶示警媒介."
 
-#: api/classes/CUser.php:723
+#: api/classes/CUser.php:731
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超級管理員可以移除用戶示警媒介."
 
@@ -9440,7 +9431,7 @@ msgstr "百分比線(右)"
 msgid "Period"
 msgstr "期間"
 
-#: include/forms.inc.php:1509
+#: include/forms.inc.php:1507
 #: include/views/configuration.maintenance.edit.php:133
 msgid "Period type"
 msgstr "期間類型"
@@ -9512,9 +9503,9 @@ msgstr "波蘭(pl_PL)"
 msgid "Populates host inventory field"
 msgstr "填入主機資產紀錄欄位"
 
-#: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
+#: authentication.php:40 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:654 include/forms.inc.php:478 include/setup.inc.php:314
-#: include/views/administration.authentication.edit.php:58
+#: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:55
@@ -9624,7 +9615,7 @@ msgstr "私有金鑰檔"
 msgid "Privilege level"
 msgstr "優先權層級"
 
-#: api/classes/CUser.php:836
+#: api/classes/CUser.php:865
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
@@ -10092,7 +10083,7 @@ msgstr "回應時間"
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案 \"%2$s\" 之步驟 \"%1$s\" 的回應時間."
 
-#: include/forms.inc.php:1777 include/forms.inc.php:1859 tr_testexpr.php:135
+#: include/forms.inc.php:1775 include/forms.inc.php:1857 tr_testexpr.php:135
 #: tr_testexpr.php:167
 msgid "Result"
 msgstr "結果"
@@ -10393,14 +10384,14 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "六"
 
-#: include/forms.inc.php:1532 include/forms.inc.php:1613
+#: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:128 include/func.inc.php:212
 msgid "Saturday"
 msgstr "週六"
 
-#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1705
-#: include/forms.inc.php:1863 include/forms.inc.php:2009
-#: include/views/administration.authentication.edit.php:76
+#: acknow.php:174 dashconf.php:270 include/forms.inc.php:1703
+#: include/forms.inc.php:1861 include/forms.inc.php:2007
+#: include/views/administration.authentication.edit.php:123
 #: include/views/administration.general.gui.edit.php:57
 #: include/views/administration.general.housekeeper.edit.php:34
 #: include/views/administration.general.iconmap.edit.php:145
@@ -10645,8 +10636,8 @@ msgstr "脚本"
 msgid "Search"
 msgstr "搜尋"
 
-#: authentication.php:45
-#: include/views/administration.authentication.edit.php:60
+#: authentication.php:47
+#: include/views/administration.authentication.edit.php:79
 msgid "Search attribute"
 msgstr "搜尋屬性"
 
@@ -10658,7 +10649,7 @@ msgstr "搜尋式樣是空白"
 msgid "Search/Filter elements limit"
 msgstr "搜尋/過濾組件限制"
 
-#: include/forms.inc.php:1598 include/maintenances.inc.php:104
+#: include/forms.inc.php:1596 include/maintenances.inc.php:104
 msgid "Second"
 msgstr "秒"
 
@@ -10821,7 +10812,7 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分開的"
 
-#: include/forms.inc.php:1553 include/func.inc.php:112
+#: include/forms.inc.php:1551 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:122
 msgid "September"
 msgstr "九月"
@@ -10915,7 +10906,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: api/classes/CUser.php:1029
+#: api/classes/CUser.php:1073
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -11421,7 +11412,7 @@ msgstr ""
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1533 include/forms.inc.php:1614
+#: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:130 include/func.inc.php:206
 msgid "Sunday"
 msgstr "日"
@@ -11439,7 +11430,7 @@ msgstr "姓氏"
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
-#: include/views/administration.authentication.edit.php:78
+#: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
 
@@ -11487,7 +11478,7 @@ msgstr "總合"
 msgid "TRIGGER COMMENTS"
 msgstr "觸發器評論"
 
-#: include/forms.inc.php:1829 include/forms.inc.php:1848
+#: include/forms.inc.php:1827 include/forms.inc.php:1846
 msgid "TRUE"
 msgstr "真"
 
@@ -11634,14 +11625,14 @@ msgstr "模板\"%1$s\"自主機\"%2$s\"斷連."
 msgid "Tera"
 msgstr "Tera"
 
-#: include/forms.inc.php:1868
-#: include/views/administration.authentication.edit.php:88
+#: include/forms.inc.php:1866
+#: include/views/administration.authentication.edit.php:136
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
 msgstr "測試"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "Test authentication"
 msgstr "測試認證"
 
@@ -11653,7 +11644,7 @@ msgstr "測試確認"
 msgid "Test data"
 msgstr "測試數據"
 
-#: adm.regexps.php:37 include/forms.inc.php:1771
+#: adm.regexps.php:37 include/forms.inc.php:1769
 msgid "Test string"
 msgstr "測試字串"
 
@@ -11696,13 +11687,13 @@ msgstr "請求的遠程程序不存在/不可用"
 msgid "Theme"
 msgstr "背景主題"
 
-#: authentication.php:148
+#: authentication.php:167
 #, php-format
 msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "有內部GUI存取的群組\"%1$d\"."
 
-#: include/forms.inc.php:1599 include/maintenances.inc.php:105
+#: include/forms.inc.php:1597 include/maintenances.inc.php:105
 msgid "Third"
 msgstr "第三的"
 
@@ -11715,11 +11706,11 @@ msgstr "這欄位是由項目\"%s\"自動填入的."
 msgid "This month"
 msgstr "本月"
 
-#: include/classes/screens/CScreenBuilder.php:489
+#: include/classes/screens/CScreenBuilder.php:487
 msgid "This screen-column is not empty. Delete it?"
 msgstr "這篩選-列不是空白. 刪除它?"
 
-#: include/classes/screens/CScreenBuilder.php:471
+#: include/classes/screens/CScreenBuilder.php:469
 msgid "This screen-row is not empty. Delete it?"
 msgstr "這篩選-行不是空白. 刪除它?"
 
@@ -11735,7 +11726,7 @@ msgstr "本年"
 msgid "Thu"
 msgstr "四"
 
-#: include/forms.inc.php:1530 include/forms.inc.php:1611
+#: include/forms.inc.php:1528 include/forms.inc.php:1609
 #: include/func.inc.php:126 include/func.inc.php:210
 msgid "Thursday"
 msgstr "週四"
@@ -11897,7 +11888,7 @@ msgstr "觸發器\"%1$s\"已存在於\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "觸發器\"%1$s\"相依於一個不存在的觸發器\"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:883
+#: api/classes/CTriggerPrototype.php:885
 #, php-format
 msgid "Trigger \"%1$s\" does not have item prototype."
 msgstr "觸發器\"%1$s\"並無項目原型."
@@ -11907,11 +11898,6 @@ msgstr "觸發器\"%1$s\"並無項目原型."
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略過觸發器\"%1$s\"-用戶規則."
-
-#: api/classes/CTriggerPrototype.php:790
-#, php-format
-msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
-msgstr "觸發器\"%1$s:%2$s\"並無項目原型."
 
 #: api/classes/CTrigger.php:1931
 #, php-format
@@ -11947,7 +11933,7 @@ msgstr "觸發器顯示選項"
 msgid "Trigger expression condition"
 msgstr "觸發器表示式條件"
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1052
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "觸發器表示式必需包含至少一個 主機:鍵值 參照."
 
@@ -11980,6 +11966,11 @@ msgstr "觸發器名稱"
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
 msgstr "觸發器類型"
+
+#: api/classes/CTriggerPrototype.php:791
+#, php-format
+msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
+msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
@@ -12081,7 +12072,7 @@ msgstr "嘗試讀取不能存取的屬性\"%s\"."
 msgid "Tue"
 msgstr "二"
 
-#: include/forms.inc.php:1528 include/forms.inc.php:1609
+#: include/forms.inc.php:1526 include/forms.inc.php:1607
 #: include/func.inc.php:124 include/func.inc.php:208
 msgid "Tuesday"
 msgstr "週二"
@@ -12479,7 +12470,7 @@ msgstr "已更新: 項目原型\"%1$s\"於\"%2$s\"."
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 觸發器\"%1$s\"於\"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1083
+#: api/classes/CTriggerPrototype.php:1085
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 觸發器原型\"%1$s\"於\"%2$s\"."
@@ -12627,7 +12618,8 @@ msgstr "用戶名稱"
 msgid "User name does not match with DB"
 msgstr "用戶名稱和DB中的不符"
 
-#: include/views/administration.authentication.edit.php:65
+#: authentication.php:51
+#: include/views/administration.authentication.edit.php:112
 msgid "User password"
 msgstr "用戶密碼"
 
@@ -12935,7 +12927,7 @@ msgstr "Webcheck必需至少有一個步驟."
 msgid "Wed"
 msgstr "三"
 
-#: include/forms.inc.php:1529 include/forms.inc.php:1610
+#: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:125 include/func.inc.php:209
 msgid "Wednesday"
 msgstr "週三"
@@ -12944,7 +12936,7 @@ msgstr "週三"
 msgid "Week"
 msgstr "週"
 
-#: include/forms.inc.php:1506 include/maintenances.inc.php:37
+#: include/forms.inc.php:1504 include/maintenances.inc.php:37
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
@@ -13081,7 +13073,7 @@ msgstr "錯誤的服務欄位\"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "錯誤的服務\"%1$s\"其時間欄位."
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:826
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
 msgid "Wrong fields for trigger."
 msgstr "錯誤的觸發器欄位."
 
@@ -13196,7 +13188,7 @@ msgstr "每年"
 #: events.php:760 include/blocks.inc.php:724
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:568
 #: include/events.inc.php:305 include/events.inc.php:323
-#: include/forms.inc.php:1922 include/triggers.inc.php:1648
+#: include/forms.inc.php:1920 include/triggers.inc.php:1648
 #: include/views/administration.users.list.php:74
 msgid "Yes"
 msgstr "是"
@@ -13344,7 +13336,7 @@ msgstr "Zabbix已接收到一個不正確的請求."
 msgid "Zabbix internal"
 msgstr "Zabbix自身"
 
-#: authentication.php:182
+#: authentication.php:212
 msgid "Zabbix internal authentication"
 msgstr "Zabbix內部認證"
 
@@ -13626,9 +13618,18 @@ msgstr "圖片"
 msgid "in"
 msgstr "在"
 
+#: api/classes/CItemKey.php:76
+#, php-format
+msgid "incorrect syntax near \"%1$s\""
+msgstr ""
+
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
 msgstr "是"
+
+#: api/classes/CItemKey.php:62
+msgid "key is empty"
+msgstr ""
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13706,7 +13707,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "毫秒"
 
-#: include/views/administration.authentication.edit.php:63
+#: include/views/administration.authentication.edit.php:110
 msgid "must be a valid LDAP user"
 msgstr "必需為一個正確的LDAP用戶"
 
@@ -13853,6 +13854,10 @@ msgstr "到"
 #: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "觸發器"
+
+#: api/classes/CItemKey.php:62
+msgid "unexpected end of key"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376
