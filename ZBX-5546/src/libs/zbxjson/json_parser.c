@@ -98,20 +98,17 @@ static int	json_parse_string(const char *start, char **error)
 			if ('\0' == *(++ptr))
 				return json_error("invalid escape sequence in string", escape_start, error);
 
-			switch (*ptr)
+			if ('u' == *ptr)
 			{
-				case 'u':
-					/* check if the \u is followed with 4 hex digits */
-					for (i = 0; i < 4; i++)
+				/* check if the \u is followed with 4 hex digits */
+				for (i = 0; i < 4; i++)
+				{
+					if (0 == isxdigit(*(++ptr)))
 					{
-						if (0 == isxdigit(*(++ptr)))
-						{
-							return json_error("invalid escape sequence in string",
-									escape_start, error);
-						}
+						return json_error("invalid escape sequence in string",
+								escape_start, error);
 					}
-				default:
-					break;
+				}
 			}
 		}
 
