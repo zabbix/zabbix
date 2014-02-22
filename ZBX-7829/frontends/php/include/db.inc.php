@@ -668,19 +668,19 @@ function DBid2nodeid($id_name) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = '('.$id_name.' div 100000000000000)';
+			$result = '('.$id_name.' div '.ZBX_DM_MAX_HISTORY_IDS.')';
 			break;
 		case ZBX_DB_ORACLE:
-			$result = 'round('.$id_name.'/100000000000000)';
+			$result = 'round('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
 			break;
 		default:
-			$result = '('.$id_name.'/100000000000000)';
+			$result = '('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
 	}
 	return $result;
 }
 
 function id2nodeid($id) {
-	return (int) bcdiv("$id", '100000000000000');
+	return (int) bcdiv("$id", ZBX_DM_MAX_HISTORY_IDS);
 }
 
 /**
@@ -824,10 +824,16 @@ function get_dbid($table, $field) {
 	$nodeid = get_current_nodeid(false);
 	$found = false;
 
-	do {
-		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+	if ($nodeid == 0) {
+		$min = 0;
+		$max = ZBX_STANDALONE_MAX_IDS;
+	}
+	else {
+		$min = bcadd(bcmul($nodeid, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0);
+		$max = bcadd($min, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
+	}
 
+	do {
 		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
 		if (!$dbSelect) {
 			return false;
@@ -835,7 +841,7 @@ function get_dbid($table, $field) {
 
 		$row = DBfetch($dbSelect);
 		if (!$row) {
-			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
+			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.' BETWEEN '.$min.' AND '.$max));
 			if (!$row || ($row['id'] == 0)) {
 				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 			}
@@ -881,7 +887,7 @@ function create_id_by_nodeid($id, $nodeid = 0) {
 	$nodeid = ($nodeid == 0) ? get_current_nodeid(false) : $nodeid;
 
 	$id = remove_nodes_from_id($id);
-	$id = bcadd($id, bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), 0);
+	$id = bcadd($id, bcadd(bcmul($nodeid, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS)), 0);
 	return $id;
 }
 
@@ -951,7 +957,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 }
 
 function remove_nodes_from_id($id) {
-	return bcmod($id, '100000000000');
+	return bcmod($id, ZBX_DM_MAX_CONFIG_IDS);
 }
 
 /**
