@@ -215,34 +215,6 @@ function DBclose() {
 	return $result;
 }
 
-function DBloadfile($file, &$error) {
-	if (!file_exists($file)) {
-		$error = 'DBloadfile. Missing file ['.$file.']';
-		return false;
-	}
-
-	$fl = file($file);
-
-	foreach ($fl as $n => $l) {
-		if (substr($l, 0, 2) == '--') {
-			unset($fl[$n]);
-		}
-	}
-	$fl = explode(";\n", implode("\n", $fl));
-	unset($fl[count($fl)-1]);
-
-	foreach ($fl as $sql) {
-		if (empty($sql)) {
-			continue;
-		}
-		if (!DBexecute($sql, 0)) {
-			$error = '';
-			return false;
-		}
-	}
-	return true;
-}
-
 function DBstart() {
 	global $DB;
 
@@ -678,17 +650,6 @@ function DBfetch($cursor, $convertNulls = true) {
 	}
 
 	return false;
-}
-
-function zbx_dbconcat($params) {
-	global $DB;
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_SQLITE3:
-			return implode(' || ', $params);
-		default:
-			return 'CONCAT('.implode(',', $params).')';
-	}
 }
 
 function zbx_sql_mod($x, $y) {
@@ -1360,36 +1321,6 @@ function zbx_dbcast_2bigint($field) {
 
 		case ZBX_DB_ORACLE:
 			return 'CAST('.$field.' AS NUMBER(20))';
-
-		default:
-			return false;
-	}
-}
-
-/**
- * Creates db dependent string with sql limit.
- * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
- *
- * @param int $limit
- *
- * @return bool|string
- */
-function zbx_limit($limit) {
-	global $DB;
-
-	if (!isset($DB['TYPE'])) {
-		return false;
-	}
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
-		case ZBX_DB_ORACLE:
-			return 'AND rownum<='.$limit;
-
-		case ZBX_DB_MYSQL:
-		case ZBX_DB_POSTGRESQL:
-		case ZBX_DB_SQLITE3:
-			return 'LIMIT '.$limit;
 
 		default:
 			return false;
