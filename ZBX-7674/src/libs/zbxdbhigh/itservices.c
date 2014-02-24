@@ -733,9 +733,13 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 				event->trigger.priority : 0, event->clock);
 	}
 
-	ret = its_flush_updates(&updates);
+	if (0 != updates->values_num)
+	{
+		ret = its_flush_updates(&updates);
 
-	zbx_vector_ptr_clean(&updates, free);
+		zbx_vector_ptr_clean(&updates, free);
+	}
+
 	zbx_vector_ptr_destroy(&updates);
 
 	UNLOCK_ITSERVICES;
