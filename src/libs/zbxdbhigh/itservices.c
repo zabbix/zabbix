@@ -536,7 +536,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	zbx_hashset_iter_t	iter;
 	zbx_itservice_t		*itservice;
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = zbx_malloc(sql, sql_alloc);
 
 	/* get a list of service status updates that must be written to database */
 	zbx_vector_ptr_create(&updates);
@@ -548,44 +548,50 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
 	}
 
-	zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
-	zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
-
 	/* write service status changes into database */
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < updates.values_num; i++)
+	if (0 != updates.values_num)
 	{
-		zbx_status_update_t	*update = updates.values[i];
+		zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update services"
-				" set status=%d"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				update->status, update->sourceid);
+		for (i = 0; i < updates.values_num; i++)
+		{
+			zbx_status_update_t	*update = updates.values[i];
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update services"
+					" set status=%d"
+					" where serviceid=" ZBX_FS_UI64 ";\n",
+					update->status, update->sourceid);
+
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
-	/* write generated service alarms into database */
-	alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
-
-	for (i = 0; i < alarms->values_num; i++)
+	if (0 != alarms->values_num)
 	{
-		zbx_status_update_t	*update = alarms->values[i];
+		/* write generated service alarms into database */
+		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
+
+		for (i = 0; i < alarms->values_num; i++)
+		{
+			zbx_status_update_t	*update = alarms->values[i];
 
 #ifdef HAVE_MULTIROW_INSERT
-		if (16 > sql_offset || 0 == i)
+			if (16 > sql_offset || 0 == i)
 #endif
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
-				alarmid++, update->sourceid, update->status, update->clock);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
+					alarmid++, update->sourceid, update->status, update->clock);
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -668,6 +674,12 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	zbx_vector_uint64_destroy(&triggerids);
 
+	if (0 == itservices.itservices.num_data)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	/* apply status updates */
 	for (j = 0; j < updates->values_num; j++)
 	{
@@ -703,12 +715,12 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	for (i = 0; i < alarms.values_num; i++)
 		zbx_free(alarms.values[i]);
-
+out:
 	zbx_vector_ptr_destroy(&alarms);
 
 	its_itservices_clean(&itservices);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -750,10 +762,14 @@ void	DBqueue_itservice_update(zbx_uint64_t triggerid, int status, int clock)
  ******************************************************************************/
 int	DBflush_itservice_updates()
 {
-	int	i, ret = FAIL;
+	const char	*__function_name = "DBflush_itservice_updates";
+
+	int		i, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == itservice_updates.values || 0 == itservice_updates.values_num)
-		return SUCCEED;
+		goto out;
 
 	LOCK_ITSERVICES;
 
@@ -765,6 +781,8 @@ int	DBflush_itservice_updates()
 	itservice_updates.values_num = 0;
 
 	UNLOCK_ITSERVICES;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
