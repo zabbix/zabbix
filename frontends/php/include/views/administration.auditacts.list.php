@@ -73,8 +73,9 @@ $auditTable->setHeader(array(
 	_('Recipient(s)'),
 	_('Message'),
 	_('Status'),
-	_('Error')
+	_('Info')
 ));
+
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
 	if ($mediatype['mediatypeid'] == 0) {
@@ -114,14 +115,12 @@ foreach ($this->data['alerts'] as $alert) {
 			zbx_nl2br($alert['message'])
 		);
 
-	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
-
-	if (!$alert['error']) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
+	if (zbx_empty($alert['error'])) {
+		$info = SPACE;
 	}
 	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($alert['error'], '', 'on');
+		$info = new CDiv(SPACE, 'status_icon iconerror');
+		$info->setHint($alert['error'], '', 'on');
 	}
 
 	$auditTable->addRow(array(
@@ -132,7 +131,7 @@ foreach ($this->data['alerts'] as $alert) {
 		new CCol($alert['sendto'], 'top'),
 		new CCol($message, 'wraptext top'),
 		new CCol($status, 'top'),
-		new CCol($error, 'top')
+		new CCol($info, 'top')
 	));
 }
 
