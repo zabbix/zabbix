@@ -892,7 +892,7 @@ function getActionMessages(array $alerts) {
 			$retries = new CSpan(0, 'red');
 		}
 
-		$recipient = (isset($alert['userid']) && $alert['userid'])
+		$recipient = $alert['userid']
 			? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
 			: $alert['sendto'];
 
@@ -907,9 +907,7 @@ function getActionMessages(array $alerts) {
 
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
-		$error = (isset($alert['error']) && $alert['error'])
-			? new CSpan($alert['error'], 'on')
-			: new CSpan(SPACE, 'off');
+		$error = $alert['error'] ? new CSpan($alert['error'], 'on') : new CSpan(SPACE, 'off');
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
@@ -982,9 +980,7 @@ function getActionCommands(array $alerts) {
 				break;
 		}
 
-		$error = (isset($alert['error']) && $alert['error'])
-			? new CSpan($alert['error'], 'on')
-			: new CSpan(SPACE, 'off');
+		$error = $alert['error'] ? new CSpan($alert['error'], 'on') : new CSpan(SPACE, 'off');
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
