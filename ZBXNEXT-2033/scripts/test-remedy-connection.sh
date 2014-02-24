@@ -5,12 +5,15 @@ URL=
 USERNAME=
 PASSWORD=
 INCIDENT=
+PROXY=
 
 
 display_usage()
 {
 	echo "Remedy service connection testing utility."
-	echo "Usage: test-remedy-connection [--url=<url>] [--username=<user name>] [--password=<password>]"
+	echo "Usage: test-remedy-connection [--url=<url>] [--proxy=<proxy>] [--username=<user name>] [--password=<password>]"
+	echo "    where:  <url>   - the Remedy service url"
+	echo "            <proxy> - <[protocol://][user:password@]proxyhost[:port]>"
 	exit 0
 }
 
@@ -33,6 +36,9 @@ while [ $# -ne 0 ]; do
 			;;
 		--incident=*)
 			INCIDENT=${1#*=}
+			;;
+		--proxy=*)
+			PROXY=${1#*=}
 			;;
 		--help|-h)
 			display_usage
@@ -61,6 +67,11 @@ SOAP_REQUEST="<urn:Incident_Number>$INCIDENT</urn:Incident_Number>"
 DATA="$SOAP_ENVELOPE_OPEN $SOAP_HEADER $SOAP_BODY_OPEN $HELPDESK_QUERY_SERVICE_OPEN\
 	$SOAP_REQUEST $HELPDESK_QUERY_SERVICE_CLOSE $SOAP_BODY_CLOSE $SOAP_ENVELOPE_CLOSE"
 
+if [ -n "$PROXY" ]; then
+	PROXY_SWITCH="-x"
+fi
+
 curl -d "$DATA" -H "Content-Type:text/xml; charset=utf-8" \
-	-H "SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Query_Service" "$URL&webService=HPD_IncidentInterface_WS"
+	-H "SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Query_Service"  \
+	"$PROXY_SWITCH" "$PROXY" "$URL&webService=HPD_IncidentInterface_WS"
 
