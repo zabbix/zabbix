@@ -7,7 +7,6 @@ use JSON::RPC::Client;
 use Data::Dumper;
 use JSON;
 
-
 my $URL = "http://localhost/svn/branches/dev/ZBXNEXT-2033/frontends/php/api_jsonrpc.php";
 my $USER = "Admin";
 my $PASSWORD = "zabbix";
@@ -29,7 +28,7 @@ my $json = {
 	id => 1
 };
 
-die "Usage import.pl <csv file>\n" unless $filename;
+die "Usage host-record-import.pl <csv file>\n" unless $filename;
 
 $response = $client->call($URL, $json);
 
@@ -53,7 +52,7 @@ $json = {
 $response = $client->call($URL, $json);
 
 # Check if response was successful
-die "host.get failed\n" unless $response->content->{result};
+die "Failed to retrieve hosts\n" unless $response->content->{result};
 
 # Create host=>hostid mapping
 foreach my $host (@{$response->content->{result}}) {
@@ -73,6 +72,7 @@ $json = {
 	auth => "$authID",
 };
 
+# Update host inventory in database
 open (FP, $filename);
 
 while (<FP>) {
