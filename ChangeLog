@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
 ..F....... [ZBXNEXT-1533] added "Action name" in Audit->Action log (Oleg)
 ...G...... [ZBX-7742] added error message upon encountering trailing data for zabbix_sender when reading from file (Juris)

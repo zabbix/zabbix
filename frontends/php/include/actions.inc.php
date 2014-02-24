@@ -831,7 +831,7 @@ function get_action_msgs_for_event($event) {
 		_('Retries left'),
 		_('Recipient(s)'),
 		_('Message'),
-		_('Error')
+		_('Info')
 	));
 
 	$alerts = $event['alerts'];
@@ -878,11 +878,12 @@ function get_action_msgs_for_event($event) {
 		);
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
-		if (empty($alert['error'])) {
-			$error = new CSpan(SPACE, 'off');
+		if (zbx_empty($alert['error'])) {
+			$info = SPACE;
 		}
 		else {
-			$error = new CSpan($alert['error'], 'on');
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($alert['error'], '', 'on');
 		}
 
 		$table->addRow(array(
@@ -893,7 +894,7 @@ function get_action_msgs_for_event($event) {
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
 			new CCol($message, 'wraptext top'),
-			new CCol($error, 'wraptext top')
+			new CCol($info, 'wraptext top')
 		));
 	}
 

@@ -1188,10 +1188,11 @@ else {
 	// determine, show or not column of errors
 	if (isset($hosts)) {
 		$host = reset($hosts);
-		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+
+		$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
-		$data['showErrorColumn'] = true;
+		$data['showInfoColumn'] = true;
 	}
 
 	// render view
