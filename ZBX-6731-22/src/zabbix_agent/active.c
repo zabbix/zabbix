@@ -125,7 +125,10 @@ static void	free_active_metrics(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_active_metrics()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
+	{
 		zbx_free(active_metrics[i].key);
+		zbx_free(active_metrics[i].key_orig);
+	}
 
 	zbx_free(active_metrics);
 
