@@ -1913,9 +1913,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
-	int				copied = 0, ret = FAIL, count = values_num;
+	int				copied = 0, ret = FAIL, count = values_num, iindex;
 	zbx_vector_history_record_t	values_ext = {NULL};
-	zbx_vc_chunk_t			*head = item->head;
+	zbx_vc_chunk_t			*head = item->head, *ichunk;
 
 	if (NULL != item->head && 0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], values))
 	{
@@ -1956,32 +1956,28 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 
 		vc_history_record_vector_copy(&values_ext, item->value_type, values + start, values_num - start);
 
-		/* found the first value that is in the new values timestamp range */
-		if (FAIL == vch_item_get_last_value(item, values[0].timestamp.sec, &chunk, &index))
-		{
-			chunk = item->tail;
-			index = chunk->first_value;
-		}
-		else
-		{
-			int		iindex = index;
-			zbx_vc_chunk_t	*ichunk = chunk;
+		/* Find the first value that is in the new values timestamp range. */
+		/* We are guaranteed to have at least one value, as the values     */
+		/* older than the first value in cache are skipped.                */
+		vch_item_get_last_value(item, values[start].timestamp.sec, &chunk, &index);
 
-			while (0 < zbx_timespec_compare(&ichunk->slots[iindex].timestamp, &values[0].timestamp))
+		iindex = index;
+		ichunk = chunk;
+
+		while (0 < zbx_timespec_compare(&ichunk->slots[iindex].timestamp, &values[start].timestamp))
+		{
+			chunk = ichunk;
+			index = iindex;
+
+			if ((--iindex) < ichunk->first_value)
 			{
-				chunk = ichunk;
-				index = iindex;
+				if (NULL == (ichunk = ichunk->prev))
+					break;
 
-				if ((--iindex) < ichunk->first_value)
-				{
-					if (NULL == (ichunk = ichunk->prev))
-						break;
-
-					iindex = ichunk->last_value;
-				}
+				iindex = ichunk->last_value;
 			}
-
 		}
+
 		vch_item_get_values_from(item, chunk, index, &values_ext);
 		vch_item_remove_values_from(item, chunk, index);
 
