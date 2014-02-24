@@ -11,9 +11,13 @@ PROXY=
 display_usage()
 {
 	echo "Remedy service connection testing utility."
-	echo "Usage: test-remedy-connection [--url=<url>] [--proxy=<proxy>] [--username=<user name>] [--password=<password>]"
+	echo "Usage: test-remedy-connection [--url=<url>] [--proxy=<proxy>] [--username=<user name>]" \
+		"[--password=<password>] [--incident=<incident>]"
 	echo "    where:  <url>   - the Remedy service url"
 	echo "            <proxy> - <[protocol://][user:password@]proxyhost[:port]>"
+	echo "        <user name> - the Remedy user name"
+	echo "        <password>  - the Remedy user password"
+	echo "        <incident>  - an existing Remedy incident number"
 	exit 0
 }
 
