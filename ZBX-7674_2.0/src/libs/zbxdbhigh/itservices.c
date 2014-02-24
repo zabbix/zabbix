@@ -548,44 +548,50 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
 	}
 
-	zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
-	zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
-
 	/* write service status changes into database */
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < updates.values_num; i++)
+	if (0 != updates.values_num)
 	{
-		zbx_status_update_t	*update = updates.values[i];
+		zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update services"
-				" set status=%d"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				update->status, update->sourceid);
+		for (i = 0; i < updates.values_num; i++)
+		{
+			zbx_status_update_t	*update = updates.values[i];
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update services"
+					" set status=%d"
+					" where serviceid=" ZBX_FS_UI64 ";\n",
+					update->status, update->sourceid);
+
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
-	/* write generated service alarms into database */
-	alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
-
-	for (i = 0; i < alarms->values_num; i++)
+	if (0 != alarms->values_num)
 	{
-		zbx_status_update_t	*update = alarms->values[i];
+		/* write generated service alarms into database */
+		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
+
+		for (i = 0; i < alarms->values_num; i++)
+		{
+			zbx_status_update_t	*update = alarms->values[i];
 
 #ifdef HAVE_MULTIROW_INSERT
-		if (16 > sql_offset || 0 == i)
+			if (16 > sql_offset || 0 == i)
 #endif
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
-				alarmid++, update->sourceid, update->status, update->clock);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
+					alarmid++, update->sourceid, update->status, update->clock);
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
