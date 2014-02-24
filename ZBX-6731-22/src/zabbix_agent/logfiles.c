@@ -416,6 +416,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	struct dirent		*d_ent = NULL;
 #endif
 	regex_t			re;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, *mtime);
@@ -433,6 +434,27 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		regerror(reg_error, &re, err_buf, sizeof(err_buf));
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for a logrt[] "
 				"item. Error: %s", format, err_buf);
+		goto out;
+	}
+
+	/* Minimize data loss if the system clock has been set back in time. */
+	/* Setting the clock ahead of time is harmless in our case. */
+	if ((time_t)-1 != (now = time(NULL)))
+	{
+		if (now < *mtime)
+		{
+			int	old_mtime;
+
+			old_mtime = *mtime;
+			*mtime = (int)now;
+			zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
+					"seconds back.", (int)(old_mtime - now));
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get system time");
+		regfree(&re);
 		goto out;
 	}
 
