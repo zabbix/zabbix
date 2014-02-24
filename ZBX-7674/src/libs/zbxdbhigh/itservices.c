@@ -655,6 +655,12 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	zbx_vector_uint64_destroy(&triggerids);
 
+	if (0 == itservices.itservices.num_data)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	/* apply status updates */
 	for (j = 0; j < updates->values_num; j++)
 	{
@@ -689,6 +695,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 	ret = its_write_status_and_alarms(&itservices, &alarms);
 
 	zbx_vector_ptr_clean(&alarms, free);
+out:
 	zbx_vector_ptr_destroy(&alarms);
 
 	its_itservices_clean(&itservices);
