@@ -536,7 +536,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	zbx_hashset_iter_t	iter;
 	zbx_itservice_t		*itservice;
 
-	sql = zbx_malloc(NULL, sql_alloc);
+	sql = zbx_malloc(sql, sql_alloc);
 
 	/* get a list of service status updates that must be written to database */
 	zbx_vector_ptr_create(&updates);
@@ -715,13 +715,12 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	for (i = 0; i < alarms.values_num; i++)
 		zbx_free(alarms.values[i]);
-
 out:
 	zbx_vector_ptr_destroy(&alarms);
 
 	its_itservices_clean(&itservices);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -763,10 +762,14 @@ void	DBqueue_itservice_update(zbx_uint64_t triggerid, int status, int clock)
  ******************************************************************************/
 int	DBflush_itservice_updates()
 {
-	int	i, ret = FAIL;
+	const char	*__function_name = "DBflush_itservice_updates";
+
+	int		i, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == itservice_updates.values || 0 == itservice_updates.values_num)
-		return SUCCEED;
+		goto out;
 
 	LOCK_ITSERVICES;
 
@@ -778,6 +781,8 @@ int	DBflush_itservice_updates()
 	itservice_updates.values_num = 0;
 
 	UNLOCK_ITSERVICES;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
