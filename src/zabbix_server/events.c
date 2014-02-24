@@ -151,6 +151,8 @@ int	process_events(void)
 {
 	const char	*__function_name = "process_events";
 
+	size_t		i;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	if (0 != events_num)
@@ -159,7 +161,14 @@ int	process_events(void)
 
 		process_actions(events, events_num);
 
-		DBupdate_itservices(events, events_num);
+		for (i = 0; i < events_num; i++)
+		{
+			if (EVENT_SOURCE_TRIGGERS == events[i].source)
+			{
+				DBupdate_services(events[i].objectid, TRIGGER_VALUE_PROBLEM == events[i].value ?
+						events[i].trigger.priority : 0, events[i].clock);
+			}
+		}
 
 		clean_events();
 	}
