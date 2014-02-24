@@ -1969,15 +1969,14 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 
 			while (0 < zbx_timespec_compare(&ichunk->slots[iindex].timestamp, &values[0].timestamp))
 			{
-				index = iindex--;
-				if (iindex < ichunk->first_value)
+				chunk = ichunk;
+				index = iindex;
+
+				if ((--iindex) < ichunk->first_value)
 				{
-					if (NULL == (chunk = ichunk->prev))
-					{
-						chunk = ichunk;
+					if (NULL == (ichunk = ichunk->prev))
 						break;
-					}
-					ichunk = chunk;
+
 					iindex = ichunk->last_value;
 				}
 			}
