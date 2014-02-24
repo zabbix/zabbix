@@ -227,16 +227,22 @@ function getMenuPopupHost(options) {
 	if (options.hasGoTo) {
 		var gotos = [];
 
+		// inventory
+		gotos[gotos.length] = {
+			label: t('Host inventory'),
+			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+		};
+
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// inventory
+		// trigger status
 		gotos[gotos.length] = {
-			label: t('Host inventory'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			label: t('Status of triggers'),
+			url: new Curl('tr_status.php?filter_set=1&show_severity=0&hostid=' + options.hostid).getUrl()
 		};
 
 		// graphs
@@ -302,6 +308,12 @@ function getMenuPopupMap(options) {
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
 
+		// latest
+		gotos[gotos.length] = {
+			label: t('Latest data'),
+			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+		};
+
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
 			var url = new Curl('hostinventories.php');
@@ -312,6 +324,20 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host inventory'),
+				url: url.getUrl()
+			};
+		}
+
+		// trigger status
+		if (typeof options.gotos.triggerStatus !== 'undefined') {
+			var url = new Curl('tr_status.php?filter_set=1');
+
+			jQuery.each(options.gotos.triggerStatus, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Status of triggers'),
 				url: url.getUrl()
 			};
 		}
@@ -340,20 +366,6 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host screens'),
-				url: url.getUrl()
-			};
-		}
-
-		// trigger status
-		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1');
-
-			jQuery.each(options.gotos.triggerStatus, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-				label: t('Status of triggers'),
 				url: url.getUrl()
 			};
 		}
