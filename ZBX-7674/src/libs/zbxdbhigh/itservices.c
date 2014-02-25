@@ -806,17 +806,19 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_ptr_t	updates;
-	int			i, ret = FAIL;
+	int			i, ret = FAIL, now;
 
 	if (0 == triggerids_num)
 		return SUCCEED;
 
 	LOCK_ITSERVICES;
 
+	now = time(NULL);
+
 	zbx_vector_ptr_create(&updates);
 
 	for (i = 0; i < triggerids_num; i++)
-		its_updates_append(&updates, triggerids[i], 0, 0);
+		its_updates_append(&updates, triggerids[i], 0, now);
 
 	if (FAIL == its_flush_updates(&updates))
 		goto out;
