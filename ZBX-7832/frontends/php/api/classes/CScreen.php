@@ -34,12 +34,12 @@ class CScreen extends CZBXAPI {
 	 * Get screen data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']		node IDs
-	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
-	 * @param int    $options['count']			count Hosts, returned column name is rowscount
-	 * @param string $options['pattern']		search hosts by pattern in host names
-	 * @param int    $options['limit']			limit selection
-	 * @param string $options['order']			deprecated parameter (for now)
+	 * @param array  $options['nodeids']	node IDs
+	 * @param bool   $options['editable']	only with read-write permission. Ignored for SuperAdmins
+	 * @param int    $options['count']		count Hosts, returned column name is rowscount
+	 * @param string $options['pattern']	search hosts by pattern in host names
+	 * @param int    $options['limit']		limit selection
+	 * @param string $options['order']		deprecated parameter (for now)
 	 *
 	 * @return array
 	 */
@@ -84,15 +84,18 @@ class CScreen extends CZBXAPI {
 		// screenids
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
+
 			$sqlParts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
 		}
 
 		// screenitemids
 		if (!is_null($options['screenitemids'])) {
 			zbx_value2array($options['screenitemids']);
+
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
 			}
+
 			$sqlParts['from']['screens_items'] = 'screens_items si';
 			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
 			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
@@ -138,7 +141,9 @@ class CScreen extends CZBXAPI {
 					if (!isset($result[$screen['screenid']]['screenitems'])) {
 						$result[$screen['screenid']]['screenitems'] = array();
 					}
+
 					$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
+
 					unset($screen['screenitemid']);
 				}
 
@@ -150,15 +155,11 @@ class CScreen extends CZBXAPI {
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		elseif ($result) {
-			$groupsToCheck = array();
-			$hostsToCheck = array();
-			$graphsToCheck = array();
-			$itemsToCheck = array();
-			$mapsToCheck = array();
-			$screensToCheck = array();
-			$screensItems = array();
+			$groupsToCheck = $hostsToCheck = $graphsToCheck = $itemsToCheck = $mapsToCheck = $screensToCheck = $screensItems = array();
 
-			$dbScreenItems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenIds));
+			$dbScreenItems = DBselect(
+				'SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenIds)
+			);
 
 			while ($screenItem = DBfetch($dbScreenItems)) {
 				$screensItems[$screenItem['screenitemid']] = $screenItem;
@@ -343,9 +344,9 @@ class CScreen extends CZBXAPI {
 		$keyFields = array(array('screenid', 'name'));
 
 		$options = array(
+			'output' => array('screenid'),
 			'filter' => zbx_array_mintersect($keyFields, $data),
 			'preservekeys' => true,
-			'output' => array('screenid'),
 			'nopermissions' => true,
 			'limit' => 1
 		);
@@ -388,8 +389,8 @@ class CScreen extends CZBXAPI {
 		unset($screen);
 
 		$dbScreens = API::getApi()->select('screens', array(
-			'filter' => array('name' => zbx_objectValues($screens, 'name')),
-			'output' => array('name')
+			'output' => array('name'),
+			'filter' => array('name' => zbx_objectValues($screens, 'name'))
 		));
 
 		foreach ($dbScreens as $dbScreen) {
@@ -413,6 +414,7 @@ class CScreen extends CZBXAPI {
 
 		// create screen items
 		$screenItems = array();
+
 		foreach ($screens as $key => $screen) {
 			if (isset($screen['screenitems'])) {
 				foreach ($screen['screenitems'] as $screenItem) {
@@ -449,9 +451,9 @@ class CScreen extends CZBXAPI {
 		}
 
 		$dbScreens = $this->get(array(
+			'output' => array('screenid'),
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => array('screenid'),
 			'preservekeys' => true
 		));
 
@@ -474,8 +476,8 @@ class CScreen extends CZBXAPI {
 
 			if (isset($screen['name'])) {
 				$dbScreenExist = API::getApi()->select('screens', array(
-					'filter' => array('name' => $screen['name']),
-					'output' => array('screenid')
+					'output' => array('screenid'),
+					'filter' => array('name' => $screen['name'])
 				));
 				$dbScreenExist = reset($dbScreenExist);
 
@@ -514,6 +516,11 @@ class CScreen extends CZBXAPI {
 			$screenIds[] = $screenId;
 		}
 
+		$dbScreensBeforeUpdate = API::getApi()->select('screens', array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'filter' => array('screenid' => $screenIds)
+		));
+
 		DB::update('screens', $update);
 
 		// replace screen items
@@ -525,8 +532,8 @@ class CScreen extends CZBXAPI {
 
 		// delete outside screen items
 		$dbScreenItems = API::getApi()->select('screens_items', array(
-			'filter' => array('screenid' => $screenIds),
 			'output' => array('screenitemid', 'screenid', 'x', 'y'),
+			'filter' => array('screenid' => $screenIds)
 		));
 
 		$deleteScreenItemIds = array();
@@ -551,6 +558,79 @@ class CScreen extends CZBXAPI {
 
 		if ($deleteScreenItemIds) {
 			API::ScreenItem()->delete($deleteScreenItemIds);
+		}
+
+		// resize outside screen items colspans and rowspans
+		$dbScreenItems = API::getApi()->select('screens_items', array(
+			'output' => array('screenitemid', 'screenid', 'x', 'y', 'colspan', 'rowspan'),
+			'filter' => array('screenid' => $screenIds)
+		));
+
+		$dbScreensBeforeUpdate = zbx_toHash($dbScreensBeforeUpdate, 'screenid');
+		$dbScreenItems = zbx_toHash($dbScreenItems, 'screenitemid');
+
+		$update = array();
+
+		foreach ($screens as $screen) {
+			// hsize, colspan, x
+			if (isset($screen['hsize'])) {
+				$dbScreen = $dbScreensBeforeUpdate[$screen['screenid']];
+
+				if ($screen['hsize'] < $dbScreen['hsize']) {
+					$diff = $dbScreen['hsize'] - $screen['hsize'];
+
+					for ($y = 0; $y < $dbScreen['vsize']; $y++) {
+						for ($x = $dbScreen['hsize'] - 1; $x >= 0; $x--) {
+							foreach ($dbScreenItems as $dbScreenItem) {
+								if ($dbScreenItem['x'] == $x && $dbScreenItem['y'] == $y
+										&& $dbScreenItem['colspan'] > 1) {
+									$count = ($dbScreenItem['colspan'] - $diff > 1)
+										? $dbScreenItem['colspan'] - $diff
+										: 1;
+
+									$update[] = array(
+										'values' => array('colspan' => $count),
+										'where' => array('screenitemid' => $dbScreenItem['screenitemid'])
+									);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// vsize, rowspan, y
+			if (isset($screen['vsize'])) {
+				$dbScreen = $dbScreensBeforeUpdate[$screen['screenid']];
+
+				if ($screen['vsize'] < $dbScreen['vsize']) {
+					$diff = $dbScreen['vsize'] - $screen['vsize'];
+
+					for ($x = 0; $x < $dbScreen['hsize']; $x++) {
+						for ($y = $dbScreen['vsize'] - 1; $y >= 0; $y--) {
+							foreach ($dbScreenItems as $dbScreenItem) {
+								if ($dbScreenItem['x'] == $x && $dbScreenItem['y'] == $y
+										&& $dbScreenItem['rowspan'] > 1) {
+									$count = ($dbScreenItem['rowspan'] - $diff > 1)
+										? $dbScreenItem['rowspan'] - $diff
+										: 1;
+
+									$update[] = array(
+										'values' => array('rowspan' => $count),
+										'where' => array('screenitemid' => $dbScreenItem['screenitemid'])
+									);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ($update) {
+			DB::update('screens_items', $update);
 		}
 
 		return array('screenids' => $screenIds);
@@ -612,8 +692,7 @@ class CScreen extends CZBXAPI {
 		}
 		unset($screenItem);
 
-		$createScreenItems = $deleteScreenItems = $updateScreenItems = array();
-		$deleteScreenItemsIds = array();
+		$createScreenItems = $deleteScreenItems = $updateScreenItems = $deleteScreenItemsIds = array();
 
 		$dbScreenItems = API::ScreenItem()->get(array(
 			'screenids' => $screenId,
@@ -664,9 +743,9 @@ class CScreen extends CZBXAPI {
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
 			$screenItems = API::getApi()->select('screens_items', array(
 				'output' => $this->outputExtend('screens_items', array('screenid', 'screenitemid'), $options['selectScreenItems']),
+				'nodeids' => get_current_nodeid(true),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
