@@ -669,14 +669,16 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Deletes the object with the given PKs with respect to relative objects.
+	 * Deletes the object with the given IDs with respect to relative objects.
 	 *
 	 * The method must be extended to handle relative objects.
 	 *
-	 * @param array $pks
+	 * @param array $ids
 	 */
-	protected function deleteByPks(array $pks) {
-		DB::delete($this->tableName(), array($this->pk() => $pks));
+	protected function deleteByIds(array $ids) {
+		DB::delete($this->tableName(), array(
+			$this->pk() => $ids
+		));
 	}
 
 	/**
