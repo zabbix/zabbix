@@ -241,7 +241,7 @@ function getMenuPopupHost(options) {
 
 		// trigger status
 		gotos[gotos.length] = {
-			label: t('Status of triggers'),
+			label: t('Triggers'),
 			url: new Curl('tr_status.php?filter_set=1&show_severity=0&hostid=' + options.hostid).getUrl()
 		};
 
@@ -337,7 +337,7 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-				label: t('Status of triggers'),
+				label: t('Triggers'),
 				url: url.getUrl()
 			};
 		}
