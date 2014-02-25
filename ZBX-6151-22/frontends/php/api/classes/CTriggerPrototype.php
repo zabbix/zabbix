@@ -517,24 +517,23 @@ class CTriggerPrototype extends CTriggerGeneral {
 			// check item prototypes
 			$items = getExpressionItems($triggerExpression);
 
-
-			$triggerPrototypes = array();
+			$hostIds = array();
 			foreach ($items as $item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$triggerPrototypes[$item['hostid']] = true;
+					$hostIds[$item['hostid']] = true;
 				}
 			}
 
-			if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+			if (!$hostIds) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
-					$trigger['expression']
+					'Trigger prototype "%1$s" must contain at least one item prototype.',
+					$trigger['description']
 				));
 			}
-			elseif (!$triggerPrototypes) {
+			elseif (count($hostIds) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype expression "%1$s" must contain at least one item prototype.',
-					$trigger['expression']
+					'Trigger prototype "%1$s" contains item prototypes from multiple hosts.',
+					$trigger['description']
 				));
 			}
 		}
@@ -599,23 +598,23 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				$items = getExpressionItems($triggerExpression);
 
-				$triggerPrototypes = array();
+				$hostIds = array();
 				foreach ($items as $item) {
 					if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$triggerPrototypes[$item['hostid']] = true;
+						$hostIds[$item['hostid']] = true;
 					}
 				}
 
-				if ($triggerPrototypes && count($triggerPrototypes) > 1) {
+				if (!$hostIds) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
-						$trigger['expression']
+						'Trigger prototype "%1$s" must contain at least one item prototype.',
+						$trigger['description']
 					));
 				}
-				elseif (!$triggerPrototypes) {
+				elseif (count($hostIds) > 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Trigger prototype expression "%1$s" must contain at least one item prototype.',
-						$trigger['expression']
+						'Trigger prototype "%1$s" contains item prototypes from multiple hosts.',
+						$trigger['description']
 					));
 				}
 			}
