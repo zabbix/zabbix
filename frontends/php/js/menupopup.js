@@ -323,10 +323,18 @@ function getMenuPopupMap(options) {
 		}
 
 		// latest
-		gotos[gotos.length] = {
-			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
-		};
+		if (typeof options.gotos.latestData !== 'undefined') {
+			var url = new Curl('latest.php');
+
+			jQuery.each(options.gotos.latest, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Latest data'),
+				url: url.getUrl()
+			};
+		}
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
