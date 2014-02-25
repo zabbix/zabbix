@@ -26,12 +26,20 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = array('class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js', 'items.js');
 $page['hist_arg'] = array('hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
+
+// supported eval types
+$evalTypes = array(
+	CONDITION_EVAL_TYPE_AND_OR,
+	CONDITION_EVAL_TYPE_AND,
+	CONDITION_EVAL_TYPE_OR,
+	CONDITION_EVAL_TYPE_EXPRESSION
+);
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -40,8 +48,6 @@ $fields = array(
 	'interfaceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'filter_macro' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'filter_value' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'key' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Key')),
 	'delay' =>				array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
@@ -97,6 +103,10 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'evaltype' =>	 		array(T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({save})'
+	),
+	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -125,6 +135,7 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('status', 'flags'),
+		'selectFilter' => array('formula', 'evaltype', 'conditions'),
 		'editable' => true
 	));
 	$item = reset($item);
@@ -182,10 +193,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 	clearCookies($result, $_REQUEST['hostid']);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
 
@@ -195,67 +202,105 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	$db_delay_flex = trim($db_delay_flex, ';');
 
-	$ifm = get_request('filter_macro');
-	$ifv = get_request('filter_value');
-	$filter = isset($ifm, $ifv) ? $ifm.':'.$ifv : '';
-
-	$item = array(
-		'interfaceid' => get_request('interfaceid'),
-		'name' => get_request('name'),
-		'description' => get_request('description'),
-		'key_' => get_request('key'),
-		'hostid' => get_request('hostid'),
-		'delay' => get_request('delay'),
-		'status' => get_request('status', ITEM_STATUS_DISABLED),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'snmpv3_contextname' => get_request('snmpv3_contextname'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+	$newItem = array(
+		'itemid' => getRequest('itemid'),
+		'interfaceid' => getRequest('interfaceid'),
+		'name' => getRequest('name'),
+		'description' => getRequest('description'),
+		'key_' => getRequest('key'),
+		'hostid' => getRequest('hostid'),
+		'delay' => getRequest('delay'),
+		'status' => getRequest('status', ITEM_STATUS_DISABLED),
+		'type' => getRequest('type'),
+		'snmp_community' => getRequest('snmp_community'),
+		'snmp_oid' => getRequest('snmp_oid'),
+		'trapper_hosts' => getRequest('trapper_hosts'),
+		'port' => getRequest('port'),
+		'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+		'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
 		'delay_flex' => $db_delay_flex,
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'params' => get_request('params'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'lifetime' => get_request('lifetime'),
-		'filter' => $filter
+		'authtype' => getRequest('authtype'),
+		'username' => getRequest('username'),
+		'password' => getRequest('password'),
+		'publickey' => getRequest('publickey'),
+		'privatekey' => getRequest('privatekey'),
+		'params' => getRequest('params'),
+		'ipmi_sensor' => getRequest('ipmi_sensor'),
+		'lifetime' => getRequest('lifetime')
 	);
 
-	if (hasRequest('itemid')) {
-		$itemId = getRequest('itemid');
+	// add macros; ignore empty new macros
+	$filter = array(
+		'evaltype' => getRequest('evaltype'),
+		'conditions' => array()
+	);
+	$conditions = getRequest('conditions', array());
+	ksort($conditions);
+	$conditions = array_values($conditions);
+	foreach ($conditions as $condition) {
+		if (!zbx_empty($condition['macro'])) {
+			$condition['macro'] = zbx_strtoupper($condition['macro']);
 
+			$filter['conditions'][] = $condition;
+		}
+	}
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
+		if (count($filter['conditions']) <= 1) {
+			$filter['formula'] = '';
+			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		}
+		else {
+			$filter['formula'] = getRequest('formula');
+		}
+	}
+	$newItem['filter'] = $filter;
+
+	if (hasRequest('itemid')) {
 		DBstart();
 
-		$dbItem = get_item_by_itemid_limited($itemId);
-
 		// unset snmpv3 fields
-		if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-			$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		if ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			$newItem['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
-		elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-			$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+		elseif ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 		}
 
-		$item = CArrayHelper::unsetEqualValues($item, $dbItem);
-		$item['itemid'] = $itemId;
+		// unset unchanged values
+		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, array('itemid'));
 
-		$result = API::DiscoveryRule()->update($item);
+		// don't update the filter if it hasn't changed
+		$conditionsChanged = false;
+		if (count($newItem['filter']['conditions']) != count($item['filter']['conditions'])) {
+			$conditionsChanged = true;
+		}
+		else {
+			$conditions = $item['filter']['conditions'];
+			foreach ($newItem['filter']['conditions'] as $i => $condition) {
+				if (CArrayHelper::unsetEqualValues($condition, $conditions[$i])) {
+					$conditionsChanged = true;
+					break;
+				}
+			}
+		}
+		$filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);
+		if (!isset($filter['evaltype']) && !isset($filter['formula']) && !$conditionsChanged) {
+			unset($newItem['filter']);
+		}
+
+		$result = API::DiscoveryRule()->update($newItem);
 		$result = DBend($result);
 		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 	}
 	else {
-		$result = API::DiscoveryRule()->create(array($item));
+		$result = API::DiscoveryRule()->create(array($newItem));
 		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 	}
 
@@ -295,11 +340,31 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = getItemFormData(array('is_discovery_rule' => true));
+	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : array();
+	$data = getItemFormData($formItem, array(
+		'is_discovery_rule' => true
+	));
 	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
+	$data['lifetime'] = getRequest('lifetime', 30);
+	$data['evaltype'] = getRequest('evaltype');
+	$data['formula'] = getRequest('formula');
+	$data['conditions'] = getRequest('conditions', array());
+
+	// update form
+	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['lifetime'] = $item['lifetime'];
+		$data['evaltype'] = $item['filter']['evaltype'];
+		$data['formula'] = $item['filter']['formula'];
+		$data['conditions'] = $item['filter']['conditions'];
+	}
+	// clone form
+	elseif (hasRequest('clone')) {
+		unset($data['itemid']);
+		$data['form'] = 'clone';
+	}
 
 	// render view
-	$itemView = new CView('configuration.item.edit', $data);
+	$itemView = new CView('configuration.host.discovery.edit', $data);
 	$itemView->render();
 	$itemView->show();
 }
@@ -307,7 +372,7 @@ else {
 	$data = array(
 		'hostid' => get_request('hostid', 0),
 		'host' => $host,
-		'showErrorColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
+		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE)
 	);
 
 	$sortfield = getPageSortField('name');

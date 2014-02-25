@@ -107,6 +107,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
+		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT
 	));
 
@@ -139,6 +140,11 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 					$gotos['triggerStatus'] = array(
 						'hostid' => $elem['elementid'],
 						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+					);
+				}
+				if ($host['graphs']) {
+					$gotos['graphs'] = array(
+						'hostid' => $host['hostid']
 					);
 				}
 				if ($host['screens']) {

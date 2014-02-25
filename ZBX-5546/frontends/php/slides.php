@@ -143,9 +143,10 @@ if (hasRequest('favobj') && hasRequest('favid')) {
 	if (hasRequest('favaction') && in_array($favouriteObject, array('screenid', 'slideshowid'))) {
 		$result = false;
 
+		DBstart();
+
 		if (getRequest('favaction') === 'add') {
 			$result = CFavorite::add('web.favorite.screenids', $favouriteId, $favouriteObject);
-
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n"
 					.'$("addrm_fav").onclick = function() { rm4favorites("'.$favouriteObject.'", "'.$favouriteId.'"); };'."\n";
@@ -153,12 +154,13 @@ if (hasRequest('favobj') && hasRequest('favid')) {
 		}
 		else {
 			$result = CFavorite::remove('web.favorite.screenids', $favouriteId, $favouriteObject);
-
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n"
 					.'$("addrm_fav").onclick = function() { add2favorites("'.$favouriteObject.'", "'.$favouriteId.'"); };'."\n";
 			}
 		}
+
+		$result = DBend($result);
 
 		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
@@ -170,7 +172,8 @@ if (hasRequest('favobj') && hasRequest('favid')) {
 		CProfile::update('web.slides.timelinefixed', $favouriteId, PROFILE_TYPE_INT);
 	}
 }
-if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
+
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }

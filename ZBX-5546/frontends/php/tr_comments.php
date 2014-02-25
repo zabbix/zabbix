@@ -61,20 +61,25 @@ $trigger = reset($trigger);
  * Actions
  */
 if (isset($_REQUEST['save'])) {
+	DBstart();
+
 	$result = DBexecute(
 		'UPDATE triggers'.
 		' SET comments='.zbx_dbstr($_REQUEST['comments']).
 		' WHERE triggerid='.zbx_dbstr($_REQUEST['triggerid'])
 	);
-	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 
 	$trigger['comments'] = $_REQUEST['comments'];
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 			_('Trigger').' ['.$_REQUEST['triggerid'].'] ['.$trigger['description'].'] '.
-			_('Comments').' ['.$_REQUEST['comments'].']');
+			_('Comments').' ['.$_REQUEST['comments'].']'
+		);
 	}
+
+	$result = DBend($result);
+	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 }
 elseif (isset($_REQUEST['cancel'])) {
 	jsRedirect('tr_status.php');

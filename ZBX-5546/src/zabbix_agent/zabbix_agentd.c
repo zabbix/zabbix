@@ -267,9 +267,7 @@ static void	set_defaults(void)
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
-#endif
 
-#ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 #endif
@@ -421,7 +419,7 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	2,			65535},
 		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-#ifdef USE_PID_FILE
+#ifndef _WINDOWS
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
@@ -445,8 +443,6 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
-			PARM_OPT,	0,			1},
 		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
@@ -462,6 +458,8 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
@@ -784,16 +782,19 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-			zbx_free_config();
-
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
+			else
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+
+			zbx_free_config();
 
 			ret = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
