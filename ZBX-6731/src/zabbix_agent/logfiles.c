@@ -548,7 +548,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
 				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
-				hostname, key)))
+				hostname, key)) || 0 >= *p_count || 0 >= *s_count)
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
 			/* (can happen during a rotation). Maybe during the next check all will be well. */

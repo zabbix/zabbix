@@ -327,12 +327,13 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
+					{
 						*lastlogsize = lastlogsize1;
+						*big_rec = 1;		/* ignore the rest of this record */
+					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
-
-					*big_rec = 1;	/* ignore the rest of this record */
 				}
 				else
 				{
