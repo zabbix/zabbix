@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$triggersWidget = new CWidget(null, 'trigger-edit');
+$triggersWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -72,8 +72,6 @@ $expressionTextBox = new CTextArea(
 		'readonly' => $this->data['expression_field_readonly']
 	)
 );
-$expressionTextBox->addClass('expression');
-
 if ($this->data['expression_field_readonly'] == 'yes') {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
