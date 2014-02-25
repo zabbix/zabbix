@@ -1304,13 +1304,14 @@ class CTrigger extends CTriggerGeneral {
 		));
 
 		// unlink triggers from IT services
-		DBexecute(
-			'UPDATE services SET triggerid=NULL,showsla='.SERVICE_SHOW_SLA_OFF.' WHERE '.dbConditionInt('triggerid', $triggerIds)
-		);
-
 		foreach ($triggerIds as $triggerId) {
 			updateServices($triggerId, SERVICE_STATUS_OK);
 		}
+
+		DBexecute(
+			'UPDATE services SET triggerid=NULL,showsla='.SERVICE_SHOW_SLA_OFF.
+			' WHERE '.dbConditionInt('triggerid', $triggerIds)
+		);
 
 		parent::deleteByIds($triggerIds);
 	}
