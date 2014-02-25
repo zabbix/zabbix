@@ -154,7 +154,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
 	$yaxisMaxData = array();
-	$yTypeComboBox = new CComboBox('ymax_type', $this->data['ymax_type'], 'submit()');
+	$yTypeComboBox = new CComboBox('ymax_type', $this->data['ymax_type'], 'submit();');
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_CALCULATED, _('Calculated'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_FIXED, _('Fixed'));
 	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE, _('Item'));
@@ -293,7 +293,7 @@ $graphTab->addTab(
 $chartImage = new CImg('chart3.php?period=3600');
 $chartImage->preload();
 
-$graphPreviewTable = new CTable(null, 'graph');
+$graphPreviewTable = new CTable(null, 'center maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 $graphForm->addItem($graphTab);
