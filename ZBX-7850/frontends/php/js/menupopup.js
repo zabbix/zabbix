@@ -242,7 +242,7 @@ function getMenuPopupHost(options) {
 		// trigger status
 		gotos[gotos.length] = {
 			label: t('Triggers'),
-			url: new Curl('tr_status.php?filter_set=1&show_severity=0&hostid=' + options.hostid).getUrl()
+			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
 
 		// graphs
