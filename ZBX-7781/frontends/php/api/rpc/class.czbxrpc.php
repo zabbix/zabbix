@@ -45,8 +45,9 @@ class czbxrpc {
 			'user.checkAuthentication' => 1,
 			'apiinfo.version' => 1
 		);
-		// Authentication
-		if (!isset($withoutAuth[$method]) || !zbx_empty($sessionid)) {
+
+		// if the method requires authentication - check if the session ID is valid
+		if (!isset($withoutAuth[$method])) {
 			if (!zbx_empty($sessionid)) {
 				$usr = self::callAPI('user.checkAuthentication', $sessionid);
 				if (!isset($usr['result'])) {
@@ -56,12 +57,19 @@ class czbxrpc {
 					);
 				}
 			}
-			elseif (!isset($withoutAuth[$method])) {
+			else {
 				return array(
 					'error' => ZBX_API_ERROR_NO_AUTH,
 					'data' => _('Not authorized')
 				);
 			}
+		}
+		// if no authentication is required - check that no session ID given
+		elseif (!zbx_empty($sessionid)) {
+			return array(
+				'error' => ZBX_API_ERROR_NO_AUTH,
+				'data' => _s('The "%1$s" method must be called without the "auth" parameter.', $method)
+			);
 		}
 
 		return self::callAPI($method, $params);
