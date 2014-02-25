@@ -30,6 +30,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
 ........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
