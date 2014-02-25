@@ -308,12 +308,6 @@ function getMenuPopupMap(options) {
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [];
 
-		// latest
-		gotos[gotos.length] = {
-			label: t('Latest data'),
-			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
-		};
-
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
 			var url = new Curl('hostinventories.php');
@@ -327,6 +321,12 @@ function getMenuPopupMap(options) {
 				url: url.getUrl()
 			};
 		}
+
+		// latest
+		gotos[gotos.length] = {
+			label: t('Latest data'),
+			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
