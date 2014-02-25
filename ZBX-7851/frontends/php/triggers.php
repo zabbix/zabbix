@@ -395,6 +395,15 @@ else {
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
+
+	if ($sortfield === 'status') {
+		foreach ($data['triggers'] as &$trigger) {
+			$trigger['status_order'] = triggerSortOrderNumber($trigger['status'], $trigger['state']);
+		}
+		unset($trigger);
+		$sortfield = 'status_order';
+	}
+
 	order_result($data['triggers'], $sortfield, getPageSortOrder());
 
 	// get real hosts

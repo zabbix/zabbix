@@ -1140,6 +1140,14 @@ else {
 		}
 	}
 
+	if ($data['sortfield'] === 'status') {
+		foreach ($data['items'] as &$item) {
+			$item['status_order'] = itemSortOrderNumber($item['status'], $item['state']);
+		}
+		unset($item);
+		$data['sortfield'] = 'status_order';
+	}
+
 	order_result($data['items'], $data['sortfield'], getPageSortOrder());
 	$data['paging'] = getPagingLine($data['items'], array('itemid'));
 

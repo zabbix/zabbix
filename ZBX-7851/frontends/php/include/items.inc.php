@@ -233,6 +233,25 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Returns status order number depending on status and state.
+ * If status = 0 and state = 1, it means it is an unsupported item and returns 2.
+ * When sorting by field 'status' ASC it will sort items like so: 0, 1 and 2, placing unsupported items as last.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return int
+ */
+function itemSortOrderNumber($status, $state) {
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return 1;
+	}
+}
+
+/**
  * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type

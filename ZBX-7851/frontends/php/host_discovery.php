@@ -331,6 +331,14 @@ else {
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
+	if ($sortfield === 'status') {
+		foreach ($data['discoveries'] as &$item) {
+			$item['status_order'] = itemSortOrderNumber($item['status'], $item['state']);
+		}
+		unset($item);
+		$sortfield = 'status_order';
+	}
+
 	order_result($data['discoveries'], $sortfield, getPageSortOrder());
 
 	// paging
