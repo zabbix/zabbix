@@ -25,9 +25,6 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 
-#define	HOST_ACTIVE		1
-#define	HOST_NOTACTIVE		-1
-
 void	main_poller_loop(unsigned char poller_type);
 
 #endif

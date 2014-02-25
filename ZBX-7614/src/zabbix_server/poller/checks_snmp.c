@@ -1032,7 +1032,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	if (NULL == (ss = zbx_snmp_open_session(item, err)))
 	{
 		SET_MSG_RESULT(value, zbx_strdup(NULL, err));
-		ret = CONFIG_ERROR;
+		ret = NETWORK_ERROR;
 		goto out;
 	}
 
