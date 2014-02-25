@@ -1,8 +1,23 @@
 Changes for 2.2.3rc1
 
 New features:
+.D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
+..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
+........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
+..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
+..F....... [ZBX-7768] fixed item valuemap import (Eduard)
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
+........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
+........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
+..F....... [ZBX-7772] fixed HTTP authentication error (Eduard)
+...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
+........S. [ZBX-7572] fixed processing of JSON object by trapper (igors)
+.......PS. [ZBX-7763] fixed checking the wrong exit code of php_get_sem() (igors)
+..F....... [ZBX-7770] removed web.page.perf item key from simple check item type (Eduard)
 ..F....... [ZBX-7242] fixed jQuery sortable objects not to change with when dragging them (Ivo)
 ..F....... [ZBX-7736] fixed incorrectly working global regular expression type "Any character string included" (Ivo)
 ..F....... [ZBX-7756] fixed SQL error in Monitoring > Maps page (Ivo)
@@ -60,7 +75,7 @@ A......... [ZBX-7703] fixed being able to switch users without proper credential
 ........S. [ZBX-7561] fixed SQL errors while processing host prototypes under MySQL (Sasha)
 ..F....... [ZBX-7688] fixed discovery item import (Eduard)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
-...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
+...G...... [ZBX-7697] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
@@ -77,7 +92,7 @@ A......... [ZBX-7660] fixed host.get returning the "templates" property even if 
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
 ..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7590] fixed displaying functional macros in graph names when host visible name is not empty (Ivo)
 A......... [ZBX-7591] fixed deleting web scenario steps on template linked to host (Ivo)
@@ -366,7 +381,7 @@ Changes for 2.1.6
 
 New features:
 ..F....... [ZBX-2616] upgraded the bundled DejaVu font from 2.33 to 2.34 (Richlv)
-..F....... [ZBXNEXT-1763] added links to inventory in Monitoring -> Maps and Monitoring -> Latest Data (Oleg)
+..F....... [ZBXNEXT-1763] added link to inventory in Monitoring -> Maps and displayed link to inventory page for hosts without inventory data in Monitoring -> Latest Data (Oleg)
 ..F....... [ZBXNEXT-1763] added host related information under Monitoring (Oleg)
 ..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
@@ -812,8 +827,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.12rc1
 
 New features:
+.D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
+A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
+........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
+........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
 ..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
 
@@ -851,7 +871,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
