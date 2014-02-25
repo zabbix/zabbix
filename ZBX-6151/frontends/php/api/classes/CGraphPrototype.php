@@ -843,7 +843,7 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::checkInput($graphs, $update);
 
 		foreach ($graphs as $graph) {
-			// check if the graph has at least one prototype and doesn't belong to multiple hosts
+			// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
 			$graphPrototypes = array();
 			foreach ($graph['gitems'] as $gitem) {
 				// $allowedItems used because it is possible to make API call without full item data
