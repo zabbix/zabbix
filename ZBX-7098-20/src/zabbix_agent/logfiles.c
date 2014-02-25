@@ -618,7 +618,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 		logfiles[i].processed_size = *lastlogsize;
 
-		if (SUCCEED != ret)
+		if (SUCCEED != ret || 0 >= *p_count || 0 >= *s_count)
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
 			/* (can happen during a rotation). Maybe during the next check all will be well. */
