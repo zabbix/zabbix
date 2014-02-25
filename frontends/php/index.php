@@ -43,7 +43,9 @@ check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
+	DBstart();
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
+	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
 }
@@ -63,15 +65,18 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
-	if (CWebUser::login(get_request('name', ''), get_request('password', ''))) {
+	DBstart();
+
+	if (CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
 		// save remember login preference
-		$user = array('autologin' => get_request('autologin', 0));
+		$user = array('autologin' => getRequest('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
-			$result = API::User()->updateProfile($user);
+			API::User()->updateProfile($user);
 		}
 		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
+		DBend(true);
 
-		$request = get_request('request');
+		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
 			$url = 'dashboard.php';
@@ -81,6 +86,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	}
 	// login failed, fall back to a guest account
 	else {
+		DBend(false);
 		CWebUser::checkAuthentication(null);
 	}
 }

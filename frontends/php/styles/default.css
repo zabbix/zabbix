@@ -54,7 +54,7 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 .rarr { font-size: 16px; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter { font-weight: bold; color: #000; }
-div.pointer:hover, img.pointer:hover { cursor: pointer; }
+div.pointer, img.pointer, span.pointer { cursor: pointer; }
 
 .move { cursor: move; }
 
@@ -168,6 +168,7 @@ input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
 .jqueryinputset input[type="button"],
 .jqueryinputset input[type="submit"] { height: auto; }
+input.macro { text-transform: uppercase; }
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
@@ -242,7 +243,9 @@ ul.favorites li a { line-height: 18px; }
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
-ul.messages li.error { color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; }
+ul.messages li.error {
+	color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; word-break: normal;
+}
 
 /* column */
 .column { margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }

@@ -181,6 +181,4 @@
 			});
 		<?php endforeach ?>
 	});
-
-	createPlaceholders();
 </script>

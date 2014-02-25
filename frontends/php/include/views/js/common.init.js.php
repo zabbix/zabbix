@@ -2,7 +2,7 @@
 	jQuery(document).ready(function() {
 		<?php if (isset($ZBX_PAGE_POST_JS)): ?>
 			<?php foreach ($ZBX_PAGE_POST_JS as $script): ?>
-				<?php echo $script; ?>
+				<?php echo $script."\n"; ?>
 			<?php endforeach ?>
 		<?php endif ?>
 

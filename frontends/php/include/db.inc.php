@@ -54,7 +54,7 @@ function DBconnect(&$error) {
 			case ZBX_DB_MYSQL:
 				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database ['.trim(mysqli_connect_error()).']';
+					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
 					$result = false;
 				}
 				else {
@@ -75,7 +75,7 @@ function DBconnect(&$error) {
 
 				$DB['DB']= @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database';
+					$error = 'Error connecting to database.';
 					$result = false;
 				}
 				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
@@ -107,7 +107,8 @@ function DBconnect(&$error) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
 				else {
-					$error = 'Error connecting to database';
+					$ociError = oci_error();
+					$error = 'Error connecting to database: '.$ociError['message'];
 					$result = false;
 				}
 
@@ -126,7 +127,7 @@ function DBconnect(&$error) {
 
 				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
-					$error = 'Error connecting to database';
+					$error = 'Error connecting to database: '.db2_conn_errormsg();
 					$result = false;
 				}
 				else {
@@ -151,7 +152,7 @@ function DBconnect(&$error) {
 						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 					}
 					catch (Exception $e) {
-						$error = 'Error connecting to database';
+						$error = 'Error connecting to database.';
 						$result = false;
 					}
 					unlock_sqlite3_access();
@@ -212,34 +213,6 @@ function DBclose() {
 	}
 	unset($DB['DB']);
 	return $result;
-}
-
-function DBloadfile($file, &$error) {
-	if (!file_exists($file)) {
-		$error = 'DBloadfile. Missing file ['.$file.']';
-		return false;
-	}
-
-	$fl = file($file);
-
-	foreach ($fl as $n => $l) {
-		if (substr($l, 0, 2) == '--') {
-			unset($fl[$n]);
-		}
-	}
-	$fl = explode(";\n", implode("\n", $fl));
-	unset($fl[count($fl)-1]);
-
-	foreach ($fl as $sql) {
-		if (empty($sql)) {
-			continue;
-		}
-		if (!DBexecute($sql, 0)) {
-			$error = '';
-			return false;
-		}
-	}
-	return true;
 }
 
 function DBstart() {
@@ -695,19 +668,19 @@ function DBid2nodeid($id_name) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = '('.$id_name.' div 100000000000000)';
+			$result = '('.$id_name.' div '.ZBX_DM_MAX_HISTORY_IDS.')';
 			break;
 		case ZBX_DB_ORACLE:
-			$result = 'round('.$id_name.'/100000000000000)';
+			$result = 'round('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
 			break;
 		default:
-			$result = '('.$id_name.'/100000000000000)';
+			$result = '('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
 	}
 	return $result;
 }
 
 function id2nodeid($id) {
-	return (int) bcdiv("$id", '100000000000000');
+	return (int) bcdiv("$id", ZBX_DM_MAX_HISTORY_IDS);
 }
 
 /**
@@ -826,10 +799,16 @@ function get_dbid($table, $field) {
 	$nodeid = get_current_nodeid(false);
 	$found = false;
 
-	do {
-		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+	if ($nodeid == 0) {
+		$min = 0;
+		$max = ZBX_STANDALONE_MAX_IDS;
+	}
+	else {
+		$min = bcadd(bcmul($nodeid, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0);
+		$max = bcadd($min, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
+	}
 
+	do {
 		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
 		if (!$dbSelect) {
 			return false;
@@ -837,7 +816,7 @@ function get_dbid($table, $field) {
 
 		$row = DBfetch($dbSelect);
 		if (!$row) {
-			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
+			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.' BETWEEN '.$min.' AND '.$max));
 			if (!$row || ($row['id'] == 0)) {
 				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 			}
@@ -937,10 +916,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	}
 
 	return false;
-}
-
-function remove_nodes_from_id($id) {
-	return bcmod($id, '100000000000');
 }
 
 /**
@@ -1310,36 +1285,6 @@ function zbx_dbcast_2bigint($field) {
 
 		case ZBX_DB_ORACLE:
 			return 'CAST('.$field.' AS NUMBER(20))';
-
-		default:
-			return false;
-	}
-}
-
-/**
- * Creates db dependent string with sql limit.
- * Works for ibmdb2, mysql, oracle, postgresql, sqlite.
- *
- * @param int $limit
- *
- * @return bool|string
- */
-function zbx_limit($limit) {
-	global $DB;
-
-	if (!isset($DB['TYPE'])) {
-		return false;
-	}
-
-	switch ($DB['TYPE']) {
-		case ZBX_DB_DB2:
-		case ZBX_DB_ORACLE:
-			return 'AND rownum<='.$limit;
-
-		case ZBX_DB_MYSQL:
-		case ZBX_DB_POSTGRESQL:
-		case ZBX_DB_SQLITE3:
-			return 'LIMIT '.$limit;
 
 		default:
 			return false;

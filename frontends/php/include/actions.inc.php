@@ -821,7 +821,32 @@ function count_operations_delay($operations, $def_period = 0) {
 	return $delays;
 }
 
-function get_action_msgs_for_event($event) {
+/**
+ * Get action messages.
+ *
+ * @param array  $alerts
+ * @param string $alerts[n]['alertid']
+ * @param string $alerts[n]['userid']
+ * @param int    $alerts[n]['alerttype']
+ * @param array  $alerts[n]['mediatypes']
+ * @param string $alerts[n]['clock']
+ * @param int    $alerts[n]['esc_step']
+ * @param int    $alerts[n]['status']
+ * @param int    $alerts[n]['retries']
+ * @param string $alerts[n]['subject']
+ * @param string $alerts[n]['sendto']
+ * @param string $alerts[n]['message']
+ * @param string $alerts[n]['error']
+ *
+ * @return CTableInfo
+ */
+function getActionMessages(array $alerts) {
+	$dbUsers = API::User()->get(array(
+		'output' => array('userid', 'alias', 'name', 'surname'),
+		'userids' => zbx_objectValues($alerts, 'userid'),
+		'preservekeys' => true
+	));
+
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
@@ -831,22 +856,22 @@ function get_action_msgs_for_event($event) {
 		_('Retries left'),
 		_('Recipient(s)'),
 		_('Message'),
-		_('Error')
+		_('Info')
 	));
 
-	$alerts = $event['alerts'];
-	foreach ($alerts as $alertid => $alert) {
+	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
 			continue;
 		}
 
-		$mediatype = array_pop($alert['mediatypes']);
+		$mediaType = array_pop($alert['mediatypes']);
 
 		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert['clock']);
+
 		if ($alert['esc_step'] > 0) {
 			$time = array(
 				bold(_('Step').NAME_DELIMITER),
-				$alert["esc_step"],
+				$alert['esc_step'],
 				br(),
 				bold(_('Time').NAME_DELIMITER),
 				br(),
@@ -866,7 +891,10 @@ function get_action_msgs_for_event($event) {
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
-		$sendto = $alert['sendto'];
+
+		$recipient = $alert['userid']
+			? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
+			: $alert['sendto'];
 
 		$message = array(
 			bold(_('Subject').NAME_DELIMITER),
@@ -876,31 +904,47 @@ function get_action_msgs_for_event($event) {
 			br(),
 			bold(_('Message').NAME_DELIMITER)
 		);
+
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
-		if (empty($alert['error'])) {
-			$error = new CSpan(SPACE, 'off');
+		if (zbx_empty($alert['error'])) {
+			$info = SPACE;
 		}
 		else {
-			$error = new CSpan($alert['error'], 'on');
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($alert['error'], '', 'on');
 		}
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
-			new CCol((!empty($mediatype['description']) ? $mediatype['description'] : ''), 'top'),
+			new CCol((isset($mediaType['description']) ? $mediaType['description'] : ''), 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
-			new CCol($sendto, 'top'),
+			new CCol($recipient, 'top'),
 			new CCol($message, 'wraptext top'),
-			new CCol($error, 'wraptext top')
+			new CCol($info, 'wraptext top')
 		));
 	}
 
 	return $table;
 }
 
-function get_action_cmds_for_event($event) {
+/**
+ * Get action remote commands.
+ *
+ * @param array  $alerts
+ * @param string $alerts[n]['alertid']
+ * @param int    $alerts[n]['alerttype']
+ * @param string $alerts[n]['clock']
+ * @param int    $alerts[n]['esc_step']
+ * @param int    $alerts[n]['status']
+ * @param string $alerts[n]['message']
+ * @param string $alerts[n]['error']
+ *
+ * @return CTableInfo
+ */
+function getActionCommands(array $alerts) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
@@ -910,13 +954,13 @@ function get_action_cmds_for_event($event) {
 		_('Error')
 	));
 
-	$alerts = $event['alerts'];
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
 			continue;
 		}
 
 		$time = zbx_date2str(EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
+
 		if ($alert['esc_step'] > 0) {
 			$time = array(
 				bold(_('Step').NAME_DELIMITER),
@@ -932,24 +976,23 @@ function get_action_cmds_for_event($event) {
 			case ALERT_STATUS_SENT:
 				$status = new CSpan(_('executed'), 'green');
 				break;
+
 			case ALERT_STATUS_NOT_SENT:
 				$status = new CSpan(_('In progress'), 'orange');
 				break;
+
 			default:
 				$status = new CSpan(_('not sent'), 'red');
 				break;
 		}
 
-		$message = array(bold(_('Command').NAME_DELIMITER));
-		array_push($message, BR(), zbx_nl2br($alert['message']));
-
-		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
+		$error = $alert['error'] ? new CSpan($alert['error'], 'on') : new CSpan(SPACE, 'off');
 
 		$table->addRow(array(
 			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
 			new CCol($status, 'top'),
-			new CCol($message, 'wraptext top'),
+			new CCol(array(bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])), 'wraptext top'),
 			new CCol($error, 'wraptext top')
 		));
 	}

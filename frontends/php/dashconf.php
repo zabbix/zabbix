@@ -30,28 +30,31 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('multiselect.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR						 TYPE		 OPTIONAL FLAGS	VALIDATION		EXCEPTION
 $fields = array(
-	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
-	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'hidegroupids' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	null),
-	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,	null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null)
+	'filterEnable' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'grpswitch' =>		array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
+	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'hidegroupids' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'trgSeverity' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'maintenance' =>	array(T_ZBX_INT, O_OPT, P_SYS,			BETWEEN(0, 1),	null),
+	'extAck' =>			array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, P_SYS,			null,			null),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,			null)
 );
 check_fields($fields);
 
 /*
  * Actions
  */
-if (isset($_REQUEST['save'])) {
+if (hasRequest('save')) {
 	// filter
-	$filterEnable = get_request('filterEnable', 0);
+	$filterEnable = getRequest('filterEnable', 0);
 	CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
 	if ($filterEnable == 1) {
@@ -60,36 +63,48 @@ if (isset($_REQUEST['save'])) {
 
 		if ($_REQUEST['grpswitch'] == 1) {
 			// show groups
-			$groupIds = get_request('groupids', array());
+			$groupIds = getRequest('groupids', array());
 
-			CFavorite::remove('web.dashconf.groups.groupids');
+			$result = true;
+
+			DBstart();
+
+			$result &= CFavorite::remove('web.dashconf.groups.groupids');
 			foreach ($groupIds as $groupId) {
-				CFavorite::add('web.dashconf.groups.groupids', $groupId);
+				$result &= CFavorite::add('web.dashconf.groups.groupids', $groupId);
 			}
 
 			// hide groups
-			$hideGroupIds = get_request('hidegroupids', array());
+			$hideGroupIds = getRequest('hidegroupids', array());
 
-			CFavorite::remove('web.dashconf.groups.hide.groupids');
+			$result &= CFavorite::remove('web.dashconf.groups.hide.groupids');
 			foreach ($hideGroupIds as $hideGroupId) {
-				CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
+				$result &= CFavorite::add('web.dashconf.groups.hide.groupids', $hideGroupId);
 			}
+
+			DBend($result);
 		}
 
 		// hosts
-		$_REQUEST['maintenance'] = get_request('maintenance', 0);
+		$_REQUEST['maintenance'] = getRequest('maintenance', 0);
 		CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
 
 		// triggers
-		$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
-		$_REQUEST['extAck'] = get_request('extAck', 0);
+		$_REQUEST['trgSeverity'] = getRequest('trgSeverity', array());
+		$_REQUEST['extAck'] = getRequest('extAck', 0);
 
 		CProfile::update('web.dashconf.triggers.severity', implode(';', array_keys($_REQUEST['trgSeverity'])), PROFILE_TYPE_STR);
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
-	jsRedirect('dashboard.php');
+	jSredirect('dashboard.php');
 }
+elseif (hasRequest('cancel')) {
+	ob_end_clean();
+	redirect('dashboard.php');
+}
+
+ob_end_flush();
 
 /*
  * Display

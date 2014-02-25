@@ -170,7 +170,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
+frontends/php/include/views/configuration.host.discovery.edit.php -text
 frontends/php/include/views/js/common.init.js.php -text
 frontends/php/include/views/js/monitoring.slides.js.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
@@ -542,6 +544,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxdbhigh/itservices.c -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text

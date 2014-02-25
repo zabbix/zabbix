@@ -197,10 +197,10 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	}
 
 	// group
-	$lists['group']['label'] = _('Host groups');
-	$lists['group']['read_write'] = new CListBox('groups_write', null, 15);
-	$lists['group']['read_only'] = new CListBox('groups_read', null, 15);
-	$lists['group']['deny'] = new CListBox('groups_deny', null, 15);
+	$lists['group']['label']		= _('Host groups');
+	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
+	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
+	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
 	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -220,10 +220,10 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	unset($groups);
 
 	// host
-	$lists['host']['label'] = _('Hosts');
-	$lists['host']['read_write'] = new CListBox('hosts_write', null, 15);
-	$lists['host']['read_only'] = new CListBox('hosts_read', null, 15);
-	$lists['host']['deny'] = new CListBox('hosts_deny', null, 15);
+	$lists['host']['label']		= _('Hosts');
+	$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
+	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
+	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
 	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
@@ -959,14 +959,12 @@ function getItemFilterForm(&$items) {
 /**
  * Get data for item edit page.
  *
+ * @param array	$item							item, item prototype or LLD rule to take the data from
  * @param bool $options['is_discovery_rule']
  *
  * @return array
  */
-function getItemFormData($options = array()) {
-	$ifm = get_request('filter_macro');
-	$ifv = get_request('filter_value');
-
+function getItemFormData(array $item = array(), array $options = array()) {
 	$data = array(
 		'form' => get_request('form'),
 		'form_refresh' => get_request('form_refresh'),
@@ -1014,13 +1012,10 @@ function getItemFormData($options = array()) {
 		'privatekey' => get_request('privatekey', ''),
 		'formula' => get_request('formula', 1),
 		'logtimefmt' => get_request('logtimefmt', ''),
-		'inventory_link' => get_request('inventory_link', 0),
 		'add_groupid' => get_request('add_groupid', get_request('groupid', 0)),
 		'valuemaps' => null,
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
-		'lifetime' => get_request('lifetime', 30),
-		'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
 		'initial_item_type' => null,
 		'templates' => array()
 	);
@@ -1050,36 +1045,13 @@ function getItemFormData($options = array()) {
 	}
 
 	// item
-	if (!empty($data['itemid'])) {
-		if ($data['is_discovery_rule']) {
-			$data['item'] = API::DiscoveryRule()->get(array(
-				'itemids' => $data['itemid'],
-				'output' => API_OUTPUT_EXTEND,
-				'hostids' => $data['hostid'],
-				'editable' => true
-			));
-		}
-		else {
-			$data['item'] = API::Item()->get(array(
-				'itemids' => $data['itemid'],
-				'filter' => array('flags' => null),
-				'output' => array(
-					'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-					'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
-					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
-					'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-					'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'filter',
-					'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname'
-				)
-			));
-		}
-		$data['item'] = reset($data['item']);
+	if ($item) {
+		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = $data['item']['templateid'] != 0;
 
 		// get templates
-		$itemid = $data['itemid'];
+		$itemid = $item['itemid'];
 		do {
 			$params = array(
 				'itemids' => $itemid,
@@ -1154,7 +1126,7 @@ function getItemFormData($options = array()) {
 	}
 
 	// fill data from item
-	if ((!empty($data['itemid']) && !isset($_REQUEST['form_refresh'])) || ($data['limited'] && !isset($_REQUEST['form_refresh']))) {
+	if (!hasRequest('form_refresh') && ($item || $data['limited'])) {
 		$data['name'] = $data['item']['name'];
 		$data['description'] = $data['item']['description'];
 		$data['key'] = $data['item']['key_'];
@@ -1184,12 +1156,12 @@ function getItemFormData($options = array()) {
 		$data['password'] = $data['item']['password'];
 		$data['publickey'] = $data['item']['publickey'];
 		$data['privatekey'] = $data['item']['privatekey'];
-		$data['formula'] = $data['item']['formula'];
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
-		$data['inventory_link'] = $data['item']['inventory_link'];
 		$data['new_application'] = get_request('new_application', '');
-		$data['lifetime'] = $data['item']['lifetime'];
-		$data['filter'] = $data['item']['filter'];
+
+		if (!$data['is_discovery_rule']) {
+			$data['formula'] = $data['item']['formula'];
+		}
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
@@ -1488,14 +1460,12 @@ function getTriggerFormData() {
 					show_messages(false, '', _('Expression Syntax Error.'));
 				}
 			}
-
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = 'yes';
 			$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 			$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), null, 'formlist');
 			$data['expression_macro_button']->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
-
 			if ($data['limited'] == 'yes') {
 				$data['expression_macro_button']->setAttribute('disabled', 'disabled');
 			}
@@ -1533,6 +1503,7 @@ function get_timeperiod_form() {
 
 	// init new_timeperiod variable
 	$new_timeperiod = get_request('new_timeperiod', array());
+	$new = is_array($new_timeperiod);
 
 	if (is_array($new_timeperiod)) {
 		if (isset($new_timeperiod['id'])) {

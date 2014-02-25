@@ -441,6 +441,14 @@ $triggers = API::Trigger()->get(array(
 
 order_result($triggers, $sortfield, $sortorder);
 
+// sort trigger hosts by name
+foreach ($triggers as &$trigger) {
+	if (count($trigger['hosts']) > 1) {
+		order_result($trigger['hosts'], 'name', ZBX_SORT_UP);
+	}
+}
+unset($trigger);
+
 $triggerIds = zbx_objectValues($triggers, 'triggerid');
 
 // get editable triggers
@@ -541,6 +549,7 @@ $hosts = API::Host()->get(array(
 	'output' => array('hostid'),
 	'hostids' => $hostIds,
 	'preservekeys' => true,
+	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT
 ));
 
