@@ -279,6 +279,7 @@ function getMenuPopupHost(options) {
  * @param string options[]['scriptid']				script id
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
+ * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
