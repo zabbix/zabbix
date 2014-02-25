@@ -716,40 +716,27 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	struct stat	buf;
 	zbx_uint64_t	l_size;
 
-	if (NULL != mtime)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
-				__function_name, filename, *lastlogsize, *mtime);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: NULL",
-				__function_name, filename, *lastlogsize);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
 	if (0 != zbx_stat(filename, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
-			__function_name, filename, *lastlogsize, zbx_result_string(ret));
-		return ret;
+		goto out;
 	}
 
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
 		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
 		/* a logfile's content while keeping the same length. */
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " (not changed) "
-			"ret:SUCCEED", __function_name, filename, *lastlogsize);
-		return SUCCEED;
+		ret = SUCCEED;
+		goto out;
 	}
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " ret:%s",
-			__function_name, filename, *lastlogsize, zbx_result_string(ret));
-		return ret;
+		goto out;
 	}
 
 	l_size = *lastlogsize;
@@ -783,17 +770,9 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (0 != close(f))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
-
-	if (NULL != mtime)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
-				__function_name, filename, *lastlogsize, *mtime, zbx_result_string(ret));
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: NULL ret:%s",
-				__function_name, filename, *lastlogsize, zbx_result_string(ret));
-	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
 	return ret;
 }
