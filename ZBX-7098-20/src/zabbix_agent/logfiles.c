@@ -436,10 +436,6 @@ out:
  *                                                                            *
  * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
- * Comments:                                                                  *
- *    This function allocates memory for 'value', because use zbx_free.       *
- *    Return SUCCEED and NULL value if end of file received.                  *
- *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
 		int *big_rec, struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
