@@ -839,26 +839,25 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-
 		parent::checkInput($graphs, $update);
 
 		foreach ($graphs as $graph) {
 			// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
-			$graphPrototypes = array();
+			$hostIds = array();
 			foreach ($graph['gitems'] as $gitem) {
 				// $allowedItems used because it is possible to make API call without full item data
 				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$graphPrototypes[$allowedItems[$gitem['itemid']]['hostid']] = true;
+					$hostIds[$allowedItems[$gitem['itemid']]['hostid']] = true;
 				}
 			}
 
-			if ($graphPrototypes && count($graphPrototypes) > 1) {
+			if (!$hostIds) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+			}
+			elseif (count($hostIds) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _(
 					'Graph prototype contains item prototypes from multiple hosts.'
 				));
-			}
-			elseif (!$graphPrototypes) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
 			}
 		}
 	}
