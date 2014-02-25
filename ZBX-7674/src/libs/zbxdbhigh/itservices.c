@@ -775,12 +775,12 @@ int	DBflush_itservice_updates()
 
 	ret = its_flush_updates(&itservice_updates);
 
+	UNLOCK_ITSERVICES;
+
 	for (i = 0; i < itservice_updates.values_num; i++)
 		zbx_free(itservice_updates.values[i]);
 
 	itservice_updates.values_num = 0;
-
-	UNLOCK_ITSERVICES;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -811,14 +811,14 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	if (0 == triggerids_num)
 		return SUCCEED;
 
-	LOCK_ITSERVICES;
-
 	now = time(NULL);
 
 	zbx_vector_ptr_create(&updates);
 
 	for (i = 0; i < triggerids_num; i++)
 		its_updates_append(&updates, triggerids[i], 0, now);
+
+	LOCK_ITSERVICES;
 
 	if (FAIL == its_flush_updates(&updates))
 		goto out;
@@ -834,12 +834,12 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 
 	zbx_free(sql);
 out:
+	UNLOCK_ITSERVICES;
+
 	for (i = 0; i < updates.values_num; i++)
 		zbx_free(updates.values[i]);
 
 	zbx_vector_ptr_destroy(&updates);
-
-	UNLOCK_ITSERVICES;
 
 	return ret;
 }
@@ -857,6 +857,3 @@ void	zbx_destroy_itservices_lock()
 {
 	zbx_mutex_destroy(&itservices_lock);
 }
-
-
-
