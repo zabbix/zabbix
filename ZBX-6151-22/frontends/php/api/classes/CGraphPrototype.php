@@ -696,7 +696,7 @@ class CGraphPrototype extends CGraphGeneral {
 		foreach ($graphs as $graph) {
 			$graphPrototypes = array();
 			if ($graph['gitems']) {
-				// check if the graph has at least one prototype and doesn't belong to multiple hosts
+				// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
 				foreach ($graph['gitems'] as $gitem) {
 					// $allowedItems used because it is possible to make API call without full item data
 					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -761,7 +761,7 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($graph['gitems'])) {
 				$graphPrototypes = array();
 				if ($graph['gitems']) {
-					// check if the graph has at least one prototype and doesn't belong to multiple hosts
+					// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
 					foreach ($graph['gitems'] as $gitem) {
 						// $allowedItems used because it is possible to make API call without full item data
 						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
