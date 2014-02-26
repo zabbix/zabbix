@@ -498,8 +498,8 @@ elseif (isset($_REQUEST['form'])) {
 
 		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['yaxismin'] = get_request('yaxismin', '0.0000');
-		$data['yaxismax'] = get_request('yaxismax', '100.0000');
+		$data['yaxismin'] = get_request('yaxismin', 0);
+		$data['yaxismax'] = get_request('yaxismax', 100);
 		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
 		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
 		$data['show_work_period'] = get_request('show_work_period', 0);
@@ -552,24 +552,6 @@ elseif (isset($_REQUEST['form'])) {
 
 		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
-
-	$_REQUEST['items'] = $data['items'];
-	$_REQUEST['name'] = $data['name'];
-	$_REQUEST['width'] = $data['width'];
-	$_REQUEST['height'] = $data['height'];
-	$_REQUEST['ymin_type'] = $data['ymin_type'];
-	$_REQUEST['ymax_type'] = $data['ymax_type'];
-	$_REQUEST['yaxismin'] = $data['yaxismin'];
-	$_REQUEST['yaxismax'] = $data['yaxismax'];
-	$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
-	$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
-	$_REQUEST['show_work_period'] = $data['show_work_period'];
-	$_REQUEST['show_triggers'] = $data['show_triggers'];
-	$_REQUEST['graphtype'] = $data['graphtype'];
-	$_REQUEST['show_legend'] = $data['show_legend'];
-	$_REQUEST['show_3d'] = $data['show_3d'];
-	$_REQUEST['percent_left'] = $data['percent_left'];
-	$_REQUEST['percent_right'] = $data['percent_right'];
 
 	$data['items'] = array_values($data['items']);
 	$itemCount = count($data['items']);

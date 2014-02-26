@@ -787,6 +787,10 @@ function convertFunctionValue($value) {
 	return $value;
 }
 
+function formatValueByScale($value, $scale) {
+	return preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', round($value, $scale));
+}
+
 /************* ZBX MISC *************/
 
 /**
