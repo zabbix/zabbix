@@ -161,7 +161,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function mediaQuery($eventIds, $sid) {
+	public function mediaQuery(array $eventIds, $sid) {
 		return $this->request(array(
 			'request' => 'media.query',
 			'sid' => $sid,
@@ -179,7 +179,7 @@ class CZabbixServer {
 	 *
 	 * @return bool|array
 	 */
-	public function mediaAcknowledge($events, $sid) {
+	public function mediaAcknowledge(array $events, $sid) {
 		return $this->request(array(
 			'request' => 'media.acknowledge',
 			'sid' => $sid,
