@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserMacro extends CZBXAPI {
+class CUserMacro extends CApiInstance {
 
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';

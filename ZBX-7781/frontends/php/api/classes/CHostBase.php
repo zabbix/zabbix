@@ -22,7 +22,7 @@
 /**
  * @package API
  */
-abstract class CHostBase extends CZBXAPI {
+abstract class CHostBase extends CApiInstance {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';

@@ -65,7 +65,7 @@ class CDRuleTest extends PHPUnit_Framework_TestCase {
 		// set api to return objects, to pass user session verification
 		API::setReturnAPI();
 
-		CZBXAPI::$userData['type'] = USER_TYPE_SUPER_ADMIN;
+		CApiInstance::$userData['type'] = USER_TYPE_SUPER_ADMIN;
 	}
 
 	public static function tearDownAfterClass() {

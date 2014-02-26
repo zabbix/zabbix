@@ -24,7 +24,7 @@
  *
  * * @package API
  */
-class CMaintenance extends CZBXAPI {
+class CMaintenance extends CApiInstance {
 
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';

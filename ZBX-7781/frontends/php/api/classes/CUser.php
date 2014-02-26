@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUser extends CZBXAPI {
+class CUser extends CApiInstance {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';

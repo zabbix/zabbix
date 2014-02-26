@@ -81,8 +81,8 @@ spl_autoload_register(function($className) {
 });
 
 define('ZBX_DISTRIBUTED', false);
-CZBXAPI::$userData['userid'] = 1;
-CZBXAPI::$userData['type'] = USER_TYPE_SUPER_ADMIN;
+CApiInstance::$userData['userid'] = 1;
+CApiInstance::$userData['type'] = USER_TYPE_SUPER_ADMIN;
 API::setReturnAPI();
 
 

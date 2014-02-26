@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDRule extends CZBXAPI {
+class CDRule extends CApiInstance {
 
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserGroup extends CZBXAPI {
+class CUserGroup extends CApiInstance {
 
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';

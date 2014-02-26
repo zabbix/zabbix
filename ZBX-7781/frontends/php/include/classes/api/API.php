@@ -106,7 +106,7 @@ class API {
 	 *
 	 * @param $object
 	 *
-	 * @return CZBXAPI
+	 * @return CApiInstance
 	 */
 	public static function getApi($object = null) {
 		if ($object) {
@@ -119,7 +119,7 @@ class API {
 		}
 		else {
 			if (!isset(self::$APIobjects[0])) {
-				self::$APIobjects[0] = new CZBXAPI();
+				self::$APIobjects[0] = new CApiInstance();
 			}
 
 			return self::$APIobjects[0];

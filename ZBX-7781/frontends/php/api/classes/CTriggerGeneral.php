@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CTriggerGeneral extends CZBXAPI {
+abstract class CTriggerGeneral extends CApiInstance {
 
 	/**
 	 * @abstract

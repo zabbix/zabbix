@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CItemGeneral extends CZBXAPI {
+abstract class CItemGeneral extends CApiInstance {
 
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	const ERROR_EXISTS = 'exists';

@@ -19,7 +19,7 @@
 **/
 
 
-class CZBXAPI {
+class CApiInstance {
 
 	public static $userData;
 

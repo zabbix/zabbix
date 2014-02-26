@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CMediatype extends CZBXAPI {
+class CMediatype extends CApiInstance {
 
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';

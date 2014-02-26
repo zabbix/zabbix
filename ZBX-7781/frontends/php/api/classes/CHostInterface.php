@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHostInterface extends CZBXAPI {
+class CHostInterface extends CApiInstance {
 
 	protected $tableName = 'interface';
 	protected $tableAlias = 'hi';
