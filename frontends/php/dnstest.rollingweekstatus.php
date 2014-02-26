@@ -331,19 +331,26 @@ if ($tlds) {
 				switch ($items[$trItem]['key_']) {
 					case DNSTEST_SLV_DNS_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['dns']['trigger'] = true;
-						$data['tld'][$items[$trItem]['hostid']]['dns']['incident'] = getLastEvent($trigger['triggerid']);
+						$data['tld'][$items[$trItem]['hostid']]['dns']['incident'] = getLastEvent(
+							$trigger['triggerid']
+						);
 						break;
 					case DNSTEST_SLV_DNSSEC_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['dnssec']['trigger'] = true;
-						$data['tld'][$items[$trItem]['hostid']]['dnssec']['incident'] = getLastEvent($trigger['triggerid']);
+						$data['tld'][$items[$trItem]['hostid']]['dnssec']['incident'] = getLastEvent(
+							$trigger['triggerid']
+						);
 						break;
 					case DNSTEST_SLV_RDDS_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['rdds']['trigger'] = true;
-						$data['tld'][$items[$trItem]['hostid']]['rdds']['incident'] = getLastEvent($trigger['triggerid']);
+						$data['tld'][$items[$trItem]['hostid']]['rdds']['incident'] = getLastEvent(
+							$trigger['triggerid']);
 						break;
 					case DNSTEST_SLV_EPP_AVAIL:
 						$data['tld'][$items[$trItem]['hostid']]['epp']['trigger'] = true;
-						$data['tld'][$items[$trItem]['hostid']]['epp']['incident'] = getLastEvent($trigger['triggerid']);
+						$data['tld'][$items[$trItem]['hostid']]['epp']['incident'] = getLastEvent(
+							$trigger['triggerid']
+						);
 						break;
 				}
 

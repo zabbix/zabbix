@@ -205,8 +205,10 @@ if ($mainEvent) {
 
 	// get end event
 	$endEvent = API::Event()->get(array(
-		'triggerids' => $eventTrigger['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
+		'triggerids' => $eventTrigger['triggerid'],
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'time_from' => $mainEvent['clock'],
 		'time_till' => get_request('filter_set') ? zbxDateToTime($data['filter_to']) : null,
 		'filter' => array(

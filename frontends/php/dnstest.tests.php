@@ -144,11 +144,13 @@ if ($items) {
 	$triggerIds = array_keys($triggers);
 
 	$events = API::Event()->get(array(
+		'output' => API_OUTPUT_EXTEND,
 		'triggerids' => $triggerIds,
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'selectTriggers' => API_OUTPUT_REFER,
 		'time_from' => zbxDateToTime($data['filter_from']),
 		'time_till' => zbxDateToTime($data['filter_to']),
-		'output' => API_OUTPUT_EXTEND,
 		'filter' => array(
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		)
@@ -167,9 +169,11 @@ if ($items) {
 			if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 				// get event end time
 				$addEvent = API::Event()->get(array(
-					'triggerids' => array($incidents[$i]['objectid']),
-					'selectTriggers' => API_OUTPUT_REFER,
 					'output' => API_OUTPUT_EXTEND,
+					'triggerids' => array($incidents[$i]['objectid']),
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'selectTriggers' => API_OUTPUT_REFER,
 					'time_from' => zbxDateToTime($data['filter_to']),
 					'filter' => array(
 						'value' => TRIGGER_VALUE_FALSE,
@@ -205,9 +209,11 @@ if ($items) {
 				$i++;
 				// get event start time
 				$addEvent = API::Event()->get(array(
-					'triggerids' => $event['objectid'],
-					'selectTriggers' => API_OUTPUT_REFER,
 					'output' => API_OUTPUT_EXTEND,
+					'triggerids' => $event['objectid'],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'selectTriggers' => API_OUTPUT_REFER,
 					'time_till' => $event['clock'] - 1,
 					'filter' => array(
 						'value' => TRIGGER_VALUE_TRUE,
@@ -244,9 +250,11 @@ if ($items) {
 	if (isset($incidents[$i]) && $incidents[$i]['status'] == TRIGGER_VALUE_TRUE) {
 		// get event end time
 		$addEvent = API::Event()->get(array(
-			'triggerids' => $incidents[$i]['objectid'],
-			'selectTriggers' => API_OUTPUT_REFER,
 			'output' => API_OUTPUT_EXTEND,
+			'triggerids' => $incidents[$i]['objectid'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'selectTriggers' => API_OUTPUT_REFER,
 			'time_from' => zbxDateToTime($data['filter_to']),
 			'filter' => array(
 				'value' => TRIGGER_VALUE_FALSE,

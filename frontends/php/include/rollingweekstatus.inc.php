@@ -30,8 +30,10 @@ function getLastEvent($problemTrigger) {
 		'SELECT MAX(e.eventid) as eventid'.
 		' FROM events e'.
 		' WHERE e.objectid='.$problemTrigger.
-			' AND value_changed='.TRIGGER_VALUE_CHANGED_YES.
-			' AND value='.TRIGGER_VALUE_TRUE
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
+			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+			' AND e.value='.TRIGGER_VALUE_TRUE
 	));
 
 	return $problemEvent ? $problemEvent['eventid'] : null;
