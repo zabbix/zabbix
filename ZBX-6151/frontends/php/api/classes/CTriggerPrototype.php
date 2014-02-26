@@ -773,31 +773,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$createdTriggers = $this->get(array(
 			'triggerids' => $triggerids,
-			'output' => array('triggerid', 'description', 'expression', 'flags'),
-			'selectItems' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('name')
+			'output' => array('description'),
+			'selectItems' => array('itemid', 'hostid', 'flags')
 		));
-		foreach ($createdTriggers as $createdTrigger) {
-			$hostIds = array();
-			foreach ($createdTrigger['items'] as $titem) {
-				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hostIds[$titem['hostid']] = true;
-				}
-			}
 
-			if (!$hostIds) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" must contain at least one item prototype.',
-					$triggers[$createdTrigger['triggerid']]['description']
-				));
-			}
-			elseif (count($hostIds) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" contains item prototypes from multiple hosts.',
-					$triggers[$createdTrigger['triggerid']]['description']
-				));
-			}
-		}
+		$this->checkIfHasPrototype($createdTriggers);
+		$this->checkCrossRefferenceDiscovery($createdTriggers);
 
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
@@ -874,30 +855,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$updatedTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => API_OUTPUT_REFER,
-			'selectItems' => API_OUTPUT_EXTEND
+			'output' => array('description'),
+			'selectItems' => array('itemid', 'hostid', 'flags')
 		));
-		foreach ($updatedTriggers as $updatedTrigger) {
-			$hostIds = array();
-			foreach ($updatedTrigger['items'] as $titem) {
-				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hostIds[$titem['hostid']] = true;
-				}
-			}
 
-			if (!$hostIds) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" must contain at least one item prototype.',
-					$trigger['description']
-				));
-			}
-			elseif (count($hostIds) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" contains item prototypes from multiple hosts.',
-					$trigger['description']
-				));
-			}
-		}
+		$this->checkIfHasPrototype($updatedTriggers);
+		$this->checkCrossRefferenceDiscovery($updatedTriggers);
 
 		foreach ($triggers as $trigger) {
 			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
@@ -1117,5 +1080,59 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if trigger prototype has at least one item prototype.
+	 *
+	 * @throws APIException if trigger prototype does not contain at least one item prototype.
+	 *
+	 * @param array $triggers
+	 */
+	function checkIfHasPrototype(array $triggers) {
+		foreach ($triggers as $trigger) {
+			$hasPrototype = false;
+
+			foreach ($trigger['items'] as $item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					$hasPrototype = true;
+					break;
+				}
+			}
+
+			if (!$hasPrototype) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" must contain at least one item prototype.',
+					$trigger['description']
+				));
+			}
+		}
+	}
+
+	/**
+	 * Check if item prototypes belong to multiple discovery rules.
+	 *
+	 * @throws APIException if item prototypes belong to multiple discovery rules.
+	 *
+	 * @param array $trigger
+	 * @param array $items
+	 */
+	function checkCrossRefferenceDiscovery(array $triggers) {
+		foreach ($triggers as $trigger) {
+			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+				'nodeids' => get_current_nodeid(true),
+				'output' => array('parent_itemid'),
+				'filter' => array('itemid' => zbx_objectValues($trigger['items'], 'itemid')),
+			));
+
+			$itemDiscoveryIds = array_flip(zbx_objectValues($itemDiscoveries, 'parent_itemid'));
+
+			if (count($itemDiscoveryIds) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
+					$trigger['description']
+				));
+			}
+		}
 	}
 }
