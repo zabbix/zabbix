@@ -512,7 +512,6 @@ ZBX_GRAPH_ITEMS;
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
 		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed);

@@ -585,9 +585,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DCload_config();
 
-	/* need to set trigger status to UNKNOWN since last run */
-	DBupdate_triggers_status_after_restart();
-
 	/* make initial configuration sync before worker processes are forked */
 	DCsync_configuration();
 
