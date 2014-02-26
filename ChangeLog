@@ -61,6 +61,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
 .......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
 A.F....... [ZBX-7829] fixed reserving of new ids for standalone installations (Sasha)
 A......... [ZBX-6742] fixed templated graph item validation when items seem to belong to multiple hosts (Ivo)
@@ -890,6 +891,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
 A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
