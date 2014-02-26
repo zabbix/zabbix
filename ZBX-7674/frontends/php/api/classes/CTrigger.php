@@ -1308,10 +1308,15 @@ class CTrigger extends CTriggerGeneral {
 			updateServices($triggerId, SERVICE_STATUS_OK);
 		}
 
-		DBexecute(
-			'UPDATE services SET triggerid=NULL,showsla='.SERVICE_SHOW_SLA_OFF.
-			' WHERE '.dbConditionInt('triggerid', $triggerIds)
-		);
+		DB::update('services', array(
+			'values' => array(
+				'triggerid' => null,
+				'showsla' => SERVICE_SHOW_SLA_OFF
+			),
+			'where' => array(
+				'triggerid' => $triggerIds
+			)
+		));
 
 		parent::deleteByIds($triggerIds);
 	}
