@@ -1310,7 +1310,7 @@ class CTrigger extends CTriggerGeneral {
 
 		DB::update('services', array(
 			'values' => array(
-				'triggerid' => 0,
+				'triggerid' => null,
 				'showsla' => SERVICE_SHOW_SLA_OFF
 			),
 			'where' => array(
