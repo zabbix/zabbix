@@ -487,7 +487,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 	return ret;
 }
 
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
+static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
 	DB_RESULT	result;
