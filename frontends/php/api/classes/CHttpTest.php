@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHttpTest extends CZBXAPI {
+class CHttpTest extends CApiInstance {
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';

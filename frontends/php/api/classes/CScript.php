@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScript extends CZBXAPI {
+class CScript extends CApiInstance {
 
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';

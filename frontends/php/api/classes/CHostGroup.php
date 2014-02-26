@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHostGroup extends CZBXAPI {
+class CHostGroup extends CApiInstance {
 
 	protected $tableName = 'groups';
 	protected $tableAlias = 'g';

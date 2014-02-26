@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CProxy extends CZBXAPI {
+class CProxy extends CApiInstance {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';

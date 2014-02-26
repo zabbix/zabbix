@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CEvent extends CZBXAPI {
+class CEvent extends CApiInstance {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';

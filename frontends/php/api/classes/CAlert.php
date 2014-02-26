@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAlert extends CZBXAPI {
+class CAlert extends CApiInstance {
 
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';

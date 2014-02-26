@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CMapElement extends CZBXAPI {
+abstract class CMapElement extends CApiInstance {
 
 	protected function checkSelementInput(&$selements, $method) {
 		$update = ($method == 'updateSelements');

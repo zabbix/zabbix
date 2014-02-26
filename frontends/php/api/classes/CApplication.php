@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CApplication extends CZBXAPI {
+class CApplication extends CApiInstance {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';

@@ -28,7 +28,7 @@
  *
  * @package API
  */
-class CIconMap extends CZBXAPI {
+class CIconMap extends CApiInstance {
 
 	protected $tableName = 'icon_map';
 	protected $tableAlias = 'im';

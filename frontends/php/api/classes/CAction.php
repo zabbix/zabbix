@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAction extends CZBXAPI {
+class CAction extends CApiInstance {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';

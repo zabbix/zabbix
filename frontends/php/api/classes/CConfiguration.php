@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CConfiguration extends CZBXAPI {
+class CConfiguration extends CApiInstance {
 
 	/**
 	 * Export configuration data.

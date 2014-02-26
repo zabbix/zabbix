@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CImage extends CZBXAPI {
+class CImage extends CApiInstance {
 
 	protected $tableName = 'images';
 	protected $tableAlias = 'i';
