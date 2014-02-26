@@ -91,7 +91,8 @@ $data = array(
 	'stime' => getRequest('stime'),
 	'alias' => getRequest('alias'),
 	'users' => array(),
-	'alerts' => array()
+	'alerts' => array(),
+	'paging' => null
 );
 
 if ($data['alias']) {
@@ -128,6 +129,9 @@ if (!$data['alias'] || $data['users']) {
 
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
+	// padding
+	$data['paging'] = getPagingLine($data['alerts']);
+
 	// get users
 	if (!$data['alias']) {
 		$data['users'] = API::User()->get(array(
@@ -150,13 +154,10 @@ else {
 	$minStartTime = ZBX_MAX_PERIOD;
 }
 
-// padding
-$data['paging'] = getPagingLine($data['alerts']);
-
 // get actions names
 if ($data['alerts']) {
 	$data['actions'] = API::Action()->get(array(
-		'output' => array('actionid	', 'name'),
+		'output' => array('actionid', 'name'),
 		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
 		'preservekeys' => true
 	));
