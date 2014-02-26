@@ -129,7 +129,7 @@ if (!$data['alias'] || $data['users']) {
 
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
-	// padding
+	// paging
 	$data['paging'] = getPagingLine($data['alerts']);
 
 	// get users
