@@ -682,7 +682,8 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('hostid', 'name', 'value_type', 'flags'),
+			'output' => array('name', 'value_type', 'flags'),
+			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
@@ -693,29 +694,8 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
-			$hostIds = array();
-			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used because it is possible to make API call without full item data
-				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$hostIds[$allowedItems[$gitem['itemid']]['hostid']] = true;
-				}
-			}
-
-			if (!$hostIds) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Graph prototype "%1$s" must have at least one prototype.',
-					$graph['name']
-				));
-			}
-			elseif (count($hostIds) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Graph prototype "%1$s" contains item prototypes from multiple hosts.',
-					$graph['name']
-				));
-			}
-		}
+		$this->checkIfHasPrototype($graphs, $allowedItems);
+		$this->checkCrossRefferenceDiscovery($graphs, $allowedItems);
 
 		parent::validateCreate($graphs);
 
@@ -748,7 +728,8 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
-			'output' => array('hostid', 'name', 'value_type', 'flags'),
+			'output' => array('name', 'value_type', 'flags'),
+			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
 		));
@@ -759,31 +740,8 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			if (isset($graph['gitems'])) {
-				// check if the graph prototype has at least one item prototype and doesn't belong to multiple hosts
-				$hostIds = array();
-				foreach ($graph['gitems'] as $gitem) {
-					// $allowedItems used because it is possible to make API call without full item data
-					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$hostIds[$allowedItems[$gitem['itemid']]['hostid']] = true;
-					}
-				}
-
-				if (!$hostIds) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Graph prototype "%1$s" must have at least one prototype.',
-						$graph['name']
-					));
-				}
-				elseif (count($hostIds) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Graph prototype "%1$s" contains item prototypes from multiple hosts.',
-						$graph['name']
-					));
-				}
-			}
-		}
+		$this->checkIfHasPrototype($graphs, $allowedItems);
+		$this->checkCrossRefferenceDiscovery($graphs, $allowedItems);
 
 		parent::validateUpdate($graphs, $dbGraphs);
 
@@ -794,6 +752,67 @@ class CGraphPrototype extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
 				);
+			}
+		}
+	}
+
+	/**
+	 * Check if graph prototype has at least one item prototype.
+	 *
+	 * @throws APIException if graph prototype does not contain at least one item prototype.
+	 *
+	 * @param array $graphs
+	 * @param array $items		array of existing items and ones that user has permission to access
+	 */
+	function checkIfHasPrototype(array $graphs, array $items) {
+		foreach ($graphs as $graph) {
+			// for update method we will skip this step, if no items are set
+			if (isset($graph['gitems'])) {
+				$hasPrototype = false;
+
+				foreach ($graph['gitems'] as $item) {
+					if ($items[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$hasPrototype = true;
+						break;
+					}
+				}
+
+				if (!$hasPrototype) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" must have at least one prototype.',
+						$graph['name']
+					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if item prototypes belong to multiple discovery rules.
+	 *
+	 * @throws APIException if item prototypes belong to multiple discovery rules.
+	 *
+	 * @param array $graphs
+	 * @param array $items		array of existing items and ones that user has permission to access
+	 */
+	function checkCrossRefferenceDiscovery(array $graphs, array $items) {
+		foreach ($graphs as $graph) {
+			// for update method we will skip this step, if no items are set
+			if (isset($graph['gitems'])) {
+				$itemDiscoveryIds = array();
+
+				foreach ($graph['gitems'] as $item) {
+					$itemDiscoveryIds[] = $items[$item['itemid']]['itemDiscovery']['parent_itemid'];
+				}
+
+				$itemDiscoveryIds = array_flip($itemDiscoveryIds);
+
+				if (count($itemDiscoveryIds) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" contains item prototypes from multiple discovery rules.',
+						$graph['name']
+					));
+				}
 			}
 		}
 	}
