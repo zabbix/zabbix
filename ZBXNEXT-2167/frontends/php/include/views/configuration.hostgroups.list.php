@@ -43,11 +43,12 @@ $hostGroupWidget->addHeaderRowNumber();
 $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');
 
-// if any of the groups are about to be deleted, show the status column
-$showStatus = false;
+// if any of the groups are about to be deleted, show the info column
+$showInfo = false;
+
 foreach ($this->data['groups'] as $hostGroup) {
 	if ($hostGroup['groupDiscovery'] && $hostGroup['groupDiscovery']['ts_delete']) {
-		$showStatus = true;
+		$showInfo = true;
 		break;
 	}
 }
@@ -60,7 +61,7 @@ $hostGroupTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name'),
 	' # ',
 	_('Members'),
-	($showStatus) ? _('Status') : null
+	$showInfo ? _('Info') : null
 ));
 
 foreach ($this->data['groups'] as $group) {
@@ -133,20 +134,24 @@ foreach ($this->data['groups'] as $group) {
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
-	// status
-	if ($showStatus) {
-		$status = array();
-
+	// info
+	if ($showInfo) {
 		// discovered item lifetime indicator
 		if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-			$deleteError->setHint(
+			$info = new CDiv(SPACE, 'status_icon iconwarning');
+			$info->setHint(
 				_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 					zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
 					zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
-				));
-			$status[] = $deleteError;
+				)
+			);
 		}
+		else {
+			$info = SPACE;
+		}
+	}
+	else {
+		$info = null;
 	}
 
 	$hostGroupTable->addRow(array(
@@ -159,7 +164,7 @@ foreach ($this->data['groups'] as $group) {
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
 		),
 		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
-		($showStatus) ? $status : null
+		$info
 	));
 }
 
