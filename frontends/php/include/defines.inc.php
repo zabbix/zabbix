@@ -929,6 +929,8 @@ define('INCIDENT_FALSE_POSITIVE',	2);
 define('DNSTEST_NO_REPLY_ERROR_CODE',	-200);
 define('DNSSEC_FAIL_ERROR_CODE',		-204);
 
+define('MIN_PROBE_OK_RESULT_PERCENTAGE',	49);
+
 // DNS TEST calculated items keys
 define('CALCULATED_ITEM_DNS_FAIL',				'dnstest.configvalue[INCIDENT.DNS.FAIL]');
 define('CALCULATED_ITEM_DNS_RECOVERY',			'dnstest.configvalue[INCIDENT.DNS.RECOVER]');

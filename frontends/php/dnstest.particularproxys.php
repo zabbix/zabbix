@@ -225,7 +225,9 @@ if ($data['tld'] && $data['slvItem'] && $data['probe']) {
 		$data['probe']['test'] = ($data['positiveNs'] >= $minNs) ? true : false;
 	}
 	else {
-		$data['probe']['test'] = ($data['totalNs'] / 2 <= $data['positiveNs']) ? true : false;
+		$data['probe']['test'] = ($data['positiveNs'] / $data['totalNs'] * 100 > MIN_PROBE_OK_RESULT_PERCENTAGE)
+			? true
+			: false;
 	}
 }
 else {
