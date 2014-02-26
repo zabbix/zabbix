@@ -787,14 +787,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (!$hostIds) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype expression "%1$s" must contain at least one item prototype.',
-					$triggers[$createdTrigger['triggerid']]['expression']
+					'Trigger prototype "%1$s" must contain at least one item prototype.',
+					$triggers[$createdTrigger['triggerid']]['description']
 				));
 			}
 			elseif (count($hostIds) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype expression "%1$s" contains trigger prototypes from multiple hosts.',
-					$triggers[$createdTrigger['triggerid']]['expression']
+					'Trigger prototype "%1$s" contains item prototypes from multiple hosts.',
+					$triggers[$createdTrigger['triggerid']]['description']
 				));
 			}
 		}
