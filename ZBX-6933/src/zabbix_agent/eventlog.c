@@ -97,15 +97,15 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
 static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTSTR *pEventMessageFile,
 		LPTSTR *pParamMessageFile)
 {
-	TCHAR	Buf[MAX_PATH];
+	TCHAR	buf[MAX_PATH];
 	HKEY	hKey = NULL;
 	LPTSTR	pFile = NULL;
 	DWORD	szData;
 
 	/* Get path to message dll */
-	zbx_wsnprintf(Buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
+	zbx_wsnprintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, Buf, 0, KEY_READ, &hKey))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, buf, 0, KEY_READ, &hKey))
 		return;
 
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, TEXT("EventMessageFile"), NULL, NULL, NULL, &szData))
