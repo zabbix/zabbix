@@ -233,29 +233,24 @@ function change_group_debug_mode($userGroupIds, $debugMode) {
 /**
  * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
  *
- * @param array $userData
+ * @param array  $userData
+ * @param string $userData['alias']
+ * @param string $userData['name']
+ * @param string $userData['surname']
  *
  * @return string
  */
 function getUserFullname($userData) {
-	$fullname = '';
-	if (!zbx_empty($userData['name'])) {
-		$fullname = $userData['name'];
-	}
-
-	// return full name and surname
 	if (!zbx_empty($userData['surname'])) {
 		if (!zbx_empty($userData['name'])) {
 			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
 		}
+
 		$fullname = $userData['surname'];
 	}
-
-	// return alias with full name
-	if (!zbx_empty($fullname)) {
-		return $userData['alias'].' ('.$fullname.')';
-	}
 	else {
-		return $userData['alias'];
+		$fullname = zbx_empty($userData['name']) ? '' : $userData['name'];
 	}
+
+	return zbx_empty($fullname) ? $userData['alias'] : $userData['alias'].' ('.$fullname.')';
 }

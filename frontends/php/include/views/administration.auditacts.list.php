@@ -37,15 +37,14 @@ $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterTable = new CTable('', 'filter');
-$filterTable->addRow(array(
-	array(
-		bold(_('Recipient')),
-		SPACE,
-		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button')
+$filterTable->addRow(array(array(
+	bold(_('Recipient')),
+	SPACE,
+	new CTextBox('alias', $this->data['alias'], 20),
+	new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
+		'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button'
 	)
-));
+)));
 $filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 $filterButton->useJQueryStyle('main');
 $resetButton = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();');
@@ -64,7 +63,7 @@ $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo(_('No audit entries found.'));
+$auditTable = new CTableInfo(_('No action log entries found.'));
 $auditTable->setHeader(array(
 	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
@@ -123,12 +122,16 @@ foreach ($this->data['alerts'] as $alert) {
 		$info->setHint($alert['error'], '', 'on');
 	}
 
+	$recipient = (isset($alert['userid']) && $alert['userid'])
+		? array(bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto'])
+		: $alert['sendto'];
+
 	$auditTable->addRow(array(
 		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol($mediatype['description'], 'top'),
-		new CCol($alert['sendto'], 'top'),
+		new CCol($recipient, 'top'),
 		new CCol($message, 'wraptext top'),
 		new CCol($status, 'top'),
 		new CCol($info, 'top')
@@ -150,7 +153,7 @@ $objData = array(
 	'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
-zbx_add_post_js('timeControl.addObject(\'events\', '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
+zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
 
 // append form to widget

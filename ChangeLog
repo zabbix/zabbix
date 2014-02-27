@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
 ..F....... [ZBXNEXT-1533] added "Action name" in Audit->Action log (Oleg)
@@ -29,6 +30,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
 ........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
@@ -59,6 +61,11 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+.......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
+A.F....... [ZBX-7829] fixed reserving of new ids for standalone installations (Sasha)
+A......... [ZBX-6742] fixed templated graph item validation when items seem to belong to multiple hosts (Ivo)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
 ........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
 ..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
@@ -884,6 +891,8 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)

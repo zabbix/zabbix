@@ -86,6 +86,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
