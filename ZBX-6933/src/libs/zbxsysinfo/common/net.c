@@ -174,10 +174,12 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	size_t		offset = 0;
-	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
-	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	struct in_addr	inaddr;
+	size_t			offset = 0;
+	int			res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL,
+				saved_nscount, saved_retrans, saved_retry;
+	char			ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	struct in_addr		inaddr;
+	struct sockaddr_in	saved_ns;
 
 	typedef struct
 	{
@@ -416,7 +418,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		pDnsRecord = pDnsRecord->pNext;
 	}
 #else	/* not _WINDOWS */
-	res_init();	/* initialize always, settings might have changed */
+	if (-1 == res_init())	/* initialize always, settings might have changed */
+		return SYSINFO_RET_FAIL;
 
 	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 		return SYSINFO_RET_FAIL;
@@ -426,16 +429,31 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		if (0 == inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
 
+		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in));
+		saved_nscount = _res.nscount;
+
 		_res.nsaddr_list[0].sin_addr = inaddr;
 		_res.nsaddr_list[0].sin_family = AF_INET;
 		_res.nsaddr_list[0].sin_port = htons(ZBX_DEFAULT_DNS_PORT);
 		_res.nscount = 1;
 	}
 
+	saved_retrans = _res.retrans;
+	saved_retry = _res.retry;
+
 	_res.retrans = retrans;
 	_res.retry = retry;
 
 	res = res_send(buf, res, answer.buffer, sizeof(answer.buffer));
+
+	_res.retrans = saved_retrans;
+	_res.retry = saved_retry;
+
+	if ('\0' != *ip)
+	{
+		memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
+		_res.nscount = saved_nscount;
+	}
 
 	hp = (HEADER *)answer.buffer;
 

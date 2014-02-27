@@ -684,6 +684,14 @@ class CUser extends CZBXAPI {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
+		elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			// forbid admins to add media to other users
+			foreach ($users as $user) {
+				if (self::$userData['userid'] != $user['userid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+			}
+		}
 
 		$timePeriodValidator = new CTimePeriodValidator();
 		foreach ($users as $user) {
@@ -722,6 +730,19 @@ class CUser extends CZBXAPI {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
+		elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			// forbid admins to delete media of other users
+			$media = DBfetch(DBselect(
+				'SELECT m.userid'.
+					' FROM media m'.
+					' WHERE '.dbConditionInt('m.mediaid', $mediaids).
+					' AND m.userid!='.zbx_dbstr(self::$userData['userid']),
+				1
+			));
+			if ($media) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
 
 		$sql = 'DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids);
 		if (!DBexecute($sql)) {
@@ -751,6 +772,14 @@ class CUser extends CZBXAPI {
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
+		}
+		elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			// forbid admins to update media of other users
+			foreach ($users as $user) {
+				if (self::$userData['userid'] != $user['userid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+			}
 		}
 
 		$updMedias = array();
@@ -948,6 +977,21 @@ class CUser extends CZBXAPI {
 				$config = select_config();
 				$authType = $config['authentication_type'];
 				break;
+		}
+
+		if ($authType == ZBX_AUTH_HTTP) {
+			// if PHP_AUTH_USER is not set, it means that HTTP authentication is not enabled
+			if (!isset($_SERVER['PHP_AUTH_USER'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot login.'));
+			}
+			// check if the user name used when calling the API matches the one used for HTTP authentication
+			elseif ($name !== $_SERVER['PHP_AUTH_USER']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Login name "%1$s" does not match the name "%2$s" used to pass HTTP authentication.',
+						$name, $_SERVER['PHP_AUTH_USER']
+					)
+				);
+			}
 		}
 
 		try {

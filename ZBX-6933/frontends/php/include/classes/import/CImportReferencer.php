@@ -691,7 +691,13 @@ class CImportReferencer {
 			$allowedTriggers = API::Trigger()->get(array(
 				'triggerids' => $triggerIds,
 				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+				'filter' => array(
+					'flags' => array(
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_CHILD,
+						ZBX_FLAG_DISCOVERY_CREATED
+					)
+				),
 				'editable' => true,
 				'preservekeys' => true
 			));
