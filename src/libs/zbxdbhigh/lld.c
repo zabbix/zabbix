@@ -75,8 +75,8 @@ static void	lld_condition_free(lld_condition_t *condition)
  ******************************************************************************/
 static int	lld_condition_compare_by_macro(const void *item1, const void *item2)
 {
-	lld_condition_t	*condition1 = *(lld_condition_t**)item1;
-	lld_condition_t	*condition2 = *(lld_condition_t**)item2;
+	lld_condition_t	*condition1 = *(lld_condition_t **)item1;
+	lld_condition_t	*condition2 = *(lld_condition_t **)item2;
 
 	return strcmp(condition1->macro, condition2->macro);
 }
@@ -365,7 +365,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 		{
 			id_len = strlen(id);
 
-			*src = SUCCEED == ret ? '1' : '0';
+			*src = (SUCCEED == ret ? '1' : '0');
 			memset(src + 1, ' ', id_len - 1);
 			src += id_len;
 		}
@@ -381,7 +381,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 	while ('\0' != *src++);
 
 	if (SUCCEED == evaluate(&result, expression, error, sizeof(error)))
-		ret = (0 == result) ? FAIL : SUCCEED;
+		ret = (0 == result ? FAIL : SUCCEED);
 
 	zbx_free(expression);
 
@@ -416,6 +416,7 @@ static int	filter_evaluate(lld_filter_t *filter, struct zbx_json_parse *jp_row)
 		case CONDITION_EVAL_TYPE_EXPRESSION:
 			return filter_evaluate_expression(filter, jp_row);
 	}
+
 	return FAIL;
 }
 

@@ -4392,7 +4392,7 @@ static void	expression_get_token(const char *expression, char const **start, cha
 	pend++;
 
 	/* find the next token */
-	while('\0' != *pend)
+	while ('\0' != *pend)
 	{
 		switch (token_class)
 		{
@@ -4423,7 +4423,7 @@ out:
  * Function: translate_expression                                             *
  *                                                                            *
  * Purpose: translate logical expression containing AND/OR operators into     *
- *          internal format with &/| operators and remove whitespace.         *
+ *          internal format with &/| operators and remove whitespace          *
  *                                                                            *
  * Parameters: expression  - [IN] the source expression                       *
  *             out         - [OUT] the resulting expression                   *
