@@ -21,8 +21,6 @@
 #include "log.h"
 #include "eventlog.h"
 
-#define	MAX_INSERT_STRS 100
-#define MAX_MSG_LENGTH 1024
 #define	DEFAULT_EVENT_CONTENT_SIZE 256
 
 static	LPCWSTR RENDER_ITEMS[] = {
@@ -99,6 +97,153 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_message_files                                            *
+ *                                                                            *
+ * Purpose: gets event message and parameter translation files from registry  *
+ *                                                                            *
+ * Parameters: szLogName         - [IN] the log name                          *
+ *             szSourceName      - [IN] the log source name                   *
+ *             pEventMessageFile - [OUT] the event message file               *
+ *             pParamMessageFile - [OUT] the parameter message file           *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTSTR *pEventMessageFile,
+		LPTSTR *pParamMessageFile)
+{
+	TCHAR	buf[MAX_PATH];
+	HKEY	hKey = NULL;
+	DWORD	szData;
+
+	/* Get path to message dll */
+	zbx_wsnprintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
+
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, buf, 0, KEY_READ, &hKey))
+		return;
+
+	if (ERROR_SUCCESS == RegQueryValueEx(hKey, TEXT("EventMessageFile"), NULL, NULL, NULL, &szData))
+	{
+		*pEventMessageFile = zbx_malloc(*pEventMessageFile, szData);
+		if (ERROR_SUCCESS != RegQueryValueEx(hKey, TEXT("EventMessageFile"), NULL, NULL,
+				(LPBYTE)*pEventMessageFile, &szData))
+		{
+			zbx_free(*pEventMessageFile);
+		}
+	}
+
+	if (ERROR_SUCCESS == RegQueryValueEx(hKey, TEXT("ParameterMessageFile"), NULL, NULL, NULL, &szData))
+	{
+		*pParamMessageFile = zbx_malloc(*pParamMessageFile, szData);
+		if (ERROR_SUCCESS != RegQueryValueEx(hKey, TEXT("ParameterMessageFile"), NULL, NULL,
+				(LPBYTE)*pParamMessageFile, &szData))
+		{
+			zbx_free(*pParamMessageFile);
+		}
+	}
+
+	RegCloseKey(hKey);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_load_message_file                                            *
+ *                                                                            *
+ * Purpose: load the specified message file, expanding environment variables  *
+ *          in the file name if necessary                                     *
+ *                                                                            *
+ * Parameters: szFileName - [IN] the message file name                        *
+ *                                                                            *
+ * Return value: Handle to the loaded library or NULL otherwise               *
+ *                                                                            *
+ ******************************************************************************/
+static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
+{
+	TCHAR	MsgDll[MAX_PATH];
+
+	if (NULL == szFileName || 0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
+		return NULL;
+
+	return LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_format_message                                               *
+ *                                                                            *
+ * Purpose: extracts the specified message from a message file                *
+ *                                                                            *
+ * Parameters: hLib           - [IN] the message file handle                  *
+ *             dwMessageId    - [IN] the message identifier                   *
+ *             pInsertStrings - [IN] a list of insert strings, optional       *
+ *                                                                            *
+ * Return value: The formatted message converted to utf8 or NULL              *
+ *                                                                            *
+ * Comments: This function allocates memory for the returned message, which   *
+ *           must be freed by the caller later.                               *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_format_message(HINSTANCE hLib, DWORD dwMessageId, LPTSTR *pInsertStrings)
+{
+	LPTSTR	pMsgBuf = NULL;
+	char	*message;
+
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+			hLib, dwMessageId, MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US), (LPTSTR)&pMsgBuf, 0,
+			(va_list *)pInsertStrings))
+	{
+		return NULL;
+	}
+
+	message = zbx_unicode_to_utf8(pMsgBuf);
+	zbx_rtrim(message, "\r\n ");
+
+	LocalFree((HLOCAL)pMsgBuf);
+
+	return message;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_translate_message_params                                     *
+ *                                                                            *
+ * Purpose: translates message by replacing parameters %%<id> with translated *
+ *          values                                                            *
+ *                                                                            *
+ * Parameters: message - [IN/OUT] the message to translate                    *
+ *             hLib    - [IN] the parameter message file handle               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
+{
+	char	*param, *pstart, *pend;
+	int	dwMessageId;
+	size_t	offset = 0;
+
+	while (1)
+	{
+		if (NULL == (pstart = strstr(*message + offset, "%%")))
+			break;
+
+		pend = pstart + 2;
+
+		dwMessageId = atoi(pend);
+
+		while ('\0' != *pend && 0 != isdigit(*pend))
+			pend++;
+
+		offset = pend - *message - 1;
+
+		if (NULL != (param = zbx_format_message(hLib, dwMessageId, NULL)))
+		{
+			zbx_replace_string(message, pstart - *message, &offset, param);
+
+			zbx_free(param);
+		}
+	}
+}
+
 /* get Nth error from event log. 1 is the first. */
 static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source,
 		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
@@ -108,14 +253,9 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	int		buffer_size = 512;
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
-	TCHAR		stat_buf[MAX_PATH], MsgDll[MAX_PATH];
-	HKEY		hk = NULL;
-	LPTSTR		pFile = NULL, pNextFile = NULL;
-	DWORD		szData, Type;
-	HINSTANCE	hLib = NULL;				/* handle to the messagetable DLL */
-	LPTSTR		pCh, aInsertStrs[MAX_INSERT_STRS];	/* array of pointers to insert */
-	LPTSTR		msgBuf = NULL;				/* hold text of the error message */
-	char		*buf = NULL;
+	LPTSTR		pEventMessageFile = NULL, pParamMessageFile = NULL, pFile = NULL, pNextFile = NULL, pCh,
+			*pInsertStrings = NULL;
+	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
 
@@ -126,25 +266,20 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	*out_severity	= 0;
 	*out_timestamp	= 0;
 	*out_eventid	= 0;
-	memset(aInsertStrs, 0, sizeof(aInsertStrs));
 
 	pELR = (EVENTLOGRECORD *)zbx_malloc((void *)pELR, buffer_size);
-retry:
-	if (0 == ReadEventLog(eventlog_handle, EVENTLOG_SEEK_READ | EVENTLOG_FORWARDS_READ, which,
+
+	while (0 == ReadEventLog(eventlog_handle, EVENTLOG_SEEK_READ | EVENTLOG_FORWARDS_READ, which,
 			pELR, buffer_size, &dwRead, &dwNeeded))
 	{
-		dwErr = GetLastError();
-		if (dwErr == ERROR_INSUFFICIENT_BUFFER)
-		{
-			buffer_size = dwNeeded;
-			pELR = (EVENTLOGRECORD *)zbx_realloc((void *)pELR, buffer_size);
-			goto retry;
-		}
-		else
+		if (ERROR_INSUFFICIENT_BUFFER != (dwErr = GetLastError()))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __function_name, strerror_from_system(dwErr));
 			goto out;
 		}
+
+		buffer_size = dwNeeded;
+		pELR = (EVENTLOGRECORD *)zbx_realloc((void *)pELR, buffer_size);
 	}
 
 	*out_severity	= pELR->EventType;			/* return event type */
@@ -152,38 +287,26 @@ retry:
 	*out_eventid	= pELR->EventID & 0xffff;
 	*out_source	= zbx_unicode_to_utf8((LPTSTR)(pELR + 1));	/* copy source name */
 
-	err = FAIL;
+	/* get message file names */
+	zbx_get_message_files(wsource, (LPTSTR)(pELR + 1), &pEventMessageFile, &pParamMessageFile);
 
-	/* prepare the array of insert strings for FormatMessage - the
-	insert strings are in the log entry. */
-	for (i = 0, pCh = (LPTSTR)((LPBYTE)pELR + pELR->StringOffset);
-			i < pELR->NumStrings && i < MAX_INSERT_STRS;
-			i++, pCh += zbx_strlen(pCh) + 1) /* point to next string */
+	/* prepare insert string array */
+	if (0 < pELR->NumStrings)
 	{
-		aInsertStrs[i] = pCh;
-	}
+		pInsertStrings = zbx_malloc(NULL, sizeof(LPWSTR) * pELR->NumStrings);
 
-	/* Get path to message dll */
-	zbx_wsnprintf(stat_buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), wsource, (LPTSTR)(pELR + 1));
+		pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
 
-	if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, stat_buf, 0, KEY_READ, &hk))
-	{
-		if (ERROR_SUCCESS == RegQueryValueEx(hk, TEXT("EventMessageFile"), NULL, &Type, NULL, &szData))
+		for (i = 0; i < pELR->NumStrings; i++)
 		{
-			buf = zbx_malloc(buf, szData);
-			if (ERROR_SUCCESS == RegQueryValueEx(hk, TEXT("EventMessageFile"), NULL, &Type,
-					(LPBYTE)buf, &szData))
-			{
-				pFile = (LPTSTR)buf;
-			}
+			pInsertStrings[i] = pCh;
+			pCh += zbx_strlen(pCh) + 1;
 		}
-
-		RegCloseKey(hk);
 	}
 
 	err = FAIL;
 
-	while (NULL != pFile && FAIL == err)
+	for (pFile = pEventMessageFile; NULL != pFile && err != SUCCEED; pFile = pNextFile)
 	{
 		if (NULL != (pNextFile = zbx_strchr(pFile, ';')))
 		{
@@ -191,36 +314,27 @@ retry:
 			pNextFile++;
 		}
 
-		if (0 != ExpandEnvironmentStrings(pFile, MsgDll, MAX_PATH))
+		if (NULL != (hLib = zbx_load_message_file(pFile)))
 		{
-			if (NULL != (hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
+			if (NULL != (*out_message = zbx_format_message(hLib, pELR->EventID, pInsertStrings)))
 			{
-				/* Format the message from the message DLL with the insert strings */
-				if (0 != FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-						FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM |
-						FORMAT_MESSAGE_MAX_WIDTH_MASK,	/* do not generate new line breaks */
-						hLib,				/* the messagetable DLL handle */
-						pELR->EventID,			/* message ID */
-						MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
-						(LPTSTR)&msgBuf,		/* address of pointer to buffer for message */
-						0,
-						(va_list *)aInsertStrs))	/* array of insert strings for the message */
+				err = SUCCEED;
+
+				if (NULL != (hParamLib = zbx_load_message_file(pParamMessageFile)))
 				{
-					*out_message = zbx_unicode_to_utf8(msgBuf);
-					zbx_rtrim(*out_message, "\r\n ");
-
-					/* Free the buffer that FormatMessage allocated for us. */
-					LocalFree((HLOCAL)msgBuf);
-
-					err = SUCCEED;
+					zbx_translate_message_params(out_message, hParamLib);
+					FreeLibrary(hParamLib);
 				}
-				FreeLibrary(hLib);
 			}
+
+			FreeLibrary(hLib);
 		}
-		pFile = pNextFile;
 	}
 
-	zbx_free(buf);
+	zbx_free(pInsertStrings);
+
+	zbx_free(pEventMessageFile);
+	zbx_free(pParamMessageFile);
 
 	if (SUCCEED != err)
 	{
@@ -228,16 +342,22 @@ retry:
 				" cannot be found. The local computer may not have the necessary registry"
 				" information or message DLL files to display messages from a remote computer.",
 				*out_eventid, NULL == *out_source ? "" : *out_source);
-		if (pELR->NumStrings)
-			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
-		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
+
+		if (0 < pELR->NumStrings)
 		{
-			if (i > 0)
-				*out_message = zbx_strdcatf(*out_message, "; ");
-			if (aInsertStrs[i])
+			char	*buf;
+
+			*out_message = zbx_strdcat(*out_message, " The following information is part of the event: ");
+
+			for (i = 0, pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
+					i < pELR->NumStrings;
+					i++, pCh += zbx_strlen(pCh) + 1)
 			{
-				buf = zbx_unicode_to_utf8(aInsertStrs[i]);
-				*out_message = zbx_strdcatf(*out_message, "%s", buf);
+				if (0 < i)
+					*out_message = zbx_strdcat(*out_message, "; ");
+
+				buf = zbx_unicode_to_utf8(pCh);
+				*out_message = zbx_strdcat(*out_message, buf);
 				zbx_free(buf);
 			}
 		}
@@ -295,7 +415,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		if (*lastlogsize > LastID)
 			*lastlogsize = FirstID;
 		else if (*lastlogsize >= FirstID)
-			FirstID = (*lastlogsize) + 1;
+			FirstID = (long)*lastlogsize + 1;
 
 		for (i = (long)FirstID; i < LastID; i++)
 		{
