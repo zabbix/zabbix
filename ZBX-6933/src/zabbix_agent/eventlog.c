@@ -145,7 +145,7 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
  ******************************************************************************/
 static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 {
-	TCHAR		MsgDll[MAX_PATH];
+	TCHAR	MsgDll[MAX_PATH];
 
 	if (NULL == szFileName || 0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
 		return NULL;
