@@ -121,7 +121,6 @@ if ($trigger['priority'] >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
 		'output' => array('mediatypeid'),
 		'limit' => 1
 	));
-	$remedyService = reset($remedyService);
 
 	if ($remedyService) {
 		// check if current event has Remedy connected
@@ -142,11 +141,11 @@ if ($trigger['priority'] >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
 			$eventId = $event['eventid'];
 
 			// something went wrong getting that ticket
-			if (isset($ticket[$eventId]['error']) && $ticket[$eventId]['error']) {
+			if ($ticket[$eventId]['error']) {
 				error($ticket[$eventId]['error']);
 			}
 			// ticket exists. Create link to ticket and label "Update ticket"
-			elseif (isset($ticket[$eventId]['externalid']) && $ticket[$eventId]['externalid']) {
+			elseif ($ticket[$eventId]['externalid']) {
 				$ticketTable = new CTableInfo();
 
 				$ticketLink = new CLink($ticket[$eventId]['externalid'],
@@ -154,7 +153,7 @@ if ($trigger['priority'] >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
 				);
 				$ticketLink->setTarget('_blank');
 
-				$ticketTable->addRow(array(_('Ticket ID'), $ticketLink));
+				$ticketTable->addRow(array(_('Ticket'), $ticketLink));
 				$ticketTable->addRow(array(_('Created'), zbx_date2str(_('d M Y H:i:s'), $ticket[$eventId]['clock'])));
 
 				$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
