@@ -435,7 +435,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_IPMI:
@@ -443,7 +443,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_ipmi(item, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_SIMPLE:
@@ -461,7 +461,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_AGGREGATE:
@@ -478,7 +478,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(0);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
@@ -496,7 +496,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
-			res = NOTSUPPORTED;
+			res = CONFIG_ERROR;
 	}
 
 	if (SUCCEED != res)
@@ -545,6 +545,7 @@ static int	get_values(unsigned char poller_type)
 	zbx_timespec_t	timespec;
 	int		i, num;
 	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int		last_available = HOST_AVAILABLE_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -565,7 +566,7 @@ static int	get_values(unsigned char poller_type)
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -584,7 +585,7 @@ static int	get_values(unsigned char poller_type)
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
-					errcodes[i] = NETWORK_ERROR;
+					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
 				break;
@@ -618,7 +619,7 @@ static int	get_values(unsigned char poller_type)
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = NOTSUPPORTED;
+					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
 				break;
@@ -680,11 +681,22 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				activate_host(&items[i], &timespec);
+				if (HOST_AVAILABLE_TRUE != last_available)
+				{
+					activate_host(&items[i], &timespec);
+					last_available = HOST_AVAILABLE_TRUE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
-				deactivate_host(&items[i], &timespec, results[i].msg);
+				if (HOST_AVAILABLE_FALSE != last_available)
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_available = HOST_AVAILABLE_FALSE;
+				}
+				break;
+			case CONFIG_ERROR:
+				/* nothing to do */
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
@@ -698,7 +710,7 @@ static int	get_values(unsigned char poller_type)
 					items[i].state, NULL);
 			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
 		}
-		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,

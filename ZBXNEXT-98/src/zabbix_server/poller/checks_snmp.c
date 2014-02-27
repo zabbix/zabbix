@@ -653,6 +653,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
  *                                                                            *
  * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
  *               NETWORK_ERROR - recoverable network error                    *
+ *               CONFIG_ERROR - item configuration error                      *
  *               SUCCEED - if function successfully completed                 *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
@@ -694,14 +695,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", OID));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
 	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
@@ -729,14 +730,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		if (NULL == (pdu = snmp_pdu_create(0 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK)))	/* create PDU */
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
-			ret = NOTSUPPORTED;
+			ret = CONFIG_ERROR;
 			break;
 		}
 
 		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))	/* add OID as variable to PDU */
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
-			ret = NOTSUPPORTED;
+			ret = CONFIG_ERROR;
 			snmp_free_pdu(pdu);
 			break;
 		}
@@ -876,7 +877,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
 	{
 		strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
@@ -895,14 +896,14 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".",
 					oids[i]));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
 		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -1136,7 +1137,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		default:
 			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[0].snmp_oid));
-			errcodes[0] = NOTSUPPORTED;
+			errcodes[0] = CONFIG_ERROR;
 	}
 
 	if (SUCCEED != (ret = errcodes[0]))
@@ -1180,7 +1181,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -1192,7 +1193,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Unsupported method \"%s\" in the OID \"%s\".",
 					method, items[i].snmp_oid));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -1294,17 +1295,17 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				goto exit;
 			}
 
-			if (NOTSUPPORTED == errcode)
+			if (CONFIG_ERROR == errcode || NOTSUPPORTED == errcode)
 			{
-				/* consider a "not supported" error as relating */
-				/* only to the items we have just tried to walk for */
+				/* consider a configuration or "not supported" error as */
+				/* relating only to the items we have just tried to walk for */
 
 				for (k = i; k < to_walk_num; k++)
 				{
 					if (0 == strcmp(oids_translated[to_walk[k]], oids_translated[j]))
 					{
 						SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, result.msg));
-						errcodes[to_walk[k]] = NOTSUPPORTED;
+						errcodes[to_walk[k]] = errcode;
 					}
 				}
 			}
@@ -1374,7 +1375,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
-			errcodes[i] = NOTSUPPORTED;
+			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
 
@@ -1420,7 +1421,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error))))
 	{
-		err = NOTSUPPORTED;
+		err = NETWORK_ERROR;
 		goto exit;
 	}
 
