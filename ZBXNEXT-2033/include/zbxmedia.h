@@ -51,6 +51,8 @@ typedef struct
 	char		*status;
 	/* contains error message or NULL otherwise */
 	char		*error;
+	/* the assignee */
+	char		*assignee;
 	/* 1 if a new ticket was created, 0 otherwise, set only for zbx_remedy_acknowledge_events() request */
 	int		is_new;
 	/* the ticket creation time, set only for zbx_remedy_query_events() request */

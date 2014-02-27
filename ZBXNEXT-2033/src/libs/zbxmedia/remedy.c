@@ -68,6 +68,7 @@
 #define ZBX_REMEDY_FIELD_INCIDENT_NUMBER	"Incident_Number"
 #define ZBX_REMEDY_FIELD_STATUS			"Status"
 #define ZBX_REMEDY_FIELD_ACTION			"Action"
+#define ZBX_REMEDY_FIELD_ASSIGNEE		"Assignee"
 
 #define ZBX_REMEDY_ERROR_INVALID_INCIDENT	"ERROR (302)"
 
@@ -99,6 +100,8 @@
 /* defines current state of event processing - automated (alerts) or manual (frontend) */
 #define ZBX_REMEDY_PROCESS_MANUAL	0
 #define ZBX_REMEDY_PROCESS_AUTOMATED	1
+
+#define ZBX_REMEDY_SERVICE_TIMEOUT	10
 
 typedef struct
 {
@@ -394,7 +397,7 @@ static const char	*remedy_fields_get_value(zbx_remedy_field_t *fields, int field
 static int	remedy_init_connection(CURL **easyhandle, const struct curl_slist *headers, const char *url,
 		const char *proxy, char **error)
 {
-	int			opt, timeout = 10, ret = FAIL, err;
+	int			opt, timeout = ZBX_REMEDY_SERVICE_TIMEOUT, ret = FAIL, err;
 
 	if (NULL == (*easyhandle = curl_easy_init()))
 	{
@@ -1532,7 +1535,8 @@ int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tic
 	DB_MEDIATYPE		mediatype = {0};
 
 	zbx_remedy_field_t	fields[] = {
-			{ZBX_REMEDY_FIELD_STATUS, NULL}
+			{ZBX_REMEDY_FIELD_STATUS, NULL},
+			{ZBX_REMEDY_FIELD_ASSIGNEE, NULL}
 	};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1557,10 +1561,16 @@ int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tic
 				mediatype.username, mediatype.passwd, ticket->ticketid, fields, ARRSIZE(fields),
 				&ticket->error))
 		{
-			const char *status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+			const char *status, *assignee;
+
+			status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+			assignee = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_ASSIGNEE);
 
 			if (NULL != status)
 				ticket->status = zbx_strdup(NULL, status);
+
+			if (NULL != assignee)
+				ticket->assignee = zbx_strdup(NULL, assignee);
 		}
 
 		zbx_vector_ptr_append(tickets, ticket);
@@ -1664,6 +1674,7 @@ void	zbx_free_ticket(zbx_ticket_t *ticket)
 	zbx_free(ticket->ticketid);
 	zbx_free(ticket->status);
 	zbx_free(ticket->error);
+	zbx_free(ticket->assignee);
 	zbx_free(ticket);
 }
 

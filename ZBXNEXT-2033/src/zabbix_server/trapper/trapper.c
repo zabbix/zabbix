@@ -532,6 +532,9 @@ static void	format_media_response(struct zbx_json *json, zbx_vector_ptr_t *ticke
 
 			zbx_snprintf(buf, sizeof(buf), "%d", ticket->clock);
 			zbx_json_addstring(json, "clock", buf, ZBX_JSON_TYPE_INT);
+
+			zbx_json_addstring(json, "assignee", (NULL != ticket->assignee ? ticket->assignee : ""),
+					ZBX_JSON_TYPE_STRING);
 		}
 		else
 		{
