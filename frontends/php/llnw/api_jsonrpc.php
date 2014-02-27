@@ -51,6 +51,9 @@ elseif ($json['method'] == 'dm.info') {
 elseif ($json['method'] == 'queue.info') {
    include($base_dir.'queue-info.php');
 }
+elseif ($json['method'] == 'circuit.get') {
+   include($base_dir.'circuit-cache.php');
+}
 else {
    sendErrorResponse('235', "Invalid method", "Invalid method");
 }
