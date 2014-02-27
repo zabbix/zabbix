@@ -39,7 +39,7 @@ $fields = array(
 	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 16),	'isset({save})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({save})',
-		hasRequest('save') ? getResourceNameByType($_REQUEST['resourcetype']) : null),
+		hasRequest('save') ? getResourceNameByType(getRequest('resourcetype')) : null),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
@@ -72,7 +72,6 @@ $fields = array(
 	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null)
 );
 check_fields($fields);
-$_REQUEST['dynamic'] = getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 
 /*
  * Permissions
@@ -99,33 +98,33 @@ $screen = reset($screens);
  * Ajax
  */
 if (getRequest('ajaxAction') === 'sw_pos') {
-	$sw_pos = getRequest('sw_pos', array());
+	$screenPositions = getRequest('sw_pos', array());
 
-	if (count($sw_pos) > 3) {
+	if (count($screenPositions) > 3) {
 		$fitem = DBfetch(DBselect(
 			'SELECT s.screenitemid,s.colspan,s.rowspan'.
 			' FROM screens_items s'.
-			' WHERE s.y='.zbx_dbstr($sw_pos[0]).
-				' AND s.x='.zbx_dbstr($sw_pos[1]).
+			' WHERE s.y='.zbx_dbstr($screenPositions[0]).
+				' AND s.x='.zbx_dbstr($screenPositions[1]).
 				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		$sitem = DBfetch(DBselect(
 			'SELECT s.screenitemid,s.colspan,s.rowspan'.
 			' FROM screens_items s'.
-			' WHERE s.y='.zbx_dbstr($sw_pos[2]).
-				' AND s.x='.zbx_dbstr($sw_pos[3]).
+			' WHERE s.y='.zbx_dbstr($screenPositions[2]).
+				' AND s.x='.zbx_dbstr($screenPositions[3]).
 				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		if ($fitem) {
 			DBexecute(
 				'UPDATE screens_items'.
-				' SET y='.zbx_dbstr($sw_pos[2]).',x='.zbx_dbstr($sw_pos[3]).
-				',colspan='.(isset($sitem['colspan']) ? zbx_dbstr($sitem['colspan']) : 1).
-				',rowspan='.(isset($sitem['rowspan']) ? zbx_dbstr($sitem['rowspan']) : 1).
-				' WHERE y='.zbx_dbstr($sw_pos[0]).
-					' AND x='.zbx_dbstr($sw_pos[1]).
+				' SET y='.zbx_dbstr($screenPositions[2]).',x='.zbx_dbstr($screenPositions[3]).','.
+					'colspan='.(isset($sitem['colspan']) ? zbx_dbstr($sitem['colspan']) : 1).','.
+					'rowspan='.(isset($sitem['rowspan']) ? zbx_dbstr($sitem['rowspan']) : 1).
+				' WHERE y='.zbx_dbstr($screenPositions[0]).
+					' AND x='.zbx_dbstr($screenPositions[1]).
 					' AND screenid='.zbx_dbstr($screen['screenid']).
 					' AND screenitemid='.zbx_dbstr($fitem['screenitemid'])
 			);
@@ -134,11 +133,11 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 		if ($sitem) {
 			DBexecute(
 				'UPDATE screens_items'.
-				' SET y='.zbx_dbstr($sw_pos[0]).',x='.zbx_dbstr($sw_pos[1]).
-				',colspan='.(isset($fitem['colspan']) ? zbx_dbstr($fitem['colspan']) : 1).
-				',rowspan='.(isset($fitem['rowspan']) ? zbx_dbstr($fitem['rowspan']) : 1).
-				' WHERE y='.zbx_dbstr($sw_pos[2]).
-					' AND x='.zbx_dbstr($sw_pos[3]).
+				' SET y='.zbx_dbstr($screenPositions[0]).',x='.zbx_dbstr($screenPositions[1]).','.
+					'colspan='.(isset($fitem['colspan']) ? zbx_dbstr($fitem['colspan']) : 1).','.
+					'rowspan='.(isset($fitem['rowspan']) ? zbx_dbstr($fitem['rowspan']) : 1).
+				' WHERE y='.zbx_dbstr($screenPositions[2]).
+					' AND x='.zbx_dbstr($screenPositions[3]).
 					' AND screenid='.zbx_dbstr($screen['screenid']).
 					' AND screenitemid='.zbx_dbstr($sitem['screenitemid'])
 			);
@@ -150,7 +149,7 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 	echo '{"result": true}';
 }
 
-if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
@@ -172,7 +171,7 @@ if (hasRequest('save')) {
 		'valign' => getRequest('valign'),
 		'colspan' => getRequest('colspan'),
 		'rowspan' => getRequest('rowspan'),
-		'dynamic' => getRequest('dynamic'),
+		'dynamic' => getRequest('dynamic', SCREEN_SIMPLE_ITEM),
 		'elements' => getRequest('elements', 0),
 		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
 		'application' => getRequest('application', '')
@@ -196,8 +195,6 @@ if (hasRequest('save')) {
 		show_messages($result, _('Item added'), _('Cannot add item'));
 	}
 
-	DBend($result);
-
 	if ($result) {
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
 			'Cell changed '.
@@ -208,6 +205,8 @@ if (hasRequest('save')) {
 
 		unset($_REQUEST['form']);
 	}
+
+	DBend($result);
 }
 elseif (hasRequest('delete')) {
 	DBstart();

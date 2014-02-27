@@ -155,7 +155,13 @@ class CScreen extends CZBXAPI {
 		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		elseif ($result) {
-			$groupsToCheck = $hostsToCheck = $graphsToCheck = $itemsToCheck = $mapsToCheck = $screensToCheck = $screensItems = array();
+			$groupsToCheck = array();
+			$hostsToCheck = array();
+			$graphsToCheck = array();
+			$itemsToCheck = array();
+			$mapsToCheck = array();
+			$screensToCheck = array();
+			$screensItems = array();
 
 			$dbScreenItems = DBselect(
 				'SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenIds)
@@ -516,7 +522,7 @@ class CScreen extends CZBXAPI {
 			$screenIds[] = $screenId;
 		}
 
-		$dbScreensBeforeUpdate = API::getApi()->select('screens', array(
+		$dbScreens = API::getApi()->select('screens', array(
 			'output' => array('screenid', 'hsize', 'vsize'),
 			'filter' => array('screenid' => $screenIds)
 		));
@@ -566,7 +572,7 @@ class CScreen extends CZBXAPI {
 			'filter' => array('screenid' => $screenIds)
 		));
 
-		$dbScreensBeforeUpdate = zbx_toHash($dbScreensBeforeUpdate, 'screenid');
+		$dbScreens = zbx_toHash($dbScreens, 'screenid');
 		$dbScreenItems = zbx_toHash($dbScreenItems, 'screenitemid');
 
 		$update = array();
@@ -574,7 +580,7 @@ class CScreen extends CZBXAPI {
 		foreach ($screens as $screen) {
 			// hsize, colspan, x
 			if (isset($screen['hsize'])) {
-				$dbScreen = $dbScreensBeforeUpdate[$screen['screenid']];
+				$dbScreen = $dbScreens[$screen['screenid']];
 
 				if ($screen['hsize'] < $dbScreen['hsize']) {
 					$diff = $dbScreen['hsize'] - $screen['hsize'];
@@ -602,7 +608,7 @@ class CScreen extends CZBXAPI {
 
 			// vsize, rowspan, y
 			if (isset($screen['vsize'])) {
-				$dbScreen = $dbScreensBeforeUpdate[$screen['screenid']];
+				$dbScreen = $dbScreens[$screen['screenid']];
 
 				if ($screen['vsize'] < $dbScreen['vsize']) {
 					$diff = $dbScreen['vsize'] - $screen['vsize'];
@@ -692,7 +698,10 @@ class CScreen extends CZBXAPI {
 		}
 		unset($screenItem);
 
-		$createScreenItems = $deleteScreenItems = $updateScreenItems = $deleteScreenItemsIds = array();
+		$createScreenItems = array();
+		$deleteScreenItems = array();
+		$updateScreenItems = array();
+		$deleteScreenItemsIds = array();
 
 		$dbScreenItems = API::ScreenItem()->get(array(
 			'screenids' => $screenId,
