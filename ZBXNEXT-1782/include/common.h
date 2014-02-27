@@ -67,7 +67,6 @@
 #endif
 #define strncasecmp	ERROR_DO_NOT_USE_STRNCASECMP_FUNCTION_TRY_TO_USE_ZBX_STRNCASECMP
 
-
 #define ON	1
 #define OFF	0
 
