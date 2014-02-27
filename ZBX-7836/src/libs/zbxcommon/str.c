@@ -723,15 +723,11 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 		if (0 <= n && n < size)
 			break;
 
+		/* result was truncated */
 		if (-1 == n)
-		{
-			/* incorrect format string, duplicate and log error */
-			THIS_SHOULD_NEVER_HAPPEN;
-			string = zbx_strdup(NULL, f);
-			break;
-		}
-
-		size = n + 1;	/* n bytes + trailing '\0' */
+			size = size * 3 / 2 + 1;	/* the length is unknown */
+		else
+			size = n + 1;	/* n bytes + trailing '\0' */
 
 		zbx_free(string);
 	}
