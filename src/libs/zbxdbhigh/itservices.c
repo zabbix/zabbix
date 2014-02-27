@@ -793,15 +793,17 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	updates;
-	int			i, ret = FAIL;
+	int			i, ret = FAIL, now;
 
 	if (0 == triggerids_num)
 		return SUCCEED;
 
+	now = time(NULL);
+
 	zbx_vector_ptr_create(&updates);
 
 	for (i = 0; i < triggerids_num; i++)
-		its_updates_append(&updates, triggerids[i], 0, 0);
+		its_updates_append(&updates, triggerids[i], 0, now);
 
 	LOCK_ITSERVICES;
 
@@ -838,6 +840,3 @@ void	zbx_destroy_itservices_lock()
 {
 	zbx_mutex_destroy(&itservices_lock);
 }
-
-
-
