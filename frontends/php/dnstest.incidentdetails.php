@@ -107,13 +107,25 @@ $tld = API::Host()->get(array(
 	)
 ));
 
+if ($tld) {
+	$data['tld'] = reset($tld);
+}
+else {
+	access_deny();
+}
+
 // get slv item
 $slvItems = API::Item()->get(array(
 	'itemids' => $data['slvItemId'],
 	'output' => array('name', 'key_', 'lastvalue')
 ));
 
-$slvItem = $slvItems ? reset($slvItems) : null;
+if ($slvItems) {
+	$data['slvItem'] = reset($slvItems);
+}
+else {
+	access_deny();
+}
 
 // get start event
 $mainEvent = API::Event()->get(array(
@@ -145,7 +157,7 @@ if ($mainEvent) {
 		exit;
 	}
 
-	switch ($slvItem['key_']) {
+	switch ($data['slvItem']['key_']) {
 		case DNSTEST_SLV_DNS_ROLLWEEK:
 			$keys = array(CALCULATED_ITEM_DNS_FAIL, CALCULATED_ITEM_DNS_RECOVERY, CALCULATED_ITEM_DNS_DELAY);
 			$data['type'] = DNSTEST_DNS;
@@ -235,11 +247,8 @@ if ($mainEvent) {
 	else {
 		$toTime = get_request('filter_set') ? zbxDateToTime($data['filter_to']) : time();
 	}
-}
 
-if ($tld && $mainEvent && $slvItem) {
-	$data['tld'] = reset($tld);
-	$data['slvItem'] = $slvItem;
+	// result generation
 	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
 	if ($mainEvent['false_positive']) {
 		$data['incidentType'] = INCIDENT_FALSE_POSITIVE;
@@ -280,12 +289,26 @@ if ($tld && $mainEvent && $slvItem) {
 		);
 	}
 
+	$data['tests'] = array();
 	while ($test = DBfetch($tests)) {
 		$data['tests'][] = array(
 			'clock' => $test['clock'],
 			'value' => $test['value']
 		);
 	}
+
+	// pagination
+	$data['paging'] = getPagingLine($data['tests']);
+	if (!$data['paging']->items) {
+		$data['paging'] = null;
+	}
+
+	// time correction after pagination
+	$firstElement = reset($data['tests']);
+	$lastElement = end($data['tests']);
+
+	$fromTime = $firstElement['clock'] - $failCount * $delayTime;
+	$toTime = $lastElement['clock'] + $recoveryCount * $delayTime;
 
 	$tempTests = $data['tests'];
 	$startEventExist = false;
@@ -317,14 +340,12 @@ if ($tld && $mainEvent && $slvItem) {
 		}
 	}
 
-	$slvToTime = $toTime + $recoveryCount * $delayTime;
-
 	$slvs = DBselect(
 		'SELECT h.value,h.clock'.
 		' FROM history h'.
 		' WHERE h.itemid='.zbx_dbstr($data['slvItemId']).
 			' AND h.clock>='.$fromTime.
-			' AND h.clock<='.$slvToTime
+			' AND h.clock<='.$toTime
 	);
 
 	while ($slv = DBfetch($slvs)) {
@@ -357,9 +378,6 @@ if ($tld && $mainEvent && $slvItem) {
 			);
 		}
 	}
-}
-else {
-	access_deny();
 }
 
 $dnsTestView = new CView('dnstest.incidentdetails.list', $data);

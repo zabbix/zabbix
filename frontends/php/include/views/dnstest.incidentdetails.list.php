@@ -258,7 +258,7 @@ $rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'),
 $detailsInfoTable->addRow(array(array($details, $rollingWeek)));
 $dnsTestWidget->additem($detailsInfoTable);
 
-$dnsTestWidget->additem($detailsTable);
+$dnsTestWidget->additem(array($data['paging'], $detailsTable, $data['paging']));
 
 if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
 	$filterTable = new CTable('', 'filter');
