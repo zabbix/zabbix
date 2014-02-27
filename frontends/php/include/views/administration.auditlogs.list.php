@@ -80,7 +80,7 @@ $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo(_('No audit entries found.'));
+$auditTable = new CTableInfo(_('No audit log entries found.'));
 $auditTable->setHeader(array(
 	_('Time'),
 	_('User'),
