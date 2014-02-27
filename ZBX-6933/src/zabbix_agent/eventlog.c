@@ -22,10 +22,6 @@
 #include "log.h"
 #include "eventlog.h"
 
-
-#define MAX_INSERT_STRS 100
-#define MAX_MSG_LENGTH 1024
-
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
 /* open event logger and return number of records */
@@ -88,10 +84,10 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
  *                                                                            *
  * Purpose: gets event message and parameter translation files from registry  *
  *                                                                            *
- * Parameters: szLogName          - [IN] the log name                         *
- *             szSourceName       - [IN] the log source name                  *
- *             pEventMessageFile  - [OUT] the event message file              *
- *             pParamMessageFile  - [OUT] the parameter message file          *
+ * Parameters: szLogName         - [IN] the log name                          *
+ *             szSourceName      - [IN] the log source name                   *
+ *             pEventMessageFile - [OUT] the event message file               *
+ *             pParamMessageFile - [OUT] the parameter message file           *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTSTR *pEventMessageFile,
@@ -99,7 +95,6 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
 {
 	TCHAR	buf[MAX_PATH];
 	HKEY	hKey = NULL;
-	LPTSTR	pFile = NULL;
 	DWORD	szData;
 
 	/* Get path to message dll */
@@ -138,7 +133,7 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
  * Purpose: load the specified message file, expanding environment variables  *
  *          in the file name if necessary                                     *
  *                                                                            *
- * Parameters: szLogName          - [IN] the message file name                *
+ * Parameters: szFileName - [IN] the message file name                        *
  *                                                                            *
  * Return value: Handle to the loaded library or NULL otherwise               *
  *                                                                            *
@@ -197,8 +192,8 @@ static char	*zbx_format_message(HINSTANCE hLib, DWORD dwMessageId, LPTSTR *pInse
  * Purpose: translates message by replacing parameters %%<id> with translated *
  *          values                                                            *
  *                                                                            *
- * Parameters: message  - [IN/OUT] the message to translate                   *
- *             hLib     - [IN] the parameter message file handle              *
+ * Parameters: message - [IN/OUT] the message to translate                    *
+ *             hLib    - [IN] the parameter message file handle               *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
@@ -206,8 +201,6 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	char	*param, *pstart, *pend;
 	int	dwMessageId;
 	size_t	offset = 0;
-
-	pstart = *message;
 
 	while (1)
 	{
@@ -329,21 +322,22 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
 				" The local computer may not have the necessary registry information or message DLL files to"
 				" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
+
 		if (0 < pELR->NumStrings)
 		{
 			char	*buf;
 
-			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
+			*out_message = zbx_strdcat(*out_message, " The following information is part of the event: ");
 
 			for (i = 0, pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
 					i < pELR->NumStrings;
 					i++, pCh += zbx_strlen(pCh) + 1)
 			{
-				if (i > 0)
-					*out_message = zbx_strdcatf(*out_message, "; ");
+				if (0 < i)
+					*out_message = zbx_strdcat(*out_message, "; ");
 
 				buf = zbx_unicode_to_utf8(pCh);
-				*out_message = zbx_strdcatf(*out_message, "%s", buf);
+				*out_message = zbx_strdcat(*out_message, buf);
 				zbx_free(buf);
 			}
 		}
@@ -405,7 +399,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		if (*lastlogsize > LastID)
 			*lastlogsize = FirstID;
 		else if (*lastlogsize >= FirstID)
-			FirstID = (long)(*lastlogsize) + 1;
+			FirstID = (long)*lastlogsize + 1;
 
 		for (i = FirstID; i < LastID; i++)
 		{
