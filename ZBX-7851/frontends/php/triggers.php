@@ -397,14 +397,11 @@ else {
 	));
 
 	if ($sortfield === 'status') {
-		foreach ($data['triggers'] as &$trigger) {
-			$trigger['status_order'] = triggerSortOrderNumber($trigger['status'], $trigger['state']);
-		}
-		unset($trigger);
-		$sortfield = 'status_order';
+		$data['triggers'] = orderTriggersByStatus($data['triggers'], getPageSortOrder());
 	}
-
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+	else {
+		order_result($data['triggers'], $sortfield, getPageSortOrder());
+	}
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);

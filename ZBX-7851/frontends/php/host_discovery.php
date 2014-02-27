@@ -332,14 +332,11 @@ else {
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	if ($sortfield === 'status') {
-		foreach ($data['discoveries'] as &$item) {
-			$item['status_order'] = itemSortOrderNumber($item['status'], $item['state']);
-		}
-		unset($item);
-		$sortfield = 'status_order';
+		$data['discoveries'] = orderItemsByStatus($data['discoveries'], getPageSortOrder());
 	}
-
-	order_result($data['discoveries'], $sortfield, getPageSortOrder());
+	else {
+		order_result($data['discoveries'], $sortfield, getPageSortOrder());
+	}
 
 	// paging
 	$data['paging'] = getPagingLine($data['discoveries'], array('itemid'), array('hostid' => get_request('hostid')));

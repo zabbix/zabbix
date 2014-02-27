@@ -233,22 +233,39 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Returns status order number depending on status and state.
- * If status = 0 and state = 1, it means it is an unsupported item and returns 2.
- * When sorting by field 'status' ASC it will sort items like so: 0, 1 and 2, placing unsupported items as last.
+ * Orders items by both status and state.
  *
- * @param int $status
- * @param int $state
+ * @param array  $items
+ * @param string $sortorder
  *
- * @return int
+ * @return array
  */
-function itemSortOrderNumber($status, $state) {
-	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+function orderItemsByStatus(array $items, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($items as $key => $item) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			$statusOrder = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+		}
+		elseif ($item['status'] == ITEM_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
 	}
-	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 1;
+	natcasesort($sort);
+
+	if ($sortorder != ZBX_SORT_UP) {
+		$sort = array_reverse($sort, true);
 	}
+
+	$tmp = $items;
+	$items = array();
+	foreach ($sort as $key => $val) {
+		$items[$key] = $tmp[$key];
+	}
+
+	return $items;
 }
 
 /**

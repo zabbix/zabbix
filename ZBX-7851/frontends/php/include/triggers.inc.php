@@ -2518,20 +2518,37 @@ function triggerIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Returns status order number depending on status and state.
- * If status = 0 and state = 1, it means it is an 'unknown' trigger and returns 2.
- * When sorting by field 'status' ASC it will sort triggers like so: 0, 1 and 2, placing 'unknown' trigger as last.
+ * Orders trigger by both status and state.
  *
- * @param int $status
- * @param int $state
+ * @param array  $triggers
+ * @param string $sortorder
  *
- * @return int
+ * @return array
  */
-function triggerSortOrderNumber($status, $state) {
-	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+function orderTriggersByStatus(array $triggers, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($triggers as $key => $trigger) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+		}
+		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
 	}
-	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 1;
+	natcasesort($sort);
+
+	if ($sortorder != ZBX_SORT_UP) {
+		$sort = array_reverse($sort, true);
 	}
+
+	$tmp = $triggers;
+	$triggers = array();
+	foreach ($sort as $key => $val) {
+		$triggers[$key] = $tmp[$key];
+	}
+
+	return $triggers;
 }
