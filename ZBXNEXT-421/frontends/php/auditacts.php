@@ -149,31 +149,18 @@ if (!$data['alias'] || $data['users']) {
 }
 
 // get first alert clock
-$minStartTime = 0;
-
+$firstAlert = null;
 if ($userId) {
 	$firstAlert = DBfetch(DBselect(
 		'SELECT MIN(a.clock) AS clock'.
 		' FROM alerts a'.
 		' WHERE a.userid='.$userId
 	));
-
-	if ($firstAlert) {
-		$minStartTime = $firstAlert['clock'];
-	}
 }
-
-if ($minStartTime == 0) {
+elseif ($data['alias'] === '') {
 	$firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
-
-	if ($firstAlert) {
-		$minStartTime = $firstAlert['clock'];
-	}
 }
-
-if ($minStartTime == 0) {
-	$minStartTime = ZBX_MAX_PERIOD;
-}
+$minStartTime = ($firstAlert) ? $firstAlert['clock'] : null;
 
 // get actions names
 if ($data['alerts']) {
