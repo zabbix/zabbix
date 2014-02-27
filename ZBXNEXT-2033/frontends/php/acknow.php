@@ -111,7 +111,7 @@ $eventAcknowledged = null;
 $eventTriggerName = null;
 $remedyService = null;
 $event = null;
-$ticketId = null;
+$ticketLink = null;
 $zabbixServerError = null;
 
 $bulk = !isset($_REQUEST['eventid']);
@@ -281,7 +281,7 @@ ob_end_flush();
  */
 
 $ackWidget = new CWidget();
-if ($ticketId) {
+if ($ticketLink) {
 	$ackWidget->addHeader(array(_('Ticket').' ', $ticketLink));
 }
 $ackWidget->addPageHeader(_('ALARM ACKNOWLEDGES').NAME_DELIMITER.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName));
@@ -361,7 +361,7 @@ $message->attr('autofocus', 'autofocus');
 $messageTable->addRow(_('Message'), $message);
 
 if ($remedyService && !$zabbixServerError) {
-	$ticketStatusMessage = $ticketId ? array(_('Update ticket').' ', $ticketLink) : _('Create ticket');
+	$ticketStatusMessage = $ticketLink ? array(_('Update ticket').' ', $ticketLink) : _('Create ticket');
 
 	$messageTable->addRow($ticketStatusMessage,
 		new CCheckBox('ticket_status', getRequest('ticket_status'), null, 1)
