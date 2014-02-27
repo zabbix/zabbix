@@ -95,17 +95,23 @@ $data = array(
 	'paging' => null
 );
 
+$userId = null;
+
 if ($data['alias']) {
 	$data['users'] = API::User()->get(array(
 		'output' => array('userid', 'alias', 'name', 'surname'),
 		'filter' => array('alias' => $data['alias']),
 		'preservekeys' => true
 	));
+
+	if ($data['users']) {
+		$user = reset($data['users']);
+
+		$userId = $user['userid'];
+	}
 }
 
 if (!$data['alias'] || $data['users']) {
-	$userIds = array_keys($data['users']);
-
 	$from = zbxDateToTime($data['stime']);
 	$till = $from + $effectivePeriod;
 
@@ -114,7 +120,7 @@ if (!$data['alias'] || $data['users']) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectMediatypes' => API_OUTPUT_EXTEND,
-			'userids' => $userIds ? $userIds : null,
+			'userids' => $userId,
 			'time_from' => $from,
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
@@ -140,17 +146,32 @@ if (!$data['alias'] || $data['users']) {
 			'preservekeys' => true
 		));
 	}
+}
 
-	// get first alert clock
+// get first alert clock
+$minStartTime = 0;
+
+if ($userId) {
 	$firstAlert = DBfetch(DBselect(
 		'SELECT MIN(a.clock) AS clock'.
 		' FROM alerts a'.
-		' WHERE '.dbConditionInt('a.userid', array_keys($data['users']))
+		' WHERE a.userid='.$userId
 	));
 
-	$minStartTime = $firstAlert['clock'];
+	if ($firstAlert) {
+		$minStartTime = $firstAlert['clock'];
+	}
 }
-else {
+
+if ($minStartTime == 0) {
+	$firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
+
+	if ($firstAlert) {
+		$minStartTime = $firstAlert['clock'];
+	}
+}
+
+if ($minStartTime == 0) {
 	$minStartTime = ZBX_MAX_PERIOD;
 }
 
