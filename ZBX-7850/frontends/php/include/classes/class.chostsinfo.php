@@ -52,7 +52,7 @@ class CHostsInfo extends CTable {
 		));
 		$hostIds = array_keys($hosts);
 
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid != 0) {
 			$cond_from = ',hosts_groups hg';
 			$cond_where = ' AND hg.hostid=h.hostid AND hg.groupid='.zbx_dbstr($this->groupid);
 		}
@@ -107,7 +107,7 @@ class CHostsInfo extends CTable {
 			$header_str .= '('.$node['name'].')'.SPACE;
 		}
 
-		if (remove_nodes_from_id($this->groupid) > 0) {
+		if ($this->groupid != 0) {
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 		}
