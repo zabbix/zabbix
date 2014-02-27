@@ -195,7 +195,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 			// externalid for creating link to Remedy and check status if new, then show it as new
 			elseif ($ticket[$eventId]['externalid']) {
 				$ticketId = $ticket[$eventId]['externalid'];
-				$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"');
+				$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
+				$ticketLink->setTarget('_blank');
 
 				$messageSuccess = $ticket[$eventId]['new']
 					? _s('Ticket "%1$s" has been created.', $ticketId)
@@ -267,7 +268,8 @@ elseif (!$bulk && $remedyService && $event) {
 		// ticket exists. Create link to ticket and label "Update ticket"
 		elseif ($ticket[$eventId]['externalid']) {
 			$ticketId = $ticket[$eventId]['externalid'];
-			$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"');
+			$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
+			$ticketLink->setTarget('_blank');
 		}
 	}
 
