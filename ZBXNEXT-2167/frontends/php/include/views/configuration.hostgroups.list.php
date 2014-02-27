@@ -43,16 +43,6 @@ $hostGroupWidget->addHeaderRowNumber();
 $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');
 
-// if any of the groups are about to be deleted, show the info column
-$showInfo = false;
-
-foreach ($this->data['groups'] as $hostGroup) {
-	if ($hostGroup['groupDiscovery'] && $hostGroup['groupDiscovery']['ts_delete']) {
-		$showInfo = true;
-		break;
-	}
-}
-
 // create table
 $hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
@@ -61,7 +51,7 @@ $hostGroupTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name'),
 	' # ',
 	_('Members'),
-	$showInfo ? _('Info') : null
+	_('Info')
 ));
 
 foreach ($this->data['groups'] as $group) {
@@ -134,24 +124,18 @@ foreach ($this->data['groups'] as $group) {
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
-	// info
-	if ($showInfo) {
-		// discovered item lifetime indicator
-		if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-			$info = new CDiv(SPACE, 'status_icon iconwarning');
-			$info->setHint(
-				_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
-					zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
-				)
-			);
-		}
-		else {
-			$info = SPACE;
-		}
+	// info, discovered item lifetime indicator
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
+		$info = new CDiv(SPACE, 'status_icon iconwarning');
+		$info->setHint(
+			_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
+				zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
+			)
+		);
 	}
 	else {
-		$info = null;
+		$info = '';
 	}
 
 	$hostGroupTable->addRow(array(
