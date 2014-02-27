@@ -113,55 +113,21 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
-if ($trigger['priority'] >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
-	// check if current user has Remedy Service media type set up
-	$remedyService = API::MediaType()->get(array(
-		'userids' => CWebUser::$data['userid'],
-		'filter' => array('type' => MEDIA_TYPE_REMEDY),
-		'output' => array('mediatypeid'),
-		'limit' => 1
-	));
+$remedyService = CRemedyService::init(array('eventTriggerSeverity' => $trigger['priority']));
 
-	if ($remedyService) {
-		// check if current event has Remedy connected
-		$zabbixServer = new CZabbixServer(
-			$ZBX_SERVER,
-			$ZBX_SERVER_PORT,
-			ZBX_SOCKET_REMEDY_TIMEOUT,
-			ZBX_SOCKET_BYTES_LIMIT
-		);
-		$ticket = $zabbixServer->mediaQuery(array($event['eventid']), get_cookie('zbx_sessionid'));
+if ($remedyService) {
+	$remedyData = CRemedyService::mediaQuery($event['eventid']);
 
-		$zabbixServerError = $zabbixServer->getError();
-		if ($zabbixServerError) {
-			error($zabbixServerError);
-		}
-		elseif ($ticket) {
-			$ticket = zbx_toHash($ticket, 'eventid');
-			$eventId = $event['eventid'];
+	if ($remedyData) {
+		$ticketTable = new CTableInfo();
 
-			// something went wrong getting that ticket
-			if ($ticket[$eventId]['error']) {
-				error($ticket[$eventId]['error']);
-			}
-			// ticket exists. Create link to ticket and label "Update ticket"
-			elseif ($ticket[$eventId]['externalid']) {
-				$ticketTable = new CTableInfo();
+		$ticketTable->addRow(array(_('Ticket'), $remedyData['ticketLink']));
+		$ticketTable->addRow(array(_('Created'), $remedyData['created']));
 
-				$ticketLink = new CLink($ticket[$eventId]['externalid'],
-					REMEDY_SERVICE_WEB_URL.'"'.$ticket[$eventId]['externalid'].'"', null, null, true
-				);
-				$ticketLink->setTarget('_blank');
+		$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
+		$ticketDetails->setHeader(_('Ticket details'));
 
-				$ticketTable->addRow(array(_('Ticket'), $ticketLink));
-				$ticketTable->addRow(array(_('Created'), zbx_date2str(_('d M Y H:i:s'), $ticket[$eventId]['clock'])));
-
-				$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);
-				$ticketDetails->setHeader(_('Ticket details'));
-
-				$left_col[] = $ticketDetails;
-			}
-		}
+		$left_col[] = $ticketDetails;
 	}
 }
 

@@ -109,10 +109,10 @@ elseif (get_request('triggers')) {
 $eventTrigger = null;
 $eventAcknowledged = null;
 $eventTriggerName = null;
+
 $remedyService = null;
+$remedyData = null;
 $event = null;
-$ticketLink = null;
-$zabbixServerError = null;
 
 $bulk = !isset($_REQUEST['eventid']);
 
@@ -127,18 +127,9 @@ if (!$bulk) {
 		$event = reset($events);
 
 		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
-		$eventTriggerSeverity = $event['relatedObject']['priority'];
 		$eventAcknowledged = $event['acknowledged'];
 
-		if ($eventTriggerSeverity >= REMEDY_SERVICE_MINIMUM_SEVERITY) {
-			// check if current user has Remedy Service media type set up
-			$remedyService = API::MediaType()->get(array(
-				'userids' => CWebUser::$data['userid'],
-				'filter' => array('type' => MEDIA_TYPE_REMEDY),
-				'output' => array('mediatypeid'),
-				'limit' => 1
-			));
-		}
+		$remedyService = CRemedyService::init(array('eventTriggerSeverity' => $event['relatedObject']['priority']));
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
@@ -164,46 +155,20 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 
 	$result = true;
 
-	if (!$bulk && $event && $remedyService && hasRequest('ticket_status')) {
-		$event = array(
-			'eventid' => getRequest('eventid'),
-			'message' => getRequest('message'),
-			'subject' => trigger_value2str($event['relatedObject']['value'])
-		);
+	if (!$bulk && $event && $remedyService) {
+		// create or update existing remedy ticket
+		if (hasRequest('ticket_status')) {
+			$remedyData = CRemedyService::mediaAcknowledge(array(
+				'eventid' => getRequest('eventid'),
+				'message' => getRequest('message'),
+				'subject' => trigger_value2str($event['relatedObject']['value'])
+			));
 
-		$zabbixServer = new CZabbixServer(
-			$ZBX_SERVER,
-			$ZBX_SERVER_PORT,
-			ZBX_SOCKET_REMEDY_TIMEOUT,
-			ZBX_SOCKET_BYTES_LIMIT
-		);
-		$ticket = $zabbixServer->mediaAcknowledge(array($event), get_cookie('zbx_sessionid'));
-
-		$zabbixServerError = $zabbixServer->getError();
-		if ($zabbixServerError) {
-			$result = false;
-			error($zabbixServerError);
+			$result = (bool) $remedyData;
 		}
+		// read remedy ticket
 		else {
-			$ticket = zbx_toHash($ticket, 'eventid');
-			$eventId = $event['eventid'];
-
-			if ($ticket[$eventId]['error']) {
-				$result = false;
-				error($ticket[$eventId]['error']);
-			}
-			// externalid for creating link to Remedy and check status if new, then show it as new
-			elseif ($ticket[$eventId]['externalid']) {
-				$ticketId = $ticket[$eventId]['externalid'];
-				$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
-				$ticketLink->setTarget('_blank');
-
-				$messageSuccess = $ticket[$eventId]['new']
-					? _s('Ticket "%1$s" has been created.', $ticketId)
-					: _s('Ticket "%1$s" has been updated.', $ticketId);
-
-				info($messageSuccess);
-			}
+			$remedyData = CRemedyService::mediaQuery(getRequest('eventid'));
 		}
 	}
 
@@ -244,34 +209,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	}
 }
 elseif (!$bulk && $remedyService && $event) {
-	$zabbixServer = new CZabbixServer(
-		$ZBX_SERVER,
-		$ZBX_SERVER_PORT,
-		ZBX_SOCKET_REMEDY_TIMEOUT,
-		ZBX_SOCKET_BYTES_LIMIT
-	);
-	$eventId = $event['eventid'];
-
-	$ticket = $zabbixServer->mediaQuery(array($eventId), get_cookie('zbx_sessionid'));
-
-	$zabbixServerError = $zabbixServer->getError();
-	if ($zabbixServerError) {
-		error($zabbixServerError);
-	}
-	else {
-		$ticket = zbx_toHash($ticket, 'eventid');
-
-		// something went wrong getting that ticket
-		if ($ticket[$eventId]['error']) {
-			error($ticket[$eventId]['error']);
-		}
-		// ticket exists. Create link to ticket and label "Update ticket"
-		elseif ($ticket[$eventId]['externalid']) {
-			$ticketId = $ticket[$eventId]['externalid'];
-			$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
-			$ticketLink->setTarget('_blank');
-		}
-	}
+	$remedyData = CRemedyService::mediaQuery($event['eventid']);
 
 	show_messages();
 }
@@ -283,8 +221,8 @@ ob_end_flush();
  */
 
 $ackWidget = new CWidget();
-if ($ticketLink) {
-	$ackWidget->addHeader(array(_('Ticket').' ', $ticketLink));
+if ($remedyData) {
+	$ackWidget->addHeader(array(_('Ticket').' ', $remedyData['ticketLink']));
 }
 $ackWidget->addPageHeader(_('ALARM ACKNOWLEDGES').NAME_DELIMITER.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName));
 
@@ -362,8 +300,8 @@ $message->attr('autofocus', 'autofocus');
 
 $messageTable->addRow(_('Message'), $message);
 
-if ($remedyService && !$zabbixServerError) {
-	$ticketStatusMessage = $ticketLink ? array(_('Update ticket').' ', $ticketLink) : _('Create ticket');
+if ($remedyService) {
+	$ticketStatusMessage = $remedyData ? array(_('Update ticket').' ', $remedyData['ticketLink']) : _('Create ticket');
 
 	$messageTable->addRow($ticketStatusMessage,
 		new CCheckBox('ticket_status', getRequest('ticket_status'), null, 1)
