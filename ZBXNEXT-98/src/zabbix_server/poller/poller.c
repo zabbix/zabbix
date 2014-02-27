@@ -660,7 +660,18 @@ static int	get_values(unsigned char poller_type)
 	}
 	else if (SUCCEED == is_snmp_type(items[0].type))
 	{
+#ifdef HAVE_SNMP
 		get_values_snmp(items, results, errcodes, num);
+#else
+		for (i = 0; i < num; i++)
+		{
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+			errcodes[i] = CONFIG_ERROR;
+		}
+#endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
