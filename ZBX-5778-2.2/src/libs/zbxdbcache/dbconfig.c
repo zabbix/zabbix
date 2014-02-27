@@ -5427,6 +5427,14 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host = NULL;
 
+		host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+		if (HOST_MAINTENANCE_STATUS_ON == host->maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == host->maintenance_type)
+		{
+			continue;
+		}
+
 		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 			continue;
 
@@ -5449,34 +5457,22 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
-						0 != host->errors_from)
-				{
+				if (NULL == host || 0 != host->errors_from)
 					continue;
-				}
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
-						0 != host->snmp_errors_from)
-				{
+				if (NULL == host || 0 != host->snmp_errors_from)
 					continue;
-				}
 				break;
 			case ITEM_TYPE_IPMI:
-				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
-						0 != host->ipmi_errors_from)
-				{
+				if (NULL == host || 0 != host->ipmi_errors_from)
 					continue;
-				}
 				break;
 			case ITEM_TYPE_JMX:
-				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
-						0 != host->jmx_errors_from)
-				{
+				if (NULL == host || 0 != host->jmx_errors_from)
 					continue;
-				}
 				break;
 			default:
 				continue;
