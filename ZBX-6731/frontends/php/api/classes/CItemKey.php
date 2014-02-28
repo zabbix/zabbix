@@ -87,7 +87,7 @@ class CItemKey {
 		// checking every byte, one by one, until first 'not key_id' char is reached
 		while (isset($key[$pos])) {
 			if (!isKeyIdChar($key[$pos])) {
-				break; // $pos now points to a first 'not a key name' char
+				break; // $pos now points to the first 'not a key name' char
 			}
 			$this->keyId .= $key[$pos++];
 		}

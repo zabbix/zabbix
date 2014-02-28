@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[2.0.11rc1])
+AM_INIT_AUTOMAKE([zabbix],[2.0.12rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1179,27 +1179,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $JABBER_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $JABBER_LIBS"
 
-	dnl Checking for libCurl [default - yes]
-	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
-	if test "x$want_curl" = "xyes"; then
-		if test "x$found_curl" != "xyes"; then
-			AC_MSG_ERROR([Curl library not found])
-		fi
-	fi
-	if test "x$found_curl" = "xyes"; then
-		have_web_monitoring="cURL"
-	fi
-	CFLAGS="$CFLAGS $LIBCURL_CPPFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
-
-	dnl Starting from 2.0 agent can do web monitoring
-	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
-	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
-
 	dnl Checking for iODBC support
 	LIBIODBC_CHECK_CONFIG([no])
 	if test "x$want_iodbc" = "xyes"; then
@@ -1349,6 +1328,29 @@ PROXY_LIBS="$PROXY_LIBS $LDAP_LIBS"
 
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LDAP_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
+
+found_curl="no"
+dnl Checking for libCurl [by default - skip]
+LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+if test "x$want_curl" = "xyes"; then
+	if test "x$found_curl" != "xyes"; then
+		AC_MSG_ERROR([Curl library not found])
+	fi
+fi
+if test "x$found_curl" = "xyes"; then
+	have_web_monitoring="cURL"
+fi
+CFLAGS="$CFLAGS $LIBCURL_CPPFLAGS"
+
+SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
+
+dnl Starting from 2.0 agent can do web monitoring
+AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]

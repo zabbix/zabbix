@@ -606,7 +606,7 @@ int	node_history(char *data, size_t datalen)
 		}
 		else if (NULL != table)
 		{
-			if (events)
+			if (0 != events)
 			{
 				res = process_record_event(sender_nodeid, nodeid, table, r);
 			}
@@ -637,6 +637,9 @@ int	node_history(char *data, size_t datalen)
 		else
 			break;
 	}
+
+	if (0 != events)
+		DBflush_itservice_updates();
 
 	if (SUCCEED == res)
 		DBcommit();

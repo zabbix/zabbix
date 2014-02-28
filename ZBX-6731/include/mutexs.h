@@ -53,7 +53,7 @@
 #	define ZBX_MUTEX_SELFMON	6
 #	define ZBX_MUTEX_CPUSTATS	7
 #	define ZBX_MUTEX_DISKSTATS	8
-#	define ZBX_MUTEX_SERVICES	9
+#	define ZBX_MUTEX_ITSERVICES	9
 #	define ZBX_MUTEX_COUNT		10
 
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
