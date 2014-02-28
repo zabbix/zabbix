@@ -52,20 +52,22 @@ class CNumericValidator extends CValidator {
 	/**
 	 * Checks if the given string is correct double.
 	 *
-	 * @param double $value
+	 * @param string $value
 	 *
 	 * @return bool
 	 */
 	public function validate($value) {
 		$parts = explode('.', $value);
 
-		if (!is_numeric($parts[0]) || strlen($parts[0]) > $this->scaleBeforePoint) {
+		if ($this->scaleBeforePoint !== null
+				&& (!is_numeric($parts[0]) || strlen($parts[0]) > $this->scaleBeforePoint)) {
 			$this->error($this->messageBeforePoint, $value);
 
 			return false;
 		}
 
-		if (isset($parts[1]) && (!is_numeric($parts[1]) || strlen($parts[1]) > $this->scaleAfterPoint)) {
+		if ($this->scaleAfterPoint !== null && isset($parts[1])
+				&& (!is_numeric($parts[1]) || strlen($parts[1]) > $this->scaleAfterPoint)) {
 			$this->error($this->messageAfterPoint, $value);
 
 			return false;

@@ -363,6 +363,32 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 
+	if ($type == T_ZBX_BIG_DBL) {
+		$error = false;
+
+		if (is_numeric($var)) {
+			$numberValidator = new CNumericValidator(array(
+				'scaleAfterPoint' => 4,
+				'messageAfterPoint' => _('Incorrect floating part of numeric value "%1$s".')
+			));
+
+			if (!$numberValidator->validate($var)) {
+				info($numberValidator->getError());
+
+				$error = true;
+			}
+		}
+		else {
+			info(_s('Field "%1$s" is not decimal number.', $caption));
+
+			$error = true;
+		}
+
+		if ($error) {
+			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		}
+	}
+
 	if ($type == T_ZBX_STR && !is_string($var)) {
 		info(_s('Field "%1$s" is not string.', $caption));
 

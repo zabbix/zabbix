@@ -117,9 +117,10 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_PERIOD',		3);
-define('T_ZBX_IP',			4);
-define('T_ZBX_CLR',			5);
+define('T_ZBX_BIG_DBL',		3);
+define('T_ZBX_PERIOD',		4);
+define('T_ZBX_IP',			5);
+define('T_ZBX_CLR',			6);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
 
