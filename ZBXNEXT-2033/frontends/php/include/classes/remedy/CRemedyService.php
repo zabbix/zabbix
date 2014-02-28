@@ -39,31 +39,21 @@ class CRemedyService {
 	 * Initialize the Remedy service. First check if event trigger severity corresponds to minimum required severity to
 	 * create, update or request a ticket. Then check if current user has Remedy service as media type.
 	 *
-	 * @throws APIException	if cannot read media type.
-	 *
 	 * @param string $event['triggerSeverity']		current event trigger severity
 	 *
 	 * @return bool
 	 */
 	public static function init(array $event) {
-		try {
-			if (isset($event['triggerSeverity'])
-				&& $event['triggerSeverity'] >= self::minTriggerSeverity) {
-
-				// check if current user has Remedy Service media type set up
-				self::$enabled = (bool) API::MediaType()->get(array(
-					'userids' => CWebUser::$data['userid'],
-					'filter' => array('type' => MEDIA_TYPE_REMEDY),
-					'output' => array('mediatypeid'),
-					'limit' => 1
-				));
-
-				return self::$enabled;
-			}
+		if (isset($event['triggerSeverity']) && $event['triggerSeverity'] >= self::minTriggerSeverity) {
+			self::$enabled = (bool) API::MediaType()->get(array(
+				'userids' => CWebUser::$data['userid'],
+				'filter' => array('type' => MEDIA_TYPE_REMEDY),
+				'output' => array('mediatypeid'),
+				'limit' => 1
+			));
 		}
-		catch (APIException $e) {
-			error($e->getMessage());
-		}
+
+		return self::$enabled;
 	}
 
 	/**
@@ -111,7 +101,7 @@ class CRemedyService {
 				return false;
 			}
 			elseif ($ticket[$eventId]['externalid']) {
-				return self::processRemedyTicketDetails($ticket[$eventId]);
+				return self::getDetails($ticket[$eventId]);
 			}
 		}
 	}
@@ -146,7 +136,7 @@ class CRemedyService {
 			ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$ticket = $zabbixServer->mediaAcknowledge(array($event), get_cookie('zbx_sessionid'));
+		$tickets = $zabbixServer->mediaAcknowledge(array($event), get_cookie('zbx_sessionid'));
 
 		$zabbixServerError = $zabbixServer->getError();
 		if ($zabbixServerError) {
@@ -155,21 +145,21 @@ class CRemedyService {
 			return false;
 		}
 		else {
-			$ticket = zbx_toHash($ticket, 'eventid');
+			$tickets = zbx_toHash($tickets, 'eventid');
 			$eventId = $event['eventid'];
 
-			if ($ticket[$eventId]['error']) {
-				error($ticket[$eventId]['error']);
+			if ($tickets[$eventId]['error']) {
+				error($tickets[$eventId]['error']);
 
 				return false;
 			}
-			elseif ($ticket[$eventId]['externalid']) {
-				$messageSuccess = $ticket[$eventId]['new']
-					? _s('Ticket "%1$s" has been created.', $ticket[$eventId]['externalid'])
-					: _s('Ticket "%1$s" has been updated.', $ticket[$eventId]['externalid']);
+			elseif ($tickets[$eventId]['externalid']) {
+				$messageSuccess = $tickets[$eventId]['new']
+					? _s('Ticket "%1$s" has been created.', $tickets[$eventId]['externalid'])
+					: _s('Ticket "%1$s" has been updated.', $tickets[$eventId]['externalid']);
 				info($messageSuccess);
 
-				return self::processRemedyTicketDetails($ticket[$eventId]);
+				return self::getDetails($tickets[$eventId]);
 			}
 		}
 	}
@@ -177,12 +167,12 @@ class CRemedyService {
 	/**
 	 * Creates Remedy ticket link and converts clock to readable time format and returns array of ticket data.
 	 *
-	 * @param array $ticketData
+	 * @param array $data		Remedy ticket data
 	 *
 	 * @return array
 	 */
-	protected static function processRemedyTicketDetails(array $ticketData) {
-		$ticketId = $ticketData['externalid'];
+	protected static function getDetails(array $data) {
+		$ticketId = $data['externalid'];
 
 		$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
 		$ticketLink->setTarget('_blank');
@@ -190,9 +180,9 @@ class CRemedyService {
 		return array(
 			'ticketId' => $ticketId,
 			'ticketLink' => $ticketLink,
-			'created' => zbx_date2str(_('d M Y H:i:s'), $ticketData['clock']),
-			'status' => $ticketData['status'],
-			'assignee' => $ticketData['assignee']
+			'created' => zbx_date2str(_('d M Y H:i:s'), $data['clock']),
+			'status' => $data['status'],
+			'assignee' => $data['assignee']
 		);
 	}
 }

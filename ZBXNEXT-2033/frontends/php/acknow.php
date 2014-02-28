@@ -43,7 +43,7 @@ $fields = array(
 	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
-	'ticket_status' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'ticket_status' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -308,9 +308,7 @@ $messageTable->addRow(_('Message'), $message);
 if ($remedyService) {
 	$ticketStatusMessage = $remedyData ? array(_('Update ticket').' ', $remedyData['ticketLink']) : _('Create ticket');
 
-	$messageTable->addRow($ticketStatusMessage,
-		new CCheckBox('ticket_status', getRequest('ticket_status'), null, 1)
-	);
+	$messageTable->addRow($ticketStatusMessage, new CCheckBox('ticket_status'));
 }
 
 $messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));
