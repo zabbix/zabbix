@@ -1,8 +1,17 @@
 1. host-reconid-import.pl
 
-The host-reconid-import.pl imports service recon id data from comma
-delimited CSV file into corresponding host_invetory tag field in 
+The host-reconid-import.pl script imports service recon id data from
+comma delimited CSV file into corresponding host_invetory tag field in 
 Zabbix. 
+
+Usage: host-record-import.pl <options> <filename>
+    Where:
+        <options>
+            --url=<url>             - Zabbix frontend URL
+            --username=<username>   - Zabbix user name
+            --password=<password>   - Zabbix user password
+        <filename> 
+	    the name of the file with ReconID data
 
 The CSV file format should be:
 ,<CI name>,<CI ReconId>,
@@ -10,16 +19,7 @@ The CSV file format should be:
 The script sets the host_inventory tag field to <CI ReconID> for hosts
 with host field matching <CI name>
 
-The authentication data is hardcoded in $URL, $USER and $PASSWORD 
-variables where:
-  $URL - the Zabbix API URL - <frontend url>/api_jsonrpc.php
-         (for example http://localhost/zabbix/frontends/php/api_jsonrpc.php)
-  $USER - the zabbix user name (for example Admin)
-  $PASSWORD - the zabbix user password (for example zabbix)
-
 The script is written in perl and requires json and json rpc perl modules.	
-To import the ReconID script run: host-reconid-import.pl <import filename>
-where <import filename> is the exported ReconId data in CSV format.
 
 
 

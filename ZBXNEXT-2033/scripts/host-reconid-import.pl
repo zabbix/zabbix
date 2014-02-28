@@ -6,17 +6,46 @@ use warnings;
 use JSON::RPC::Client;
 use Data::Dumper;
 use JSON;
+use Getopt::Long;
 
-my $URL = "http://localhost/svn/branches/dev/ZBXNEXT-2033/frontends/php/api_jsonrpc.php";
-my $USER = "Admin";
-my $PASSWORD = "zabbix";
+sub display_usage
+{
+	printf "ReconID -> Zabbix:host_inventory.tag importing utility\n";
+	printf "Usage: host-record-import.pl <options> <filename>\n";
+	printf "  Where <options> are:\n";
+	printf "    --url=<url>             - Zabbix frontend URL\n";
+	printf "    --username=<username>   - Zabbix user name\n";
+	printf "    --password=<password>   - Zabbix user password\n";
+}
+
+my $URL;
+my $USER;
+my $PASSWORD;
+
+GetOptions(
+	"url=s" => \$URL,
+	"username=s" => \$USER,
+	"password=s" => \$PASSWORD
+) or die("Error in command line arguments\n");
+
+$URL = $URL . "/api_jsonrpc.php";
+
+my $filename = $ARGV[0];
+
+if (!$filename or !$URL or !$USER or !$PASSWORD)
+{
+	display_usage();
+	exit;
+}
+
+# Update host inventory in database
+open (FP, $filename) or die "Failed to open input file '" . $filename . "'";
 
 # Authenticate yourself
 my $client = new JSON::RPC::Client;
 my $authID;
 my $response;
 my %hosts;
-my $filename = $ARGV[0];
 
 my $json = {
 	jsonrpc => "2.0",
@@ -28,15 +57,12 @@ my $json = {
 	id => 1
 };
 
-die "Usage host-record-import.pl <csv file>\n" unless $filename;
-
 $response = $client->call($URL, $json);
 
 # Check if response was successful
 die "Authentication failed\n" unless $response->content->{'result'};
 
 $authID = $response->content->{'result'};
-#print "Authentication successful. Auth ID: " . $authID . "\n";
 
 $json = {
 	jsonrpc=> '2.0',
@@ -49,6 +75,7 @@ $json = {
 	id => 2,
 	auth => "$authID",
 };
+
 $response = $client->call($URL, $json);
 
 # Check if response was successful
@@ -73,7 +100,6 @@ $json = {
 };
 
 # Update host inventory in database
-open (FP, $filename);
 
 while (<FP>) {
  	chomp;
@@ -97,7 +123,4 @@ while (<FP>) {
 }
  
 close (FP); 
-
-
-
 
