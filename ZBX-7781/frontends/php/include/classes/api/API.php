@@ -29,60 +29,11 @@ class API {
 	private static $wrapper;
 
 	/**
-	 * A map of classes that should handle the corresponding API objects requests.
+	 * Factory for creating API services.
 	 *
-	 * @var array
+	 * @var CApiServiceFactory
 	 */
-	protected static $classMap = array(
-		'action' => 'CAction',
-		'alert' => 'CAlert',
-		'apiinfo' => 'CAPIInfo',
-		'application' => 'CApplication',
-		'configuration' => 'CConfiguration',
-		'dcheck' => 'CDCheck',
-		'dhost' => 'CDHost',
-		'discoveryrule' => 'CDiscoveryRule',
-		'drule' => 'CDRule',
-		'dservice' => 'CDService',
-		'event' => 'CEvent',
-		'graph' => 'CGraph',
-		'graphitem' => 'CGraphItem',
-		'graphprototype' => 'CGraphPrototype',
-		'host' => 'CHost',
-		'hostgroup' => 'CHostGroup',
-		'hostprototype' => 'CHostPrototype',
-		'history' => 'CHistory',
-		'hostinterface' => 'CHostInterface',
-		'image' => 'CImage',
-		'iconmap' => 'CIconMap',
-		'item' => 'CItem',
-		'itemprototype' => 'CItemPrototype',
-		'maintenance' => 'CMaintenance',
-		'map' => 'CMap',
-		'mediatype' => 'CMediatype',
-		'proxy' => 'CProxy',
-		'service' => 'CService',
-		'screen' => 'CScreen',
-		'screenitem' => 'CScreenItem',
-		'script' => 'CScript',
-		'template' => 'CTemplate',
-		'templatescreen' => 'CTemplateScreen',
-		'templatescreenitem' => 'CTemplateScreenItem',
-		'trigger' => 'CTrigger',
-		'triggerprototype' => 'CTriggerPrototype',
-		'user' => 'CUser',
-		'usergroup' => 'CUserGroup',
-		'usermacro' => 'CUserMacro',
-		'usermedia' => 'CUserMedia',
-		'httptest' => 'CHttpTest'
-	);
-
-	/**
-	 * Array of created CApiService objects.
-	 *
-	 * @var array
-	 */
-	protected static $instances = array();
+	private static $apiServiceFactory;
 
 	/**
 	 * Sets the API wrapper.
@@ -91,6 +42,15 @@ class API {
 	 */
 	public static function setWrapper(CApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
+	}
+
+	/**
+	 * Set the service factory.
+	 *
+	 * @param CApiServiceFactory $factory
+	 */
+	public static function setApiServiceFactory(CApiServiceFactory $factory) {
+		self::$apiServiceFactory = $factory;
 	}
 
 	/**
@@ -131,34 +91,7 @@ class API {
 	 * @return CApiService
 	 */
 	public static function getApiService($name = null) {
-		if ($name) {
-			$className = self::getServiceClassName($name);
-			if (!isset(self::$instances[$name])) {
-				self::$instances[$name] = new $className;
-			}
-
-			return self::$instances[$name];
-		}
-		else {
-			if (!isset(self::$instances[0])) {
-				self::$instances[0] = new CApiService();
-			}
-
-			return self::$instances[0];
-		}
-	}
-
-	/**
-	 * Returns the class name for the given API. The name of the object should not be case sensitive.
-	 *
-	 * @static
-	 *
-	 * @param string $object
-	 *
-	 * @return string
-	 */
-	protected static function getServiceClassName($object) {
-		return self::$classMap[strtolower($object)];
+		return self::$apiServiceFactory->getObject($name ? $name : 'api');
 	}
 
 	/**
