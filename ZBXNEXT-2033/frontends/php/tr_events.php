@@ -113,7 +113,7 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
-$remedyService = CRemedyService::init(array('eventTriggerSeverity' => $trigger['priority']));
+$remedyService = CRemedyService::init(array('triggerSeverity' => $trigger['priority']));
 
 if ($remedyService) {
 	$remedyData = CRemedyService::mediaQuery($event['eventid']);
@@ -122,6 +122,10 @@ if ($remedyService) {
 		$ticketTable = new CTableInfo();
 
 		$ticketTable->addRow(array(_('Ticket'), $remedyData['ticketLink']));
+		if ($remedyData['assignee']) {
+			$ticketTable->addRow(array(_('Assignee'), $remedyData['assignee']));
+		}
+		$ticketTable->addRow(array(_('Status'), $remedyData['status']));
 		$ticketTable->addRow(array(_('Created'), $remedyData['created']));
 
 		$ticketDetails = new CUIWidget('hat_ticketdetails', $ticketTable);

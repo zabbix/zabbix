@@ -129,7 +129,7 @@ if (!$bulk) {
 		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
 
-		$remedyService = CRemedyService::init(array('eventTriggerSeverity' => $event['relatedObject']['priority']));
+		$remedyService = CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
@@ -222,7 +222,12 @@ ob_end_flush();
 
 $ackWidget = new CWidget();
 if ($remedyData) {
-	$ackWidget->addHeader(array(_('Ticket').' ', $remedyData['ticketLink']));
+	$ackWidget->addHeader(array(_('Ticket').NAME_DELIMITER.' ', $remedyData['ticketLink']));
+	if ($remedyData['assignee']) {
+		$ackWidget->addHeader(array(_('Assignee').NAME_DELIMITER.' ', $remedyData['assignee']));
+	}
+	$ackWidget->addHeader(array(_('Status').NAME_DELIMITER.' ', $remedyData['status']));
+	$ackWidget->addHeader(array(_('Created').NAME_DELIMITER.' ', $remedyData['created']));
 }
 $ackWidget->addPageHeader(_('ALARM ACKNOWLEDGES').NAME_DELIMITER.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName));
 

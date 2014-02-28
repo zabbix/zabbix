@@ -21,15 +21,34 @@
 
 class CRemedyService {
 
+	/**
+	 * Minimum required event trigger severity to enable Remedy service.
+	 *
+	 * @constant
+	 */
 	const minTriggerSeverity = TRIGGER_SEVERITY_WARNING;
 
+	/**
+	 * Remedy service status.
+	 *
+	 * @var bool
+	 */
 	public static $enabled = false;
-	//protected $data;
 
-	public static function init(array $data) {
+	/**
+	 * Initialize the Remedy service. First check if event trigger severity corresponds to minimum required severity to
+	 * create, update or request a ticket. Then check if current user has Remedy service as media type.
+	 *
+	 * @throws APIException	if cannot read media type.
+	 *
+	 * @param string $event['triggerSeverity']		current event trigger severity
+	 *
+	 * @return bool
+	 */
+	public static function init(array $event) {
 		try {
-			if (isset($data['eventTriggerSeverity'])
-				&& $data['eventTriggerSeverity'] >= self::minTriggerSeverity) {
+			if (isset($event['triggerSeverity'])
+				&& $event['triggerSeverity'] >= self::minTriggerSeverity) {
 
 				// check if current user has Remedy Service media type set up
 				self::$enabled = (bool) API::MediaType()->get(array(
@@ -47,6 +66,20 @@ class CRemedyService {
 		}
 	}
 
+	/**
+	 * Query Zabbix server about an existing event.
+	 * Returns false if Remedy service is not enabled, no event data was passed, error connecting to Zabbix server or
+	 * something went wrong with actual ticket.
+	 * If query was success, receive array of raw ticket data from Zabbix server and then process each field.
+	 * Returns array of processed ticket data (link to ticket, correct time format etc).
+	 *
+	 * @global string $ZBX_SERVER
+	 * @global string $ZBX_SERVER_PORT
+	 *
+	 * @param int    $eventId
+	 *
+	 * @return bool|array
+	 */
 	public static function mediaQuery($eventId = null) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -72,19 +105,33 @@ class CRemedyService {
 		else {
 			$ticket = zbx_toHash($ticket, 'eventid');
 
-			// something went wrong getting that ticket
 			if ($ticket[$eventId]['error']) {
 				error($ticket[$eventId]['error']);
 
 				return false;
 			}
-			// ticket exists. Create link to ticket and label "Update ticket"
 			elseif ($ticket[$eventId]['externalid']) {
 				return self::processRemedyTicketDetails($ticket[$eventId]);
 			}
 		}
 	}
 
+	/**
+	 * Send event data to Remedy service to create or update a ticket.
+	 * Returns false if Remedy service is not enabled, no event data was passed, error connecting to Zabbix server or
+	 * something went wrong with actual ticket.
+	 * If operation was success, receive array of raw ticket data from Zabbix server and then process each field.
+	 * Returns array of processed ticket data (link to ticket, correct time format etc).
+	 *
+	 * @global string $ZBX_SERVER
+	 * @global string $ZBX_SERVER_PORT
+	 *
+	 * @param string $event['eventid']		an existing event ID
+	 * @param string $event['message']		user message when acknowledging event
+	 * @param string $event['subject']		trigger status 'OK' or 'PROBLEM'
+	 *
+	 * @return bool|array
+	 */
 	public static function mediaAcknowledge(array $event = array()) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -116,7 +163,6 @@ class CRemedyService {
 
 				return false;
 			}
-			// externalid for creating link to Remedy and check status if new, then show it as new
 			elseif ($ticket[$eventId]['externalid']) {
 				$messageSuccess = $ticket[$eventId]['new']
 					? _s('Ticket "%1$s" has been created.', $ticket[$eventId]['externalid'])
@@ -128,6 +174,13 @@ class CRemedyService {
 		}
 	}
 
+	/**
+	 * Creates Remedy ticket link and converts clock to readable time format and returns array of ticket data.
+	 *
+	 * @param array $ticketData
+	 *
+	 * @return array
+	 */
 	protected static function processRemedyTicketDetails(array $ticketData) {
 		$ticketId = $ticketData['externalid'];
 
@@ -137,9 +190,9 @@ class CRemedyService {
 		return array(
 			'ticketId' => $ticketId,
 			'ticketLink' => $ticketLink,
-			'created' => isset($ticketData['clock']) ? zbx_date2str(_('d M Y H:i:s'), $ticketData['clock']) : null,
+			'created' => zbx_date2str(_('d M Y H:i:s'), $ticketData['clock']),
 			'status' => $ticketData['status'],
-			'assignee' => isset($ticketData['assignee']) ? $ticketData['assignee'] : null,
+			'assignee' => $ticketData['assignee']
 		);
 	}
 }
