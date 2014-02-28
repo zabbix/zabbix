@@ -339,11 +339,13 @@ static void	remedy_fields_set_value(zbx_remedy_field_t *fields, int fields_num, 
 	{
 		if (0 == strcmp(fields[i].name, name))
 		{
-			/* zbx_strdup() frees old value if it's not NULL */
-			if (NULL == value)
-				zbx_free(fields[i].value);
-			else
+			if (NULL != value)
+			{
+				/* zbx_strdup() frees old value if it's not NULL */
 				fields[i].value = zbx_strdup(fields[i].value, value);
+			}
+			else
+				zbx_free(fields[i].value);
 		}
 	}
 }
@@ -1099,6 +1101,41 @@ static int	remedy_get_mediatype(DB_MEDIATYPE *media)
 
 /******************************************************************************
  *                                                                            *
+ * Function: remedy_get_ticket_creation_time                                  *
+ *                                                                            *
+ * Purpose: retrieves the creation time of the specified ticket               *
+ *                                                                            *
+ * Parameters: externalid    - [IN] the ticket external id                    *
+ *                                                                            *
+ * Return Value: the ticket creation time in seconds or 0 if the ticket was   *
+ *               not found                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	remedy_get_ticket_creation_time(const char *externalid)
+{
+	int		clock;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*incident_number;
+
+	incident_number = DBdyn_escape_string(externalid);
+
+	/* read the incident creation time */
+	result = DBselect("select clock from ticket where externalid='%s' and new=1",
+			incident_number);
+
+	zbx_free(incident_number);
+
+	if (NULL != (row = DBfetch(result)))
+		clock = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return clock;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: remedy_get_last_ticket                                           *
  *                                                                            *
  * Purpose: retrieves either the ticket directly linked to the specified      *
@@ -1107,7 +1144,6 @@ static int	remedy_get_mediatype(DB_MEDIATYPE *media)
  *                                                                            *
  * Parameters: eventid         - [IN] the event                               *
  *             incident_number - [OUT] the linked incident number             *
- *             clock           - [OUT] the incident creation time             *
  *                                                                            *
  * Return Value: SUCCEED - the incident was retrieved successfully            *
  *               FAIL - otherwise                                             *
@@ -1116,12 +1152,11 @@ static int	remedy_get_mediatype(DB_MEDIATYPE *media)
  *           which must be freed later.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid, int *clock)
+static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid)
 {
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*incident_number;
 
 	if (NULL == (*externalid = remedy_get_ticketid_by_eventid(eventid)))
 	{
@@ -1145,28 +1180,9 @@ static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid, int
 		DBfree_result(result);
 	}
 
-	incident_number = DBdyn_escape_string(*externalid);
-
-	/* read the incident creation time */
-	result = DBselect("select clock from ticket where externalid='%s' and new=1",
-			incident_number);
-
-	zbx_free(incident_number);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*clock = atoi(row[0]);
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		*clock = 0;
-	}
-
 	ret = SUCCEED;
 out:
 	DBfree_result(result);
-
 
 	return ret;
 }
@@ -1207,6 +1223,10 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 #define ZBX_EVENT_REMEDY_CRITICAL	1
 
 #define ZBX_REMEDY_DEFAULT_SERVICECI	""
+
+/* the number of fields at the end of fields array used only to query data */
+/* and should not be passed to modify function                             */
+#define ZBX_REMEDY_QUERY_FIELDS		1
 
 	const char	*__function_name = "remedy_process_event";
 	int		ret = FAIL, acknowledge_status = ZBX_REMEDY_ACK_UNKNOWN, event_value, trigger_severity,
@@ -1265,6 +1285,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 			{"WorkInfoAttachment1Name", NULL},
 			{"WorkInfoAttachment1Data", NULL},
 			{"WorkInfoAttachment1OrigSize", NULL},
+			{ZBX_REMEDY_FIELD_ASSIGNEE, NULL},
 	};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1321,7 +1342,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 						ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
 
 				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
-						media->passwd, fields, ARRSIZE(fields), error);
+						media->passwd, fields, ARRSIZE(fields) - ZBX_REMEDY_QUERY_FIELDS, error);
 
 				goto out;
 			}
@@ -1337,7 +1358,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 						ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
 
 				ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username,
-						media->passwd, fields, ARRSIZE(fields), error);
+						media->passwd, fields, ARRSIZE(fields) - ZBX_REMEDY_QUERY_FIELDS, error);
 
 				goto out;
 			}
@@ -1421,7 +1442,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 				ZBX_REMEDY_PROCESS_AUTOMATED == state ? subject : message);
 
 		ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd, fields,
-				ARRSIZE(fields), error);
+				ARRSIZE(fields) - ZBX_REMEDY_QUERY_FIELDS, error);
 	}
 
 out:
@@ -1446,12 +1467,18 @@ out:
 
 		if (NULL != ticket)
 		{
+			const char	*assignee;
+
 			ticket->eventid = eventid;
 			ticket->is_new = is_new;
 			if (NULL != incident_status)
 				ticket->status = zbx_strdup(NULL, incident_status);
 			if (NULL != incident_number)
 				ticket->ticketid = zbx_strdup(NULL, incident_number);
+
+			assignee = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_ASSIGNEE);
+			if (NULL != assignee)
+				ticket->assignee = zbx_strdup(NULL, assignee);
 		}
 
 		DBcommit();
@@ -1556,7 +1583,7 @@ int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tic
 
 		ticket->eventid = eventids->values[i];
 
-		if (SUCCEED == remedy_get_last_ticketid(ticket->eventid, &ticket->ticketid, &ticket->clock) &&
+		if (SUCCEED == remedy_get_last_ticketid(ticket->eventid, &ticket->ticketid) &&
 				SUCCEED == remedy_query_ticket(mediatype.smtp_server, mediatype.smtp_helo,
 				mediatype.username, mediatype.passwd, ticket->ticketid, fields, ARRSIZE(fields),
 				&ticket->error))
@@ -1571,6 +1598,8 @@ int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tic
 
 			if (NULL != assignee)
 				ticket->assignee = zbx_strdup(NULL, assignee);
+
+			ticket->clock = remedy_get_ticket_creation_time(ticket->ticketid);
 		}
 
 		zbx_vector_ptr_append(tickets, ticket);
@@ -1643,8 +1672,11 @@ int	zbx_remedy_acknowledge_events(zbx_uint64_t userid, zbx_vector_ptr_t *acknowl
 		ticket = zbx_malloc(NULL, sizeof(zbx_ticket_t));
 		memset(ticket, 0, sizeof(zbx_ticket_t));
 
-		remedy_process_event(ack->eventid, userid, row[0], ack->subject, ack->message, &mediatype,
-				ZBX_REMEDY_PROCESS_MANUAL, ticket, &ticket->error);
+		if (SUCCEED == remedy_process_event(ack->eventid, userid, row[0], ack->subject, ack->message,
+				&mediatype, ZBX_REMEDY_PROCESS_MANUAL, ticket, &ticket->error))
+		{
+			ticket->clock = remedy_get_ticket_creation_time(ticket->ticketid);
+		}
 
 		zbx_vector_ptr_append(tickets, ticket);
 	}
@@ -1725,4 +1757,3 @@ void	zbx_free_acknowledge(zbx_acknowledge_t *ack)
 }
 
 #endif
-

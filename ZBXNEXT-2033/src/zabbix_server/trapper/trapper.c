@@ -504,6 +504,7 @@ out:
 static void	format_media_response(struct zbx_json *json, zbx_vector_ptr_t *tickets, int response_type)
 {
 	int	i;
+	char	buf[32];
 
 	zbx_json_init(json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -526,20 +527,14 @@ static void	format_media_response(struct zbx_json *json, zbx_vector_ptr_t *ticke
 		zbx_json_addstring(json, "error", (NULL != ticket->error ? ticket->error : ""),
 				ZBX_JSON_TYPE_STRING);
 
-		if (response_type == ZBX_MEDIA_RESPONSE_QUERY)
-		{
-			char	buf[32];
+		zbx_json_addstring(json, "assignee", (NULL != ticket->assignee ? ticket->assignee : ""),
+				ZBX_JSON_TYPE_STRING);
 
-			zbx_snprintf(buf, sizeof(buf), "%d", ticket->clock);
-			zbx_json_addstring(json, "clock", buf, ZBX_JSON_TYPE_INT);
+		zbx_snprintf(buf, sizeof(buf), "%d", ticket->clock);
+		zbx_json_addstring(json, "clock", buf, ZBX_JSON_TYPE_INT);
 
-			zbx_json_addstring(json, "assignee", (NULL != ticket->assignee ? ticket->assignee : ""),
-					ZBX_JSON_TYPE_STRING);
-		}
-		else
-		{
+		if (response_type != ZBX_MEDIA_RESPONSE_QUERY)
 			zbx_json_adduint64(json, "new", ticket->is_new);
-		}
 
 		zbx_json_close(json);
 	}
