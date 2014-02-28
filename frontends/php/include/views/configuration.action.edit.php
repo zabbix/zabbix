@@ -107,7 +107,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 }
 
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 $conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
@@ -951,7 +951,7 @@ if (!empty($this->data['new_operation'])) {
 			$grouped_opconditions = implode(' '.$glog_op.' ', $grouped_opconditions);
 
 			$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
-			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And / or'));
+			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
 			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
 			$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 
