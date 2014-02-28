@@ -56,6 +56,7 @@ function IN($array, $var = '') {
 	if (is_array($array)) {
 		$array = implode(',', $array);
 	}
+
 	return 'str_in_array({'.$var.'},array('.$array.'))&&';
 }
 
@@ -334,10 +335,32 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 
-	if ($type == T_ZBX_DBL && !is_numeric($var)) {
-		info(_s('Field "%1$s" is not decimal number.', $caption));
+	if ($type == T_ZBX_DBL) {
+		$error = false;
 
-		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		if (is_numeric($var)) {
+			$numberValidator = new CNumericValidator(array(
+				'scaleBeforePoint' => 12,
+				'scaleAfterPoint' => 4,
+				'messageBeforePoint' => _('Incorrect number part of numeric value "%1$s".'),
+				'messageAfterPoint' => _('Incorrect floating part of numeric value "%1$s".')
+			));
+
+			if (!$numberValidator->validate($var)) {
+				info($numberValidator->getError());
+
+				$error = true;
+			}
+		}
+		else {
+			info(_s('Field "%1$s" is not decimal number.', $caption));
+
+			$error = true;
+		}
+
+		if ($error) {
+			return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
+		}
 	}
 
 	if ($type == T_ZBX_STR && !is_string($var)) {

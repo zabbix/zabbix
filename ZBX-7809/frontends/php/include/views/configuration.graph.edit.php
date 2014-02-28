@@ -104,11 +104,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$yaxisMinData[] = $yTypeComboBox;
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
-		$yaxisMinData[] = new CTextBox(
-			'yaxismin',
-			formatValueByScale($this->data['yaxismin'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT),
-			7
-		);
+		$yaxisMinData[] = new CTextBox('yaxismin', $this->data['yaxismin'], 7);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
@@ -166,11 +162,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$yaxisMaxData[] = $yTypeComboBox;
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
-		$yaxisMaxData[] = new CTextBox(
-			'yaxismax',
-			formatValueByScale($this->data['yaxismax'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT),
-			7
-		);
+		$yaxisMaxData[] = new CTextBox('yaxismax', $this->data['yaxismax'], 7);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
