@@ -694,8 +694,7 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		$this->checkIfHasPrototype($graphs, $allowedItems);
-		$this->checkCrossRefferenceDiscovery($graphs, $allowedItems);
+		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 
 		parent::validateCreate($graphs);
 
@@ -740,8 +739,7 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		$this->checkIfHasPrototype($graphs, $allowedItems);
-		$this->checkCrossRefferenceDiscovery($graphs, $allowedItems);
+		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 
 		parent::validateUpdate($graphs, $dbGraphs);
 
@@ -757,59 +755,34 @@ class CGraphPrototype extends CGraphGeneral {
 	}
 
 	/**
-	 * Check if graph prototype has at least one item prototype.
+	 * Check if graph prototype has at least one item prototype and belongs to one discovery rule.
 	 *
-	 * @throws APIException if graph prototype does not contain at least one item prototype.
+	 * @throws APIException if graph prototype has no item prototype or items belong to multiple discovery rules.
 	 *
-	 * @param array $graphs
-	 * @param array $items		array of existing items and ones that user has permission to access
+	 * @param array $graphs		array of graphs
+	 * @param array $items		array of existing graph items and ones that user has permission to access
 	 */
-	function checkIfHasPrototype(array $graphs, array $items) {
-		foreach ($graphs as $graph) {
-			// for update method we will skip this step, if no items are set
-			if (isset($graph['gitems'])) {
-				$hasPrototype = false;
-
-				foreach ($graph['gitems'] as $item) {
-					if ($items[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$hasPrototype = true;
-						break;
-					}
-				}
-
-				if (!$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Graph prototype "%1$s" must have at least one prototype.',
-						$graph['name']
-					));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Check if item prototypes belong to multiple discovery rules.
-	 *
-	 * @throws APIException if item prototypes belong to multiple discovery rules.
-	 *
-	 * @param array $graphs
-	 * @param array $items		array of existing items and ones that user has permission to access
-	 */
-	function checkCrossRefferenceDiscovery(array $graphs, array $items) {
+	protected function checkDiscoveryRuleCount(array $graphs, array $items) {
 		foreach ($graphs as $graph) {
 			// for update method we will skip this step, if no items are set
 			if (isset($graph['gitems'])) {
 				$itemDiscoveryIds = array();
 
 				foreach ($graph['gitems'] as $item) {
-					$itemDiscoveryIds[] = $items[$item['itemid']]['itemDiscovery']['parent_itemid'];
+					if ($items[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$itemDiscoveryIds[$items[$item['itemid']]['itemDiscovery']['parent_itemid']] = true;
+					}
 				}
-
-				$itemDiscoveryIds = array_flip($itemDiscoveryIds);
 
 				if (count($itemDiscoveryIds) > 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Graph prototype "%1$s" contains item prototypes from multiple discovery rules.',
+						$graph['name']
+					));
+				}
+				elseif (!$itemDiscoveryIds) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" must have at least one prototype.',
 						$graph['name']
 					));
 				}
