@@ -110,8 +110,8 @@ $eventTrigger = null;
 $eventAcknowledged = null;
 $eventTriggerName = null;
 
-$remedyService = null;
-$remedyData = null;
+$isRemedyServiceEnabled = null;
+$ticket = null;
 $event = null;
 
 $bulk = !isset($_REQUEST['eventid']);
@@ -129,7 +129,7 @@ if (!$bulk) {
 		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
 
-		$remedyService = CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
+		$isRemedyServiceEnabled = CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
@@ -155,20 +155,20 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 
 	$result = true;
 
-	if (!$bulk && $event && $remedyService) {
+	if (!$bulk && $event && $isRemedyServiceEnabled) {
 		// create or update existing remedy ticket
 		if (hasRequest('ticket_status')) {
-			$remedyData = CRemedyService::mediaAcknowledge(array(
+			$ticket = CRemedyService::mediaAcknowledge(array(
 				'eventid' => getRequest('eventid'),
 				'message' => getRequest('message'),
 				'subject' => trigger_value2str($event['relatedObject']['value'])
 			));
 
-			$result = (bool) $remedyData;
+			$result = (bool) $ticket;
 		}
 		// read remedy ticket
 		else {
-			$remedyData = CRemedyService::mediaQuery(getRequest('eventid'));
+			$ticket = CRemedyService::mediaQuery(getRequest('eventid'));
 		}
 	}
 
@@ -208,8 +208,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		}
 	}
 }
-elseif (!$bulk && $remedyService && $event) {
-	$remedyData = CRemedyService::mediaQuery($event['eventid']);
+elseif (!$bulk && $isRemedyServiceEnabled && $event) {
+	$ticket = CRemedyService::mediaQuery($event['eventid']);
 
 	show_messages();
 }
@@ -221,13 +221,13 @@ ob_end_flush();
  */
 
 $ackWidget = new CWidget();
-if ($remedyData) {
-	$ackWidget->addHeader(array(_('Ticket').NAME_DELIMITER.' ', $remedyData['ticketLink']));
-	if ($remedyData['assignee']) {
-		$ackWidget->addHeader(array(_('Assignee').NAME_DELIMITER.' ', $remedyData['assignee']));
+if ($ticket) {
+	$ackWidget->addHeader(array(_('Ticket').NAME_DELIMITER.' ', $ticket['link']));
+	if ($ticket['assignee']) {
+		$ackWidget->addHeader(array(_('Assignee').NAME_DELIMITER.' ', $ticket['assignee']));
 	}
-	$ackWidget->addHeader(array(_('Status').NAME_DELIMITER.' ', $remedyData['status']));
-	$ackWidget->addHeader(array(_('Created').NAME_DELIMITER.' ', $remedyData['created']));
+	$ackWidget->addHeader(array(_('Status').NAME_DELIMITER.' ', $ticket['status']));
+	$ackWidget->addHeader(array(_('Created').NAME_DELIMITER.' ', $ticket['created']));
 }
 $ackWidget->addPageHeader(_('ALARM ACKNOWLEDGES').NAME_DELIMITER.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName));
 
@@ -305,8 +305,8 @@ $message->attr('autofocus', 'autofocus');
 
 $messageTable->addRow(_('Message'), $message);
 
-if ($remedyService) {
-	$ticketStatusMessage = $remedyData ? array(_('Update ticket').' ', $remedyData['ticketLink']) : _('Create ticket');
+if ($isRemedyServiceEnabled) {
+	$ticketStatusMessage = $ticket ? array(_('Update ticket').' ', $ticket['link']) : _('Create ticket');
 
 	$messageTable->addRow($ticketStatusMessage, new CCheckBox('ticket_status'));
 }

@@ -174,12 +174,12 @@ class CRemedyService {
 	protected static function getDetails(array $data) {
 		$ticketId = $data['externalid'];
 
-		$ticketLink = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
-		$ticketLink->setTarget('_blank');
+		$link = new CLink($ticketId, REMEDY_SERVICE_WEB_URL.'"'.$ticketId.'"', null, null, true);
+		$link->setTarget('_blank');
 
 		return array(
 			'ticketId' => $ticketId,
-			'ticketLink' => $ticketLink,
+			'link' => $link,
 			'created' => zbx_date2str(_('d M Y H:i:s'), $data['clock']),
 			'status' => $data['status'],
 			'assignee' => $data['assignee']
