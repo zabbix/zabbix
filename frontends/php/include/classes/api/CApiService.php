@@ -19,7 +19,7 @@
 **/
 
 
-class CApiInstance {
+class CApiService {
 
 	public static $userData;
 
@@ -313,7 +313,7 @@ class CApiInstance {
 
 		// create the map from a database table
 		if ($table) {
-			$res = DBselect(API::getApi()->createSelectQuery($table, array(
+			$res = DBselect(API::getApiService()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
 				'filter' => array($baseField => array_keys($objects)),
 				'nodeids' => get_current_nodeid(true)
@@ -691,7 +691,7 @@ class CApiInstance {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = API::getApi()->select($tableName, array(
+		$dbObjects = API::getApiService()->select($tableName, array(
 			'output' => $fields,
 			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 			'preservekeys' => true

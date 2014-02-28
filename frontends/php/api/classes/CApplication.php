@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CApplication extends CApiInstance {
+class CApplication extends CApiService {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';

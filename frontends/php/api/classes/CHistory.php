@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHistory extends CApiInstance {
+class CHistory extends CApiService {
 
 	protected $tableName = 'history';
 	protected $tableAlias = 'h';

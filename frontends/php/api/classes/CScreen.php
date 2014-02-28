@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScreen extends CApiInstance {
+class CScreen extends CApiService {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
@@ -378,7 +378,7 @@ class CScreen extends CApiInstance {
 		}
 		unset($screen);
 
-		$dbScreens = API::getApi()->select('screens', array(
+		$dbScreens = API::getApiService()->select('screens', array(
 			'filter' => array('name' => zbx_objectValues($screens, 'name')),
 			'output' => array('name')
 		));
@@ -464,7 +464,7 @@ class CScreen extends CApiInstance {
 			}
 
 			if (isset($screen['name'])) {
-				$dbScreenExist = API::getApi()->select('screens', array(
+				$dbScreenExist = API::getApiService()->select('screens', array(
 					'filter' => array('name' => $screen['name']),
 					'output' => array('screenid')
 				));
@@ -515,7 +515,7 @@ class CScreen extends CApiInstance {
 		}
 
 		// delete outside screen items
-		$dbScreenItems = API::getApi()->select('screens_items', array(
+		$dbScreenItems = API::getApiService()->select('screens_items', array(
 			'filter' => array('screenid' => $screenIds),
 			'output' => array('screenitemid', 'screenid', 'x', 'y'),
 		));
@@ -655,7 +655,7 @@ class CScreen extends CApiInstance {
 
 		// adding ScreenItems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', array(
 				'output' => $this->outputExtend($options['selectScreenItems'], array('screenid', 'screenitemid')),
 				'filter' => array('screenid' => $screenIds),
 				'preservekeys' => true,

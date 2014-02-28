@@ -20,18 +20,35 @@
 
 
 /**
- * Class containing methods for operations with API.
- *
- * @package API
+ * This class is used by the API client to return the results of an API call.
  */
-class CAPIInfo extends CApiService {
+class CApiClientResponse {
 
 	/**
-	 * Get API version.
+	 * Data returned by the service method.
 	 *
-	 * @return string
+	 * @var mixed
 	 */
-	public function version() {
-		return ZABBIX_API_VERSION;
-	}
+	public $data;
+
+	/**
+	 * Error code.
+	 *
+	 * @var	int
+	 */
+	public $errorCode;
+
+	/**
+	 * Error message.
+	 *
+	 * @var	string
+	 */
+	public $errorMessage;
+
+	/**
+	 * Debug information.
+	 *
+	 * @var	array
+	 */
+	public $debug;
 }

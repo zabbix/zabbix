@@ -98,7 +98,7 @@ class czbxrpc {
 
 		list($resource, $action) = explode('.', $method);
 
-		$class_name = API::getObjectClassName($resource);
+		$class_name = API::getInstanceClassName($resource);
 		if (!class_exists($class_name)) {
 			return array(
 				'error' => ZBX_API_ERROR_PARAMETERS,
@@ -118,7 +118,7 @@ class czbxrpc {
 			API::setReturnAPI();
 
 			$result = call_user_func(array(
-				API::getObject($resource),
+				API::getApi($resource),
 				$action
 			), $params);
 
@@ -148,7 +148,7 @@ class czbxrpc {
 					'data' => $e->getMessage(),
 				);
 
-				if (isset(CApiInstance::$userData['debug_mode']) && CApiInstance::$userData['debug_mode']) {
+				if (isset(CApiService::$userData['debug_mode']) && CApiService::$userData['debug_mode']) {
 					$result['debug'] = $e->getTrace();
 				}
 

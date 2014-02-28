@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHttpTest extends CApiInstance {
+class CHttpTest extends CApiService {
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
@@ -715,7 +715,7 @@ class CHttpTest extends CApiInstance {
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApi()->select('httpstep', array(
+				$httpSteps = API::getApiService()->select('httpstep', array(
 					'output' => $this->outputExtend($options['selectSteps'], array('httptestid', 'httpstepid')),
 					'filters' => array('httptestid' => $httpTestIds),
 					'preservekeys' => true,

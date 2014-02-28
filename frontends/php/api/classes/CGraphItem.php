@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CGraphItem extends CApiInstance {
+class CGraphItem extends CApiService {
 
 	protected $tableName = 'graphs_items';
 	protected $tableAlias = 'gi';

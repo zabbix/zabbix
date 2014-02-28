@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CEvent extends CApiInstance {
+class CEvent extends CApiService {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
@@ -566,7 +566,7 @@ class CEvent extends CApiInstance {
 		if ($options['select_acknowledges'] !== null) {
 			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
 				// create the base query
-				$sqlParts = API::getApi()->createSelectQueryParts('acknowledges', 'a', array(
+				$sqlParts = API::getApiService()->createSelectQueryParts('acknowledges', 'a', array(
 					'output' => $this->outputExtend($options['select_acknowledges'],
 						array('acknowledgeid', 'eventid', 'clock')
 					),
@@ -638,7 +638,7 @@ class CEvent extends CApiInstance {
 		foreach ($eventIds as $eventId) {
 			if (!isset($allowedEvents[$eventId])) {
 				// check if an event actually exists but maybe belongs to a different source or object
-				$event = API::getApi()->select($this->tableName(), array(
+				$event = API::getApiService()->select($this->tableName(), array(
 					'output' => array('eventid', 'source', 'object'),
 					'eventids' => $eventId,
 					'limit' => 1

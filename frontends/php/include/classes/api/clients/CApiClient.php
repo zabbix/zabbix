@@ -20,18 +20,36 @@
 
 
 /**
- * Class containing methods for operations with API.
- *
- * @package API
+ * This class should be used for calling API services.
  */
-class CAPIInfo extends CApiService {
+abstract class CApiClient {
 
 	/**
-	 * Get API version.
+	 * Name of the current API.
 	 *
-	 * @return string
+	 * @var string
 	 */
-	public function version() {
-		return ZABBIX_API_VERSION;
+	public $api;
+
+	/**
+	 * A magic method for calling public methods of the API service.
+	 *
+	 * @param string 	$method
+	 * @param array 	$params
+	 *
+	 * @return mixed
+	 */
+	public function __call($method, array $params) {
+		return $this->callServiceMethod($method, $params);
 	}
+
+	/**
+	 * Call the given API service method and return the response.
+	 *
+	 * @param string $method
+	 * @param array	 $params
+	 *
+	 * @return CApiClientResponse
+	 */
+	abstract protected function callServiceMethod($method, array $params);
 }

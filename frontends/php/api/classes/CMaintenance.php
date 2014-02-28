@@ -24,7 +24,7 @@
  *
  * * @package API
  */
-class CMaintenance extends CApiInstance {
+class CMaintenance extends CApiService {
 
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';
@@ -740,7 +740,7 @@ class CMaintenance extends CApiInstance {
 		// selectTimeperiods
 		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
-			$timeperiods = API::getApi()->select('timeperiods', array(
+			$timeperiods = API::getApiService()->select('timeperiods', array(
 				'output' => $options['selectTimeperiods'],
 				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
 				'preservekeys' => true,

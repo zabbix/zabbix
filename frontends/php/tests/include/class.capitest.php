@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';
 
 // APIs
 require_once dirname(__FILE__).'/../../include/classes/api/APIException.php';
-require_once dirname(__FILE__).'/../../include/classes/api/CApiInstance.php';
+require_once dirname(__FILE__).'/../../include/classes/api/CApiService.php';
 require_once dirname(__FILE__).'/../../api/classes/CItemGeneral.php';
 require_once dirname(__FILE__).'/../../api/classes/CItemKey.php';
 require_once dirname(__FILE__).'/../../api/classes/CItem.php';
@@ -60,7 +60,7 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * API object.
 	 *
-	 * @var CApiInstance
+	 * @var CApiService
 	 */
 	protected $api;
 
@@ -103,7 +103,7 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		define('ZBX_DISTRIBUTED', false);
 
 		// add some user data
-		CApiInstance::$userData = array(
+		CApiService::$userData = array(
 			'userid' => null,
 			'type' => USER_TYPE_SUPER_ADMIN
 		);

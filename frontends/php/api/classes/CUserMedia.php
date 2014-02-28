@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserMedia extends CApiInstance {
+class CUserMedia extends CApiService {
 
 	protected $tableName = 'media';
 	protected $tableAlias = 'm';

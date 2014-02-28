@@ -1427,7 +1427,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApi()->select('item_condition', array(
+				$conditions = API::getApiService()->select('item_condition', array(
 					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,

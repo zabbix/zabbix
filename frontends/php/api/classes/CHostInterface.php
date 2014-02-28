@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHostInterface extends CApiInstance {
+class CHostInterface extends CApiService {
 
 	protected $tableName = 'interface';
 	protected $tableAlias = 'hi';
@@ -503,7 +503,7 @@ class CHostInterface extends CApiInstance {
 			$this->checkPort($interface);
 
 			// check main interfaces
-			$interfacesToRemove = API::getApi()->select($this->tableName(), array(
+			$interfacesToRemove = API::getApiService()->select($this->tableName(), array(
 				'output' => array('interfaceid'),
 				'filter' => array(
 					'hostid' => $data['hostids'],

@@ -170,6 +170,11 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/api/CApiClientResponse.php -text
+frontends/php/include/classes/api/clients/CApiClient.php -text
+frontends/php/include/classes/api/clients/CLocalApiClient.php -text
+frontends/php/include/classes/api/wrappers/CApiWrapper.php -text
+frontends/php/include/classes/api/wrappers/CFrontendApiWrapper.php -text
 frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
 frontends/php/include/views/configuration.host.discovery.edit.php -text

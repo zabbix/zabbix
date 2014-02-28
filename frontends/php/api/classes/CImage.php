@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CImage extends CApiInstance {
+class CImage extends CApiService {
 
 	protected $tableName = 'images';
 	protected $tableAlias = 'i';
