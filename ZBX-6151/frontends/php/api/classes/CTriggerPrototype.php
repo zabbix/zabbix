@@ -774,11 +774,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$createdTriggers = $this->get(array(
 			'triggerids' => $triggerids,
 			'output' => array('description'),
-			'selectItems' => array('itemid', 'hostid', 'flags')
+			'selectItems' => array('itemid', 'hostid', 'flags'),
+			'nopermissions' => true
 		));
 
-		$this->checkIfHasPrototype($createdTriggers);
-		$this->checkCrossRefferenceDiscovery($createdTriggers);
+		$this->checkDiscoveryRuleCount($createdTriggers);
 
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
@@ -856,11 +856,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$updatedTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => array('description'),
-			'selectItems' => array('itemid', 'hostid', 'flags')
+			'selectItems' => array('itemid', 'hostid', 'flags'),
+			'nopermissions' => true
 		));
 
-		$this->checkIfHasPrototype($updatedTriggers);
-		$this->checkCrossRefferenceDiscovery($updatedTriggers);
+		$this->checkDiscoveryRuleCount($updatedTriggers);
 
 		foreach ($triggers as $trigger) {
 			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
@@ -1083,41 +1083,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check if trigger prototype has at least one item prototype.
+	 * Check if trigger prototype has at least one item prototype and belongs to one discovery rule.
 	 *
-	 * @throws APIException if trigger prototype does not contain at least one item prototype.
+	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
 	 *
-	 * @param array $triggers
+	 * @param array $triggers	array of created or updated triggers
 	 */
-	function checkIfHasPrototype(array $triggers) {
-		foreach ($triggers as $trigger) {
-			$hasPrototype = false;
-
-			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
-				}
-			}
-
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" must contain at least one item prototype.',
-					$trigger['description']
-				));
-			}
-		}
-	}
-
-	/**
-	 * Check if item prototypes belong to multiple discovery rules.
-	 *
-	 * @throws APIException if item prototypes belong to multiple discovery rules.
-	 *
-	 * @param array $trigger
-	 * @param array $items
-	 */
-	function checkCrossRefferenceDiscovery(array $triggers) {
+	protected function checkDiscoveryRuleCount(array $triggers) {
 		foreach ($triggers as $trigger) {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'nodeids' => get_current_nodeid(true),
@@ -1130,6 +1102,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if (count($itemDiscoveryIds) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
+					$trigger['description']
+				));
+			}
+			elseif (!$itemDiscoveryIds) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" must contain at least one item prototype.',
 					$trigger['description']
 				));
 			}
