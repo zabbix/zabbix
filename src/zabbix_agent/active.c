@@ -92,7 +92,10 @@ static void	free_active_metrics()
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_active_metrics()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
+	{
 		zbx_free(active_metrics[i].key);
+		zbx_free(active_metrics[i].key_orig);
+	}
 
 	zbx_free(active_metrics);
 
@@ -142,6 +145,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			active_metrics[i].key = strdup(key);
 			active_metrics[i].lastlogsize = lastlogsize;
 			active_metrics[i].mtime = mtime;
+			active_metrics[i].big_rec = 0;
 		}
 
 		/* replace metric */
@@ -165,6 +169,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	active_metrics[i].mtime = mtime;
 	/* can skip existing log[] and eventlog[] data */
 	active_metrics[i].skip_old_data = active_metrics[i].lastlogsize ? 0 : 1;
+	active_metrics[i].big_rec = 0;
 
 	/* move to the last metric */
 	i++;
@@ -637,7 +642,13 @@ ret:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: ATTENTION! This function's address and pointers to arguments     *
+ *           are described in Zabbix defined type "zbx_process_value_func_t"  *
+ *           and used when calling process_log(), process_logrt() and         *
+ *           zbx_read2(). If you ever change this process_value() arguments   *
+ *           or return value do not forget to synchronize changes with the    *
+ *           defined type "zbx_process_value_func_t" and implementations of   *
+ *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
 static int	process_value(
@@ -747,12 +758,9 @@ ret:
 static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
-	register int	i, s_count, p_count;
+	int		i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
-	char		*value = NULL;
-	zbx_uint64_t	lastlogsize;
-	int		mtime;
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
 	char		pattern[MAX_STRING_LEN];
@@ -760,6 +768,8 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		maxlines_persec_str[16];
 	int		maxlines_persec;
 #ifdef _WINDOWS
+	char		*value = NULL;
+	zbx_uint64_t	lastlogsize;
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
 	char		key_severity[MAX_STRING_LEN], str_severity[32] /* for `regex_match_ex' */;
@@ -790,7 +800,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
+			do {
 				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
@@ -823,54 +833,18 @@ static void	process_active_checks(char *server, unsigned short port)
 				else if (0 != strcmp(tmp, "skip"))
 					break;
 
-				s_count = 0;
-				p_count = 0;
-				lastlogsize = active_metrics[i].lastlogsize;
+				/* do not flood Zabbix server if file grows too fast */
+				s_count = maxlines_persec * active_metrics[i].refresh;
 
-				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding,
-						active_metrics[i].skip_old_data)))
-				{
-					active_metrics[i].skip_old_data = 0;
+				/* do not flood local system if file grows too fast */
+				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
-					/* End of file. The file could become empty, must save `lastlogsize'. */
-					if (NULL == value)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						break;
-					}
-
-					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE))
-					{
-						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, value, &lastlogsize,
-								NULL, NULL, NULL, NULL,	NULL, 1);
-						s_count++;
-					}
-					p_count++;
-
-					zbx_free(value);
-
-					if (SUCCEED == send_err)
-						active_metrics[i].lastlogsize = lastlogsize;
-					else
-					{
-						/* buffer is full, stop processing active checks */
-						/* till the buffer is cleared */
-						lastlogsize = active_metrics[i].lastlogsize;
-						goto ret;
-					}
-
-					/* do not flood Zabbix server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
-						break;
-
-					/* do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;
-				} /* while processing a log */
-
+				ret = process_log(filename, &active_metrics[i].lastlogsize, NULL,
+						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
+						regexps, regexps_num, pattern, &p_count, &s_count, process_value,
+						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}
-			while (0); /* simple try realization */
+			while (0);
 
 			if (FAIL == ret)
 			{
@@ -888,7 +862,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-			do { /* simple try realization */
+			do {
 				if (2 != parse_command(active_metrics[i].key, NULL, 0, params, sizeof(params)))
 					break;
 
@@ -921,61 +895,18 @@ static void	process_active_checks(char *server, unsigned short port)
 				else if (0 != strcmp(tmp, "skip"))
 					break;
 
-				s_count = 0;
-				p_count = 0;
-				lastlogsize = active_metrics[i].lastlogsize;
-				mtime = active_metrics[i].mtime;
+				/* do not flood Zabbix server if files grow too fast */
+				s_count = maxlines_persec * active_metrics[i].refresh;
 
-				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding,
-						active_metrics[i].skip_old_data)))
-				{
-					active_metrics[i].skip_old_data = 0;
+				/* do not flood local system if files grow too fast */
+				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
-					/* End of file. The file could become empty,*/
-					/* must save `lastlogsize' and `mtime'. */
-					if (NULL == value)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						active_metrics[i].mtime	= mtime;
-						break;
-					}
-
-					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE))
-					{
-						send_err = process_value(server, port, CONFIG_HOSTNAME,
-								active_metrics[i].key_orig, value, &lastlogsize,
-								&mtime, NULL, NULL, NULL, NULL, 1);
-						s_count++;
-					}
-					p_count++;
-
-					zbx_free(value);
-
-					if (SUCCEED == send_err)
-					{
-						active_metrics[i].lastlogsize = lastlogsize;
-						active_metrics[i].mtime = mtime;
-					}
-					else
-					{
-						/* buffer is full, stop processing active checks*/
-						/* till the buffer is cleared */
-						lastlogsize = active_metrics[i].lastlogsize;
-						mtime = active_metrics[i].mtime;
-						goto ret;
-					}
-
-					/* do not flood Zabbix server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
-						break;
-
-					/* do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;
-				} /* while processing a log */
-
+				ret = process_logrt(filename, &active_metrics[i].lastlogsize, &active_metrics[i].mtime,
+						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
+						regexps, regexps_num, pattern, &p_count, &s_count, process_value,
+						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}
-			while (0); /* simple try realization */
+			while (0);
 
 			if (FAIL == ret)
 			{
@@ -1155,7 +1086,9 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		active_metrics[i].nextcheck = (int)time(NULL) + active_metrics[i].refresh;
 	}
+#ifdef _WINDOWS
 ret:
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
