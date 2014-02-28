@@ -74,9 +74,15 @@ class ZBase {
 		$this->rootDir = $this->findRootDir();
 		$this->registerAutoloader();
 
-		$wrapper = new CFrontendApiWrapper(new CLocalApiClient());
+		// initialize API classes
+		$apiServiceFactory = new CApiServiceFactory();
+
+		$client = new CLocalApiClient();
+		$client->setServiceFactory($apiServiceFactory);
+		$wrapper = new CFrontendApiWrapper($client);
 		$wrapper->setProfiler(CProfiler::getInstance());
 		API::setWrapper($wrapper);
+		API::setApiServiceFactory($apiServiceFactory);
 
 		// system includes
 		require_once $this->getRootDir().'/include/debug.inc.php';

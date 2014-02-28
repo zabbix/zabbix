@@ -24,6 +24,22 @@
  */
 class CLocalApiClient extends CApiClient {
 
+	/**
+	 * Factory for creating API services.
+	 *
+	 * @var CApiServiceFactory
+	 */
+	protected $serviceFactory;
+
+	/**
+	 * Set service factory.
+	 *
+	 * @param CApiServiceFactory $factory
+	 */
+	public function setServiceFactory(CApiServiceFactory $factory) {
+		$this->serviceFactory = $factory;
+	}
+
 	protected function callServiceMethod($method, array $params) {
 		global $DB;
 
@@ -39,7 +55,7 @@ class CLocalApiClient extends CApiClient {
 
 		$response = new CApiClientResponse();
 		try {
-			$result = call_user_func_array(array(API::getApiService($this->api), $method), $params);
+			$result = call_user_func_array(array($this->serviceFactory->getObject($this->api), $method), $params);
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {

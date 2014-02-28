@@ -22,50 +22,36 @@
 /**
  * A class for creating a storing instances of global objects.
  */
-class CFactoryRegistry {
+class CRegistryFactory {
+
+	/**
+	 * Array of defined objects.
+	 *
+	 * @var array
+	 */
+	protected $objects = array();
 
 	/**
 	 * An array of created object instances.
 	 *
-	 * @var
+	 * @var array
 	 */
-	protected $objects;
+	protected $instances = array();
 
 	/**
-	 * An instance of the factory.
+	 * Creates and returns an instance of the given object.
 	 *
-	 * @var CFactoryRegistry
+	 * @param $object
+	 *
+	 * @return object
 	 */
-	protected static $instance;
-
-	/**
-	 * Returns an instance of the factory object.
-	 *
-	 * @param string $class
-	 *
-	 * @return CFactoryRegistry
-	 */
-	public static function getInstance($class = __CLASS__) {
-		if (!self::$instance) {
-			self::$instance = new $class();
+	public function getObject($object) {
+		if (!isset($this->instances[$object])) {
+			$class = $this->objects[$object];
+			$this->instances[$object] = new $class();
 		}
 
-		return self::$instance;
-	}
-
-	/**
-	 * Creates and returns an object from the given class.
-	 *
-	 * @param $class
-	 *
-	 * @return mixed
-	 */
-	protected function getObject($class) {
-		if (!isset($this->objects[$class])) {
-			$this->objects[$class] = new $class();
-		}
-
-		return $this->objects[$class];
+		return $this->instances[$object];
 	}
 
 }
