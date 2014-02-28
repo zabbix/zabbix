@@ -19,7 +19,7 @@
 **/
 
 
-$action = 'screenedit.php?form=update&screenid='.get_request('screenid');
+$action = 'screenedit.php?form=update&screenid='.getRequest('screenid').'&templateid='.getRequest('templateid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.get_request('screenitemid');
 }
@@ -623,9 +623,9 @@ $screenForm->addItem($screenTab);
 // append buttons to form
 $buttons = array();
 if (isset($_REQUEST['screenitemid'])) {
-	array_push($buttons, new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')));
+	$buttons[] = new CButtonDelete(null, url_params(array('form', 'screenid', 'screenitemid', 'templateid')));
 }
-array_push($buttons, new CButtonCancel(url_param('screenid')));
+$buttons[] = new CButtonCancel(url_param('screenid').url_param('templateid'));
 
 $screenForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 
