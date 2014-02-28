@@ -115,7 +115,7 @@ foreach ($this->data['alerts'] as $alert) {
 		);
 
 	if (zbx_empty($alert['error'])) {
-		$info = SPACE;
+		$info = '';
 	}
 	else {
 		$info = new CDiv(SPACE, 'status_icon iconerror');
