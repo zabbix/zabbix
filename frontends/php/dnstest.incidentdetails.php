@@ -44,6 +44,7 @@ $fields = array(
 	'filter_to' =>				array(T_ZBX_INT, O_OPT,	null,	null,		null),
 	'filter_rolling_week' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null),
 	'filter_failing_tests' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+	'filter_show_all' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT,	P_ACT,  NOT_EMPTY,	'isset({favobj})'),
@@ -94,8 +95,8 @@ else {
 	}
 }
 
+$data['filter_show_all'] = get_request('filter_show_all');
 $data['filter_failing_tests'] = get_request('filter_failing_tests');
-
 $data['sid'] = get_request('sid');
 
 // get TLD
@@ -298,17 +299,23 @@ if ($mainEvent) {
 	}
 
 	// pagination
-	$data['paging'] = getPagingLine($data['tests']);
-	if (!$data['paging']->items) {
+	if ($data['filter_show_all']) {
+		$toTime += $recoveryCount * $delayTime;
 		$data['paging'] = null;
 	}
+	else {
+		$data['paging'] = getPagingLine($data['tests']);
+		if (!$data['paging']->items) {
+			$data['paging'] = null;
+		}
 
-	// time correction after pagination
-	$firstElement = reset($data['tests']);
-	$lastElement = end($data['tests']);
+		// time correction after pagination
+		$firstElement = reset($data['tests']);
+		$lastElement = end($data['tests']);
 
-	$fromTime = $firstElement['clock'] - $failCount * $delayTime;
-	$toTime = $lastElement['clock'] + $recoveryCount * $delayTime;
+		$fromTime = $firstElement['clock'] - $failCount * $delayTime;
+		$toTime = $lastElement['clock'] + $recoveryCount * $delayTime + SEC_PER_MIN;
+	}
 
 	$tempTests = $data['tests'];
 	$startEventExist = false;

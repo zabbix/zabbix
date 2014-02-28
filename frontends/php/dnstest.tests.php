@@ -362,7 +362,7 @@ if ($items) {
 			exit;
 		}
 
-		$timeStep = getFirstUintValue($item['itemid'], zbxDateToTime($data['filter_from'])) / 60;
+		$timeStep = getFirstUintValue($item['itemid'], zbxDateToTime($data['filter_from'])) / SEC_PER_MIN;
 		$timeStep = $timeStep ? $timeStep : 1;
 
 		$data['downTimeMinutes'] = $data['downTests'] * $timeStep;

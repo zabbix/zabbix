@@ -160,6 +160,15 @@ $filterTable->addRow(array(
 				bold(_('Only failing tests'))
 			),
 			'spaces'
+		),
+		new CSpan(
+			array(
+				new CCheckBox('filter_show_all',
+					isset($this->data['filter_show_all']) ? $this->data['filter_show_all'] : null, null, 1),
+				SPACE,
+				bold(_('Show all'))
+			),
+			'spaces'
 		)
 	)
 ));
