@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScreenItem extends CApiInstance {
+class CScreenItem extends CApiService {
 
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';

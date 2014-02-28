@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAction extends CApiInstance {
+class CAction extends CApiService {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
@@ -1731,7 +1731,7 @@ class CAction extends CApiInstance {
 
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
-			$conditions = API::getApi()->select('conditions', array(
+			$conditions = API::getApiService()->select('conditions', array(
 				'output' => $this->outputExtend($options['selectConditions'], array('actionid', 'conditionid')),
 				'filter' => array('actionid' => $actionIds),
 				'preservekeys' => true,
@@ -1745,7 +1745,7 @@ class CAction extends CApiInstance {
 
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
-			$operations = API::getApi()->select('operations', array(
+			$operations = API::getApiService()->select('operations', array(
 				'output' => $this->outputExtend($options['selectOperations'],
 					array('operationid', 'actionid', 'operationtype')
 				),

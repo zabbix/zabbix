@@ -137,6 +137,15 @@ class CWebUser {
 	}
 
 	/**
+	 * Returns true if debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function getDebugMode() {
+		return (self::$data['debug_mode']);
+	}
+
+	/**
 	 * Returns true if the current user is logged in.
 	 *
 	 * @return bool

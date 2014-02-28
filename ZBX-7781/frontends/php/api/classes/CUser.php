@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUser extends CApiInstance {
+class CUser extends CApiService {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';

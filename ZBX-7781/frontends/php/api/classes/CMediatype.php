@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CMediatype extends CApiInstance {
+class CMediatype extends CApiService {
 
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';

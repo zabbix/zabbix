@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDService extends CApiInstance{
+class CDService extends CApiService{
 
 	protected $tableName = 'dservices';
 	protected $tableAlias = 'ds';

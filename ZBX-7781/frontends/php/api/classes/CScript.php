@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScript extends CApiInstance {
+class CScript extends CApiService {
 
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';

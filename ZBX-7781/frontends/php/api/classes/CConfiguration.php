@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CConfiguration extends CApiInstance {
+class CConfiguration extends CApiService {
 
 	/**
 	 * Export configuration data.

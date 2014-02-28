@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDHost extends CApiInstance {
+class CDHost extends CApiService {
 
 	protected $tableName = 'dhosts';
 	protected $tableAlias = 'dh';

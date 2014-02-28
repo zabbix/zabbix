@@ -28,7 +28,7 @@
  *
  * @package API
  */
-class CIconMap extends CApiInstance {
+class CIconMap extends CApiService {
 
 	protected $tableName = 'icon_map';
 	protected $tableAlias = 'im';
@@ -458,7 +458,7 @@ class CIconMap extends CApiInstance {
 		$iconMapIds = array_keys($result);
 
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$mappings = API::getApi()->select('icon_mapping', array(
+			$mappings = API::getApiService()->select('icon_mapping', array(
 				'output' => $this->outputExtend($options['selectMappings'], array('iconmapid', 'iconmappingid')),
 				'filter' => array('iconmapid' => $iconMapIds),
 				'preservekeys' => true,

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDCheck extends CApiInstance {
+class CDCheck extends CApiService {
 
 	protected $tableName = 'dchecks';
 	protected $tableAlias = 'dc';

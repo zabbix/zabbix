@@ -1558,7 +1558,7 @@ class CHost extends CHostGeneral {
 		// adding inventories
 		if ($options['selectInventory'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = API::getApi()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $options['selectInventory'],
 				'filter' => array('hostid' => $hostids),
 				'nodeids' => get_current_nodeid(true)
@@ -1661,7 +1661,7 @@ class CHost extends CHostGeneral {
 
 		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
-			$hostDiscoveries = API::getApi()->select('host_discovery', array(
+			$hostDiscoveries = API::getApiService()->select('host_discovery', array(
 				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
 				'filter' => array('hostid' => $hostids),
 				'preservekeys' => true,

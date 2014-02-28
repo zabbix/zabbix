@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CItemGeneral extends CApiInstance {
+abstract class CItemGeneral extends CApiService {
 
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	const ERROR_EXISTS = 'exists';

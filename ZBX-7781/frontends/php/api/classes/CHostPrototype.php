@@ -143,7 +143,7 @@ class CHostPrototype extends CHostBase {
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check if the host is discovered
-		$discoveryRules = API::getApi()->select('items', array(
+		$discoveryRules = API::getApiService()->select('items', array(
 			'output' => array('hostid'),
 			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
 		));
@@ -1226,7 +1226,7 @@ class CHostPrototype extends CHostBase {
 					' AND hg.groupid!=0'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApi()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupLinks'],
 				'nodeids' => $options['nodeids'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
@@ -1248,7 +1248,7 @@ class CHostPrototype extends CHostBase {
 					' AND hg.name NOT LIKE '.zbx_dbstr('')
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApi()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupPrototypes'],
 				'nodeids' => $options['nodeids'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
@@ -1323,7 +1323,7 @@ class CHostPrototype extends CHostBase {
 			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
 				$output[] = 'inventory_mode';
 			}
-			$inventory = API::getApi()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $output,
 				'filter' => array('hostid' => $hostPrototypeIds),
 				'nodeids' => get_current_nodeid(true)

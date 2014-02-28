@@ -21,12 +21,12 @@
 
 class API {
 
-	const RETURN_TYPE_API = 'api';
-	const RETURN_TYPE_RPC = 'rpc';
-
-	private static $APIobjects = array();
-	private static $RPCobjects = array();
-	private static $return = self::RETURN_TYPE_RPC;
+	/**
+	 * API wrapper that all of the calls will go through.
+	 *
+	 * @var CApiWrapper
+	 */
+	private static $wrapper;
 
 	/**
 	 * A map of classes that should handle the corresponding API objects requests.
@@ -78,7 +78,78 @@ class API {
 	);
 
 	/**
-	 * Returns the class name for the given API object. The name of the object should not be case sensitive.
+	 * Array of created CApiService objects.
+	 *
+	 * @var array
+	 */
+	protected static $instances = array();
+
+	/**
+	 * Sets the API wrapper.
+	 *
+	 * @param CApiWrapper $wrapper
+	 */
+	public static function setWrapper(CApiWrapper $wrapper = null) {
+		self::$wrapper = $wrapper;
+	}
+
+	/**
+	 * Returns the API wrapper.
+	 *
+	 * @return CApiWrapper
+	 */
+	public static function getWrapper() {
+		return self::$wrapper;
+	}
+
+	/**
+	 * Returns an object that can be used for making API calls.  If a wrapper is used, returns a CApiWrapper,
+	 * otherwise - returns a CApiService object.
+	 *
+	 * @param $name
+	 *
+	 * @return CApiWrapper|CApiService
+	 */
+	public static function getApi($name) {
+		if (self::$wrapper) {
+			self::$wrapper->getClient()->api = $name;
+
+			return self::$wrapper;
+		}
+		else {
+			return self::getApiService($name);
+		}
+	}
+
+	/**
+	 * Returns the CApiInstance object for the requested API.
+	 *
+	 * NOTE: This method must only be called from other CApiService objects.
+	 *
+	 * @param string $name
+	 *
+	 * @return CApiService
+	 */
+	public static function getApiService($name = null) {
+		if ($name) {
+			$className = self::getServiceClassName($name);
+			if (!isset(self::$instances[$name])) {
+				self::$instances[$name] = new $className;
+			}
+
+			return self::$instances[$name];
+		}
+		else {
+			if (!isset(self::$instances[0])) {
+				self::$instances[0] = new CApiService();
+			}
+
+			return self::$instances[0];
+		}
+	}
+
+	/**
+	 * Returns the class name for the given API. The name of the object should not be case sensitive.
 	 *
 	 * @static
 	 *
@@ -86,342 +157,294 @@ class API {
 	 *
 	 * @return string
 	 */
-	public static function getObjectClassName($object) {
+	protected static function getServiceClassName($object) {
 		return self::$classMap[strtolower($object)];
-	}
-
-	public static function setReturnAPI() {
-		self::$return = self::RETURN_TYPE_API;
-	}
-
-	public static function setReturnRPC() {
-		self::$return = self::RETURN_TYPE_RPC;
-	}
-
-	/**
-	 * Returns an instance of the CZBXAPI class, that's responsible for handling the given
-	 * API objects requests.
-	 *
-	 * @static
-	 *
-	 * @param $object
-	 *
-	 * @return CApiInstance
-	 */
-	public static function getApi($object = null) {
-		if ($object) {
-			$className = self::getObjectClassName($object);
-			if (!isset(self::$APIobjects[$object])) {
-				self::$APIobjects[$object] = new $className;
-			}
-
-			return self::$APIobjects[$object];
-		}
-		else {
-			if (!isset(self::$APIobjects[0])) {
-				self::$APIobjects[0] = new CApiInstance();
-			}
-
-			return self::$APIobjects[0];
-		}
-	}
-
-	private static function getRpc($className) {
-		if (!isset(self::$RPCobjects[$className])) {
-			self::$RPCobjects[$className] = new CAPIObject($className);
-		}
-
-		return self::$RPCobjects[$className];
-	}
-
-	public static function getObject($className) {
-		return (self::$return == self::RETURN_TYPE_API) ? self::getApi($className) : self::getRpc($className);
 	}
 
 	/**
 	 * @return CAction
 	 */
 	public static function Action() {
-		return self::getObject('action');
+		return self::getApi('action');
 	}
 
 	/**
 	 * @return CAlert
 	 */
 	public static function Alert() {
-		return self::getObject('alert');
+		return self::getApi('alert');
 	}
 
 	/**
 	 * @return CAPIInfo
 	 */
 	public static function APIInfo() {
-		return self::getObject('apiinfo');
+		return self::getApi('apiinfo');
 	}
 
 	/**
 	 * @return CApplication
 	 */
 	public static function Application() {
-		return self::getObject('application');
+		return self::getApi('application');
 	}
 
 	/**
 	 * @return CConfiguration
 	 */
 	public static function Configuration() {
-		return self::getObject('configuration');
+		return self::getApi('configuration');
 	}
 
 	/**
 	 * @return CDCheck
 	 */
 	public static function DCheck() {
-		return self::getObject('dcheck');
+		return self::getApi('dcheck');
 	}
 
 	/**
 	 * @return CDHost
 	 */
 	public static function DHost() {
-		return self::getObject('dhost');
+		return self::getApi('dhost');
 	}
 
 	/**
 	 * @return CDiscoveryRule
 	 */
 	public static function DiscoveryRule() {
-		return self::getObject('discoveryrule');
+		return self::getApi('discoveryrule');
 	}
 
 	/**
 	 * @return CDRule
 	 */
 	public static function DRule() {
-		return self::getObject('drule');
+		return self::getApi('drule');
 	}
 
 	/**
 	 * @return CDService
 	 */
 	public static function DService() {
-		return self::getObject('dservice');
+		return self::getApi('dservice');
 	}
 
 	/**
 	 * @return CEvent
 	 */
 	public static function Event() {
-		return self::getObject('event');
+		return self::getApi('event');
 	}
 
 	/**
 	 * @return CGraph
 	 */
 	public static function Graph() {
-		return self::getObject('graph');
+		return self::getApi('graph');
 	}
 
 	/**
 	 * @return CGraphItem
 	 */
 	public static function GraphItem() {
-		return self::getObject('graphitem');
+		return self::getApi('graphitem');
 	}
 
 	/**
 	 * @return CGraphPrototype
 	 */
 	public static function GraphPrototype() {
-		return self::getObject('graphprototype');
+		return self::getApi('graphprototype');
 	}
 
 	/**
 	 * @return CHistory
 	 */
 	public static function History() {
-		return self::getObject('history');
+		return self::getApi('history');
 	}
 
 	/**
 	 * @return CHost
 	 */
 	public static function Host() {
-		return self::getObject('host');
+		return self::getApi('host');
 	}
 
 	/**
 	 * @return CHostPrototype
 	 */
 	public static function HostPrototype() {
-		return self::getObject('hostprototype');
+		return self::getApi('hostprototype');
 	}
 
 	/**
 	 * @return CHostGroup
 	 */
 	public static function HostGroup() {
-		return self::getObject('hostgroup');
+		return self::getApi('hostgroup');
 	}
 
 	/**
 	 * @return CHostInterface
 	 */
 	public static function HostInterface() {
-		return self::getObject('hostinterface');
+		return self::getApi('hostinterface');
 	}
 
 	/**
 	 * @return CImage
 	 */
 	public static function Image() {
-		return self::getObject('image');
+		return self::getApi('image');
 	}
 
 	/**
 	 * @return CIconMap
 	 */
 	public static function IconMap() {
-		return self::getObject('iconmap');
+		return self::getApi('iconmap');
 	}
 
 	/**
 	 * @return CItem
 	 */
 	public static function Item() {
-		return self::getObject('item');
+		return self::getApi('item');
 	}
 
 	/**
 	 * @return CItemPrototype
 	 */
 	public static function ItemPrototype() {
-		return self::getObject('itemprototype');
+		return self::getApi('itemprototype');
 	}
 
 	/**
 	 * @return CMaintenance
 	 */
 	public static function Maintenance() {
-		return self::getObject('maintenance');
+		return self::getApi('maintenance');
 	}
 
 	/**
 	 * @return CMap
 	 */
 	public static function Map() {
-		return self::getObject('map');
+		return self::getApi('map');
 	}
 
 	/**
 	 * @return CMediaType
 	 */
 	public static function MediaType() {
-		return self::getObject('mediatype');
+		return self::getApi('mediatype');
 	}
 
 	/**
 	 * @return CProxy
 	 */
 	public static function Proxy() {
-		return self::getObject('proxy');
+		return self::getApi('proxy');
 	}
 
 	/**
 	 * @return CService
 	 */
 	public static function Service() {
-		return self::getObject('service');
+		return self::getApi('service');
 	}
 
 	/**
 	 * @return CScreen
 	 */
 	public static function Screen() {
-		return self::getObject('screen');
+		return self::getApi('screen');
 	}
 
 	/**
 	 * @return CScreenItem
 	 */
 	public static function ScreenItem() {
-		return self::getObject('screenitem');
+		return self::getApi('screenitem');
 	}
 
 	/**
 	 * @return CScript
 	 */
 	public static function Script() {
-		return self::getObject('script');
+		return self::getApi('script');
 	}
 
 	/**
 	 * @return CTemplate
 	 */
 	public static function Template() {
-		return self::getObject('template');
+		return self::getApi('template');
 	}
 
 	/**
 	 * @return CTemplateScreen
 	 */
 	public static function TemplateScreen() {
-		return self::getObject('templatescreen');
+		return self::getApi('templatescreen');
 	}
 
 	/**
 	 * @return CTemplateScreenItem
 	 */
 	public static function TemplateScreenItem() {
-		return self::getObject('templatescreenitem');
+		return self::getApi('templatescreenitem');
 	}
 
 	/**
 	 * @return CTrigger
 	 */
 	public static function Trigger() {
-		return self::getObject('trigger');
+		return self::getApi('trigger');
 	}
 
 	/**
 	 * @return CTriggerPrototype
 	 */
 	public static function TriggerPrototype() {
-		return self::getObject('triggerprototype');
+		return self::getApi('triggerprototype');
 	}
 
 	/**
 	 * @return CUser
 	 */
 	public static function User() {
-		return self::getObject('user');
+		return self::getApi('user');
 	}
 
 	/**
 	 * @return CUserGroup
 	 */
 	public static function UserGroup() {
-		return self::getObject('usergroup');
+		return self::getApi('usergroup');
 	}
 
 	/**
 	 * @return CUserMacro
 	 */
 	public static function UserMacro() {
-		return self::getObject('usermacro');
+		return self::getApi('usermacro');
 	}
 
 	/**
 	 * @return CUserMedia
 	 */
 	public static function UserMedia() {
-		return self::getObject('usermedia');
+		return self::getApi('usermedia');
 	}
 
 	/**
 	 * @return CHttpTest
 	 */
 	public static function HttpTest() {
-		return self::getObject('httptest');
+		return self::getApi('httptest');
 	}
 }

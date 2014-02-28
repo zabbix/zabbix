@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserGroup extends CApiInstance {
+class CUserGroup extends CApiService {
 
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDRule extends CApiInstance {
+class CDRule extends CApiService {
 
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';
