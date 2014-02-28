@@ -837,6 +837,8 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
 ...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
 ...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
 A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
