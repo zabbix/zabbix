@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7858] fixed some triggers not being displayed in Monitoring -> Triggers (Pavels)
 ...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
 ...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
 .......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
