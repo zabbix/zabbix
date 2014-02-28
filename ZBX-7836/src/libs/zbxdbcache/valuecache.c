@@ -1262,9 +1262,6 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 	{
 		zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
 
-		if (1 == count)
-			count++;
-
 		ret = vc_db_read_values_by_count(itemid, value_type, values, count, now, &ts, 0);
 	}
 
