@@ -144,7 +144,7 @@ class CScreenActions extends CScreenBase {
 			($sortfield === 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),
 			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
 			_('Message'),
-			_('Error')
+			_('Info')
 		));
 
 		foreach ($alerts as $alert) {
@@ -176,7 +176,13 @@ class CScreenActions extends CScreenBase {
 				$alert['message']
 			);
 
-			$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
+			if (zbx_empty($alert['error'])) {
+				$info = '';
+			}
+			else {
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($alert['error'], '', 'on');
+			}
 
 			$actionTable->addRow(array(
 				get_node_name_by_elid($alert['alertid']),
@@ -186,7 +192,7 @@ class CScreenActions extends CScreenBase {
 				new CCol($retries, 'top'),
 				new CCol($recipient, 'top'),
 				new CCol($message, 'top pre'),
-				new CCol($error, 'wraptext top')
+				new CCol($info, 'wraptext top')
 			));
 		}
 
