@@ -835,7 +835,7 @@ Changes for 2.0.12rc1
 
 New features:
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
