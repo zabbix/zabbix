@@ -25,13 +25,22 @@ class CJSONrpc {
 
 	public $json;
 
+	/**
+	 * API client to use for making requests.
+	 *
+	 * @var CApiClient
+	 */
+	protected $client;
+
 	private $_error;
 	private $_response;
 	private $_error_list;
 	private $_zbx2jsonErrors;
 	private $_jsonDecoded;
 
-	public function __construct($jsonData) {
+	public function __construct(CApiClient $apiClient, $jsonData) {
+		$this->apiClient = $apiClient;
+
 		$this->json = new CJSON();
 		$this->initErrors();
 
@@ -53,15 +62,15 @@ class CJSONrpc {
 			$call['id'] = null;
 		}
 
-		if (!$this->validate($call)) {
-			return $this->_response;
+		if ($this->validate($call)) {
+			$params = isset($call['params']) ? $call['params'] : null;
+			$auth = isset($call['auth']) ? $call['auth'] : null;
+
+			list($api, $method) = explode('.', $call['method']);
+			$result = $this->apiClient->callMethod($api, $method, $params, $auth);
+
+			$this->processResult($call, $result);
 		}
-
-		$params = isset($call['params']) ? $call['params'] : null;
-		$auth = isset($call['auth']) ? $call['auth'] : null;
-
-		$result = czbxrpc::call($call['method'], $params, $auth);
-		$this->processResult($call, $result);
 
 		if (!$encoded) {
 			return $this->_response;
@@ -95,8 +104,8 @@ class CJSONrpc {
 		return true;
 	}
 
-	public function processResult($call, $result) {
-		if (isset($result['result'])) {
+	public function processResult($call, CApiClientResponse $response) {
+		if ($response->data) {
 			// Notifications MUST NOT be answered
 			if ($call['id'] === null) {
 				return;
@@ -104,18 +113,16 @@ class CJSONrpc {
 
 			$formedResp = array(
 				'jsonrpc' => self::VERSION,
-				'result' => $result['result'],
+				'result' => $response->data,
 				'id' => $call['id']
 			);
 
 			$this->_response = $formedResp;
 		}
 		else {
-			$result['data'] = isset($result['data']) ? $result['data'] : null;
-			$result['debug'] = isset($result['debug']) ? $result['debug'] : null;
-			$errno = $this->_zbx2jsonErrors[$result['error']];
+			$errno = $this->_zbx2jsonErrors[$response->errorCode];
 
-			$this->jsonError($call['id'], $errno, $result['data'], $result['debug']);
+			$this->jsonError($call['id'], $errno, $response->errorMessage, $response->debug);
 		}
 	}
 
