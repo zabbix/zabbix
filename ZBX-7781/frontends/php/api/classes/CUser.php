@@ -1110,12 +1110,14 @@ class CUser extends CApiService {
 	/**
 	 * Check if session id is authenticated.
 	 *
-	 * @param string $sessionid		session id
+	 * @param array $sessionid		session id
 	 *
 	 * @return array				an array of user data
 	 */
-	public function checkAuthentication($sessionid) {
+	public function checkAuthentication(array $sessionid) {
 		global $ZBX_LOCALNODEID;
+
+		$sessionid = reset($sessionid);
 
 		// access DB only once per page load
 		if (!is_null(self::$userData)) {

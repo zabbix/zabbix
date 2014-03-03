@@ -62,7 +62,7 @@ class CLocalApiClient extends CApiClient {
 			}
 
 			// call API method
-			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $method), $params);
+			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $method), array($params));
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
@@ -112,7 +112,7 @@ class CLocalApiClient extends CApiClient {
 				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised'));
 			}
 
-			$this->serviceFactory->getObject('user')->checkAuthentication($auth);
+			$this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
 		}
 		elseif ($auth !== null) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS,
