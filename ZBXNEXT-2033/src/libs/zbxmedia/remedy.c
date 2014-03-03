@@ -1154,7 +1154,6 @@ static int	remedy_get_ticket_creation_time(const char *externalid)
  ******************************************************************************/
 static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid)
 {
-	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -1169,22 +1168,17 @@ static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid)
 					" and e.eventid=" ZBX_FS_UI64,
 					EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, eventid);
 
-		if (NULL == (row = DBfetch(result)))
-			goto out;
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(triggerid, row[0]);
 
-		ZBX_STR2UINT64(triggerid, row[0]);
-
-		if (NULL == (*externalid = remedy_get_ticketid_by_triggerid(triggerid)))
-			goto out;
+			*externalid = remedy_get_ticketid_by_triggerid(triggerid);
+		}
 
 		DBfree_result(result);
 	}
 
-	ret = SUCCEED;
-out:
-	DBfree_result(result);
-
-	return ret;
+	return NULL != *externalid ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
