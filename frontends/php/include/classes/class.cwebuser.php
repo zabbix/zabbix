@@ -82,7 +82,7 @@ class CWebUser {
 	public static function checkAuthentication($sessionid) {
 		try {
 			if ($sessionid !== null) {
-				self::$data = API::User()->checkAuthentication($sessionid);
+				self::$data = API::User()->checkAuthentication(array($sessionid));
 			}
 
 			if ($sessionid === null || empty(self::$data)) {

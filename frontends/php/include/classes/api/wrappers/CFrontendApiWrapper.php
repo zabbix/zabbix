@@ -55,15 +55,16 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 *
 	 * @param string 	$method
 	 * @param array 	$params
+	 * @param string	$auth
 	 *
 	 * @return mixed
 	 */
-	protected function callClientMethod($method, array $params) {
+	protected function callClientMethod($method, array $params, $auth) {
 		API::setWrapper();
 		// don't pass the authentication token for methods that don't require authentication
 		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
 
-		$response = $this->client->callMethod($this->api, $method, $params, $auth);
+		$response = parent::callClientMethod($method, $params, $auth);
 		API::setWrapper($this);
 
 		// call profiling
@@ -96,6 +97,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 */
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
+			|| ($api === 'user' && $method === 'checkAuthentication')
 			|| ($api === 'apiinfo' && $method === 'version'));
 	}
 }

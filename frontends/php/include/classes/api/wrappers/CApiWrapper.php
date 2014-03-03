@@ -22,7 +22,7 @@
 /**
  * This class should be used as a client for calling API services.
  */
-abstract class CApiWrapper {
+class CApiWrapper {
 
 	/**
 	 * Currently used API.
@@ -79,7 +79,7 @@ abstract class CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	public function __call($method, array $params) {
-		return $this->callClientMethod($method, $params);
+		return $this->callClientMethod($method, reset($params), $this->auth);
 	}
 
 	/**
@@ -87,8 +87,11 @@ abstract class CApiWrapper {
 	 *
 	 * @param string 	$method
 	 * @param array 	$params
+	 * @param string	$auth
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract protected function callClientMethod($method, array $params);
+	protected function callClientMethod($method, array $params, $auth) {
+		return $this->client->callMethod($this->api, $method, $params, $auth);
+	}
 }
