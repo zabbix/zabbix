@@ -3180,7 +3180,8 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 			err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_NO_IP;
-		zbx_dns_errf(log_fd, "EPP \"%s\": %s", random_host, err);
+		zbx_dns_errf(log_fd, "\"%s\": %s", random_host, err);
+		goto out;
 	}
 
 	/* choose random IP */
