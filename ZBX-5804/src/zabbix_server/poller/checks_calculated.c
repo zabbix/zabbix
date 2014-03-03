@@ -323,6 +323,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 				"Received value [" ZBX_FS_DBL "] is not suitable for value type [%s] and data type [%s]",
 				value, zbx_item_value_type_string(dc_item->value_type),
 				zbx_item_data_type_string(dc_item->data_type)));
+		ret = NOTSUPPORTED;
 		goto clean;
 	}
 
