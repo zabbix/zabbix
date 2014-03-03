@@ -148,9 +148,7 @@ $filterTable->addRow(array(
 			'Rolling week',
 			null,
 			'spaces',
-			'javascript: location.href = "dnstest.tests.php?filter_set=1&filter_rolling_week=1&host='.
-				$this->data['tld']['host'].'&type='.$this->data['type'].'&sid='.$this->data['sid'].
-				'&slvItemId='.$this->data['slvItemId'].'";'
+			'javascript: location.href = "dnstest.tests.php?filter_rolling_week=1";'
 		)
 	)
 ));

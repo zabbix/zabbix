@@ -60,40 +60,54 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 	exit();
 }
 
-$data = array();
-$data['host'] = get_request('host');
-$data['type'] = get_request('type');
-$data['slvItemId'] = get_request('slvItemId');
 $data['tests'] = array();
+
+/*
+ * Filter
+ */
+if (get_request('filter_set')) {
+	$data['host'] = get_request('host');
+	$data['type'] = get_request('type');
+	$data['slvItemId'] = get_request('slvItemId');
+
+	$data['filter_from'] = (get_request('filter_from') == get_request('original_from'))
+		? date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK))
+		: get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+
+	$data['filter_to'] = (get_request('filter_to') == get_request('original_to'))
+		? date('YmdHis', get_request('filter_to', time()))
+		: get_request('filter_to', date('YmdHis', time()));
+
+	CProfile::update('web.dnstest.tests.host', $data['host'], PROFILE_TYPE_STR);
+	CProfile::update('web.dnstest.tests.type', $data['type'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.tests.slvItemId', $data['slvItemId'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.tests.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.tests.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
+}
+elseif (get_request('filter_rolling_week')) {
+	$data['host'] = CProfile::get('web.dnstest.tests.host');
+	$data['type'] = CProfile::get('web.dnstest.tests.type');
+	$data['slvItemId'] = CProfile::get('web.dnstest.tests.slvItemId');
+
+	// set new filter from and filter to
+	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
+	$data['filter_to'] = date('YmdHis', time());
+
+	CProfile::update('web.dnstest.tests.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.tests.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
+}
+else {
+	$data['host'] = CProfile::get('web.dnstest.tests.host');
+	$data['type'] = CProfile::get('web.dnstest.tests.type');
+	$data['slvItemId'] = CProfile::get('web.dnstest.tests.slvItemId');
+	$data['filter_from'] = CProfile::get('web.dnstest.tests.filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+	$data['filter_to'] = CProfile::get('web.dnstest.tests.filter_to', date('YmdHis', time()));
+}
 
 // check
 if (!$data['host'] || !$data['slvItemId'] || $data['type'] === null) {
 	access_deny();
 }
-
-/*
- * Filter
- */
-if (get_request('filter_rolling_week')) {
-	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
-	$data['filter_to'] = date('YmdHis', time());
-}
-else {
-	if (get_request('filter_from') == get_request('original_from')) {
-		$data['filter_from'] = date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK));
-	}
-	else {
-		$data['filter_from'] = get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
-	}
-	if (get_request('filter_to') == get_request('original_to')) {
-		$data['filter_to'] = date('YmdHis', get_request('filter_to', time()));
-	}
-	else {
-		$data['filter_to'] = get_request('filter_to', date('YmdHis', time()));
-	}
-}
-
-$data['sid'] = get_request('sid');
 
 // get TLD
 $tld = API::Host()->get(array(
