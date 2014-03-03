@@ -5425,7 +5425,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		ZBX_DC_HOST	*host = NULL;
+		ZBX_DC_HOST	*host;
 
 		host = zbx_hashset_search(&config->hosts, &item->hostid);
 
@@ -5434,9 +5434,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		{
 			continue;
 		}
-
-		if (0 != (item->flags & (ZBX_FLAG_DISCOVERY_RULE | ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-			continue;
 
 		switch (item->type)
 		{
