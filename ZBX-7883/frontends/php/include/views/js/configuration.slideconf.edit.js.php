@@ -97,20 +97,22 @@
 		}
 
 		if (initSize < 2) {
-			initSortable();
+			jQuery(document).ready(function() {
+				initSortable();
+			});
 		}
 
 		createPlaceholders();
 	}
 
-	jQuery(function($) {
-		var slideTable = $('#slideTable'),
+	function initSortable() {
+		var slideTable = jQuery('#slideTable'),
 			slideTableWidth = slideTable.width(),
-			slideTableColumns = $('#slideTable .header td'),
+			slideTableColumns = jQuery('#slideTable .header td'),
 			slideTableColumnWidths = [];
 
 		slideTableColumns.each(function() {
-			slideTableColumnWidths[slideTableColumnWidths.length] = $(this).width();
+			slideTableColumnWidths[slideTableColumnWidths.length] = jQuery(this).width();
 		});
 
 		slideTable.sortable({
@@ -128,7 +130,7 @@
 			},
 			helper: function(e, ui) {
 				ui.children().each(function() {
-					var td = $(this);
+					var td = jQuery(this);
 
 					td.width(td.width());
 				});
@@ -140,16 +142,19 @@
 				}
 
 				slideTableColumns.each(function(i) {
-					$(this).width(slideTableColumnWidths[i]);
+					jQuery(this).width(slideTableColumnWidths[i]);
 				});
 
 				return ui;
 			},
 			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 			}
 		});
-	});
+	}
 
+	jQuery(document).ready(function() {
+		initSortable();
+	});
 	createPlaceholders();
 </script>
