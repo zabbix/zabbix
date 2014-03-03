@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:19+0200\n"
-"PO-Revision-Date: 2014-02-02 09:14+0300\n"
+"POT-Creation-Date: 2014-03-04 00:15+0200\n"
+"PO-Revision-Date: 2014-02-20 14:19+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391325245.0\n"
+"X-POOTLE-MTIME: 1392898787.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2832,7 +2832,7 @@ msgstr "権限の編集"
 
 #: popup_trexpr.php:25
 msgid "Condition"
-msgstr "アクションの実行条件"
+msgstr "トリガー条件式の作成"
 
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:973
@@ -13683,7 +13683,7 @@ msgstr "トリガーイベントとアラートデータの保存期間 (日) \"
 
 #: include/views/configuration.triggers.expression.php:120
 msgid "Trigger expression condition"
-msgstr "トリガー条件式の状態"
+msgstr "トリガー条件式の作成"
 
 #: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
 msgid "Trigger expression must contain at least one host:key reference."
