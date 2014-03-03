@@ -34,5 +34,5 @@ abstract class CApiClient {
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract function callMethod($api, $method, array $params, $auth);
+	abstract public function callMethod($api, $method, array $params, $auth);
 }
