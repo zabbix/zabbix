@@ -43,19 +43,34 @@ class CLocalApiClient extends CApiClient {
 	protected function callServiceMethod($method, array $params) {
 		global $DB;
 
-		// the nopermission parameter must not be available for external API calls.
-		unset($params['nopermissions']);
-
-		// if no transaction has been started yet - start one
-		$newTransaction = false;
-		if ($DB['TRANSACTIONS'] == 0) {
-			DBstart();
-			$newTransaction = true;
-		}
-
 		$response = new CApiClientResponse();
+		$newTransaction = false;
 		try {
-			$result = call_user_func_array(array($this->serviceFactory->getObject($this->api), $method), $params);
+			// validate the API
+			if (!$this->serviceFactory->hasObject($this->api)) {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect API "'.$this->api.'".');
+			}
+
+			$apiService = $this->serviceFactory->getObject($this->api);
+
+			// validate the method
+			if (!in_array($method, get_class_methods($apiService))) {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS,
+					'Incorrect method "'.$method.'" for API "'.$this->api.'".'
+				);
+			}
+
+			// the nopermission parameter must not be available for external API calls.
+			unset($params['nopermissions']);
+
+			// if no transaction has been started yet - start one
+			if ($DB['TRANSACTIONS'] == 0) {
+				DBstart();
+				$newTransaction = true;
+			}
+
+			// call API method
+			$result = call_user_func_array(array($apiService, $method), $params);
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
