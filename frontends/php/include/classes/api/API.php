@@ -72,7 +72,7 @@ class API {
 	 */
 	public static function getApi($name) {
 		if (self::$wrapper) {
-			self::$wrapper->getClient()->api = $name;
+			self::$wrapper->api = $name;
 
 			return self::$wrapper;
 		}
