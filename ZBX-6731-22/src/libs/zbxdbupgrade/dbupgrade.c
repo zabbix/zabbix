@@ -107,6 +107,7 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
+#ifndef HAVE_SQLITE3
 /*********************************************************************************
  *                                                                               *
  * Function: parse_db_monitor_item_params                                        *
@@ -197,7 +198,6 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 		*sql = zbx_strdup(NULL, "");
 }
 
-#ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
 	switch (field->type)

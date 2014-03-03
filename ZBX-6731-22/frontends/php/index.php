@@ -56,7 +56,7 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 	}
 	else {
-		access_deny();
+		access_deny(ACCESS_DENY_PAGE);
 	}
 }
 

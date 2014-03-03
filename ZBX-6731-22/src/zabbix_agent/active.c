@@ -1332,7 +1332,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	thread_num = ((zbx_thread_args_t *)args)->thread_num;
 	thread_num2 = ((zbx_thread_args_t *)args)->thread_num2;
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [active checks #%d]", thread_num, thread_num2);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [active checks #%d]", thread_num, thread_num2);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;

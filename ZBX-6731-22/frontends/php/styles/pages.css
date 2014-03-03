@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 /* host edit */
 .host-edit .interface-group,
 .hostprototype-edit .interface-group { width: 750px; }
@@ -70,7 +71,7 @@
 .inventory-host .formlist .formrow .interfaces { min-width: 500px; }
 
 /* icon mapping */
-#iconMapTable .sortable { height: 30px; }
+#iconMapTable .sortable { height: 30px; line-height: 30px; }
 #iconMapTable .sortable .preview { vertical-align: middle; }
 
 /* overview monitoring */
@@ -84,17 +85,23 @@
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
-.latest-mon .tableinfo td.latest-host { width: 10%; }
-.latest-mon .tableinfo td.latest-item { width: 25%; }
+.latest-mon .tableinfo td.latest-node { width: 5%; }
+.latest-mon .tableinfo td.latest-host { width: 9%; }
+.latest-mon .tableinfo td.latest-interval { width: 5%; }
+.latest-mon .tableinfo td.latest-history { width: 5%; }
+.latest-mon .tableinfo td.latest-trends { width: 5%; }
+.latest-mon .tableinfo td.latest-type { width: 8%; }
+.latest-mon .tableinfo td.latest-lastcheck { width: 14%; }
+.latest-mon .tableinfo td.latest-lastvalue { width: 22%; }
+.latest-mon .tableinfo td.latest-data { width: 10%; }
+.latest-mon .tableinfo td.latest-actions { width: 5%; }
+.latest-mon .tableinfo td.latest-info { width: 27px; }
 .latest-mon .tableinfo td,
-.latest-mon .tableinfo div.txt,
+.latest-mon .tableinfo td div.item,
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a { overflow: hidden; text-overflow: ellipsis; }
+.latest-mon .tableinfo td a { overflow: hidden; text-overflow: ellipsis; }
 .latest-mon .tableinfo td span,
-.latest-mon .tableinfo td.latest-actions a { float: left; max-width: 100%; }
-.latest-mon .tableinfo.latest-details td.latest-lastcheck { width: 9%; }
-.latest-mon .tableinfo.latest-details td.latest-error { width: 4%; }
-.latest-mon .tableinfo.latest-details td.latest-error div { float: left; }
+.latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
 /* regexp test result table, based on .tableinfo */
