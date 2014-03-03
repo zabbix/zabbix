@@ -25,7 +25,6 @@ class CJSONrpc {
 
 	public $json;
 
-	private $_multicall;
 	private $_error;
 	private $_response;
 	private $_error_list;
@@ -36,7 +35,6 @@ class CJSONrpc {
 		$this->json = new CJSON();
 		$this->initErrors();
 
-		$this->_multicall = false;
 		$this->_error = false;
 		$this->_response = array();
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
@@ -45,32 +43,25 @@ class CJSONrpc {
 			$this->jsonError(null, '-32700', null, null, true);
 			return;
 		}
-
-		if (!isset($this->_jsonDecoded['jsonrpc'])) {
-			$this->_multicall = true;
-		}
-		else {
-			$this->_jsonDecoded = array($this->_jsonDecoded);
-		}
 	}
 
 	public function execute($encoded = true) {
-		foreach ($this->_jsonDecoded as $call) {
-			// notification
-			if (!isset($call['id'])) {
-				$call['id'] = null;
-			}
+		$call = $this->_jsonDecoded;
 
-			if (!$this->validate($call)) {
-				continue;
-			}
-
-			$params = isset($call['params']) ? $call['params'] : null;
-			$auth = isset($call['auth']) ? $call['auth'] : null;
-
-			$result = czbxrpc::call($call['method'], $params, $auth);
-			$this->processResult($call, $result);
+		// notification
+		if (!isset($call['id'])) {
+			$call['id'] = null;
 		}
+
+		if (!$this->validate($call)) {
+			return $this->_response;
+		}
+
+		$params = isset($call['params']) ? $call['params'] : null;
+		$auth = isset($call['auth']) ? $call['auth'] : null;
+
+		$result = czbxrpc::call($call['method'], $params, $auth);
+		$this->processResult($call, $result);
 
 		if (!$encoded) {
 			return $this->_response;
@@ -117,12 +108,7 @@ class CJSONrpc {
 				'id' => $call['id']
 			);
 
-			if ($this->_multicall) {
-				$this->_response[] = $formedResp;
-			}
-			else {
-				$this->_response = $formedResp;
-			}
+			$this->_response = $formedResp;
 		}
 		else {
 			$result['data'] = isset($result['data']) ? $result['data'] : null;
@@ -166,12 +152,7 @@ class CJSONrpc {
 			'id' => $id
 		);
 
-		if ($this->_multicall) {
-			$this->_response[] = $formed_error;
-		}
-		else {
-			$this->_response = $formed_error;
-		}
+		$this->_response = $formed_error;
 	}
 
 	private function initErrors() {
