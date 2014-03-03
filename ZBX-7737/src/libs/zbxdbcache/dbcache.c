@@ -1125,6 +1125,7 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *ite
 				break;
 			default:
 				/* NOP - removes warning */
+				;
 		}
 
 		zbx_format_value(value, sizeof(value), item->valuemapid,
@@ -1143,7 +1144,7 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *ite
 	}
 }
 
-static int	validate_inventory_item(ZBX_DC_HISTORY *h, char **field_name, unsigned char inventory_link)
+static int	validate_inventory_item(ZBX_DC_HISTORY *h, const char **field_name, unsigned char inventory_link)
 {
 	if (NULL == h || NULL == field_name || NULL == *field_name)
 		return FAIL;
