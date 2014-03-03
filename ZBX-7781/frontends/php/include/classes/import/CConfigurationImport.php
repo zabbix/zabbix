@@ -112,66 +112,54 @@ class CConfigurationImport {
 			throw new UnexpectedValueException('Reader is not set.');
 		}
 
-		try {
-			// hack to make api throw exceptions
-			// this made to not check all api calls results for false return
-			czbxrpc::$useExceptions = true;
+		$this->data = $this->reader->read($this->source);
 
-			$this->data = $this->reader->read($this->source);
+		$version = $this->getImportVersion();
 
-			$version = $this->getImportVersion();
-
-			// if import version is 1.8 we use old class that support it.
-			// old import class process hosts, maps and screens separately.
-			if ($version == '1.8') {
-				CXmlImport18::import($this->source);
-				if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-					CXmlImport18::parseMap($this->options);
-				}
-				if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-					CXmlImport18::parseScreen($this->options);
-				}
-				if ($this->options['hosts']['updateExisting']
-						|| $this->options['hosts']['createMissing']
-						|| $this->options['templates']['updateExisting']
-						|| $this->options['templates']['createMissing']) {
-					CXmlImport18::parseMain($this->options);
-				}
+		// if import version is 1.8 we use old class that support it.
+		// old import class process hosts, maps and screens separately.
+		if ($version == '1.8') {
+			CXmlImport18::import($this->source);
+			if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
+				CXmlImport18::parseMap($this->options);
 			}
-			else {
-				$this->formatter = $this->getFormatter($version);
-
-				// pass data to formatter
-				// export has root key "zabbix_export" which is not passed
-				$this->formatter->setData($this->data['zabbix_export']);
-				$this->referencer = new CImportReferencer();
-
-				// parse all import for references to resolve them all together with less sql count
-				$this->gatherReferences();
-				$this->processGroups();
-				$this->processTemplates();
-				$this->processHosts();
-				$this->processApplications();
-				$this->processItems();
-				$this->processDiscoveryRules();
-				$this->processTriggers();
-				$this->processGraphs();
-				$this->processImages();
-				$this->processMaps();
-
-				// screens should be created after all other elements
-				$this->processTemplateScreens();
-				$this->processScreens();
+			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
+				CXmlImport18::parseScreen($this->options);
 			}
+			if ($this->options['hosts']['updateExisting']
+					|| $this->options['hosts']['createMissing']
+					|| $this->options['templates']['updateExisting']
+					|| $this->options['templates']['createMissing']) {
+				CXmlImport18::parseMain($this->options);
+			}
+		}
+		else {
+			$this->formatter = $this->getFormatter($version);
 
-			// prevent api from throwing exception
-			czbxrpc::$useExceptions = false;
-			return true;
+			// pass data to formatter
+			// export has root key "zabbix_export" which is not passed
+			$this->formatter->setData($this->data['zabbix_export']);
+			$this->referencer = new CImportReferencer();
+
+			// parse all import for references to resolve them all together with less sql count
+			$this->gatherReferences();
+			$this->processGroups();
+			$this->processTemplates();
+			$this->processHosts();
+			$this->processApplications();
+			$this->processItems();
+			$this->processDiscoveryRules();
+			$this->processTriggers();
+			$this->processGraphs();
+			$this->processImages();
+			$this->processMaps();
+
+			// screens should be created after all other elements
+			$this->processTemplateScreens();
+			$this->processScreens();
 		}
-		catch (Exception $e) {
-			czbxrpc::$useExceptions = false;
-			throw new Exception($e->getMessage(), $e->getCode());
-		}
+
+		return true;
 	}
 
 	/**
