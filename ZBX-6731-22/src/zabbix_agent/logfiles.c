@@ -790,7 +790,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
 
-			while (p < p_end)
+			for (;;)
 			{
 				if (0 >= *p_count || 0 >= *s_count)
 				{
