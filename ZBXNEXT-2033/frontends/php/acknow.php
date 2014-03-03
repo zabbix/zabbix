@@ -210,7 +210,9 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 elseif (!$bulk && CRemedyService::$enabled && $event) {
 	$ticket = CRemedyService::mediaQuery($event['eventid']);
 
-	show_messages();
+	if (hasErrorMesssages()) {
+		show_messages();
+	}
 }
 
 ob_end_flush();
@@ -305,9 +307,12 @@ $message->attr('autofocus', 'autofocus');
 $messageTable->addRow(_('Message'), $message);
 
 if (CRemedyService::$enabled) {
+
 	$ticketStatusMessage = $ticket ? array(_('Update ticket').' ', $ticket['link']) : _('Create ticket');
 
-	$messageTable->addRow($ticketStatusMessage, new CCheckBox('ticket_status'));
+	$messageTable->addRow($ticketStatusMessage,
+		new CCheckBox('ticket_status'), hasErrorMesssages() ? getRequest('ticket_status') : 'no'
+	);
 }
 
 $messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));

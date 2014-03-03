@@ -2612,12 +2612,14 @@ function encode_log($data) {
 			: $data;
 }
 
-function no_errors() {
+function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	foreach ($ZBX_MESSAGES as $message) {
-		if ($message['type'] == 'error') {
-			return false;
+	if ($ZBX_MESSAGES !== null) {
+		foreach ($ZBX_MESSAGES as $message) {
+			if ($message['type'] == 'error') {
+				return false;
+			}
 		}
 	}
 
