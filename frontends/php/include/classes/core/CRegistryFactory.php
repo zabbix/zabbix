@@ -54,4 +54,15 @@ class CRegistryFactory {
 		return $this->instances[$object];
 	}
 
+	/**
+	 * Returns true if the given object is defined in the factory.
+	 *
+	 * @param string $object
+	 *
+	 * @return bool
+	 */
+	public function hasObject($object) {
+		return isset($this->objects[$object]);
+	}
+
 }
