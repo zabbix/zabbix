@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:18+0200\n"
-"PO-Revision-Date: 2013-10-30 17:46+0300\n"
+"POT-Creation-Date: 2014-03-03 17:42+0200\n"
+"PO-Revision-Date: 2014-02-19 17:24+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383147965.0\n"
+"X-POOTLE-MTIME: 1392823448.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1255,7 +1255,7 @@ msgstr "Mapeamento de valor não foi incluído"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Não foi possível mudar a autenticação"
 
 #: authentication.php:189
 msgid "Cannot change authentication method to HTTP"
@@ -1607,7 +1607,7 @@ msgstr "Não foi encontrado a interface do host em \"%1$s\" para a chave do item
 #: include/classes/import/CConfigurationImport.php:877
 #, php-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\".Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
+msgstr "Não foi possível localizar o host ou template \"%1$s\" utilizado no gráfico \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
@@ -1710,7 +1710,7 @@ msgstr "Falha na associação do template"
 
 #: api/classes/CUser.php:985
 msgid "Cannot login."
-msgstr ""
+msgstr "Não foi possível conectar."
 
 #: api/classes/CUser.php:910
 msgid "Cannot logout."
@@ -6858,7 +6858,7 @@ msgstr "Autenticação LDAP"
 
 #: authentication.php:136
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "Autenticação LDAP modificada"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -7198,11 +7198,11 @@ msgstr "Falha de login \"%s\"."
 #: api/classes/CUser.php:990
 #, php-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "O nome de conexão \"%1$s\" não confere com o nome \"%2$s\" que foi passado para a autenticação HTTP."
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Nome de conexão ou senha incorreta!"
 
 #: api/classes/CUser.php:875 api/classes/CUser.php:893
 #: api/classes/CUser.php:940
@@ -11998,7 +11998,7 @@ msgstr "Protótipo de trigger"
 #: api/classes/CTriggerPrototype.php:791
 #, php-format
 msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" precisa conter pelo menos um protótipo de trigger."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
@@ -13652,7 +13652,7 @@ msgstr "em"
 #: api/classes/CItemKey.php:76
 #, php-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "sintaxe incorreta entre \"%1$s\""
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13660,7 +13660,7 @@ msgstr "é"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "chave vazia"
 
 #: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
@@ -13888,7 +13888,7 @@ msgstr "trigger"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "final inesperado da chave"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376

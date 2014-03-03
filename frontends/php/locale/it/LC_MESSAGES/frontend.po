@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:18+0200\n"
-"PO-Revision-Date: 2014-02-12 16:12+0300\n"
+"POT-Creation-Date: 2014-03-03 17:42+0200\n"
+"PO-Revision-Date: 2014-02-13 07:22+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392214323.0\n"
+"X-POOTLE-MTIME: 1392268972.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -1706,7 +1706,7 @@ msgstr "Impossibile collegare template"
 
 #: api/classes/CUser.php:985
 msgid "Cannot login."
-msgstr ""
+msgstr "Login non possibile"
 
 #: api/classes/CUser.php:910
 msgid "Cannot logout."
@@ -7186,7 +7186,7 @@ msgstr "Login fallito \"%s\"."
 #: api/classes/CUser.php:990
 #, php-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Il nome utente \"%1$s\" non corrisponde col nome \"%2$s\" utilizzato come autenticazione HTTP."
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
@@ -11986,7 +11986,7 @@ msgstr "Prototipo trigger"
 #: api/classes/CTriggerPrototype.php:791
 #, php-format
 msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "L'espressione del trigger prototipo \"%1$s\" deve almeno contenere un item prototipo."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89

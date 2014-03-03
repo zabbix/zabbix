@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:18+0200\n"
-"PO-Revision-Date: 2014-02-02 16:12+0300\n"
+"POT-Creation-Date: 2014-03-03 17:42+0200\n"
+"PO-Revision-Date: 2014-02-19 20:43+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391350320.0\n"
+"X-POOTLE-MTIME: 1392835394.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -12006,7 +12006,7 @@ msgstr "Prototyp spúšťača"
 #: api/classes/CTriggerPrototype.php:791
 #, php-format
 msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Výraz prototypu spúšťača \"%1$s\" musí obsahovať najmenej jeden prototyp položky."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
