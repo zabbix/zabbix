@@ -908,7 +908,7 @@ function getActionMessages(array $alerts) {
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		if (zbx_empty($alert['error'])) {
-			$info = SPACE;
+			$info = '';
 		}
 		else {
 			$info = new CDiv(SPACE, 'status_icon iconerror');

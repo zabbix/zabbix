@@ -227,16 +227,22 @@ function getMenuPopupHost(options) {
 	if (options.hasGoTo) {
 		var gotos = [];
 
+		// inventory
+		gotos[gotos.length] = {
+			label: t('Host inventory'),
+			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+		};
+
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// inventory
+		// trigger status
 		gotos[gotos.length] = {
-			label: t('Host inventory'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			label: t('Triggers'),
+			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
 
 		// graphs
@@ -273,6 +279,7 @@ function getMenuPopupHost(options) {
  * @param string options[]['scriptid']				script id
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
+ * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
@@ -316,6 +323,34 @@ function getMenuPopupMap(options) {
 			};
 		}
 
+		// latest
+		if (typeof options.gotos.latestData !== 'undefined') {
+			var url = new Curl('latest.php');
+
+			jQuery.each(options.gotos.latestData, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Latest data'),
+				url: url.getUrl()
+			};
+		}
+
+		// trigger status
+		if (typeof options.gotos.triggerStatus !== 'undefined') {
+			var url = new Curl('tr_status.php?filter_set=1');
+
+			jQuery.each(options.gotos.triggerStatus, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Triggers'),
+				url: url.getUrl()
+			};
+		}
+
 		// graphs
 		if (typeof options.gotos.graphs !== 'undefined') {
 			var url = new Curl('charts.php');
@@ -340,20 +375,6 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host screens'),
-				url: url.getUrl()
-			};
-		}
-
-		// trigger status
-		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1');
-
-			jQuery.each(options.gotos.triggerStatus, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-				label: t('Status of triggers'),
 				url: url.getUrl()
 			};
 		}
