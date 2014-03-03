@@ -47,6 +47,8 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
 	$apiClient = API::getWrapper()->getClient();
+
+	// unset wrappers so that calls between methods would be made directly to the services
 	API::setWrapper();
 
 	$jsonRpc = new CJSONrpc($apiClient, $data);
