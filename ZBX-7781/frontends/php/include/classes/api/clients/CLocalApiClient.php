@@ -40,25 +40,17 @@ class CLocalApiClient extends CApiClient {
 		$this->serviceFactory = $factory;
 	}
 
-	protected function callServiceMethod($method, array $params) {
+	public function callMethod($api, $method, array $params, $auth) {
 		global $DB;
 
 		$response = new CApiClientResponse();
 		$newTransaction = false;
 		try {
-			// validate the API
-			if (!$this->serviceFactory->hasObject($this->api)) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect API "'.$this->api.'".');
-			}
+			// authenticate
+			$this->authenticate($api, $method, $auth);
 
-			$apiService = $this->serviceFactory->getObject($this->api);
-
-			// validate the method
-			if (!in_array($method, get_class_methods($apiService))) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS,
-					'Incorrect method "'.$method.'" for API "'.$this->api.'".'
-				);
-			}
+			// check method
+			$this->checkMethod($api, $method);
 
 			// the nopermission parameter must not be available for external API calls.
 			unset($params['nopermissions']);
@@ -70,7 +62,7 @@ class CLocalApiClient extends CApiClient {
 			}
 
 			// call API method
-			$result = call_user_func_array(array($apiService, $method), $params);
+			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $method), $params);
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
@@ -83,7 +75,7 @@ class CLocalApiClient extends CApiClient {
 			if ($newTransaction) {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
 				// failed attempt data
-				if ($this->api === 'user' && $method === 'login') {
+				if ($api === 'user' && $method === 'login') {
 					DBend(true);
 				}
 				// otherwise - revert the transaction
@@ -102,5 +94,68 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Checks the authentication token if the given method requires authentication.
+	 *
+	 * @param string $api
+	 * @param string $method
+	 * @param string $auth
+	 *
+	 * @throws APIException
+	 */
+	protected function authenticate($api, $method, $auth) {
+		// authenticate
+		if ($this->requiresAuthentication($api, $method)) {
+			if (zbx_empty($auth)) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised'));
+			}
+
+			$this->serviceFactory->getObject('user')->checkAuthentication($auth);
+		}
+		elseif ($auth !== null) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS,
+				_s('The "%1$s" method must be called without the "auth" parameter.', $method)
+			);
+		}
+	}
+
+	/**
+	 * Checks if the given API and method are valid.
+	 *
+	 * @param $api
+	 * @param $method
+	 *
+	 * @throws APIException
+	 */
+	protected function checkMethod($api, $method) {
+		// validate the API
+		if (!$this->serviceFactory->hasObject($api)) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Incorrect API "%1$s".', $api));
+		}
+
+		$apiService = $this->serviceFactory->getObject($api);
+
+		// validate the method
+		if (!in_array($method, get_class_methods($apiService))) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect method "%1$s" for API "%2$s".', $method, $api)
+			);
+		}
+	}
+
+	/**
+	 * Returns true if calling the given method requires a valid authentication token.
+	 *
+	 * @param $api
+	 * @param $method
+	 *
+	 * @return bool
+	 */
+	protected function requiresAuthentication($api, $method) {
+		return !(($api === 'user' && $method === 'login')
+			|| ($api === 'user' && $method === 'checkAuthentication')
+			|| ($api === 'apiinfo' && $method === 'version'));
 	}
 }
