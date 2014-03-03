@@ -91,8 +91,11 @@ $data = array(
 	'stime' => getRequest('stime'),
 	'alias' => getRequest('alias'),
 	'users' => array(),
-	'alerts' => array()
+	'alerts' => array(),
+	'paging' => null
 );
+
+$userId = null;
 
 if ($data['alias']) {
 	$data['users'] = API::User()->get(array(
@@ -100,11 +103,15 @@ if ($data['alias']) {
 		'filter' => array('alias' => $data['alias']),
 		'preservekeys' => true
 	));
+
+	if ($data['users']) {
+		$user = reset($data['users']);
+
+		$userId = $user['userid'];
+	}
 }
 
 if (!$data['alias'] || $data['users']) {
-	$userIds = array_keys($data['users']);
-
 	$from = zbxDateToTime($data['stime']);
 	$till = $from + $effectivePeriod;
 
@@ -113,7 +120,7 @@ if (!$data['alias'] || $data['users']) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectMediatypes' => API_OUTPUT_EXTEND,
-			'userids' => $userIds ? $userIds : null,
+			'userids' => $userId,
 			'time_from' => $from,
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
@@ -128,6 +135,9 @@ if (!$data['alias'] || $data['users']) {
 
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
+	// paging
+	$data['paging'] = getPagingLine($data['alerts']);
+
 	// get users
 	if (!$data['alias']) {
 		$data['users'] = API::User()->get(array(
@@ -136,27 +146,26 @@ if (!$data['alias'] || $data['users']) {
 			'preservekeys' => true
 		));
 	}
+}
 
-	// get first alert clock
+// get first alert clock
+$firstAlert = null;
+if ($userId) {
 	$firstAlert = DBfetch(DBselect(
 		'SELECT MIN(a.clock) AS clock'.
 		' FROM alerts a'.
-		' WHERE '.dbConditionInt('a.userid', array_keys($data['users']))
+		' WHERE a.userid='.$userId
 	));
-
-	$minStartTime = $firstAlert['clock'];
 }
-else {
-	$minStartTime = ZBX_MAX_PERIOD;
+elseif ($data['alias'] === '') {
+	$firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
 }
-
-// padding
-$data['paging'] = getPagingLine($data['alerts']);
+$minStartTime = ($firstAlert) ? $firstAlert['clock'] : null;
 
 // get actions names
 if ($data['alerts']) {
 	$data['actions'] = API::Action()->get(array(
-		'output' => array('actionid	', 'name'),
+		'output' => array('actionid', 'name'),
 		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
 		'preservekeys' => true
 	));

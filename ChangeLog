@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
@@ -30,6 +31,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
 ........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
@@ -60,6 +62,12 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7858] fixed some triggers not being displayed in Monitoring -> Triggers (Pavels)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+.......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
+A.F....... [ZBX-7829] fixed reserving of new ids for standalone installations (Sasha)
+A......... [ZBX-6742] fixed templated graph item validation when items seem to belong to multiple hosts (Ivo)
 A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
 ........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
@@ -886,6 +894,10 @@ New features:
 A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
 A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)

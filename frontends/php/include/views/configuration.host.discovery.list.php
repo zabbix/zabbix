@@ -86,7 +86,7 @@ foreach ($data['discoveries'] as $discovery) {
 			$info->setHint($discovery['error'], '', 'on');
 		}
 		else {
-			$info = SPACE;
+			$info = '';
 		}
 	}
 	else {
