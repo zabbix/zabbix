@@ -85,7 +85,7 @@ function _llnw_is_user_rw() {
 		static $groups; // cache the groups per request - we only need to call the API once.
 		if (empty($groups)) {
 			$groups = array();
-			$apigroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
+			$apigroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_EXTEND));
 			foreach ($apigroups as $group) {
 				$groups[] = $group['usrgrpid'];
 			}
