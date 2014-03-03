@@ -1661,10 +1661,12 @@ int	zbx_remedy_acknowledge_events(zbx_uint64_t userid, zbx_vector_ptr_t *acknowl
 	for (i = 0; i < acknowledges->values_num; i++)
 	{
 		zbx_acknowledge_t	*ack = acknowledges->values[i];
-		zbx_ticket_t	*ticket;
+		zbx_ticket_t		*ticket;
 
 		ticket = zbx_malloc(NULL, sizeof(zbx_ticket_t));
 		memset(ticket, 0, sizeof(zbx_ticket_t));
+
+		ticket->eventid = ack->eventid;
 
 		if (SUCCEED == remedy_process_event(ack->eventid, userid, row[0], ack->subject, ack->message,
 				&mediatype, ZBX_REMEDY_PROCESS_MANUAL, ticket, &ticket->error))
