@@ -754,7 +754,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY != type)
+			if (INTERFACE_TYPE_ANY == type)
 			{
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
@@ -767,7 +767,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
 					ret = FAIL;
 				}
-				else if (0 == interfaceids[type - 1])
+			}
+			else
+			{
+				if (0 == interfaceids[type - 1])
 				{
 					zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 							zbx_interface_type_string((zbx_interface_type_t)type));
