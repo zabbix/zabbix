@@ -30,7 +30,7 @@ foreach (@$tlds_ref)
 {
     $tld = $_;
 
-    my ($itemid_in, $itemid_out, $lastclock) = get_rollweek_data($tld, $cfg_key_in, $cfg_key_out);
+    my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     my $fails = get_down_count($itemid_in, $itemid_out, $from, $till);

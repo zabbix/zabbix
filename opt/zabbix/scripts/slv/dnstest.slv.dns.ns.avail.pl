@@ -15,12 +15,13 @@ exit_if_running();
 
 set_slv_config(get_dnstest_config());
 
-my ($from, $till, $value_ts) = get_minute_bounds();
-
 db_connect();
 
+my $interval = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
 my $cfg_max_value = get_macro_dns_udp_rtt();
+
+my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
 my $tlds_ref = get_tlds();
 
@@ -29,6 +30,9 @@ init_values();
 foreach (@$tlds_ref)
 {
     $tld = $_;
+
+    my $lastclock = get_lastclock($tld, $cfg_key_out);
+    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline, SLV_UNAVAILABILITY_LIMIT, \&check_item_value);
 }

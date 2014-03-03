@@ -13,7 +13,7 @@ use constant SUCCESS => 0;
 use constant FAIL => 1;
 use constant UP => 1;
 use constant DOWN => 0;
-use constant SLV_UNAVAILABILITY_LIMIT => 49;
+use constant SLV_UNAVAILABILITY_LIMIT => 49;	# NB! this has to be in sync with frontend configuration
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
 use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
@@ -48,9 +48,9 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_dns_udp_delay get_macro_dns_tcp_delay get_macro_rdds_delay
 		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
-		get_macro_epp_rtt get_rollweek_data get_lastclock get_tlds
+		get_macro_epp_rtt get_item_data get_lastclock get_tlds
 		db_connect db_select
-		set_slv_config get_minute_bounds get_interval_bounds get_rollweek_bounds get_month_bounds
+		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
 		get_item_values check_lastclock get_down_count
@@ -157,7 +157,7 @@ sub get_macro_epp_rtt
     return __get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT}');
 }
 
-sub get_rollweek_data
+sub get_item_data
 {
     my $host = shift;
     my $cfg_key_in = shift;
@@ -372,18 +372,6 @@ sub db_select
 sub set_slv_config
 {
     $config = shift;
-}
-
-# Get bounds of the previous minute shifted $avail_shift_back seconds back.
-sub get_minute_bounds
-{
-    my $t = time();
-    my $till = int($t / 60) * 60 - $avail_shift_back;
-    my $from = $till - 60;
-
-    $till--;
-
-    return ($from, $till, $till - 29);
 }
 
 # Get bounds of the previous rdds test period shifted $avail_shift_back seconds back.

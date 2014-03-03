@@ -15,12 +15,13 @@ exit_if_running();
 
 set_slv_config(get_dnstest_config());
 
-my ($from, $till, $value_ts) = get_minute_bounds();
-
 db_connect();
 
+my $interval = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
 my $cfg_minns = get_macro_minns();
+
+my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
 my $probes_ref = get_online_probes($from, $till, undef);
 my $online_probes = scalar(@$probes_ref);
@@ -32,6 +33,9 @@ init_values();
 foreach (@$tlds_ref)
 {
     $tld = $_;
+
+    my $lastclock = get_lastclock($tld, $cfg_key_out);
+    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
     if ($online_probes < $cfg_minonline)
     {

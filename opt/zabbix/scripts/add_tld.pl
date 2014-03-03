@@ -406,12 +406,12 @@ sub create_group {
     return $groupid;
 }
 
-sub create_template {                      
-    my $name = shift;                      
-    my $child_templateid = shift;          
-                                           
+sub create_template {
+    my $name = shift;
+    my $child_templateid = shift;
+
     my ($result, $templateid, $options, $groupid);
-                                                            
+
     unless ($zabbix->exist('hostgroup', {'name' => 'Templates - TLD'})) {
         $result = $zabbix->create('hostgroup', {'name' => 'Templates - TLD'});
         $groupid = $result->{'groupids'}[0];
@@ -421,9 +421,9 @@ sub create_template {
         $groupid = $result->{'groupid'};
     }
 
-    unless ($zabbix->exist('template',{'host' => $name})) { 
+    unless ($zabbix->exist('template',{'host' => $name})) {
         $options = {'groups'=> {'groupid' => $groupid}, 'host' => $name};
-                                                            
+
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
 
         $result = $zabbix->create('template', $options);
@@ -432,14 +432,14 @@ sub create_template {
     else {
         $result = $zabbix->get('template', {'filter' => {'host' => $name}});
         $templateid = $result->{'templateid'};
-        
+
         $options = {'templateid' => $templateid, 'groups'=> {'groupid' => $groupid}, 'host' => $name};
         $options->{'templates'} = [{'templateid' => $child_templateid}] if defined $child_templateid;
-        
+
         $result = $zabbix->update('template', $options);
         $templateid = $result->{'templateids'}[0];
     }
-    
+
     return $templateid;
 }
 
