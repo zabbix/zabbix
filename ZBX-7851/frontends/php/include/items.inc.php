@@ -239,8 +239,6 @@ function itemIndicatorStyle($status, $state = null) {
  *
  * @param array  $items
  * @param string $sortorder
- *
- * @return array
  */
 function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 	$sort = array();

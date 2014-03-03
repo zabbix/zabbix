@@ -2524,8 +2524,6 @@ function triggerIndicatorStyle($status, $state = null) {
  *
  * @param array  $triggers
  * @param string $sortorder
- *
- * @return array
  */
 function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
 	$sort = array();
