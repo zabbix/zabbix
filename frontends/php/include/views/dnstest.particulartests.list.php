@@ -215,8 +215,11 @@ elseif ($this->data['type'] == DNSTEST_DNSSEC) {
 	);
 }
 
+$tldTriggersLink = new CLink($this->data['tld']['name'], 'tr_status.php?groupid=0&hostid='.$this->data['tld']['hostid']);
+$tldTriggersLink->setTarget('_blank');
+
 $particularTests = array(
-	new CSpan(array(bold(_('TLD')), ':', SPACE, $this->data['tld']['name'])),
+	new CSpan(array(bold(_('TLD')), ':', SPACE, $tldTriggersLink)),
 	BR(),
 	new CSpan(array(bold(_('Service')), ':', SPACE, $this->data['slvItem']['name'])),
 	BR(),
