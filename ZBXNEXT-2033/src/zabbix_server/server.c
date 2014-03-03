@@ -199,6 +199,8 @@ int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
+int	CONFIG_REMEDY_SERVICE_TIMEOUT	= 20;
+
 /* mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -436,6 +438,8 @@ static void	zbx_load_config()
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"RemedyServiceTimeout",	&CONFIG_REMEDY_SERVICE_TIMEOUT,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_MIN},
 		{NULL}
 	};
 

@@ -101,7 +101,7 @@
 #define ZBX_REMEDY_PROCESS_MANUAL	0
 #define ZBX_REMEDY_PROCESS_AUTOMATED	1
 
-#define ZBX_REMEDY_SERVICE_TIMEOUT	20
+extern int	CONFIG_REMEDY_SERVICE_TIMEOUT;
 
 typedef struct
 {
@@ -399,7 +399,7 @@ static const char	*remedy_fields_get_value(zbx_remedy_field_t *fields, int field
 static int	remedy_init_connection(CURL **easyhandle, const struct curl_slist *headers, const char *url,
 		const char *proxy, char **error)
 {
-	int	opt, timeout = ZBX_REMEDY_SERVICE_TIMEOUT, ret = FAIL, err;
+	int	opt, timeout = CONFIG_REMEDY_SERVICE_TIMEOUT, ret = FAIL, err;
 
 	if (NULL == (*easyhandle = curl_easy_init()))
 	{
