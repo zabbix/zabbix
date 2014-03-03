@@ -90,7 +90,9 @@ class CRemedyService {
 		if ($zabbixServerError) {
 			error($zabbixServerError);
 
-			return false;
+			self::$enabled = false;
+
+			return self::$enabled;
 		}
 		else {
 			$ticket = zbx_toHash($ticket, 'eventid');
@@ -98,7 +100,9 @@ class CRemedyService {
 			if ($ticket[$eventId]['error']) {
 				error($ticket[$eventId]['error']);
 
-				return false;
+				self::$enabled = false;
+
+				return self::$enabled;
 			}
 			elseif ($ticket[$eventId]['externalid']) {
 				return self::getDetails($ticket[$eventId]);
@@ -142,7 +146,9 @@ class CRemedyService {
 		if ($zabbixServerError) {
 			error($zabbixServerError);
 
-			return false;
+			self::$enabled = false;
+
+			return self::$enabled;
 		}
 		else {
 			$tickets = zbx_toHash($tickets, 'eventid');
@@ -151,7 +157,9 @@ class CRemedyService {
 			if ($tickets[$eventId]['error']) {
 				error($tickets[$eventId]['error']);
 
-				return false;
+				self::$enabled = false;
+
+				return self::$enabled;
 			}
 			elseif ($tickets[$eventId]['externalid']) {
 				$messageSuccess = $tickets[$eventId]['new']

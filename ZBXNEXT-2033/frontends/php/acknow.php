@@ -110,7 +110,6 @@ $eventTrigger = null;
 $eventAcknowledged = null;
 $eventTriggerName = null;
 
-$isRemedyServiceEnabled = null;
 $ticket = null;
 $event = null;
 
@@ -129,7 +128,7 @@ if (!$bulk) {
 		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
 
-		$isRemedyServiceEnabled = CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
+		CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
@@ -155,7 +154,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 
 	$result = true;
 
-	if (!$bulk && $event && $isRemedyServiceEnabled) {
+	if (!$bulk && $event && CRemedyService::$enabled) {
 		// create or update existing remedy ticket
 		if (hasRequest('ticket_status')) {
 			$ticket = CRemedyService::mediaAcknowledge(array(
@@ -208,7 +207,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		}
 	}
 }
-elseif (!$bulk && $isRemedyServiceEnabled && $event) {
+elseif (!$bulk && CRemedyService::$enabled && $event) {
 	$ticket = CRemedyService::mediaQuery($event['eventid']);
 
 	show_messages();
@@ -305,7 +304,7 @@ $message->attr('autofocus', 'autofocus');
 
 $messageTable->addRow(_('Message'), $message);
 
-if ($isRemedyServiceEnabled) {
+if (CRemedyService::$enabled) {
 	$ticketStatusMessage = $ticket ? array(_('Update ticket').' ', $ticket['link']) : _('Create ticket');
 
 	$messageTable->addRow($ticketStatusMessage, new CCheckBox('ticket_status'));

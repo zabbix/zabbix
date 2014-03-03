@@ -113,9 +113,9 @@ $eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $tr
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 
-$isRemedyServiceEnabled = CRemedyService::init(array('triggerSeverity' => $trigger['priority']));
+CRemedyService::init(array('triggerSeverity' => $trigger['priority']));
 
-if ($isRemedyServiceEnabled) {
+if (CRemedyService::$enabled) {
 	$ticket = CRemedyService::mediaQuery($event['eventid']);
 
 	if ($ticket) {
