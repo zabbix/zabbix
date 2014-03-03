@@ -64,40 +64,65 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 }
 
 $data['tests'] = array();
-$data['host'] = get_request('host');
-$data['eventid'] = get_request('eventid');
-$data['slvItemId'] = get_request('slvItemId');
-$data['availItemId'] = get_request('availItemId');
+
+/*
+ * Filter
+ */
+if (get_request('filter_set')) {
+	$data['host'] = get_request('host');
+	$data['eventid'] = get_request('eventid');
+	$data['slvItemId'] = get_request('slvItemId');
+	$data['availItemId'] = get_request('availItemId');
+	$data['filter_show_all'] = get_request('filter_show_all', 0);
+	$data['filter_failing_tests'] = get_request('filter_failing_tests', 0);
+
+	$data['filter_from'] = (get_request('filter_from') == get_request('original_from'))
+		? date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK))
+		: get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+
+	$data['filter_to'] = (get_request('filter_to') == get_request('original_to'))
+		? date('YmdHis', get_request('filter_to', time()))
+		: get_request('filter_to', date('YmdHis', time()));
+
+	CProfile::update('web.dnstest.incidentdetails.host', $data['host'], PROFILE_TYPE_STR);
+	CProfile::update('web.dnstest.incidentdetails.eventid', $data['eventid'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.slvItemId', $data['slvItemId'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.availItemId', $data['availItemId'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.filter_show_all', $data['filter_show_all'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.filter_failing_tests', $data['filter_failing_tests'], PROFILE_TYPE_ID);
+}
+elseif (get_request('filter_rolling_week')) {
+	$data['host'] = CProfile::get('web.dnstest.incidentdetails.host');
+	$data['eventid'] = CProfile::get('web.dnstest.incidentdetails.eventid');
+	$data['slvItemId'] = CProfile::get('web.dnstest.incidentdetails.slvItemId');
+	$data['availItemId'] = CProfile::get('web.dnstest.incidentdetails.availItemId');
+	$data['filter_show_all'] = CProfile::get('web.dnstest.incidentdetails.filter_show_all');
+	$data['filter_failing_tests'] = CProfile::get('web.dnstest.incidentdetails.filter_failing_tests');
+
+	// set new filter from and filter to
+	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
+	$data['filter_to'] = date('YmdHis', time());
+
+	CProfile::update('web.dnstest.incidentdetails.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
+	CProfile::update('web.dnstest.incidentdetails.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
+}
+else {
+	$data['host'] = CProfile::get('web.dnstest.incidentdetails.host');
+	$data['eventid'] = CProfile::get('web.dnstest.incidentdetails.eventid');
+	$data['slvItemId'] = CProfile::get('web.dnstest.incidentdetails.slvItemId');
+	$data['availItemId'] = CProfile::get('web.dnstest.incidentdetails.availItemId');
+	$data['filter_from'] = CProfile::get('web.dnstest.incidentdetails.filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+	$data['filter_to'] = CProfile::get('web.dnstest.incidentdetails.filter_to', date('YmdHis', time()));
+	$data['filter_show_all'] = CProfile::get('web.dnstest.incidentdetails.filter_show_all');
+	$data['filter_failing_tests'] = CProfile::get('web.dnstest.incidentdetails.filter_failing_tests');
+}
 
 // check
 if (!$data['eventid'] || !$data['slvItemId'] || !$data['availItemId'] || !$data['host']) {
 	access_deny();
 }
-/*
- * Filter
- */
-if (get_request('filter_rolling_week')) {
-	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
-	$data['filter_to'] = date('YmdHis', time());
-}
-else {
-	if (get_request('filter_from') == get_request('original_from')) {
-		$data['filter_from'] = date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK));
-	}
-	else {
-		$data['filter_from'] = get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
-	}
-	if (get_request('filter_to') == get_request('original_to')) {
-		$data['filter_to'] = date('YmdHis', get_request('filter_to', time()));
-	}
-	else {
-		$data['filter_to'] = get_request('filter_to', date('YmdHis', time()));
-	}
-}
-
-$data['filter_show_all'] = get_request('filter_show_all');
-$data['filter_failing_tests'] = get_request('filter_failing_tests');
-$data['sid'] = get_request('sid');
 
 // get TLD
 $tld = API::Host()->get(array(

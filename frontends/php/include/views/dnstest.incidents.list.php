@@ -227,7 +227,7 @@ if (isset($this->data['tld'])) {
 					'dnstest.incidentdetails.php?host='.$this->data['tld']['host'].
 						'&eventid='.$event['eventid'].'&slvItemId='.$this->data['dns']['itemid'].
 						'&filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-						'&availItemId='.$this->data['dns']['availItemId']
+						'&availItemId='.$this->data['dns']['availItemId'].'&filter_set=1'
 				),
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
@@ -300,7 +300,7 @@ if (isset($this->data['tld'])) {
 					'dnstest.incidentdetails.php?host='.$this->data['tld']['host'].
 						'&eventid='.$event['eventid'].'&slvItemId='.$this->data['dnssec']['itemid'].
 						'&filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-						'&availItemId='.$this->data['dnssec']['availItemId']
+						'&availItemId='.$this->data['dnssec']['availItemId'].'&filter_set=1'
 				),
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
@@ -373,7 +373,7 @@ if (isset($this->data['tld'])) {
 					'dnstest.incidentdetails.php?host='.$this->data['tld']['host'].
 						'&eventid='.$event['eventid'].'&slvItemId='.$this->data['rdds']['itemid'].
 						'&filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-						'&availItemId='.$this->data['rdds']['availItemId']
+						'&availItemId='.$this->data['rdds']['availItemId'].'&filter_set=1'
 				),
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),
@@ -445,7 +445,7 @@ if (isset($this->data['tld'])) {
 					'dnstest.incidentdetails.php?host='.$this->data['tld']['host'].
 						'&eventid='.$event['eventid'].'&slvItemId='.$this->data['epp']['itemid'].
 						'&filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-						'&availItemId='.$this->data['epp']['availItemId']
+						'&availItemId='.$this->data['epp']['availItemId'].'&filter_set=1'
 				),
 				$incidentStatus,
 				date('d.m.Y H:i:s', $event['startTime']),

@@ -118,7 +118,7 @@ if (isset($this->data['tld'])) {
 						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dns']['incident'].
 							'&slvItemId='.$tld['dns']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['dns']['availItemId']
+							'&availItemId='.$tld['dns']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
@@ -160,7 +160,7 @@ if (isset($this->data['tld'])) {
 						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dnssec']['incident'].
 							'&slvItemId='.$tld['dnssec']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['dnssec']['availItemId']
+							'&availItemId='.$tld['dnssec']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
@@ -202,7 +202,7 @@ if (isset($this->data['tld'])) {
 						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['rdds']['incident'].
 							'&slvItemId='.$tld['rdds']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['rdds']['availItemId']
+							'&availItemId='.$tld['rdds']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
@@ -244,7 +244,7 @@ if (isset($this->data['tld'])) {
 						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['epp']['incident'].
 							'&slvItemId='.$tld['epp']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['epp']['availItemId']
+							'&availItemId='.$tld['epp']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {

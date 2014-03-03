@@ -148,9 +148,7 @@ $filterTable->addRow(array(
 			'Rolling week',
 			null,
 			'spaces',
-			'javascript: location.href = "dnstest.incidentdetails.php?filter_set=1&filter_rolling_week=1&host='.
-				$this->data['tld']['host'].'&eventid='.$this->data['eventid'].'&slvItemId='.$this->data['slvItemId'].
-				'&availItemId='.$this->data['availItemId'].'&sid='.$this->data['sid'].'";'
+			'javascript: location.href = "dnstest.incidentdetails.php?filter_rolling_week=1";'
 		),
 		new CSpan(
 			array(
