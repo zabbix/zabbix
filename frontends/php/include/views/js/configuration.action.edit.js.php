@@ -244,6 +244,8 @@
 	function removeOperationCondition(index) {
 		jQuery('#opconditions_' + index).find('*').remove();
 		jQuery('#opconditions_' + index).remove();
+
+		processOperationTypeOfCalculation();
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
@@ -517,6 +519,29 @@
 		}
 	}
 
+	function processOperationTypeOfCalculation() {
+		var labels = jQuery('#operationConditionTable .label');
+
+		if (labels.length > 1) {
+			jQuery('#operationConditionRow').css('display', '');
+
+			var conditions = [];
+			labels.each(function(index, label) {
+				label = jQuery(label);
+
+				conditions.push({
+					id: label.data('formulaid'),
+					type: label.data('conditiontype')
+				});
+			});
+
+			jQuery('#operationConditionLabel').html(getConditionFormula(conditions, +jQuery('#operationEvaltype').val()));
+		}
+		else {
+			jQuery('#operationConditionRow').css('display', 'none');
+		}
+	}
+
 	function addDiscoveryTemplates() {
 		var values = jQuery('#discoveryTemplates').multiSelect.getData();
 
@@ -578,5 +603,6 @@
 		});
 
 		processTypeOfCalculation();
+		processOperationTypeOfCalculation();
 	});
 </script>
