@@ -553,7 +553,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
 				encoding, regexps, pattern, output_template, p_count, s_count, process_value, server,
-				port, hostname, key)))
+				port, hostname, key)) || 0 >= *p_count || 0 >= *s_count)
 		{
 			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
 			/* (can happen during a rotation). Maybe during the next check all will be well. */
@@ -768,12 +768,13 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					(*p_count)--;
 
 					if (SUCCEED == send_err)
+					{
 						*lastlogsize = lastlogsize1;
+						*big_rec = 1;		/* ignore the rest of this record */
+					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
-
-					*big_rec = 1;	/* ignore the rest of this record */
 				}
 				else
 				{
