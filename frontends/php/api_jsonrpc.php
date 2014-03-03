@@ -46,6 +46,9 @@ $data = $http_request->body();
 try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
+	$apiClient = API::getWrapper()->getClient();
+	API::setWrapper(new CApiWrapper($apiClient));
+
 	$jsonRpc = new CJSONrpc($data);
 	echo $jsonRpc->execute();
 }
