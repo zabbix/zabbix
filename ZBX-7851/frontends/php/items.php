@@ -1141,7 +1141,7 @@ else {
 	}
 
 	if ($data['sortfield'] === 'status') {
-		$data['items'] = orderItemsByStatus($data['items'], getPageSortOrder());
+		orderItemsByStatus($data['items'], getPageSortOrder());
 	}
 	else {
 		order_result($data['items'], $data['sortfield'], getPageSortOrder());

@@ -397,7 +397,7 @@ else {
 	));
 
 	if ($sortfield === 'status') {
-		$data['triggers'] = orderTriggersByStatus($data['triggers'], getPageSortOrder());
+		orderTriggersByStatus($data['triggers'], getPageSortOrder());
 	}
 	else {
 		order_result($data['triggers'], $sortfield, getPageSortOrder());

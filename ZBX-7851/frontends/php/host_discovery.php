@@ -332,7 +332,7 @@ else {
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	if ($sortfield === 'status') {
-		$data['discoveries'] = orderItemsByStatus($data['discoveries'], getPageSortOrder());
+		orderItemsByStatus($data['discoveries'], getPageSortOrder());
 	}
 	else {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());

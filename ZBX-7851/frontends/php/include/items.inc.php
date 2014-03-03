@@ -233,14 +233,16 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Orders items by both status and state.
+ * Orders items by both status and state. Items are sorted in the following order: enabled, disabled, not supported.
+ *
+ * Keep in sync with orderTriggersByStatus().
  *
  * @param array  $items
  * @param string $sortorder
  *
  * @return array
  */
-function orderItemsByStatus(array $items, $sortorder = ZBX_SORT_UP) {
+function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 	$sort = array();
 
 	foreach ($items as $key => $item) {
@@ -253,19 +255,19 @@ function orderItemsByStatus(array $items, $sortorder = ZBX_SORT_UP) {
 
 		$sort[$key] = $statusOrder;
 	}
-	natcasesort($sort);
 
-	if ($sortorder != ZBX_SORT_UP) {
-		$sort = array_reverse($sort, true);
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
 	}
 
-	$tmp = $items;
-	$items = array();
+	$sortedItems = array();
 	foreach ($sort as $key => $val) {
-		$items[$key] = $tmp[$key];
+		$sortedItems[$key] = $items[$key];
 	}
-
-	return $items;
+	$items = $sortedItems;
 }
 
 /**

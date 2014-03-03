@@ -2518,14 +2518,16 @@ function triggerIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Orders trigger by both status and state.
+ * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ *
+ * Keep in sync with orderItemsByStatus().
  *
  * @param array  $triggers
  * @param string $sortorder
  *
  * @return array
  */
-function orderTriggersByStatus(array $triggers, $sortorder = ZBX_SORT_UP) {
+function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
 	$sort = array();
 
 	foreach ($triggers as $key => $trigger) {
@@ -2538,17 +2540,17 @@ function orderTriggersByStatus(array $triggers, $sortorder = ZBX_SORT_UP) {
 
 		$sort[$key] = $statusOrder;
 	}
-	natcasesort($sort);
 
-	if ($sortorder != ZBX_SORT_UP) {
-		$sort = array_reverse($sort, true);
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
 	}
 
-	$tmp = $triggers;
-	$triggers = array();
+	$sortedTriggers = array();
 	foreach ($sort as $key => $val) {
-		$triggers[$key] = $tmp[$key];
+		$sortedTriggers[$key] = $triggers[$key];
 	}
-
-	return $triggers;
+	$triggers = $sortedTriggers;
 }
