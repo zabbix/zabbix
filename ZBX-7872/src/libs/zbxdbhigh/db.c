@@ -955,9 +955,14 @@ double	DBget_requiredperformance()
 
 	/* !!! Don't forget to sync the code with PHP !!! */
 	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
+			" where h.hostid=i.hostid"
+			" and h.status=%d"
+			" and i.status=%d"
+			" and i.delay<>0"
+			" and i.flags in (%d,%d,%d)",
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+			ITEM_STATUS_ACTIVE,
+			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CREATED);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		qps_total = atof(row[0]);
 	DBfree_result(result);
