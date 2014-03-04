@@ -1197,7 +1197,7 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 
 	now = ZBX_VC_TIME();
 
-	/* Read the item values from database */
+	/* read the item values from database */
 	if (NULL != ts)
 	{
 		ret = vc_db_read_values_by_count(itemid, value_type, values, 1, now, ts, 0);
