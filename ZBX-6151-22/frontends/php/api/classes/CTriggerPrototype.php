@@ -908,8 +908,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
 	 *
-	 * @param array $trigger	trigger data
-	 * @param array $items		array of trigger prototype items
+	 * @param array  $trigger						array of trigger data
+	 * @param string $trigger['description']		trigger description
+	 * @param array  $items							array of trigger items
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
 		if ($items) {

@@ -759,8 +759,10 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @throws APIException if graph prototype has no item prototype or items belong to multiple discovery rules.
 	 *
-	 * @param array $graphs		array of graphs
-	 * @param array $items		array of existing graph items and ones that user has permission to access
+	 * @param array  $graphs				array of graphs
+	 * @param array  $graphs['gitems']		array of graphs items
+	 * @param string $graphs['name']		graph name
+	 * @param array  $items					array of existing graph items and ones that user has permission to access
 	 */
 	protected function checkDiscoveryRuleCount(array $graphs, array $items) {
 		foreach ($graphs as $graph) {
@@ -768,9 +770,9 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($graph['gitems'])) {
 				$itemDiscoveryIds = array();
 
-				foreach ($graph['gitems'] as $item) {
-					if ($items[$item['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$itemDiscoveryIds[$items[$item['itemid']]['itemDiscovery']['parent_itemid']] = true;
+				foreach ($graph['gitems'] as $gitem) {
+					if ($items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$itemDiscoveryIds[$items[$gitem['itemid']]['itemDiscovery']['parent_itemid']] = true;
 					}
 				}
 
