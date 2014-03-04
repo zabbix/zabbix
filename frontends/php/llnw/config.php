@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-$base_dir = '/var/www/zabbix/llnw/';
+$base_dir = __DIR__ . '/';
 
 $script_name = basename($_SERVER['PHP_SELF']);
 $script_name = preg_replace('/\.php$/', '', $script_name);
