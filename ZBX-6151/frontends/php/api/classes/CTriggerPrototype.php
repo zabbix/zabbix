@@ -774,7 +774,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$createdTriggers = $this->get(array(
 			'triggerids' => $triggerids,
 			'output' => array('description'),
-			'selectItems' => array('itemid', 'hostid', 'flags'),
+			'selectItems' => array('itemid'),
 			'nopermissions' => true
 		));
 
@@ -856,7 +856,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$updatedTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => array('description'),
-			'selectItems' => array('itemid', 'hostid', 'flags'),
+			'selectItems' => array('itemid'),
 			'nopermissions' => true
 		));
 
@@ -1087,7 +1087,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
 	 *
-	 * @param array $triggers	array of created or updated triggers
+	 * @param array  $triggers						array of triggers
+	 * @param array  $triggers['items']				array if trigger items
+	 * @param string $triggers['description']		trigger description
 	 */
 	protected function checkDiscoveryRuleCount(array $triggers) {
 		foreach ($triggers as $trigger) {
