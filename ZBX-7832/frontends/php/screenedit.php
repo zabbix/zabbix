@@ -83,15 +83,15 @@ $options = array(
 	'editable' => true
 );
 
-$dbScreens = (getRequest('templateid') == 0)
+$screens = (getRequest('templateid') == 0)
 	? API::Screen()->get($options)
 	: API::TemplateScreen()->get($options);
 
-if (!$dbScreens) {
+if (!$screens) {
 	access_deny();
 }
 
-$dbScreen = reset($dbScreens);
+$screen = reset($screens);
 
 /*
  * Ajax
@@ -105,7 +105,7 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 			' FROM screens_items s'.
 			' WHERE s.y='.zbx_dbstr($screenPositions[0]).
 				' AND s.x='.zbx_dbstr($screenPositions[1]).
-				' AND s.screenid='.zbx_dbstr($dbScreen['screenid'])
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		$sitem = DBfetch(DBselect(
@@ -113,7 +113,7 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 			' FROM screens_items s'.
 			' WHERE s.y='.zbx_dbstr($screenPositions[2]).
 				' AND s.x='.zbx_dbstr($screenPositions[3]).
-				' AND s.screenid='.zbx_dbstr($dbScreen['screenid'])
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
 		));
 
 		if ($fitem) {
@@ -124,7 +124,7 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 					'rowspan='.(isset($sitem['rowspan']) ? zbx_dbstr($sitem['rowspan']) : 1).
 				' WHERE y='.zbx_dbstr($screenPositions[0]).
 					' AND x='.zbx_dbstr($screenPositions[1]).
-					' AND screenid='.zbx_dbstr($dbScreen['screenid']).
+					' AND screenid='.zbx_dbstr($screen['screenid']).
 					' AND screenitemid='.zbx_dbstr($fitem['screenitemid'])
 			);
 		}
@@ -137,12 +137,12 @@ if (getRequest('ajaxAction') === 'sw_pos') {
 					'rowspan='.(isset($fitem['rowspan']) ? zbx_dbstr($fitem['rowspan']) : 1).
 				' WHERE y='.zbx_dbstr($screenPositions[2]).
 					' AND x='.zbx_dbstr($screenPositions[3]).
-					' AND screenid='.zbx_dbstr($dbScreen['screenid']).
+					' AND screenid='.zbx_dbstr($screen['screenid']).
 					' AND screenitemid='.zbx_dbstr($sitem['screenitemid'])
 			);
 		}
 
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'], 'Screen items switched');
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Screen items switched');
 	}
 
 	echo '{"result": true}';
@@ -157,7 +157,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 if (hasRequest('save')) {
-	$dbScreenItem = array(
+	$screenItem = array(
 		'screenid' => getRequest('screenid'),
 		'resourceid' => getRequest('resourceid'),
 		'resourcetype' => getRequest('resourcetype'),
@@ -179,23 +179,23 @@ if (hasRequest('save')) {
 	DBstart();
 
 	if (hasRequest('screenitemid')) {
-		$dbScreenItem['screenitemid'] = getRequest('screenitemid');
+		$screenItem['screenitemid'] = getRequest('screenitemid');
 
-		$result = API::ScreenItem()->update($dbScreenItem);
+		$result = API::ScreenItem()->update($screenItem);
 
 		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
-		$dbScreenItem['x'] = getRequest('x');
-		$dbScreenItem['y'] = getRequest('y');
+		$screenItem['x'] = getRequest('x');
+		$screenItem['y'] = getRequest('y');
 
-		$result = API::ScreenItem()->create($dbScreenItem);
+		$result = API::ScreenItem()->create($screenItem);
 
 		show_messages($result, _('Item added'), _('Cannot add item'));
 	}
 
 	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'],
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
 			'Cell changed '.
 			(hasRequest('screenitemid') ? 'screen itemid "'.getRequest('screenitemid').'"' : '').
 			((hasRequest('x') && hasRequest('y')) ? ' coordinates "'.getRequest('x').','.getRequest('y').'"' : '').
@@ -213,10 +213,10 @@ elseif (hasRequest('delete')) {
 	$deletedScreenItems = API::ScreenItem()->delete(getRequest('screenitemid'));
 
 	if ($deletedScreenItems) {
-		$dbScreenItemId = reset($deletedScreenItems['screenitemids']);
+		$screenItemId = reset($deletedScreenItems['screenitemids']);
 
-		add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'],
-			'Screen itemid "'.$dbScreenItemId.'"'
+		add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			'Screen itemid "'.$screenItemId.'"'
 		);
 	}
 
@@ -225,39 +225,39 @@ elseif (hasRequest('delete')) {
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
 elseif (hasRequest('add_row')) {
-	DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($dbScreen['screenid']));
+	DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 
 	$addRow = getRequest('add_row', 0);
 
-	if ($dbScreen['vsize'] > $addRow) {
+	if ($screen['vsize'] > $addRow) {
 		DBexecute(
 			'UPDATE screens_items SET y=(y+1)'.
-			' WHERE screenid='.zbx_dbstr($dbScreen['screenid']).
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
 				' AND y>='.zbx_dbstr($addRow)
 		);
 	}
 
-	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'], 'Row added');
+	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Row added');
 }
 elseif (hasRequest('add_col')) {
-	DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($dbScreen['screenid']));
+	DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 
 	$addColumn = getRequest('add_col', 0);
 
-	if ($dbScreen['hsize'] > $addColumn) {
+	if ($screen['hsize'] > $addColumn) {
 		DBexecute(
 			'UPDATE screens_items SET x=(x+1)'.
-			' WHERE screenid='.zbx_dbstr($dbScreen['screenid']).
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
 				' AND x>='.zbx_dbstr($addColumn)
 		);
 	}
 
-	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'], 'Column added');
+	add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Column added');
 }
 elseif (hasRequest('rmv_row')) {
 	$result = false;
 
-	if ($dbScreen['vsize'] > 1) {
+	if ($screen['vsize'] > 1) {
 		DBstart();
 
 		$update = array(
@@ -270,7 +270,7 @@ elseif (hasRequest('rmv_row')) {
 			: API::TemplateScreen()->update($update);
 
 		add_audit_details(
-			AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'], 'Row deleted'
+			AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Row deleted'
 		);
 
 		$result = DBend($result);
@@ -284,7 +284,7 @@ elseif (hasRequest('rmv_row')) {
 elseif (hasRequest('rmv_col')) {
 	$result = false;
 
-	if ($dbScreen['hsize'] > 1) {
+	if ($screen['hsize'] > 1) {
 		DBstart();
 
 		$update = array(
@@ -297,7 +297,7 @@ elseif (hasRequest('rmv_col')) {
 			: API::TemplateScreen()->update($update);
 
 		add_audit_details(
-			AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $dbScreen['screenid'], $dbScreen['name'], 'Column deleted'
+			AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Column deleted'
 		);
 
 		$result = DBend($result);
