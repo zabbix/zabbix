@@ -19,7 +19,7 @@
 **/
 
 
-$action = 'screenedit.php?form=update&screenid='.getRequest('screenid').'&templateid='.getRequest('templateid');
+$action = 'screenedit.php?form=update&screenid='.getRequest('screenid').url_param('templateid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.get_request('screenitemid');
 }

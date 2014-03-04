@@ -270,7 +270,6 @@ class CScreenBuilder {
 		$skipedFields = array();
 		$screenitems = array();
 		$emptyScreenColumns = array();
-		$templateId = isset($this->screen['templateid']) ? $this->screen['templateid'] : '';
 
 		// calculate table columns and rows
 		foreach ($this->screen['screenitems'] as $screenitem) {
@@ -305,7 +304,7 @@ class CScreenBuilder {
 				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1'.
 					'&screenid='.$this->screen['screenid'].
 					'&add_col='.$i.
-					'&templateid='.$templateId.'";'
+					(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'";'
 				);
 
 				$newColumns[] = new CCol($icon);
@@ -324,7 +323,7 @@ class CScreenBuilder {
 				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1'.
 					'&screenid='.$this->screen['screenid'].
 					'&add_row='.$r.
-					'&templateid='.$templateId.'";'
+					(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'";'
 				);
 
 				$newColumns[] = new CCol($icon);
@@ -374,13 +373,13 @@ class CScreenBuilder {
 				if ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] != 0) {
 					$action = 'screenedit.php?form=update'.url_param('screenid').
 						'&screenitemid='.$screenitem['screenitemid'].
-						'&templateid='.$templateId;
+						(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '');
 				}
 				elseif ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] == 0) {
 					$action = 'screenedit.php?form=update'.url_param('screenid').
 						'&x='.$c.
 						'&y='.$r.
-						'&templateid='.$templateId;
+						(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '');
 				}
 				else {
 					$action = null;
@@ -415,13 +414,13 @@ class CScreenBuilder {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
 							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').
 								'&screenitemid='.$screenitem['screenitemid'].
-								'&templateid='.$templateId;
+								(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '');
 						}
 						elseif ($this->mode == SCREEN_MODE_EDIT && empty($screenitem['screenitemid'])) {
 							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').
 								'&x='.$c.
 								'&y='.$r.
-								'&templateid='.$templateId;
+								(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '');
 						}
 
 						$item = $screenBase->get();
@@ -487,13 +486,13 @@ class CScreenBuilder {
 				if ($emptyScreenRow) {
 					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].
 						'&rmv_row='.$r.
-						'&templateid='.$templateId.'";';
+						(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'";';
 				}
 				else {
 					$removeRowLink = 'javascript: if (Confirm("'._('This screen-row is not empty. Delete it?').'")) {'.
 						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
 							'&rmv_row='.$r.
-							'&templateid='.$templateId.'"; }';
+						(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'"; }';
 				}
 
 				$icon->addAction('onclick', $removeRowLink);
@@ -509,7 +508,7 @@ class CScreenBuilder {
 			$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].
 				'&add_row='.$this->screen['vsize'].
-				'&templateid='.$templateId.'";');
+				(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'";');
 			$newColumns = array(new CCol($icon));
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
@@ -519,13 +518,13 @@ class CScreenBuilder {
 					$removeColumnLink = 'javascript: if (Confirm("'._('This screen-column is not empty. Delete it?').'")) {'.
 						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
 							'&rmv_col='.$i.
-							'&templateid='.$templateId.'"; }';
+							(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'"; }';
 				}
 				else {
 					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1'.
 						'&screenid='.$this->screen['screenid'].
 						'&rmv_col='.$i.
-						'&templateid='.$templateId.'";';
+						(($this->screen['templateid'] != 0) ? '&templateid='.$this->screen['templateid'] : '').'";';
 				}
 
 				$icon->addAction('onclick', $removeColumnLink);
