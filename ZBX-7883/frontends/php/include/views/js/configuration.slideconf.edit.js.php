@@ -97,9 +97,7 @@
 		}
 
 		if (initSize < 2) {
-			jQuery(document).ready(function() {
-				initSortable();
-			});
+			initSortable();
 		}
 
 		createPlaceholders();
@@ -153,7 +151,7 @@
 		});
 	}
 
-	jQuery(document).ready(function() {
+	jQuery(function() {
 		initSortable();
 	});
 	createPlaceholders();
