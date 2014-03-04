@@ -8,7 +8,8 @@ global $LLNW_PERFORMANCE_LINK_ID;
 ?>
 <div style="display: table; height: 99%; width: 99%;">
 <div class="vertical-middle">
-<div class="loginForm">
+<div class="login" style="position: relative !important;">
+<div class="loginForm" style="position: relative !important;">
 	<div style="position: relative; color: #F0F0F0; height: 100%;">
 		<!-- Search Form -->
 		<div style="height: 100%; padding-top: 100px; padding-right: 40px; margin-left: 275px;">
@@ -29,11 +30,14 @@ global $LLNW_PERFORMANCE_LINK_ID;
 </div>
 </div>
 </div>
+</div>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery('#search').focus();
 		jQuery('#search').height(40);
 		jQuery('#search').css('font-size', 20);
-		jQuery('#searchbttn').height(42);
+		jQuery('#searchbttn').height(40);
+		jQuery('.login .loginForm input[type="text"]').css('border-top-left-radius', '4px');
+		jQuery('.login .loginForm input[type="text"]').css('border-bottom-left-radius', '4px');
 	});
 </script>
