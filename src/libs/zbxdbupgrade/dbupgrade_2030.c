@@ -307,6 +307,23 @@ static int	DBpatch_2030028(void)
 
 #endif
 
+static int	DBpatch_2030029(void)
+{
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=7 where sort_triggers=9"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030030(void)
+{
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=8 where sort_triggers=10"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 DBPATCH_START(2030)
 
 /* version, duplicates flag, mandatory flag */
@@ -340,5 +357,7 @@ DBPATCH_ADD(2030025, 0, 1)
 DBPATCH_ADD(2030026, 0, 1)
 DBPATCH_ADD(2030027, 0, 1)
 DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 0, 1)
+DBPATCH_ADD(2030030, 0, 1)
 
 DBPATCH_END()
