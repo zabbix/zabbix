@@ -211,6 +211,11 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 	zbx_vector_ptr_append(updates, update);
 }
 
+static void	zbx_status_update_free(zbx_status_update_t *update)
+{
+	zbx_free(update);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: its_itservices_load_children                                     *
@@ -537,44 +542,50 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
 	}
 
-	zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
-	zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
-
 	/* write service status changes into database */
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < updates.values_num; i++)
+	if (0 != updates.values_num)
 	{
-		zbx_status_update_t	*update = updates.values[i];
+		zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update services"
-				" set status=%d"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				update->status, update->sourceid);
+		for (i = 0; i < updates.values_num; i++)
+		{
+			zbx_status_update_t	*update = updates.values[i];
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update services"
+					" set status=%d"
+					" where serviceid=" ZBX_FS_UI64 ";\n",
+					update->status, update->sourceid);
+
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
-	/* write generated service alarms into database */
-	alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
-
-	for (i = 0; i < alarms->values_num; i++)
+	if (0 != alarms->values_num)
 	{
-		zbx_status_update_t	*update = alarms->values[i];
+		/* write generated service alarms into database */
+		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
+
+		for (i = 0; i < alarms->values_num; i++)
+		{
+			zbx_status_update_t	*update = alarms->values[i];
 
 #ifdef HAVE_MULTIROW_INSERT
-		if (16 > sql_offset || 0 == i)
+			if (16 > sql_offset || 0 == i)
 #endif
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
-				alarmid++, update->sourceid, update->status, update->clock);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
+					alarmid++, update->sourceid, update->status, update->clock);
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto out;
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -596,7 +607,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 out:
 	zbx_free(sql);
 
-	zbx_vector_ptr_clean(&updates, free);
+	zbx_vector_ptr_clean(&updates, (zbx_mem_free_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
@@ -637,7 +648,6 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	its_itservices_init(&itservices);
 
-	zbx_vector_ptr_create(&alarms);
 	zbx_vector_uint64_create(&triggerids);
 
 	for (i = 0; i < updates->values_num; i++)
@@ -655,6 +665,14 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	zbx_vector_uint64_destroy(&triggerids);
 
+	if (0 == itservices.itservices.num_data)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	zbx_vector_ptr_create(&alarms);
+
 	/* apply status updates */
 	for (j = 0; j < updates->values_num; j++)
 	{
@@ -667,8 +685,11 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 			{
 				zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[i];
 
-				if (SERVICE_ALGORITHM_NONE == itservice->algorithm || itservice->status == update->status)
+				if (SERVICE_ALGORITHM_NONE == itservice->algorithm ||
+						itservice->status == update->status)
+				{
 					continue;
+				}
 
 				its_updates_append(&alarms, itservice->serviceid, update->status, update->clock);
 				itservice->status = update->status;
@@ -681,19 +702,22 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 				/* update parent services */
 				for (i = 0; i < itservice->parents.values_num; i++)
-					its_itservice_update_status(itservice->parents.values[i], update->clock, &alarms);
+				{
+					its_itservice_update_status(itservice->parents.values[i], update->clock,
+							&alarms);
+				}
 			}
 		}
 	}
 
 	ret = its_write_status_and_alarms(&itservices, &alarms);
 
-	zbx_vector_ptr_clean(&alarms, free);
+	zbx_vector_ptr_clean(&alarms, (zbx_mem_free_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&alarms);
-
+out:
 	its_itservices_clean(&itservices);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -714,31 +738,38 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
  ******************************************************************************/
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 {
-	int			i, ret;
-	const DB_EVENT		*event;
+	const char		*__function_name = "DBupdate_itservices";
+
+	int			i, ret = SUCCEED;
 	zbx_vector_ptr_t	updates;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&updates);
 
-	LOCK_ITSERVICES;
-
 	for (i = 0; i < events_num; i++)
 	{
-		event = &events[i];
-
-		if (EVENT_SOURCE_TRIGGERS != event->source)
+		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 
-		its_updates_append(&updates, event->objectid, TRIGGER_VALUE_OK == event->value ?
-				event->trigger.priority : 0, event->clock);
+		its_updates_append(&updates, events[i].objectid, TRIGGER_VALUE_PROBLEM == events[i].value ?
+				events[i].trigger.priority : 0, events[i].clock);
 	}
 
-	ret = its_flush_updates(&updates);
+	if (0 != updates.values_num)
+	{
+		LOCK_ITSERVICES;
 
-	zbx_vector_ptr_clean(&updates, free);
+		ret = its_flush_updates(&updates);
+
+		UNLOCK_ITSERVICES;
+
+		zbx_vector_ptr_clean(&updates, free);
+	}
+
 	zbx_vector_ptr_destroy(&updates);
 
-	UNLOCK_ITSERVICES;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -762,15 +793,17 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	updates;
-	int			i, ret = FAIL;
+	int			i, ret = FAIL, now;
 
 	if (0 == triggerids_num)
 		return SUCCEED;
 
+	now = time(NULL);
+
 	zbx_vector_ptr_create(&updates);
 
 	for (i = 0; i < triggerids_num; i++)
-		its_updates_append(&updates, triggerids[i], 0, 0);
+		its_updates_append(&updates, triggerids[i], 0, now);
 
 	LOCK_ITSERVICES;
 
@@ -786,10 +819,10 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 
 	zbx_free(sql);
 out:
-	zbx_vector_ptr_clean(&updates, free);
-	zbx_vector_ptr_destroy(&updates);
-
 	UNLOCK_ITSERVICES;
+
+	zbx_vector_ptr_clean(&updates, (zbx_mem_free_func_t)zbx_status_update_free);
+	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
 }
@@ -807,6 +840,3 @@ void	zbx_destroy_itservices_lock()
 {
 	zbx_mutex_destroy(&itservices_lock);
 }
-
-
-
