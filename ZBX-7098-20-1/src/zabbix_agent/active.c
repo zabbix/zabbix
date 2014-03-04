@@ -51,7 +51,7 @@ static int			regexps_alloc = 0;
 static int			regexps_num = 0;
 #endif
 
-static void	init_active_metrics()
+static void	init_active_metrics(void)
 {
 	size_t	sz;
 
@@ -74,7 +74,7 @@ static void	init_active_metrics()
 	}
 }
 
-static void	disable_all_metrics()
+static void	disable_all_metrics(void)
 {
 	int	i;
 
@@ -85,7 +85,7 @@ static void	disable_all_metrics()
 }
 
 #ifdef _WINDOWS
-static void	free_active_metrics()
+static void	free_active_metrics(void)
 {
 	int	i;
 
@@ -105,7 +105,7 @@ static void	free_active_metrics()
 }
 #endif
 
-static int	get_min_nextcheck()
+static int	get_min_nextcheck(void)
 {
 	int	i, min = -1;
 
