@@ -207,8 +207,7 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds, int count,
 		int timestamp, const zbx_timespec_t *ts);
-static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values,
-		int values_num);
+static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
 static void	vch_item_clean_cache(zbx_vc_item_t *item);
 
 /******************************************************************************************************************
@@ -1520,9 +1519,9 @@ out:
  *                                                                            *
  * Purpose: copies value in the specified item's chunk slot                   *
  *                                                                            *
- * Parameters: chunk   - [IN/OUT] the target chunk                            *
- *             index   - [IN] the target slot                                 *
- *             value   - [IN] the value  to copy                              *
+ * Parameters: chunk        - [IN/OUT] the target chunk                       *
+ *             index        - [IN] the target slot                            *
+ *             source_value - [IN] the value to copy                          *
  *                                                                            *
  * Return value: SUCCEED - the value was copied successfully                  *
  *               FAIL    - the value copying failed (not enough space for     *
@@ -1539,13 +1538,12 @@ static int	vch_item_copy_value(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int i
 	int			ret = FAIL;
 
 	value = &chunk->slots[index];
-	memset(value, 0, sizeof(zbx_history_record_t));
 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			if (NULL == (value->value.str =  vc_item_strdup(item, source_value->value.str)))
+			if (NULL == (value->value.str = vc_item_strdup(item, source_value->value.str)))
 				goto out;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
@@ -1554,10 +1552,8 @@ static int	vch_item_copy_value(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int i
 			break;
 		default:
 			value->value = source_value->value;
-			break;
 	}
 	value->timestamp = source_value->timestamp;
-	item->values_total++;
 
 	ret = SUCCEED;
 out:
@@ -1570,9 +1566,9 @@ out:
  *                                                                            *
  * Purpose: copies values at the beginning of item tail chunk                 *
  *                                                                            *
- * Parameters: item    - [IN/OUT] the target item                             *
- *             values  - [IN] the values to copy                              *
- *             nvalues - [IN] the number of values to copy                    *
+ * Parameters: item       - [IN/OUT] the target item                          *
+ *             values     - [IN] the values to copy                           *
+ *             values_num - [IN] the number of values to copy                 *
  *                                                                            *
  * Return value: SUCCEED - the values were copied successfully                *
  *               FAIL    - the value copying failed (not enough space for     *
@@ -1582,7 +1578,7 @@ out:
  *           str, text and log type values are stored in cache string pool.   *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int nvalues)
+static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
 	int	i, ret = FAIL, first_value = item->tail->first_value;
 
@@ -1590,7 +1586,7 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			for (i = nvalues - 1; i >= 0; i--)
+			for (i = values_num - 1; i >= 0; i--)
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
@@ -1604,7 +1600,7 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			for (i = nvalues - 1; i >= 0; i--)
+			for (i = values_num - 1; i >= 0; i--)
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
@@ -1618,9 +1614,9 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 
 			break;
 		default:
-			memcpy(&item->tail->slots[item->tail->first_value - nvalues], values,
-					nvalues * sizeof(zbx_history_record_t));
-			item->tail->first_value -= nvalues;
+			memcpy(&item->tail->slots[item->tail->first_value - values_num], values,
+					values_num * sizeof(zbx_history_record_t));
+			item->tail->first_value -= values_num;
 			ret = SUCCEED;
 	}
 out:
@@ -1753,10 +1749,11 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_record_t *value)
 {
-	int				ret = FAIL, index, sindex, nslots = 0;
-	zbx_vc_chunk_t			*head = item->head, *chunk, *schunk;
+	int		ret = FAIL, index, sindex, nslots = 0;
+	zbx_vc_chunk_t	*head = item->head, *chunk, *schunk;
 
-	if (NULL != item->head && 0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
+	if (NULL != item->head &&
+			0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
 	{
 		if (0 >= vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
@@ -1780,6 +1777,8 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 		else
 			item->head->last_value++;
 
+		item->values_total++;
+
 		chunk = item->head;
 		index = item->head->last_value;
 
@@ -1790,7 +1789,7 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			chunk = schunk;
 			index = sindex;
 
-			if ((--sindex) < schunk->first_value)
+			if (--sindex < schunk->first_value)
 			{
 				if (NULL == (schunk = schunk->prev))
 				{
@@ -1800,7 +1799,6 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 
 				sindex = schunk->last_value;
 			}
-
 		} while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
 	}
 	else
@@ -1816,6 +1814,8 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 		}
 		else
 			item->head->last_value++;
+
+		item->values_total++;
 
 		chunk = item->head;
 		index = item->head->last_value;
@@ -1946,7 +1946,8 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		if (SUCCEED == (ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records,
 				update_seconds, update_end)) && 0 < records.values_num)
 		{
-			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
 				ret = records.values_num;
 		}
@@ -2009,7 +2010,8 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 		if (SUCCEED == (ret = vc_db_read_values_by_count(item->itemid, item->value_type,
 				&records, count - cache_records, update_end, timestamp, 0)) && 0 < records.values_num)
 		{
-			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
 				ret = records.values_num;
 		}
