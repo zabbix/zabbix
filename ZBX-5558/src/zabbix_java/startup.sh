@@ -38,6 +38,10 @@ if [ -n "$START_POLLERS" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.startPollers=$START_POLLERS"
 fi
 
+# uncomment to enable remote monitoring of the standard JMX objects on the Zabbix Java Gateway itself
+# JAVA_OPTIONS="$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345
+# 	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+
 COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabbix.gateway.JavaGateway"
 
 if [ -n "$PID_FILE" ]; then
