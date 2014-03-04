@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7836] fixed possible crash when a value older than the last item value was added to the value cache (wiper)
 ..F....... [ZBX-7851] fixed item, trigger and discovery rule sorting by "Status" field (Ivo)
 ..F....... [ZBX-7858] fixed some triggers not being displayed in Monitoring -> Triggers (Pavels)
 ...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
