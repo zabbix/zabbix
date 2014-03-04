@@ -418,9 +418,6 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 		return ZBX_NO_POLLER;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & flags))
-		return ZBX_NO_POLLER;
-
 	switch (item_type)
 	{
 		case ITEM_TYPE_SIMPLE:
@@ -2575,9 +2572,11 @@ void	DCsync_configuration(void)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
+				" and i.flags=%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("i.itemid"));
 	isec = zbx_time() - sec;
 
