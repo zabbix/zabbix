@@ -135,8 +135,10 @@ create_macro('{$DNSTEST.IP6.MIN.SERVERS}', 4, undef);
 create_macro('{$DNSTEST.IP4.REPLY.MS}', 200, undef);
 create_macro('{$DNSTEST.IP6.REPLY.MS}', 200, undef);
 
-create_macro('{$DNSTEST.DNS.TCP.RTT}', 1500, undef);
-create_macro('{$DNSTEST.DNS.UDP.RTT}', 500, undef);
+create_macro('{$DNSTEST.DNS.TCP.RTT.LOW}', 1500, undef);
+create_macro('{$DNSTEST.DNS.TCP.RTT.HIGH}', 7500, undef);
+create_macro('{$DNSTEST.DNS.UDP.RTT.LOW}', 500, undef);
+create_macro('{$DNSTEST.DNS.UDP.RTT.HIGH}', 2500, undef);
 create_macro('{$DNSTEST.DNS.UDP.DELAY}', 60, undef);
 create_macro('{$DNSTEST.DNS.TCP.DELAY}', 3000, undef);
 create_macro('{$DNSTEST.DNS.UPDATE.TIME}', 3600, undef);
@@ -144,7 +146,8 @@ create_macro('{$DNSTEST.DNS.PROBE.ONLINE}', 20, undef);
 create_macro('{$DNSTEST.DNS.AVAIL.MINNS}', 2, undef);
 create_macro('{$DNSTEST.DNS.ROLLWEEK.SLA}', 240, undef);
 
-create_macro('{$DNSTEST.RDDS.RTT}', 2000, undef);
+create_macro('{$DNSTEST.RDDS.RTT.LOW}', 2000, undef);
+create_macro('{$DNSTEST.RDDS.RTT.HIGH}', 10000, undef);
 create_macro('{$DNSTEST.RDDS.DELAY}', 300, undef);
 create_macro('{$DNSTEST.RDDS.UPDATE.TIME}', 3600, undef);
 create_macro('{$DNSTEST.RDDS.PROBE.ONLINE}', 10, undef);
@@ -152,9 +155,12 @@ create_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}', 48, undef);
 create_macro('{$DNSTEST.RDDS.MAXREDIRS}', 10, undef);
 
 create_macro('{$DNSTEST.EPP.DELAY}', 300, undef);
-create_macro('{$DNSTEST.EPP.LOGIN.RTT}', 4000, undef);
-create_macro('{$DNSTEST.EPP.UPDATE.RTT}', 4000, undef);
-create_macro('{$DNSTEST.EPP.INFO.RTT}', 2000, undef);
+create_macro('{$DNSTEST.EPP.LOGIN.RTT.LOW}', 4000, undef);
+create_macro('{$DNSTEST.EPP.LOGIN.RTT.HIGH}', 20000, undef);
+create_macro('{$DNSTEST.EPP.UPDATE.RTT.LOW}', 4000, undef);
+create_macro('{$DNSTEST.EPP.UPDATE.RTT.HIGH}', 20000, undef);
+create_macro('{$DNSTEST.EPP.INFO.RTT.LOW}', 2000, undef);
+create_macro('{$DNSTEST.EPP.INFO.RTT.HIGH}', 10000, undef);
 create_macro('{$DNSTEST.EPP.PROBE.ONLINE}', 5, undef);
 create_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}', 48, undef);
 
@@ -1546,7 +1552,7 @@ sub create_dnstest_items {
 	'DNSTEST.DNS.UDP.DELAY',
 	'DNSTEST.RDDS.DELAY',
 	'DNSTEST.EPP.DELAY',
-	'DNSTEST.DNS.UDP.RTT',
+	'DNSTEST.DNS.UDP.RTT.LOW',
 	'DNSTEST.DNS.AVAIL.MINNS')
     {
 	$options = {'name' => '$1 value',
