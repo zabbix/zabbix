@@ -981,13 +981,17 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
  ******************************************************************************/
 static size_t	vc_item_strfree(char *str)
 {
-	void	*ptr = str - REFCOUNT_FIELD_SIZE;
 	size_t	freed = 0;
 
-	if (0 == --(*(uint32_t *)ptr))
+	if (NULL != str)
 	{
-		freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
-		zbx_hashset_remove(&vc_cache->strpool, ptr);
+		void	*ptr = str - REFCOUNT_FIELD_SIZE;
+
+		if (0 == --(*(uint32_t *)ptr))
+		{
+			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
+			zbx_hashset_remove(&vc_cache->strpool, ptr);
+		}
 	}
 
 	return freed;
@@ -1035,8 +1039,7 @@ static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_
 
 	return plog;
 fail:
-	if (NULL != plog->source)
-		vc_item_strfree(plog->source);
+	vc_item_strfree(plog->source);
 
 	__vc_mem_free_func(plog);
 
@@ -1061,15 +1064,16 @@ static size_t	vc_item_logfree(zbx_log_value_t *log)
 {
 	size_t	freed = 0;
 
-	if (NULL != log->source)
+	if (NULL != log)
+	{
 		freed += vc_item_strfree(log->source);
-
-	if (NULL != log->value)
 		freed += vc_item_strfree(log->value);
 
-	__vc_mem_free_func(log);
+		__vc_mem_free_func(log);
+		freed += sizeof(zbx_log_value_t);
+	}
 
-	return freed + sizeof(zbx_log_value_t);
+	return freed;
 }
 
 /******************************************************************************
@@ -1755,7 +1759,7 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 	if (NULL != item->head &&
 			0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
 	{
-		if (0 >= vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
+		if (0 < vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
 			/* If the added value has the same or older timestamp as the first value in cache */
 			/* we can't add it to keep cache consistency. In this case reset the cached_all   */
@@ -1793,7 +1797,9 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			{
 				if (NULL == (schunk = schunk->prev))
 				{
+					memset(&chunk->slots[index], 0, sizeof(zbx_vc_chunk_t));
 					THIS_SHOULD_NEVER_HAPPEN;
+
 					goto out;
 				}
 
