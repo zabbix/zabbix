@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'host' =>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
 	'type' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2,3'),	null),
-	'time' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null),
+	'time' =>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 	'slvItemId' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null)
 );
 check_fields($fields);
@@ -53,7 +53,7 @@ if (get_request('host') && get_request('time') && get_request('slvItemId') && ge
 	CProfile::update('web.dnstest.particulartests.slvItemId', $data['slvItemId'], PROFILE_TYPE_ID);
 	CProfile::update('web.dnstest.particulartests.type', $data['type'], PROFILE_TYPE_ID);
 }
-elseif (!get_request('host') && !get_request('time') && !get_request('slvItemId') && !get_request('type')) {
+elseif (!get_request('host') && !get_request('time') && !get_request('slvItemId') && get_request('type') === null) {
 	$data['host'] = CProfile::get('web.dnstest.particulartests.host');
 	$data['time'] = CProfile::get('web.dnstest.particulartests.time');
 	$data['slvItemId'] = CProfile::get('web.dnstest.particulartests.slvItemId');
