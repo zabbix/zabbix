@@ -2572,7 +2572,7 @@ void	DCsync_configuration(void)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
-				" and i.flags=%d"
+				" and i.flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
