@@ -82,9 +82,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 	log_level = level;
 
-	if (LOG_LEVEL_EMPTY == level)
-		return SUCCEED;
-
 	if (LOG_TYPE_FILE == type && NULL == filename)
 		type = LOG_TYPE_SYSLOG;
 
