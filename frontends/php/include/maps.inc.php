@@ -1205,6 +1205,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				'output' => array('itemid'),
 				'selectApplications' => array('name'),
 				'itemids' => $itemIds,
+				'webitems' => true,
 				'preservekeys' => true
 			));
 
