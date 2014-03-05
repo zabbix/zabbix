@@ -685,7 +685,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'output' => array('name', 'value_type', 'flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		));
 
 		foreach ($itemIds as $itemid) {
@@ -700,11 +700,15 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				if (!in_array($allowedItems[$gitem['itemid']]['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+						$allowedItems[$gitem['itemid']]['name'],
+						$graph['name']
+					));
+				}
 			}
 		}
 	}
@@ -720,6 +724,20 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		// check for "itemid" when updating graph prototype with only "gitemid" passed
+		foreach ($graphs as &$graph) {
+			if (isset($graph['gitems'])) {
+				foreach ($graph['gitems'] as &$gitem) {
+					if (isset($gitem['gitemid']) && !isset($gitem['itemid'])) {
+						$dbGitems = zbx_toHash($dbGraphs[$graph['graphid']]['gitems'], 'gitemid');
+						$gitem['itemid'] = $dbGitems[$gitem['gitemid']]['itemid'];
+					}
+				}
+				unset($gitem);
+			}
+		}
+		unset($graph);
+
 		$itemIds = $this->validateItemsUpdate($graphs);
 
 		$allowedItems = API::Item()->get(array(
@@ -730,11 +748,11 @@ class CGraphPrototype extends CGraphGeneral {
 			'output' => array('name', 'value_type', 'flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 		));
 
-		foreach ($itemIds as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
+		foreach ($itemIds as $itemId) {
+			if (!isset($allowedItems[$itemId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -745,11 +763,15 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				if (!in_array($allowedItems[$gitem['itemid']]['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+						$allowedItems[$gitem['itemid']]['name'],
+						$graph['name']
+					));
+				}
 			}
 		}
 	}

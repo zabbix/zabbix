@@ -679,6 +679,20 @@ class CGraph extends CGraphGeneral {
 	 * @param array $dbGraphs
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		// check for "itemid" when updating graph with only "gitemid" passed
+		foreach ($graphs as &$graph) {
+			if (isset($graph['gitems'])) {
+				foreach ($graph['gitems'] as &$gitem) {
+					if (isset($gitem['gitemid']) && !isset($gitem['itemid'])) {
+						$dbGitems = zbx_toHash($dbGraphs[$graph['graphid']]['gitems'], 'gitemid');
+						$gitem['itemid'] = $dbGitems[$gitem['gitemid']]['itemid'];
+					}
+				}
+				unset($gitem);
+			}
+		}
+		unset($graph);
+
 		$itemIds = $this->validateItemsUpdate($graphs);
 		$this->validateItems($itemIds, $graphs);
 
