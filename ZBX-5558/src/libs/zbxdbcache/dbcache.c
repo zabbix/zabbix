@@ -862,6 +862,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 		}
+
+		DBflush_itservice_updates();
 	}
 clean_triggers:
 	zbx_hashset_destroy(&trigger_info);

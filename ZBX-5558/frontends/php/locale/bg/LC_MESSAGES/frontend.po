@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:24+0200\n"
+"POT-Creation-Date: 2014-03-03 16:18+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1132,7 +1132,7 @@ msgstr "Не може да се добави действие"
 msgid "Cannot add application"
 msgstr "Не може да се добави приложение"
 
-#: api/classes/CTrigger.php:1713
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не може да се добави зависимост от хост към шаблон."
 
@@ -1304,11 +1304,11 @@ msgstr "Не може да се копира тригер \"%1$s:%2$s\", защ�
 msgid "Cannot create another database connection."
 msgstr "Не може да се създаде друга връзка към базата данни."
 
-#: api/classes/CTrigger.php:1747
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr "Не може да създаде циклична зависимост."
 
-#: api/classes/CTrigger.php:1719
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr "Не може да се създаде зависимост на тригера от себе си."
 
@@ -1360,7 +1360,7 @@ msgstr "Не може да се изтрие действието"
 msgid "Cannot delete application"
 msgstr "Не може да се изтрие приложението"
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1460
 msgid "Cannot delete dependency"
 msgstr "Не може да се изтрие зависимостта"
 
@@ -1673,7 +1673,7 @@ msgstr "Не може да се изгради дървовидна структ
 msgid "Cannot have empty visible template name"
 msgstr "Видимото име на шаблон не може да бъде празно"
 
-#: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
+#: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
 #: api/classes/CTriggerPrototype.php:1008
 #: api/classes/CTriggerPrototype.php:1066
 #, php-format
@@ -2701,7 +2701,7 @@ msgstr "Създадено: елемент на данните \"%1$s\" в \"%2$
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: елемент на данните прототип \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1482
+#: api/classes/CTrigger.php:1501
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Тригер \"%1$s\" в \"%2$s\"."
@@ -3470,7 +3470,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr "Изтрито: Шаблон \"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1246
+#: api/classes/CTrigger.php:1250
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Тригер \"%1$s\" on \"%2$s\"."
@@ -3937,7 +3937,7 @@ msgstr "Първо влизане в падащо меню \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запомни избраното в падащо меню \"%1$s\"."
 
-#: api/classes/CTrigger.php:1889
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублиране на зависимостите в тригер \"%1$s\"."
@@ -4065,8 +4065,8 @@ msgstr "Състояние на действие празно."
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:909
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -6234,15 +6234,15 @@ msgstr "Зададено е неправилно ID на екран \"%s\" за 
 msgid "Incorrect screen provided for slide show."
 msgstr "Зададен е неправилен екран за слайдшоу."
 
-#: include/services.inc.php:490 include/services.inc.php:499
+#: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
 msgstr "Неправилно време за приключване на услугата."
 
-#: include/services.inc.php:487 include/services.inc.php:496
+#: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
 msgstr "Неправилно време за започване на услугата."
 
-#: include/services.inc.php:481
+#: include/services.inc.php:482
 msgid "Incorrect service time type."
 msgstr "Неправилен тип време за услугата."
 
@@ -8472,8 +8472,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
+#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:824
 #: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
@@ -8679,7 +8679,7 @@ msgstr "Непотвърдено"
 msgid "Not Templated items"
 msgstr "Няма шаблонни елементи на данните"
 
-#: api/classes/CTrigger.php:1792
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не всички шаблони са свързани към \"%s\"."
@@ -10919,7 +10919,7 @@ msgstr "Услуга изтрита"
 msgid "Service port"
 msgstr "Порт на услуга"
 
-#: include/services.inc.php:504
+#: include/services.inc.php:505
 msgid "Service start time must be less than end time."
 msgstr "Времето за стартиране на услугата трябва да бъде по-малко от крайното време."
 
@@ -11939,7 +11939,7 @@ msgstr "Тригер \"%1$s\" не разполага с прототип еле
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Тригер \"%1$s\" пропуснат - потребителско правило."
 
-#: api/classes/CTrigger.php:1931
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
@@ -11949,7 +11949,7 @@ msgstr "Тригер \"%s\" принадлежи към шаблони с раз
 msgid "Trigger added"
 msgstr "Тригер добавен"
 
-#: api/classes/CTrigger.php:1835
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "Тригерът не може да бъде зависим от тригер, който е наследен от него."
 
@@ -12505,7 +12505,7 @@ msgstr "Актуализирано: Елемент на данните \"%1$s\" 
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Прототип на елемент на данните \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1586
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Тригер \"%1$s\" в \"%2$s\"."

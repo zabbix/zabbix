@@ -382,13 +382,14 @@ function update_services_rec($serviceid) {
  * Retrieves the service linked to given trigger, sets it's status to $status and propagates the status change
  * to the parent services.
  *
- * @param $triggerid
- * @param $status
+ * @param string $triggerId
+ * @param int    $status
  */
-function update_services($triggerid, $status) {
-	DBexecute('UPDATE services SET status='.zbx_dbstr($status).' WHERE triggerid='.zbx_dbstr($triggerid));
+function updateServices($triggerId, $status) {
+	DBexecute('UPDATE services SET status='.zbx_dbstr($status).' WHERE triggerid='.zbx_dbstr($triggerId));
 
-	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerid));
+	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerId));
+
 	while ($row = DBfetch($result)) {
 		add_service_alarm($row['serviceid'], $status, time());
 		update_services_rec($row['serviceid']);
