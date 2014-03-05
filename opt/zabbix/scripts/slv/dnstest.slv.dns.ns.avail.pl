@@ -19,7 +19,7 @@ db_connect();
 
 my $interval = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
-my $cfg_max_value = get_macro_dns_udp_rtt();
+my $cfg_max_value = get_macro_dns_udp_rtt_high();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
@@ -48,5 +48,5 @@ sub check_item_value
 {
     my $value = shift;
 
-    return (is_service_error($value) == SUCCESS or $value > RTT_LIMIT_MULTIPLIER * $cfg_max_value) ? FAIL : SUCCESS;
+    return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? FAIL : SUCCESS;
 }

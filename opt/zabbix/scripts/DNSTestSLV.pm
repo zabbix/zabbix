@@ -31,8 +31,6 @@ use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant API_OUTPUT_REFER => 'refer'; # TODO: OBSOLETE AFTER API
 use constant TRIGGER_VALUE_TRUE => 1;
 
-use constant RTT_LIMIT_MULTIPLIER => 5;
-
 use constant SECONDS_WEEK => 604800;
 
 use constant SENDER_BATCH_COUNT => 250;
@@ -42,13 +40,14 @@ our ($result, $dbh, $tld);
 our %OPTS; # command-line options
 
 our @EXPORT = qw($result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RDDS_UP RTT_LIMIT_MULTIPLIER SLV_UNAVAILABILITY_LIMIT
+		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
-		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt get_macro_dns_tcp_rtt get_macro_rdds_rtt
-		get_macro_dns_udp_delay get_macro_dns_tcp_delay get_macro_rdds_delay
+		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
+		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
+		get_macro_rdds_delay
 		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
-		get_macro_epp_rtt get_item_data get_lastclock get_tlds
+		get_macro_epp_rtt_low get_item_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
@@ -97,19 +96,24 @@ sub get_macro_rdds_rollweek_sla
     return __get_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}');
 }
 
-sub get_macro_dns_udp_rtt
+sub get_macro_dns_udp_rtt_high
 {
-    return __get_macro('{$DNSTEST.DNS.UDP.RTT}');
+    return __get_macro('{$DNSTEST.DNS.UDP.RTT.HIGH}');
 }
 
-sub get_macro_dns_tcp_rtt
+sub get_macro_dns_udp_rtt_low
 {
-    return __get_macro('{$DNSTEST.DNS.TCP.RTT}');
+    return __get_macro('{$DNSTEST.DNS.UDP.RTT.LOW}');
 }
 
-sub get_macro_rdds_rtt
+sub get_macro_dns_tcp_rtt_low
 {
-    return __get_macro('{$DNSTEST.RDDS.RTT}');
+    return __get_macro('{$DNSTEST.DNS.TCP.RTT.LOW}');
+}
+
+sub get_macro_rdds_rtt_low
+{
+    return __get_macro('{$DNSTEST.RDDS.RTT.LOW}');
 }
 
 sub get_macro_dns_udp_delay
@@ -152,9 +156,9 @@ sub get_macro_epp_rollweek_sla
     return __get_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}');
 }
 
-sub get_macro_epp_rtt
+sub get_macro_epp_rtt_low
 {
-    return __get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT}');
+    return __get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT.LOW}');
 }
 
 sub get_item_data

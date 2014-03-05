@@ -47,8 +47,6 @@
 #define COMMAND_BUF_SIZE	1024
 #define XML_VALUE_BUF_SIZE	512
 
-#define RTT_LIMIT_MULTIPLIER	5
-
 #define EPP_BASE_DIR			"/opt/zabbix/epp"
 #define EPP_COMMANDS_DIR		"commands"
 #define EPP_CERTS_DIR			"certs"
@@ -1213,15 +1211,6 @@ static void	zbx_clean_nss(zbx_ns_t *nss, size_t nss_num)
 	}
 }
 
-static int	rtt_over_limit(int rtt, int rtt_limit)
-{
-	if (rtt > rtt_limit * RTT_LIMIT_MULTIPLIER)
-		return SUCCEED;
-
-	/* not over limit */
-	return FAIL;
-}
-
 static int	is_service_err(int ec)
 {
 	if (0 > ec && -200 >= ec && ec > ZBX_NO_VALUE)
@@ -1231,9 +1220,11 @@ static int	is_service_err(int ec)
 	return FAIL;
 }
 
+/* The ns is considered non-working only in case it was the one to blame. Resolver */
+/* and internal errors do not count. Another case of ns fail is slow response.     */
 static int	rtt_result(int rtt, int rtt_limit)
 {
-	if (SUCCEED == is_service_err(rtt) || SUCCEED == rtt_over_limit(rtt, rtt_limit))
+	if (SUCCEED == is_service_err(rtt) || rtt > rtt_limit)
 		return FAIL;
 
 	return SUCCEED;
@@ -1319,7 +1310,7 @@ FILE	*open_item_log(const char *domain, const char *prefix, char *err, size_t er
 
 	if (NULL == CONFIG_LOG_FILE)
 	{
-		zbx_strlcpy(err, "zabbix log file (LogFile) is not set", err_size);
+		zbx_strlcpy(err, "zabbix log file configuration parameter (LogFile) is not set", err_size);
 		return NULL;
 	}
 
@@ -1532,8 +1523,6 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck,
 					strlen(keyname) + 1, items, items_num);
 
-			/* The ns is considered non-working only in case it was the one to blame. Resolver */
-			/* and internal errors do not count. Another case of ns fail is slow response.     */
 			if (SUCCEED != rtt_result(rtt, rtt_limit))
 				nss[i].result = FAIL;
 		}

@@ -1552,7 +1552,7 @@ sub create_dnstest_items {
 	'DNSTEST.DNS.UDP.DELAY',
 	'DNSTEST.RDDS.DELAY',
 	'DNSTEST.EPP.DELAY',
-	'DNSTEST.DNS.UDP.RTT.LOW',
+	'DNSTEST.DNS.UDP.RTT.HIGH',
 	'DNSTEST.DNS.AVAIL.MINNS')
     {
 	$options = {'name' => '$1 value',

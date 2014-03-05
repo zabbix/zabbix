@@ -92,7 +92,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	if ($data['type'] == DNSTEST_DNS) {
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
-		$calculatedItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT;
+		$calculatedItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT_HIGH;
 	}
 
 	// get host with calculated items
@@ -136,7 +136,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			if ($macroItem['key_'] == CALCULATED_ITEM_DNS_AVAIL_MINNS) {
 				$minDnsCount = $macroItemValue['value'];
 			}
-			elseif ($macroItem['key_'] == CALCULATED_ITEM_DNS_UDP_RTT) {
+			elseif ($macroItem['key_'] == CALCULATED_ITEM_DNS_UDP_RTT_HIGH) {
 				$udpRtt = $macroItemValue['value'];
 			}
 			else {
@@ -326,7 +326,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			if (!$itemValue) {
 				$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_NO_RESULT;
 			}
-			elseif ($itemValue['value'] < $udpRtt * 5 && $itemValue['value'] > DNSTEST_NO_REPLY_ERROR_CODE) {
+			elseif ($itemValue['value'] < $udpRtt && $itemValue['value'] > DNSTEST_NO_REPLY_ERROR_CODE) {
 				$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_UP;
 			}
 			else {

@@ -153,7 +153,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		exit;
 	}
 
-	$macroItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT;
+	$macroItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT_HIGH;
 
 	if ($data['type'] == DNSTEST_DNS) {
 		$macroItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
@@ -179,7 +179,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 		$macroItemValue = reset($macroItemValue);
 
-		if ($macroItem['key_'] == CALCULATED_ITEM_DNS_UDP_RTT) {
+		if ($macroItem['key_'] == CALCULATED_ITEM_DNS_UDP_RTT_HIGH) {
 			$dnsUdpRtt = $macroItemValue['value'];
 		}
 		else {
@@ -189,7 +189,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	if (!isset($dnsUdpRtt)) {
 		show_error_message(_s(
 			'No permissions to referred item with key "%1$s" or it does not exist!',
-			CALCULATED_ITEM_DNS_UDP_RTT
+			CALCULATED_ITEM_DNS_UDP_RTT_HIGH
 		));
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit;

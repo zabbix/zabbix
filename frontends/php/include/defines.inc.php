@@ -904,7 +904,6 @@ define('DNSTEST_EPP',			3);
 // DNS TEST macros
 define('DNSTEST_PAGE_SLV',			'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
 define('DNSTEST_MIN_DNS_COUNT',		'{$DNSTEST.DNS.AVAIL.MINNS}');
-define('DNSTEST_DNS_UDP_RTT',		'{$DNSTEST.DNS.UDP.RTT}');
 define('DNSTEST_DNS_UDP_DELAY',		'{$DNSTEST.DNS.UDP.DELAY}');
 define('DNSTEST_RDDS_DELAY',		'{$DNSTEST.RDDS.DELAY}');
 
@@ -944,7 +943,7 @@ define('CALCULATED_ITEM_DNS_DELAY',				'dnstest.configvalue[DNSTEST.DNS.UDP.DELA
 define('CALCULATED_ITEM_RDDS_DELAY',			'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
 define('CALCULATED_ITEM_EPP_DELAY',				'dnstest.configvalue[DNSTEST.EPP.DELAY]');
 define('CALCULATED_ITEM_DNS_AVAIL_MINNS',		'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
-define('CALCULATED_ITEM_DNS_UDP_RTT',			'dnstest.configvalue[DNSTEST.DNS.UDP.RTT]');
+define('CALCULATED_ITEM_DNS_UDP_RTT_HIGH',		'dnstest.configvalue[DNSTEST.DNS.UDP.RTT.HIGH]');
 define('CALCULATED_ITEM_SLV_DNS_NS_RTT_UDP',	'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]');
 define('CALCULATED_ITEM_SLV_DNS_NS_RTT_TCP',	'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]');
 define('CALCULATED_ITEM_SLV_DNS_NS_UPD',		'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]');
