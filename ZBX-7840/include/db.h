@@ -521,7 +521,12 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
-void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
+
+int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
+int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
+
+void	zbx_create_itservices_lock();
+void	zbx_destroy_itservices_lock();
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
@@ -560,9 +565,6 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
-
-void	zbx_create_services_lock();
-void	zbx_destroy_services_lock();
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
