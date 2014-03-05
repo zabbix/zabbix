@@ -37,46 +37,55 @@ class CScreenActions extends CScreenBase {
 				$sortorder = ZBX_SORT_UP;
 				$sorttitle = _('Time');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_TIME_DESC:
 				$sortfield = 'clock';
 				$sortorder = ZBX_SORT_DOWN;
 				$sorttitle = _('Time');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
 				$sortfield = 'description';
 				$sortorder = ZBX_SORT_UP;
 				$sorttitle = _('Type');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
 				$sortfield = 'description';
 				$sortorder = ZBX_SORT_DOWN;
 				$sorttitle = _('Type');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
 				$sortfield = 'status';
 				$sortorder = ZBX_SORT_UP;
 				$sorttitle = _('Status');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_STATUS_DESC:
 				$sortfield = 'status';
 				$sortorder = ZBX_SORT_DOWN;
 				$sorttitle = _('Status');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC:
 				$sortfield = 'retries';
 				$sortorder = ZBX_SORT_UP;
 				$sorttitle = _('Retries left');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC:
 				$sortfield = 'retries';
 				$sortorder = ZBX_SORT_DOWN;
 				$sorttitle = _('Retries left');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_ASC:
 				$sortfield = 'sendto';
 				$sortorder = ZBX_SORT_UP;
 				$sorttitle = _('Recipient(s)');
 				break;
+
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_DESC:
 				$sortfield = 'sendto';
 				$sortorder = ZBX_SORT_DOWN;
@@ -84,7 +93,7 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
+		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.userid'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
@@ -113,21 +122,29 @@ class CScreenActions extends CScreenBase {
 
 		order_result($alerts, $sortfield, $sortorder);
 
+		if ($alerts) {
+			$dbUsers = API::User()->get(array(
+				'output' => array('userid', 'alias', 'name', 'surname'),
+				'userids' => zbx_objectValues($alerts, 'userid'),
+				'preservekeys' => true
+			));
+		}
+
 		// indicator of sort field
 		$sortfieldSpan = new CSpan(array($sorttitle, SPACE));
-		$sortorderSpan = new CSpan(SPACE, ($sortorder == ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
 		$actionTable = new CTableInfo(_('No actions found.'));
 		$actionTable->setHeader(array(
 			is_show_all_nodes() ? _('Nodes') : null,
-			($sortfield == 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
-			($sortfield == 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
-			($sortfield == 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
-			($sortfield == 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),
-			($sortfield == 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
+			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
+			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
+			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
+			($sortfield === 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),
+			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
 			_('Message'),
-			_('Error')
+			_('Info')
 		));
 
 		foreach ($alerts as $alert) {
@@ -144,6 +161,10 @@ class CScreenActions extends CScreenBase {
 				$retries = new CSpan(0, 'red');
 			}
 
+			$recipient = $alert['userid']
+				? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
+				: $alert['sendto'];
+
 			$message = array(
 				bold(_('Subject').NAME_DELIMITER),
 				br(),
@@ -155,17 +176,23 @@ class CScreenActions extends CScreenBase {
 				$alert['message']
 			);
 
-			$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
+			if (zbx_empty($alert['error'])) {
+				$info = '';
+			}
+			else {
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($alert['error'], '', 'on');
+			}
 
 			$actionTable->addRow(array(
 				get_node_name_by_elid($alert['alertid']),
 				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
-				new CCol(!empty($alert['description']) ? $alert['description'] : '-', 'top'),
+				new CCol(zbx_empty($alert['description']) ? '-' : $alert['description'], 'top'),
 				new CCol($status, 'top'),
 				new CCol($retries, 'top'),
-				new CCol($alert['sendto'], 'top'),
+				new CCol($recipient, 'top'),
 				new CCol($message, 'top pre'),
-				new CCol($error, 'wraptext top')
+				new CCol($info, 'wraptext top')
 			));
 		}
 

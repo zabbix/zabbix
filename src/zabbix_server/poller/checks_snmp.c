@@ -688,14 +688,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
 	{
 		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", OID));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
 	if (-1 == snprint_objid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len))
 	{
 		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snprint_objid(): buffer is not large enough: \"%s\".", OID));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
@@ -724,14 +724,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID
 		if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GETNEXT)))	/* create empty PDU */
 		{
 			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
-			ret = NOTSUPPORTED;
+			ret = CONFIG_ERROR;
 			break;
 		}
 
 		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))	/* add OID as variable to PDU */
 		{
 			SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
-			ret = NOTSUPPORTED;
+			ret = CONFIG_ERROR;
 			snmp_free_pdu(pdu);
 			break;
 		}
@@ -893,21 +893,21 @@ static int	zbx_snmp_get_value(struct snmp_session *ss, unsigned char value_type,
 	if (NULL == snmp_parse_oid(snmp_oid, anOID, &anOID_len))
 	{
 		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", snmp_oid));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
 	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
 	{
 		SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
 	if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))
 	{
 		SET_MSG_RESULT(value, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
-		ret = NOTSUPPORTED;
+		ret = CONFIG_ERROR;
 		snmp_free_pdu(pdu);
 		goto out;
 	}
@@ -1029,7 +1029,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	if (NULL == (ss = zbx_snmp_open_session(item, err)))
 	{
 		SET_MSG_RESULT(value, zbx_strdup(NULL, err));
-		ret = NOTSUPPORTED;
+		ret = NETWORK_ERROR;
 		goto out;
 	}
 
@@ -1046,7 +1046,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 			default:
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 						item->snmp_oid));
-				ret = NOTSUPPORTED;
+				ret = CONFIG_ERROR;
 		}
 	}
 	else
@@ -1074,7 +1074,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 					SET_MSG_RESULT(value, zbx_dsprintf(NULL,
 							"Unsupported method \"%s\" in the OID \"%s\".",
 							method, item->snmp_oid));
-					ret = NOTSUPPORTED;
+					ret = CONFIG_ERROR;
 					break;
 				}
 
@@ -1147,7 +1147,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 			default:
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 						item->snmp_oid));
-				ret = NOTSUPPORTED;
+				ret = CONFIG_ERROR;
 		}
 	}
 
