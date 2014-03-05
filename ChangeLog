@@ -1,10 +1,13 @@
 Changes for 2.2.3rc1
 
 New features:
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
 .......PS. [ZBX-7840] fixed icmppingloss[] calculation when a DNS name is pingable by both IPv4 and IPv6 (asaveljevs)
 ..F....... [ZBX-7883] fixed JS error when adding slides in configuration page (Ivo)
 ........S. [ZBX-7836] fixed possible crash when a value older than the last item value was added to the value cache (wiper)
