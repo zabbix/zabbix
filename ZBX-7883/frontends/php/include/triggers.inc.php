@@ -2516,3 +2516,39 @@ function triggerIndicatorStyle($status, $state = null) {
 
 	return 'unknown';
 }
+
+/**
+ * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ *
+ * Keep in sync with orderItemsByStatus().
+ *
+ * @param array  $triggers
+ * @param string $sortorder
+ */
+function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($triggers as $key => $trigger) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+		}
+		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedTriggers = array();
+	foreach ($sort as $key => $val) {
+		$sortedTriggers[$key] = $triggers[$key];
+	}
+	$triggers = $sortedTriggers;
+}
