@@ -65,22 +65,17 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
-	if (CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
-		// save remember login preference
-		DBstart();
+	DBstart();
+	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
+	DBend(true);
 
-		$result = true;
+	if ($loginSuccess) {
+		// save remember login preference
 		$user = array('autologin' => getRequest('autologin', 0));
 
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
-			$result &= (bool) API::User()->updateProfile($user);
+			API::User()->updateProfile($user);
 		}
-
-		if ($result) {
-			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
-		}
-
-		DBend($result);
 
 		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
