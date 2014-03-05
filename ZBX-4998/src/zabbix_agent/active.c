@@ -1461,8 +1461,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(activechk_args.host);
 	free_active_metrics();
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd active check stopped");
-
 	ZBX_DO_EXIT();
 
 	zbx_thread_exit(0);
