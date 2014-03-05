@@ -768,14 +768,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 					ret = FAIL;
 				}
 			}
-			else
+			else if (0 == interfaceids[type - 1])
 			{
-				if (0 == interfaceids[type - 1])
-				{
-					zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
-							zbx_interface_type_string((zbx_interface_type_t)type));
-					ret = FAIL;
-				}
+				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
+						zbx_interface_type_string((zbx_interface_type_t)type));
+				ret = FAIL;
 			}
 		}
 		DBfree_result(tresult);
