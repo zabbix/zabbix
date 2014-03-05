@@ -46,6 +46,14 @@ COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabb
 
 if [ -n "$PID_FILE" ]; then
 
+	# check that the PID file can be created
+
+	touch "$PID_FILE"
+	if [ $? -ne 0 ]; then
+		echo "Zabbix Java Gateway did not start: cannot create PID file"
+		exit 1
+	fi
+
 	# start the gateway and output pretty errors to the console
 
 	STDOUT=`$COMMAND_LINE & echo $! > "$PID_FILE"`
