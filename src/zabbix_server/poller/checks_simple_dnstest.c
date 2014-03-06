@@ -1198,12 +1198,14 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 			continue;
 
 		/* add IP here */
-		ns_entry->ips_num++;
 		if (0 == ns_entry->ips_num)
 			ns_entry->ips = zbx_malloc(NULL, sizeof(char *));
 		else
-			ns_entry->ips = zbx_realloc(ns_entry->ips, ns_entry->ips_num * sizeof(char *));
-		ns_entry->ips[ns_entry->ips_num - 1] = zbx_strdup(NULL, ip);
+			ns_entry->ips = zbx_realloc(ns_entry->ips, (ns_entry->ips_num + 1) * sizeof(char *));
+
+		ns_entry->ips[ns_entry->ips_num] = zbx_strdup(NULL, ip);
+
+		ns_entry->ips_num++;
 	}
 
 	return nss_num;
