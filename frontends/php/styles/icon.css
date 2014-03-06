@@ -85,6 +85,15 @@
 	margin: 0 1px 0 1px;
 }
 
+.service-icon {
+	display: inline-block;
+	vertical-align: middle;
+	height: 14px;
+	width: 14px;
+	background-repeat:no-repeat;
+	margin: 0 1px 0 1px;
+}
+
 .status_icon_extra {
 	margin-top:-2px;
 }

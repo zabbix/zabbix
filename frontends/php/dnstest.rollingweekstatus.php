@@ -168,14 +168,14 @@ if ($data['filter_slv'] > 0
 		}
 
 		if (!isset($options['hostids'])) {
-			$options['hostids'] = 0;
+			$options['hostids'] = null;
 		}
 	}
 }
 
 // disabled services
 if ($data['filter_status'] == 2
-		&& (!isset($options['hostids']) || (isset($options['hostids']) && $options['hostids'] != 0))) {
+		&& (!isset($options['hostids']) || (isset($options['hostids']) && $options['hostids']))) {
 	if (isset($options['hostids'])) {
 		$filtredHost = ' AND '.dbConditionInt('i.hostid', $options['hostids']);
 		unset($options['hostids']);
@@ -197,7 +197,7 @@ if ($data['filter_status'] == 2
 		' WHERE '.dbConditionString('i.key_', $items['key']).
 			$filtredHost.
 		' GROUP BY i.hostid'.
-		' HAVING COUNT(i.itemid)<=2'
+		' HAVING COUNT(i.itemid)<=3'
 	);
 
 	while ($hostId = DBfetch($itemsHostids)) {
@@ -205,7 +205,7 @@ if ($data['filter_status'] == 2
 	}
 
 	if (!isset($options['hostids'])) {
-		$options['hostids'] = 0;
+		$options['hostids'] = null;
 	}
 }
 

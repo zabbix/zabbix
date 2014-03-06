@@ -115,18 +115,18 @@ if (isset($this->data['tld'])) {
 				if ($tld['dns']['incident'] && isset($tld['dns']['availItemId'])
 						&& isset($tld['dns']['itemid'])) {
 					$dnsStatus =  new CLink(
-						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dns']['incident'].
 							'&slvItemId='.$tld['dns']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
 							'&availItemId='.$tld['dns']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+					$dnsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
 				}
 			}
 			else {
-				$dnsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+				$dnsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
 			$dnsValue = ($tld['dns']['lastvalue'] > 0)
@@ -147,7 +147,7 @@ if (isset($this->data['tld'])) {
 			$dns = array(new CSpan($dnsValue, 'right'), $dnsStatus, $dnsGraph);
 		}
 		else {
-			$dns = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
+			$dns = new CDiv(null, 'service-icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dns->setHint('Incorrect TLD configuration.', '', 'on');
 		}
 
@@ -157,18 +157,18 @@ if (isset($this->data['tld'])) {
 				if ($tld['dnssec']['incident'] && isset($tld['dnssec']['availItemId'])
 						&& isset($tld['dnssec']['itemid'])) {
 					$dnssecStatus =  new CLink(
-						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dnssec']['incident'].
 							'&slvItemId='.$tld['dnssec']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
 							'&availItemId='.$tld['dnssec']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$dnssecStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+					$dnssecStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
 				}
 			}
 			else {
-				$dnssecStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+				$dnssecStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
 			$dnssecValue = ($tld['dnssec']['lastvalue'] > 0)
@@ -189,7 +189,7 @@ if (isset($this->data['tld'])) {
 			$dnssec =  array(new CSpan($dnssecValue, 'right'), $dnssecStatus, $dnssecGraph);
 		}
 		else {
-			$dnssec = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
+			$dnssec = new CDiv(null, 'service-icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$dnssec->setHint('DNSSEC is disabled.', '', 'on');
 		}
 
@@ -199,18 +199,18 @@ if (isset($this->data['tld'])) {
 				if ($tld['rdds']['incident'] && isset($tld['rdds']['availItemId'])
 						&& isset($tld['rdds']['itemid'])) {
 					$rddsStatus =  new CLink(
-						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['rdds']['incident'].
 							'&slvItemId='.$tld['rdds']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
 							'&availItemId='.$tld['rdds']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$rddsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+					$rddsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
 				}
 			}
 			else {
-				$rddsStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+				$rddsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
 			$rddsValue = ($tld['rdds']['lastvalue'] > 0)
@@ -231,7 +231,7 @@ if (isset($this->data['tld'])) {
 			$rdds =  array(new CSpan($rddsValue, 'right'), $rddsStatus, $rddsGraph);
 		}
 		else {
-			$rdds = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
+			$rdds = new CDiv(null, 'service-icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$rdds->setHint('RDDS is disabled.', '', 'on');
 		}
 
@@ -241,18 +241,18 @@ if (isset($this->data['tld'])) {
 				if ($tld['epp']['incident'] && isset($tld['epp']['availItemId'])
 						&& isset($tld['epp']['itemid'])) {
 					$eppStatus =  new CLink(
-						new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value'),
+						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
 						'dnstest.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['epp']['incident'].
 							'&slvItemId='.$tld['epp']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
 							'&availItemId='.$tld['epp']['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$eppStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekfail cell-value');
+					$eppStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
 				}
 			}
 			else {
-				$eppStatus =  new CDiv(null, 'status_icon status_icon_extra iconrollingweekok cell-value');
+				$eppStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
 			$eppValue = ($tld['epp']['lastvalue'] > 0)
@@ -273,7 +273,7 @@ if (isset($this->data['tld'])) {
 			$epp =  array(new CSpan($eppValue, 'right'), $eppStatus, $eppGraph);
 		}
 		else {
-			$epp = new CDiv(null, 'status_icon status_icon_extra iconrollingweekdisabled disabled-service');
+			$epp = new CDiv(null, 'service-icon status_icon_extra iconrollingweekdisabled disabled-service');
 			$epp->setHint('EPP is disabled.', '', 'on');
 		}
 		$row = array(
