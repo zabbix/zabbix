@@ -1795,6 +1795,46 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
+    my $options = {'name' => 'Total number of probes with enabled IPv4',
+                                              'key_'=> 'online.nodes.pl[total,ipv4]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 300,
+                                              };
+    create_item($options);                
+
+    $options = {'name' => 'Number of online probes with enabled IPv4',
+                                              'key_'=> 'online.nodes.pl[online,ipv4]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 60,
+                                              };
+    create_item($options);
+
+    my $options = {'name' => 'Total number of probes with enabled IPv6',
+                                              'key_'=> 'online.nodes.pl[total,ipv6]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 300,
+                                              };
+    create_item($options);                
+
+    $options = {'name' => 'Number of online probes with enabled IPv6',
+                                              'key_'=> 'online.nodes.pl[online,ipv6]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 60,
+                                              };
+    create_item($options);
+
     $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
                          'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
                         'priority' => '5',
@@ -1811,6 +1851,20 @@ sub create_probe_status_host {
 
     $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
                          'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
+                        'priority' => '5',
+                };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP4.MIN.SERVERS}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$DNSTEST.IP4.MIN.SERVERS}',
+                        'priority' => '5',
+                };
+
+    create_trigger($options);
+
+    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP6.MIN.SERVERS}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$DNSTEST.IP6.MIN.SERVERS}',
                         'priority' => '5',
                 };
 
