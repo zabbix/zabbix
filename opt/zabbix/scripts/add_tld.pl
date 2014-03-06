@@ -1735,8 +1735,8 @@ sub create_probe_status_host {
 
     my $interfaceid = $zabbix->get('hostinterface', {'hostids' => $hostid, 'output' => ['interfaceid']});
 
-    my $options = {'name' => 'Total number of probes',
-                                              'key_'=> 'online.nodes.pl[total]',
+    my $options = {'name' => 'Total number of probes for DNS tests',
+                                              'key_'=> 'online.nodes.pl[total,dns]',
                                               'hostid' => $hostid,
 					      'interfaceid' => $interfaceid->{'interfaceid'},
                                               'applications' => [get_application_id('Probes availability', $hostid)],
@@ -1745,8 +1745,8 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    $options = {'name' => 'Number of online probes',
-                                              'key_'=> 'online.nodes.pl',
+    $options = {'name' => 'Number of online probes for DNS tests',
+                                              'key_'=> 'online.nodes.pl[online,dns]',
                                               'hostid' => $hostid,
 					      'interfaceid' => $interfaceid->{'interfaceid'},
                                               'applications' => [get_application_id('Probes availability', $hostid)],
@@ -1755,22 +1755,62 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
+    $options = {'name' => 'Total number of probes for EPP tests',
+                                              'key_'=> 'online.nodes.pl[total,epp]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 300,
+                                              };
+    create_item($options);                
+
+    $options = {'name' => 'Number of online probes for EPP tests',
+                                              'key_'=> 'online.nodes.pl[online,epp]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 60,
+                                              };
+    create_item($options);
+
+    $options = {'name' => 'Total number of probes for RDDS tests',
+                                              'key_'=> 'online.nodes.pl[total,rdds]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 300,
+                                              };
+    create_item($options);                
+
+    $options = {'name' => 'Number of online probes for RDDS tests',
+                                              'key_'=> 'online.nodes.pl[online,rdds]',
+                                              'hostid' => $hostid,
+                                              'interfaceid' => $interfaceid->{'interfaceid'},
+                                              'applications' => [get_application_id('Probes availability', $hostid)],
+                                              'type' => 10, 'value_type' => 3,
+                                              'delay' => 60,
+                                              };
+    create_item($options);
+
     $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
+                         'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.RDDS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}',
+                         'expression' => '{'.$name.':online.nodes.pl[online,rdds].last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl.last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
+                         'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
