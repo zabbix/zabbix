@@ -62,3 +62,37 @@ SELECT function, parameter, count(*)
  WHERE function IN ('nodata', 'date', 'dayofmonth', 'dayofweek', 'time', 'now')
  GROUP BY function, parameter;
 ```
+
+
+### Item type states
+
+(rel: [LMN-66](https://support.zabbix.com/browse/LMN-66), item unsupported types inflate the queue)
+
+[Type constants](https://github.llnw.net/Zabbix/svn.zabbix.com/blob/2.2.2%2Bllnw.4/frontends/php/include/defines.inc.php#L318-L334)
+
+[Status constants](https://github.llnw.net/Zabbix/svn.zabbix.com/blob/2.2.2%2Bllnw.4/frontends/php/include/defines.inc.php#L358-L360)
+
+*  0 = Active
+*  1 = Disabled
+*  3 = Not supported
+
+[State constants](https://github.llnw.net/Zabbix/svn.zabbix.com/blob/2.2.2%2Bllnw.4/frontends/php/include/defines.inc.php#L362-L363)
+
+*  0 = Normal
+*  1 = Not supported
+
+```sql
+SELECT COUNT(itemid), {status,type,state}
+ FROM items
+ GROUP BY {status,type,state};
+```
+
+Not supported by key-name:
+
+```sql
+SELECT COUNT(itemid) as count, state, key_
+ FROM items
+ WHERE state=1 AND status!=1
+ GROUP BY key_
+ ORDER BY count DESC;
+```
