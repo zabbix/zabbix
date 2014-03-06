@@ -305,6 +305,14 @@ static int	DBpatch_2030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030029(void)
+{
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -340,5 +348,6 @@ DBPATCH_ADD(2030025, 0, 1)
 DBPATCH_ADD(2030026, 0, 1)
 DBPATCH_ADD(2030027, 0, 1)
 DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 2020001, 0)
 
 DBPATCH_END()
