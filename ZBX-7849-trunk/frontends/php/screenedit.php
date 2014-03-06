@@ -1,0 +1,357 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2014 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/screens.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
+
+$page['title'] = _('Configuration of screens');
+$page['file'] = 'screenedit.php';
+$page['hist_arg'] = array('screenid');
+$page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'screenid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null),
+	'screenitemid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 16),	'isset({save})'),
+	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
+	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({save})',
+		isset($_REQUEST['save']) ? getResourceNameByType($_REQUEST['resourcetype']) : null),
+	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
+	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
+	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null, _('Column span')),
+	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null, _('Row span')),
+	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')),
+	'sort_triggers' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_RECIPIENT_DESC), null),
+	'valign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM), null),
+	'halign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HALIGN_CENTER, HALIGN_RIGHT), null),
+	'style' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 2),	'isset({save})'),
+	'url' =>			array(T_ZBX_STR, O_OPT, null,	null,			'isset({save})'),
+	'dynamic' =>		array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'x' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})&&(isset({form})&&({form}!="update"))'),
+	'y' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})&&(isset({form})&&({form}!="update"))'),
+	'screen_type' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'tr_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'tr_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'application' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
+	// actions
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'add_row' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'add_col' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'rmv_row' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'rmv_col' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'sw_pos' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null)
+);
+check_fields($fields);
+$_REQUEST['dynamic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
+
+/*
+ * Permissions
+ */
+$options = array(
+	'screenids' => $_REQUEST['screenid'],
+	'editable' => true,
+	'output' => API_OUTPUT_EXTEND,
+	'selectScreenItems' => API_OUTPUT_EXTEND
+);
+$screens = API::Screen()->get($options);
+if (empty($screens)) {
+	$screens = API::TemplateScreen()->get($options);
+	if (empty($screens)) {
+		access_deny();
+	}
+}
+$screen = reset($screens);
+
+/*
+ * Ajax
+ */
+if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
+	$sw_pos = get_request('sw_pos', array());
+	if (count($sw_pos) > 3) {
+		DBstart();
+
+		$fitem = DBfetch(DBselect(
+			'SELECT s.screenitemid,s.colspan,s.rowspan'.
+			' FROM screens_items s'.
+			' WHERE s.y='.zbx_dbstr($sw_pos[0]).
+				' AND s.x='.zbx_dbstr($sw_pos[1]).
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
+		));
+
+		$sitem = DBfetch(DBselect(
+			'SELECT s.screenitemid,s.colspan,s.rowspan'.
+			' FROM screens_items s'.
+			' WHERE s.y='.zbx_dbstr($sw_pos[2]).
+				' AND s.x='.zbx_dbstr($sw_pos[3]).
+				' AND s.screenid='.zbx_dbstr($screen['screenid'])
+		));
+
+		if ($fitem) {
+			DBexecute('UPDATE screens_items'.
+						' SET y='.zbx_dbstr($sw_pos[2]).',x='.zbx_dbstr($sw_pos[3]).
+						',colspan='.(isset($sitem['colspan']) ? zbx_dbstr($sitem['colspan']) : 1).
+						',rowspan='.(isset($sitem['rowspan']) ? zbx_dbstr($sitem['rowspan']) : 1).
+						' WHERE y='.zbx_dbstr($sw_pos[0]).
+							' AND x='.zbx_dbstr($sw_pos[1]).
+							' AND screenid='.zbx_dbstr($screen['screenid']).
+							' AND screenitemid='.zbx_dbstr($fitem['screenitemid'])
+			);
+		}
+		if ($sitem) {
+			DBexecute('UPDATE screens_items '.
+						' SET y='.zbx_dbstr($sw_pos[0]).',x='.zbx_dbstr($sw_pos[1]).
+						',colspan='.(isset($fitem['colspan']) ? zbx_dbstr($fitem['colspan']) : 1).
+						',rowspan='.(isset($fitem['rowspan']) ? zbx_dbstr($fitem['rowspan']) : 1).
+						' WHERE y='.zbx_dbstr($sw_pos[2]).
+							' AND x='.zbx_dbstr($sw_pos[3]).
+							' AND screenid='.zbx_dbstr($screen['screenid']).
+							' AND screenitemid='.zbx_dbstr($sitem['screenitemid'])
+			);
+		}
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Screen items switched');
+
+		DBend(true);
+	}
+	echo '{"result": true}';
+}
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
+/*
+ * Actions
+ */
+if (isset($_REQUEST['save'])) {
+	$screenItem = array(
+		'screenid' => get_request('screenid'),
+		'resourceid' => get_request('resourceid'),
+		'resourcetype' => get_request('resourcetype'),
+		'caption' => get_request('caption'),
+		'style' => get_request('style'),
+		'url' => get_request('url'),
+		'width' => get_request('width'),
+		'height' => get_request('height'),
+		'halign' => get_request('halign'),
+		'valign' => get_request('valign'),
+		'colspan' => get_request('colspan'),
+		'rowspan' => get_request('rowspan'),
+		'dynamic' => get_request('dynamic'),
+		'elements' => get_request('elements', 0),
+		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
+		'application' => get_request('application', '')
+	);
+
+	DBstart();
+
+	if (!empty($_REQUEST['screenitemid'])) {
+		$screenItem['screenitemid'] = $_REQUEST['screenitemid'];
+
+		$messageSuccess = _('Item updated');
+		$messageFailed = _('Cannot update item');
+
+		$result = API::ScreenItem()->update($screenItem);
+	}
+	else {
+		$screenItem['x'] = get_request('x');
+		$screenItem['y'] = get_request('y');
+
+		$messageSuccess = _('Item added');
+		$messageFailed = _('Cannot add item');
+
+		$result = API::ScreenItem()->create($screenItem);
+	}
+
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Cell changed '.
+			(isset($_REQUEST['screenitemid']) ? 'screen itemid "'.$_REQUEST['screenitemid'].'"' : '').
+			(isset($_REQUEST['x']) && isset($_REQUEST['y']) ? ' coordinates "'.$_REQUEST['x'].','.$_REQUEST['y'].'"' : '').
+			(isset($_REQUEST['resourcetype']) ? ' resource type "'.$_REQUEST['resourcetype'].'"' : '')
+		);
+		unset($_REQUEST['form']);
+	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+}
+elseif (isset($_REQUEST['delete'])) {
+	DBstart();
+
+	$screenitemid = API::ScreenItem()->delete($_REQUEST['screenitemid']);
+
+	if ($screenitemid) {
+		$screenitemid = reset($screenitemid);
+		$screenitemid = reset($screenitemid);
+		add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			'Screen itemid "'.$screenitemid.'"'
+		);
+	}
+	unset($_REQUEST['x']);
+
+	$result = DBend($screenitemid);
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+}
+elseif (isset($_REQUEST['add_row'])) {
+	DBstart();
+
+	$result = DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+
+	$add_row = getRequest('add_row', 0);
+	if ($screen['vsize'] > $add_row) {
+		$result &= DBexecute(
+			'UPDATE screens_items'.
+			' SET y=(y+1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND y>='.zbx_dbstr($add_row)
+		);
+	}
+
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Row added')
+		);
+	}
+
+	DBend($result);
+}
+elseif (isset($_REQUEST['add_col'])) {
+	DBstart();
+
+	$result = DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+
+	$add_col = getRequest('add_col', 0);
+	if ($screen['hsize'] > $add_col) {
+		$result &= DBexecute(
+			'UPDATE screens_items'.
+			' SET x=(x+1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND x>='.zbx_dbstr($add_col)
+		);
+	}
+
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Column added')
+		);
+	}
+
+	DBend($result);
+}
+elseif (isset($_REQUEST['rmv_row'])) {
+	if ($screen['vsize'] > 1) {
+		$rmv_row = getRequest('rmv_row', 0);
+
+		DBstart();
+
+		$result = DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		$result &= DBexecute(
+			'DELETE FROM screens_items'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND y='.zbx_dbstr($rmv_row)
+		);
+		$result &= DBexecute(
+			'UPDATE screens_items'.
+			' SET y=(y-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND y>'.zbx_dbstr($rmv_row)
+		);
+
+		if ($result) {
+			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+				_('Row deleted')
+			);
+		}
+
+		DBend($result);
+	}
+	else {
+		error(_('Screen should contain at least one row and column.'));
+		show_error_message(_('Impossible to remove last row and column.'));
+	}
+}
+elseif (isset($_REQUEST['rmv_col'])) {
+	if ($screen['hsize'] > 1) {
+		$rmv_col = getRequest('rmv_col', 0);
+
+		DBstart();
+
+		$result = DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		$result &= DBexecute(
+			'DELETE FROM screens_items'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND x='.zbx_dbstr($rmv_col)
+		);
+		$result &= DBexecute(
+			'UPDATE screens_items'.
+			' SET x=(x-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND x>'.zbx_dbstr($rmv_col)
+		);
+
+		if ($result) {
+			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+				_('Column deleted')
+			);
+		}
+
+		DBend($result);
+	}
+	else {
+		error(_('Screen should contain at least one row and column.'));
+		show_error_message(_('Impossible to remove last row and column.'));
+	}
+}
+
+/*
+ * Display
+ */
+$data = array(
+	'screenid' => get_request('screenid', 0)
+);
+
+// getting updated screen, so we wont have to refresh the page to see changes
+$data['screen'] = API::Screen()->get($options);
+if (empty($data['screen'])) {
+	$data['screen'] = API::TemplateScreen()->get($options);
+	if (empty($data['screen'])) {
+		access_deny();
+	}
+}
+$data['screen'] = reset($data['screen']);
+
+// render view
+$screenView = new CView('configuration.screen.constructor.list', $data);
+$screenView->render();
+$screenView->show();
+
+require_once dirname(__FILE__).'/include/page_footer.php';
