@@ -81,8 +81,8 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-					'a.userid,a.actionid'.
+		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
+					'a.userid,a.actionid,a.mediatypeid,mt.description'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
@@ -130,9 +130,9 @@ class CScreenActions extends CScreenBase {
 			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			_('Action'),
 			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
-			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
 			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
 			_('Message'),
+			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
 			_('Info')
 		));
 
@@ -184,10 +184,11 @@ class CScreenActions extends CScreenBase {
 				get_node_name_by_elid($alert['alertid']),
 				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
 				new CCol($actions[$alert['actionid']]['name'], 'top'),
-				new CCol(zbx_empty($alert['description']) ? '-' : $alert['description'], 'top'),
-				new CCol($status, 'top'),
+				new CCol(($alert['mediatypeid'] == 0 || zbx_empty($alert['description']))
+					? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),
 				new CCol($message, 'top pre'),
+				new CCol($status, 'top'),
 				new CCol($info, 'wraptext top')
 			));
 		}
