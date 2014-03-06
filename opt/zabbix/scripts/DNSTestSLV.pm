@@ -13,7 +13,7 @@ use constant SUCCESS => 0;
 use constant FAIL => 1;
 use constant UP => 1;
 use constant DOWN => 0;
-use constant SLV_UNAVAILABILITY_LIMIT => 49;	# NB! this has to be in sync with frontend configuration
+use constant SLV_UNAVAILABILITY_LIMIT => 49; # NB! must be in sync with frontend
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
 use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
@@ -30,6 +30,7 @@ use constant EVENT_OBJECT_TRIGGER => 0;
 use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant API_OUTPUT_REFER => 'refer'; # TODO: OBSOLETE AFTER API
 use constant TRIGGER_VALUE_TRUE => 1;
+use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
 
 use constant SECONDS_WEEK => 604800;
 
@@ -1390,38 +1391,50 @@ sub __get_eventtimes
 
     # select events, where time_from < filter_from and value = TRIGGER_VALUE_TRUE
     $res = db_select(
-	"select clock,value".
+	"select clock,value,false_positive".
 	" from events".
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
 		" and clock<$from".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-	" order by clock desc".
+	" order by clock,ns desc".
 	" limit 1");
 
     while (my @row = $res->fetchrow_array)
     {
 	my $clock = $row[0];
 	my $value = $row[1];
+	my $false_positive = $row[2];
 
-	# we cannot add 'value=TRIGGER_VALUE_TRUE' to the SQL query as this way
-	# we might ignore the latest value with value not TRIGGER_VALUE_TRUE
-	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE);
+	# we cannot add 'value=TRIGGER_VALUE_TRUE' and 'false_positive!=INCIDENT_FALSE_POSITIVE'
+	# to the SQL query above as we need the latest event before $from
+	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE);
     }
 
     $res = db_select(
-	"select clock from events".
+	"select clock,value,false_positive from events".
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-		" and clock between $from and $till");
+		" and clock between $from and $till".
+	" order by clock,ns");
 
-    my (@unsorted_eventtimes, @row);
+    my (@unsorted_eventtimes, @row, $add_event);
+    $add_event = 1;
     while (@row = $res->fetchrow_array)
     {
-	push(@unsorted_eventtimes, $row[0]);
+	my $clock = $row[0];
+	my $value = $row[1];
+	my $false_positive = $row[2];
+
+	if ($value == TRIGGER_VALUE_TRUE)
+	{
+	    $add_event = ($false_positive == INCIDENT_FALSE_POSITIVE) ? 0 : 1;
+	}
+
+	push(@unsorted_eventtimes, $clock) if ($add_event == 1);
     }
 
     push(@eventtimes, $_) foreach (sort(@unsorted_eventtimes));
