@@ -1217,10 +1217,14 @@ static void	zbx_clean_nss(zbx_ns_t *nss, size_t nss_num)
 
 	for (i = 0; i < nss_num; i++)
 	{
-		for (j = 0; j < nss[i].ips_num; j++)
-			zbx_free(nss[i].ips[j]);
+		if (0 != nss[i].ips_num)
+		{
+			for (j = 0; j < nss[i].ips_num; j++)
+				zbx_free(nss[i].ips[j]);
 
-		zbx_free(nss[i].ips);
+			zbx_free(nss[i].ips);
+		}
+
 		zbx_free(nss[i].name);
 	}
 }
