@@ -831,7 +831,9 @@ class CGraphPrototype extends CGraphGeneral {
 			'output' => array('flags'),
 			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD))
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_CREATED)
+			)
 		));
 
 		foreach ($itemids as $itemid) {

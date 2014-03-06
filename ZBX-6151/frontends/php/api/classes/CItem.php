@@ -323,7 +323,7 @@ class CItem extends CItemGeneral {
 			}
 
 			if (array_key_exists('flags', $options['filter'])
-					&& ($options['filter']['flags'] !== null || !zbx_empty($options['filter']['flags']))) {
+					&& ($options['filter']['flags'] === null || !zbx_empty($options['filter']['flags']))) {
 				unset($sqlParts['where']['flags']);
 			}
 		}
