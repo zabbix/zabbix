@@ -155,6 +155,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 				$gotos['inventory'] = array(
 					'hostid' => $host['hostid']
 				);
+				$gotos['latestData'] = array(
+					'hostid' => $host['hostid']
+				);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
@@ -1202,6 +1205,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				'output' => array('itemid'),
 				'selectApplications' => array('name'),
 				'itemids' => $itemIds,
+				'webitems' => true,
 				'preservekeys' => true
 			));
 
