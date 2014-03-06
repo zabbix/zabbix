@@ -3167,7 +3167,14 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				upd_group_prototypes = 0;
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_itemid) values ";
+#ifdef HAVE_MYSQL
+	const char		*ins_hosts_sql =
+				"insert into hosts (hostid,host,name,status,flags,templateid,description) values ";
+	const char		*ex_hosts_values = ",''";
+#else
 	const char		*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags,templateid) values ";
+	const char		*ex_hosts_values = "";
+#endif
 	const char		*ins_hosts_templates_sql =
 				"insert into hosts_templates (hosttemplateid,hostid,templateid) values ";
 	const char		*ins_group_prototype_sql =
@@ -3260,9 +3267,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d," ZBX_FS_UI64 "%s)" ZBX_ROW_DL,
 					host_prototype->hostid, host_esc, name_esc, (int)host_prototype->status,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
+					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid, ex_hosts_values);
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					host_prototype->hostid, host_prototype->itemid);
