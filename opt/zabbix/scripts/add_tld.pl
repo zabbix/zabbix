@@ -248,6 +248,24 @@ my $probes_mon_groupid = create_group('Probes - Mon');
 
 my $proxy_mon_templateid = create_template('Template Proxy Health', LINUX_TEMPLATEID);
 
+my $item_key = 'zabbix[proxy,{$DNSTEST.PROXY_NAME},lastaccess]';
+
+my $options = {'name' => 'Availability of $2 Probe',
+                                          'key_'=> $item_key,
+                                          'hostid' => $proxy_mon_templateid,
+                                          'applications' => [get_application_id('Probe Availability', $proxy_mon_templateid)],
+                                          'type' => 5, 'value_type' => 3,
+                                          'units' => 'unixtime', delay => '30'};
+
+create_item($options);
+
+$options = { 'description' => 'PROBE {HOST.NAME}: Probe {$DNSTEST.PROXY_NAME} is not available',
+                     'expression' => '{Template Proxy Health:'.$item_key.'.fuzzytime(2m)}=0',
+                    'priority' => '4',
+            };
+    
+create_trigger($options);
+
 foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_name = $proxies->{$proxyid}->{'host'};
 
