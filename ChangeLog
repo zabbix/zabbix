@@ -849,6 +849,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
 ....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
 ...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
