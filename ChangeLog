@@ -6,7 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-7569] fixed handling of hosts without any interfaces (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ...G...... [ZBX-7740] fixed agent crash if logrt and log items are not supported (Andris)
 ...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
 ...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
