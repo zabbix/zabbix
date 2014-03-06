@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
 ........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
 ....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
