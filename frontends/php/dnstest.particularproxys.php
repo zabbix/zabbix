@@ -99,7 +99,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	// get slv item
 	$slvItems = API::Item()->get(array(
 		'itemids' => $data['slvItemId'],
-		'output' => array('name', 'lastvalue')
+		'output' => array('name')
 	));
 
 	if ($slvItems) {
@@ -250,7 +250,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	$data['totalNs'] = count($totalNs);
 	$data['positiveNs'] = count($totalNs) - count($negativeNs);
 
-	$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
 	$data['minMs'] = $dnsUdpRtt;
 
 	if ($data['type'] == DNSTEST_DNS) {

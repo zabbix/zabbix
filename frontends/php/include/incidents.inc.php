@@ -19,7 +19,7 @@
 **/
 
 /**
- * Get failed DNS tests count.
+ * Get failed tests count.
  *
  * @param int 		$itemId
  * @param int 		$endTime
@@ -44,7 +44,7 @@ function getFailedTestsCount($itemId, $endTime, $incidentStartTime, $incidentEnd
 }
 
 /**
- * Get total DNS tests count.
+ * Get total tests count.
  *
  * @param int 		$itemId
  * @param int 		$startTime

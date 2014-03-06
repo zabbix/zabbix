@@ -77,9 +77,7 @@ $particularProxys = array(
 	))
 );
 
-$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status');
-
-$particularProxysInfoTable->addRow(array(array($particularProxys, $rollingWeek)));
+$particularProxysInfoTable->addRow(array($particularProxys));
 $particularProxysInfoTable->addRow(array(array(
 	new CSpan(array(bold(_('Total number of NS')), ':', SPACE, $this->data['totalNs']), 'first-row-element'),
 	new CSpan(array(bold(_('Number of NS with positive result')), ':', SPACE, $this->data['positiveNs']))

@@ -162,15 +162,29 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		)
 	));
 
-	$data['tld'] = reset($tld);
+	if ($tld) {
+		$data['tld'] = reset($tld);
+	}
+	else {
+		show_error_message(_('No permissions to referred TLD or it does not exist!'));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
 
 	// get slv item
 	$slvItems = API::Item()->get(array(
 		'itemids' => $data['slvItemId'],
-		'output' => array('name', 'key_', 'lastvalue')
+		'output' => array('name')
 	));
 
-	$data['slvItem'] = reset($slvItems);
+	if ($slvItems) {
+		$data['slvItem'] = reset($slvItems);
+	}
+	else {
+		show_error_message(_('No permissions to referred SLV item or it does not exist!'));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
 
 	// get "Probes" groupId
 	$groups = API::HostGroup()->get(array(
@@ -462,13 +476,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 				break;
 			}
 		}
-	}
-
-	if ($data['tld'] && $data['slvItem']) {
-		$data['slv'] = sprintf('%.3f', $data['slvItem']['lastvalue']);
-	}
-	else {
-		access_deny();
 	}
 
 	CArrayHelper::sort($data['probes'], array('name'));

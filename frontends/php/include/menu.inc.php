@@ -98,7 +98,7 @@ $ZBX_MENU = array(
 		)
 	),
 	'dnstest' => array(
-		'label'				=> _('DNS test'),
+		'label'				=> _('SLA monitoring'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,

@@ -895,42 +895,42 @@ define('SHORT_DESCRIPTION',	1);
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
-// DNS TEST services
+// SLA monitoring services
 define('DNSTEST_DNS',			0);
 define('DNSTEST_DNSSEC',		1);
 define('DNSTEST_RDDS',			2);
 define('DNSTEST_EPP',			3);
 
-// DNS TEST macros
+// SLA monitoring macros
 define('DNSTEST_PAGE_SLV',			'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
 define('DNSTEST_MIN_DNS_COUNT',		'{$DNSTEST.DNS.AVAIL.MINNS}');
 define('DNSTEST_DNS_UDP_DELAY',		'{$DNSTEST.DNS.UDP.DELAY}');
 define('DNSTEST_RDDS_DELAY',		'{$DNSTEST.RDDS.DELAY}');
 
-// DNS TEST rolling week items keys
+// SLA monitoring rolling week items keys
 define('DNSTEST_SLV_DNS_ROLLWEEK',		'dnstest.slv.dns.rollweek');
 define('DNSTEST_SLV_DNSSEC_ROLLWEEK',	'dnstest.slv.dnssec.rollweek');
 define('DNSTEST_SLV_RDDS_ROLLWEEK',		'dnstest.slv.rdds.rollweek');
 define('DNSTEST_SLV_EPP_ROLLWEEK',		'dnstest.slv.epp.rollweek');
 
-// DNS TEST availability items keys
+// SLA monitoring availability items keys
 define('DNSTEST_SLV_DNS_AVAIL',		'dnstest.slv.dns.avail');
 define('DNSTEST_SLV_DNSSEC_AVAIL',	'dnstest.slv.dnssec.avail');
 define('DNSTEST_SLV_RDDS_AVAIL',	'dnstest.slv.rdds.avail');
 define('DNSTEST_SLV_EPP_AVAIL',		'dnstest.slv.epp.avail');
 
-// DNS TEST incident status
+// SLA monitoring incident status
 define('INCIDENT_ACTIVE',			0);
 define('INCIDENT_RESOLVED',			1);
 define('INCIDENT_FALSE_POSITIVE',	2);
 
-// DNS TEST incident status
+// SLA monitoring incident status
 define('DNSTEST_NO_REPLY_ERROR_CODE',	-200);
 define('DNSSEC_FAIL_ERROR_CODE',		-204);
 
 define('MIN_PROBE_OK_RESULT_PERCENTAGE',	49);
 
-// DNS TEST calculated items keys
+// SLA monitoring calculated items keys
 define('CALCULATED_ITEM_DNS_FAIL',				'dnstest.configvalue[INCIDENT.DNS.FAIL]');
 define('CALCULATED_ITEM_DNS_RECOVERY',			'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
 define('CALCULATED_ITEM_DNSSEC_FAIL',			'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
@@ -955,7 +955,7 @@ define('CALCULATED_ITEM_SLV_EPP_INFO',			'dnstest.configvalue[DNSTEST.SLV.EPP.IN
 define('CALCULATED_ITEM_SLV_EPP_LOGIN',			'dnstest.configvalue[DNSTEST.SLV.EPP.LOGIN]');
 define('CALCULATED_ITEM_EPP_UPDATE',			'dnstest.configvalue[DNSTEST.SLV.EPP.UPDATE]');
 
-// DNS TEST probe status items keys
+// SLA monitoring probe status items keys
 define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');
 define('PROBE_STATUS_MANUAL',		'dnstest.probe.status[manual]');
 define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
@@ -972,19 +972,19 @@ define('PROBE_RDDS43_UPD',			'dnstest.rdds.43.upd[{$DNSTEST.TLD}]');
 define('PROBE_RDDS80_IP',			'dnstest.rdds.80.ip[{$DNSTEST.TLD}]');
 define('PROBE_RDDS80_RTT',			'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]');
 
-// DNS TEST NS names
+// SLA monitoring NS names
 define('NS_NO_RESULT',	0);
 define('NS_DOWN',		1);
 define('NS_UP',			2);
 
-// DNS TEST probe status
+// SLA monitoring probe status
 define('PROBE_DOWN',	0);
 define('PROBE_UP',		1);
 
-// DNS TEST monthly reports item
+// SLA monitoring monthly reports item
 define('MONTHLY_REPORTS_APPLICATION',	'SLV monthly');
 
-// DNS TEST monthly reports item keys
+// SLA monitoring monthly reports item keys
 define('MONTHLY_REPORTS_DNS_NS_RTT_UDP',	'dnstest.slv.dns.ns.rtt.udp.month');
 define('MONTHLY_REPORTS_DNS_NS_RTT_TCP',	'dnstest.slv.dns.ns.rtt.tcp.month');
 define('MONTHLY_REPORTS_DNS_NS_UPD',		'dnstest.slv.dns.ns.upd.month');
@@ -996,7 +996,7 @@ define('MONTHLY_REPORTS_EPP_INFO',			'dnstest.slv.epp.rtt.info.month');
 define('MONTHLY_REPORTS_EPP_LOGIN',			'dnstest.slv.epp.rtt.login.month');
 define('MONTHLY_REPORTS_EPP_UPDATE',		'dnstest.slv.epp.rtt.update.month');
 
-// DNS TEST "dnstest" host name
+// SLA monitoring "dnstest" host name
 define('DNSTEST_HOST',	'dnstest');
 
 // if magic quotes on, then get rid of them

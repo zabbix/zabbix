@@ -230,8 +230,7 @@ if ($this->data['type'] == DNSTEST_DNS || $this->data['type'] == DNSTEST_DNSSEC)
 	$particularTests = array_merge($particularTests, $additionInfo);
 }
 
-$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status');
-$particularTestsInfoTable->addRow(array(array($particularTests, $rollingWeek)));
+$particularTestsInfoTable->addRow(array($particularTests));
 $dnsTestWidget->additem($particularTestsInfoTable);
 
 $dnsTestWidget->additem($particularTestsTable);

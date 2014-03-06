@@ -913,10 +913,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 .tests .info-block .first-row-element { width: 300px; display: inline-block; }
 
 .particular-test .info-block { text-align: left; width: 100%; }
-.particular-test .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -20px 10px; }
 
 .particular-proxy .info-block { text-align: left; width: 100%; }
-.particular-proxy .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -40px 10px; }
 .particular-proxy .info-block .first-row-element { width: 300px; display: inline-block; }
 
 .monthly-reports table.filter.info-block { text-align: left; }
