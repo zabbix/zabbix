@@ -64,6 +64,7 @@ FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|3|hosts	|hostid
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -1301,4 +1302,4 @@ INDEX		|2		|templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030011	|2030011
+ROW		|2030012	|2030012
