@@ -645,7 +645,7 @@ out:
 	return ret;
 }
 
-static int	zbx_get_ns_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
+static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *ip, const ldns_rr_list *keys,
 		const char *testprefix, const char *domain, FILE *log_fd, int *rtt, int *upd, char ipv4_enabled,
 		char ipv6_enabled, char epp_enabled, char *err, size_t err_size)
 {
@@ -1115,7 +1115,7 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 }
 
 static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns_t **nss, char ipv4_enabled,
-		char ipv6_enabled)
+		char ipv6_enabled, FILE *log_fd)
 {
 	char		ns[ZBX_HOST_BUF_SIZE], ip[ZBX_IP_BUF_SIZE], ns_found, ip_found;
 	size_t		i, j, j2, nss_num = 0, nss_alloc = 8;
@@ -1126,12 +1126,21 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 	{
 		item = &items[i];
 		ns_found = ip_found = 0;
+		*ns = *ip = '\0';
 
-		get_param(item->params, 2, ns, sizeof(ns));
-		get_param(item->params, 3, ip, sizeof(ip));
-
-		if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, NULL, NULL))
+		if (SUCCEED != get_param(item->params, 2, ns, sizeof(ns)))
+		{
+			zbx_dns_errf(log_fd, "%s: cannot get Name Server from item %s (itemid:" ZBX_FS_UI64 ")",
+					item->host.host, item->key_orig, item->itemid);
 			continue;
+		}
+
+		if (SUCCEED != get_param(item->params, 3, ip, sizeof(ip)))
+		{
+			zbx_dns_errf(log_fd, "%s: cannot get IP address from item %s (itemid:" ZBX_FS_UI64 ")",
+					item->host.host, item->key_orig, item->itemid);
+			continue;
+		}
 
 		if (0 == nss_num)
 		{
@@ -1139,7 +1148,7 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 		}
 		else
 		{
-			/* check if need to add entry */
+			/* check if need to add NS */
 			for (j = 0; j < nss_num; j++)
 			{
 				ns_entry = &(*nss)[j];
@@ -1171,27 +1180,30 @@ static size_t	zbx_get_nameservers(const DC_ITEM *items, size_t items_num, zbx_ns
 			*nss = zbx_realloc(*nss, nss_alloc * sizeof(zbx_ns_t));
 		}
 
-		/* add entry here */
+		/* add NS here */
 		if (0 == ns_found)
 		{
 			ns_entry = &(*nss)[nss_num];
 
 			ns_entry->name = zbx_strdup(NULL, ns);
-			ns_entry->result = SUCCEED;
-			ns_entry->ips_num = 1;
-			ns_entry->ips = zbx_malloc(NULL, sizeof(char *));
-			ns_entry->ips[0] = zbx_strdup(NULL, ip);
+			ns_entry->result = SUCCEED;	/* by default Name Server is considered working */
+			ns_entry->ips_num = 0;
 
 			nss_num++;
 		}
 		else
-		{
 			ns_entry = &(*nss)[j];
 
-			ns_entry->ips_num++;
+		if (SUCCEED != zbx_validate_ip(ip, ipv4_enabled, ipv6_enabled, NULL, NULL))
+			continue;
+
+		/* add IP here */
+		ns_entry->ips_num++;
+		if (0 == ns_entry->ips_num)
+			ns_entry->ips = zbx_malloc(NULL, sizeof(char *));
+		else
 			ns_entry->ips = zbx_realloc(ns_entry->ips, ns_entry->ips_num * sizeof(char *));
-			ns_entry->ips[ns_entry->ips_num - 1] = zbx_strdup(NULL, ip);
-		}
+		ns_entry->ips[ns_entry->ips_num - 1] = zbx_strdup(NULL, ip);
 	}
 
 	return nss_num;
@@ -1427,7 +1439,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 	}
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
-					err, sizeof(err)))
+			err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -1501,7 +1513,9 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 		zbx_dns_err(log_fd, err);
 	}
 
-	nss_num = zbx_get_nameservers(items, items_num, &nss, ipv4_enabled, ipv6_enabled);
+	/* get list of Name Servers and IPs, by default it will set every Name Server */
+	/* as working so if we have no IPs the result of Name Server will be SUCCEED  */
+	nss_num = zbx_get_nameservers(items, items_num, &nss, ipv4_enabled, ipv6_enabled, log_fd);
 
 	for (i = 0; i < nss_num; i++)
 	{
@@ -1509,7 +1523,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 		{
 			if (ZBX_EC_NOERROR == res_ec)
 			{
-				if (SUCCEED != zbx_get_ns_values(res, nss[i].name, nss[i].ips[j], keys, testprefix,
+				if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys, testprefix,
 						domain, log_fd, &rtt,
 						(ZBX_DNSTEST_UDP == proto && 0 != rdds_enabled) ? &upd : NULL,
 						ipv4_enabled, ipv6_enabled, epp_enabled, err, sizeof(err)))
@@ -1523,6 +1537,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck,
 					strlen(keyname) + 1, items, items_num);
 
+			/* if a single IP of the Name Server fails, consider the whole Name Server down */
 			if (SUCCEED != rtt_result(rtt, rtt_limit))
 				nss[i].result = FAIL;
 		}
