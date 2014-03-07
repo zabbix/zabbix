@@ -852,6 +852,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
 ........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
 ........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
