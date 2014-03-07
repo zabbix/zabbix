@@ -2643,7 +2643,6 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
 
 	DBPATCH_END()
 

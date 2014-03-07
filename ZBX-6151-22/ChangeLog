@@ -1,10 +1,31 @@
 Changes for 2.2.3rc1
 
 New features:
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
+...G...... [ZBX-7740] fixed agent crash if logrt and log items are not supported (Andris)
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
+.......PS. [ZBX-7840] fixed icmppingloss[] calculation when a DNS name is pingable by both IPv4 and IPv6 (asaveljevs)
+..F....... [ZBX-7883] fixed JS error when adding slides in configuration page (Ivo)
+........S. [ZBX-7836] fixed possible crash when a value older than the last item value was added to the value cache (wiper)
+..F....... [ZBX-7851] fixed item, trigger and discovery rule sorting by "Status" field (Ivo)
+..F....... [ZBX-7858] fixed some triggers not being displayed in Monitoring -> Triggers (Pavels)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+.......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
+A.F....... [ZBX-7829] fixed reserving of new ids for standalone installations (Sasha)
+A......... [ZBX-6742] fixed templated graph item validation when items seem to belong to multiple hosts (Ivo)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
+..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
 ........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
 ..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
 ..F....... [ZBX-7768] fixed item valuemap import (Eduard)
@@ -825,10 +846,20 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.12rc1
 
 New features:
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)

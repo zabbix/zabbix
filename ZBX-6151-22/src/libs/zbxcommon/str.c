@@ -2557,6 +2557,8 @@ const char	*zbx_result_string(int result)
 			return "SUCCEED";
 		case FAIL:
 			return "FAIL";
+		case CONFIG_ERROR:
+			return "CONFIG_ERROR";
 		case NOTSUPPORTED:
 			return "NOTSUPPORTED";
 		case NETWORK_ERROR:
