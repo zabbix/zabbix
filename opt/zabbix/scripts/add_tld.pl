@@ -1763,7 +1763,7 @@ sub create_probe_status_host {
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
-    create_item($options);                
+    create_item($options);
 
     $options = {'name' => 'Number of online probes for EPP tests',
                                               'key_'=> 'online.nodes.pl[online,epp]',
@@ -1783,7 +1783,7 @@ sub create_probe_status_host {
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
-    create_item($options);                
+    create_item($options);
 
     $options = {'name' => 'Number of online probes for RDDS tests',
                                               'key_'=> 'online.nodes.pl[online,rdds]',
@@ -1795,7 +1795,7 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    my $options = {'name' => 'Total number of probes with enabled IPv4',
+    $options = {'name' => 'Total number of probes with enabled IPv4',
                                               'key_'=> 'online.nodes.pl[total,ipv4]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
@@ -1803,7 +1803,7 @@ sub create_probe_status_host {
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
-    create_item($options);                
+    create_item($options);
 
     $options = {'name' => 'Number of online probes with enabled IPv4',
                                               'key_'=> 'online.nodes.pl[online,ipv4]',
@@ -1815,7 +1815,7 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    my $options = {'name' => 'Total number of probes with enabled IPv6',
+    $options = {'name' => 'Total number of probes with enabled IPv6',
                                               'key_'=> 'online.nodes.pl[total,ipv6]',
                                               'hostid' => $hostid,
                                               'interfaceid' => $interfaceid->{'interfaceid'},
@@ -1823,7 +1823,7 @@ sub create_probe_status_host {
                                               'type' => 10, 'value_type' => 3,
                                               'delay' => 300,
                                               };
-    create_item($options);                
+    create_item($options);
 
     $options = {'name' => 'Number of online probes with enabled IPv6',
                                               'key_'=> 'online.nodes.pl[online,ipv6]',
