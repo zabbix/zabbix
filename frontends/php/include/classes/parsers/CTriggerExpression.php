@@ -22,8 +22,8 @@ class CTriggerExpression {
 	// for parsing of trigger expression
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
-	const STATE_AFTER_OPERATOR = 2;
-	const STATE_AFTER_MINUS = 3;
+	const STATE_AFTER_BINARY_OPERATOR = 2;
+	const STATE_AFTER_UNARY_OPERATOR = 3;
 	const STATE_AFTER_CLOSE_BRACE = 4;
 	const STATE_AFTER_CONSTANT = 5;
 
@@ -151,6 +151,24 @@ class CTriggerExpression {
 	private $pos;
 
 	/**
+	 * Allowed binary operators.
+	 *
+	 * @var array
+	 */
+	protected $allowedBinaryOperators = array(
+		'<', '>', '<=', '>=', '+', '-', '/', '*', 'and', 'or', '=', '<>'
+	);
+
+	/**
+	 * Allowed unary operators.
+	 *
+	 * @var array
+	 */
+	protected $allowedUnaryOperators = array(
+		'-', 'not'
+	);
+
+	/**
 	 * @param array $options
 	 * @param bool $options['lldmacros']
 	 */
@@ -216,25 +234,31 @@ class CTriggerExpression {
 			switch ($state) {
 				case self::STATE_INIT:
 				case self::STATE_AFTER_OPEN_BRACE:
-				case self::STATE_AFTER_OPERATOR:
+				case self::STATE_AFTER_BINARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-							break;
-						case '-':
-							$state = self::STATE_AFTER_MINUS;
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
 						default:
+							// try to parse the next token as a unary operator
+							$pos = $this->pos;
+							if ($this->parseUnaryOperator()) {
+								$state = self::STATE_AFTER_UNARY_OPERATOR;
+								break;
+							}
+							// if this is not an operator - return to the start position and try to parse it as a
+							// constant
+							$this->pos = $pos;
 							if (!$this->parseConstant()) {
 								break 3;
 							}
 							$state = self::STATE_AFTER_CONSTANT;
 					}
 					break;
-				case self::STATE_AFTER_MINUS:
+				case self::STATE_AFTER_UNARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
 							break;
@@ -254,18 +278,6 @@ class CTriggerExpression {
 					switch ($this->expression[$this->pos]) {
 						case ' ':
 							break;
-						case '=':
-						case '#':
-						case '<':
-						case '>':
-						case '&':
-						case '|':
-						case '+':
-						case '-':
-						case '/':
-						case '*':
-							$state = self::STATE_AFTER_OPERATOR;
-							break;
 						case ')':
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
@@ -274,7 +286,10 @@ class CTriggerExpression {
 							$level--;
 							break;
 						default:
-							break 3;
+							if (!$this->parseBinaryOperator()) {
+								break 3;
+							}
+							$state = self::STATE_AFTER_BINARY_OPERATOR;
 					}
 					break;
 			}
@@ -286,7 +301,7 @@ class CTriggerExpression {
 			$this->isValid = false;
 		}
 
-		if ($level != 0 || isset($this->expression[$this->pos]) || $state == self::STATE_AFTER_OPERATOR || $state == self::STATE_AFTER_MINUS) {
+		if ($level != 0 || isset($this->expression[$this->pos]) || $state == self::STATE_AFTER_BINARY_OPERATOR || $state == self::STATE_AFTER_UNARY_OPERATOR) {
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
 					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
@@ -306,6 +321,64 @@ class CTriggerExpression {
 		}
 
 		return array_unique(zbx_objectValues($this->expressions, 'host'));
+	}
+
+	/**
+	 * Parses a binary operator and moves the current position to the last symbol of the operator.
+	 *
+	 * @return null|string
+	 */
+	protected function parseBinaryOperator() {
+		$j = $this->pos;
+
+		while (isset($this->expression[$j]) && $this->isBinaryOperatorChar($this->expression[$j])) {
+			$j++;
+		}
+
+		// is host empty?
+		if ($this->pos == $j) {
+			return null;
+		}
+
+		$operator = substr($this->expression, $this->pos, $j - $this->pos);
+
+		// check if this is a valid operator
+		if (!in_array($operator, $this->allowedBinaryOperators)) {
+			return null;
+		}
+
+		$this->pos = $j - 1;
+
+		return $operator;
+	}
+
+	/**
+	 * Parses a unary operator and moves the current position to the last symbol of the operator.
+	 *
+	 * @return null|string
+	 */
+	protected function parseUnaryOperator() {
+		$j = $this->pos;
+
+		while (isset($this->expression[$j]) && $this->isBinaryOperatorChar($this->expression[$j])) {
+			$j++;
+		}
+
+		// is host empty?
+		if ($this->pos == $j) {
+			return null;
+		}
+
+		$operator = substr($this->expression, $this->pos, $j - $this->pos);
+
+		// check if this is a valid operator
+		if (!in_array($operator, $this->allowedUnaryOperators)) {
+			return null;
+		}
+
+		$this->pos = $j - 1;
+
+		return $operator;
 	}
 
 	/**
@@ -749,6 +822,38 @@ class CTriggerExpression {
 		$this->lldmacros[] = array('expression' => $lldmacro);
 		$this->pos = $j;
 		return true;
+	}
+
+	/**
+	 * Returns true if the char can be used in a binary operator.
+	 *
+	 * @param string $c
+	 *
+	 * @return bool
+	 */
+	protected function isBinaryOperatorChar($c) {
+		$operatorChars = array('<', '>', '<', '>', '+', '-', '/', '*', '=');
+
+		if (($c >= 'a' && $c <= 'z') || in_array($c, $operatorChars)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns true if the char can be used in a unary operator.
+	 *
+	 * @param string $c
+	 *
+	 * @return bool
+	 */
+	protected function isUnaryOperatorChar($c) {
+		if (($c >= 'a' && $c <= 'z') || $c === '-') {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
