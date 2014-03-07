@@ -37,7 +37,7 @@ sub new($$) {
 
 #    $ua->ssl_opts(verify_hostname => 0);
 
-    $ua->timeout(10);
+    $ua->timeout(60);
 
     $ua->agent("Net::Zabbix");
 
@@ -58,7 +58,7 @@ sub new($$) {
             auth      => $authid,
             error => '',
             };
-        
+
 	bless( $self, $class );
 
 	return bless ($self, $class) if defined $self->api_version();
@@ -93,8 +93,6 @@ sub new($$) {
 
     set_authid($domain, $auth);
 
-    
-
     return bless {
         UserAgent => $ua,
         request   => $req,
@@ -108,16 +106,16 @@ sub get_authid($) {
     my $domain = shift;
 
     my $authid;
-    
+
     if (-e '/tmp/'.$domain.'.tmp') {
 
         open(TMP, '< /tmp/'.$domain.'.tmp');
 
         my @lines = <TMP>;
 
-        close(TMP);                                                   
-                                                                      
-        $authid = shift (@lines);                                    
+        close(TMP);
+
+        $authid = shift (@lines);
     }
 
     return $authid;
@@ -128,9 +126,9 @@ sub set_authid($$) {
     my $authid = shift;
 
     open(TMP, '> /tmp/'.$domain.'.tmp');
-    
+
     print TMP $authid;
-    
+
     close(TMP);
 }
 
@@ -352,19 +350,18 @@ sub to_utf8($) {
     my $json = shift;
 
     if (is_hash($json)) {
-    foreach my $key (keys %{$json}) {
-        ${$json}{$key} = to_utf8(${$json}{$key});
-    }
+        foreach my $key (keys %{$json}) {
+            ${$json}{$key} = to_utf8(${$json}{$key});
+        }
     }
     elsif(is_array($json)) {
-    for(my $i=0; $i<@{$json}; $i++) {
-        ${$json}[$i] = to_utf8(${$json}[$i]);
-    }
+        for(my $i=0; $i<@{$json}; $i++) {
+            ${$json}[$i] = to_utf8(${$json}[$i]);
+        }
     }
     else {
-    $json = encode_utf8($json);
+        $json = encode_utf8($json);
     }
-    
 
     return $json;
 }
