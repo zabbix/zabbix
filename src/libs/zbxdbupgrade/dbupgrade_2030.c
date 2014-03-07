@@ -305,6 +305,26 @@ static int	DBpatch_2030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030029(void)
+{
+	/* 7 - SCREEN_SORT_TRIGGERS_STATUS_ASC */
+	/* 9 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=7 where sort_triggers=9"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030030(void)
+{
+	/* 8 - SCREEN_SORT_TRIGGERS_STATUS_DESC */
+	/* 10 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=8 where sort_triggers=10"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -340,5 +360,7 @@ DBPATCH_ADD(2030025, 0, 1)
 DBPATCH_ADD(2030026, 0, 1)
 DBPATCH_ADD(2030027, 0, 1)
 DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 0, 1)
+DBPATCH_ADD(2030030, 0, 1)
 
 DBPATCH_END()
