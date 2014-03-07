@@ -26,28 +26,46 @@
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
 	char		*c = NULL;
-	regex_t		re;
+	static char	*old_pattern = NULL;
+	static int	old_flags;
+	static regex_t	re;
 	regmatch_t	match;
 
 	if (NULL != len)
 		*len = 0;
 
-	if (NULL != string)
+	if (NULL == string)
+		goto out;
+
+	/* performance optimization: if possible then reuse the last compiled regexp */
+
+	if (NULL == old_pattern)
+		goto compile;
+
+	if (0 != strcmp(old_pattern, pattern) || old_flags != flags)
+		regfree(&re);
+	else
+		goto execute;
+compile:
+	if (0 == regcomp(&re, pattern, flags))
 	{
-		if (0 == regcomp(&re, pattern, flags))
-		{
-			if (0 == regexec(&re, string, (size_t)1, &match, 0)) /* matched */
-			{
-				c = (char *)string + match.rm_so;
-
-				if (NULL != len)
-					*len = match.rm_eo - match.rm_so;
-			}
-
-			regfree(&re);
-		}
+		old_pattern = zbx_strdup(old_pattern, pattern);
+		old_flags = flags;
 	}
+	else
+	{
+		zbx_free(old_pattern);
+		goto out;
+	}
+execute:
+	if (0 == regexec(&re, string, (size_t)1, &match, 0)) /* matched */
+	{
+		c = (char *)string + match.rm_so;
 
+		if (NULL != len)
+			*len = match.rm_eo - match.rm_so;
+	}
+out:
 	return c;
 }
 

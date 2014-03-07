@@ -90,6 +90,10 @@ static int	add_trigger_info(DB_EVENT *event)
  * Return value: SUCCEED - event added                                        *
  *               FAIL    - event not added                                    *
  *                                                                            *
+ * Comments: When processing trigger events IT services updates are queued    *
+ *           and _must_ be flushed at the end of transaction with             *
+ *           DBflush_itservice_updates() function !!!                         *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -131,7 +135,10 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 		process_actions(&event);
 
 	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed && EVENT_OBJECT_TRIGGER == event.object)
-		DBupdate_services(event.objectid, TRIGGER_VALUE_TRUE == event.value ? event.trigger.priority : 0, event.clock);
+	{
+		DBqueue_itservice_update(event.objectid, TRIGGER_VALUE_TRUE == event.value ? event.trigger.priority : 0,
+				event.clock);
+	}
 
 	ret = SUCCEED;
 fail:

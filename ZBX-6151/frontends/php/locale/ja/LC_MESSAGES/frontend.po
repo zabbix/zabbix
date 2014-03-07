@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:24+0200\n"
+"POT-Creation-Date: 2014-03-03 16:18+0200\n"
 "PO-Revision-Date: 2014-02-02 09:12+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1125,7 +1125,7 @@ msgstr "アクションを追加できません"
 msgid "Cannot add application"
 msgstr "アプリケーションを追加できません"
 
-#: api/classes/CTrigger.php:1713
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr "ホストからテンプレートへの依存関係は作成できません"
 
@@ -1297,11 +1297,11 @@ msgstr "条件式に複数のホストが利用されているため、トリガ
 msgid "Cannot create another database connection."
 msgstr "データベースへのコネクションを作成できません。"
 
-#: api/classes/CTrigger.php:1747
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr "循環する依存関係は作成できません。"
 
-#: api/classes/CTrigger.php:1719
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
 
@@ -1352,7 +1352,7 @@ msgstr "アクションを削除できません"
 msgid "Cannot delete application"
 msgstr "アプリケーションを削除できません"
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1460
 msgid "Cannot delete dependency"
 msgstr "依存関係を削除できません"
 
@@ -1663,7 +1663,7 @@ msgstr "ツリーをフォーマットできません。"
 msgid "Cannot have empty visible template name"
 msgstr "テンプレート名に空白は設定できません"
 
-#: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
+#: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
 #: api/classes/CTriggerPrototype.php:1008
 #: api/classes/CTriggerPrototype.php:1066
 #, php-format
@@ -2684,7 +2684,7 @@ msgstr "作成: \"%2$s\"のアイテム\"%1$s\"。"
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CTrigger.php:1482
+#: api/classes/CTrigger.php:1501
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガー\"%1$s\"。"
@@ -3451,7 +3451,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr "削除: テンプレート\"%1$s\"。"
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1246
+#: api/classes/CTrigger.php:1250
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
@@ -3918,7 +3918,7 @@ msgstr "ドロップダウンの1つ目の項目 \"%1$s\""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "ドロップダウンの選択を記憶する \"%1$s\""
 
-#: api/classes/CTrigger.php:1889
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "トリガー\"%1$s\"の依存関係が重複しています。"
@@ -4046,8 +4046,8 @@ msgstr "アクションの実行条件が空白です。"
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:909
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -6208,15 +6208,15 @@ msgstr "スクリーンの要素のスクリーンID\"%s\"が正しくありま�
 msgid "Incorrect screen provided for slide show."
 msgstr "スライドショーに設定されているスクリーンが正しくありません。"
 
-#: include/services.inc.php:490 include/services.inc.php:499
+#: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
 msgstr "サービス終了時刻が正しくありません。"
 
-#: include/services.inc.php:487 include/services.inc.php:496
+#: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
 msgstr "サービス開始時刻が正しくありません。"
 
-#: include/services.inc.php:481
+#: include/services.inc.php:482
 msgid "Incorrect service time type."
 msgstr "サービスタイムの種別が正しくありません。"
 
@@ -8439,8 +8439,8 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
+#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:824
 #: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
@@ -8646,7 +8646,7 @@ msgstr "コメントなし"
 msgid "Not Templated items"
 msgstr "テンプレートではないアイテム"
 
-#: api/classes/CTrigger.php:1792
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "すべてのテンプレートは\"%s\"にリンクされていません。"
@@ -10880,7 +10880,7 @@ msgstr "サービスを削除しました"
 msgid "Service port"
 msgstr "サービスのポート"
 
-#: include/services.inc.php:504
+#: include/services.inc.php:505
 msgid "Service start time must be less than end time."
 msgstr "サービス開始時刻は終了時刻よりも前でなければなりません。"
 
@@ -11897,7 +11897,7 @@ msgstr "トリガー\"%1$s\"にはアイテムのプロトタイプが設定さ�
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "トリガー\"%1$s\"はスキップされました - ユーザの指定。"
 
-#: api/classes/CTrigger.php:1931
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "トリガー\"%s\"はリンクされている他のテンプレートに含まれています"
@@ -11907,7 +11907,7 @@ msgstr "トリガー\"%s\"はリンクされている他のテンプレートに
 msgid "Trigger added"
 msgstr "トリガーを追加しました"
 
-#: api/classes/CTrigger.php:1835
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "トリガーは自身を継承したトリガーと依存関係を持つことはできません。"
 
@@ -12463,7 +12463,7 @@ msgstr "更新: \"%2$s\"のアイテム\"%1$s\"。"
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
-#: api/classes/CTrigger.php:1586
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガー\"%1$s\"。"

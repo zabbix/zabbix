@@ -121,6 +121,8 @@ static void	process_time_functions(void)
 				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 			}
+
+			DBflush_itservice_updates();
 		}
 
 		DBcommit();
@@ -502,6 +504,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
 					&ts, tr[i].new_value, TRIGGER_VALUE_CHANGED_NO, 0, 1);
 		}
+
+		DBflush_itservice_updates();
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

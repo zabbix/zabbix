@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:24+0200\n"
+"POT-Creation-Date: 2014-03-03 16:18+0200\n"
 "PO-Revision-Date: 2013-07-01 20:21+0200\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1138,7 +1138,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Aplikāciju nevar pievienot"
 
-#: api/classes/CTrigger.php:1713
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr ""
 
@@ -1310,11 +1310,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr ""
 
-#: api/classes/CTrigger.php:1747
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1719
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1365,7 +1365,7 @@ msgstr ""
 msgid "Cannot delete application"
 msgstr ""
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1460
 msgid "Cannot delete dependency"
 msgstr ""
 
@@ -1678,7 +1678,7 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr ""
 
-#: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
+#: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
 #: api/classes/CTriggerPrototype.php:1008
 #: api/classes/CTriggerPrototype.php:1066
 #, php-format
@@ -2692,7 +2692,7 @@ msgstr ""
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1482
+#: api/classes/CTrigger.php:1501
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3461,7 +3461,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr ""
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1246
+#: api/classes/CTrigger.php:1250
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3928,7 +3928,7 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1889
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -4056,8 +4056,8 @@ msgstr ""
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:909
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -6218,15 +6218,15 @@ msgstr ""
 msgid "Incorrect screen provided for slide show."
 msgstr ""
 
-#: include/services.inc.php:490 include/services.inc.php:499
+#: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
 msgstr ""
 
-#: include/services.inc.php:487 include/services.inc.php:496
+#: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
 msgstr ""
 
-#: include/services.inc.php:481
+#: include/services.inc.php:482
 msgid "Incorrect service time type."
 msgstr ""
 
@@ -8457,8 +8457,8 @@ msgstr ""
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
+#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:824
 #: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
@@ -8664,7 +8664,7 @@ msgstr "Nav Apst"
 msgid "Not Templated items"
 msgstr "Nav šablona rādītāji"
 
-#: api/classes/CTrigger.php:1792
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -10900,7 +10900,7 @@ msgstr ""
 msgid "Service port"
 msgstr "Servisa ports"
 
-#: include/services.inc.php:504
+#: include/services.inc.php:505
 msgid "Service start time must be less than end time."
 msgstr ""
 
@@ -11923,7 +11923,7 @@ msgstr ""
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CTrigger.php:1931
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
@@ -11933,7 +11933,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Trigeris pievienots"
 
-#: api/classes/CTrigger.php:1835
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr ""
 
@@ -12489,7 +12489,7 @@ msgstr ""
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1586
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
