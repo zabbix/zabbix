@@ -884,7 +884,7 @@ class CGraphPrototype extends CGraphGeneral {
 				}
 				elseif (!$itemDiscoveryIds) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Graph prototype "%1$s" must have at least one prototype.',
+						'Graph prototype "%1$s" must have at least one item prototype.',
 						$graph['name']
 					));
 				}
