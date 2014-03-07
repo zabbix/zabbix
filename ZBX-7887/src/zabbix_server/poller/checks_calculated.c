@@ -250,7 +250,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			f->found = ITEM_FOUND;
 			f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
 
-
 			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)]",
