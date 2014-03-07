@@ -1935,8 +1935,8 @@ static void	zbx_set_rdds_values(const char *ip43, int rtt43, int upd43, const ch
 	}
 }
 
-/* discard the curl output */
-static size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
+/* discard the curl output (using inline to hide "unused" compiler warning when -Wunused) */
+static inline size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	return size * nmemb;
 }
@@ -3000,26 +3000,17 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 	}
 }
 
-static const char	*get_epp_certs_path(const char *domain, const char *file)
-{
-	static char	path_buf[512];
-
-	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s/%s/%s.tmpl", EPP_BASE_DIR, domain, EPP_COMMANDS_DIR, file);
-
-	return path_buf;
-}
-
 int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	static int		ssl_initialized = 0;
 	static char		cert_file[512], key_file[512];
 
 	ldns_resolver		*res = NULL;
-	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str, *res_ip = NULL;
+	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL;
 	short			epp_port = 700;
 	X509			*cert = NULL;
 	const SSL_METHOD	*method;
-	const char		*ip, *random_host;
+	const char		*ip = NULL, *random_host;
 	SSL_CTX			*ctx = NULL;
 	SSL			*ssl = NULL;
 	FILE			*log_fd = NULL;
