@@ -64,6 +64,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
 ........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
 ........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ...G...... [ZBX-7740] fixed agent crash if logrt and log items are not supported (Andris)
