@@ -307,6 +307,7 @@ static int	DBpatch_2030028(void)
 
 static int	DBpatch_2030029(void)
 {
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
 	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
 		return FAIL;
 
