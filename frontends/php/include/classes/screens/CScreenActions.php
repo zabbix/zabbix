@@ -184,8 +184,7 @@ class CScreenActions extends CScreenBase {
 				get_node_name_by_elid($alert['alertid']),
 				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
 				new CCol($actions[$alert['actionid']]['name'], 'top'),
-				new CCol(($alert['mediatypeid'] == 0 || zbx_empty($alert['description']))
-					? '-' : $alert['description'], 'top'),
+				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),
 				new CCol($message, 'top pre'),
 				new CCol($status, 'top'),

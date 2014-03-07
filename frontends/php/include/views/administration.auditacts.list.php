@@ -127,9 +127,7 @@ foreach ($this->data['alerts'] as $alert) {
 		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
-		new CCol((isset($mediatype['mediatypeid']) && $mediatype['mediatypeid'] != 0
-				&& !zbx_empty($mediatype['description']))
-			? $mediatype['description'] : '-', 'top'),
+		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
 		new CCol($recipient, 'top'),
 		new CCol($message, 'wraptext top'),
 		new CCol($status, 'top'),
