@@ -1658,7 +1658,7 @@ Required options
         --tld=STRING
                 TLD name
         --dns-test-prefix=STRING
-                domain test prefix for DNS monitoring (specify *RANDOMTLD* for root servers monitoring)
+                domain test prefix for DNS monitoring (specify '*randomtld*' for root servers monitoring)
 
 Other options
 

@@ -1470,7 +1470,7 @@ int	check_dnstest_dns(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	if (0 == strcmp(testprefix, "*RANDOMTLD*"))
+	if (0 == strcmp(testprefix, "*randomtld*"))
 	{
 		zbx_free(testprefix);
 
