@@ -496,8 +496,21 @@ class CScreen extends CZBXAPI {
 		));
 
 		$this->validateUpdate($screens, $dbScreens);
+		$this->updateReal($screens);
+		$this->truncateScreenItems($screens, $dbScreens);
 
-		$update = $screenIds = array();
+		return array('screenids' => zbx_objectValues($screens, 'screenid'));
+	}
+
+	/**
+	 * Saves screens and screen items.
+	 *
+	 * @param array $screens
+	 *
+	 * @return array
+	 */
+	protected function updateReal(array $screens) {
+		$update = array();
 
 		foreach ($screens as $screen) {
 			$screenId = $screen['screenid'];
@@ -509,8 +522,6 @@ class CScreen extends CZBXAPI {
 					'where' => array('screenid' => $screenId)
 				);
 			}
-
-			$screenIds[] = $screenId;
 		}
 
 		DB::update('screens', $update);
@@ -522,6 +533,27 @@ class CScreen extends CZBXAPI {
 			}
 		}
 
+		return $screens;
+	}
+
+	/**
+	 * Delete or reduce the size of screens items when reducing the size of the screens.
+	 *
+	 * Each array in the $screens array must have the following values:
+	 * - screenid
+	 * - hsize
+	 * - vsize
+	 *
+	 * Each array in the $dbScreens array must have the following values:
+	 * - screenid
+	 * - hsize
+	 * - vsize
+	 * - screenitems
+	 *
+	 * @param array $screens
+	 * @param array $dbScreens	array of existing screens with screen IDs as keys
+	 */
+	protected function truncateScreenItems(array $screens, array $dbScreens) {
 		$deleteScreenItemIds = array();
 		$updateScreenItems = array();
 		foreach ($screens as $screen) {
@@ -568,8 +600,6 @@ class CScreen extends CZBXAPI {
 		foreach ($updateScreenItems as $screenItem) {
 			DB::updateByPk('screens_items', $screenItem['screenitemid'], $screenItem);
 		}
-
-		return array('screenids' => $screenIds);
 	}
 
 	/**
