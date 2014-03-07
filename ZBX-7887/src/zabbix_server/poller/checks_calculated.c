@@ -21,6 +21,10 @@
 #include "zbxserver.h"
 #include "log.h"
 
+#define	ITEM_NOTFOUND 0
+#define	ITEM_FOUND 1
+#define	ITEM_NOTSUPPORTED 2
+
 typedef struct
 {
 	int		functionid;
@@ -80,7 +84,7 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 	f->func = func;
 	f->params = params;
 	f->value = NULL;
-	f->found = 0;
+	f->found = ITEM_NOTFOUND;
 
 	return f->functionid;
 }
@@ -196,12 +200,10 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			" where h.hostid=i.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
-				" and i.state=%d"
 				" and (",
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			ITEM_STATE_NORMAL);
+			ITEM_STATUS_ACTIVE);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
@@ -239,8 +241,15 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			if (0 != strcmp(f->host, item.host_name))
 				continue;
 
-			f->found = 1;
+			if (ITEM_STATE_NOTSUPPORTED == item.state)
+			{
+				f->found = ITEM_NOTSUPPORTED;
+				continue;
+			}
+
+			f->found = ITEM_FOUND;
 			f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
+
 
 			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now))
 			{
@@ -266,11 +275,20 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	{
 		f = &exp->functions[i];
 
-		if (0 == f->found)
+		if (ITEM_NOTFOUND == f->found)
 		{
 			zbx_snprintf(error, max_error_len,
 				"Cannot evaluate function [%s(%s)]"
 					": item [%s:%s] not found",
+					f->func, f->params, f->host, f->key);
+			ret = NOTSUPPORTED;
+			break;
+		}
+		else if (ITEM_NOTSUPPORTED == f->found)
+		{
+			zbx_snprintf(error, max_error_len,
+				"Cannot evaluate function [%s(%s)]"
+					": item [%s:%s] not supported",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;
