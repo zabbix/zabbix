@@ -250,14 +250,7 @@ $testsInfoTable->addRow(array(array(
 			new CSpan(array(
 				bold(_('Total time within selected period')), ':', SPACE, convertUnitsS($this->data['downPeriod'])
 			))
-		),
-		BR(),
-		BR(),
-		new CSpan(array(bold(
-			_s('Downtime: %1$s',
-				round($this->data['downTimeMinutes'] / ($this->data['downPeriod'] / SEC_PER_MIN) * 100).'%'
-			)
-		)))
+		)
 	), 'info-block')
 )));
 

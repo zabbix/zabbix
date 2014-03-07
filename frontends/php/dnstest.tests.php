@@ -361,7 +361,7 @@ if ($items) {
 
 		$item = API::Item()->get(array(
 			'hostids' => $dnstest['hostid'],
-			'output' => array('itemid'),
+			'output' => array('itemid', 'value_type'),
 			'filter' => array(
 				'key_' => $itemKey
 			)
@@ -376,8 +376,16 @@ if ($items) {
 			exit;
 		}
 
-		$timeStep = getFirstUintValue($item['itemid'], zbxDateToTime($data['filter_from'])) / SEC_PER_MIN;
-		$timeStep = $timeStep ? $timeStep : 1;
+		$itemValue = API::History()->get(array(
+			'itemids' => $item['itemid'],
+			'time_from' => zbxDateToTime($data['filter_from']),
+			'history' => $item['value_type'],
+			'output' => API_OUTPUT_EXTEND,
+			'limit' => 1
+		));
+		$itemValue = reset($itemValue);
+
+		$timeStep = $itemValue['value'] ?  $itemValue['value'] / SEC_PER_MIN : 1;
 
 		$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
 

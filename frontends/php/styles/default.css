@@ -898,23 +898,23 @@ fieldset legend { margin: 0.2em 0.5em; }
 .rolling-week-status .tableinfo .disabled-service { margin-left: 75px; }
 .rolling-week-status .tableinfo .cell-value { margin-left: 10px; }
 
-.incidents table.filter.info-block { text-align: left; }
 .incidents .filter .time-period { margin-left: 20px; }
 .incidents .incidents-info { width: 100%; }
 .incidents .rolling-week-status { font-size: 16px; font-weight: bold; float: right; }
 
-.incident-details .info-block { text-align: left; width: 100%; }
 .incident-details .filter .spaces { margin-left: 20px; }
 .incident-details .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -20px 10px; }
 
-.tests .info-block { text-align: left; width: 100%; }
 .tests .filter .spaces { margin-left: 20px; }
 .tests .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -10px 10px; }
 .tests .info-block .first-row-element { width: 300px; display: inline-block; }
 
-.particular-test .info-block { text-align: left; width: 100%; }
-
-.particular-proxy .info-block { text-align: left; width: 100%; }
 .particular-proxy .info-block .first-row-element { width: 300px; display: inline-block; }
 
+.incidents table.filter.info-block,
 .monthly-reports table.filter.info-block { text-align: left; }
+
+.incident-details .info-block,
+.tests .info-block,
+.particular-test .info-block,
+.particular-proxy .info-block { text-align: left; width: 100%; }
