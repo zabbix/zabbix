@@ -473,6 +473,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			if (zbx_strtoupper($host['host']) == zbx_strtoupper($data['tld']['host'].' '.$probe['host'])
 					&& isset($host['value'])) {
 				$data['probes'][$hostId] = $host;
+				$data['probes'][$hostId]['name'] = $probe['host'];
 				break;
 			}
 		}
