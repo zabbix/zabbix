@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed graph and graph prototype update validation allowing to pass only 'gitemid' parameter without 'itemid' (Ivo)
 ........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
 ........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)

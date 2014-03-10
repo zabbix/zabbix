@@ -2396,6 +2396,15 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020001(void)
+{
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2643,6 +2652,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
+	DBPATCH_ADD(2020001, 0, 0)
 
 	DBPATCH_END()
 
