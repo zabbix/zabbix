@@ -959,10 +959,10 @@ double	DBget_requiredperformance()
 			" and h.status=%d"
 			" and i.status=%d"
 			" and i.delay<>0"
-			" and i.flags in (%d,%d,%d)",
+			" and i.flags<>%d",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
-			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CREATED);
+			ZBX_FLAG_DISCOVERY_CHILD);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		qps_total = atof(row[0]);
 	DBfree_result(result);
