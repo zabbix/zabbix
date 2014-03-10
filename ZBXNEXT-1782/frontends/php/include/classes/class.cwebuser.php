@@ -63,6 +63,8 @@ class CWebUser {
 				zbx_setcookie('zbx_sessionid', self::$data['sessionid'],
 					self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0
 				);
+
+				add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, self::$data['userid'], '', null, null, null);
 			}
 
 			return $result;
