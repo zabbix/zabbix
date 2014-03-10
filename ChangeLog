@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
 ........S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 ..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed graph and graph prototype update validation allowing to pass only 'gitemid' parameter without 'itemid' (Ivo)
@@ -854,6 +855,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
 ..F.....S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
 ........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
