@@ -65,10 +65,6 @@ if (isset($_REQUEST['filter_set'])) {
 	$data['filter_search'] = get_request('filter_search');
 	$data['filter_year'] = get_request('filter_year');
 	$data['filter_month'] = get_request('filter_month');
-
-	CProfile::update('web.dnstest.monthlyreports.filter_search', get_request('filter_search'), PROFILE_TYPE_STR);
-	CProfile::update('web.dnstest.monthlyreports.filter_year', get_request('filter_year', 0), PROFILE_TYPE_INT);
-	CProfile::update('web.dnstest.monthlyreports.filter_month', get_request('filter_month', 0), PROFILE_TYPE_INT);
 }
 else {
 	$year = date('Y', time());
@@ -81,9 +77,9 @@ else {
 	else {
 		$month--;
 	}
-	$data['filter_search'] = CProfile::get('web.dnstest.monthlyreports.filter_search');
-	$data['filter_year'] = CProfile::get('web.dnstest.monthlyreports.filter_year', $year);
-	$data['filter_month'] = CProfile::get('web.dnstest.monthlyreports.filter_month', $month);
+	$data['filter_search'] = null;
+	$data['filter_year'] = $year;
+	$data['filter_month'] = $month;
 }
 
 if ($data['filter_search']) {

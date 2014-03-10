@@ -895,6 +895,9 @@ define('SHORT_DESCRIPTION',	1);
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
+// SLA monitoring start year
+define('SLA_MONITORING_START_YEAR',	2014);
+
 // SLA monitoring services
 define('DNSTEST_DNS',			0);
 define('DNSTEST_DNSSEC',		1);

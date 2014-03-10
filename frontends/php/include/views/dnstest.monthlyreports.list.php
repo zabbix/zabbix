@@ -48,10 +48,9 @@ $filterYear = new CComboBox(
 	isset($this->data['filter_year']) ? $this->data['filter_year'] : null
 );
 
-for ($i = 2013; $i <= date('Y', time()); $i++) {
+for ($i = SLA_MONITORING_START_YEAR; $i <= date('Y', time()); $i++) {
 	$filterYear->addItem($i, $i);
 }
-
 
 $filterTable->addRow(array(
 	array(array(bold(_('TLD')), ':'.SPACE), $filterTld),
