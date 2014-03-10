@@ -201,7 +201,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 				" and h.status in (%d,%d)"
 				" and i.status=%d"
 				" and (",
-			ZBX_SQL_ITEM_SELECT
+			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ITEM_STATUS_ACTIVE);
 
