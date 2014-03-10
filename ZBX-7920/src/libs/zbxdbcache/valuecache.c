@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <stddef.h>
+
 #include "common.h"
 #include "log.h"
 #include "memalloc.h"
@@ -151,6 +153,11 @@ typedef struct
 }
 zbx_vc_item_t;
 
+/* the number of zbx_vc_item_t structures that can be allocated in 8KB memory area */
+/* (this includes padding and memory allocator overhead)                           */
+#define ZBX_ITEMS_PER_8KB		113
+
+
 #define ZBX_VC_TIME()	time(NULL)
 
 /* the value cache data  */
@@ -170,6 +177,11 @@ typedef struct
 
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
+
+	/* A pool of preallocated memory chunks for new items.                                 */
+	/* The pool is built as a linked list of memory chunks of size sizeof(zbx_vc_item_t)   */
+	/* where address of the next chunk is written at the begining of current memory chunk. */
+	void		*item_pool;
 
 	/* the cached items */
 	zbx_hashset_t	items;
@@ -209,6 +221,61 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
 		int timestamp, const zbx_timespec_t *ts);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
 static void	vch_item_clean_cache(zbx_vc_item_t *item);
+static void	vc_release_space(size_t space);
+
+#define ZBX_VC_SIZE_ITEM_HASHSET_ENTRY()	(sizeof(zbx_vc_item_t) + offsetof(ZBX_HASHSET_ENTRY_T, data))
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: vc_mem_item_malloc                                                  *
+ *                                                                               *
+ * Purpose: memory allocation function for item hashset to implement item pool   *
+ *                                                                               *
+ * Comments: To void initial cache fragmentation when item allocation is         *
+ *           interleaved with data allocation items are allocated in 8K batches  *
+ *           and stored in item pool.                                            *
+ *                                                                               *
+ *********************************************************************************/
+static void	*vc_mem_item_malloc(void *old, size_t size)
+{
+	void	*ptr;
+	int	i;
+
+	if (size != ZBX_VC_SIZE_ITEM_HASHSET_ENTRY())
+		return __vc_mem_malloc_func(old, size);
+
+	/* old pointer must be NULL */
+	if (NULL != old)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "vc_mem_item_malloc: allocating already allocated memory. "
+				"Please report this to Zabbix developers.");
+	}
+
+	if (NULL == vc_cache->item_pool)
+	{
+		for (i = 0; i < ZBX_ITEMS_PER_8KB; i++)
+		{
+			if (NULL == (ptr = __vc_mem_malloc_func(NULL, ZBX_VC_SIZE_ITEM_HASHSET_ENTRY())))
+			{
+				vc_release_space(size);
+
+				if (0 != vc_cache->low_memory)
+					return NULL;
+
+				ptr = __vc_mem_malloc_func(NULL, size);
+
+			}
+
+			*(void **)ptr = vc_cache->item_pool;
+			vc_cache->item_pool = ptr;
+		}
+	}
+
+	ptr = vc_cache->item_pool;
+	vc_cache->item_pool = *(void **)ptr;
+
+	return ptr;
+}
 
 /******************************************************************************************************************
  *                                                                                                                *
@@ -755,13 +822,14 @@ static void	vc_warn_low_memory()
  *           bytes of space to reduce number of space release requests.       *
  *                                                                            *
  ******************************************************************************/
-static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
+static void	vc_release_space(size_t space)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_vc_item_t			*item;
 	int				timestamp, i;
 	size_t				freed = 0;
 	zbx_vector_vc_itemweight_t	items;
+	void				*ptr;
 
 	timestamp = ZBX_VC_TIME() - SEC_PER_DAY;
 
@@ -774,7 +842,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (0 == item->refcount && source_item != item && item->last_accessed < timestamp)
+		if (0 == item->refcount && item->last_accessed < timestamp)
 		{
 			freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
 			zbx_hashset_iter_remove(&iter);
@@ -788,6 +856,15 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	vc_cache->low_memory = 1;
 
 	vc_warn_low_memory();
+
+	/* free the memory allocated for item pool */
+	for (ptr = vc_cache->item_pool; NULL != ptr; )
+	{
+		void	*ptrnext = *(void**)ptr;
+
+		__vc_mem_free_func(ptr);
+		ptr = ptrnext;
+	}
 
 	/* remove items with least hits/size ratio */
 	zbx_vector_vc_itemweight_create(&items);
@@ -878,12 +955,11 @@ static void	vc_history_record_vector_append(zbx_vector_history_record_t *vector,
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_malloc                                                   *
+ * Function: vc_malloc                                                        *
  *                                                                            *
- * Purpose: allocate cache memory to store item's resources                   *
+ * Purpose: allocate value cache memory                                       *
  *                                                                            *
- * Parameters: item   - [IN] the item                                         *
- *             size   - [IN] the number of bytes to allocate                  *
+ * Parameters: size   - [IN] the number of bytes to allocate                  *
  *                                                                            *
  * Return value:  The pointer to allocated memory or NULL if there is not     *
  *                enough shared memory.                                       *
@@ -893,7 +969,7 @@ static void	vc_history_record_vector_append(zbx_vector_history_record_t *vector,
  *           still fails a NULL value is returned.                            *
  *                                                                            *
  ******************************************************************************/
-static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
+static void	*vc_malloc(size_t size)
 {
 	char	*ptr;
 
@@ -902,7 +978,7 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 		/* If failed to allocate required memory, try to free space in      */
 		/* cache and allocate again. If there still is not enough space -   */
 		/* return NULL as failure.                                          */
-		vc_release_space(item, size);
+		vc_release_space(size);
 		ptr = __vc_mem_malloc_func(NULL, size);
 	}
 
@@ -911,12 +987,11 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_strdup                                                   *
+ * Function: vc_strdup                                                        *
  *                                                                            *
- * Purpose: copies string to the cache memory                                 *
+ * Purpose: allocates value cache memory and duplicates the specified string  *
  *                                                                            *
- * Parameters: item  - [IN] the item                                          *
- *             str   - [IN] the string to copy                                *
+ * Parameters: str   - [IN] the string to copy                                *
  *                                                                            *
  * Return value:  The pointer to the copied string or NULL if there was not   *
  *                enough space in cache.                                      *
@@ -930,7 +1005,7 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
  *           tries again. If it still fails then a NULL value is returned.    *
  *                                                                            *
  ******************************************************************************/
-static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
+static char	*vc_strdup(const char *str)
 {
 	void	*ptr;
 
@@ -949,7 +1024,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 			/* If there is not enough space - free enough to store string + hashset entry overhead */
 			/* and try inserting one more time. If it fails again, then fail the function.         */
 			if (0 == tries++)
-				vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
+				vc_release_space(len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
 			else
 				return NULL;
 		}
@@ -999,12 +1074,12 @@ static size_t	vc_item_strfree(char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_logdup                                                   *
+ * Function: vc_logdup                                                        *
  *                                                                            *
- * Purpose: copies log value to the cache memory                              *
+ * Purpose: allocates value cache memory and duplicates the specified log     *
+ *          value                                                             *
  *                                                                            *
- * Parameters: item  - [IN] the item                                          *
- *             log   - [IN] the log value to copy                             *
+ * Parameters: log   - [IN] the log value to copy                             *
  *                                                                            *
  * Return value:  The pointer to the copied log value or NULL if there was    *
  *                not enough space in cache.                                  *
@@ -1015,11 +1090,11 @@ static size_t	vc_item_strfree(char *str)
  *           If it still fails then a NULL value is returned.                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_t *log)
+static zbx_log_value_t	*vc_logdup(const zbx_log_value_t *log)
 {
 	zbx_log_value_t	*plog = NULL;
 
-	if (NULL == (plog = vc_item_malloc(item, sizeof(zbx_log_value_t))))
+	if (NULL == (plog = vc_malloc(sizeof(zbx_log_value_t))))
 		return NULL;
 
 	plog->timestamp = log->timestamp;
@@ -1028,13 +1103,13 @@ static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_
 
 	if (NULL != log->source)
 	{
-		if (NULL == (plog->source = vc_item_strdup(item, log->source)))
+		if (NULL == (plog->source = vc_strdup(log->source)))
 			goto fail;
 	}
 	else
 		plog->source = NULL;
 
-	if (NULL == (plog->value = vc_item_strdup(item, log->value)))
+	if (NULL == (plog->value = vc_strdup(log->value)))
 		goto fail;
 
 	return plog;
@@ -1338,7 +1413,7 @@ static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *i
 
 	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_history_record_t) * (nslots - 1);
 
-	if (NULL == (chunk = vc_item_malloc(item, chunk_size)))
+	if (NULL == (chunk = vc_malloc(chunk_size)))
 		return FAIL;
 
 	memset(chunk, 0, sizeof(zbx_vc_chunk_t));
@@ -1547,11 +1622,11 @@ static int	vch_item_copy_value(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int i
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			if (NULL == (value->value.str = vc_item_strdup(item, source_value->value.str)))
+			if (NULL == (value->value.str = vc_strdup(source_value->value.str)))
 				goto out;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (NULL == (value->value.log = vc_item_logdup(item, source_value->value.log)))
+			if (NULL == (value->value.log = vc_logdup(source_value->value.log)))
 				goto out;
 			break;
 		default:
@@ -1594,7 +1669,7 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
-				if (NULL == (value->value.str = vc_item_strdup(item, values[i].value.str)))
+				if (NULL == (value->value.str = vc_strdup(values[i].value.str)))
 					goto out;
 
 				value->timestamp = values[i].timestamp;
@@ -1608,7 +1683,7 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
-				if (NULL == (value->value.log = vc_item_logdup(item, values[i].value.log)))
+				if (NULL == (value->value.log = vc_logdup(values[i].value.log)))
 					goto out;
 
 				value->timestamp = values[i].timestamp;
@@ -2447,7 +2522,7 @@ void	zbx_vc_init(void)
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, vc_mem_item_malloc, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
