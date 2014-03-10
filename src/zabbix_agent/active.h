@@ -75,6 +75,7 @@ typedef struct
 	int		mtime;
 	unsigned char	skip_old_data;	/* for processing [event]log metrics */
 	unsigned char	state;
+	int		big_rec;	/* for reading logfiles: 0 - normal record, 1 - long unfinished record */
 }
 ZBX_ACTIVE_METRIC;
 
