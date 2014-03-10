@@ -198,11 +198,11 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select %s"
 			" where h.hostid=i.hostid"
-				" and h.status=%d"
+				" and h.status in (%d,%d)"
 				" and i.status=%d"
 				" and (",
-			ZBX_SQL_ITEM_SELECT,
-			HOST_STATUS_MONITORED,
+			ZBX_SQL_ITEM_SELECT
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ITEM_STATUS_ACTIVE);
 
 	for (i = 0; i < exp->functions_num; i++)
