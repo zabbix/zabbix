@@ -94,6 +94,14 @@ typedef struct
 }
 ZBX_DC_HISTORY;
 
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	const char	*field_name;
+	char		*value_esc;
+}
+zbx_inventory_value_t;
+
 /* value_avg_t structure is used for item average value trend calculations. */
 /*                                                                          */
 /* For double values the average value is calculated on the fly with the    */
@@ -1085,12 +1093,13 @@ notsupported:
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h, unsigned char inventory_link)
+static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DB_ITEM *item, ZBX_DC_HISTORY *h,
+		unsigned char inventory_link)
 {
-	const char	*inventory_field;
-	char		value[MAX_BUFFER_LEN], *value_esc;
-	int		update_inventory = 0;
-	unsigned short	inventory_field_len;
+	char			value[MAX_BUFFER_LEN];
+	const char		*inventory_field;
+	unsigned short		inventory_field_len;
+	zbx_inventory_value_t	*inventory_value;
 
 	if (1 == h->value_null || NULL == (inventory_field = DBget_inventory_field(inventory_link)))
 		return;
@@ -1099,30 +1108,54 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, h->value.dbl);
-			update_inventory = 1;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.ui64);
-			update_inventory = 1;
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			strscpy(value, h->value_orig.str);
-			update_inventory = 1;
 			break;
+		default:
+			return;
 	}
-
-	if (1 != update_inventory)
-		return;
 
 	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
 
 	inventory_field_len = DBget_inventory_field_len(inventory_link);
-	value_esc = DBdyn_escape_string_len(value, inventory_field_len);
-	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-			"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-			inventory_field, value_esc, item->hostid);
-	zbx_free(value_esc);
+
+	inventory_value = zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
+
+	inventory_value->hostid = item->hostid;
+	inventory_value->field_name = inventory_field;
+	inventory_value->value_esc = DBdyn_escape_string_len(value, inventory_field_len);
+
+	zbx_vector_ptr_append(inventory_values, inventory_value);
+}
+
+static void	DCadd_update_inventory_sql(size_t *sql_offset, zbx_vector_ptr_t *inventory_values)
+{
+	int	i;
+
+	if (0 == inventory_values->values_num)
+		return;
+
+	for (i = 0; i < inventory_values->values_num; i++)
+	{
+		zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+				inventory_value->field_name, inventory_value->value_esc, inventory_value->hostid);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+	}
+}
+
+static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
+{
+	zbx_free(inventory_value->value_esc);
+	zbx_free(inventory_value);
 }
 
 /******************************************************************************
@@ -1151,11 +1184,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_config_hk_t			config_hk;
 	zbx_hashset_t			delta_history = {NULL};
 	zbx_item_history_value_t	*deltaitem;
+	zbx_vector_ptr_t		inventory_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCconfig_get_config_hk(&config_hk);
 
+	zbx_vector_ptr_create(&inventory_values);
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, history_num);
 
@@ -1194,19 +1229,16 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		zbx_vector_uint64_append(&ids, item.itemid);
 
-		h = NULL;
-
 		for (i = 0; i < history_num; i++)
 		{
 			if (item.itemid == history[i].itemid)
-			{
-				h = &history[i];
 				break;
-			}
 		}
 
-		if (NULL == h)
+		if (history_num == i)
 			continue;
+
+		h = &history[i];
 
 		item.state = (unsigned char)atoi(row[1]);
 		item.delta = atoi(row[2]);
@@ -1240,11 +1272,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		DCadd_update_item_sql(&sql_offset, &item, h, deltaitem);
-		DCadd_update_inventory_sql(&sql_offset, &item, h, inventory_link);
-
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		DCinventory_value_add(&inventory_values, &item, h, inventory_link);
 	}
 	DBfree_result(result);
+
+	zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DCadd_update_inventory_sql(&sql_offset, &inventory_values);
+
+	zbx_vector_ptr_clean(&inventory_values, (zbx_mem_free_func_t)DCinventory_value_free);
+	zbx_vector_ptr_destroy(&inventory_values);
 
 	/* disable processing of deleted and disabled history items by setting value_null */
 	for (i = 0; i < history_num; i++)
@@ -1258,10 +1297,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DCset_delta_items(&delta_history);
 	zbx_hashset_destroy(&delta_history);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
