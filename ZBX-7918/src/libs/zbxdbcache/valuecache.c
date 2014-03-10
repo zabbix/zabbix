@@ -2817,8 +2817,8 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	stats->misses = vc_cache->misses;
 	stats->low_memory = vc_cache->low_memory;
 
-	stats->total = vc_mem->total_size;
-	stats->used = vc_mem->used_size;
+	stats->total_size = vc_mem->total_size;
+	stats->free_size = vc_mem->free_size;
 
 	vc_try_unlock();
 
