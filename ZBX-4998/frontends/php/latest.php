@@ -473,7 +473,7 @@ foreach ($items as $key => $item){
 			$info->setHint($item['error'], '', 'on');
 		}
 		else {
-			$info = SPACE;
+			$info = '';
 		}
 
 		// trend value
@@ -653,7 +653,7 @@ foreach ($items as $item) {
 			$info->setHint($item['error'], '', 'on');
 		}
 		else {
-			$info = SPACE;
+			$info = '';
 		}
 
 		// trend value

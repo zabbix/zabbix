@@ -204,7 +204,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$info->setHint($trigger['error'], '', 'on');
 		}
 		else {
-			$info = SPACE;
+			$info = '';
 		}
 	}
 	else {

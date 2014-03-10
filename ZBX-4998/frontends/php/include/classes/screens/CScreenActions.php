@@ -68,18 +68,6 @@ class CScreenActions extends CScreenBase {
 				$sorttitle = _('Status');
 				break;
 
-			case SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC:
-				$sortfield = 'retries';
-				$sortorder = ZBX_SORT_UP;
-				$sorttitle = _('Retries left');
-				break;
-
-			case SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC:
-				$sortfield = 'retries';
-				$sortorder = ZBX_SORT_DOWN;
-				$sorttitle = _('Retries left');
-				break;
-
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_ASC:
 				$sortfield = 'sendto';
 				$sortorder = ZBX_SORT_UP;
@@ -93,7 +81,8 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.userid'.
+		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
+					'a.userid,a.actionid,a.mediatypeid,mt.description'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
@@ -135,30 +124,37 @@ class CScreenActions extends CScreenBase {
 		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo(_('No actions found.'));
+		$actionTable = new CTableInfo(_('No action log entries found.'));
 		$actionTable->setHeader(array(
 			is_show_all_nodes() ? _('Nodes') : null,
 			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
+			_('Action'),
 			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
-			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
-			($sortfield === 'retries') ? array($sortfieldSpan, $sortorderSpan) : _('Retries left'),
 			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
 			_('Message'),
-			_('Error')
+			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
+			_('Info')
+		));
+
+		$actions = API::Action()->get(array(
+			'output' => array('actionid', 'name'),
+			'actionids' => array_unique(zbx_objectValues($alerts, 'actionid')),
+			'preservekeys' => true
 		));
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('sent'), 'green');
-				$retries = new CSpan(SPACE, 'green');
+				$status = new CSpan(_('Sent'), 'green');
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$status = new CSpan(_('In progress'), 'orange');
-				$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], 'orange');
+				$status = new CSpan(array(
+					_('In progress').':',
+					BR(),
+					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
+				), 'orange');
 			}
 			else {
-				$status = new CSpan(_('not sent'), 'red');
-				$retries = new CSpan(0, 'red');
+				$status = new CSpan(_('Not sent'), 'red');
 			}
 
 			$recipient = $alert['userid']
@@ -166,27 +162,33 @@ class CScreenActions extends CScreenBase {
 				: $alert['sendto'];
 
 			$message = array(
-				bold(_('Subject').NAME_DELIMITER),
+				bold(_('Subject').':'),
 				br(),
 				$alert['subject'],
 				br(),
 				br(),
-				bold(_('Message').NAME_DELIMITER),
+				bold(_('Message').':'),
 				br(),
 				$alert['message']
 			);
 
-			$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
+			if (zbx_empty($alert['error'])) {
+				$info = '';
+			}
+			else {
+				$info = new CDiv(SPACE, 'status_icon iconerror');
+				$info->setHint($alert['error'], '', 'on');
+			}
 
 			$actionTable->addRow(array(
 				get_node_name_by_elid($alert['alertid']),
 				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
-				new CCol(zbx_empty($alert['description']) ? '-' : $alert['description'], 'top'),
-				new CCol($status, 'top'),
-				new CCol($retries, 'top'),
+				new CCol($actions[$alert['actionid']]['name'], 'top'),
+				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),
 				new CCol($message, 'top pre'),
-				new CCol($error, 'wraptext top')
+				new CCol($status, 'top'),
+				new CCol($info, 'wraptext top')
 			));
 		}
 

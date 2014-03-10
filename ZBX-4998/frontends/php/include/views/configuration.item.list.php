@@ -131,7 +131,7 @@ foreach ($this->data['items'] as $item) {
 		}
 
 		if (!$infoIcons) {
-			$infoIcons[] = SPACE;
+			$infoIcons[] = '';
 		}
 	}
 	else {
