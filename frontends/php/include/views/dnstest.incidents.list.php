@@ -182,7 +182,16 @@ $dnsTestWidget->addFlicker($filterForm, CProfile::get('web.dnstest.incidents.fil
 
 if (isset($this->data['tld'])) {
 	$infoBlock = new CTable(null, 'filter info-block');
-	$infoBlock->addRow(array(array(bold(_('TLD')), ':', SPACE, $this->data['tld']['name'])));
+	$dateFrom = date('d.m.Y H:i', zbxDateToTime($this->data['filter_from']));
+	$dateTill = date('d.m.Y H:i', zbxDateToTime($this->data['filter_to']));
+	$infoBlock->addRow(array(array(
+		bold(_('TLD')),
+		':',
+		SPACE,
+		$this->data['tld']['name'],
+		BR(),
+		bold(_s('From %1$s till %2$s', $dateFrom, $dateTill))
+	)));
 	$dnsTestWidget->additem($infoBlock);
 }
 
@@ -247,7 +256,7 @@ if (isset($this->data['tld'])) {
 		);
 
 		$testsInfo = array(
-			_('Tests are down'),
+			bold(_('Tests are down')),
 			':',
 			SPACE,
 			$testsDown,
@@ -261,10 +270,10 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'Incidents: %1$s',
-				isset($this->data['dns']) ? count($this->data['dns']['events']) : 0
-			),
+			bold(_('Incidents')),
+			':',
+			SPACE,
+			isset($this->data['dns']) ? count($this->data['dns']['events']) : 0,
 			BR(),
 			$testsInfo
 		));
@@ -320,7 +329,7 @@ if (isset($this->data['tld'])) {
 		);
 
 		$testsInfo = array(
-			_('Tests are down'),
+			bold(_('Tests are down')),
 			':',
 			SPACE,
 			$testsDown,
@@ -334,10 +343,10 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'Incidents: %1$s',
-				isset($this->data['dnssec']) ? count($this->data['dnssec']['events']) : 0
-			),
+			bold(_('Incidents')),
+			':',
+			SPACE,
+			isset($this->data['dnssec']) ? count($this->data['dnssec']['events']) : 0,
 			BR(),
 			$testsInfo
 		));
@@ -392,7 +401,7 @@ if (isset($this->data['tld'])) {
 		);
 
 		$testsInfo = array(
-			_('Tests are down'),
+			bold(_('Tests are down')),
 			':',
 			SPACE,
 			$testsDown,
@@ -406,10 +415,10 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'Incidents: %1$s',
-				isset($this->data['rdds']) ? count($this->data['rdds']['events']) : 0
-			),
+			bold(_('Incidents')),
+			':',
+			SPACE,
+			isset($this->data['rdds']) ? count($this->data['rdds']['events']) : 0,
 			BR(),
 			$testsInfo
 		));
@@ -464,7 +473,7 @@ if (isset($this->data['tld'])) {
 		);
 
 		$testsInfo = array(
-			_('Tests are down'),
+			bold(_('Tests are down')),
 			':',
 			SPACE,
 			$testsDown,
@@ -478,10 +487,10 @@ if (isset($this->data['tld'])) {
 		);
 
 		$details = new CSpan(array(
-			_s(
-				'Incidents: %1$s',
-				isset($this->data['epp']) ? count($this->data['epp']['events']) : 0
-			),
+			bold(_('Incidents')),
+			':',
+			SPACE,
+			isset($this->data['epp']) ? count($this->data['epp']['events']) : 0,
 			BR(),
 			$testsInfo
 		));
