@@ -45,69 +45,93 @@ int	__zbx_open(const char *pathname, int flags)
 }
 #endif
 
-/*
- * Reads in at most one less than size characters from a file descriptor and stores them into the buffer pointed to by s.
- * Reading stops after a newline. If a newline is read, it is stored into the buffer.
- *
- * On success, the number of bytes read is returned (zero indicates end of file).
- * On error, -1 is returned, and errno is set appropriately.
- */
+void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
+{
+	/* default is single-byte character set */
+	*cr = "\r";
+	*lf = "\n";
+	*szbyte = 1;
+
+	if ('\0' != *encoding)
+	{
+		if (0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
+				0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
+				0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE"))
+		{
+			*cr = "\r\0";
+			*lf = "\n\0";
+			*szbyte = 2;
+		}
+		else if (0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
+				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE"))
+		{
+			*cr = "\0\r";
+			*lf = "\0\n";
+			*szbyte = 2;
+		}
+		else if (0 == strcasecmp(encoding, "UTF-32") || 0 == strcasecmp(encoding, "UTF-32LE") ||
+				0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE"))
+		{
+			*cr = "\r\0\0\0";
+			*lf = "\n\0\0\0";
+			*szbyte = 4;
+		}
+		else if (0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE"))
+		{
+			*cr = "\0\0\0\r";
+			*lf = "\0\0\0\n";
+			*szbyte = 4;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_read                                                         *
+ *                                                                            *
+ * Purpose: Read one text line from a file descriptor into buffer             *
+ *                                                                            *
+ * Parameters: fd       - [IN] file descriptor to read from                   *
+ *             buf      - [IN] buffer to read into                            *
+ *             count    - [IN] buffer size in bytes                           *
+ *             encoding - [IN] pointer to a text string describing encoding.  *
+ *                        The following encodings are recognized:             *
+ *                          "UNICODE"                                         *
+ *                          "UNICODEBIG"                                      *
+ *                          "UNICODEFFFE"                                     *
+ *                          "UNICODELITTLE"                                   *
+ *                          "UTF-16"   "UTF16"                                *
+ *                          "UTF-16BE" "UTF16BE"                              *
+ *                          "UTF-16LE" "UTF16LE"                              *
+ *                          "UTF-32"   "UTF32"                                *
+ *                          "UTF-32BE" "UTF32BE"                              *
+ *                          "UTF-32LE" "UTF32LE".                             *
+ *                        "" (empty string) means a single-byte character set.*
+ *                                                                            *
+ * Return value: On success, the number of bytes read is returned (0 (zero)   *
+ *               indicates end of file).                                      *
+ *               On error, -1 is returned and errno is set appropriately.     *
+ *                                                                            *
+ * Comments: Reading stops after a newline. If the newline is read, it is     *
+ *           stored into the buffer.                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
 	size_t		i, szbyte;
 	const char	*cr, *lf;
 	int		nbytes;
-#ifdef _WINDOWS
-	__int64		offset;
-#else
-	off_t		offset;
-#endif
+	zbx_offset_t	offset;
 
-#ifdef _WINDOWS
-	offset = _lseeki64(fd, 0, SEEK_CUR);
-#else
-	offset = lseek(fd, 0, SEEK_CUR);
-#endif
+	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
+		return -1;
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
 
-	if (0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
-			0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
-			0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE"))
-	{
-		cr = "\r\0";
-		lf = "\n\0";
-		szbyte = 2;
-	}
-	else if (0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
-			0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE"))
-	{
-		cr = "\0\r";
-		lf = "\0\n";
-		szbyte = 2;
-	}
-	else if (0 == strcasecmp(encoding, "UTF-32") || 0 == strcasecmp(encoding, "UTF-32LE") ||
-			0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE"))
-	{
-		cr = "\r\0\0\0";
-		lf = "\n\0\0\0";
-		szbyte = 4;
-	}
-	else if (0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE"))
-	{
-		cr = "\0\0\0\r";
-		lf = "\0\0\0\n";
-		szbyte = 4;
-	}
-	else	/* Single or Multi Byte Character Sets */
-	{
-		cr = "\r";
-		lf = "\n";
-		szbyte = 1;
-	}
+	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
-	for (i = 0; i + szbyte <= (size_t)nbytes; i += szbyte)
+	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
@@ -117,18 +141,17 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
-			if (i + szbyte < (size_t)nbytes && 0 == memcmp(&buf[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */
+			/* CR+LF (Windows) ? */
+			if (i < (size_t)nbytes - szbyte && 0 == memcmp(&buf[i + szbyte], lf, szbyte))
 				i += szbyte;
+
 			i += szbyte;
 			break;
 		}
 	}
 
-#ifdef _WINDOWS
-	_lseeki64(fd, offset + i, SEEK_SET);
-#else
-	lseek(fd, offset + i, SEEK_SET);
-#endif
+	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
+		return -1;
 
 	return (int)i;
 }

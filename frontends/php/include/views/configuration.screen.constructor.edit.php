@@ -349,12 +349,12 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 }
 
 /*
- * Screen item: History of actions
+ * Screen item: Action log
  */
 elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
 	$screenFormList->addRow(
-		_('Sort triggers by'),
+		_('Sort entries by'),
 		new CComboBox('sort_triggers', $sortTriggers, null, array(
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
@@ -362,8 +362,6 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
 			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
 			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
-			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC => _('Retries left (descending)'),
-			SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC => _('Retries left (ascending)'),
 			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
 		))
