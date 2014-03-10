@@ -58,6 +58,17 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 $data = array();
 $data['services'] = array();
 
+$year = date('Y', time());
+$month = date('m', time());
+
+if ($month == 1) {
+	$year--;
+	$month = 12;
+}
+else {
+	$month--;
+}
+
 /*
  * Filter
  */
@@ -65,18 +76,12 @@ if (isset($_REQUEST['filter_set'])) {
 	$data['filter_search'] = get_request('filter_search');
 	$data['filter_year'] = get_request('filter_year');
 	$data['filter_month'] = get_request('filter_month');
+
+	if ($year < $data['filter_year'] || ($year == $data['filter_year'] && $month < $data['filter_month'])) {
+		show_error_message(_('Incorrect report period.'));
+	}
 }
 else {
-	$year = date('Y', time());
-	$month = date('m', time());
-
-	if ($month == 1) {
-		$year--;
-		$month = 12;
-	}
-	else {
-		$month--;
-	}
 	$data['filter_search'] = null;
 	$data['filter_year'] = $year;
 	$data['filter_month'] = $month;
