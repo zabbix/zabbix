@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavel)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
@@ -64,6 +65,10 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed graph and graph prototype update validation allowing to pass only 'gitemid' parameter without 'itemid' (Ivo)
+........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ...G...... [ZBX-7740] fixed agent crash if logrt and log items are not supported (Andris)
 ...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
 ...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
@@ -906,6 +911,9 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
 ....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
 ....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
 ...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
