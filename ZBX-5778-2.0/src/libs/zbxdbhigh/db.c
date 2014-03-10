@@ -721,6 +721,8 @@ void	DBupdate_triggers_status_after_restart()
 
 	zbx_free(tr);
 
+	DBflush_itservice_updates();
+
 	DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

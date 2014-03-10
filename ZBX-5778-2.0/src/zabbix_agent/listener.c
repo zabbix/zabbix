@@ -73,7 +73,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [listener]", ((zbx_thread_args_t *)args)->thread_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [listener]", ((zbx_thread_args_t *)args)->thread_num);
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
