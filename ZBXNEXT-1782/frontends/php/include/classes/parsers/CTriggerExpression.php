@@ -225,7 +225,7 @@ class CTriggerExpression {
 		$this->lldmacros = array();
 
 		$this->pos = 0;
-		$this->expression = $this->normalizeExpression($expression);
+		$this->expression = $expression;
 
 		$state = self::STATE_INIT;
 		$level = 0;
@@ -237,8 +237,6 @@ class CTriggerExpression {
 				case self::STATE_AFTER_BINARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-						case "	":
-						case "\n":
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
@@ -263,8 +261,6 @@ class CTriggerExpression {
 				case self::STATE_AFTER_UNARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-						case "	":
-						case "\n":
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
@@ -281,8 +277,6 @@ class CTriggerExpression {
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
-						case "	":
-						case "\n":
 							break;
 						case ')':
 							$state = self::STATE_AFTER_CLOSE_BRACE;
@@ -314,14 +308,6 @@ class CTriggerExpression {
 		}
 
 		return $this->isValid;
-	}
-
-	protected function normalizeExpression($expression) {
-		// convert new lines to Unix format
-		return strtr($expression, array(
-			"\r\n" => "\n",
-			"\r" => "\n"
-		));
 	}
 
 	/**
