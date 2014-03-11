@@ -662,7 +662,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* initialize history value cache */
 	zbx_vc_init();
 
-	zbx_create_services_lock();
+	zbx_create_itservices_lock();
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
@@ -924,7 +924,7 @@ void	zbx_on_exit()
 	/* free history value cache */
 	zbx_vc_destroy();
 
-	zbx_destroy_services_lock();
+	zbx_destroy_itservices_lock();
 
 	zbx_mutex_destroy(&node_sync_access);
 

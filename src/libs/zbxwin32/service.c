@@ -63,8 +63,6 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
-			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent shutdown requested");
-
 			serviceStatus.dwCurrentState	= SERVICE_STOP_PENDING;
 			serviceStatus.dwWaitHint	= 4000;
 			SetServiceStatus(serviceHandle, &serviceStatus);
