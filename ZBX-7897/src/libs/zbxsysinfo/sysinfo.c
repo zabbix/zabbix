@@ -220,7 +220,10 @@ void	zbx_logs_free(zbx_log_t **logs)
 	size_t	i;
 
 	for (i = 0; NULL != logs[i]; i++)
+	{
 		zbx_log_clean(logs[i]);
+		zbx_free(logs[i]);
+	}
 	zbx_free(logs);
 }
 
