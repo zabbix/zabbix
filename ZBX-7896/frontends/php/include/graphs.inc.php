@@ -719,7 +719,7 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 		}
 	}
 	else {
-		show_error_message(_('PHP gd FreeType support missing'));
+		show_error_message('PHP gd FreeType support missing');
 	}
 }
 
@@ -742,7 +742,7 @@ function imageTextSize($fontsize, $angle, $string) {
 		$result['width'] = abs($ar[0] - $ar[4]);
 	}
 	else {
-		show_error_message(_('PHP gd FreeType support missing'));
+		show_error_message('PHP gd FreeType support missing');
 		return false;
 	}
 
@@ -771,7 +771,7 @@ function imageTextBaseline($fontsize, $string) {
 		return $ar[1];
 	}
 	else {
-		show_error_message(_('PHP gd FreeType support missing'));
+		show_error_message('PHP gd FreeType support missing');
 	}
 }
 
