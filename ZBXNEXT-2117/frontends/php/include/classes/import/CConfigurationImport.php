@@ -117,8 +117,6 @@ class CConfigurationImport {
 			// this made to not check all api calls results for false return
 			czbxrpc::$useExceptions = true;
 
-			DBstart();
-
 			$this->data = $this->reader->read($this->source);
 
 			$version = $this->getImportVersion();
@@ -172,11 +170,10 @@ class CConfigurationImport {
 			// prevent api from throwing exception
 			czbxrpc::$useExceptions = false;
 
-			return DBend(true);
+			return true;
 		}
 		catch (Exception $e) {
 			czbxrpc::$useExceptions = false;
-			DBend(false);
 
 			throw new Exception($e->getMessage(), $e->getCode());
 		}
@@ -570,7 +567,7 @@ class CConfigurationImport {
 			}
 		}
 
-		// refresh applications beacuse templated ones can be inherited to host and used in items
+		// refresh applications because templated ones can be inherited to host and used in items
 		$this->referencer->refreshApplications();
 	}
 
@@ -597,7 +594,7 @@ class CConfigurationImport {
 			foreach ($items as $item) {
 				$item['hostid'] = $hostid;
 
-				if (!empty($item['applications'])) {
+				if (isset($item['applications']) && $item['applications']) {
 					$applicationsIds = array();
 
 					foreach ($item['applications'] as $application) {
@@ -613,11 +610,11 @@ class CConfigurationImport {
 					$item['applications'] = $applicationsIds;
 				}
 
-				if (isset($item['interface_ref'])) {
+				if (isset($item['interface_ref']) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 
-				if ($item['valuemap']) {
+				if (isset($item['valuemap']) && $item['valuemap']) {
 					$valueMapId = $this->referencer->resolveValueMap($item['valuemap']['name']);
 
 					if (!$valueMapId) {

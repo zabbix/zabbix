@@ -99,11 +99,11 @@ if ($exportData) {
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 
-	if (no_errors()) {
-		print($exportData);
+	if (hasErrorMesssages()) {
+		show_messages();
 	}
 	else {
-		show_messages();
+		print($exportData);
 	}
 
 	exit;
@@ -140,15 +140,6 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 }
 elseif (hasRequest('save')) {
 	$templateId = getRequest('templateid');
-
-	if ($templateId) {
-		$msgOk = _('Template updated');
-		$msgFail = _('Cannot update template');
-	}
-	else {
-		$msgOk = _('Template added');
-		$msgFail = _('Cannot add template');
-	}
 
 	try {
 		DBstart();
@@ -232,17 +223,22 @@ elseif (hasRequest('save')) {
 		);
 
 		if ($templateId) {
-			$created = false;
-
 			$template['templateid'] = $templateId;
 			$template['templates_clear'] = $templatesClear;
 
-			if (!API::Template()->update($template)) {
+			$messageSuccess = _('Template updated');
+			$messageFailed = _('Cannot update template');
+			$auditAction = AUDIT_ACTION_UPDATE;
+
+			$result = API::Template()->update($template);
+			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$created = true;
+			$messageSuccess = _('Template added');
+			$messageFailed = _('Cannot add template');
+			$auditAction = AUDIT_ACTION_ADD;
 
 			$result = API::Template()->create($template);
 
@@ -271,8 +267,13 @@ elseif (hasRequest('save')) {
 				'inherited' => false
 			));
 
-			if ($dbTriggers && !copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $templateId, $cloneTemplateId)) {
-				throw new Exception();
+			if ($dbTriggers) {
+				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
+						$templateId, $cloneTemplateId);
+
+				if (!$result) {
+					throw new Exception();
+				}
 			}
 
 			// copy graphs
@@ -294,12 +295,12 @@ elseif (hasRequest('save')) {
 			));
 
 			if ($dbDiscoveryRules) {
-				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+				$result &= API::DiscoveryRule()->copy(array(
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => array($templateId)
 				));
 
-				if (!$copyDiscoveryRules) {
+				if (!$result) {
 					throw new Exception();
 				}
 			}
@@ -313,32 +314,29 @@ elseif (hasRequest('save')) {
 			));
 
 			if ($dbTemplateScreens) {
-				$copyTemplateScreens = API::TemplateScreen()->copy(array(
+				$result &= API::TemplateScreen()->copy(array(
 					'screenIds' => zbx_objectValues($dbTemplateScreens, 'screenid'),
 					'templateIds' => $templateId
 				));
 
-				if (!$copyTemplateScreens) {
+				if (!$result) {
 					throw new Exception();
 				}
 			}
 		}
 
-		DBend(true);
-
-		show_messages(true, $msgOk, $msgFail);
-		clearCookies(true);
-
-		if ($created) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
+		if ($result) {
+			add_audit_ext($auditAction, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+		$result = DBend($result);
+		show_messages($result, $messageSuccess, $messageFailed);
+		clearCookies($result);
 	}
 	catch (Exception $e) {
 		DBend(false);
-
-		show_messages(false, $msgOk, $msgFail);
+		show_error_message($messageFailed);
 	}
 
 	unset($_REQUEST['save']);
@@ -574,28 +572,29 @@ else {
 
 		order_result($template['parentTemplates'], 'name');
 
+		$linkedTemplatesOutput = $linkedToOutput = $linkedToObjects = array();
+
 		$i = 0;
-		$linkedTemplatesOutput = array();
 
 		foreach ($template['parentTemplates'] as $linkedTemplate) {
 			$i++;
 
 			if ($i > $config['max_in_table']) {
-				$linkedTemplatesOutput[] = '...';
-				$linkedTemplatesOutput[] = '//empty element for array_pop';
+				$linkedTemplatesOutput[] = ' &hellip;';
+
 				break;
 			}
 
 			$url = 'templates.php?form=update&templateid='.$linkedTemplate['templateid'].url_param('groupid');
 
+			if ($linkedTemplatesOutput) {
+				$linkedTemplatesOutput[] = ', ';
+			}
+
 			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, 'unknown');
-			$linkedTemplatesOutput[] = ', ';
 		}
-		array_pop($linkedTemplatesOutput);
 
 		$i = 0;
-		$linkedToOutput = array();
-		$linkedToObjects = array();
 
 		foreach ($template['hosts'] as $h) {
 			$h['objectid'] = $h['hostid'];
@@ -611,8 +610,8 @@ else {
 
 		foreach ($linkedToObjects as $linkedToHost) {
 			if (++$i > $config['max_in_table']) {
-				$linkedToOutput[] = '...';
-				$linkedToOutput[] = '//empty element for array_pop';
+				$linkedToOutput[] = ' &hellip;';
+
 				break;
 			}
 
@@ -632,10 +631,12 @@ else {
 					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
 			}
 
+			if ($linkedToOutput) {
+				$linkedToOutput[] = ', ';
+			}
+
 			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
-			$linkedToOutput[] = ', ';
 		}
-		array_pop($linkedToOutput);
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),

@@ -87,9 +87,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	}
 
 	$label = num2letter($i);
-	$labelSpan = new CSpan('('.$label.')', 'label');
+	$labelSpan = new CSpan($label, 'label');
 	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-	$labelSpan->setAttribute('data-label', $label);
+	$labelSpan->setAttribute('data-formulaid', $label);
 
 	$conditionTable->addRow(
 		array(
@@ -107,9 +107,9 @@ foreach ($this->data['action']['conditions'] as $condition) {
 }
 
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
-$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 $conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
@@ -894,6 +894,7 @@ if (!empty($this->data['new_operation'])) {
 		$grouped_opconditions = array();
 
 		$operationConditionsTable = new CTable(_('No conditions defined.'), 'formElementTable');
+		$operationConditionsTable->attr('id', 'operationConditionTable');
 		$operationConditionsTable->attr('style', 'min-width: 310px;');
 		$operationConditionsTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
@@ -913,9 +914,12 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
+			$labelCol = new CCol($label, 'label');
+			$labelCol->setAttribute('data-conditiontype', $opcondition['conditiontype']);
+			$labelCol->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow(
 				array(
-					'('.$label.')',
+					$labelCol,
 					get_condition_desc($opcondition['conditiontype'], $opcondition['operator'], $opcondition['value']),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
@@ -927,45 +931,21 @@ if (!empty($this->data['new_operation'])) {
 				null, 'opconditions_'.$i
 			);
 
-			$grouped_opconditions[$opcondition['conditiontype']][] = $label;
 			$i++;
 		}
 
-		if ($operationConditionsTable->itemsCount() > 1) {
-			switch ($this->data['new_operation']['evaltype']) {
-				case ACTION_EVAL_TYPE_AND:
-					$group_op = $glog_op = _('and');
-					break;
-				case ACTION_EVAL_TYPE_OR:
-					$group_op = $glog_op = _('or');
-					break;
-				default:
-					$group_op = _('or');
-					$glog_op = _('and');
-					break;
-			}
+		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
+		$calcTypeComboBox->attr('id', 'operationEvaltype');
+		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
+		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
+		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 
-			foreach ($grouped_opconditions as $id => $condition) {
-				$grouped_opconditions[$id] = '('.implode(' '.$group_op.' ', $condition).')';
-			}
-			$grouped_opconditions = implode(' '.$glog_op.' ', $grouped_opconditions);
-
-			$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
-			$calcTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
-
-			$newOperationsTable->addRow(array(
+		$newOperationsTable->addRow(array(
 				_('Type of calculation'),
-				array(
-					$calcTypeComboBox,
-					new CTextBox('preview', $grouped_opconditions, ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
-				)
-			));
-		}
-		else {
-			$operationConditionsTable->addItem(new CVar('new_operation[evaltype]', ACTION_EVAL_TYPE_AND_OR));
-		}
+				array($calcTypeComboBox, new CSpan('', null, 'operationConditionLabel'))
+			),
+			null, 'operationConditionRow'
+		);
 
 		if (!isset($_REQUEST['new_opcondition'])) {
 			$operationConditionsTable->addRow(new CCol(new CSubmit('new_opcondition', _('New'), null, 'link_menu')));

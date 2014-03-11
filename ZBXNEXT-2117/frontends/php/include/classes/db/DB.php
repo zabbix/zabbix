@@ -94,8 +94,16 @@ class DB {
 
 		if (is_null(self::$nodeId)) {
 			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
+			if (self::$nodeId == 0) {
+				self::$minNodeId = 0;
+				self::$maxNodeId = ZBX_STANDALONE_MAX_IDS;
+			}
+			else {
+				self::$minNodeId = bcadd(
+					bcmul(self::$nodeId, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0
+				);
+				self::$maxNodeId = bcadd(self::$minNodeId, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
+			}
 		}
 	}
 
@@ -185,8 +193,7 @@ class DB {
 
 		$sql = 'SELECT MAX('.$id_name.') AS id'.
 				' FROM '.$table.
-				' WHERE '.$id_name.'>='.self::$minNodeId.
-				' AND '.$id_name.'<='.self::$maxNodeId;
+				' WHERE '.$id_name.' BETWEEN '.self::$minNodeId.' AND '.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
 		$nextid = ($row && $row['id']) ? $row['id'] : self::$minNodeId;
@@ -297,6 +304,21 @@ class DB {
 			}
 		}
 		return $defaults;
+	}
+
+	/**
+	 * Returns the default value of the given field.
+	 *
+	 * @param string $table		name of the table
+	 * @param string $field		name of the field
+	 *
+	 * @return string|null
+	 */
+	public static function getDefault($table, $field) {
+		$table = self::getSchema($table);
+		$field = $table['fields'][$field];
+
+		return isset($field['default']) ? $field['default'] : null;
 	}
 
 	public static function checkValueTypes($table, &$values) {
@@ -631,10 +653,10 @@ class DB {
 		$oldRecords = zbx_toHash($oldRecords, $pk);
 
 		$modifiedRecords = array();
-		foreach ($newRecords as $record) {
+		foreach ($newRecords as $key => $record) {
 			// if it's a new or modified record - save it later
 			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
-				$modifiedRecords[] = $record;
+				$modifiedRecords[$key] = $record;
 			}
 
 			// remove the existing records from the collection, the remaining ones will be deleted
@@ -646,6 +668,11 @@ class DB {
 		// save modified records
 		if ($modifiedRecords) {
 			$modifiedRecords = self::save($tableName, $modifiedRecords);
+
+			// add the new IDs to the new records
+			foreach ($modifiedRecords as $key => $record) {
+				$newRecords[$key][$pk] = $record[$pk];
+			}
 		}
 
 		// delete remaining records
@@ -655,7 +682,83 @@ class DB {
 			));
 		}
 
-		return $modifiedRecords;
+		return $newRecords;
+	}
+
+	/**
+	 * Replaces the records given in $groupedOldRecords with the ones given in $groupedNewRecords.
+	 *
+	 * This method can be used to replace related objects in one-to-many relations. Both old and new records
+	 * must be grouped by the ID of the record they belong to. The records will be matched by position, instead of
+	 * the primary key as in DB::replace(). That is, the first new record will update the first old one, second new
+	 * record - the second old one, etc. Since the records are matched by position, the new records should not contain
+	 * primary keys.
+	 *
+	 * Example 1:
+	 * $old = array(2 => array( array('gitemid' => 1, 'color' => 'FF0000') ));
+	 * $new = array(2 => array( array('color' => '00FF00') ));
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'))
+	 *
+	 * The new record updated the old one.
+	 *
+	 * Example 2:
+	 * $old = array(2 => array( array('gitemid' => 1, 'color' => 'FF0000') ));
+	 * $new = array(
+	 *     2 => array(
+	 *         array('color' => '00FF00'),
+	 *         array('color' => '0000FF')
+	 *     )
+	 * );
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'), array('gitemid' => 2, 'color' => '0000FF'))
+	 *
+	 * The first record was updated, the second one - created.
+	 *
+	 * Example 3:
+	 * $old = array(
+	 *     2 => array(
+	 *         array('gitemid' => 1, 'color' => 'FF0000'),
+	 *         array('gitemid' => 2, 'color' => '0000FF')
+	 *     )
+	 * );
+	 * $new = array(2 => array( array('color' => '00FF00') ));
+	 * var_dump(DB::replaceByPosition('items', $old, $new));
+	 * // array(array('gitemid' => 1, 'color' => '00FF00'))
+	 *
+	 * The first record was updated, the second one - deleted.
+	 *
+	 * @param string 	$tableName			table to update
+	 * @param array 	$groupedOldRecords	grouped old records
+	 * @param array 	$groupedNewRecords	grouped new records
+	 *
+	 * @return array	array of new records not grouped (!).
+	 */
+	public static function replaceByPosition($tableName, array $groupedOldRecords, array $groupedNewRecords) {
+		$pk = self::getPk($tableName);
+
+		$allOldRecords = array();
+		$allNewRecords = array();
+		foreach ($groupedNewRecords as $key => $newRecords) {
+			// if records exist for the parent object - replace them, otherwise create new records
+			if (isset($groupedOldRecords[$key])) {
+				$oldRecords = $groupedOldRecords[$key];
+
+				// updated the records by position
+				$newRecords = self::mergeRecords($oldRecords, $newRecords, $pk);
+
+				foreach ($oldRecords as $record) {
+					$allOldRecords[] = $record;
+				}
+			}
+
+			foreach ($newRecords as $record) {
+				$allNewRecords[] = $record;
+			}
+		}
+
+		// replace the old records with the new ones
+		return self::replace($tableName, $allOldRecords, $allNewRecords);
 	}
 
 	/**
@@ -678,6 +781,30 @@ class DB {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Replace each record in $oldRecords with a corresponding record in $newRecords, but keep the old record IDs.
+	 * The records are match by position, that is, the first new record, replaces the first old record and etc.
+	 * If there are less $newRecords than $oldRecords, the remaining old records will be discarded.
+	 *
+	 * @param array 	$oldRecords		array of old records
+	 * @param array 	$newRecords		array of new records
+	 * @param string 	$pk				name of the private key column
+	 *
+	 * @return array	array of new records with the primary keys from the old ones
+	 */
+	protected static function mergeRecords(array $oldRecords, array $newRecords, $pk) {
+		$result = array();
+		foreach ($newRecords as $i => $record) {
+			if (isset($oldRecords[$i])) {
+				$record[$pk] = $oldRecords[$i][$pk];
+			}
+
+			$result[] = $record;
+		}
+
+		return $result;
 	}
 
 	/**

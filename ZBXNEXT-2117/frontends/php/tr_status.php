@@ -381,10 +381,12 @@ $triggerTable->setHeader(array(
 $sortfield = getPageSortField('description');
 $sortorder = getPageSortOrder();
 $options = array(
+	'output' => array('triggerid', $sortfield),
 	'nodeids' => get_current_nodeid(),
 	'monitored' => true,
-	'output' => array('triggerid', $sortfield),
 	'skipDependent' => true,
+	'sortfield' => $sortfield,
+	'sortorder' => $sortorder,
 	'limit' => $config['search_limit'] + 1
 );
 
@@ -440,6 +442,14 @@ $triggers = API::Trigger()->get(array(
 ));
 
 order_result($triggers, $sortfield, $sortorder);
+
+// sort trigger hosts by name
+foreach ($triggers as &$trigger) {
+	if (count($trigger['hosts']) > 1) {
+		order_result($trigger['hosts'], 'name', ZBX_SORT_UP);
+	}
+}
+unset($trigger);
 
 $triggerIds = zbx_objectValues($triggers, 'triggerid');
 
@@ -541,6 +551,7 @@ $hosts = API::Host()->get(array(
 	'output' => array('hostid'),
 	'hostids' => $hostIds,
 	'preservekeys' => true,
+	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT
 ));
 
@@ -696,7 +707,10 @@ foreach ($triggers as $trigger) {
 	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
-		: new CLink($lastChangeDate, 'events.php?triggerid='.$trigger['triggerid']);
+		: new CLink($lastChangeDate,
+			'events.php?triggerid='.$trigger['triggerid'].
+				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+		);
 
 	// acknowledge
 	if ($config['event_ack_enable']) {

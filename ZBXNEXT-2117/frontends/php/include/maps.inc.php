@@ -107,6 +107,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
+		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT
 	));
 
@@ -141,12 +142,20 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 					);
 				}
+				if ($host['graphs']) {
+					$gotos['graphs'] = array(
+						'hostid' => $host['hostid']
+					);
+				}
 				if ($host['screens']) {
 					$gotos['screens'] = array(
 						'hostid' => $host['hostid']
 					);
 				}
 				$gotos['inventory'] = array(
+					'hostid' => $host['hostid']
+				);
+				$gotos['latestData'] = array(
 					'hostid' => $host['hostid']
 				);
 				break;
@@ -161,7 +170,8 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$gotos['events'] = array(
 					'triggerid' => $elem['elementid'],
-					'nav_time' => time() - SEC_PER_WEEK
+					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
+					'period' => SEC_PER_WEEK
 				);
 				break;
 
@@ -963,6 +973,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				'output' => array('itemid'),
 				'selectApplications' => array('name'),
 				'itemids' => $itemIds,
+				'webitems' => true,
 				'preservekeys' => true
 			));
 

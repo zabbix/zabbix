@@ -478,6 +478,11 @@ class CItem extends CItemGeneral {
 		else {
 			foreach ($items as &$item) {
 				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+
+				// set default formula value
+				if (!isset($item['formula'])) {
+					$item['formula'] = '1';
+				}
 			}
 			unset($item);
 		}

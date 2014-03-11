@@ -89,11 +89,28 @@ foreach ($this->data['users'] as $user) {
 	order_result($user['usrgrps'], 'name');
 
 	$usersGroups = array();
+	$i = 0;
+
 	foreach ($user['usrgrps'] as $userGroup) {
-		$usersGroups[] = new CLink($userGroup['name'], 'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']);
-		$usersGroups[] = BR();
+		$i++;
+
+		if ($i > $this->data['config']['max_in_table']) {
+			$usersGroups[] = ' &hellip;';
+
+			break;
+		}
+
+		if ($usersGroups) {
+			$usersGroups[] = ', ';
+		}
+
+		$usersGroups[] = new CLink(
+			$userGroup['name'],
+			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid'],
+			($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED)
+				? 'disabled' : 'enabled'
+		);
 	}
-	array_pop($usersGroups);
 
 	// user type style
 	$userTypeStyle = 'enabled';

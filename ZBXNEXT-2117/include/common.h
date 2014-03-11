@@ -62,6 +62,12 @@
 #endif
 #define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
+#ifdef strncasecmp
+#	undef strncasecmp
+#endif
+#define strncasecmp	ERROR_DO_NOT_USE_STRNCASECMP_FUNCTION_TRY_TO_USE_ZBX_STRNCASECMP
+
+
 #define ON	1
 #define OFF	0
 
@@ -80,6 +86,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
@@ -273,9 +280,10 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_STORE_SIMPLE_CHANGE		2
 
 /* condition evaluation types */
-#define ACTION_EVAL_TYPE_AND_OR			0
-#define ACTION_EVAL_TYPE_AND			1
-#define ACTION_EVAL_TYPE_OR			2
+#define CONDITION_EVAL_TYPE_AND_OR		0
+#define CONDITION_EVAL_TYPE_AND			1
+#define CONDITION_EVAL_TYPE_OR			2
+#define CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define CONDITION_TYPE_HOST_GROUP		0
@@ -313,6 +321,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_MORE_EQUAL		5
 #define CONDITION_OPERATOR_LESS_EQUAL		6
 #define CONDITION_OPERATOR_NOT_IN		7
+#define CONDITION_OPERATOR_REGEXP		8
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
@@ -976,6 +985,7 @@ char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);
 int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
+int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
@@ -1018,6 +1028,11 @@ double	str2double(const char *str);
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
+
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
+
+void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 

@@ -485,183 +485,187 @@ static void	active_passive_misconfig(zbx_sock_t *sock)
 
 static int	process_trap(zbx_sock_t	*sock, char *s)
 {
-	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
-	char	lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
-	int	sender_nodeid, nodeid;
-	char	*answer;
-
-	int	ret = SUCCEED, res;
-	size_t	datalen;
-
-	struct 		zbx_json_parse jp;
-	char		value[MAX_STRING_LEN];
-	AGENT_VALUE	av;
-
-	memset(&av, 0, sizeof(AGENT_VALUE));
+	int	ret = SUCCEED;
 
 	zbx_rtrim(s, " \r\n");
 
-	datalen = strlen(s);
-	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len " ZBX_FS_SIZE_T, s, (zbx_fs_size_t)datalen);
+	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 
-	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
+	if ('{' == *s)	/* JSON protocol */
+	{
+		struct zbx_json_parse	jp;
+		char			value[MAX_STRING_LEN];
+
+		if (SUCCEED != zbx_json_open(s, &jp))
+		{
+			zbx_send_response(sock, FAIL, zbx_json_strerror(), CONFIG_TIMEOUT);
+			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object from %s: %s",
+					get_ip_by_socket(sock), zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
+		{
+			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				{
+					send_proxyconfig(sock, &jp);
+				}
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
+							" Datalen " ZBX_FS_SIZE_T,
+							(zbx_fs_size_t)(jp.end - jp.start + 1));
+					recv_proxyconfig(sock, &jp);
+				}
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
+				{
+					/* This is a misconfiguration: the proxy is configured in active mode */
+					/* but server sends requests to it as to a proxy in passive mode. To  */
+					/* prevent logging of this problem for every request we report it     */
+					/* only when the server sends configuration to the proxy and ignore   */
+					/* it for other requests.                                             */
+					active_passive_misconfig(sock);
+				}
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
+				0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			{
+				recv_agenthistory(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_proxyhistory(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_proxyhistory(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_discovery_data(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_discovery_data(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_areg_data(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_areg_data(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_proxy_heartbeat(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+			{
+				ret = send_list_of_active_checks_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					recv_host_availability(sock, &jp);
+				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					send_host_availability(sock);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
+			{
+				ret = node_process_command(sock, s, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					ret = recv_getqueue(sock, &jp);
+			}
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
+		}
+	}
+	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s);
 	}
-	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* request for last IDs */
+	else if (0 == strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23)) /* request for last IDs */
 	{
 		send_history_last_id(sock, s);
-		return ret;
 	}
-	else
+	else if (0 == strncmp(s, "Data", 4))	/* node data exchange */
 	{
-		if (0 == strncmp(s, "Data", 4))	/* node data exchange */
+		int	res, nodeid, sender_nodeid;
+		char	*data, *answer;
+
+		node_sync_lock(0);
+
+		res = node_sync(s, &sender_nodeid, &nodeid);
+		if (FAIL == res)
 		{
-			node_sync_lock(0);
-
-			res = node_sync(s, &sender_nodeid, &nodeid);
-			if (FAIL == res)
-			{
-				alarm(CONFIG_TIMEOUT);
-				send_data_to_node(sender_nodeid, sock, "FAIL");
-				alarm(0);
-			}
-			else
-			{
-				res = calculate_checksums(nodeid, NULL, 0);
-				if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes"
-							" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
-							CONFIG_NODEID,
-							sender_nodeid,
-							nodeid,
-							(zbx_fs_size_t)strlen(data));
-					alarm(CONFIG_TRAPPER_TIMEOUT);
-					res = send_data_to_node(sender_nodeid, sock, data);
-					zbx_free(data);
-					if (SUCCEED == res)
-						res = recv_data_from_node(sender_nodeid, sock, &answer);
-					if (SUCCEED == res && 0 == strcmp(answer, "OK"))
-						res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
-					alarm(0);
-				}
-			}
-
-			node_sync_unlock(0);
-
-			return ret;
-		}
-		else if (0 == strncmp(s, "History", 7))	/* slave node history */
-		{
-			const char	*reply;
-
-			reply = (SUCCEED == node_history(s, datalen) ? "OK" : "FAIL");
-
 			alarm(CONFIG_TIMEOUT);
-			if (SUCCEED != zbx_tcp_send_raw(sock, reply))
-				zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
+			send_data_to_node(sender_nodeid, sock, "FAIL");
 			alarm(0);
-
-			return ret;
-		}
-		else if (SUCCEED == zbx_json_open(s, &jp))	/* JSON protocol */
-		{
-			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
-			{
-				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-					{
-						send_proxyconfig(sock, &jp);
-					}
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
-								" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
-						recv_proxyconfig(sock, &jp);
-					}
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
-					{
-						/* This is a misconfiguration: the proxy is configured in active mode */
-						/* but server sends requests to it as to a proxy in passive mode. To  */
-						/* prevent logging of this problem for every request we report it     */
-						/* only when the server sends configuration to the proxy and ignore   */
-						/* it for other requests.                                             */
-						active_passive_misconfig(sock);
-					}
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
-				{
-					recv_agenthistory(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_proxyhistory(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_proxyhistory(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_discovery_data(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_discovery_data(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_areg_data(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_areg_data(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_proxy_heartbeat(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
-				{
-					ret = send_list_of_active_checks_json(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						recv_host_availability(sock, &jp);
-					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-						send_host_availability(sock);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
-				{
-					ret = node_process_command(sock, s, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
-				{
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-						ret = recv_getqueue(sock, &jp);
-				}
-				else
-					zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
-			}
-			return ret;
-		}
-		else if ('<' == *s)	/* XML protocol */
-		{
-			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
-					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp),
-					source, sizeof(source),	severity, sizeof(severity));
-
-			av.value	= value_dec;
-			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
-				av.lastlogsize = 0;
-			av.timestamp	= atoi(timestamp);
-			av.source	= source;
-			av.severity	= atoi(severity);
 		}
 		else
 		{
+			res = calculate_checksums(nodeid, NULL, 0);
+			if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes"
+						" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
+						CONFIG_NODEID,
+						sender_nodeid,
+						nodeid,
+						(zbx_fs_size_t)strlen(data));
+				alarm(CONFIG_TRAPPER_TIMEOUT);
+				res = send_data_to_node(sender_nodeid, sock, data);
+				zbx_free(data);
+				if (SUCCEED == res)
+					res = recv_data_from_node(sender_nodeid, sock, &answer);
+				if (SUCCEED == res && 0 == strcmp(answer, "OK"))
+					res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
+				alarm(0);
+			}
+		}
+
+		node_sync_unlock(0);
+	}
+	else if (0 == strncmp(s, "History", 7))	/* slave node history */
+	{
+		const char	*reply;
+
+		reply = (SUCCEED == node_history(s, strlen(s)) ? "OK" : "FAIL");
+
+		alarm(CONFIG_TIMEOUT);
+		if (SUCCEED != zbx_tcp_send_raw(sock, reply))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
+		alarm(0);
+	}
+	else
+	{
+		char		value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
+				source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
+		AGENT_VALUE	av;
+
+		memset(&av, 0, sizeof(AGENT_VALUE));
+
+		if ('<' == *s)	/* XML protocol */
+		{
+			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
+					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
+					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
+
+			av.value = value_dec;
+			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
+				av.lastlogsize = 0;
+			av.timestamp = atoi(timestamp);
+			av.source = source;
+			av.severity = atoi(severity);
+		}
+		else
+		{
+			char	*pl, *pr;
+
 			pl = s;
 			if (NULL == (pr = strchr(pl, ':')))
 				return FAIL;
@@ -678,8 +682,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			zbx_strlcpy(av.key, pl, sizeof(av.key));
 			*pr = ':';
 
-			av.value	= pr + 1;
-			av.severity	= 0;
+			av.value = pr + 1;
+			av.severity = 0;
 		}
 
 		zbx_timespec(&av.ts);
@@ -690,10 +694,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		process_mass_data(sock, 0, &av, 1, NULL);
 
 		alarm(CONFIG_TIMEOUT);
-		if (SUCCEED != zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK"))
+		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		alarm(0);
 	}
+
 	return ret;
 }
 

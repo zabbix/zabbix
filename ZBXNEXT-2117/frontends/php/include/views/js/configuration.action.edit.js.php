@@ -244,6 +244,8 @@
 	function removeOperationCondition(index) {
 		jQuery('#opconditions_' + index).find('*').remove();
 		jQuery('#opconditions_' + index).remove();
+
+		processOperationTypeOfCalculation();
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
@@ -495,53 +497,48 @@
 	}
 
 	function processTypeOfCalculation() {
-		var count = jQuery('#conditionTable tr').length - 1;
+		var labels = jQuery('#conditionTable .label');
 
-		if (count > 1) {
+		if (labels.length > 1) {
 			jQuery('#conditionRow').css('display', '');
 
-			var groupOperator = '',
-				globalOperator = '',
-				str = '';
+			var conditions = [];
+			labels.each(function(index, label) {
+				label = jQuery(label);
 
-			if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_AND; ?>) {
-				groupOperator = <?php echo CJs::encodeJson(_('and')); ?>;
-				globalOperator = <?php echo CJs::encodeJson(_('and')); ?>;
-			}
-			else if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_OR; ?>) {
-				groupOperator = <?php echo CJs::encodeJson(_('or')); ?>;
-				globalOperator = <?php echo CJs::encodeJson(_('or')); ?>;
-			}
-			else {
-				groupOperator = <?php echo CJs::encodeJson(_('or')); ?>;
-				globalOperator = <?php echo CJs::encodeJson(_('and')); ?>;
-			}
-
-			var conditionTypeHold = '';
-
-			jQuery('#conditionTable tr').not('.header').each(function() {
-				var conditionType = jQuery(this).find('.label').data('conditiontype');
-
-				if (empty(str)) {
-					str = ' (' + jQuery(this).find('.label').data('label');
-					conditionTypeHold = conditionType;
-				}
-				else {
-					if (conditionType != conditionTypeHold) {
-						str += ') ' + globalOperator + ' (' + jQuery(this).find('.label').data('label');
-						conditionTypeHold = conditionType;
-					}
-					else {
-						str += ' ' + groupOperator + ' ' + jQuery(this).find('.label').data('label');
-					}
-				}
+				conditions.push({
+					id: label.data('formulaid'),
+					type: label.data('conditiontype')
+				});
 			});
-			str += ')';
 
-			jQuery('#conditionLabel').html(str);
+			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
 		else {
 			jQuery('#conditionRow').css('display', 'none');
+		}
+	}
+
+	function processOperationTypeOfCalculation() {
+		var labels = jQuery('#operationConditionTable .label');
+
+		if (labels.length > 1) {
+			jQuery('#operationConditionRow').css('display', '');
+
+			var conditions = [];
+			labels.each(function(index, label) {
+				label = jQuery(label);
+
+				conditions.push({
+					id: label.data('formulaid'),
+					type: label.data('conditiontype')
+				});
+			});
+
+			jQuery('#operationConditionLabel').html(getConditionFormula(conditions, +jQuery('#operationEvaltype').val()));
+		}
+		else {
+			jQuery('#operationConditionRow').css('display', 'none');
 		}
 	}
 
@@ -606,5 +603,6 @@
 		});
 
 		processTypeOfCalculation();
+		processOperationTypeOfCalculation();
 	});
 </script>

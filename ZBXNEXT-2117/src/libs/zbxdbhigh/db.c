@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdb.h"
 #include "db.h"
 #include "log.h"
 #include "common.h"
@@ -168,7 +167,7 @@ int	DBconnect(int flag)
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBNAME);
+	zbx_db_init(CONFIG_DBNAME, db_schema);
 }
 
 /******************************************************************************
@@ -818,271 +817,32 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_escape_string_len                                          *
- *                                                                            *
- * Return value: return length in bytes of escaped string                     *
- *               with terminating '\0'                                        *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: sync changes with 'DBescape_string'                              *
- *           and 'DBdyn_escape_string_len'                                    *
- *                                                                            *
- ******************************************************************************/
-static size_t	DBget_escape_string_len(const char *src)
-{
-	const char	*s;
-	size_t		len = 1;	/* '\0' */
-
-	for (s = src; NULL != s && '\0' != *s; s++)
-	{
-		if ('\r' == *s)
-			continue;
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
-			len++;
-
-		len++;
-	}
-
-	return len;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBescape_string                                                  *
- *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: sync changes with 'DBget_escape_string_len'                      *
- *           and 'DBdyn_escape_string_len'                                    *
- *                                                                            *
- ******************************************************************************/
-static void	DBescape_string(const char *src, char *dst, size_t len)
-{
-	const char	*s;
-	char		*d;
-#if defined(HAVE_MYSQL)
-#	define ZBX_DB_ESC_CH	'\\'
-#elif !defined(HAVE_POSTGRESQL)
-#	define ZBX_DB_ESC_CH	'\''
-#endif
-	assert(dst);
-
-	len--;	/* '\0' */
-
-	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
-	{
-		if ('\r' == *s)
-			continue;
-
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
-		{
-			if (2 > len)
-				break;
-#if defined(HAVE_POSTGRESQL)
-			*d++ = *s;
-#else
-			*d++ = ZBX_DB_ESC_CH;
-#endif
-			len--;
-		}
-		*d++ = *s;
-		len--;
-	}
-	*d = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBdyn_escape_string                                              *
- *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	size_t	len;
-	char	*dst = NULL;
-
-	len = DBget_escape_string_len(src);
-
-	dst = zbx_malloc(dst, len);
-
-	DBescape_string(src, dst, len);
-
-	return dst;
+	return zbx_db_dyn_escape_string(src);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_string_len                                          *
  *                                                                            *
- * Return value: escaped string                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
-	const char	*s;
-	char		*dst = NULL;
-	size_t		len = 1;	/* '\0' */
-
-	max_src_len++;
-
-	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
-	{
-		if ('\r' == *s)
-			continue;
-
-		/* only UTF-8 characters should reduce a variable max_src_len */
-		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
-			break;
-
-#if defined(HAVE_MYSQL)
-		if ('\'' == *s || '\\' == *s)
-#elif defined(HAVE_POSTGRESQL)
-		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
-#else
-		if ('\'' == *s)
-#endif
-			len++;
-
-		len++;
-	}
-
-	dst = zbx_malloc(dst, len);
-
-	DBescape_string(src, dst, len);
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_escape_like_pattern_len                                    *
- *                                                                            *
- * Return value: return length of escaped LIKE pattern with terminating '\0'  *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: sync changes with 'DBescape_like_pattern'                        *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_escape_like_pattern_len(const char *src)
-{
-	int		len;
-	const char	*s;
-
-	len = DBget_escape_string_len(src) - 1; /* minus '\0' */
-
-	for (s = src; s && *s; s++)
-	{
-		len += (*s == '_' || *s == '%' || *s == ZBX_SQL_LIKE_ESCAPE_CHAR);
-		len += 1;
-	}
-
-	len++; /* '\0' */
-
-	return len;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBescape_like_pattern                                            *
- *                                                                            *
- * Return value: escaped string to be used as pattern in LIKE                 *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: sync changes with 'DBget_escape_like_pattern_len'                *
- *                                                                            *
- *           For instance, we wish to find string a_b%c\d'e!f in our database *
- *           using '!' as escape character. Our queries then become:          *
- *                                                                            *
- *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
- *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (IBM DB2, Oracle, SQLite3) *
- *                                                                            *
- *           Using backslash as escape character in LIKE would be too much    *
- *           trouble, because escaping backslashes would have to be escaped   *
- *           as well, like so:                                                *
- *                                                                            *
- *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
- *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
- *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (IBM DB2, Oracle, SQLite3) *
- *                                                                            *
- *           Hence '!' instead of backslash.                                  *
- *                                                                            *
- ******************************************************************************/
-static void	DBescape_like_pattern(const char *src, char *dst, int len)
-{
-	char		*d;
-	char		*tmp = NULL;
-	const char	*t;
-
-	assert(dst);
-
-	tmp = zbx_malloc(tmp, len);
-
-	DBescape_string(src, tmp, len);
-
-	len--; /* '\0' */
-
-	for (t = tmp, d = dst; t && *t && len; t++)
-	{
-		if (*t == '_' || *t == '%' || *t == ZBX_SQL_LIKE_ESCAPE_CHAR)
-		{
-			if (len <= 1)
-				break;
-			*d++ = ZBX_SQL_LIKE_ESCAPE_CHAR;
-			len--;
-		}
-		*d++ = *t;
-		len--;
-	}
-
-	*d = '\0';
-
-	zbx_free(tmp);
+	return zbx_db_dyn_escape_string_len(src, max_src_len);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_like_pattern                                        *
  *                                                                            *
- * Return value: escaped string to be used as pattern in LIKE                 *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_like_pattern(const char *src)
 {
-	int	len;
-	char	*dst = NULL;
-
-	len = DBget_escape_like_pattern_len(src);
-
-	dst = zbx_malloc(dst, len);
-
-	DBescape_like_pattern(src, dst, len);
-
-	return dst;
+	return zbx_db_dyn_escape_like_pattern(src);
 }
 
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
@@ -1271,8 +1031,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "graph_discovery"))
+			0 == strcmp(tablename, "autoreg_host"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -2188,117 +1947,3 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 	zbx_free(sql);
 }
-
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Function: DBbytea_escape                                                   *
- *                                                                            *
- * Purpose: converts from binary string to the null terminated escaped string *
- *                                                                            *
- * Transformations:                                                           *
- *      <= 0x1f || '\'' || '\\' || >= 0x7f -> \\ooo (ooo is an octal number)  *
- *                                                                            *
- * Parameters:                                                                *
- *      input - null terminated hexadecimal string                            *
- *      output - pointer to buffer                                            *
- *      olen - size of returned buffer                                        *
- *                                                                            *
- ******************************************************************************/
-size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
-{
-	const u_char	*i = input;
-	char		*o;
-	size_t		len = 1;	/* '\0' */
-
-	while (i - input < ilen)
-	{
-		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
-		{
-			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
-				len++;
-			len += 4;
-		}
-		else
-			len++;
-		i++;
-	}
-
-	if (*olen < len)
-	{
-		*olen = len;
-		*output = zbx_realloc(*output, *olen);
-	}
-	o = *output;
-	i = input;
-
-	while (i - input < ilen)
-	{
-		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
-		{
-			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
-				*o++ = '\\';
-			*o++ = '\\';
-			*o++ = ((*i >> 6) & 0x7) + 0x30;
-			*o++ = ((*i >> 3) & 0x7) + 0x30;
-			*o++ = (*i & 0x7) + 0x30;
-		}
-		else
-			*o++ = *i;
-		i++;
-	}
-	*o = '\0';
-
-	return len - 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBbytea_unescape                                                 *
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \\   == \                                                             *
- *                                                                            *
- * Parameters:                                                                *
- *      io - [IN/OUT] null terminated string / binary data                    *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- ******************************************************************************/
-size_t	DBbytea_unescape(u_char *io)
-{
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	while ('\0' != *i)
-	{
-		switch (*i)
-		{
-			case '\\':
-				i++;
-				if ('\\' == *i)
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
-#endif

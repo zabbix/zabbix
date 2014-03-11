@@ -20,7 +20,10 @@
 #include "common.h"
 #include "logfiles.h"
 #include "log.h"
-#include "zbxregexp.h"
+
+#if defined(_WINDOWS)
+#	include "gnuregex.h"
+#endif /* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -349,28 +352,55 @@ out:
  *                                                                            *
  * Function: process_logrt                                                    *
  *                                                                            *
- * Purpose: Get message from logfile with rotation                            *
+ * Purpose: Find new records in logfiles with rotation                        *
  *                                                                            *
- * Parameters: filename - logfile name (regular expression with a path)       *
- *             lastlogsize - offset for message                               *
- *             mtime - last modification time of the file                     *
- *             value - pointer for logged message                             *
+ * Parameters:                                                                *
+ *     filename        - [IN] logfile name (regular expression with a path)   *
+ *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
+ *     mtime           - [IN/OUT] last modification time of the file          *
+ *     skip_old_data   - [IN/OUT] start from the beginning of the file or     *
+ *                       jump to the end                                      *
+ *     big_rec         - [IN/OUT] state variable to remember whether a long   *
+ *                       record is being processed                            *
+ *     encoding        - [IN] text string describing encoding.                *
+ *                         The following encodings are recognized:            *
+ *                           "UNICODE"                                        *
+ *                           "UNICODEBIG"                                     *
+ *                           "UNICODEFFFE"                                    *
+ *                           "UNICODELITTLE"                                  *
+ *                           "UTF-16"   "UTF16"                               *
+ *                           "UTF-16BE" "UTF16BE"                             *
+ *                           "UTF-16LE" "UTF16LE"                             *
+ *                           "UTF-32"   "UTF32"                               *
+ *                           "UTF-32BE" "UTF32BE"                             *
+ *                           "UTF-32LE" "UTF32LE".                            *
+ *                           "" (empty string) means a single-byte character  *
+ *                           set (e.g. ASCII).                                *
+ *     regexps         - [IN] array of regexps                                *
+ *     pattern         - [IN] pattern to match                                *
+ *     output_template - [IN] output formatting template                      *
+ *     p_count         - [IN/OUT] limit of records to be processed            *
+ *     s_count         - [IN/OUT] limit of records to be sent to server       *
+ *     process_value   - [IN] pointer to function process_value()             *
+ *     server          - [IN] server to send data to                          *
+ *     port            - [IN] port to send data to                            *
+ *     hostname        - [IN] hostname the data comes from                    *
+ *     key             - [IN] item key the data belongs to                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
- * Comments: This function allocates memory for 'value', so use zbx_free().   *
- *           Return SUCCEED and NULL 'value' if end of file received.         *
- *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **value, const char *encoding,
-		unsigned char skip_old_data)
+int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
+		int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
-	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
-	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
+	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;
+	char			err_buf[MAX_STRING_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
@@ -382,6 +412,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	DIR			*dir = NULL;
 	struct dirent		*d_ent = NULL;
 #endif
+	regex_t			re;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, *mtime);
@@ -389,7 +421,37 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	/* splitting filename */
 	if (SUCCEED != split_filename(filename, &directory, &format))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format", filename);
+		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
+				filename);
+		goto out;
+	}
+
+	if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
+	{
+		regerror(reg_error, &re, err_buf, sizeof(err_buf));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for a logrt[] "
+				"item. Error: %s", format, err_buf);
+		goto out;
+	}
+
+	/* Minimize data loss if the system clock has been set back in time. */
+	/* Setting the clock ahead of time is harmless in our case. */
+	if ((time_t)-1 != (now = time(NULL)))
+	{
+		if (now < *mtime)
+		{
+			int	old_mtime;
+
+			old_mtime = *mtime;
+			*mtime = (int)now;
+			zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
+					"seconds back.", (int)(old_mtime - now));
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get system time");
+		regfree(&re);
 		goto out;
 	}
 
@@ -401,7 +463,9 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get entries from '%s' directory: %s", directory, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
+				zbx_strerror(errno));
+		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
 		zbx_free(find_wpath);
@@ -409,23 +473,24 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	}
 	zbx_free(find_wpath);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "we are in the Windows directory reading cycle");
 	do
 	{
 		file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, file_name_utf8);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process read entry '%s'", logfile_candidate);
-		}
-		else if (NULL != zbx_regexp_match(file_name_utf8, format, &length))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8, (int)file_buf.st_mtime);
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, file_name_utf8, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8,
+						(int)file_buf.st_mtime);
+			}
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 		zbx_free(logfile_candidate);
 		zbx_free(file_name_utf8);
@@ -437,45 +502,37 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	if (NULL == (dir = opendir(directory)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
+		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "we are in the *nix directory reading cycle");
 	while (NULL != (d_ent = readdir(dir)))
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
 
-		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
+		if (0 == zbx_stat(logfile_candidate, &file_buf))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process read entry '%s'", logfile_candidate);
-		}
-		else if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, (int)file_buf.st_mtime);
+			if (S_ISREG(file_buf.st_mode) &&
+					*mtime <= file_buf.st_mtime &&
+					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name,
+						(int)file_buf.st_mtime);
+			}
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 		zbx_free(logfile_candidate);
 	}
 #endif	/*_WINDOWS*/
 
-	if (1 == skip_old_data)
-		i = logfiles_num ? logfiles_num - 1 : 0;
-	else
-		i = 0;
+	regfree(&re);
 
-	/* find the oldest file that match */
-	for ( ; i < logfiles_num; i++)
-	{
-		if (logfiles[i].mtime < *mtime)
-			continue;	/* not interested in mtimes less than the given mtime */
-		else
-			break;	/* the first occurrence is found */
-	}
+	i = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
 
 	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
 	for (j = i + 1; j < logfiles_num; j++)
@@ -486,91 +543,37 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 			break;	/* all next mtimes are bigger */
 	}
 
-	/* if all mtimes are less than the given one, take the latest file from existing ones */
-	if (0 < logfiles_num && i == logfiles_num)
-		i = logfiles_num - 1;	/* i cannot be bigger than logfiles_num */
-
-	/* processing matched or moving to the newer one and repeating the cycle */
+	/* processing matched logfiles starting from the older one to the newer one */
 	for (; i < logfiles_num; i++)
 	{
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
-		if (0 != zbx_stat(logfile_candidate, &file_buf))/* situation could have changed */
+
+		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
+				encoding, regexps, pattern, output_template, p_count, s_count, process_value, server,
+				port, hostname, key)) || 0 >= *p_count || 0 >= *s_count)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
+			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
+			/* (can happen during a rotation). Maybe during the next check all will be well. */
+			ret = SUCCEED;
+			break;
 		}
 
-		if (1 == skip_old_data)
+		if (i != logfiles_num - 1)
 		{
-			*lastlogsize = (zbx_uint64_t)file_buf.st_size;
-			zabbix_log(LOG_LEVEL_DEBUG, "skipping existing filename:'%s' lastlogsize:" ZBX_FS_UI64,
-					logfile_candidate, *lastlogsize);
+			zbx_free(logfile_candidate);
+			*lastlogsize = 0;
 		}
-
-		*mtime = (int)file_buf.st_mtime;	/* must contain the latest mtime as possible */
-
-		if (file_buf.st_size < *lastlogsize)
-			*lastlogsize = 0;	/* maintain backward compatibility */
-
-		if (-1 == (fd = zbx_open(logfile_candidate, O_RDONLY)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
-		}
-
-#ifdef _WINDOWS
-		if (-1L != _lseeki64(fd, (__int64)*lastlogsize, SEEK_SET))
-#else
-		if ((off_t)-1 != lseek(fd, (off_t)*lastlogsize, SEEK_SET))
-#endif
-		{
-			if (-1 != (nbytes = zbx_read(fd, buffer, sizeof(buffer), encoding)))
-			{
-				if (0 != nbytes)
-				{
-					*lastlogsize += nbytes;
-					*value = convert_to_utf8(buffer, nbytes, encoding);
-					zbx_rtrim(*value, "\r\n ");
-					ret = SUCCEED;
-					break;	/* return at this point */
-				}
-				else	/* EOF is reached, but there can be other files to try reading from */
-				{
-					if (i == logfiles_num - 1)
-					{
-						ret = SUCCEED;	/* EOF of the most current file is reached */
-						break;
-					}
-					else
-					{
-						zbx_free(logfile_candidate);
-						*lastlogsize = 0;
-						close(fd);
-						continue;	/* try to read from a more current file */
-					}
-				}
-			}
-			else	/* cannot read from the file */
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot read from '%s': %s", logfile_candidate,
-						zbx_strerror(errno));
-				break;	/* must return, situation could have changed */
-			}
-		}
-		else	/* cannot position in the file */
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for file '%s': %s",
-					*lastlogsize, logfile_candidate, zbx_strerror(errno));
-			break;	/* must return, situation could have changed */
-		}
-	}	/* trying to read from logfiles */
+	}
 
 	if (0 == logfiles_num)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
 
+		/* do not make a logrt[] item NOTSUPPORTED if there are no matching files in the directory */
+		ret = SUCCEED;
+	}
+
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-	if (0 < fd && -1 == close(fd))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 #ifdef _WINDOWS
 	if (0 != find_handle && -1 == _findclose(find_handle))
@@ -589,90 +592,392 @@ out:
 	return ret;
 }
 
+static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
+		size_t szbyte)
+{
+	if (1 == szbyte)	/* single-byte character set */
+	{
+		for (; p < p_end; p++)
+		{
+			if (0xd < *p || 0xa > *p)
+				continue;
+
+			if (0xa == *p)  /* LF (Unix) */
+			{
+				*p_next = p + 1;
+				return p;
+			}
+
+			if (0xd == *p)	/* CR (Mac) */
+			{
+				if (p < p_end - 1 && 0xa == *(p + 1))   /* CR+LF (Windows) */
+				{
+					*p_next = p + 2;
+					return p;
+				}
+
+				*p_next = p + 1;
+				return p;
+			}
+		}
+		return (char *)NULL;
+	}
+	else
+	{
+		while (p <= p_end - szbyte)
+		{
+			if (0 == memcmp(p, lf, szbyte))		/* LF (Unix) */
+			{
+				*p_next = p + szbyte;
+				return p;
+			}
+
+			if (0 == memcmp(p, cr, szbyte))		/* CR (Mac) */
+			{
+				if (p <= p_end - szbyte - szbyte && 0 == memcmp(p + szbyte, lf, szbyte))
+				{
+					/* CR+LF (Windows) */
+					*p_next = p + szbyte + szbyte;
+					return p;
+				}
+
+				*p_next = p + szbyte;
+				return p;
+			}
+
+			p += szbyte;
+		}
+		return (char *)NULL;
+	}
+}
+
+static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key)
+{
+	int		ret, nbytes;
+	const char	*cr, *lf, *p_end;
+	char		*p_start, *p, *p_nl, *p_next, *item_value = NULL;
+	size_t		szbyte;
+	zbx_offset_t	offset;
+	static char	*buf = NULL;
+	int		send_err;
+	zbx_uint64_t	lastlogsize1;
+
+#define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
+						/* up to 64 k characters to the Zabbix server a 256 kB buffer might */
+						/* be required. */
+	if (NULL == buf)
+	{
+		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
+	}
+
+	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+
+	for (;;)
+	{
+		if (0 >= *p_count || 0 >= *s_count)
+		{
+			/* limit on number of processed or sent-to-server lines reached */
+			ret = SUCCEED;
+			goto out;
+		}
+
+		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
+		{
+			*big_rec = 0;
+			ret = FAIL;
+			goto out;
+		}
+
+		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
+
+		if (-1 == nbytes)
+		{
+			/* error on read */
+			*big_rec = 0;
+			ret = FAIL;
+			goto out;
+		}
+
+		if (0 == nbytes)
+		{
+			/* end of file reached */
+			ret = SUCCEED;
+			goto out;
+		}
+
+		p_start = buf;			/* beginning of current line */
+		p = buf;			/* current byte */
+		p_end = buf + (size_t)nbytes;	/* no data from this position */
+
+		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		{
+			if (BUF_SIZE > nbytes)
+			{
+				/* Buffer is not full (no more data available) and there is no "newline" in it. */
+				/* Do not analyze it now, keep the same position in the file and wait the next check, */
+				/* maybe more data will come. */
+
+				*lastlogsize = (zbx_uint64_t)offset;
+				ret = SUCCEED;
+				goto out;
+			}
+			else
+			{
+				/* buffer is full and there is no "newline" in it */
+
+				if (0 == *big_rec)
+				{
+					/* It is the first, beginning part of a long record. Match it against the */
+					/* regexp now (our buffer length corresponds to what we can save in the */
+					/* database). */
+
+					char	*value = NULL;
+
+					buf[BUF_SIZE] = '\0';
+
+					if ('\0' != *encoding)
+						value = convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
+					else
+						value = buf;
+
+					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
+							" (showing only the first 64 characters). Only the first 64 kB"
+							" will be analyzed, the rest will be ignored while Zabbix agent"
+							" is running", value);
+
+					lastlogsize1 = (size_t)offset + (size_t)nbytes;
+					send_err = SUCCEED;
+
+					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+							output_template, &item_value))
+					{
+						send_err = process_value(server, port, hostname, key, item_value,
+								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
+
+						zbx_free(item_value);
+
+						if (SUCCEED == send_err)
+							(*s_count)--;
+					}
+					(*p_count)--;
+
+					if (SUCCEED == send_err)
+					{
+						*lastlogsize = lastlogsize1;
+						*big_rec = 1;		/* ignore the rest of this record */
+					}
+
+					if ('\0' != *encoding)
+						zbx_free(value);
+				}
+				else
+				{
+					/* It is a middle part of a long record. Ignore it. We have already */
+					/* checked the first part against the regexp. */
+
+					*lastlogsize = (size_t)offset + (size_t)nbytes;
+				}
+			}
+		}
+		else
+		{
+			/* the "newline" was found, so there is at least one complete record */
+			/* (or trailing part of a large record) in the buffer */
+
+			for (;;)
+			{
+				if (0 >= *p_count || 0 >= *s_count)
+				{
+					/* limit on number of processed or sent-to-server lines reached */
+					ret = SUCCEED;
+					goto out;
+				}
+
+				if (0 == *big_rec)
+				{
+					char	*value = NULL;
+
+					*p_nl = '\0';
+
+					if ('\0' != *encoding)
+						value = convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
+					else
+						value = p_start;
+
+					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
+					send_err = SUCCEED;
+
+					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+							output_template, &item_value))
+					{
+						send_err = process_value(server, port, hostname, key, item_value,
+								&lastlogsize1, mtime, NULL, NULL, NULL, NULL, 1);
+
+						zbx_free(item_value);
+
+						if (SUCCEED == send_err)
+							(*s_count)--;
+					}
+					(*p_count)--;
+
+					if (SUCCEED == send_err)
+						*lastlogsize = lastlogsize1;
+
+					if ('\0' != *encoding)
+						zbx_free(value);
+				}
+				else
+				{
+					/* skip the trailing part of a long record */
+					*lastlogsize = (size_t)offset + (size_t)(p_next - buf);
+					*big_rec = 0;
+				}
+
+				/* move to the next record in the buffer */
+				p_start = p_next;
+				p = p_next;
+
+				if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+				{
+					/* There are no complete records in the buffer. */
+					/* Try to read more data from this position if available. */
+					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
+					{
+						ret = FAIL;
+						goto out;
+					}
+					else
+						break;
+				}
+			}
+		}
+	}
+out:
+	return ret;
+
+#undef BUF_SIZE
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_log                                                      *
  *                                                                            *
- * Purpose: Get message from logfile WITHOUT rotation                         *
+ * Purpose: Match new records in logfile with regexp, transmit matching       *
+ *          records to Zabbix server                                          *
  *                                                                            *
- * Parameters: filename - logfile name                                        *
- *             lastlogsize - offset for message                               *
- *             value - pointer for logged message                             *
+ * Parameters:                                                                *
+ *     filename        - [IN] logfile name                                    *
+ *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
+ *     mtime           - [IN] file modification time for reporting to server  *
+ *     skip_old_data   - [IN/OUT] start from the beginning of the file or     *
+ *                       jump to the end                                      *
+ *     big_rec         - [IN/OUT] state variable to remember whether a long   *
+ *                       record is being processed                            *
+ *     encoding        - [IN] text string describing encoding.                *
+ *                         The following encodings are recognized:            *
+ *                           "UNICODE"                                        *
+ *                           "UNICODEBIG"                                     *
+ *                           "UNICODEFFFE"                                    *
+ *                           "UNICODELITTLE"                                  *
+ *                           "UTF-16"   "UTF16"                               *
+ *                           "UTF-16BE" "UTF16BE"                             *
+ *                           "UTF-16LE" "UTF16LE"                             *
+ *                           "UTF-32"   "UTF32"                               *
+ *                           "UTF-32BE" "UTF32BE"                             *
+ *                           "UTF-32LE" "UTF32LE".                            *
+ *                           "" (empty string) means a single-byte character  *
+ *                           set (e.g. ASCII).                                *
+ *     regexps         - [IN] array of regexps                                *
+ *     pattern         - [IN] pattern to match                                *
+ *     output_template - [IN] output formatting template                      *
+ *     p_count         - [IN/OUT] limit of records to be processed            *
+ *     s_count         - [IN/OUT] limit of records to be sent to server       *
+ *     process_value   - [IN] pointer to function process_value()             *
+ *     server          - [IN] server to send data to                          *
+ *     port            - [IN] port to send data to                            *
+ *     hostname        - [IN] hostname the data comes from                    *
+ *     key             - [IN] item key the data belongs to                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: This function allocates memory for 'value', so use zbx_free().   *
- *           Return SUCCEED and NULL 'value' if end of file received.         *
+ * Comments:                                                                  *
+ *           This function does not deal with log file rotation.              *
  *                                                                            *
  ******************************************************************************/
-int	process_log(char *filename, zbx_uint64_t *lastlogsize, char **value, const char *encoding,
-		unsigned char skip_old_data)
+int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
+		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char	*__function_name = "process_log";
 
-	int		f;
+	int		f, ret = FAIL;
 	struct stat	buf;
-	int		nbytes, ret = FAIL;
-	char		buffer[MAX_BUFFER_LEN];
+	zbx_uint64_t	l_size;
 
-	assert(NULL != filename);
-	assert(NULL != lastlogsize);
-	assert(NULL != value);
-	assert(NULL != encoding);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64,
-			__function_name, filename, *lastlogsize);
-
-	/* handling of file shrinking */
 	if (0 != zbx_stat(filename, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
-		return ret;
+		goto out;
 	}
 
-	if (1 == skip_old_data)
+	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
-		*lastlogsize = (zbx_uint64_t)buf.st_size;
-		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing filename:'%s' lastlogsize:" ZBX_FS_UI64,
-				filename, *lastlogsize);
+		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
+		/* a logfile's content while keeping the same length. */
+		ret = SUCCEED;
+		goto out;
 	}
-
-	if (buf.st_size < *lastlogsize)
-		*lastlogsize = 0;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
-		return ret;
+		goto out;
 	}
 
-#ifdef _WINDOWS
-	if (-1L != _lseeki64(f, (__int64)*lastlogsize, SEEK_SET))
-#else
-	if ((off_t)-1 != lseek(f, (off_t)*lastlogsize, SEEK_SET))
-#endif
+	l_size = *lastlogsize;
+
+	if (1 == *skip_old_data)
 	{
-		if (-1 != (nbytes = zbx_read(f, buffer, sizeof(buffer), encoding)))
-		{
-			if (0 != nbytes)
-			{
-				*lastlogsize += nbytes;
-				*value = convert_to_utf8(buffer, nbytes, encoding);
-				zbx_rtrim(*value, "\r\n ");
-			}
-			ret = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "cannot read from '%s': %s", filename, zbx_strerror(errno));
+		l_size = (zbx_uint64_t)buf.st_size;
+		zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to lastlogsize:" ZBX_FS_UI64,
+				filename, l_size);
+	}
+
+	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
+		l_size = 0;
+
+	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
+	{
+		*lastlogsize = l_size;
+		*skip_old_data = 0;
+
+		if (NULL != mtime)
+			*mtime = (int)buf.st_mtime;
+
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, encoding, regexps, pattern, output_template, p_count,
+				s_count, process_value, server, port, hostname, key);
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for '%s': %s",
-				*lastlogsize, filename, zbx_strerror(errno));
+				l_size, filename, zbx_strerror(errno));
+	}
 
-	close(f);
+	if (0 != close(f))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
 	return ret;
 }

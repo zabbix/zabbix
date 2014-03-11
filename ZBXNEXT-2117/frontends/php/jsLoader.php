@@ -81,7 +81,9 @@ $availableJScripts = array(
 	'class.cviewswitcher.js' => '',
 	'init.js' => '',
 	// templates
-	'sysmap.tpl.js' => 'templates/'
+	'sysmap.tpl.js' => 'templates/',
+	// page-specific scripts
+	'items.js' => 'pages/',
 );
 
 $tranStrings = array(
@@ -192,7 +194,8 @@ $tranStrings = array(
 		'Insert macro' => _('Insert macro'),
 		'Item "%1$s"' => _('Item "%1$s"'),
 		'Go to' => _('Go to'),
-		'Scripts' => _('History'),
+		'Graphs' => _('Graphs'),
+		'History' => _('History'),
 		'Host inventory' => _('Host inventory'),
 		'Host screens' => _('Host screens'),
 		'Latest data' => _('Latest data'),
@@ -207,9 +210,9 @@ $tranStrings = array(
 		'Remove all' => _('Remove all'),
 		'Scripts' => _('Scripts'),
 		'Service "%1$s"' => _('Service "%1$s"'),
-		'Status of triggers' => _('Status of triggers'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
+		'Triggers' => _('Triggers'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
@@ -218,6 +221,10 @@ $tranStrings = array(
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
+	),
+	'items.js' => array(
+		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
+		'No interface found' => _('No interface found')
 	)
 );
 

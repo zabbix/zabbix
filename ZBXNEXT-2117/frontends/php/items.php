@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js');
+$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js', 'items.js');
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -491,13 +491,13 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	if ($result) {
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
-			_('Host').' ['.$host['name'].'] '._('History cleared'));
+			_('Host').' ['.$host['name'].'] '._('History cleared')
+		);
 	}
 
 	$result = DBend($result);
-
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
-	clearCookies($result, get_request('hostid'));
+	clearCookies($result, getRequest('hostid'));
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -749,26 +749,50 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$goResult = API::Item()->delete($group_itemid);
+	$result = API::Item()->delete($group_itemid);
 
-	if ($goResult) {
+	if ($result) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
-				_('Host').' ['.$host['name'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
+				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
+			);
 		}
 	}
 
-	show_messages(DBend($goResult), _('Items deleted'), _('Cannot delete items'));
-	clearCookies($goResult, get_request('hostid'));
+	$result = DBend($result);
+	show_messages($result, _('Items deleted'), _('Cannot delete items'));
+	clearCookies($result, getRequest('hostid'));
 }
 
 /*
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create item'), 'update', 'clone'))) {
-	$data = getItemFormData();
+	$item = array();
+	if (hasRequest('itemid')) {
+		$item = API::Item()->get(array(
+			'itemids' => getRequest('itemid'),
+			'output' => array(
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname'
+			)
+		));
+		$item = reset($item);
+	}
+
+	$data = getItemFormData($item);
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
+	$data['inventory_link'] = getRequest('inventory_link');
+
+	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['inventory_link'] = $item['inventory_link'];
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
@@ -1137,7 +1161,13 @@ else {
 		}
 	}
 
-	order_result($data['items'], $data['sortfield'], getPageSortOrder());
+	if ($data['sortfield'] === 'status') {
+		orderItemsByStatus($data['items'], getPageSortOrder());
+	}
+	else {
+		order_result($data['items'], $data['sortfield'], getPageSortOrder());
+	}
+
 	$data['paging'] = getPagingLine($data['items'], array('itemid'));
 
 	$itemTriggerIds = array();
@@ -1164,10 +1194,11 @@ else {
 	// determine, show or not column of errors
 	if (isset($hosts)) {
 		$host = reset($hosts);
-		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+
+		$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
-		$data['showErrorColumn'] = true;
+		$data['showInfoColumn'] = true;
 	}
 
 	// render view

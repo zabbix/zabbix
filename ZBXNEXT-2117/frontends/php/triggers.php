@@ -395,13 +395,25 @@ else {
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+
+	if ($sortfield === 'status') {
+		orderTriggersByStatus($data['triggers'], getPageSortOrder());
+	}
+	else {
+		order_result($data['triggers'], $sortfield, getPageSortOrder());
+	}
+
+	foreach ($data['triggers'] as &$trigger) {
+		if (count($trigger['dependencies']) > 1) {
+			order_result($trigger['dependencies'], 'hostname', ZBX_SORT_UP);
+		}
+	}
+	unset($trigger);
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// determine, show or not column of errors
-	$data['showErrorColumn'] = true;
 	if ($data['hostid'] > 0) {
 		$host = API::Host()->get(array(
 			'hostids' => $_REQUEST['hostid'],
@@ -410,7 +422,10 @@ else {
 			'editable' => true
 		));
 		$host = reset($host);
-		$data['showErrorColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
+		$data['showInfoColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showInfoColumn'] = true;
 	}
 
 	// nodes
