@@ -590,7 +590,7 @@ class CScreen extends CZBXAPI {
 		}
 
 		if ($deleteScreenItemIds) {
-			API::ScreenItem()->delete($deleteScreenItemIds);
+			DB::delete('screens_items', array('screenitemid' => $deleteScreenItemIds));
 		}
 
 		foreach ($updateScreenItems as $screenItem) {
