@@ -56,37 +56,41 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showInfoColumn'] ? _('Info') : null
 ));
 
 foreach ($data['discoveries'] as $discovery) {
+	// description
 	$description = array();
 
 	if ($discovery['templateid']) {
-		$template_host = get_realhost_by_itemid($discovery['templateid']);
-		$description[] = new CLink($template_host['name'], '?hostid='.$template_host['hostid'], 'unknown');
+		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
+
+		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
+	// status
 	$status = new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate' : 'disable'),
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
-	if ($data['showErrorColumn']) {
-		$error = '';
-		if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($discovery['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
-			}
-			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($discovery['error'], '', 'on');
-			}
+	// info
+	if ($data['showInfoColumn']) {
+		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($discovery['error'], '', 'on');
 		}
+		else {
+			$info = '';
+		}
+	}
+	else {
+		$info = null;
 	}
 
 	// host prototype link
@@ -127,7 +131,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$data['showErrorColumn'] ? $error : null
+		$info
 	));
 }
 

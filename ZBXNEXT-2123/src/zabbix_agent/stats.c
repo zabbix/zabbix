@@ -415,7 +415,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	assert(args);
 
-	zabbix_log(LOG_LEVEL_WARNING, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", ((zbx_thread_args_t *)args)->thread_num);
 
 	zbx_free(args);
 
@@ -445,8 +445,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _WINDOWS
 	if (CPU_COLLECTOR_STARTED(collector))
 		free_cpu_collector(&(collector->cpus));
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
 	ZBX_DO_EXIT();
 

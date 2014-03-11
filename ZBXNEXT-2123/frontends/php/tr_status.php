@@ -471,10 +471,13 @@ $triggerTable->setHeader(array(
 $sortfield = getPageSortField('description');
 $sortorder = getPageSortOrder();
 $options = array(
+	'output' => array('triggerid', $sortfield),
 	'nodeids' => get_current_nodeid(),
 	'output' => array('triggerid', $sortfield),
 	'monitored' => true,
 	'skipDependent' => true,
+	'sortfield' => $sortfield,
+	'sortorder' => $sortorder,
 	'limit' => $config['search_limit'] + 1
 );
 
