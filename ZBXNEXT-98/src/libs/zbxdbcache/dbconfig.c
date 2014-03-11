@@ -3060,7 +3060,17 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
 	s2 = zbx_hashset_search(&config->snmpitems, &i2->itemid);
 
-	return memcmp(&s1->snmp_community, &s2->snmp_community, 5 * ZBX_PTR_SIZE + 4 * sizeof(unsigned char));
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_community, s2->snmp_community);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securityname, s2->snmpv3_securityname);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authpassphrase, s2->snmpv3_authpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privpassphrase, s2->snmpv3_privpassphrase);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_contextname, s2->snmpv3_contextname);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_securitylevel, s2->snmpv3_securitylevel);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_authprotocol, s2->snmpv3_authprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmpv3_privprotocol, s2->snmpv3_privprotocol);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_oid_type, s2->snmp_oid_type);
+
+	return 0;
 }
 
 static int	__config_heap_elem_compare(const void *d1, const void *d2)
