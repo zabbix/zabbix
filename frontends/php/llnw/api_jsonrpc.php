@@ -1,5 +1,5 @@
 <?php
-$d='/var/www/zabbix/llnw/';
+$d = __DIR__ . '/';
 include($d.'config.php');
 
 // THIS PAGE IS LIVE!!!
