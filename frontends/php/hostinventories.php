@@ -35,22 +35,13 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	// filter
 	'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
-	'inventory'=>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_field'=>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_field_value'=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_exact'=>        array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
 	//ajax
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
-
-// validate host inventory filter fields
-if (hasRequest('inventory')) {
-	$inventoryFields = zbx_toHash(getHostInventories(), 'db_field');
-	foreach (getRequest('inventory') as $field) {
-		if (!isset($inventoryFields[$field['field']])) {
-			error(_s('Incorrect host inventory field "%1$s".', $field['field']));
-		}
-	}
-}
 
 /*
  * Permissions
@@ -74,52 +65,6 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 }
 
 $hostid = getRequest('hostid', 0);
-
-// reset filter
-if (hasRequest('filter_rst')) {
-	$i = 0;
-	while (CProfile::get('web.hostinventories.filter.inventory.field', null, $i) !== null) {
-		CProfile::delete('web.hostinventories.filter.inventory.field', $i);
-		CProfile::delete('web.hostinventories.filter.inventory.value', $i);
-
-		$i++;
-	}
-}
-// update filter
-if (hasRequest('filter_set')) {
-	// update host inventory filter
-	$i = 0;
-	foreach (getRequest('inventory', array()) as $field) {
-		if ($field['value'] === '') {
-			continue;
-		}
-
-		CProfile::update('web.hostinventories.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
-		CProfile::update('web.hostinventories.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
-
-		$i++;
-	}
-	// delete remaining old values
-	while (CProfile::get('web.hostinventories.filter.inventory.field', null, $i) !== null) {
-		CProfile::delete('web.hostinventories.filter.inventory.field', $i);
-		CProfile::delete('web.hostinventories.filter.inventory.value', $i);
-
-		$i++;
-	}
-}
-
-// fetch filter from profiles
-$filter = array();
-$i = 0;
-while (CProfile::get('web.hostinventories.filter.inventory.field', null, $i) !== null) {
-	$filter[] = array(
-		'field' => CProfile::get('web.hostinventories.filter.inventory.field', null, $i),
-		'value' => CProfile::get('web.hostinventories.filter.inventory.value', null, $i)
-	);
-
-	$i++;
-}
-
 $data = array();
 
 /*
@@ -179,47 +124,97 @@ if ($hostid > 0) {
 	$hostinventoriesView->show();
 }
 else{
-	$pageFilter = new CPageFilter(array(
+	$data['config'] = select_config();
+	$options = array(
 		'groups' => array(
 			'real_hosts' => 1,
 		),
-		'groupid' => getRequest('groupid'),
-	));
-
-	$data = array(
-		'config' => select_config(),
-		'pageFilter' => $pageFilter,
-		'hosts' => array(),
-		'filter' => $filter
+		'groupid' => getRequest('groupid', null),
 	);
+	$data['pageFilter'] = new CPageFilter($options);
 
-	if ($pageFilter->groupsSelected) {
-		$inventoryFilter = array();
-		foreach ($filter as $inventoryField) {
-			$inventoryFilter[$inventoryField['field']][] = $inventoryField['value'];
+	// host inventory filter
+	if (hasRequest('filter_set')) {
+		$data['filterField'] = getRequest('filter_field');
+		$data['filterFieldValue'] = getRequest('filter_field_value');
+		$data['filterExact'] = getRequest('filter_exact');
+		CProfile::update('web.hostinventories.filter_field', $data['filterField'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_field_value', $data['filterFieldValue'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_exact', $data['filterExact'], PROFILE_TYPE_INT);
+	}
+	else{
+		$data['filterField'] = CProfile::get('web.hostinventories.filter_field');
+		$data['filterFieldValue'] = CProfile::get('web.hostinventories.filter_field_value');
+		$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact');
+	}
+
+	$data['hosts'] = array();
+
+	if ($data['pageFilter']->groupsSelected) {
+		// which inventory fields we will need for displaying
+		$requiredInventoryFields = array(
+			'name',
+			'type',
+			'os',
+			'serialno_a',
+			'tag',
+			'macaddress_a'
+		);
+
+		// checking if correct inventory field is specified for filter
+		$possibleInventoryFields = getHostInventories();
+		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
+		if (!empty($data['filterField'])
+				&& !empty($data['filterFieldValue'])
+				&& !isset($possibleInventoryFields[$data['filterField']])) {
+			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
+		}
+		else {
+			// if we are filtering by field, this field is also required
+			if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+				$requiredInventoryFields[] = $data['filterField'];
+			}
+
+			$options = array(
+				'output' => array('hostid', 'name', 'status'),
+				'selectInventory' => $requiredInventoryFields,
+				'withInventory' => true,
+				'selectGroups' => API_OUTPUT_EXTEND,
+				'limit' => ($data['config']['search_limit'] + 1)
+			);
+			if ($data['pageFilter']->groupid > 0) {
+				$options['groupids'] = $data['pageFilter']->groupid;
+			}
+
+			$data['hosts'] = API::Host()->get($options);
+
+			// copy some inventory fields to the uppers array level for sorting
+			// and filter out hosts if we are using filter
+			foreach ($data['hosts'] as $num => $host) {
+				$data['hosts'][$num]['pr_name'] = $host['inventory']['name'];
+				$data['hosts'][$num]['pr_type'] = $host['inventory']['type'];
+				$data['hosts'][$num]['pr_os'] = $host['inventory']['os'];
+				$data['hosts'][$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
+				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
+				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
+				// if we are filtering by inventory field
+				if(!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+					// must we filter exactly or using a substring (both are case insensitive)
+					$match = $data['filterExact']
+						? zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]) === zbx_strtolower($data['filterFieldValue'])
+							: zbx_strpos(
+							zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]),
+							zbx_strtolower($data['filterFieldValue'])
+						) !== false;
+					if (!$match) {
+						unset($data['hosts'][$num]);
+					}
+				}
+			}
+
+			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
 		}
 
-		$data['hosts'] = API::Host()->get(array(
-			'output' => array('hostid', 'name', 'status'),
-			'selectInventory' => array('name', 'type', 'os', 'serialno_a', 'tag', 'macaddress_a'),
-			'selectGroups' => API_OUTPUT_EXTEND,
-			'groupids' => ($pageFilter->groupid) ? $pageFilter->groupid : null,
-			'withInventory' => true,
-			'searchInventory' => $inventoryFilter,
-			'limit' => ($data['config']['search_limit'] + 1)
-		));
-
-		// copy some inventory fields to the uppers array level for sorting
-		foreach ($data['hosts'] as $num => $host) {
-			$data['hosts'][$num]['pr_name'] = $host['inventory']['name'];
-			$data['hosts'][$num]['pr_type'] = $host['inventory']['type'];
-			$data['hosts'][$num]['pr_os'] = $host['inventory']['os'];
-			$data['hosts'][$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
-			$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
-			$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
-		}
-
-		order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
 	}
 
 	$data['paging'] = getPagingLine($data['hosts']);

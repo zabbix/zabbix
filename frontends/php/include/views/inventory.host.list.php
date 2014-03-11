@@ -19,47 +19,42 @@
 **/
 
 
-$hostInventoryWidget = new CWidget(null, 'inventory-list');
+$hostInventoryWidget = new CWidget();
 
 $rForm = new CForm('get');
 $rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
-// inventory filter
-$inventoryFilters = $data['filter'];
-if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
+$filterTable = new CTable('', 'filter');
+// getting inventory fields to make a drop down
+$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
+$inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
+foreach ($inventoryFields as $inventoryField) {
+	$inventoryFieldsComboBox->addItem(
+		$inventoryField['db_field'],
+		$inventoryField['title']
 	);
 }
-$inventoryFields = array();
-foreach (getHostInventories() as $inventory) {
-	$inventoryFields[$inventory['db_field']] = $inventory['title'];
-}
+$exactComboBox = new CComboBox('filter_exact', $this->data['filterExact']);
+$exactComboBox->addItem('0', _('like'));
+$exactComboBox->addItem('1', _('exactly'));
+$filterTable->addRow(array(
+	array(
+		array(bold(_('Field')), SPACE, $inventoryFieldsComboBox),
+		array(
+			$exactComboBox,
+			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
+		),
+	),
+), 'host-inventories');
 
-$inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
-$i = 0;
-foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
-
-	$i++;
-}
-$inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+$filter = new CButton('filter', _('Filter'),
+	"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
 );
-
-$filterTable = new CTable('', 'filter');
-$filterTable->addRow($inventoryFilterTable, 'host-inventories');
-
-$filter = new CSubmit('filter_set', _('Filter'));
 $filter->useJQueryStyle('main');
-$reset = new CSubmit('filter_rst', _('Reset'));
+
+$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 $reset->useJQueryStyle();
 
 $divButtons = new CDiv(array($filter, SPACE, $reset));
@@ -118,7 +113,5 @@ foreach ($this->data['hosts'] as $host) {
 
 $table = array($this->data['paging'], $table, $this->data['paging']);
 $hostInventoryWidget->addItem($table);
-
-require_once dirname(__FILE__).'/js/inventory.host.list.js.php';
 
 return $hostInventoryWidget;

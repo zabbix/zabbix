@@ -225,12 +225,7 @@ div.footer .formrow { display: table-row; }
 div.footer .formrow .dt { width: 20%; display: table-cell; }
 div.footer .formrow .dd { margin-left: 10px; }
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
-div.footer .formrow .main:hover,
-div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main,
-input[type="button"].main,
-input[type="submit"].main {
-	border-color: #DD7711;
-}
+div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
 
 /* object list */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -460,7 +455,7 @@ table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
-table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; }
+table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
