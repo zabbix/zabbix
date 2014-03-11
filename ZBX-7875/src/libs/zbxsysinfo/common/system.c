@@ -111,21 +111,21 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
-	OS_WIN_VERSION		os_version_info;
+	OS_WIN_VERSION	os_version_info;
 	char			*os = NULL;
 	size_t			os_alloc = 256, os_offset = 0;
 
 	os = zbx_malloc(os, os_alloc);
-	memset( &os_version_info, '\0', sizeof(os_version_info) );
+	memset(&os_version_info, '\0', sizeof(os_version_info));
 
-	if( !get_win_version( &os_version_info ) )
+	if (0 == get_win_version(&os_version_info))
 	{
 		zbx_snprintf_alloc( &os, &os_alloc, &os_offset, "%s %s %s [Version %s.%s]",
-								os_version_info.ProductName,
-								os_version_info.CSDVersion,
-								os_version_info.ProcessorArchitecture,
-								os_version_info.CurrentVersion,
-								os_version_info.CurrentBuild);
+				os_version_info.ProductName,
+				os_version_info.CSDVersion,
+				os_version_info.ProcessorArchitecture,
+				os_version_info.CurrentVersion,
+				os_version_info.CurrentBuild);
 	}
 	else
 	{

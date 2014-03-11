@@ -793,40 +793,33 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
  *                                                                            *
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int get_win_version( OS_WIN_VERSION *os_version )
+int		get_win_version(OS_WIN_VERSION *os_version)
 {
-	const char	*__function_name = "get_win_version";
-	int		ret = FAIL;
+	const char		*__function_name = "get_win_version";
+	int				ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
-	const char win_keys[5][32] = {\
-					"ProductName",\
-					"CSDVersion",\
-					"CurrentBuild",\
-					"CurrentVersion",\
-					"PROCESSOR_ARCHITECTURE"};
-	const char sys_key_1[] = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-	const char sys_key_2[] = "System\\CurrentControlSet\\Control\\Session Manager\\Environment";
-	int i;			/* counter */
-	HKEY hKeyRegistry;	/* handle to registry key */
-	DWORD dwBuffer;		/* bytes to allocate for buffers */
-	LPSTR lpNameStrings;	/* temporal key value storage */
-	LPCTSTR wsource;	/* variable to contain reg key path (unicode) */
+	const char		win_keys[5][32] = {
+			"ProductName",
+			"CSDVersion",
+			"CurrentBuild",
+			"CurrentVersion",
+			"PROCESSOR_ARCHITECTURE"};
+	const char		sys_key_1[] = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
+	const char		sys_key_2[] = "System\\CurrentControlSet\\Control\\Session Manager\\Environment";
+	int				i;				/* counter */
+	HKEY			hKeyRegistry;	/* handle to registry key */
+	DWORD			dwBuffer;		/* bytes to allocate for buffers */
+	LPSTR			lpNameStrings;	/* temporal key value storage */
+	LPCTSTR			wsource;		/* variable to contain reg key path (unicode) */
 
 	wsource = zbx_utf8_to_unicode(sys_key_1);
 	dwBuffer = 256;
 
 	/* open key of registry */
-	if(RegOpenKeyEx(
-		HKEY_LOCAL_MACHINE,
-		wsource,
-		0,
-		KEY_READ,
-		&hKeyRegistry) != ERROR_SUCCESS)
+	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &hKeyRegistry))
 	{
 		return ret;
 	}
@@ -835,17 +828,12 @@ int get_win_version( OS_WIN_VERSION *os_version )
 	lpNameStrings = zbx_malloc(&lpNameStrings, dwBuffer);
 
 	/* get version string from registry keys */
-	for(i=0;i<4;i++)
+	for (i = 0; i < 4; i++)
 	{
 		wsource = zbx_utf8_to_unicode(win_keys[i]);
 
-		if(RegQueryValueEx(
-			hKeyRegistry,
-			wsource,
-			NULL,
-			NULL,
-			(LPBYTE)lpNameStrings,
-			&dwBuffer) != ERROR_SUCCESS)
+		if (ERROR_SUCCESS != RegQueryValueEx(hKeyRegistry, wsource, NULL, NULL,
+				(LPBYTE)lpNameStrings, &dwBuffer))
 		{
 			return ret;
 		}
@@ -854,24 +842,20 @@ int get_win_version( OS_WIN_VERSION *os_version )
 			switch (i)
 			{
 				case 0:
-					zbx_snprintf(   os_version->ProductName,\
-							sizeof(os_version->ProductName),\
-							zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings) );
+					zbx_snprintf(os_version->ProductName, sizeof(os_version->ProductName),
+							zbx_unicode_to_utf8((LPCTSTR)lpNameStrings));
 					break;
 				case 1:
-					zbx_snprintf(   os_version->CSDVersion,\
-							sizeof(os_version->CSDVersion),\
-							zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings) );
+					zbx_snprintf(os_version->CSDVersion, sizeof(os_version->CSDVersion),
+							zbx_unicode_to_utf8((LPCTSTR)lpNameStrings));
 					break;
 				case 2:
-					zbx_snprintf(   os_version->CurrentBuild,\
-							sizeof(os_version->CurrentBuild),\
-							zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings) );
+					zbx_snprintf(os_version->CurrentBuild, sizeof(os_version->CurrentBuild),
+							zbx_unicode_to_utf8((LPCTSTR)lpNameStrings));
 					break;
 				case 3:
-					zbx_snprintf(   os_version->CurrentVersion,\
-							sizeof(os_version->CurrentVersion),\
-							zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings) );
+					zbx_snprintf(os_version->CurrentVersion, sizeof(os_version->CurrentVersion),
+							zbx_unicode_to_utf8((LPCTSTR)lpNameStrings));
 					break;
 			}
 		}
@@ -885,12 +869,7 @@ int get_win_version( OS_WIN_VERSION *os_version )
 	wsource = zbx_utf8_to_unicode(sys_key_2);
 
 	/* open key in different part of registry */
-	if(RegOpenKeyEx(
-		HKEY_LOCAL_MACHINE,
-		wsource,
-		0,
-		KEY_READ,
-		&hKeyRegistry) != ERROR_SUCCESS)
+	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &hKeyRegistry))
 	{
 		return ret;
 	}
@@ -898,21 +877,15 @@ int get_win_version( OS_WIN_VERSION *os_version )
 	wsource = zbx_utf8_to_unicode(win_keys[4]);
 
 	/* get CPU type string from registry key */
-	if(RegQueryValueEx(
-		hKeyRegistry,
-		wsource,
-		NULL,
-		NULL,
-		(LPBYTE)lpNameStrings,
-		&dwBuffer) != ERROR_SUCCESS)
+	if(ERROR_SUCCESS != RegQueryValueEx(hKeyRegistry, wsource, NULL, NULL,
+			(LPBYTE)lpNameStrings, &dwBuffer))
 	{
 		return ret;
 	}
 	else
 	{
-		zbx_snprintf(   os_version->ProcessorArchitecture,
-				sizeof(os_version->ProcessorArchitecture),\
-				zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings) );
+		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
+				zbx_unicode_to_utf8( (LPCTSTR)lpNameStrings));
 	}
 
 	/* close registry key */

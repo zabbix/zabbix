@@ -283,14 +283,15 @@ int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #ifdef _WINDOWS
 typedef struct 
 {
-	char ProductName[128];		/* "Windows ..." */
-	char CSDVersion[64];		/* "Service pack ..." */
-	char CurrentBuild[32];		/* "6xxx" */
-	char CurrentVersion[32];	/* "6.x" */
-	char ProcessorArchitecture[64];	/* "x86" | "x64" | "Intel Itanium-based" */
-} OS_WIN_VERSION;
+	char	ProductName[128];			/* "Windows ..." */
+	char	CSDVersion[64];				/* "Service pack ..." */
+	char	CurrentBuild[32];			/* "6xxx" */
+	char	CurrentVersion[32];			/* "6.x" */
+	char	ProcessorArchitecture[64];	/* "x86" | "x64" | "Intel Itanium-based" */
+}
+OS_WIN_VERSION;
 
-int	get_win_version( OS_WIN_VERSION *os_version );
+int		get_win_version(OS_WIN_VERSION *os_version);
 
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
