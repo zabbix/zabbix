@@ -427,17 +427,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_agent(item, result);
 			alarm(0);
 			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-#ifdef HAVE_SNMP
-			/* SNMP checks use their own timeouts */
-			res = get_value_snmp(item, result);
-#else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
-			res = CONFIG_ERROR;
-#endif
-			break;
 		case ITEM_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
@@ -486,11 +475,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = get_value_telnet(item, result);
 			alarm(0);
 			break;
-		case ITEM_TYPE_JMX:
-			alarm(CONFIG_TIMEOUT);
-			res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, item, result);
-			alarm(0);
-			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
 			break;
@@ -506,14 +490,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
-
-	/* remove formatting symbols from the end of the result */
-	/* so it could be checked by "is_uint64" and "is_double" functions */
-	/* when we try to get "int" or "float" values from "string" result */
-	if (ISSET_STR(result))
-		zbx_rtrim(result->str, ZBX_WHITESPACE);
-	if (ISSET_TEXT(result))
-		zbx_rtrim(result->text, ZBX_WHITESPACE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -653,14 +629,10 @@ static int	get_values(unsigned char poller_type)
 	zbx_free(port);
 
 	/* retrieve item values */
-	if (1 == num)
-	{
-		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0]);
-	}
-	else if (SUCCEED == is_snmp_type(items[0].type))
+	if (SUCCEED == is_snmp_type(items[0].type))
 	{
 #ifdef HAVE_SNMP
+		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num);
 #else
 		for (i = 0; i < num; i++)
@@ -678,6 +650,11 @@ static int	get_values(unsigned char poller_type)
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
+	}
+	else if (1 == num)
+	{
+		if (SUCCEED == errcodes[0])
+			errcodes[0] = get_value(&items[0], &results[0]);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -716,6 +693,14 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
+			/* remove formatting symbols from the end of the result */
+			/* so it could be checked by "is_uint64" and "is_double" functions */
+			/* when we try to get "int" or "float" values from "string" result */
+			if (ISSET_STR(&results[i]))
+				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
+			if (ISSET_TEXT(&results[i]))
+				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
+
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].state, NULL);
