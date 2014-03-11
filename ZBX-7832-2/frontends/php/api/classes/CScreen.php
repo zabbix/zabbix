@@ -506,8 +506,6 @@ class CScreen extends CZBXAPI {
 	 * Saves screens and screen items.
 	 *
 	 * @param array $screens
-	 *
-	 * @return array
 	 */
 	protected function updateReal(array $screens) {
 		$update = array();
@@ -532,8 +530,6 @@ class CScreen extends CZBXAPI {
 				$this->replaceItems($screen['screenid'], $screen['screenitems']);
 			}
 		}
-
-		return $screens;
 	}
 
 	/**
