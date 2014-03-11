@@ -293,7 +293,14 @@ class CProxy extends CZBXAPI {
 		)));
 	}
 
-	public function create($proxies) {
+	/**
+	 * Create proxy.
+	 *
+	 * @param array $proxies
+	 *
+	 * @return array
+	 */
+	public function create(array $proxies) {
 		$proxies = zbx_toArray($proxies);
 
 		$proxies = $this->convertDeprecatedValues($proxies);
@@ -326,16 +333,21 @@ class CProxy extends CZBXAPI {
 		return array('proxyids' => $proxyIds);
 	}
 
-	public function update($proxies) {
+	/**
+	 * Update proxy.
+	 *
+	 * @param array $proxies
+	 *
+	 * @return array
+	 */
+	public function update(array $proxies) {
 		$proxies = zbx_toArray($proxies);
 
 		$proxies = $this->convertDeprecatedValues($proxies);
 
 		$this->checkInput($proxies, __FUNCTION__);
 
-		$proxyIds = array();
-		$proxyUpdate = array();
-		$hostUpdate = array();
+		$proxyIds = $proxyUpdate = $hostUpdate = array();
 
 		foreach ($proxies as $proxy) {
 			$proxyIds[] = $proxy['proxyid'];
