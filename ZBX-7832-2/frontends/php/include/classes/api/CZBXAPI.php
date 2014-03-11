@@ -769,7 +769,7 @@ class CZBXAPI {
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $messageRequired);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, array($idField)));
 			}
 
 			$this->checkValidator($object[$idField], $idValidator);
