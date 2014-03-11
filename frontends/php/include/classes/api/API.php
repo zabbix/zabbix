@@ -68,6 +68,7 @@ class API {
 		'template' => 'CTemplate',
 		'templatescreen' => 'CTemplateScreen',
 		'templatescreenitem' => 'CTemplateScreenItem',
+		'trends' => 'CTrends',
 		'trigger' => 'CTrigger',
 		'triggerprototype' => 'CTriggerPrototype',
 		'user' => 'CUser',
@@ -375,6 +376,13 @@ class API {
 	 */
 	public static function TemplateScreenItem() {
 		return self::getObject('templatescreenitem');
+	}
+
+	/**
+	 * @return CTrends
+	 */
+	public static function Trends() {
+		return self::getObject('trends');
 	}
 
 	/**
