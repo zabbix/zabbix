@@ -1890,9 +1890,10 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 		}
 	}
 
-	$allLabelsSize = imageTextSize(8, 0, str_replace("\r", '', str_replace("\n", '', $allStrings)));
+	$allStrings = str_replace("\r", '', str_replace("\n", '', $allStrings));
+	$allLabelsSize = imageTextSize(8, 0, $allStrings);
 	$labelFontHeight = $allLabelsSize['height'];
-	$labelFontBaseline = $allLabelsSize['baseline'];
+	$labelFontBaseline = imageTextBaseline(0, $allStrings);
 
 	$elementsHostIds = array();
 	foreach ($selements as $selement) {

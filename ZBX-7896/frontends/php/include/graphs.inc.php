@@ -740,7 +740,6 @@ function imageTextSize($fontsize, $angle, $string) {
 
 		$result['height'] = abs($ar[1] - $ar[5]);
 		$result['width'] = abs($ar[0] - $ar[4]);
-		$result['baseline'] = $ar[1];
 	}
 	else {
 		show_error_message(_('PHP gd FreeType support missing'));
@@ -748,6 +747,32 @@ function imageTextSize($fontsize, $angle, $string) {
 	}
 
 	return $result;
+}
+
+/**
+ * Returns the Y coordinate of the baseline of the text.
+ *
+ * @param $fontsize
+ * @param $string
+ */
+function imageTextBaseline($fontsize, $string) {
+	$gdinfo = gd_info();
+
+	if ($gdinfo['FreeType Support'] && function_exists('imagettfbbox')) {
+		if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string)) {
+			$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+		}
+		else {
+			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		}
+
+		$ar = imagettfbbox($fontsize, 0, $ttf, $string);
+
+		return $ar[1];
+	}
+	else {
+		show_error_message(_('PHP gd FreeType support missing'));
+	}
 }
 
 function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
