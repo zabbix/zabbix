@@ -204,8 +204,7 @@ $headers = array(
 	_('Start time'),
 	_('End Time'),
 	_('Failed tests within incident'),
-	_('Total number of tests'),
-	_('Downtime')
+	_('Total number of tests')
 );
 $noData = _('No incidents found.');
 
@@ -243,8 +242,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				'Down'
+				$event['incidentTotalTests']
 			);
 
 			$dnsTable->addRow($row);
@@ -317,8 +315,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				'Down'
+				$event['incidentTotalTests']
 			);
 
 			$dnssecTable->addRow($row);
@@ -391,8 +388,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				'Down'
+				$event['incidentTotalTests']
 			);
 
 			$rddsTable->addRow($row);
@@ -464,8 +460,7 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests'],
-				'Down'
+				$event['incidentTotalTests']
 			);
 
 			$eppTable->addRow($row);

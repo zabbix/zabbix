@@ -226,32 +226,27 @@ else {
 }
 
 $testsInfoTable->addRow(array(array(
-	array(
-		new CSpan(array(bold(_('TLD')), ':', SPACE, $this->data['tld']['name'])),
-		BR(),
-		new CSpan(array(bold(_('Service')), ':', SPACE, $serviceName))
-	),
-	new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status')
+	new CSpan(array(bold(_('TLD')), ':', SPACE, $this->data['tld']['name'])),
+	BR(),
+	new CSpan(array(bold(_('Service')), ':', SPACE, $serviceName))
 )));
 
 $testsInfoTable->addRow(array(array(
-	new CDiv(array(
-		array(
-			new CSpan(
-				array(bold(_('Number of tests downtime')), ':', SPACE, $this->data['downTests']), 'first-row-element'
-			),
-			new CSpan(array(bold(_('Number of mimutes downtime')), ':', SPACE, $this->data['downTimeMinutes']))
+	array(
+		new CSpan(
+			array(bold(_('Number of tests downtime')), ':', SPACE, $this->data['downTests']), 'first-row-element'
 		),
-		BR(),
-		array(
-			new CSpan(
-				array(bold(_('Number of state changes')), ':', SPACE, $this->data['statusChanges']), 'first-row-element'
-			),
-			new CSpan(array(
-				bold(_('Total time within selected period')), ':', SPACE, convertUnitsS($this->data['downPeriod'])
-			))
-		)
-	), 'info-block')
+		new CSpan(array(bold(_('Number of mimutes downtime')), ':', SPACE, $this->data['downTimeMinutes']))
+	),
+	BR(),
+	array(
+		new CSpan(
+			array(bold(_('Number of state changes')), ':', SPACE, $this->data['statusChanges']), 'first-row-element'
+		),
+		new CSpan(array(
+			bold(_('Total time within selected period')), ':', SPACE, convertUnitsS($this->data['downPeriod'])
+		))
+	)
 )));
 
 
