@@ -233,6 +233,42 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Orders items by both status and state. Items are sorted in the following order: enabled, disabled, not supported.
+ *
+ * Keep in sync with orderTriggersByStatus().
+ *
+ * @param array  $items
+ * @param string $sortorder
+ */
+function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($items as $key => $item) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			$statusOrder = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+		}
+		elseif ($item['status'] == ITEM_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedItems = array();
+	foreach ($sort as $key => $val) {
+		$sortedItems[$key] = $items[$key];
+	}
+	$items = $sortedItems;
+}
+
+/**
  * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type
@@ -304,7 +340,7 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
 			'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -366,7 +402,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
 			'description', 'inventory_link'
 		),
 		'inherited' => false,
@@ -485,7 +521,7 @@ function get_item_by_itemid_limited($itemid) {
 			'i.delta,i.snmpv3_contextname,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,'.
 			'i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,'.
 			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
-			'i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
+			'i.publickey,i.privatekey,i.flags,i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($row) {
@@ -628,6 +664,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		'hostids' => $hostIds,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
+		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
 	));
 
@@ -797,13 +834,13 @@ function delete_history_by_itemid($itemIds) {
 		return $result;
 	}
 
-	DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
-	DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_text WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_log WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_uint WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history_str WHERE '.dbConditionInt('itemid', $itemIds));
+	$result &= DBexecute('DELETE FROM history WHERE '.dbConditionInt('itemid', $itemIds));
 
-	return true;
+	return (bool) $result;
 }
 
 /**

@@ -139,7 +139,7 @@ if ($exportData) {
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 
-	if (!no_errors()) {
+	if (hasErrorMesssages()) {
 		show_messages();
 	}
 	else {
@@ -989,12 +989,25 @@ else {
 			$hostTemplates = '-';
 		}
 		else {
-			$hostTemplates = array();
 			order_result($host['parentTemplates'], 'name');
 
+			$hostTemplates = array();
+			$i = 0;
+
 			foreach ($host['parentTemplates'] as $template) {
-				$caption = array();
-				$caption[] = new CLink(CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+				$i++;
+
+				if ($i > $config['max_in_table']) {
+					$hostTemplates[] = ' &hellip;';
+
+					break;
+				}
+
+				$caption = array(new CLink(
+					CHtml::encode($template['name']),
+					'templates.php?form=update&templateid='.$template['templateid'],
+					'unknown'
+				));
 
 				if (!empty($templates[$template['templateid']]['parentTemplates'])) {
 					order_result($templates[$template['templateid']]['parentTemplates'], 'name');
@@ -1009,12 +1022,11 @@ else {
 					$caption[] = ')';
 				}
 
-				$hostTemplates[] = $caption;
-				$hostTemplates[] = ', ';
-			}
+				if ($hostTemplates) {
+					$hostTemplates[] = ', ';
+				}
 
-			if ($hostTemplates) {
-				array_pop($hostTemplates);
+				$hostTemplates[] = $caption;
 			}
 		}
 

@@ -512,8 +512,8 @@ function insert_js($script, $jQueryDocumentReady = false) {
 
 function get_js($script, $jQueryDocumentReady = false) {
 	return $jQueryDocumentReady
-		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'
-		: '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
+		? '<script type="text/javascript">'."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'</script>'
+		: '<script type="text/javascript">'."\n".$script."\n".'</script>';
 }
 
 function insertPagePostJs() {

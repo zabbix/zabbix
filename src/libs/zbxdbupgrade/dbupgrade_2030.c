@@ -132,6 +132,210 @@ static int	DBpatch_2030011(void)
 
 static int	DBpatch_2030012(void)
 {
+	const ZBX_TABLE table =
+			{"graph_discovery_tmp", "", 0,
+				{
+					{"graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030013(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_discovery_tmp (select graphid,parent_graphid from graph_discovery)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030014(void)
+{
+	return DBdrop_table("graph_discovery");
+}
+
+static int	DBpatch_2030015(void)
+{
+	const ZBX_TABLE table =
+			{"graph_discovery", "graphid", 0,
+				{
+					{"graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030016(void)
+{
+	return DBcreate_index("graph_discovery", "graph_discovery_1", "parent_graphid", 0);
+}
+
+static int	DBpatch_2030017(void)
+{
+	const ZBX_FIELD	field = {"graphid", NULL, "graphs", "graphid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("graph_discovery", 1, &field);
+}
+
+static int	DBpatch_2030018(void)
+{
+	const ZBX_FIELD	field = {"parent_graphid", NULL, "graphs", "graphid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("graph_discovery", 2, &field);
+}
+
+static int	DBpatch_2030019(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_discovery (select graphid,parent_graphid from graph_discovery_tmp)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030020(void)
+{
+	return DBdrop_table("graph_discovery_tmp");
+}
+
+static int	DBpatch_2030021(void)
+{
+	const ZBX_TABLE	table =
+			{"item_condition", "item_conditionid", 0,
+				{
+					{"item_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"macro", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030022(void)
+{
+	return DBcreate_index("item_condition", "item_condition_1", "itemid", 0);
+}
+
+static int	DBpatch_2030023(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_condition", 1, &field);
+}
+
+static int	DBpatch_2030024(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*value, *macro_esc, *value_esc;
+	int		ret = FAIL, rc;
+
+	result = DBselect("select itemid,filter from items where filter<>'' and flags=%d", ZBX_FLAG_DISCOVERY_RULE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (NULL == (value = strchr(row[1], ':')) || 0 == strcmp(row[1], ":"))
+			continue;
+
+		*value++ = '\0';
+
+		macro_esc = DBdyn_escape_string(row[1]);
+		value_esc = DBdyn_escape_string(value);
+
+		rc = DBexecute("insert into item_condition"
+				" (item_conditionid,itemid,macro,value)"
+				" values (%s,%s,'%s','%s')",
+				row[0], row[0],  macro_esc, value_esc);
+
+		zbx_free(value_esc);
+		zbx_free(macro_esc);
+
+		if (ZBX_DB_OK > rc)
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2030025(void)
+{
+	const ZBX_FIELD field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_2030026(void)
+{
+	return DBdrop_field("items", "filter");
+}
+
+static int	DBpatch_2030027(void)
+{
+	const ZBX_FIELD	field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_2030028(void)
+{
+	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags=%d", ZBX_FLAG_DISCOVERY_RULE))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030029(void)
+{
+	/* 7 - SCREEN_SORT_TRIGGERS_STATUS_ASC */
+	/* 9 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=7 where sort_triggers=9"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030030(void)
+{
+	/* 8 - SCREEN_SORT_TRIGGERS_STATUS_DESC */
+	/* 10 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=8 where sort_triggers=10"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030031(void)
+{
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030032(void)
+{
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
@@ -154,7 +358,27 @@ DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
 DBPATCH_ADD(2030009, 0, 1)
 DBPATCH_ADD(2030010, 0, 1)
-DBPATCH_ADD(2030011, 2020001, 1)
+DBPATCH_ADD(2030011, 0, 1)
 DBPATCH_ADD(2030012, 0, 1)
+DBPATCH_ADD(2030013, 0, 1)
+DBPATCH_ADD(2030014, 0, 1)
+DBPATCH_ADD(2030015, 0, 1)
+DBPATCH_ADD(2030016, 0, 1)
+DBPATCH_ADD(2030017, 0, 1)
+DBPATCH_ADD(2030018, 0, 1)
+DBPATCH_ADD(2030019, 0, 1)
+DBPATCH_ADD(2030020, 0, 1)
+DBPATCH_ADD(2030021, 0, 1)
+DBPATCH_ADD(2030022, 0, 1)
+DBPATCH_ADD(2030023, 0, 1)
+DBPATCH_ADD(2030024, 0, 1)
+DBPATCH_ADD(2030025, 0, 1)
+DBPATCH_ADD(2030026, 0, 1)
+DBPATCH_ADD(2030027, 0, 1)
+DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 0, 1)
+DBPATCH_ADD(2030030, 0, 1)
+DBPATCH_ADD(2030031, 0, 0)
+DBPATCH_ADD(2030032, 0, 1)
 
 DBPATCH_END()

@@ -92,6 +92,8 @@ if (isset($_REQUEST['save'])) {
 		'description' => getRequest('description')
 	);
 
+	DBstart();
+
 	// skip discovered hosts
 	$proxy['hosts'] = API::Host()->get(array(
 		'hostids' => get_request('hosts', array()),
@@ -99,34 +101,31 @@ if (isset($_REQUEST['save'])) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
-	DBstart();
-
 	if (isset($_REQUEST['proxyid'])) {
 		$proxy['proxyid'] = $_REQUEST['proxyid'];
-		$proxyIds = API::Proxy()->update($proxy);
+		$result = API::Proxy()->update($proxy);
 
-		$action = AUDIT_ACTION_UPDATE;
-		$msgOk = _('Proxy updated');
-		$msgFail = _('Cannot update proxy');
+		$messageSuccess = _('Proxy updated');
+		$messageFailed = _('Cannot update proxy');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$proxyIds = API::Proxy()->create($proxy);
+		$result = API::Proxy()->create($proxy);
 
-		$action = AUDIT_ACTION_ADD;
-		$msgOk = _('Proxy added');
-		$msgFail = _('Cannot add proxy');
+		$messageSuccess = _('Proxy added');
+		$messageFailed = _('Cannot add proxy');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
 
-	$result = DBend($proxyIds);
-
-	show_messages($result, $msgOk, $msgFail);
-	clearCookies($result);
-
 	if ($result) {
-		add_audit($action, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($proxyIds['proxyids']).']');
+		add_audit($auditAction, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($result['proxyids']).']');
 		unset($_REQUEST['form']);
 	}
 	unset($_REQUEST['save']);
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete'])) {
 	$result = API::Proxy()->delete(array($_REQUEST['proxyid']));

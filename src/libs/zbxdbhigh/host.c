@@ -23,12 +23,6 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "mutexs.h"
-
-#define LOCK_SERVICES	zbx_mutex_lock(&services_lock)
-#define UNLOCK_SERVICES	zbx_mutex_unlock(&services_lock)
-
-static ZBX_MUTEX	services_lock;
 
 /******************************************************************************
  *                                                                            *
@@ -487,7 +481,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 	return ret;
 }
 
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
+static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
 	DB_RESULT	result;
@@ -600,16 +594,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	int		res = SUCCEED;
-	zbx_uint64_t	graphid, interfaceids[4];
+	int		ret = SUCCEED, i;
+	zbx_uint64_t	graphid, interfaceids[INTERFACE_TYPE_COUNT];
 	unsigned char	t_flags, h_flags, type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (res = validate_inventory_links(hostid, templateids, error, max_error_len)))
+	if (SUCCEED != (ret = validate_inventory_links(hostid, templateids, error, max_error_len)))
 		goto out;
 
-	if (SUCCEED != (res = validate_httptests(hostid, templateids, error, max_error_len)))
+	if (SUCCEED != (ret = validate_httptests(hostid, templateids, error, max_error_len)))
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
@@ -625,7 +619,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 	tresult = DBselect("%s", sql);
 
-	while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
+	while (SUCCEED == ret && NULL != (trow = DBfetch(tresult)))
 	{
 		ZBX_STR2UINT64(graphid, trow[0]);
 		t_flags = (unsigned char)atoi(trow[2]);
@@ -664,7 +658,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 			if (t_flags != h_flags)
 			{
-				res = FAIL;
+				ret = FAIL;
 				zbx_snprintf(error, max_error_len,
 						"graph prototype and real graph \"%s\" have the same name", trow[1]);
 				break;
@@ -684,7 +678,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 			if (SUCCEED != DBcmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
 			{
-				res = FAIL;
+				ret = FAIL;
 				zbx_snprintf(error, max_error_len,
 						"graph \"%s\" already exists on the host (items are not identical)",
 						trow[1]);
@@ -695,7 +689,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	}
 	DBfree_result(tresult);
 
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -713,7 +707,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 		if (NULL != (trow = DBfetch(tresult)))
 		{
-			res = FAIL;
+			ret = FAIL;
 			zbx_snprintf(error, max_error_len,
 					"item prototype and real item \"%s\" have the same key", trow[0]);
 		}
@@ -721,7 +715,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	}
 
 	/* interfaces */
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 	{
 		memset(&interfaceids, 0, sizeof(interfaceids));
 
@@ -755,16 +749,30 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 		tresult = DBselect("%s", sql);
 
-		while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
+		while (SUCCEED == ret && NULL != (trow = DBfetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY != type && 0 == interfaceids[type - 1])
+			if (INTERFACE_TYPE_ANY == type)
 			{
-				res = FAIL;
+				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
+				{
+					if (0 != interfaceids[i])
+						break;
+				}
+
+				if (INTERFACE_TYPE_COUNT == i)
+				{
+					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
+					ret = FAIL;
+				}
+			}
+			else if (0 == interfaceids[type - 1])
+			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));
+				ret = FAIL;
 			}
 		}
 		DBfree_result(tresult);
@@ -774,352 +782,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	zbx_free(gitems);
 	zbx_free(chd_gitems);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBclear_parents_from_trigger                                     *
- *                                                                            *
- * Purpose: removes any links between trigger and service if service          *
- *          is not leaf (treenode)                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBclear_parents_from_trigger()
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	serviceid;
-
-	result = DBselect("select s.serviceid"
-				" from services s,services_links sl"
-				" where s.serviceid=sl.serviceupid"
-					" and s.triggerid is not null"
-				" group by s.serviceid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-
-		DBexecute("update services"
-				" set triggerid=null"
-				" where serviceid=" ZBX_FS_UI64, serviceid);
-	}
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_service_status                                             *
- *                                                                            *
- * Purpose: retrieve true status                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint64_t triggerid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	int		status = 0;
-	char		sort_order[MAX_STRING_LEN];
-	char		sql[MAX_STRING_LEN];
-
-	if (0 != triggerid)
-	{
-		result = DBselect("select priority"
-					" from triggers"
-					" where triggerid=" ZBX_FS_UI64
-						" and status=0"
-						" and value=%d",
-					triggerid,
-					TRIGGER_VALUE_PROBLEM);
-		row = DBfetch(result);
-		if (NULL != row && SUCCEED != DBis_null(row[0]))
-		{
-			status = atoi(row[0]);
-		}
-		DBfree_result(result);
-	}
-
-	if (SERVICE_ALGORITHM_MAX == algorithm || SERVICE_ALGORITHM_MIN == algorithm)
-	{
-		zbx_strlcpy(sort_order, (SERVICE_ALGORITHM_MAX == algorithm ? "desc" : "asc"), sizeof(sort_order));
-
-		zbx_snprintf(sql, sizeof(sql), "select s.status"
-						" from services s,services_links l"
-						" where l.serviceupid=" ZBX_FS_UI64
-							" and s.serviceid=l.servicedownid"
-						" order by s.status %s",
-						serviceid,
-						sort_order);
-
-		result = DBselectN(sql, 1);
-		row = DBfetch(result);
-		if (NULL != row && SUCCEED != DBis_null(row[0]))
-		{
-			if (atoi(row[0]) != 0)
-			{
-				status = atoi(row[0]);
-			}
-		}
-		DBfree_result(result);
-	}
-
-	return status;
-}
-
-/* SUCCEED if latest service alarm has this status */
-/* Rewrite required to simplify logic ?*/
-static int	latest_service_alarm(zbx_uint64_t serviceid, int status)
-{
-	const char	*__function_name = "latest_service_alarm";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-	char		sql[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): serviceid [" ZBX_FS_UI64 "] status [%d]",
-			__function_name, serviceid, status);
-
-	zbx_snprintf(sql, sizeof(sql), "select servicealarmid,value"
-					" from service_alarms"
-					" where serviceid=" ZBX_FS_UI64
-					" order by servicealarmid desc", serviceid);
-
-	result = DBselectN(sql, 1);
-	row = DBfetch(result);
-
-	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
-	{
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-static void	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
-{
-	const char	*__function_name = "DBadd_service_alarm";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != latest_service_alarm(serviceid, status))
-	{
-		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
-			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-			DBget_maxid("service_alarms"), serviceid, clock, status);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBupdate_services_rec                                            *
- *                                                                            *
- * Purpose: re-calculate and update status of the service and its children    *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: recursive function                                               *
- *           !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
-{
-	int		algorithm, status = 0;
-	zbx_uint64_t	serviceupid;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	result = DBselect("select l.serviceupid,s.algorithm"
-			" from services_links l,services s"
-			" where s.serviceid=l.serviceupid"
-				" and l.servicedownid=" ZBX_FS_UI64,
-			serviceid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceupid, row[0]);
-		algorithm = atoi(row[1]);
-
-		if (SERVICE_ALGORITHM_MAX == algorithm || SERVICE_ALGORITHM_MIN == algorithm)
-		{
-			status = DBget_service_status(serviceupid, algorithm, 0);
-
-			DBadd_service_alarm(serviceupid, status, clock);
-			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64, status, serviceupid);
-		}
-		else if (SERVICE_ALGORITHM_NONE != algorithm)
-			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]", algorithm);
-	}
-	DBfree_result(result);
-
-	result = DBselect("select serviceupid"
-			" from services_links"
-			" where servicedownid=" ZBX_FS_UI64,
-			serviceid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceupid, row[0]);
-		DBupdate_services_rec(serviceupid, clock);
-	}
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBupdate_services_status_all                                     *
- *                                                                            *
- * Purpose: Cleaning parent nodes from triggers, updating ALL services status.*
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBupdate_services_status_all()
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zbx_uint64_t	serviceid = 0, triggerid = 0;
-	int		status = 0, clock;
-
-	DBclear_parents_from_trigger();
-
-	clock = time(NULL);
-
-	result = DBselect(
-			"select serviceid,algorithm,triggerid"
-			" from services"
-			" where serviceid not in (select distinct serviceupid from services_links)");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-		if (SUCCEED == DBis_null(row[2]))
-			triggerid = 0;
-		else
-			ZBX_STR2UINT64(triggerid, row[2]);
-
-		status = DBget_service_status(serviceid, atoi(row[1]), triggerid);
-
-		DBexecute("update services"
-				" set status=%d"
-				" where serviceid=" ZBX_FS_UI64,
-				status, serviceid);
-
-		DBadd_service_alarm(serviceid, status, clock);
-	}
-	DBfree_result(result);
-
-	result = DBselect(
-			"select max(servicedownid),serviceupid"
-			" from services_links"
-			" where servicedownid not in (select distinct serviceupid from services_links)"
-			" group by serviceupid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-		DBupdate_services_rec(serviceid, clock);
-	}
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBupdate_services                                                *
- *                                                                            *
- * Purpose: re-calculate and update status of the service and its children    *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *             status - new status of the service                             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	serviceid;
-
-	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64, triggerid);
-
-	LOCK_SERVICES;
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-
-		DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64, status, serviceid);
-
-		DBadd_service_alarm(serviceid, status, clock);
-		DBupdate_services_rec(serviceid, clock);
-	}
-
-	UNLOCK_SERVICES;
-
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_services_by_triggerids                                  *
- *                                                                            *
- * Purpose: delete triggers from service                                      *
- *                                                                            *
- * Parameters: triggerids     - [IN] trigger identificators from database     *
- *             triggerids_num - [IN] number of triggers                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int triggerids_num)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 256, sql_offset = 0;
-
-	if (0 == triggerids_num)
-		return;
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from services"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids, triggerids_num);
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
-
-	DBupdate_services_status_all();
 }
 
 /******************************************************************************
@@ -1220,7 +885,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	}
 	while (num != triggerids->values_num);
 
-	DBdelete_services_by_triggerids(triggerids->values, triggerids->values_num);
+	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids->values, triggerids->values_num);
 
 	for (i = 0; i < triggerids->values_num; i++)
@@ -2543,6 +2208,21 @@ clean:
 	return res;
 }
 
+typedef struct
+{
+	zbx_uint64_t		applicationid;
+	char			*name;
+	zbx_vector_uint64_t	templateids;
+}
+zbx_application_t;
+
+static void	zbx_application_clean(zbx_application_t *application)
+{
+	zbx_vector_uint64_destroy(&application->templateids);
+	zbx_free(application->name);
+	zbx_free(application);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBcopy_template_applications                                     *
@@ -2552,139 +2232,158 @@ clean:
  * Parameters: hostid      - [IN] host id                                     *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	typedef struct
-	{
-		zbx_uint64_t	applicationid;
-		zbx_uint64_t	templateid;
-		char		*name_esc;
-	}
-	zbx_app_t;
-
-	const char	*__function_name = "DBcopy_template_applications";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
-	zbx_app_t	*app = NULL;
-	size_t		app_alloc = 0, app_num = 0;
-	int		new_applications = 0;
+	const char		*__function_name = "DBcopy_template_applications";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_application_t	*application;
+	zbx_vector_ptr_t	applications;
+	int			i, j, new_applications = 0, new_application_templates = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&applications);
+
 	sql = zbx_malloc(sql, sql_alloc);
 
-	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ta.applicationid,ta.name,ha.applicationid"
-			" from applications ta"
-			" left join applications ha"
-				" on ha.name=ta.name"
-					" and ha.hostid=" ZBX_FS_UI64
-			" where",
-			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ha.applicationid");
+			"select applicationid,hostid,name"
+			" from applications"
+			" where hostid=" ZBX_FS_UI64
+				" or", hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values, templateids->values_num);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (app_num == app_alloc)
+		zbx_uint64_t	db_applicationid, db_hostid;
+
+		ZBX_STR2UINT64(db_applicationid, row[0]);
+		ZBX_STR2UINT64(db_hostid, row[1]);
+
+		for (i = 0; i < applications.values_num; i++)
 		{
-			app_alloc += 16;
-			app = zbx_realloc(app, app_alloc * sizeof(zbx_app_t));
+			application = (zbx_application_t *)applications.values[i];
+
+			if (0 == strcmp(application->name, row[2]))
+				break;
 		}
 
-		ZBX_STR2UINT64(app[app_num].templateid, row[0]);
-
-		if (SUCCEED != DBis_null(row[2]))
+		if (i == applications.values_num)
 		{
-			ZBX_STR2UINT64(app[app_num].applicationid, row[2]);
-			app[app_num].name_esc = NULL;
+			application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
+
+			application->applicationid = 0;
+			application->name = zbx_strdup(NULL, row[2]);
+			zbx_vector_uint64_create(&application->templateids);
+
+			zbx_vector_ptr_append(&applications, application);
 		}
+
+		if (db_hostid == hostid)
+			application->applicationid = db_applicationid;
 		else
-		{
-			app[app_num].applicationid = 0;
-			app[app_num].name_esc = DBdyn_escape_string(row[1]);
-			new_applications++;
-		}
-		app_num++;
+			zbx_vector_uint64_append(&application->templateids, db_applicationid);
 	}
 	DBfree_result(result);
 
-	if (0 != app_num)
+	for (i = 0; i < applications.values_num; i++)
 	{
-		zbx_uint64_t	applicationid = 0, application_templateid = 0;
-		size_t		i;
+		application = (zbx_application_t *)applications.values[i];
+
+		if (0 == application->applicationid)
+			new_applications++;
+
+		new_application_templates += application->templateids.values_num;
+	}
+
+	if (0 == new_applications && 0 == new_application_templates)
+		goto clean;
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (0 != new_applications)
+	{
+		zbx_uint64_t	applicationid;
+		char		*name_esc;
 		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
-		const char	*ins_application_template_sql =
-				"insert into application_template"
-				" (application_templateid,applicationid,templateid)"
-				" values ";
 
-		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (0 != new_applications)
-		{
-			applicationid = DBget_maxid_num("applications", new_applications);
+		applicationid = DBget_maxid_num("applications", new_applications);
 #ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
+#endif
+		for (i = 0; i < applications.values_num; i++)
+		{
+			application = (zbx_application_t *)applications.values[i];
+
+			if (0 != application->applicationid)
+				continue;
+
+			name_esc = DBdyn_escape_string(application->name);
+
+#ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
-			for (i = 0; i < app_num; i++)
-			{
-				if (0 != app[i].applicationid)
-					continue;
-
-				app[i].applicationid = applicationid++;
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
-#endif
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-						app[i].applicationid, hostid, app[i].name_esc);
-
-				zbx_free(app[i].name_esc);
-			}
-
-#ifdef HAVE_MULTIROW_INSERT
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
-		}
-
-		application_templateid = DBget_maxid_num("application_template", app_num);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
-#endif
-		for (i = 0; i < app_num; i++)
-		{
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
-#endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					application_templateid++, app[i].applicationid, app[i].templateid);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
+					applicationid, hostid, name_esc);
+
+			zbx_free(name_esc);
+
+			application->applicationid = applicationid++;
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
 		sql_offset--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		DBexecute("%s", sql);
-
-		zbx_free(app);
 	}
 
+	if (0 != new_application_templates)
+	{
+		zbx_uint64_t	application_templateid;
+		const char	*ins_application_template_sql =
+				"insert into application_template"
+				" (application_templateid,applicationid,templateid)"
+				" values ";
+
+		application_templateid = DBget_maxid_num("application_template", new_application_templates);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+#endif
+		for (i = 0; i < applications.values_num; i++)
+		{
+			application = (zbx_application_t *)applications.values[i];
+
+			for (j = 0; j < application->templateids.values_num; j++)
+			{
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+#endif
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						application_templateid++, application->applicationid,
+						application->templateids.values[j]);
+			}
+		}
+
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBexecute("%s", sql);
+clean:
+	zbx_vector_ptr_clean(&applications, (zbx_mem_free_func_t)zbx_application_clean);
+	zbx_vector_ptr_destroy(&applications);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -5319,20 +5018,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, interfaceid);
 
 	return interfaceid;
-}
-
-void	zbx_create_services_lock()
-{
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&services_lock, ZBX_MUTEX_SERVICES))
-	{
-		zbx_error("cannot create mutex for IT services");
-		exit(FAIL);
-	}
-}
-
-void	zbx_destroy_services_lock()
-{
-	zbx_mutex_destroy(&services_lock);
 }
 
 /******************************************************************************

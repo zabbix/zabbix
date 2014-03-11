@@ -1300,7 +1300,7 @@ int	get_host_availability_data(struct zbx_json *j)
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
 			" from hosts"
-			" where status in (%d,%d)",
+			" where status in (%d,%d) order by hostid asc",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
@@ -2060,9 +2060,6 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	for (i = 0; i < values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
-
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == items[i].flags)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

@@ -43,7 +43,9 @@ check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
+	DBstart();
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
+	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
 }
@@ -56,22 +58,26 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 	}
 	else {
-		access_deny();
+		access_deny(ACCESS_DENY_PAGE);
 	}
 }
 
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
-	if (CWebUser::login(get_request('name', ''), get_request('password', ''))) {
-		// save remember login preference
-		$user = array('autologin' => get_request('autologin', 0));
-		if (CWebUser::$data['autologin'] != $user['autologin']) {
-			$result = API::User()->updateProfile($user);
-		}
-		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
+	DBstart();
+	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
+	DBend(true);
 
-		$request = get_request('request');
+	if ($loginSuccess) {
+		// save remember login preference
+		$user = array('autologin' => getRequest('autologin', 0));
+
+		if (CWebUser::$data['autologin'] != $user['autologin']) {
+			API::User()->updateProfile($user);
+		}
+
+		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
 			$url = 'dashboard.php';

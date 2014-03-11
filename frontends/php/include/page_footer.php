@@ -35,7 +35,14 @@ if (!defined('PAGE_HEADER_LOADED')) {
 
 // history
 if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	add_user_history($page);
+	// if URL length is greater than DB field size, skip history update
+	$url = getHistoryUrl($page);
+
+	if ($url) {
+		DBstart();
+		$result = addUserHistory($page['title'], $url);
+		DBend($result);
+	}
 }
 
 // last page
@@ -43,7 +50,11 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 }
 
-CProfile::flush();
+if (CProfile::isModified()) {
+	DBstart();
+	$result = CProfile::flush();
+	DBend($result);
+}
 
 // end transactions if they have not been closed already
 if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
@@ -53,7 +64,6 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 
 show_messages();
 
-$post_script = '';
 if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 	if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		CProfiler::getInstance()->stop();
@@ -62,29 +72,6 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	$post_script .= 'var page_refresh = null;'."\n";
-	$post_script .= "jQuery(function() {\n";
-
-	if (isset($ZBX_PAGE_POST_JS)) {
-		foreach ($ZBX_PAGE_POST_JS as $script) {
-			$post_script .= $script."\n";
-		}
-	}
-
-	if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']) {
-		$post_script .= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
-	}
-
-	if (isset($page['scripts']) && in_array('flickerfreescreen.js', $page['scripts'])) {
-		$post_script .= 'window.flickerfreeScreenShadow.timeout = '.SCREEN_REFRESH_TIMEOUT.' * 1000;'."\n";
-		$post_script .= 'window.flickerfreeScreenShadow.responsiveness = '.SCREEN_REFRESH_RESPONSIVENESS.' * 1000;'."\n";
-	}
-
-	// the chkbxRange.init() method must be called after the inserted post scripts
-	$post_script .= "cookie.init();\n";
-	$post_script .= "chkbxRange.init();\n";
-	$post_script .= '});'."\n";
-
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
 		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 
@@ -111,7 +98,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$table->show();
 	}
 
-	insert_js($post_script);
+	require_once 'include/views/js/common.init.js.php';
 
 	echo '</body>'."\n".
 		'</html>'."\n";

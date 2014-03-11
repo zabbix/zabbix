@@ -43,15 +43,6 @@ $hostGroupWidget->addHeaderRowNumber();
 $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');
 
-// if any of the groups are about to be deleted, show the status column
-$showStatus = false;
-foreach ($this->data['groups'] as $hostGroup) {
-	if ($hostGroup['groupDiscovery'] && $hostGroup['groupDiscovery']['ts_delete']) {
-		$showStatus = true;
-		break;
-	}
-}
-
 // create table
 $hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
@@ -60,7 +51,7 @@ $hostGroupTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name'),
 	' # ',
 	_('Members'),
-	($showStatus) ? _('Status') : null
+	_('Info')
 ));
 
 foreach ($this->data['groups'] as $group) {
@@ -71,49 +62,56 @@ foreach ($this->data['groups'] as $group) {
 		$i++;
 
 		if ($i > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = '...';
-			$hostsOutput[] = '//empty for array_pop';
+			$hostsOutput[] = ' &hellip;';
+
 			break;
 		}
 
 		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
 
+		if ($i > 1) {
+			$hostsOutput[] = ', ';
+		}
+
 		$hostsOutput[] = new CLink($template['name'], $url, 'unknown');
-		$hostsOutput[] = ', ';
 	}
 
-	if ($hostsOutput) {
-		array_pop($hostsOutput);
-
-		$hostsOutput[] = BR();
-		$hostsOutput[] = BR();
-	}
-
-	foreach ($group['hosts'] as $host) {
-		$i++;
-
-		if ($i > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = '...';
-			$hostsOutput[] = '//empty for array_pop';
-			break;
+	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
+		if ($hostsOutput) {
+			$hostsOutput[] = BR();
+			$hostsOutput[] = BR();
 		}
 
-		switch ($host['status']) {
-			case HOST_STATUS_NOT_MONITORED:
-				$style = 'on';
-				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+		$n = 0;
+
+		foreach ($group['hosts'] as $host) {
+			$i++;
+			$n++;
+
+			if ($i > $this->data['config']['max_in_table']) {
+				$hostsOutput[] = ' &hellip;';
+
 				break;
+			}
 
-			default:
-				$style = null;
-				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-			break;
+			switch ($host['status']) {
+				case HOST_STATUS_NOT_MONITORED:
+					$style = 'on';
+					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+					break;
+
+				default:
+					$style = null;
+					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+			}
+
+			if ($n > 1) {
+				$hostsOutput[] = ', ';
+			}
+
+			$hostsOutput[] = new CLink($host['name'], $url, $style);
 		}
-
-		$hostsOutput[] = new CLink($host['name'], $url, $style);
-		$hostsOutput[] = ', ';
 	}
-	array_pop($hostsOutput);
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];
 	$templateCount = $this->data['groupCounts'][$group['groupid']]['templates'];
@@ -126,20 +124,18 @@ foreach ($this->data['groups'] as $group) {
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
-	// status
-	if ($showStatus) {
-		$status = array();
-
-		// discovered item lifetime indicator
-		if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-			$deleteError->setHint(
-				_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
-					zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
-				));
-			$status[] = $deleteError;
-		}
+	// info, discovered item lifetime indicator
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
+		$info = new CDiv(SPACE, 'status_icon iconwarning');
+		$info->setHint(
+			_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
+				zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
+			)
+		);
+	}
+	else {
+		$info = '';
 	}
 
 	$hostGroupTable->addRow(array(
@@ -152,7 +148,7 @@ foreach ($this->data['groups'] as $group) {
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
 		),
 		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
-		($showStatus) ? $status : null
+		$info
 	));
 }
 

@@ -206,6 +206,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['name']			script name
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
+ * @param bool   options['hasGraphs']		link to host graphs page
  * @param bool   options['hasScreens']		link to host screen page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
@@ -226,17 +227,31 @@ function getMenuPopupHost(options) {
 	if (options.hasGoTo) {
 		var gotos = [];
 
+		// inventory
+		gotos[gotos.length] = {
+			label: t('Host inventory'),
+			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+		};
+
 		// latest
 		gotos[gotos.length] = {
 			label: t('Latest data'),
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// inventory
+		// trigger status
 		gotos[gotos.length] = {
-			label: t('Host inventory'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			label: t('Triggers'),
+			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
+
+		// graphs
+		if (options.hasGraphs) {
+			gotos[gotos.length] = {
+				label: t('Graphs'),
+				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
+			};
+		}
 
 		// screens
 		if (options.hasScreens) {
@@ -264,7 +279,9 @@ function getMenuPopupHost(options) {
  * @param string options[]['scriptid']				script id
  * @param string options[]['confirmation']			confirmation text
  * @param object options['gotos']					links section (optional)
+ * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
+ * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
@@ -306,16 +323,16 @@ function getMenuPopupMap(options) {
 			};
 		}
 
-		// screens
-		if (typeof options.gotos.screens !== 'undefined') {
-			var url = new Curl('host_screen.php');
+		// latest
+		if (typeof options.gotos.latestData !== 'undefined') {
+			var url = new Curl('latest.php');
 
-			jQuery.each(options.gotos.screens, function(name, value) {
+			jQuery.each(options.gotos.latestData, function(name, value) {
 				url.setArgument(name, value);
 			});
 
 			gotos[gotos.length] = {
-				label: t('Host screens'),
+				label: t('Latest data'),
 				url: url.getUrl()
 			};
 		}
@@ -329,7 +346,35 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-				label: t('Status of triggers'),
+				label: t('Triggers'),
+				url: url.getUrl()
+			};
+		}
+
+		// graphs
+		if (typeof options.gotos.graphs !== 'undefined') {
+			var url = new Curl('charts.php');
+
+			jQuery.each(options.gotos.graphs, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Graphs'),
+				url: url.getUrl()
+			};
+		}
+
+		// screens
+		if (typeof options.gotos.screens !== 'undefined') {
+			var url = new Curl('host_screen.php');
+
+			jQuery.each(options.gotos.screens, function(name, value) {
+				url.setArgument(name, value);
+			});
+
+			gotos[gotos.length] = {
+				label: t('Host screens'),
 				url: url.getUrl()
 			};
 		}

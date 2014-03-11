@@ -459,6 +459,7 @@ class CConfigurationExport {
 		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $hostIds,
 			'output' => $this->dataFields['drule'],
+			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
@@ -483,6 +484,7 @@ class CConfigurationExport {
 		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $templateIds,
 			'output' => $this->dataFields['drule'],
+			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
@@ -511,6 +513,11 @@ class CConfigurationExport {
 			$item['graphPrototypes'] = array();
 			$item['triggerPrototypes'] = array();
 			$item['hostPrototypes'] = array();
+
+			// unset unnecessary condition fields
+			foreach ($item['filter']['conditions'] as &$condition) {
+				unset($condition['item_conditionid'], $condition['itemid']);
+			}
 		}
 		unset($item);
 

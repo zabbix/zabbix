@@ -28,7 +28,7 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_CLOCK => _('Clock'),
 		SCREEN_RESOURCE_DATA_OVERVIEW => _('Data overview'),
 		SCREEN_RESOURCE_GRAPH => _('Graph'),
-		SCREEN_RESOURCE_ACTIONS => _('History of actions'),
+		SCREEN_RESOURCE_ACTIONS => _('Action log'),
 		SCREEN_RESOURCE_EVENTS => _('History of events'),
 		SCREEN_RESOURCE_HOSTS_INFO => _('Hosts info'),
 		SCREEN_RESOURCE_MAP => _('Map'),
@@ -313,7 +313,7 @@ function delete_slideshow($slideshowid) {
 	$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
 	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
 
-	return $result;
+	return (bool) $result;
 }
 
 // check whether there are dynamic items in the screen, if so return TRUE, else FALSE
