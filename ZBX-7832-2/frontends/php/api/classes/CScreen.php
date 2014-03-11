@@ -441,7 +441,9 @@ class CScreen extends CZBXAPI {
 	protected function validateUpdate(array $screens, array $dbScreens) {
 		foreach ($screens as $screen) {
 			if (!isset($dbScreens[$screen['screenid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
@@ -480,7 +482,7 @@ class CScreen extends CZBXAPI {
 	public function update(array $screens) {
 		$screens = zbx_toArray($screens);
 
-		// check hostids before doing anything
+		// check screen IDs before doing anything
 		$this->checkObjectIds($screens, 'screenid',
 			_('No "%1$s" given for screen.'),
 			_('Empty screen ID for screen.'),
@@ -566,8 +568,9 @@ class CScreen extends CZBXAPI {
 					elseif (($dbScreenItem['x'] + $dbScreenItem['colspan']) > $screen['hsize']) {
 						$colspan = $screen['hsize'] - $dbScreenItem['x'];
 
-						$updateScreenItems[$dbScreenItem['screenitemid']]['screenitemid'] = $dbScreenItem['screenitemid'];
-						$updateScreenItems[$dbScreenItem['screenitemid']]['colspan'] = $colspan;
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['colspan'] = $colspan;
 					}
 				}
 			}
@@ -582,8 +585,9 @@ class CScreen extends CZBXAPI {
 					elseif (($dbScreenItem['y'] + $dbScreenItem['rowspan']) > $screen['vsize']) {
 						$rowspan = $screen['vsize'] - $dbScreenItem['y'];
 
-						$updateScreenItems[$dbScreenItem['screenitemid']]['screenitemid'] = $dbScreenItem['screenitemid'];
-						$updateScreenItems[$dbScreenItem['screenitemid']]['rowspan'] = $rowspan;
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['rowspan'] = $rowspan;
 					}
 				}
 			}
