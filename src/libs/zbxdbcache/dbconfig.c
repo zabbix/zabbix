@@ -5628,7 +5628,7 @@ double	DCget_required_performance()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (0 != item->delay && ZBX_FLAG_DISCOVERY_PROTOTYPE != item->flags)
+		if (0 != item->delay)
 			nvps += 1.0 / item->delay;
 	}
 
