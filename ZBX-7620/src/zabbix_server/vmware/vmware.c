@@ -666,7 +666,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	int		err, opt, timeout = 10, ret = FAIL;
 	char		xml[MAX_STRING_LEN], *error_object = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
@@ -893,12 +893,14 @@ static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() refresh_rate:%s", __function_name, value);
+
 	if (SUCCEED != (ret = is_uint31(value, refresh_rate)))
 		*error = zbx_strdup(*error, "Cannot get refreshRate");
 
 	zbx_free(value);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, SUCCEED == ret ? *refresh_rate : -1);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
