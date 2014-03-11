@@ -2932,10 +2932,7 @@ static int	__config_item_hk_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM_HK	*item_hk_1 = (const ZBX_DC_ITEM_HK *)d1;
 	const ZBX_DC_ITEM_HK	*item_hk_2 = (const ZBX_DC_ITEM_HK *)d2;
 
-	if (item_hk_1->hostid < item_hk_2->hostid)
-		return -1;
-	if (item_hk_1->hostid > item_hk_2->hostid)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(item_hk_1->hostid, item_hk_2->hostid);
 
 	return item_hk_1->key == item_hk_2->key ? 0 : strcmp(item_hk_1->key, item_hk_2->key);
 }
@@ -2958,15 +2955,8 @@ static int	__config_host_ph_compare(const void *d1, const void *d2)
 	const ZBX_DC_HOST_PH	*host_ph_1 = (const ZBX_DC_HOST_PH *)d1;
 	const ZBX_DC_HOST_PH	*host_ph_2 = (const ZBX_DC_HOST_PH *)d2;
 
-	if (host_ph_1->proxy_hostid < host_ph_2->proxy_hostid)
-		return -1;
-	if (host_ph_1->proxy_hostid > host_ph_2->proxy_hostid)
-		return +1;
-
-	if (host_ph_1->status < host_ph_2->status)
-		return -1;
-	if (host_ph_1->status > host_ph_2->status)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(host_ph_1->proxy_hostid, host_ph_2->proxy_hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(host_ph_1->status, host_ph_2->status);
 
 	return host_ph_1->host == host_ph_2->host ? 0 : strcmp(host_ph_1->host, host_ph_2->host);
 }
@@ -3007,10 +2997,7 @@ static int	__config_hmacro_hm_compare(const void *d1, const void *d2)
 	const ZBX_DC_HMACRO_HM	*hmacro_hm_1 = (const ZBX_DC_HMACRO_HM *)d1;
 	const ZBX_DC_HMACRO_HM	*hmacro_hm_2 = (const ZBX_DC_HMACRO_HM *)d2;
 
-	if (hmacro_hm_1->hostid < hmacro_hm_2->hostid)
-		return -1;
-	if (hmacro_hm_1->hostid > hmacro_hm_2->hostid)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(hmacro_hm_1->hostid, hmacro_hm_2->hostid);
 
 	return hmacro_hm_1->macro == hmacro_hm_2->macro ? 0 : strcmp(hmacro_hm_1->macro, hmacro_hm_2->macro);
 }
@@ -3032,15 +3019,8 @@ static int	__config_interface_ht_compare(const void *d1, const void *d2)
 	const ZBX_DC_INTERFACE_HT	*interface_ht_1 = (const ZBX_DC_INTERFACE_HT *)d1;
 	const ZBX_DC_INTERFACE_HT	*interface_ht_2 = (const ZBX_DC_INTERFACE_HT *)d2;
 
-	if (interface_ht_1->hostid < interface_ht_2->hostid)
-		return -1;
-	if (interface_ht_1->hostid > interface_ht_2->hostid)
-		return +1;
-
-	if (interface_ht_1->type < interface_ht_2->type)
-		return -1;
-	if (interface_ht_1->type > interface_ht_2->type)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(interface_ht_1->hostid, interface_ht_2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(interface_ht_1->type, interface_ht_2->type);
 
 	return 0;
 }
@@ -3068,28 +3048,14 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	unsigned char		f1;
 	unsigned char		f2;
 
-	if (i1->interfaceid < i2->interfaceid)
-		return -1;
-	if (i1->interfaceid > i2->interfaceid)
-		return +1;
-
-	if (i1->port < i2->port)
-		return -1;
-	if (i1->port > i2->port)
-		return +1;
-
-	if (i1->type < i2->type)
-		return -1;
-	if (i1->type > i2->type)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->port, i2->port);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->type, i2->type);
 
 	f1 = ZBX_FLAG_DISCOVERY_RULE & i1->flags;
 	f2 = ZBX_FLAG_DISCOVERY_RULE & i2->flags;
 
-	if (f1 < f2)
-		return -1;
-	if (f1 > f2)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(f1, f2);
 
 	s1 = zbx_hashset_search(&config->snmpitems, &i1->itemid);
 	s2 = zbx_hashset_search(&config->snmpitems, &i2->itemid);
@@ -3105,10 +3071,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
-	if (i1->nextcheck < i2->nextcheck)
-		return -1;
-	if (i1->nextcheck > i2->nextcheck)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3134,15 +3097,8 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
-	if (i1->nextcheck < i2->nextcheck)
-		return -1;
-	if (i1->nextcheck > i2->nextcheck)
-		return +1;
-
-	if (i1->interfaceid < i2->interfaceid)
-		return -1;
-	if (i1->interfaceid > i2->interfaceid)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
 }
@@ -3152,23 +3108,13 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 	const ZBX_DC_JMXITEM	*j1;
 	const ZBX_DC_JMXITEM	*j2;
 
-	if (i1->interfaceid < i2->interfaceid)
-		return -1;
-	if (i1->interfaceid > i2->interfaceid)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	j1 = zbx_hashset_search(&config->jmxitems, &i1->itemid);
 	j2 = zbx_hashset_search(&config->jmxitems, &i2->itemid);
 
-	if (j1->username < j2->username)
-		return -1;
-	if (j1->username > j2->username)
-		return +1;
-
-	if (j1->password < j2->password)
-		return -1;
-	if (j1->password > j2->password)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
+	ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
 
 	return 0;
 }
@@ -3181,10 +3127,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
-	if (i1->nextcheck < i2->nextcheck)
-		return -1;
-	if (i1->nextcheck > i2->nextcheck)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3204,10 +3147,7 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	nextcheck2 = (p2->proxy_config_nextcheck < p2->proxy_data_nextcheck) ?
 			p2->proxy_config_nextcheck : p2->proxy_data_nextcheck;
 
-	if (nextcheck1 < nextcheck2)
-		return -1;
-	if (nextcheck1 > nextcheck2)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(nextcheck1, nextcheck2);
 
 	return 0;
 }

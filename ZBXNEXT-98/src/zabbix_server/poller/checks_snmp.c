@@ -112,15 +112,8 @@ static int	zbx_snmp_index_compare(const zbx_snmp_index_t *s1, const zbx_snmp_ind
 {
 	int	rc;
 
-	if (s1->hostid < s2->hostid)
-		return -1;
-	if (s1->hostid > s2->hostid)
-		return +1;
-
-	if (s1->port < s2->port)
-		return -1;
-	if (s1->port > s2->port)
-		return +1;
+	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->port, s2->port);
 
 	if (0 != (rc = strcmp(s1->oid, s2->oid)))
 		return rc;

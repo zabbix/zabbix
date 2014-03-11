@@ -632,11 +632,7 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
  ******************************************************************************/
 static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx_vc_item_weight_t *d2)
 {
-	if (d1->weight > d2->weight)
-		return 1;
-
-	if (d1->weight < d2->weight)
-		return -1;
+	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
 }
