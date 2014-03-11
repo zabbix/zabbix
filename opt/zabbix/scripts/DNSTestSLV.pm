@@ -461,6 +461,37 @@ sub get_online_probes
     $all_probes_ref = __get_probes() unless ($all_probes_ref);
 
     my (@result, @row, $sql, $host, $hostid, $res, $probe_down, $no_values);
+
+    # Filter out unreachable probes. Probes are considered unreachable if last access time is over 60 seconds.
+    my $probe_availability_item = 'zabbix[proxy,{$DNSTEST.PROXY_NAME},lastaccess]';
+    my $probe_availability_limit = 60; # seconds
+
+    my $hosts_mon = '';
+    foreach my $host (keys(%$all_probes_ref))
+    {
+	$hosts_mon .= ',' if ($hosts_mon ne '');
+	$hosts_mon .= "'$host - mon'";
+    }
+
+    return \@result if ($hosts_mon eq '');
+
+    $res = db_select(
+	"select distinct h.host".
+	" from items i,history_uint hi,hosts h".
+	" where i.itemid=hi.itemid".
+	    " and i.hostid=h.hostid".
+	    " and i.key_='$probe_availability_item'".
+	    " and hi.clock between $from and $till".
+	    " and hi.clock-hi.value > $probe_availability_limit".
+	    " and h.host in ($hosts_mon)");
+
+    while (@row = $res->fetchrow_array)
+    {
+	my $h = $row[0];
+	$h =~ s/^(\S+).*/$1/; # remove ' - mon' from the host name
+	delete($all_probes_ref->{$h});
+    }
+
     foreach my $host (keys(%$all_probes_ref))
     {
 	$hostid = $all_probes_ref->{$host};
@@ -1443,7 +1474,7 @@ sub __get_eventtimes
     return \@eventtimes;
 }
 
-# Returns a reference to hash probes (host name => hostid).
+# Returns a reference to hash of all probes (host name => hostid).
 sub __get_probes
 {
     my $res = db_select(
