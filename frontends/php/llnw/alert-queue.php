@@ -40,8 +40,6 @@ if ($json['method'] == 'alertqueue.create') {
     sendErrorResponse('235', "Invalid params", "Missing trigger value");
   }
   
-  // unescape the quotes in the JSON
-  $item = str_replace("\\\"", "\"", $item); 
   $item = json_decode($item, true);
   if ($item == null) {
     dbug("Error: Unable to parse item JSON");
@@ -89,8 +87,6 @@ if ($json['method'] == 'alertqueue.create') {
     $item["trends"] = $default_trends;
   }
   
-  // unescape the quotes in the JSON
-  $trigger = str_replace("\\\"", "\"", $trigger); 
   $trigger = json_decode($trigger, true);
   if ($trigger == null) {
     dbug("Error: Unable to parse trigger JSON");
