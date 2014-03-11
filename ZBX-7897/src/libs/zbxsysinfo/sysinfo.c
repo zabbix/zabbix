@@ -194,7 +194,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->severity = 0;
 	log->logeventid = 0;
 	log->mtime = 0;
-
 }
 
 void	init_result(AGENT_RESULT *result)
