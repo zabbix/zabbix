@@ -118,7 +118,14 @@ $tld = API::Host()->get(array(
 	)
 ));
 
-$data['tld'] = reset($tld);
+if ($tld) {
+	$data['tld'] = reset($tld);
+}
+else {
+	show_error_message(_('No permissions to referred TLD or it does not exist!'));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
 
 // used items
 if ($data['type'] == DNSTEST_DNS) {
@@ -298,104 +305,100 @@ if ($items) {
 			' AND h.clock<='.zbxDateToTime($data['filter_to'])
 	);
 
-	if ($data['tld'] && $data['slvItemId']) {
-		$data['slv'] = sprintf('%.3f', getSLV($data['slvItemId']));
+	// result generation
+	$data['downTests'] = 0;
+	$data['statusChanges'] = 0;
+	while ($test = DBfetch($tests)) {
+		if ($test['value'] == 0) {
+			$data['tests'][] = array(
+				'value' => $test['value'],
+				'clock' => $test['clock'],
+				'incident' => 0,
+				'updated' => false
+			);
 
-		// result generation
-		$data['downTests'] = 0;
-		$data['statusChanges'] = 0;
-		while ($test = DBfetch($tests)) {
-			if ($test['value'] == 0) {
-				$data['tests'][] = array(
-					'value' => $test['value'],
-					'clock' => $test['clock'],
-					'incident' => 0,
-					'updated' => false
-				);
-
-				if (!$test['value']) {
-					$data['downTests']++;
-				}
+			if (!$test['value']) {
+				$data['downTests']++;
 			}
+		}
 
-			// state changes
-			if (!isset($statusChanged)) {
+		// state changes
+		if (!isset($statusChanged)) {
+			$statusChanged = $test['value'];
+		}
+		else {
+			if ($statusChanged != $test['value']) {
 				$statusChanged = $test['value'];
-			}
-			else {
-				if ($statusChanged != $test['value']) {
-					$statusChanged = $test['value'];
-					$data['statusChanges']++;
-				}
+				$data['statusChanges']++;
 			}
 		}
+	}
 
-		$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
+	$data['downPeriod'] = zbxDateToTime($data['filter_to']) - zbxDateToTime($data['filter_from']);
 
-		if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
-			$itemKey = CALCULATED_ITEM_DNS_DELAY;
-		}
-		elseif ($data['type'] == DNSTEST_RDDS) {
-			$itemKey = CALCULATED_ITEM_RDDS_DELAY;
-		}
-		else {
-			$itemKey = CALCULATED_ITEM_EPP_DELAY;
-		}
+	if ($data['type'] == DNSTEST_DNS || $data['type'] == DNSTEST_DNSSEC) {
+		$itemKey = CALCULATED_ITEM_DNS_DELAY;
+	}
+	elseif ($data['type'] == DNSTEST_RDDS) {
+		$itemKey = CALCULATED_ITEM_RDDS_DELAY;
+	}
+	else {
+		$itemKey = CALCULATED_ITEM_EPP_DELAY;
+	}
 
-		// get host with calculated items
-		$dnstest = API::Host()->get(array(
-			'output' => array('hostid'),
-			'filter' => array(
-				'host' => DNSTEST_HOST
-			)
-		));
+	// get host with calculated items
+	$dnstest = API::Host()->get(array(
+		'output' => array('hostid'),
+		'filter' => array(
+			'host' => DNSTEST_HOST
+		)
+	));
 
-		if ($dnstest) {
-			$dnstest = reset($dnstest);
-		}
-		else {
-			show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
-			require_once dirname(__FILE__).'/include/page_footer.php';
-			exit;
-		}
+	if ($dnstest) {
+		$dnstest = reset($dnstest);
+	}
+	else {
+		show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
 
-		$item = API::Item()->get(array(
-			'hostids' => $dnstest['hostid'],
-			'output' => array('itemid', 'value_type'),
-			'filter' => array(
-				'key_' => $itemKey
-			)
-		));
+	$item = API::Item()->get(array(
+		'hostids' => $dnstest['hostid'],
+		'output' => array('itemid', 'value_type'),
+		'filter' => array(
+			'key_' => $itemKey
+		)
+	));
 
-		if ($item) {
-			$item = reset($item);
-		}
-		else {
-			show_error_message(_s('Missed items for host "%1$s"!', DNSTEST_HOST));
-			require_once dirname(__FILE__).'/include/page_footer.php';
-			exit;
-		}
+	if ($item) {
+		$item = reset($item);
+	}
+	else {
+		show_error_message(_s('Missed items for host "%1$s"!', DNSTEST_HOST));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
 
-		$itemValue = API::History()->get(array(
-			'itemids' => $item['itemid'],
-			'time_from' => zbxDateToTime($data['filter_from']),
-			'history' => $item['value_type'],
-			'output' => API_OUTPUT_EXTEND,
-			'limit' => 1
-		));
-		$itemValue = reset($itemValue);
+	$itemValue = API::History()->get(array(
+		'itemids' => $item['itemid'],
+		'time_from' => zbxDateToTime($data['filter_from']),
+		'history' => $item['value_type'],
+		'output' => API_OUTPUT_EXTEND,
+		'limit' => 1
+	));
+	$itemValue = reset($itemValue);
 
-		$timeStep = $itemValue['value'] ?  $itemValue['value'] / SEC_PER_MIN : 1;
+	$timeStep = $itemValue['value'] ?  $itemValue['value'] / SEC_PER_MIN : 1;
 
-		$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
+	$data['downTimeMinutes'] = $data['downTests'] * $timeStep;
 
-		foreach ($incidentsData as $incident) {
-			foreach ($data['tests'] as $key => $test) {
-				if (!$test['updated'] && $incident['startTime'] < $test['clock'] && (!isset($incident['endTime'])
-						|| (isset($incident['endTime']) && $incident['endTime'] > $test['clock']))) {
-					$data['tests'][$key]['incident'] = $incident['false_positive'] ? 2 : 1;
-					$data['tests'][$key]['updated'] = true;
-				}
+	foreach ($incidentsData as $incident) {
+		foreach ($data['tests'] as $key => $test) {
+			if (!$test['updated'] && $incident['startTime'] < $test['clock'] && (!isset($incident['endTime'])
+					|| (isset($incident['endTime']) && $incident['endTime'] > $test['clock']))) {
+				$data['tests'][$key]['incident'] = $incident['false_positive'] ? 2 : 1;
+				$data['tests'][$key]['updated'] = true;
 			}
 		}
 	}

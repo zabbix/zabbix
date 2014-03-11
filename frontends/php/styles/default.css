@@ -906,7 +906,6 @@ fieldset legend { margin: 0.2em 0.5em; }
 .incident-details .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -20px 10px; }
 
 .tests .filter .spaces { margin-left: 20px; }
-.tests .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -10px 10px; }
 .tests .info-block .first-row-element { width: 300px; display: inline-block; }
 
 .particular-proxy .info-block .first-row-element { width: 300px; display: inline-block; }
