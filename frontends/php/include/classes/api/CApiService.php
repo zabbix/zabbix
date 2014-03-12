@@ -540,7 +540,7 @@ class CApiService {
 
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
-	 * Soring is currently only supported for CZBXAPI::get() methods.
+	 * Sorting is currently only supported for CApiService::get() methods.
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
