@@ -125,7 +125,7 @@ static int	DBpatch_2030010(void)
 
 static int	DBpatch_2030011(void)
 {
-	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps_elements", &field);
 }
@@ -305,6 +305,42 @@ static int	DBpatch_2030028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030029(void)
+{
+	/* 7 - SCREEN_SORT_TRIGGERS_STATUS_ASC */
+	/* 9 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=7 where sort_triggers=9"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030030(void)
+{
+	/* 8 - SCREEN_SORT_TRIGGERS_STATUS_DESC */
+	/* 10 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC (no more supported) */
+	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=8 where sort_triggers=10"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030031(void)
+{
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2030032(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -322,7 +358,7 @@ DBPATCH_ADD(2030007, 0, 1)
 DBPATCH_ADD(2030008, 0, 1)
 DBPATCH_ADD(2030009, 0, 1)
 DBPATCH_ADD(2030010, 0, 1)
-DBPATCH_ADD(2030011, 2020001, 1)
+DBPATCH_ADD(2030011, 0, 1)
 DBPATCH_ADD(2030012, 0, 1)
 DBPATCH_ADD(2030013, 0, 1)
 DBPATCH_ADD(2030014, 0, 1)
@@ -340,5 +376,9 @@ DBPATCH_ADD(2030025, 0, 1)
 DBPATCH_ADD(2030026, 0, 1)
 DBPATCH_ADD(2030027, 0, 1)
 DBPATCH_ADD(2030028, 0, 1)
+DBPATCH_ADD(2030029, 0, 1)
+DBPATCH_ADD(2030030, 0, 1)
+DBPATCH_ADD(2030031, 0, 0)
+DBPATCH_ADD(2030032, 0, 1)
 
 DBPATCH_END()

@@ -233,6 +233,42 @@ function itemIndicatorStyle($status, $state = null) {
 }
 
 /**
+ * Orders items by both status and state. Items are sorted in the following order: enabled, disabled, not supported.
+ *
+ * Keep in sync with orderTriggersByStatus().
+ *
+ * @param array  $items
+ * @param string $sortorder
+ */
+function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($items as $key => $item) {
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			$statusOrder = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 2 : 0;
+		}
+		elseif ($item['status'] == ITEM_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedItems = array();
+	foreach ($sort as $key => $val) {
+		$sortedItems[$key] = $items[$key];
+	}
+	$items = $sortedItems;
+}
+
+/**
  * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type

@@ -860,7 +860,7 @@ class CDiscoveryRule extends CItemGeneral {
 			),
 			'required' => array('evaltype', 'conditions'),
 			'messageRequired' => _('No "%2$s" given for the filter of discovery rule "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" the filter of discovery rule "%1$s".')
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for the filter of discovery rule "%1$s".')
 		);
 	}
 
