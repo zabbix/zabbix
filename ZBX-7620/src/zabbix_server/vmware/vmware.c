@@ -931,7 +931,6 @@ static int	vmware_get_group_perfcounters(const char *data, int size, const char 
 	int				i, ret = FAIL;
 	zbx_perfcounter_mapping_t	*counter;
 
-
 	if (NULL == (doc = xmlReadMemory(data, size, "noname.xml", NULL, 0)))
 		goto out;
 
@@ -978,8 +977,13 @@ static int	vmware_get_group_perfcounters(const char *data, int size, const char 
 	{
 		if (0 == *counter->pcounter)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to retrieve vmware performance counter: %s/%s",
+			zabbix_log(LOG_LEVEL_WARNING, "failed to retrieve VMware performance counter: %s/%s",
 					group, counter->key);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "found VMware performance counter %s/%s: " ZBX_FS_UI64,
+					group, counter->key, *counter->pcounter);
 		}
 	}
 
