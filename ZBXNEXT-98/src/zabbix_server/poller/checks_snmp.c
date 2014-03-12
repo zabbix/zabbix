@@ -667,7 +667,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
 static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *result)
+		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
@@ -676,7 +676,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			bulk, status, running, ret = SUCCEED;
+	int			bulk, status, level, running, ret = SUCCEED;
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
@@ -716,6 +716,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 	}
 
+	level = 0;
 	running = 1;
 
 	while (1 == running)
@@ -738,22 +739,47 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		if (1 == bulk)
 		{
 			pdu->non_repeaters = 0;
-			pdu->max_repetitions = 10;
+			pdu->max_repetitions = max_vars;
 		}
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld", __function_name,
-				status, NULL == response ? (long)-1 : response->errstat);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld max_vars:%d",
+				__function_name, status, NULL == response ? (long)-1 : response->errstat, max_vars);
 
-		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
+		if (1 < max_vars &&
+			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
+		{
+			/* The logic of iteratively reducing request size here is the same as in function */
+			/* zbx_snmp_get_values(). Please refer to the description there for explanation.  */
+
+			if (*min_fail > max_vars)
+				*min_fail = max_vars;
+
+			if (0 == level)
+			{
+				max_vars /= 2;
+			}
+			else if (1 == level)
+			{
+				max_vars = 1;
+			}
+
+			level++;
+
+			goto next;
+		}
+		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, sizeof(error));
 			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 			running = 0;
 			goto next;
 		}
+
+		if (*max_succeed < max_vars)
+			*max_succeed = max_vars;
 
 		/* process response */
 		for (var = response->variables; NULL != var; var = var->next_variable)
@@ -911,8 +937,8 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld mapping_num:%d", __function_name,
-			status, NULL == response ? (long)-1 : response->errstat, mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld mapping_num:%d",
+			__function_name, status, NULL == response ? (long)-1 : response->errstat, mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -1109,7 +1135,7 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 }
 
 static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
@@ -1125,7 +1151,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		case 0:
 			zbx_snmp_translate(oid_translated, items[0].snmp_oid, sizeof(oid_translated));
 			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, ZBX_SNMP_WALK_MODE_DISCOVERY,
-					&results[0]);
+					&results[0], max_succeed, min_fail, max_vars);
 			break;
 		default:
 			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
@@ -1274,7 +1300,8 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 			init_result(&result);
 
-			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result);
+			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result,
+					max_succeed, min_fail, num);
 
 			if (NETWORK_ERROR == errcode)
 			{
@@ -1420,7 +1447,18 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags))
 	{
-		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error));
+		int	max_vars;
+
+		if (SUCCEED == DCconfig_get_interface_snmp_stats(items[j].interface.interfaceid,
+				&max_succeed, &min_fail, 1))
+		{
+			max_vars = DCconfig_get_suggested_snmp_vars(max_succeed, min_fail);
+		}
+		else
+			max_vars = 1;
+
+		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
+				&max_succeed, &min_fail, max_vars);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{

@@ -4174,6 +4174,40 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 	UNLOCK_CACHE;
 }
 
+int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail, int lock)
+{
+	int			ret = FAIL;
+	ZBX_DC_INTERFACE	*dc_interface;
+
+	if (1 == lock)
+		LOCK_CACHE;
+
+	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
+	{
+		*max_snmp_succeed = dc_interface->max_snmp_succeed;
+		*min_snmp_fail = dc_interface->min_snmp_fail;
+
+		ret = SUCCEED;
+	}
+
+	if (1 == lock)
+		UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
+{
+	int	num;
+
+	num = max_snmp_succeed + 1;
+
+	if (num < min_snmp_fail)
+		return num;
+
+	return min_snmp_fail - 1;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_interface_by_type                                   *
@@ -4411,16 +4445,12 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
 					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
 			{
-				ZBX_DC_INTERFACE	*dc_interface;
+				int	max_snmp_succeed, min_snmp_fail;
 
-				dc_interface = zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
-
-				if (NULL != dc_interface)
+				if (SUCCEED == DCconfig_get_interface_snmp_stats(dc_item->interfaceid,
+						&max_snmp_succeed, &min_snmp_fail, 0))
 				{
-					if (dc_interface->max_snmp_succeed + 1 < dc_interface->min_snmp_fail)
-						max_items = dc_interface->max_snmp_succeed + 1;
-					else
-						max_items = dc_interface->min_snmp_fail - 1;
+					max_items = DCconfig_get_suggested_snmp_vars(max_snmp_succeed, min_snmp_fail);
 				}
 			}
 		}
