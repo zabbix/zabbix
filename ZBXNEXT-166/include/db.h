@@ -577,4 +577,41 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
 
+/* bulk insert support */
+
+/* database field value */
+typedef union
+{
+	int		i32;
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_db_value_t;
+
+/* database bulk insert data */
+typedef struct
+{
+	/* the target table */
+	const ZBX_TABLE		*table;
+	/* the fields to insert */
+	zbx_vector_ptr_t	fields;
+	/* the current sql insert statement */
+	char			*sql;
+	size_t			sql_alloc;
+	size_t			sql_offset;
+	/* the insert sql header */
+	char			*sql_command;
+	/* additional values to insert for MYSQL databases */
+	char			*sql_values;
+}
+zbx_db_insert_t;
+
+int	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num);
+int	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
+int	zbx_db_insert_execute(zbx_db_insert_t *self);
+
+
 #endif

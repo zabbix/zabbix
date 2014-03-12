@@ -1933,3 +1933,421 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 	zbx_free(sql);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_prepare_dyn                                        *
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *             table       - [IN] the target table name                       *
+ *             fields      - [IN] names of the fields to insert               *
+ *             fields_num  - [IN] the number of items in fields array         *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: The operation fails if the target table does not have the        *
+ *           specified fields defined in its schema.                          *
+ *                                                                            *
+ *           Usage example:                                                   *
+ *             zbx_db_insert_t ins;                                           *
+ *                                                                            *
+ *             zbx_db_insert_prepare(&ins, "history", "id", "value");         *                                                               *
+ *             zbx_db_insert_add(&ins, (zbx_uint64_t)1, 1.0);                 *
+ *             zbx_db_insert_add(&ins, (zbx_uint64_t)2, 2.0);                 *
+ *               ...                                                          *
+ *             zbx_db_insert_execute(&ins);                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num)
+{
+	int		ret = FAIL, i;
+	char		delim, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	ZBX_FIELD	*field;
+#ifdef HAVE_MYSQL
+	size_t		sql_values_alloc = 0, sql_values_offset = 0;
+#endif
+
+	memset(self, 0, sizeof(zbx_db_insert_t));
+
+	zbx_vector_ptr_create(&self->fields);
+
+	/* find the table in database schema */
+	for (i = 0; NULL != tables[i].table; i++)
+	{
+		if (0 == strcmp(table, tables[i].table))
+		{
+			self->table = &tables[i];
+			break;
+		}
+	}
+
+	if (NULL == self->table)
+		goto out;
+
+	/* find the fields in database schema */
+	for (i = 0; i < fields_num; i++)
+	{
+		for (field = (ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
+		{
+			if (0 == strcmp(fields[i], field->name))
+			{
+				zbx_vector_ptr_append(&self->fields, field);
+				break;
+			}
+		}
+
+		if (i == self->fields.values_num)
+			goto out;
+	}
+
+	/* create sql insert statement command */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s ", self->table->table);
+
+	delim = '(';
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		field = self->fields.values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s", delim, field->name);
+		delim = ',';
+	}
+
+#if defined(HAVE_MYSQL)
+	/* MYSQL workaround - explicitly add missing text fields with '' default value */
+	for (field = (ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
+	{
+		if (ZBX_TYPE_CHAR != field->type && ZBX_TYPE_CHAR != field->type &&
+				ZBX_TYPE_SHORTTEXT != field->type && ZBX_TYPE_LONGTEXT != field->type)
+		{
+			continue;
+		}
+
+		if (NULL == field->default_value || '\0' != *field->default_value)
+			continue;
+
+		if (FAIL == zbx_vector_ptr_search(&self->fields, field, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s", delim, field->name);
+			zbx_snprintf_alloc(&self->sql_values, &sql_values_alloc, &sql_values_offset, "%c''", delim);
+
+			delim = ',';
+		}
+	}
+#endif
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values ");
+
+#ifdef HAVE_ORACLE
+	delim = '(';
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c:%d", delim, i + 1);
+		delim = ',';
+	}
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
+	DBstatement_prepare(sql);
+
+	zbx_free(sql);
+#else
+	self->sql_command = sql;
+
+	DBbegin_multiple_update(&self->sql, &self->sql_alloc, &self->sql_offset);
+#endif
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		zbx_free(self->sql);
+		zbx_free(self->sql_command);
+		zbx_free(self->sql_values);
+
+		zbx_vector_ptr_destroy(&self->fields);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_prepare                                            *
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *             table       - [IN] the target table name                       *
+ *             ...         - [IN] names of the fields to insert               *
+ *             NULL        - [IN] terminating NULL pointer                    *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
+ *           function.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
+{
+	zbx_vector_str_t	fields;
+	va_list			args;
+	char			*field;
+	int			ret;
+
+	va_start(args, table);
+
+	zbx_vector_str_create(&fields);
+
+	while (NULL != (field = va_arg(args, char *)))
+		zbx_vector_str_append(&fields, field);
+
+	va_end(args);
+
+	ret = zbx_db_insert_prepare_dyn(self, table, (const char **)fields.values, fields.values_num);
+
+	zbx_vector_str_destroy(&fields);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_add_dyn                                            *
+ *                                                                            *
+ * Purpose: adds row values for database bulk insert operation                *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *             values      - [IN] the values to insert                        *
+ *             fields_num  - [IN] the number of items in values array         *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: The values must be listed in the same order as the field names   *
+ *           for insert preparation functions.                                *
+ *           Note that for Oracle databases or if the accumulated insert data *
+ *           exceeded limits this function will do the actual inserting into  *
+ *           database.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+{
+	int		i, ret = FAIL;
+#ifndef HAVE_ORACLE
+	char		delim, *value_esc;
+#endif
+
+	if (0 == self->fields.values_num || values_num != self->fields.values_num)
+		goto out;
+
+#ifdef HAVE_ORACLE
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		ZBX_FIELD		*field = self->fields.values[i];
+		const zbx_db_value_t	*value = values[i];
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_CHAR:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				DBbind_parameter(i + 1, (void *)value->str, field->type);
+				break;
+			default:
+				DBbind_parameter(i + 1, (void *)value, field->type);
+				break;
+		}
+	}
+
+	ret = ZBX_DB_OK < DBstatement_execute() ? SUCCEED : FAIL;
+#else
+
+# ifdef HAVE_MULTIROW_INSERT
+	if (16 > self->sql_offset)
+		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+# else
+	zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+# endif
+
+	delim = '(';
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		const zbx_db_value_t	*value = values[i];
+		ZBX_FIELD		*field = self->fields.values[i];
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_CHAR:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				value_esc = DBdyn_escape_string(value->str);
+				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%c'%s'", delim,
+						value_esc);
+				zbx_free(value_esc);
+				break;
+			case ZBX_TYPE_INT:
+				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%c%d", delim,
+						value->i32);
+				break;
+			case ZBX_TYPE_FLOAT:
+				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%c" ZBX_FS_DBL,
+						delim, value->dbl);
+				break;
+			case ZBX_TYPE_UINT:
+				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%c" ZBX_FS_UI64,
+					delim, value->ui64);
+				break;
+			case ZBX_TYPE_ID:
+				if (0 != value->ui64)
+				{
+					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%c"
+							ZBX_FS_UI64, delim, value->ui64);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%cnull",
+							delim);
+				}
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+
+		}
+		delim = ',';
+	}
+
+	if (NULL != self->sql_values)
+		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_values);
+
+	zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ")" ZBX_ROW_DL);
+
+	ret = DBexecute_overflowed_sql(&self->sql, &self->sql_alloc, &self->sql_offset);
+#endif
+
+out:
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_add                                                *
+ *                                                                            *
+ * Purpose: adds row values for database bulk insert operation                *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *             ...         - [IN] the values to insert                        *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: This is a convenience wrapper for zbx_db_insert_add() function.  *
+ *           Note that the types of the passed values must conform to the     *
+ *           corresponding field types.                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
+{
+	zbx_vector_ptr_t	values;
+	va_list			args;
+	int			ret, i;
+	ZBX_FIELD		*field;
+	zbx_db_value_t		*value = NULL;
+
+	va_start(args, self);
+
+	zbx_vector_ptr_create(&values);
+
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		field = self->fields.values[i];
+
+		value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_CHAR:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				if (NULL == (value->str = va_arg(args, char *)))
+					goto out;
+				break;
+			case ZBX_TYPE_INT:
+				value->i32 = va_arg(args, int);
+				break;
+			case ZBX_TYPE_FLOAT:
+				value->dbl = va_arg(args, double);
+				break;
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+				value->ui64 = va_arg(args, zbx_uint64_t);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+		}
+
+		zbx_vector_ptr_append(&values, value);
+		value = NULL;
+	}
+
+	va_end(args);
+
+	ret = zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+
+	zbx_vector_ptr_clean(&values, zbx_ptr_free);
+
+out:
+	zbx_vector_ptr_destroy(&values);
+
+	zbx_free(value);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_execute                                            *
+ *                                                                            *
+ * Purpose: executes the prepared database bulk insert operation              *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_execute(zbx_db_insert_t *self)
+{
+	int	ret = SUCCEED;
+
+#ifndef HAVE_ORACLE
+	if (16 > self->sql_offset)
+		goto out;
+
+# ifdef HAVE_MULTIROW_INSERT
+		if (',' == self->sql[self->sql_offset - 1])
+		{
+			self->sql_offset--;
+			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ";\n");
+		}
+# endif
+	DBend_multiple_update(sql, sql_alloc, sql_offset);
+
+	if (ZBX_DB_OK > DBexecute("%s", self->sql))
+		ret = FAIL;
+out:
+	zbx_free(self->sql);
+	zbx_free(self->sql_command);
+	zbx_free(self->sql_values);
+#endif
+	zbx_vector_ptr_destroy(&self->fields);
+
+	return ret;
+}
+
