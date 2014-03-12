@@ -237,6 +237,9 @@ class CTriggerExpression {
 				case self::STATE_AFTER_BINARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
+						case "\r":
+						case "\n":
+						case "\t":
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
@@ -261,6 +264,9 @@ class CTriggerExpression {
 				case self::STATE_AFTER_UNARY_OPERATOR:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
+						case "\r":
+						case "\n":
+						case "\t":
 							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
@@ -277,6 +283,9 @@ class CTriggerExpression {
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->expression[$this->pos]) {
 						case ' ':
+						case "\r":
+						case "\n":
+						case "\t":
 							break;
 						case ')':
 							$state = self::STATE_AFTER_CLOSE_BRACE;

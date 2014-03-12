@@ -595,7 +595,11 @@ foreach ($triggers as $trigger) {
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
 
 	if ($_REQUEST['show_details']) {
-		$description = array($description, BR(), explode_exp($trigger['expression'], true, true));
+		$description = array(
+			$description,
+			BR(),
+			new CDiv(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+		);
 	}
 
 	if (!empty($trigger['dependencies'])) {

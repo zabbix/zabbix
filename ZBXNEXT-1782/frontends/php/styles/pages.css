@@ -176,7 +176,7 @@
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 
 /* triggers expression condition */
-.trigger-expression #expr_type { width: 605px; max-width: 605px; }
+.trigger-popup #expr_type { width: 605px; max-width: 605px; }
 
 /* login */
 .login { position: absolute; height: 99%; width: 99%; }
