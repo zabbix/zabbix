@@ -44,29 +44,30 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing object                               *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *         Windows part - Nikolajs Agafonovs                                  *
+ * Author: Windows part - Nikolajs Agafonovs                                  *
  *                                                                            *
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
+	const char      *__function_name = "parse_cfg_object";
+
+	int		ret = SUCCEED;
+
 #ifdef _WINDOWS
-	WIN32_FIND_DATAA FindFileData;
-	HANDLE hFind = NULL;
-	char cFileName[MAX_PATH] = {0};
-	int iPathLen = 0;
+	WIN32_FIND_DATAA	FindFileData;
+	HANDLE				hFind = NULL;
+	char				cFileName[MAX_PATH] = {0};
+	int					iPathLen = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "parse_cfg_object: %s", cfg_file);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %i", __function_name, ret);
 
-	iPathLen = strlen(cfg_file);
-	if (MAX_PATH - 3 < iPathLen)
+	if (MAX_PATH - 3 < (iPathLen = strlen(cfg_file)))
 	{
-		zbx_error("%s: path too long", cfg_file);
-		return FAIL;	/* overflow protection */
+		zabbix_log(LOG_LEVEL_ERR,"%s: path is too long", cfg_file);
+		return FAIL;
 	}
 
 	zbx_snprintf(cFileName, sizeof(cFileName), "%s\\*", cfg_file);
-	zabbix_log(LOG_LEVEL_DEBUG, "FindFirstFile: %s", cFileName);
 
 	hFind = FindFirstFileA(cFileName, &FindFileData);
 	if (INVALID_HANDLE_VALUE == hFind)
@@ -74,20 +75,18 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		return FAIL;
 	}
 
-	while(FindNextFileA(hFind, &FindFileData))
+	while (0 != FindNextFileA(hFind, &FindFileData))
 	{
-		if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		if ( 0 != (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
 		if (MAX_PATH < strlen(FindFileData.cFileName) + iPathLen)
 		{
-			zbx_error("%s: Skipping, path too long", FindFileData.cFileName);
+			zabbix_log(LOG_LEVEL_WARNING,"%s: Skipping, path is too long", FindFileData.cFileName);
 			continue;
 		}
 
 		zbx_snprintf(cFileName, sizeof(cFileName), "%s\\%s", cfg_file, FindFileData.cFileName);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "parse_cfg_object: Include=%s", cFileName);
 
 		if (FAIL == __parse_cfg_file(cFileName, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
@@ -97,13 +96,14 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 
 	FindClose(hFind);
-	return SUCCEED;
 #else
 	DIR		*dir;
 	struct stat	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
 	int		result = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %i", __function_name, ret);
 
 	if (-1 == stat(cfg_file, &sb))
 	{
@@ -140,9 +140,9 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
 	}
-
-	return result;
 #endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	return ret;
 }
 
 /******************************************************************************
