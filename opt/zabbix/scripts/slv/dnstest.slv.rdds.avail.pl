@@ -19,8 +19,12 @@ db_connect();
 
 my $interval = get_macro_rdds_delay();
 my $cfg_minonline = get_macro_rdds_probe_online();
+my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
+
+my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
+my $online_probes = scalar(@$probes_ref);
 
 my $tlds_ref = get_tlds('RDDS');
 
@@ -33,8 +37,6 @@ foreach (@$tlds_ref)
     my $lastclock = get_lastclock($tld, $cfg_key_out);
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    my $probes_ref = get_online_probes($from, $till, undef);
-    my $online_probes = scalar(@$probes_ref);
     if ($online_probes < $cfg_minonline)
     {
 	info("success ($online_probes probes are online, min - $cfg_minonline)");

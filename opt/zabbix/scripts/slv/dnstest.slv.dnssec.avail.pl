@@ -20,10 +20,11 @@ db_connect();
 
 my $interval = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
+my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
-my $probes_ref = get_online_probes($from, $till, undef);
+my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 my $online_probes = scalar(@$probes_ref);
 
 my $tlds_ref = get_tlds();

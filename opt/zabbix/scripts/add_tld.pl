@@ -190,6 +190,7 @@ create_macro('{$DNSTEST.SLV.EPP.UPDATE}', 99, undef);
 create_macro('{$DNSTEST.SLV.EPP.INFO}', 99, undef);
 
 create_macro('{$ROLLING.WEEK.STATUS.PAGE.SLV}', '0,5,10,25,50,75,100', undef);
+create_macro('{$DNSTEST.PROBE.AVAIL.LIMIT}', '60', undef);
 
 my $result;
 my $m = '{$DNSTEST.DNS.UDP.DELAY}';

@@ -23,6 +23,7 @@ db_connect();
 
 my $cfg_max_value = get_macro_epp_rtt_low('login');
 my $cfg_delay = get_macro_epp_delay();
+my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my $tlds_ref = get_tlds();
 
@@ -37,7 +38,8 @@ foreach (@$tlds_ref)
 
     db_connect();
 
-    process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value, MIN_LOGIN_ERROR, MAX_LOGIN_ERROR);
+    process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, $probe_avail_limit,
+			\&check_item_value, MIN_LOGIN_ERROR, MAX_LOGIN_ERROR);
 }
 
 # unset TLD (for the logs)

@@ -48,7 +48,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_rdds_delay
 		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
-		get_macro_epp_rtt_low get_item_data get_lastclock get_tlds
+		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_lastclock get_tlds
 		db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
@@ -160,6 +160,11 @@ sub get_macro_epp_rollweek_sla
 sub get_macro_epp_rtt_low
 {
     return __get_macro('{$DNSTEST.EPP.'.uc(shift).'.RTT.LOW}');
+}
+
+sub get_macro_probe_avail_limit
+{
+    return __get_macro('{$DNSTEST.PROBE.AVAIL.LIMIT}');
 }
 
 sub get_item_data
@@ -456,6 +461,7 @@ sub get_online_probes
 {
     my $from = shift;
     my $till = shift;
+    my $probe_avail_limit = shift;
     my $all_probes_ref = shift;
 
     $all_probes_ref = __get_probes() unless ($all_probes_ref);
@@ -464,7 +470,6 @@ sub get_online_probes
 
     # Filter out unreachable probes. Probes are considered unreachable if last access time is over 60 seconds.
     my $probe_availability_item = 'zabbix[proxy,{$DNSTEST.PROXY_NAME},lastaccess]';
-    my $probe_availability_limit = 60; # seconds
 
     my $hosts_mon = '';
     foreach my $host (keys(%$all_probes_ref))
@@ -482,7 +487,7 @@ sub get_online_probes
 	    " and i.hostid=h.hostid".
 	    " and i.key_='$probe_availability_item'".
 	    " and hi.clock between $from and $till".
-	    " and hi.clock-hi.value > $probe_availability_limit".
+	    " and hi.clock-hi.value > $probe_avail_limit".
 	    " and h.host in ($hosts_mon)");
 
     while (@row = $res->fetchrow_array)
@@ -722,13 +727,14 @@ sub is_service_error
 sub process_slv_ns_monthly
 {
     my $tld = shift;
-    my $cfg_key_in = shift;      # part of input key, e. g. 'dnstest.dns.udp.upd[{$DNSTEST.TLD},'
-    my $cfg_key_out = shift;     # part of output key, e. g. 'dnstest.slv.dns.ns.upd['
-    my $from = shift;            # start of SLV period
-    my $till = shift;            # end of SLV period
-    my $value_ts = shift;        # value timestamp
-    my $cfg_interval = shift;    # input values interval
-    my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
+    my $cfg_key_in = shift;        # part of input key, e. g. 'dnstest.dns.udp.upd[{$DNSTEST.TLD},'
+    my $cfg_key_out = shift;       # part of output key, e. g. 'dnstest.slv.dns.ns.upd['
+    my $from = shift;              # start of SLV period
+    my $till = shift;              # end of SLV period
+    my $value_ts = shift;          # value timestamp
+    my $cfg_interval = shift;      # input values interval
+    my $probe_avail_limit = shift; # macro value
+    my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
     my $nss_ref = __get_nss($tld, $cfg_key_out);
@@ -760,7 +766,7 @@ sub process_slv_ns_monthly
 	$cur_till = $cur_from + $interval;
 	$cur_till-- unless ($cur_till == $till); # SQL BETWEEN includes upper bound
 
-	my $online_probes_ref = get_online_probes($cur_from, $cur_till, $probes_ref);
+	my $online_probes_ref = get_online_probes($cur_from, $cur_till, $probe_avail_limit, $probes_ref);
 
 	info("from:$cur_from till:$cur_till diff:", $cur_till - $cur_from, " online:", scalar(@$online_probes_ref));
 
@@ -803,15 +809,16 @@ sub process_slv_ns_monthly
 sub process_slv_monthly
 {
     my $tld = shift;
-    my $cfg_key_in = shift;      # e. g. 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]'
-    my $cfg_key_out = shift;     # e. g. 'dnstest.slv.rdds.43.rtt'
-    my $from = shift;            # start of SLV period
-    my $till = shift;            # end of SLV period
-    my $value_ts = shift;        # value timestamp
-    my $cfg_interval = shift;    # input values interval
-    my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
-    my $min_error = shift;       # min error that relates to this item
-    my $max_error = shift;       # max error that relates to this item
+    my $cfg_key_in = shift;        # e. g. 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]'
+    my $cfg_key_out = shift;       # e. g. 'dnstest.slv.rdds.43.rtt'
+    my $from = shift;              # start of SLV period
+    my $till = shift;              # end of SLV period
+    my $value_ts = shift;          # value timestamp
+    my $cfg_interval = shift;      # input values interval
+    my $probe_avail_limit = shift; # macro value
+    my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
+    my $min_error = shift;         # optional: min error that relates to this item
+    my $max_error = shift;         # optional: max error that relates to this item
 
     my $probes_ref = __get_probes();
 
@@ -828,7 +835,7 @@ sub process_slv_monthly
 	$cur_till = $cur_from + $interval;
 	$cur_till-- unless ($cur_till == $till); # SQL BETWEEN includes upper bound
 
-	my $online_probes_ref = get_online_probes($cur_from, $cur_till, $probes_ref);
+	my $online_probes_ref = get_online_probes($cur_from, $cur_till, $probe_avail_limit, $probes_ref);
 
 	info("from:$cur_from till:$cur_till diff:", $cur_till - $cur_from, " online:", scalar(@$online_probes_ref));
 
@@ -874,6 +881,7 @@ sub process_slv_ns_avail
     my $value_ts = shift;
     my $cfg_minonline = shift;
     my $unavail_limit = shift;
+    my $probe_avail_limit = shift;
     my $check_value_ref = shift;
 
     my $nss_ref = __get_nss($tld, $cfg_key_out);
@@ -881,7 +889,7 @@ sub process_slv_ns_avail
     my @out_keys;
     push(@out_keys, $cfg_key_out . $_ . ']') foreach (@$nss_ref);
 
-    my $online_probes_ref = get_online_probes($from, $till, undef);
+    my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
     my $count = scalar(@$online_probes_ref);
     if ($count < $cfg_minonline)
     {

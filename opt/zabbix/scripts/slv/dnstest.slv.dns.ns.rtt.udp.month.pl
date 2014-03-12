@@ -27,6 +27,7 @@ db_connect();
 
 my $cfg_max_value = get_macro_dns_udp_rtt_low();
 my $cfg_delay = get_macro_dns_udp_delay();
+my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my $tlds_ref = get_tlds();
 
@@ -39,7 +40,8 @@ foreach (@$tlds_ref)
     my $lastclock = get_lastclock($tld, $cfg_key_out);
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    process_slv_ns_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, \&check_item_value);
+    process_slv_ns_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, $probe_avail_limit,
+			   \&check_item_value);
 }
 
 # unset TLD (for the logs)
