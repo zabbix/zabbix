@@ -73,5 +73,4 @@ class CApiServiceFactory extends CRegistryFactory {
 		'usermedia' => 'CUserMedia',
 		'httptest' => 'CHttpTest'
 	);
-
 }
