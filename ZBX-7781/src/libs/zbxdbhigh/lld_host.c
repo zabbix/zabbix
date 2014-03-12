@@ -1668,10 +1668,19 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				sql7_alloc = 0, sql7_offset = 0,
 				sql8_alloc = 0, sql8_offset = 0,
 				sql9_alloc = 0, sql9_offset = 0;
+#ifdef HAVE_MYSQL
+	const char		*ins_hosts_sql =
+				"insert into hosts (hostid,host,name,proxy_hostid,ipmi_authtype,ipmi_privilege,"
+					"ipmi_username,ipmi_password,status,flags,description)"
+				" values ";
+	const char		*ex_hosts_values = ",''";
+#else
 	const char		*ins_hosts_sql =
 				"insert into hosts (hostid,host,name,proxy_hostid,ipmi_authtype,ipmi_privilege,"
 					"ipmi_username,ipmi_password,status,flags)"
 				" values ";
+	const char		*ex_hosts_values = "";
+#endif
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_hostid,host) values ";
 #ifdef HAVE_MYSQL
@@ -1859,10 +1868,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_hosts_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%s,%d,%d,'%s','%s',%d,%d)" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s','%s',%s,%d,%d,'%s','%s',%d,%d%s)" ZBX_ROW_DL,
 					host->hostid, host_esc, name_esc, DBsql_id_ins(proxy_hostid),
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username_esc, ipmi_password_esc,
-					(int)status, ZBX_FLAG_DISCOVERY_CREATED);
+					(int)status, ZBX_FLAG_DISCOVERY_CREATED, ex_hosts_values);
 
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);

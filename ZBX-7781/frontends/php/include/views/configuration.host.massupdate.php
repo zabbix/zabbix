@@ -129,6 +129,16 @@ else {
 	);
 }
 
+// append description to form list
+$hostFormList->addRow(
+	array(
+		_('Description'),
+		SPACE,
+		new CVisibilityBox('visible[description]', isset($this->data['visible']['description']), 'description', _('Original'))
+	),
+	new CTextArea('description', $this->data['description'])
+);
+
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $this->data['proxy_hostid']);
 $proxyComboBox->addItem(0, _('(no proxy)'));
@@ -158,6 +168,7 @@ $hostFormList->addRow(
 );
 
 $templatesFormList = new CFormList('templatesFormList');
+
 // append templates table to from list
 $templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
@@ -193,6 +204,7 @@ $templatesFormList->addRow(
 );
 
 $ipmiFormList = new CFormList('ipmiFormList');
+
 // append ipmi to form list
 $ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $this->data['ipmi_authtype']);
 $ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
@@ -235,6 +247,7 @@ $ipmiFormList->addRow(
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
+
 // append inventories to form list
 $inventoryModesComboBox = new CComboBox('inventory_mode', $this->data['inventory_mode'], 'submit()');
 $inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
@@ -285,6 +298,7 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 
 // append tabs to form
 $hostTab = new CTabView();
+
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave')) {
 	$hostTab->setSelected(0);

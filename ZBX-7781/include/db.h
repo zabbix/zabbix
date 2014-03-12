@@ -520,7 +520,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
