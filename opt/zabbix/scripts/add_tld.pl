@@ -1572,7 +1572,10 @@ sub create_dnstest_items {
 	'DNSTEST.RDDS.DELAY',
 	'DNSTEST.EPP.DELAY',
 	'DNSTEST.DNS.UDP.RTT.HIGH',
-	'DNSTEST.DNS.AVAIL.MINNS')
+	'DNSTEST.DNS.AVAIL.MINNS',
+	'DNSTEST.DNS.ROLLWEEK.SLA',
+	'DNSTEST.RDDS.ROLLWEEK.SLA',
+	'DNSTEST.EPP.ROLLWEEK.SLA')
     {
 	$options = {'name' => '$1 value',
 		   'key_'=> 'dnstest.configvalue['.$m.']',
