@@ -30,10 +30,74 @@ int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_cfg_object                                                 *
+ *                                                                            *
+ * Purpose: parse "Include=..." line in configuration file                    *
+ *                                                                            *
+ * Parameters: cfg_file - full name of config file                            *
+ *             cfg      - pointer to configuration parameter structure        *
+ *             level    - a level of included file                            *
+ *             strict   - treat unknown parameters as error                   *
+ *                                                                            *
+ * Return value: SUCCEED - parsed successfully                                *
+ *               FAIL - error processing object                               *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *         Windows part - Nikolajs Agafonovs                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+	WIN32_FIND_DATAA FindFileData;
+	HANDLE hFind = NULL;
+	char cFileName[MAX_PATH] = {0};
+	int iPathLen = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "parse_cfg_object: %s", cfg_file);
+
+	iPathLen = strlen(cfg_file);
+	if (MAX_PATH - 3 < iPathLen)
+	{
+		zbx_error("%s: path too long", cfg_file);
+		return FAIL;	/* overflow protection */
+	}
+
+	zbx_snprintf(cFileName, sizeof(cFileName), "%s\\*", cfg_file);
+	zabbix_log(LOG_LEVEL_DEBUG, "FindFirstFile: %s", cFileName);
+
+	hFind = FindFirstFileA(cFileName, &FindFileData);
+	if (INVALID_HANDLE_VALUE == hFind)
+	{
+		return FAIL;
+	}
+
+	while(FindNextFileA(hFind, &FindFileData))
+	{
+		if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			continue;
+
+		if (MAX_PATH < strlen(FindFileData.cFileName) + iPathLen)
+		{
+			zbx_error("%s: Skipping, path too long", FindFileData.cFileName);
+			continue;
+		}
+
+		zbx_snprintf(cFileName, sizeof(cFileName), "%s\\%s", cfg_file, FindFileData.cFileName);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "parse_cfg_object: Include=%s", cFileName);
+
+		if (FAIL == __parse_cfg_file(cFileName, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		{
+			FindClose(hFind);
+			return FAIL;
+		}
+	}
+
+	FindClose(hFind);
+	return SUCCEED;
 #else
 	DIR		*dir;
 	struct stat	sb;
