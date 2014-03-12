@@ -1664,7 +1664,7 @@ function make_trigger_details($trigger) {
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(
 		new CCol(_('Expression')),
-		new CCol(explode_exp($trigger['expression'], true, true), 'wraptext')
+		new CCol(explode_exp($trigger['expression'], true, true), 'trigger-expression')
 	));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));

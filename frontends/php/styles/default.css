@@ -574,3 +574,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* tabs */
 .tabs { visibility: hidden; }
+
+/* trigger expression */
+.trigger-expression, table.tableinfo .trigger-expression { white-space: pre-wrap; }

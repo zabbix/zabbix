@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget(null, 'trigger-expression');
+$expressionWidget = new CWidget(null, 'trigger-popup');
 
 // create form
 $expressionForm = new CForm();
