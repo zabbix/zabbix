@@ -1971,6 +1971,9 @@ int	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const ch
 	size_t		sql_values_alloc = 0, sql_values_offset = 0;
 #endif
 
+	if (0 == fields_num)
+		return FAIL;
+
 	memset(self, 0, sizeof(zbx_db_insert_t));
 
 	zbx_vector_ptr_create(&self->fields);
