@@ -107,6 +107,7 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
+#ifndef HAVE_SQLITE3
 /*********************************************************************************
  *                                                                               *
  * Function: parse_db_monitor_item_params                                        *
@@ -197,7 +198,6 @@ static void	parse_db_monitor_item_params(const char *params, char **dsn, char **
 		*sql = zbx_strdup(NULL, "");
 }
 
-#ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
 	switch (field->type)
@@ -2396,6 +2396,15 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020001(void)
+{
+	/* 16 - CONDITION_TYPE_MAINTENANCE */
+	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -2643,7 +2652,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010198, 0, 1)
 	DBPATCH_ADD(2010199, 0, 1)
 	DBPATCH_ADD(2020000, 0, 1)
-	/* Patch 2020001 is reserved for ZBXNEXT-2124 */
+	DBPATCH_ADD(2020001, 0, 0)
 
 	DBPATCH_END()
 

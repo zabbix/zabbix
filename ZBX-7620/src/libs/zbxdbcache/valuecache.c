@@ -165,6 +165,9 @@ typedef struct
 	/* the low memory mode flag */
 	int		low_memory;
 
+	/* timestamp of the last low memory warning message */
+	int		last_warning_time;
+
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
 
@@ -204,8 +207,7 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds, int count,
 		int timestamp, const zbx_timespec_t *ts);
-static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values,
-		int values_num);
+static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
 static void	vch_item_clean_cache(zbx_vc_item_t *item);
 
 /******************************************************************************************************************
@@ -560,12 +562,12 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC(data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -699,7 +701,10 @@ static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
 static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 {
 	if (NULL != item)
+	{
 		item->hits += hits;
+		item->last_accessed = ZBX_VC_TIME();
+	}
 
 	if (NULL != vc_cache)
 	{
@@ -720,14 +725,13 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	static int	last_warning_time = 0;
 	int		now;
 
 	now = ZBX_VC_TIME();
 
-	if (now - last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
-		last_warning_time = now;
+		vc_cache->last_warning_time = now;
 
 		zabbix_log(LOG_LEVEL_WARNING, "value cache is fully used: please increase ValueCacheSize"
 				" configuration parameter");
@@ -874,61 +878,6 @@ static void	vc_history_record_vector_append(zbx_vector_history_record_t *vector,
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_history_record_vector_copy                                    *
- *                                                                            *
- * Purpose: copies cache value array into value vector                        *
- *                                                                            *
- * Parameters:  vector     - [OUT] the target vector                          *
- *              value_type - [IN] the value type                              *
- *              values     - [IN] the array to copy                           *
- *              values_num - [IN] the number of values in the array           *
- *                                                                            *
- * Comments: Additional memory is allocated to store string, text and log     *
- *           value contents. This memory must be freed by the caller.         *
- *           zbx_history_record_vector_destroy() function properly frees the  *
- *           value vector together with memory allocated to store value       *
- *           contents.                                                        *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_record_vector_copy(zbx_vector_history_record_t *vector, int value_type,
-		const zbx_history_record_t *values, int values_num)
-{
-	int	i;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			for (i = 0; i < values_num; i++)
-			{
-				zbx_history_record_t	value;
-
-				value.value.str = zbx_strdup(NULL, values[i].value.str);
-				value.timestamp = values[i].timestamp;
-				zbx_vector_history_record_append_ptr(vector, &value);
-			}
-
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			for (i = 0; i < values_num; i++)
-			{
-				zbx_history_record_t	value;
-
-				value.value.log = vc_history_logdup(values[i].value.log);
-				value.timestamp = values[i].timestamp;
-				zbx_vector_history_record_append_ptr(vector, &value);
-			}
-
-			break;
-		default:
-			zbx_vector_history_record_reserve(vector, vector->values_num + values_num);
-			memcpy(vector->values + vector->values_num, values, sizeof(zbx_history_record_t) * values_num);
-			vector->values_num += values_num;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vc_item_malloc                                                   *
  *                                                                            *
  * Purpose: allocate cache memory to store item's resources                   *
@@ -1010,7 +959,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	(*(uint32_t *)ptr)++;
 
-	return ptr + REFCOUNT_FIELD_SIZE;
+	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
 /******************************************************************************
@@ -1032,13 +981,17 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
  ******************************************************************************/
 static size_t	vc_item_strfree(char *str)
 {
-	void	*ptr = str - REFCOUNT_FIELD_SIZE;
 	size_t	freed = 0;
 
-	if (0 == --(*(uint32_t *)ptr))
+	if (NULL != str)
 	{
-		freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
-		zbx_hashset_remove(&vc_cache->strpool, ptr);
+		void	*ptr = str - REFCOUNT_FIELD_SIZE;
+
+		if (0 == --(*(uint32_t *)ptr))
+		{
+			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
+			zbx_hashset_remove(&vc_cache->strpool, ptr);
+		}
 	}
 
 	return freed;
@@ -1086,8 +1039,7 @@ static zbx_log_value_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_log_value_
 
 	return plog;
 fail:
-	if (NULL != plog->source)
-		vc_item_strfree(plog->source);
+	vc_item_strfree(plog->source);
 
 	__vc_mem_free_func(plog);
 
@@ -1112,15 +1064,16 @@ static size_t	vc_item_logfree(zbx_log_value_t *log)
 {
 	size_t	freed = 0;
 
-	if (NULL != log->source)
+	if (NULL != log)
+	{
 		freed += vc_item_strfree(log->source);
-
-	if (NULL != log->value)
 		freed += vc_item_strfree(log->value);
 
-	__vc_mem_free_func(log);
+		__vc_mem_free_func(log);
+		freed += sizeof(zbx_log_value_t);
+	}
 
-	return freed + sizeof(zbx_log_value_t);
+	return freed;
 }
 
 /******************************************************************************
@@ -1162,44 +1115,6 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_item_reset_cache                                              *
- *                                                                            *
- * Purpose: resets item cache by freeing allocated data and setting cache     *
- *          data to 0.                                                        *
- *                                                                            *
- * Parameters: item    - [IN] the item                                        *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_reset_cache(zbx_vc_item_t *item)
-{
-	vch_item_free_cache(item);
-
-	/* reset all item data except itemid and value_type which are the first members in zbx_vc_item_t structure */
-	memset((void*)item + sizeof(item->itemid) + sizeof(item->value_type), 0,
-			sizeof(zbx_vc_item_t) - sizeof(item->itemid) - sizeof(item->value_type));
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_item_change_value_type                                        *
- *                                                                            *
- * Purpose: changes item value type                                           *
- *                                                                            *
- * Parameters:  item       - [IN] the item                                    *
- *              value_type - [IN] the new value type                          *
- *                                                                            *
- * Comments: Changing item value type means dropping all cached data and      *
- *           reseting item cache parameters.                                  *
- *                                                                            *
- ******************************************************************************/
-static void	vc_item_change_value_type(zbx_vc_item_t *item, int value_type)
-{
-	vc_item_reset_cache(item);
-	item->value_type = value_type;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vc_remove_item                                                   *
  *                                                                            *
  * Purpose: removes item from cache and frees resources allocated for it      *
@@ -1211,40 +1126,6 @@ static void	vc_remove_item(zbx_vc_item_t *item)
 {
 	vch_item_free_cache(item);
 	zbx_hashset_remove(&vc_cache->items, item);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vc_prepare_item                                                  *
- *                                                                            *
- * Purpose: prepares the item for history request                             *
- *                                                                            *
- * Parameters: item       - [IN] the item to prepare                          *
- *             value_type - [IN] the new value type                           *
- *             seconds    - [IN] the time period to retrieve data for         *
- *             count      - [IN] the number of history values to retrieve     *
- *             timestamp  - [IN] the period end timestamp                     *
- *             ts         - [IN] the value timestamp                          *
- *                                                                            *
- * Return value:  SUCCEED - the item can't handle the history request         *
- *                FAIL    - the item can't handle the request and the data    *
- *                          must be read from database                        *
- *                                                                            *
- ******************************************************************************/
-static int	vc_prepare_item(zbx_vc_item_t *item, int value_type, int seconds, int count,
-		int timestamp, const zbx_timespec_t *ts)
-{
-	int	ret = FAIL;
-
-	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
-		goto out;
-
-	if (item->value_type != value_type)
-		vc_item_change_value_type(item, value_type);
-
-	ret = SUCCEED;
-out:
-	return ret;
 }
 
 /******************************************************************************
@@ -1316,7 +1197,7 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 
 	now = ZBX_VC_TIME();
 
-	/* Read the item values from database */
+	/* read the item values from database */
 	if (NULL != ts)
 	{
 		ret = vc_db_read_values_by_count(itemid, value_type, values, 1, now, ts, 0);
@@ -1329,9 +1210,6 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 	{
 		zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
 
-		if (1 == count)
-			count++;
-
 		ret = vc_db_read_values_by_count(itemid, value_type, values, count, now, &ts, 0);
 	}
 
@@ -1342,20 +1220,17 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 		/* check if during data retrieval from DB the item was not already added to cache */
 		if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 		{
-			if (0 == vc_cache->low_memory)
-			{
-				zbx_vc_item_t   new_item = {itemid, value_type};
+			zbx_vc_item_t   new_item = {itemid, value_type};
 
-				if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
-					goto out;
+			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+				goto out;
 
-				vc_item_addref(item);
+			vc_item_addref(item);
 
-				vch_init(item, values, seconds, count, timestamp, ts);
-			}
+			vch_init(item, values, seconds, count, timestamp, ts);
 		}
 		else
-			vch_item_add_values_at_beginning(item, values->values, values->values_num);
+			vch_item_add_values_at_tail(item, values->values, values->values_num);
 	}
 out:
 	return item;
@@ -1644,15 +1519,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_copy_values_at_end                                      *
+ * Function: vch_item_copy_value                                              *
  *                                                                            *
- * Purpose: copies values at the end of the item head chunk                   *
+ * Purpose: copies value in the specified item's chunk slot                   *
  *                                                                            *
- * Parameters: item    - [IN/OUT] the target item                             *
- *             values  - [IN] the values to copy                              *
- *             nvalues - [IN] the number of values to copy                    *
+ * Parameters: chunk        - [IN/OUT] the target chunk                       *
+ *             index        - [IN] the target slot                            *
+ *             source_value - [IN] the value to copy                          *
  *                                                                            *
- * Return value: SUCCEED - the values were copied successfully                *
+ * Return value: SUCCEED - the value was copied successfully                  *
  *               FAIL    - the value copying failed (not enough space for     *
  *                         string, text or log type data)                     *
  *                                                                            *
@@ -1660,50 +1535,32 @@ out:
  *           str, text and log type values are stored in cache string pool.   *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_copy_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int nvalues)
+static int	vch_item_copy_value(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int index,
+		const zbx_history_record_t *source_value)
 {
-	int	i, ret = FAIL, last_value = item->head->last_value;
+	zbx_history_record_t	*value;
+	int			ret = FAIL;
+
+	value = &chunk->slots[index];
 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			for (i = 0; i < nvalues; i++)
-			{
-				zbx_history_record_t	*value = &item->head->slots[item->head->last_value + 1];
-
-				if (NULL == (value->value.str = vc_item_strdup(item, values[i].value.str)))
-					goto out;
-
-				value->timestamp = values[i].timestamp;
-				item->head->last_value++;
-			}
-			ret = SUCCEED;
-
+			if (NULL == (value->value.str = vc_item_strdup(item, source_value->value.str)))
+				goto out;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			for (i = 0; i < nvalues; i++)
-			{
-				zbx_history_record_t	*value = &item->head->slots[item->head->last_value + 1];
-
-				if (NULL == (value->value.log = vc_item_logdup(item, values[i].value.log)))
-					goto out;
-
-				value->timestamp = values[i].timestamp;
-				item->head->last_value++;
-			}
-			ret = SUCCEED;
-
+			if (NULL == (value->value.log = vc_item_logdup(item, source_value->value.log)))
+				goto out;
 			break;
 		default:
-			memcpy(&item->head->slots[item->head->last_value + 1], values,
-					nvalues * sizeof(zbx_history_record_t));
-			item->head->last_value += nvalues;
-			ret = SUCCEED;
+			value->value = source_value->value;
 	}
-out:
-	item->values_total += item->head->last_value - last_value;
+	value->timestamp = source_value->timestamp;
 
+	ret = SUCCEED;
+out:
 	return ret;
 }
 
@@ -1713,9 +1570,9 @@ out:
  *                                                                            *
  * Purpose: copies values at the beginning of item tail chunk                 *
  *                                                                            *
- * Parameters: item    - [IN/OUT] the target item                             *
- *             values  - [IN] the values to copy                              *
- *             nvalues - [IN] the number of values to copy                    *
+ * Parameters: item       - [IN/OUT] the target item                          *
+ *             values     - [IN] the values to copy                           *
+ *             values_num - [IN] the number of values to copy                 *
  *                                                                            *
  * Return value: SUCCEED - the values were copied successfully                *
  *               FAIL    - the value copying failed (not enough space for     *
@@ -1725,7 +1582,7 @@ out:
  *           str, text and log type values are stored in cache string pool.   *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_copy_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values, int nvalues)
+static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
 	int	i, ret = FAIL, first_value = item->tail->first_value;
 
@@ -1733,7 +1590,7 @@ static int	vch_item_copy_values_at_beginning(zbx_vc_item_t *item, const zbx_hist
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			for (i = nvalues - 1; i >= 0; i--)
+			for (i = values_num - 1; i >= 0; i--)
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
@@ -1747,7 +1604,7 @@ static int	vch_item_copy_values_at_beginning(zbx_vc_item_t *item, const zbx_hist
 
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			for (i = nvalues - 1; i >= 0; i--)
+			for (i = values_num - 1; i >= 0; i--)
 			{
 				zbx_history_record_t	*value = &item->tail->slots[item->tail->first_value - 1];
 
@@ -1761,102 +1618,15 @@ static int	vch_item_copy_values_at_beginning(zbx_vc_item_t *item, const zbx_hist
 
 			break;
 		default:
-			memcpy(&item->tail->slots[item->tail->first_value - nvalues], values,
-					nvalues * sizeof(zbx_history_record_t));
-			item->tail->first_value -= nvalues;
+			memcpy(&item->tail->slots[item->tail->first_value - values_num], values,
+					values_num * sizeof(zbx_history_record_t));
+			item->tail->first_value -= values_num;
 			ret = SUCCEED;
 	}
 out:
 	item->values_total += first_value - item->tail->first_value;
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vch_item_get_values_from                                         *
- *                                                                            *
- * Purpose: get all item values starting with the specified chunk and index   *
- *                                                                            *
- * Parameters:  item     - [IN] the item                                      *
- *              chunk    - [IN] the starting chunk                            *
- *              index    - [IN] the starting index in the specified chunk     *
- *              values   - [OUT] the output vector                            *
- *                                                                            *
- * Comments: Additional memory is allocated to store string, text and log     *
- *           value contents. This memory must be freed by the caller.         *
- *           zbx_history_record_vector_destroy() function properly frees the  *
- *           value vector together with memory allocated to store value       *
- *           contents.                                                        *
- *                                                                            *
- ******************************************************************************/
-static void	vch_item_get_values_from(const zbx_vc_item_t *item, const zbx_vc_chunk_t *chunk, int index,
-		zbx_vector_history_record_t *values)
-{
-	while (1)
-	{
-		while (index <= chunk->last_value)
-		{
-			zbx_history_record_t	value;
-
-			vc_history_record_copy(&value, chunk->slots + index, item->value_type);
-			zbx_vector_history_record_append_ptr(values, &value);
-			index++;
-		}
-
-		if (NULL == (chunk = chunk->next))
-			break;
-
-		index = chunk->first_value;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vch_item_remove_values_from                                      *
- *                                                                            *
- * Purpose: removes all item history values starting with the specified chunk *
- *          and index                                                         *
- *                                                                            *
- * Parameters:  item     - [IN] the item                                      *
- *              chunk    - [IN] the starting chunk                            *
- *              index    - [IN] the starting index in the specified chunk     *
- *                                                                            *
- ******************************************************************************/
-static void	vch_item_remove_values_from(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk, int index)
-{
-	zbx_vc_chunk_t	*head;
-
-	/* find the last value to keep in cache (the previous value of the specified chunk/index) */
-	if (--index < chunk->first_value)
-	{
-		if (NULL == chunk->prev)
-		{
-			/* the specified value is the first value in cache - all data must be dropped */
-			vch_item_free_cache(item);
-			return;
-		}
-		chunk = chunk->prev;
-		index = chunk->last_value;
-	}
-
-	/* free the resources allocated by removable values in the new head chunk */
-	vc_item_free_values(item, chunk->slots, index + 1, chunk->last_value);
-
-	/* free the chunks following the new head chunk */
-	head = chunk->next;
-	while (NULL != head)
-	{
-		zbx_vc_chunk_t	*next = head->next;
-
-		vch_item_free_chunk(item, head);
-		head = next;
-	}
-
-	/* set the new head chunk and last value */
-	item->head = chunk;
-	chunk->last_value = index;
-	chunk->next = NULL;
 }
 
 /******************************************************************************
@@ -1966,129 +1736,99 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_add_values_at_end                                       *
+ * Function: vch_item_add_value_at_head                                       *
  *                                                                            *
- * Purpose: adds item history values at the end of current item's history     *
+ * Purpose: adds one item history value at the end of current item's history  *
  *          data                                                              *
  *                                                                            *
  * Parameters:  item   - [IN] the item to add history data to                 *
- *              values - [IN] the item history data values                    *
- *              num    - [IN] the number of history data values to add        *
+ *              value  - [IN] the item history data value                     *
  *                                                                            *
- * Return value: SUCCEED - the history data values were added successfully    *
- *               FAIL - failed to add history data values (not enough memory) *
+ * Return value: SUCCEED - the history data value was added successfully      *
+ *               FAIL - failed to add history data value (not enough memory)  *
  *                                                                            *
- * Comments: In the case of failure the item is removed from cache.           *
+ * Comments: In the case of failure the item will be removed from cache       *
+ *           later.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
+static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_record_t *value)
 {
-	int				copied = 0, ret = FAIL, count = values_num;
-	zbx_vector_history_record_t	values_ext = {NULL};
-	zbx_vc_chunk_t			*head = item->head;
+	int		ret = FAIL, index, sindex, nslots = 0;
+	zbx_vc_chunk_t	*head = item->head, *chunk, *schunk;
 
-	if (NULL != item->head && 0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], values))
+	if (NULL != item->head &&
+			0 < vc_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
 	{
-		zbx_vc_chunk_t	*chunk;
-		int		index, start = 0, now;
-
-		/* To avoid creating potential holes in cache skip adding values with timestamps */
-		/* lower than the first value in cache.                                          */
-		for (start = 0; start < values_num; start++)
+		if (0 < vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
-			if (0 >= vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], &values[start]))
-				break;
-		}
-
-		if (0 < start)
-		{
-			/* if some of values were not added to cache, the cached_all flag */
-			/* must be reset and the maximum request range adjusted           */
+			/* If the added value has the same or older timestamp as the first value in cache */
+			/* we can't add it to keep cache consistency. In this case reset the cached_all   */
+			/* flag and return success.                                                       */
 			item->cached_all = 0;
 
-			now = ZBX_VC_TIME();
-			if (now - values[start - 1].timestamp.sec <= item->range)
-			{
-				item->range = now - values[start - 1].timestamp.sec - 1;
-
-				if (SEC_PER_MIN > item->range)
-					item->range = SEC_PER_MIN;
-			}
-		}
-
-		if (start >= values_num)
-		{
 			ret = SUCCEED;
 			goto out;
 		}
 
-		zbx_vector_history_record_create(&values_ext);
+		sindex = item->head->last_value;
+		schunk = item->head;
 
-		vc_history_record_vector_copy(&values_ext, item->value_type, values + start, values_num - start);
-
-		/* found the first value that is in the new values timestamp range */
-		if (FAIL == vch_item_get_last_value(item, values[0].timestamp.sec, &chunk, &index))
+		if (0 == item->head->slots_num - item->head->last_value - 1)
 		{
-			chunk = item->tail;
-			index = chunk->first_value;
+			if (FAIL == vch_item_add_chunk(item, vch_item_chunk_slot_count(item, 1), NULL))
+				goto out;
 		}
 		else
+			item->head->last_value++;
+
+		item->values_total++;
+
+		chunk = item->head;
+		index = item->head->last_value;
+
+		do
 		{
-			int		iindex = index;
-			zbx_vc_chunk_t	*ichunk = chunk;
+			chunk->slots[index] = schunk->slots[sindex];
 
-			while (0 < zbx_timespec_compare(&ichunk->slots[iindex].timestamp, &values[0].timestamp))
+			chunk = schunk;
+			index = sindex;
+
+			if (--sindex < schunk->first_value)
 			{
-				index = iindex--;
-				if (iindex < ichunk->first_value)
+				if (NULL == (schunk = schunk->prev))
 				{
-					if (NULL == (chunk = ichunk->prev))
-					{
-						chunk = ichunk;
-						break;
-					}
-					ichunk = chunk;
-					iindex = ichunk->last_value;
+					memset(&chunk->slots[index], 0, sizeof(zbx_vc_chunk_t));
+					THIS_SHOULD_NEVER_HAPPEN;
+
+					goto out;
 				}
+
+				sindex = schunk->last_value;
 			}
-
-		}
-		vch_item_get_values_from(item, chunk, index, &values_ext);
-		vch_item_remove_values_from(item, chunk, index);
-
-		zbx_vector_history_record_sort(&values_ext, (zbx_compare_func_t)vc_history_record_compare_asc_func);
-
-		values = values_ext.values;
-		count = values_ext.values_num;
+		} while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
 	}
-
-	while (0 != count)
+	else
 	{
-		int	copy_slots, nslots = 0;
-
 		/* find the number of free slots on the right side in last (head) chunk */
 		if (NULL != item->head)
 			nslots = item->head->slots_num - item->head->last_value - 1;
 
 		if (0 == nslots)
 		{
-			nslots = vch_item_chunk_slot_count(item, count);
-
-			if (FAIL == vch_item_add_chunk(item, nslots, NULL))
+			if (FAIL == vch_item_add_chunk(item, vch_item_chunk_slot_count(item, 1), NULL))
 				goto out;
-
-			item->head->first_value = 0;
-			item->head->last_value = -1;
 		}
-		/* copy values to chunk */
-		copy_slots = MIN(nslots, count);
+		else
+			item->head->last_value++;
 
-		if (FAIL == vch_item_copy_values_at_end(item, values + copied, copy_slots))
-			goto out;
+		item->values_total++;
 
-		copied += copy_slots;
-		count -= copy_slots;
+		chunk = item->head;
+		index = item->head->last_value;
 	}
+
+	if (SUCCEED != vch_item_copy_value(item, chunk, index, value))
+		goto out;
 
 	/* try to remove old (unused) chunks if a new chunk was added */
 	if (head != item->head)
@@ -2096,15 +1836,12 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_history_rec
 
 	ret = SUCCEED;
 out:
-	if (NULL != values_ext.values)
-		zbx_history_record_vector_destroy(&values_ext, item->value_type);
-
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_add_values_at_beginning                                 *
+ * Function: vch_item_add_values_at_tail                                      *
  *                                                                            *
  * Purpose: adds item history values at the beginning of current item's       *
  *          history data                                                      *
@@ -2120,8 +1857,7 @@ out:
  *           Overlapping values (by timestamp seconds) are ignored.           *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_history_record_t *values,
-		int values_num)
+static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num)
 {
 	int 	count = values_num, ret = FAIL;
 
@@ -2158,7 +1894,7 @@ static int	vch_item_add_values_at_beginning(zbx_vc_item_t *item, const zbx_histo
 		copy_slots = MIN(nslots, count);
 		count -= copy_slots;
 
-		if (FAIL == vch_item_copy_values_at_beginning(item, values + count, copy_slots))
+		if (FAIL == vch_item_copy_values_at_tail(item, values + count, copy_slots))
 			goto out;
 	}
 
@@ -2216,8 +1952,9 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		if (SUCCEED == (ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records,
 				update_seconds, update_end)) && 0 < records.values_num)
 		{
-			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
-			if (SUCCEED == (ret = vch_item_add_values_at_beginning(item, records.values, records.values_num)))
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
+			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
 				ret = records.values_num;
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2279,8 +2016,9 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 		if (SUCCEED == (ret = vc_db_read_values_by_count(item->itemid, item->value_type,
 				&records, count - cache_records, update_end, timestamp, 0)) && 0 < records.values_num)
 		{
-			zbx_vector_history_record_sort(&records, (zbx_compare_func_t)vc_history_record_compare_asc_func);
-			if (SUCCEED == (ret = vch_item_add_values_at_beginning(item, records.values, records.values_num)))
+			zbx_vector_history_record_sort(&records,
+					(zbx_compare_func_t)vc_history_record_compare_asc_func);
+			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
 				ret = records.values_num;
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2619,7 +2357,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
 		}
 	}
 
-	if (SUCCEED == (ret = vch_item_add_values_at_beginning(item, values->values, values->values_num)))
+	if (SUCCEED == (ret = vch_item_add_values_at_tail(item, values->values, values->values_num)))
 		vc_update_statistics(item, 0, values->values_num);
 
 	return ret;
@@ -2796,10 +2534,14 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 		vc_item_addref(item);
 
-		if (item->value_type != value_type)
-			vc_item_change_value_type(item, value_type);
-
-		if (FAIL == (ret = vch_item_add_values_at_end(item, &record, 1)))
+		/* If the new value type does not match the item's type in cache we can't  */
+		/* change the cache because other processes might still be accessing it    */
+		/* at the same time. The only thing that can be done - mark it for removal */
+		/* so it could be added later with new type.                               */
+		/* Also mark it for removal if the value adding failed. In this case we    */
+		/* won't have the latest data in cache - so the requests must go directly  */
+		/* to the database.                                                        */
+		if (item->value_type != value_type || FAIL == (ret = vch_item_add_value_at_head(item, &record)))
 			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
 
 		vc_item_release(item);
@@ -2859,6 +2601,9 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	{
 		int	i, start = 0;
 
+		if (1 == vc_cache->low_memory)
+			goto out;
+
 		item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values);
 
 		/* The values vector contains cache data sorted in ascending order, which  */
@@ -2899,12 +2644,12 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 
 		ret = SUCCEED;
 
-		goto out;
+		goto finish;
 	}
 
 	vc_item_addref(item);
 
-	if (FAIL == vc_prepare_item(item, value_type, seconds, count, timestamp, NULL))
+	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
 		goto out;
 
 	ret = vch_item_get_value_range(item, values, seconds, count, timestamp);
@@ -2933,12 +2678,7 @@ out:
 			vc_update_statistics(NULL, 0, values->values_num);
 		}
 	}
-	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
-	}
-
+finish:
 	if (NULL != item)
 		vc_item_release(item);
 
@@ -2996,6 +2736,9 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 		zbx_vector_history_record_t	values;
 		int				i;
 
+		if (1 == vc_cache->low_memory)
+			goto out;
+
 		zbx_vector_history_record_create(&values);
 
 		item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values);
@@ -3021,7 +2764,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 	vc_item_addref(item);
 
-	if (FAIL == vc_prepare_item(item, value_type, 0, 0, 0, ts))
+	if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
 		goto out;
 
 	ret = vch_item_get_value(item, ts, value, found);
@@ -3038,11 +2781,6 @@ out:
 			vc_update_statistics(NULL, 0, 1);
 			*found = 1;
 		}
-	}
-	else
-	{
-		if (NULL != item)
-			item->last_accessed = ZBX_VC_TIME();
 	}
 finish:
 	if (NULL != item)

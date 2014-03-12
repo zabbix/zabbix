@@ -2538,7 +2538,8 @@ function get_status() {
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
 				' AND i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0'
+				' AND i.delay<>0'.
+				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 
@@ -2612,16 +2613,25 @@ function encode_log($data) {
 			: $data;
 }
 
-function no_errors() {
+/**
+ * Check if we have error messages to display.
+ *
+ * @global array $ZBX_MESSAGES
+ *
+ * @return bool
+ */
+function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	foreach ($ZBX_MESSAGES as $message) {
-		if ($message['type'] == 'error') {
-			return false;
+	if ($ZBX_MESSAGES !== null) {
+		foreach ($ZBX_MESSAGES as $message) {
+			if ($message['type'] === 'error') {
+				return true;
+			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 /**

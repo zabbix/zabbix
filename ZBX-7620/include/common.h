@@ -80,6 +80,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
@@ -1018,6 +1019,11 @@ double	str2double(const char *str);
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
+
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
+
+void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 
