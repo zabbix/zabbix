@@ -4200,7 +4200,10 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 {
 	int	num;
 
-	num = max_snmp_succeed + 1;
+	if (1 >= max_snmp_succeed)
+		num = max_snmp_succeed + 1;
+	else
+		num = max_snmp_succeed * 3 / 2;
 
 	if (num < min_snmp_fail)
 		return num;
