@@ -335,3 +335,10 @@ void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 			break;
 	}
 }
+
+void	str_base64_decode_dyn(const char *in, int in_size, char **out, int *out_size)
+{
+	*out = zbx_malloc(*out, in_size);
+
+	str_base64_decode(in, *out, in_size, out_size);
+}

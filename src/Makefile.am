@@ -7,7 +7,8 @@ DIST_SUBDIRS = \
 	zabbix_sender \
 	zabbix_proxy \
 	zabbix_server \
-	zabbix_java
+	zabbix_java \
+	zabbix_rsm
 
 if AGENT
 AGENT_SUBDIRS = \
@@ -50,4 +51,5 @@ SUBDIRS = \
 	$(AGENT_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
-	$(JAVA_SUBDIRS)
+	$(JAVA_SUBDIRS) \
+	zabbix_rsm

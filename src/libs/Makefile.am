@@ -59,6 +59,7 @@ SUBDIRS = \
 	zbxcomms \
 	zbxjson \
 	zbxexec \
+	zbxrsm \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 
