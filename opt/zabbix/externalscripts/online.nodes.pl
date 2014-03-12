@@ -5,6 +5,7 @@ use lib '/opt/zabbix/scripts';
 
 use strict;
 use Zabbix;
+use DBI;
 use DNSTest;
 use Data::Dumper;
 
@@ -15,49 +16,76 @@ my $type = shift || 'dns';
 my $hosts;
 
 my $config = get_dnstest_config();
-my $zabbix = Zabbix->new({ url => $config->{'zapi'}->{'url'}, user => $config->{'zapi'}->{'user'}, password => $config->{'zapi'}->{'password'} });
 
-my $groupid = $zabbix->get('hostgroup', {'filter' => {'name' => ['Probes']} });
 
-$groupid = $groupid->{'groupid'};
+my $dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
+                                           $config->{'db'}->{'user'},
+                                           $config->{'db'}->{'password'});
 
-my $hosts_tmp = $zabbix->get('host', {'groupids' => $groupid, 'selectParentTemplates' => ['hostid'], 'preservekeys' => 1 });
+my $sql = "select IFNULL(value, 60) FROM globalmacro gm WHERE macro = ?";
 
-foreach my $hostid (keys %{$hosts_tmp}) {
-    my $host = $hosts_tmp->{$hostid};
-    my @templates_tmp = $host->{'parentTemplates'};
+my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+
+$sth->execute('{$DNSTEST.PROBE.AVAIL.LIMIT}') or die $dbh->errstr;
+
+my @macro = $sth->fetchrow_array;
+
+$sth->finish;
+
+my $max_diff = $macro[0];
+
+my $sql = "select hostid, host FROM hosts h JOIN hosts_groups hg USING(hostid) JOIN groups g USING(groupid) WHERE g.name = ?";
+
+my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+
+$sth->execute('Probes') or die $dbh->errstr;
+
+while (my $row = $sth->fetchrow_hashref) {
+    my $hostid = $row->{'hostid'};
     my @templates;
+    push(@templates, $row->{'hostid'});
 
-    $hosts->{$hostid} = {};
+    $hosts->{$hostid}->{'name'} = $row->{'host'};
 
-    $hosts->{$hostid}->{'status'} = 1;
+    @templates = (@templates, get_parent_templateids($row->{'hostid'}));
 
-    push(@templates, $hostid);
+    foreach my $templateid (@templates) {
+	my $sql = "SELECT hostid, macro, value FROM hostmacro WHERE hostid = ?";
 
-    foreach my $template (@templates_tmp) {
-	push(@templates, ${$template}[0]->{'templateid'});
-	@templates = (@templates, get_parent_templateids(${$template}[0]->{'templateid'}));
+	my $sth = $dbh->prepare($sql) or die $dbh->errstr;               
+                                                                 
+	$sth->execute($templateid) or die $dbh->errstr;
+
+	while (my $macro = $sth->fetchrow_hashref) {
+	    $hosts->{$hostid}->{$macro->{'macro'}} = $macro->{'value'};
+	}
+
+	$sth->finish;
     }
 
-    my $macros = $zabbix->get('usermacro', {'hostids' => [@templates], 'output' => 'extend'});
+    my $sql = "SELECT IFNULL(min(lastvalue),1) as value FROM items where hostid = ? AND key_ LIKE 'dnstest.probe.status[%]'";
 
-    foreach my $macro (@{$macros}) {
-	my $name = $macro->{'macro'};
-	my $value = $macro->{'value'};
-	$hosts->{$hostid}->{$name} = $value;
+    my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+
+    $sth->execute($hostid) or die $dbh->errstr;
+
+    while (my $item = $sth->fetchrow_hashref) {
+	$hosts->{$hostid}->{'status'} = $item->{'value'};
     }
-}
 
-my $items = {};
+    $sth->finish;
 
-$items = $zabbix->get('item', {'groupids' => $groupid, 'output'=> ['itemid', 'hostid', 'key_', 'lastvalue'], 'preservekeys' => 1, 'filter' => {'key_' => ['dnstest.probe.status[manual]', 'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]']}});
+    my $sql = "SELECT lastclock, lastvalue FROM items i JOIN hosts h USING (hostid) where h.host = ? AND key_ = 'zabbix[proxy,{\$DNSTEST.PROXY_NAME},lastaccess]'";
 
-foreach my $itemid (sort keys %{$items}) {
-    my $hostid = $items->{$itemid}->{'hostid'};
-    my $value = $items->{$itemid}->{'lastvalue'} || '1';
-    my $key = $items->{$itemid}->{'key_'};
+    my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 
-    $hosts->{$hostid}->{'status'} = 0 if $value == 0;
+    $sth->execute($row->{'host'}.' - mon') or die $dbh->errstr;
+
+    while (my $item = $sth->fetchrow_hashref) {
+	$hosts->{$hostid}->{'status'} = 0 if (time - $item->{'lastvalue'} > $max_diff);
+    }
+
+    $sth->finish;
 }
 
 my $total = 0;
@@ -98,16 +126,20 @@ sub get_parent_templateids($) {
     my $templateid = shift;
     my @result;
 
-    my $hosts = $zabbix->get('template', {'templateids' => $templateid, 'selectParentTemplates' => ['templateid']});
+    my $sql = "SELECT templateid FROM hosts_templates WHERE hostid = ?";
 
-    my @templates = $hosts->{'parentTemplates'} if scalar @{$hosts->{'parentTemplates'}};
+    my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 
-    foreach my $template (@templates) {
-	my $templateid = ${$template}[0]->{'templateid'};
+    $sth->execute($templateid) or die $dbh->errstr;
+
+    while (my $row = $sth->fetchrow_hashref) {
+	my $templateid = $row->{'templateid'};
 	push (@result, $templateid);
-	my @parent_templates = get_parent_templateids($templateid);
-	@result = (@result, @parent_templates) if scalar @parent_templates;
+        my @parent_templates = get_parent_templateids($templateid);
+        @result = (@result, @parent_templates) if scalar @parent_templates;
     }
+
+    $sth->finish;
 
     return @result;
 }
