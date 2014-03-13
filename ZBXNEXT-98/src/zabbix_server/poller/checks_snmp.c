@@ -1450,7 +1450,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		int	max_vars;
 
 		if (SUCCEED == DCconfig_get_interface_snmp_stats(items[j].interface.interfaceid,
-				&max_succeed, &min_fail, 1))
+				&max_succeed, &min_fail))
 		{
 			max_vars = DCconfig_get_suggested_snmp_vars(max_succeed, min_fail);
 		}

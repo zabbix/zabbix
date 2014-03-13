@@ -4174,13 +4174,11 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 	UNLOCK_CACHE;
 }
 
-int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail, int lock)
+static int	DCconfig_get_interface_snmp_stats_nolock(zbx_uint64_t interfaceid, int *max_snmp_succeed,
+		int *min_snmp_fail)
 {
 	int			ret = FAIL;
 	ZBX_DC_INTERFACE	*dc_interface;
-
-	if (1 == lock)
-		LOCK_CACHE;
 
 	if (NULL != (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
 	{
@@ -4190,8 +4188,18 @@ int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_su
 		ret = SUCCEED;
 	}
 
-	if (1 == lock)
-		UNLOCK_CACHE;
+	return ret;
+}
+
+int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail)
+{
+	int	ret;
+
+	LOCK_CACHE;
+
+	ret = DCconfig_get_interface_snmp_stats_nolock(interfaceid, max_snmp_succeed, min_snmp_fail);
+
+	UNLOCK_CACHE;
 
 	return ret;
 }
@@ -4454,8 +4462,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			{
 				int	max_snmp_succeed, min_snmp_fail;
 
-				if (SUCCEED == DCconfig_get_interface_snmp_stats(dc_item->interfaceid,
-						&max_snmp_succeed, &min_snmp_fail, 0))
+				if (SUCCEED == DCconfig_get_interface_snmp_stats_nolock(dc_item->interfaceid,
+						&max_snmp_succeed, &min_snmp_fail))
 				{
 					max_items = DCconfig_get_suggested_snmp_vars(max_snmp_succeed, min_snmp_fail);
 				}

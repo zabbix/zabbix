@@ -296,7 +296,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 		int process_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
-int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail, int lock);
+int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
