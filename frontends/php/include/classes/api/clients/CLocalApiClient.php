@@ -27,16 +27,16 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Factory for creating API services.
 	 *
-	 * @var CApiServiceFactory
+	 * @var CRegistryFactory
 	 */
 	protected $serviceFactory;
 
 	/**
 	 * Set service factory.
 	 *
-	 * @param CApiServiceFactory $factory
+	 * @param CRegistryFactory $factory
 	 */
-	public function setServiceFactory(CApiServiceFactory $factory) {
+	public function setServiceFactory(CRegistryFactory $factory) {
 		$this->serviceFactory = $factory;
 	}
 

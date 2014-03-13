@@ -31,7 +31,7 @@ class API {
 	/**
 	 * Factory for creating API services.
 	 *
-	 * @var CApiServiceFactory
+	 * @var CRegistryFactory
 	 */
 	private static $apiServiceFactory;
 
@@ -47,9 +47,9 @@ class API {
 	/**
 	 * Set the service factory.
 	 *
-	 * @param CApiServiceFactory $factory
+	 * @param CRegistryFactory $factory
 	 */
-	public static function setApiServiceFactory(CApiServiceFactory $factory) {
+	public static function setApiServiceFactory(CRegistryFactory $factory) {
 		self::$apiServiceFactory = $factory;
 	}
 
