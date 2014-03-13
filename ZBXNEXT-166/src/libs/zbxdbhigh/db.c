@@ -1954,7 +1954,7 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
  *           Usage example:                                                   *
  *             zbx_db_insert_t ins;                                           *
  *                                                                            *
- *             zbx_db_insert_prepare(&ins, "history", "id", "value");         *                                                               *
+ *             zbx_db_insert_prepare(&ins, "history", "id", "value");         *
  *             zbx_db_insert_add(&ins, (zbx_uint64_t)1, 1.0);                 *
  *             zbx_db_insert_add(&ins, (zbx_uint64_t)2, 2.0);                 *
  *               ...                                                          *
@@ -1965,7 +1965,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 {
 	int		i;
 	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	size_t		sql_alloc = 512, sql_offset = 0;
 	const ZBX_FIELD	*field;
 #ifdef HAVE_MYSQL
 	size_t		sql_values_alloc = 0, sql_values_offset = 0;
@@ -1977,6 +1977,19 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 		exit(EXIT_FAILURE);
 	}
 
+	sql = zbx_malloc(sql, sql_alloc);
+
+#ifndef HAVE_ORACLE
+	self->sql_alloc = 16 * ZBX_KIBIBYTE;
+	self->sql_offset = 0;
+	self->sql = zbx_malloc(NULL, self->sql_alloc);
+
+#	ifdef HAVE_MYSQL
+	self->sql_values = NULL;
+#	endif
+#endif
+	zbx_vector_ptr_create(&self->fields);
+
 	/* find the table and fields in database schema */
 
 	if (NULL == (self->table = DBget_table(table)))
@@ -1984,8 +1997,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
-
-	zbx_vector_ptr_create(&self->fields);
 
 	for (i = 0; i < fields_num; i++)
 	{
