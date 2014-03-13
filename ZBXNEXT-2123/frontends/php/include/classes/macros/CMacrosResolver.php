@@ -167,6 +167,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							case '{HOST.HOST}':
 								$macros[$hostId][$hostMacro] = $dbHost['host'];
 								break;
+
 							case '{HOST.NAME}':
 								$macros[$hostId][$hostMacro] = $dbHost['name'];
 								break;
@@ -212,9 +213,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							case '{HOST.IP}':
 								$macros[$hostId][$interfaceMacro] = $dbInterface['ip'];
 								break;
+
 							case '{HOST.DNS}':
 								$macros[$hostId][$interfaceMacro] = $dbInterface['dns'];
 								break;
+
 							case '{HOST.CONN}':
 								$macros[$hostId][$interfaceMacro] = $dbInterface['useip'] ? $dbInterface['ip'] : $dbInterface['dns'];
 								break;
@@ -261,9 +264,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								case '{HOST.IP}':
 									$macros[$hostId][$interfaceMacro] = $interface['ip'];
 									break;
+
 								case '{HOST.DNS}':
 									$macros[$hostId][$interfaceMacro] = $interface['dns'];
 									break;
+
 								case '{HOST.CONN}':
 									$macros[$hostId][$interfaceMacro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
 									break;
@@ -444,9 +449,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($hostMacrosAvailable) {
 			$macroValues = $this->getHostMacros($macros['host'], $macroValues);
 		}
+
 		if ($interfaceWithoutPortMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interfaceWithoutPort'], $macroValues, false);
 		}
+
 		if ($interfaceMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interface'], $macroValues, true);
 			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION;
@@ -454,9 +461,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		else {
 			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT;
 		}
+
 		if ($itemMacrosAvailable) {
 			$macroValues = $this->getItemMacros($macros['item'], $triggers, $macroValues);
 		}
+
 		if ($userMacrosData) {
 			// get hosts for triggers
 			$dbTriggers = API::Trigger()->get(array(
@@ -536,8 +545,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($this->isTypeAvailable('graphFunctionalItem')) {
 			$source = $this->getSource();
 
-			$strList = array();
-			$itemsList = array();
+			$strList = $itemsList = array();
 
 			foreach ($data as $graph) {
 				$strList[] = $graph[$source];
@@ -575,8 +583,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	private function resolveGraphsFunctionalItemMacros($strList, $itemsList) {
 		// retrieve all string macros and all host-key pairs
-		$hostKeyPairs = array();
-		$matchesList = array();
+		$hostKeyPairs = $matchesList = array();
 		$items = reset($itemsList);
 
 		foreach ($strList as $str) {
@@ -616,13 +623,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$query = 'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
 					' FROM items i, hosts h'.
 					' WHERE i.hostid=h.hostid AND (';
+
 		foreach ($hostKeyPairs as $host => $keys) {
 			$query .= '(h.host='.zbx_dbstr($host).' AND i.key_ IN(';
+
 			foreach ($keys as $key => $val) {
 				$query .= zbx_dbstr($key).',';
 			}
+
 			$query = substr($query, 0, -1).')) OR ';
 		}
+
 		$query = substr($query, 0, -4).')';
 
 		// get necessary items for all graph strings
@@ -729,6 +740,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// positional index larger than item count, resolve to UNKNOWN
 			if (!isset($items[$posInItemList])) {
 				$macroList[$matches['macroType'][$i]][$position] = UNRESOLVED_MACRO_STRING;
+
 				continue;
 			}
 
@@ -1067,5 +1079,260 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Expand functional macros in given map label.
+	 *
+	 * @param string $label			label to expand
+	 * @param array  $replaceHosts	list of hosts in order which they appear in trigger expression if trigger label is given,
+	 * or single host when host label is given
+	 *
+	 * @return string
+	 */
+	public function resolveMapLabelMacros($label, $replaceHosts = null) {
+		$functionsPattern = '(last|max|min|avg)\(([0-9]+['.ZBX_TIME_SUFFIXES.']?)?\)';
+
+		// find functional macro pattern
+		$pattern = ($replaceHosts === null)
+			? '/{'.ZBX_PREG_HOST_FORMAT.':.+\.'.$functionsPattern.'}/Uu'
+			: '/{('.ZBX_PREG_HOST_FORMAT.'|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.'.$functionsPattern.'}/Uu';
+
+		preg_match_all($pattern, $label, $matches);
+
+		// for each functional macro
+		foreach ($matches[0] as $expr) {
+			$macro = $expr;
+
+			if ($replaceHosts !== null) {
+				// search for macros with all possible indecies
+				foreach ($replaceHosts as $i => $host) {
+					$macroTmp = $macro;
+
+					// repalce only macro in first position
+					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
+
+					// only one simple macro possible inside functional macro
+					if ($macro !== $macroTmp) {
+						break;
+					}
+				}
+			}
+
+			// try to create valid expression
+			$expressionData = new CTriggerExpression();
+
+			if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
+				continue;
+			}
+
+			// look in DB for coressponding item
+			$itemHost = $expressionData->expressions[0]['host'];
+			$key = $expressionData->expressions[0]['item'];
+			$function = $expressionData->expressions[0]['functionName'];
+
+			$item = API::Item()->get(array(
+				'output' => array('itemid', 'lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid'),
+				'webitems' => true,
+				'filter' => array(
+					'host' => $itemHost,
+					'key_' => $key
+				)
+			));
+
+			$item = reset($item);
+
+			// if no corresponding item found with functional macro key and host
+			if (!$item) {
+				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
+
+				continue;
+			}
+
+			// do function type (last, min, max, avg) related actions
+			if ($function === 'last') {
+				$value = $item['lastclock'] ? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
+			}
+			else {
+				$value = getItemFunctionalValue($item, $function, $expressionData->expressions[0]['functionParamList'][0]);
+			}
+
+			if (isset($value)) {
+				$label = str_replace($expr, $value, $label);
+			}
+		}
+
+		return $label;
+	}
+
+	/**
+	 * Resolve all kinds of macros in map labels.
+	 *
+	 * @param array  $selement
+	 * @param string $selement['label']						label to expand
+	 * @param int    $selement['elementtype']				element type
+	 * @param int    $selement['elementid']					element id
+	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
+	 *
+	 * @return string
+	 */
+	public function resolveMapLabelMacrosAll(array $selement) {
+		$label = $selement['label'];
+
+		// for host and trigger items expand macros if they exists
+		if (($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST || $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+				&& (zbx_strpos($label, 'HOST.NAME') !== false
+						|| zbx_strpos($label, 'HOSTNAME') !== false /* deprecated */
+						|| zbx_strpos($label, 'HOST.HOST') !== false
+						|| zbx_strpos($label, 'HOST.DESCRIPTION') !== false
+						|| zbx_strpos($label, 'HOST.DNS') !== false
+						|| zbx_strpos($label, 'HOST.IP') !== false
+						|| zbx_strpos($label, 'IPADDRESS') !== false /* deprecated */
+						|| zbx_strpos($label, 'HOST.CONN') !== false)) {
+			// priorities of interface types doesn't match interface type ids in DB
+			$priorities = array(
+				INTERFACE_TYPE_AGENT => 4,
+				INTERFACE_TYPE_SNMP => 3,
+				INTERFACE_TYPE_JMX => 2,
+				INTERFACE_TYPE_IPMI => 1
+			);
+
+			// get host data if element is host
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+				$res = DBselect(
+					'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,h.description,hi.type AS interfacetype'.
+					' FROM interface hi,hosts h'.
+					' WHERE hi.hostid=h.hostid'.
+						' AND hi.main=1 AND hi.hostid='.zbx_dbstr($selement['elementid'])
+				);
+
+				// process interface priorities
+				$tmpPriority = 0;
+
+				while ($dbHost = DBfetch($res)) {
+					if ($priorities[$dbHost['interfacetype']] > $tmpPriority) {
+						$resHost = $dbHost;
+						$tmpPriority = $priorities[$dbHost['interfacetype']];
+					}
+				}
+
+				$hostsByNr[''] = $resHost;
+			}
+			// get trigger host list if element is trigger
+			else {
+				$res = DBselect(
+					'SELECT hi.ip,hi.dns,hi.useip,h.host,h.name,h.description,f.functionid,hi.type AS interfacetype'.
+					' FROM interface hi,items i,functions f,hosts h'.
+					' WHERE h.hostid=hi.hostid'.
+						' AND hi.hostid=i.hostid'.
+						' AND i.itemid=f.itemid'.
+						' AND hi.main=1 AND f.triggerid='.zbx_dbstr($selement['elementid']).
+					' ORDER BY f.functionid'
+				);
+
+				// process interface priorities, build $hostsByFunctionId array
+				$tmpFunctionId = -1;
+
+				while ($dbHost = DBfetch($res)) {
+					if ($dbHost['functionid'] != $tmpFunctionId) {
+						$tmpPriority = 0;
+						$tmpFunctionId = $dbHost['functionid'];
+					}
+
+					if ($priorities[$dbHost['interfacetype']] > $tmpPriority) {
+						$hostsByFunctionId[$dbHost['functionid']] = $dbHost;
+						$tmpPriority = $priorities[$dbHost['interfacetype']];
+					}
+				}
+
+				// get all function ids from expression and link host data against position in expression
+				preg_match_all('/\{([0-9]+)\}/', $selement['elementExpressionTrigger'], $matches);
+
+				$hostsByNr = array();
+
+				foreach ($matches[1] as $i => $functionid) {
+					if (isset($hostsByFunctionId[$functionid])) {
+						$hostsByNr[$i + 1] = $hostsByFunctionId[$functionid];
+					}
+				}
+
+				// for macro without numeric index
+				if (isset($hostsByNr[1])) {
+					$hostsByNr[''] = $hostsByNr[1];
+				}
+			}
+
+			// resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}
+			$label = $this->resolveMapLabelMacros($label, $hostsByNr);
+
+			// resolves basic macros
+			// $hostsByNr possible keys: '' and 1-9
+			foreach ($hostsByNr as $i => $host) {
+				$replace = array(
+					'{HOST.NAME'.$i.'}' => $host['name'],
+					'{HOSTNAME'.$i.'}' => $host['name'],
+					'{HOST.HOST'.$i.'}' => $host['host'],
+					'{HOST.DESCRIPTION'.$i.'}' => $host['description'],
+					'{HOST.DNS'.$i.'}' => $host['dns'],
+					'{HOST.IP'.$i.'}' => $host['ip'],
+					'{IPADDRESS'.$i.'}' => $host['ip'],
+					'{HOST.CONN'.$i.'}' => $host['useip'] ? $host['ip'] : $host['dns']
+				);
+
+				$label = str_replace(array_keys($replace), $replace, $label);
+			}
+		}
+		else {
+			// resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided
+			$label = $this->resolveMapLabelMacros($label);
+		}
+
+		// resolve map specific processing consuming macros
+		switch ($selement['elementtype']) {
+			case SYSMAP_ELEMENT_TYPE_HOST:
+			case SYSMAP_ELEMENT_TYPE_MAP:
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				if (zbx_strpos($label, '{TRIGGERS.UNACK}') !== false) {
+					$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
+					$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
+					$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
+					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}',
+						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
+					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}',
+						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGERS.ACK}') !== false) {
+					$label = str_replace('{TRIGGERS.ACK}',
+						get_triggers_unacknowledged($selement, null, true), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
+					$label = str_replace('{TRIGGERS.PROBLEM.ACK}',
+						get_triggers_unacknowledged($selement, true, true), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
+					$label = str_replace('{TRIGGER.EVENTS.ACK}',
+						get_events_unacknowledged($selement, null, null, true), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
+					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}',
+						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
+				}
+				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
+					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
+						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
+				}
+				break;
+		}
+
+		return $label;
 	}
 }
