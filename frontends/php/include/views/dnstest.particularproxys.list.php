@@ -80,7 +80,8 @@ $particularProxys = array(
 $particularProxysInfoTable->addRow(array($particularProxys));
 $particularProxysInfoTable->addRow(array(array(
 	new CSpan(array(bold(_('Total number of NS')), ':', SPACE, $this->data['totalNs']), 'first-row-element'),
-	new CSpan(array(bold(_('Number of NS with positive result')), ':', SPACE, $this->data['positiveNs']))
+	new CSpan(array(bold(_('Number of NS with positive result')), ':', SPACE, $this->data['positiveNs']), 'second-row-element'),
+	new CSpan(array(bold(_('Number of NS with negative result')), ':', SPACE, $this->data['totalNs'] - $this->data['positiveNs']))
 )));
 
 $dnsTestWidget->additem($particularProxysInfoTable);

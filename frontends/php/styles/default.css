@@ -908,7 +908,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 .tests .filter .spaces { margin-left: 20px; }
 .tests .info-block .first-row-element { width: 300px; display: inline-block; }
 
-.particular-proxy .info-block .first-row-element { width: 300px; display: inline-block; }
+.particular-proxy .info-block .first-row-element { width: 220px; display: inline-block; }
+.particular-proxy .info-block .second-row-element { width: 300px; display: inline-block; }
 
 .incidents table.filter.info-block,
 .monthly-reports table.filter.info-block { text-align: left; }
