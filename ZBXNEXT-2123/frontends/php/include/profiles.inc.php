@@ -135,16 +135,44 @@ class CProfile {
 		}
 
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $deleteIdx2));
+		self::deleteValues($idx, $deleteIdx2);
 
 		// remove from cache
 		foreach ($deleteIdx2 as $v) {
 			unset(self::$profiles[$idx][$v]);
 		}
-
 		if (!self::$profiles[$idx]) {
 			unset(self::$profiles[$idx]);
 		}
+	}
+
+	/**
+	 * Removes all values stored under the given idx.
+	 *
+	 * @param string $idx
+	 */
+	public static function deleteIdx($idx) {
+		if (self::$profiles === null) {
+			self::init();
+		}
+
+		if (!isset(self::$profiles[$idx])) {
+			return;
+		}
+
+		self::deleteValues($idx, array_keys(self::$profiles[$idx]));
+		unset(self::$profiles[$idx]);
+	}
+
+	/**
+	 * Deletes the given values from the DB.
+	 *
+	 * @param string 	$idx
+	 * @param array 	$idx2
+	 */
+	protected static function deleteValues($idx, array $idx2) {
+		// remove from DB
+		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
 	}
 
 	/**

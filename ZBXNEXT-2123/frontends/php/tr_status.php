@@ -113,15 +113,8 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['status_change_days'] = 14;
 
 	CProfile::delete('web.tr_status.filter.application');
-
-	// reset inventory filters
-	$i = 0;
-	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
-		CProfile::delete('web.tr_status.filter.inventory.field', $i);
-		CProfile::delete('web.tr_status.filter.inventory.value', $i);
-
-		$i++;
-	}
+	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
+	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
 }
 // update filter in profiles
 elseif (hasRequest('filter_set')) {
@@ -146,12 +139,14 @@ elseif (hasRequest('filter_set')) {
 	}
 
 	// delete remaining old values
+	$idx2 = array();
 	while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null) {
-		CProfile::delete('web.tr_status.filter.inventory.field', $i);
-		CProfile::delete('web.tr_status.filter.inventory.value', $i);
+		$idx2[] = $i;
 
 		$i++;
 	}
+	CProfile::delete('web.tr_status.filter.inventory.field', $idx2);
+	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
 }
 
 // fetch filter from profiles
