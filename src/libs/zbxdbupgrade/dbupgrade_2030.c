@@ -125,7 +125,7 @@ static int	DBpatch_2030010(void)
 
 static int	DBpatch_2030011(void)
 {
-	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps_elements", &field);
 }
@@ -334,6 +334,13 @@ static int	DBpatch_2030031(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2030032(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -372,5 +379,6 @@ DBPATCH_ADD(2030028, 0, 1)
 DBPATCH_ADD(2030029, 0, 1)
 DBPATCH_ADD(2030030, 0, 1)
 DBPATCH_ADD(2030031, 0, 0)
+DBPATCH_ADD(2030032, 0, 1)
 
 DBPATCH_END()

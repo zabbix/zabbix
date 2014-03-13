@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templates, hosts and proxies (Eduard, Sasha)
 ..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavel)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
@@ -66,6 +67,9 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7832] fixed screen item row- and colspans not being adjusted when reducing the size of a screen (Pavels)
+........S. [ZBX-7620] improved error messaging and debug logging for VMware items (wiper)
+........S. [ZBX-7897] fixed memory leak in trapper for log file items (Juris)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
 ........S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 ..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
