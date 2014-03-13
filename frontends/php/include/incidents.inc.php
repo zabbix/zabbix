@@ -44,6 +44,28 @@ function getFailedTestsCount($itemId, $endTime, $incidentStartTime, $incidentEnd
 }
 
 /**
+ * Get failed tests count inside incident.
+ *
+ * @param int 		$itemId
+ * @param int 		$incidentStartTime
+ * @param int 		$incidentEndTime
+ *
+ * @return int
+ */
+function getFailedRollingWeekTestsCount($itemId, $startTime, $endTime) {
+	$getFailedTestsCount = DBfetch(DBselect(
+		'SELECT COUNT(itemid) AS count'.
+		' FROM history_uint h'.
+		' WHERE h.itemid='.$itemId.
+			' AND h.clock>='.$startTime.
+			' AND h.clock<='.$endTime.
+			' AND h.value=0'
+	));
+
+	return $getFailedTestsCount['count'];
+}
+
+/**
  * Get total tests count.
  *
  * @param int 		$itemId

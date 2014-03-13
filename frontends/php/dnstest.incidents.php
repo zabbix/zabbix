@@ -784,6 +784,145 @@ if ($host || $data['filter_search']) {
 					}
 				}
 			}
+
+			$services = array();
+
+			// get deleay items
+			$itemKeys = array();
+			if ((isset($data['dns']['events']) && $data['dns']['events'])
+					|| (isset($data['dnssec']['events']) && $data['dnssec']['events'])) {
+				array_push($itemKeys, CALCULATED_ITEM_DNS_DELAY, CALCULATED_DNS_ROLLWEEK_SLA);
+				if (isset($data['dns']['events']) && $data['dns']['events']) {
+					$services['dns'] = array();
+				}
+				if (isset($data['dnssec']['events']) && $data['dnssec']['events']) {
+					$services['dnssec'] = array();
+				}
+			}
+			if (isset($data['rdds']['events']) && $data['rdds']['events']) {
+				array_push($itemKeys, CALCULATED_ITEM_RDDS_DELAY, CALCULATED_RDDS_ROLLWEEK_SLA);
+			}
+			if (isset($data['epp']['events']) && $data['epp']['events']) {
+				array_push($itemKeys, CALCULATED_ITEM_EPP_DELAY, CALCULATED_EPP_ROLLWEEK_SLA);
+			}
+
+			// get host with calculated items
+			$dnstest = API::Host()->get(array(
+				'output' => array('hostid'),
+				'filter' => array(
+					'host' => DNSTEST_HOST
+				)
+			));
+
+			if ($dnstest) {
+				$dnstest = reset($dnstest);
+			}
+			else {
+				show_error_message(_s('No permissions to referred host "%1$s" or it does not exist!', DNSTEST_HOST));
+				require_once dirname(__FILE__).'/include/page_footer.php';
+				exit;
+			}
+
+			$items = API::Item()->get(array(
+				'hostids' => $dnstest['hostid'],
+				'output' => array('itemid', 'value_type', 'key_'),
+				'filter' => array(
+					'key_' => $itemKeys
+				)
+			));
+
+			// get SLA items
+			foreach ($items as $item) {
+				if ($item['key_'] === CALCULATED_DNS_ROLLWEEK_SLA || $item['key_'] === CALCULATED_RDDS_ROLLWEEK_SLA
+						|| $item['key_'] === CALCULATED_EPP_ROLLWEEK_SLA) {
+					// get last value
+					$itemValue = API::History()->get(array(
+						'itemids' => $item['itemid'],
+						'time_from' => $filterTimeFrom,
+						'history' => $item['value_type'],
+						'output' => API_OUTPUT_EXTEND,
+						'limit' => 1
+					));
+					$itemValue = reset($itemValue);
+
+					if ($item['key_'] === CALCULATED_DNS_ROLLWEEK_SLA) {
+						if (isset($services['dns'])) {
+							$services['dns']['slaValue'] = $itemValue['value'];
+						}
+						if (isset($services['dnssec'])) {
+							$services['dnssec']['slaValue'] = $itemValue['value'];
+						}
+					}
+					elseif ($item['key_'] === CALCULATED_RDDS_ROLLWEEK_SLA) {
+						$services['rdds']['slaValue'] = $itemValue['value'];
+					}
+					else {
+						$services['epp']['slaValue'] = $itemValue['value'];
+					}
+				}
+				else {
+					// get last value
+					$itemValue = API::History()->get(array(
+						'itemids' => $item['itemid'],
+						'time_till' => $filterTimeTill,
+						'sortorder' => ZBX_SORT_DOWN,
+						'sortfield' => array('clock'),
+						'history' => $item['value_type'],
+						'output' => API_OUTPUT_EXTEND,
+						'limit' => 1
+					));
+					$itemValue = reset($itemValue);
+
+					if ($item['key_'] == CALCULATED_ITEM_DNS_DELAY) {
+						if (isset($services['dns'])) {
+							$services['dns']['delay'] = $itemValue['value'];
+							$services['dns']['itemId'] = $dnsAvailItem;
+						}
+						if (isset($services['dnssec'])) {
+							$services['dnssec']['delay'] = $itemValue['value'];
+							$services['dnssec']['itemId'] = $dnssecAvailItem;
+						}
+					}
+					elseif ($item['key_'] == CALCULATED_ITEM_RDDS_DELAY) {
+						$services['rdds']['delay'] = $itemValue['value'];
+						$services['rdds']['itemId'] = $rddsAvailItem;
+					}
+					elseif ($item['key_'] == CALCULATED_ITEM_EPP_DELAY) {
+						$services['epp']['delay'] = $itemValue['value'];
+						$services['epp']['itemId'] = $eppAvailItem;
+					}
+				}
+			}
+
+			foreach ($services as $key => $service) {
+				foreach ($data[$key]['events'] as &$event) {
+					// get failed tests time interval
+					if (!isset($event['endTime'])) {
+						$event['endTime'] = $filterTimeTill;
+					}
+					if ($event['startTime'] >= $filterTimeFrom && $event['endTime'] <= $filterTimeTill) {
+						$getFailedFrom = $event['startTime'];
+						$getFailedTill = $event['endTime'];
+					}
+					elseif ($event['startTime'] < $filterTimeFrom && $event['endTime'] <= $filterTimeTill) {
+						$getFailedFrom = $filterTimeFrom;
+						$getFailedTill = $event['endTime'];
+					}
+					elseif ($event['startTime'] >= $filterTimeFrom && $event['endTime'] > $filterTimeTill) {
+						$getFailedFrom = $event['startTime'];
+						$getFailedTill = $filterTimeTill;
+					}
+
+					// get failed tests count
+					$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom, $getFailedTill);
+
+					// get percent
+					$event['incidentPercentDown'] = sprintf('%.3f',
+						(100 * $failedTests * $service['delay'] / 60) / $service['slaValue']
+					);
+				}
+				unset($event);
+			}
 		}
 	}
 }

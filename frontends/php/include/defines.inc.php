@@ -957,6 +957,9 @@ define('CALCULATED_ITEM_SLV_RDDS_UPD',			'dnstest.configvalue[DNSTEST.SLV.RDDS.U
 define('CALCULATED_ITEM_SLV_EPP_INFO',			'dnstest.configvalue[DNSTEST.SLV.EPP.INFO]');
 define('CALCULATED_ITEM_SLV_EPP_LOGIN',			'dnstest.configvalue[DNSTEST.SLV.EPP.LOGIN]');
 define('CALCULATED_ITEM_EPP_UPDATE',			'dnstest.configvalue[DNSTEST.SLV.EPP.UPDATE]');
+define('CALCULATED_DNS_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.DNS.ROLLWEEK.SLA]');
+define('CALCULATED_RDDS_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.RDDS.ROLLWEEK.SLA]');
+define('CALCULATED_EPP_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.EPP.ROLLWEEK.SLA]');
 
 // SLA monitoring probe status items keys
 define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');

@@ -204,7 +204,8 @@ $headers = array(
 	_('Start time'),
 	_('End Time'),
 	_('Failed tests within incident'),
-	_('Total number of tests')
+	_('Total number of tests'),
+	_('Input into rolling week')
 );
 $noData = _('No incidents found.');
 
@@ -214,7 +215,6 @@ $rddsTab = new CDiv();
 $eppTab = new CDiv();
 
 if (isset($this->data['tld'])) {
-
 	// DNS
 	if (isset($this->data['dns']['events'])) {
 		$dnsInfoTable = new CTable(null, 'incidents-info');
@@ -242,7 +242,8 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests']
+				$event['incidentTotalTests'],
+				$event['incidentPercentDown']
 			);
 
 			$dnsTable->addRow($row);
@@ -315,7 +316,8 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests']
+				$event['incidentTotalTests'],
+				$event['incidentPercentDown']
 			);
 
 			$dnssecTable->addRow($row);
@@ -388,7 +390,8 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests']
+				$event['incidentTotalTests'],
+				$event['incidentPercentDown']
 			);
 
 			$rddsTable->addRow($row);
@@ -460,7 +463,8 @@ if (isset($this->data['tld'])) {
 				date('d.m.Y H:i:s', $event['startTime']),
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
-				$event['incidentTotalTests']
+				$event['incidentTotalTests'],
+				$event['incidentPercentDown']
 			);
 
 			$eppTable->addRow($row);
