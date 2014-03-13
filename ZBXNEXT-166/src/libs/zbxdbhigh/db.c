@@ -2049,6 +2049,8 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ") values ");
 
 #ifdef HAVE_ORACLE
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
+
 	for (i = 0; i < self->fields.values_num; i++)
 	{
 		if (0 != i)
