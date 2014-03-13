@@ -20,7 +20,8 @@ DIST_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxexec \
-	zbxself
+	zbxself \
+	zbxrsm
 
 if PROXY
 PROXY_SUBDIRS = \
@@ -31,7 +32,8 @@ PROXY_SUBDIRS = \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
-	zbxself
+	zbxself \
+	zbxrsm
 endif
 
 if SERVER
@@ -44,7 +46,8 @@ SERVER_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
-	zbxself
+	zbxself \
+	zbxrsm
 endif
 
 SUBDIRS = \
@@ -59,7 +62,6 @@ SUBDIRS = \
 	zbxcomms \
 	zbxjson \
 	zbxexec \
-	zbxrsm \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 

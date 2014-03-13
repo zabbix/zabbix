@@ -17,12 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
-#include "checks_simple_dnstest.h"
-#include "zbxserver.h"
-#include "comms.h"
-#include "log.h"	/* TODO: tracking down crash when adding a value, remove later */
-
 #include <ldns/ldns.h>
 
 #include <openssl/bio.h>
@@ -31,6 +25,14 @@
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
+
+#include "sysinfo.h"
+#include "checks_simple_dnstest.h"
+#include "zbxserver.h"
+#include "comms.h"
+#include "log.h"	/* TODO: tracking down crash when adding a value, remove later */
+
+#include "rsm.h"
 
 #define ZBX_HOST_BUF_SIZE	128
 #define ZBX_IP_BUF_SIZE		64
@@ -47,10 +49,6 @@
 #define COMMAND_BUF_SIZE	1024
 #define XML_VALUE_BUF_SIZE	512
 
-#define EPP_BASE_DIR			"/opt/zabbix/epp"
-#define EPP_COMMANDS_DIR		"commands"
-#define EPP_CERTS_DIR			"certs"
-
 #define EXPECTED_SERVER_ID		"192.0.34.201/620:0:2d0:270:1::201"
 #define EXPECTED_RESULT_CODE		"1000"
 #define EXPECTED_RESULT_CODE_LOGOUT	"1500"
@@ -58,13 +56,12 @@
 #define REQUEST_DOMAIN			"icann-test.icanntest1"
 
 #define COMMAND_LOGIN			"login"
-#define COMMAND_LOGIN_USER		"monitor"
-#define COMMAND_LOGIN_PSWD		"cawabonga"
 #define COMMAND_INFO			"info"
 #define COMMAND_UPDATE			"update"
 #define COMMAND_LOGOUT			"logout"
 
 extern const char	*CONFIG_LOG_FILE;
+extern const char	*epp_passphrase;
 
 typedef struct
 {
@@ -2553,7 +2550,7 @@ out:
 	return ret;
 }
 
-static int	get_tmpl(const char *domain, const char *command, char *tmpl_buf, size_t tmpl_buf_size)
+static int	get_tmpl(const char *epp_commands, const char *command, char *tmpl_buf, size_t tmpl_buf_size)
 {
 	static char	path_buf[512];
 
@@ -2561,7 +2558,7 @@ static int	get_tmpl(const char *domain, const char *command, char *tmpl_buf, siz
 	size_t		read;
 	int		ret = FAIL;
 
-	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s/%s/%s.tmpl", EPP_BASE_DIR, domain, EPP_COMMANDS_DIR, command);
+	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s.tmpl", epp_commands, command);
 
 	if (NULL == (f = fopen(path_buf, "r")))
 		goto out;
@@ -2626,8 +2623,8 @@ out:
 	return ret;
 }
 
-static int	command_login(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
-		char *err, size_t err_size)
+static int	command_login(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+		const char *epp_user, const char *epp_passwd, char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
 			*data = NULL;
@@ -2635,14 +2632,14 @@ static int	command_login(const char *domain, const char *name, SSL *ssl, int *rt
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
 		goto out;
 	}
 
-	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, COMMAND_LOGIN_USER, COMMAND_LOGIN_PSWD))
+	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, epp_user, epp_passwd))
 	{
 		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2691,7 +2688,7 @@ out:
 	return ret;
 }
 
-static int	command_update(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+static int	command_update(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
 		char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
@@ -2700,7 +2697,7 @@ static int	command_update(const char *domain, const char *name, SSL *ssl, int *r
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2758,7 +2755,7 @@ out:
 	return ret;
 }
 
-static int	command_info(const char *domain, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
+static int	command_info(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
 		char *err, size_t err_size)
 {
 	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
@@ -2767,7 +2764,7 @@ static int	command_info(const char *domain, const char *name, SSL *ssl, int *rtt
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2823,13 +2820,13 @@ out:
 	return ret;
 }
 
-static int	command_logout(const char *domain, const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
+static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
 {
 	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
 	int	ret = FAIL;
 
-	if (SUCCEED != get_tmpl(domain, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		goto out;
@@ -3006,7 +3003,10 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	static char		cert_file[512], key_file[512];
 
 	ldns_resolver		*res = NULL;
-	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL;
+	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL,
+				*secretkey_enc_b64 = NULL, *secretkey_salt_b64 = NULL, *epp_passwd_enc_b64 = NULL,
+				*epp_passwd_salt_b64 = NULL, *epp_user = NULL, *epp_passwd = NULL, *epp_certs = NULL,
+				*epp_commands = NULL, *tmp;
 	short			epp_port = 700;
 	X509			*cert = NULL;
 	const SSL_METHOD	*method;
@@ -3038,6 +3038,13 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	if (NULL == (log_fd = open_item_log(domain, ZBX_EPP_LOG_PREFIX, err, sizeof(err))))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (NULL == epp_passphrase || '\0' == *epp_passphrase)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "EPP passphrase was not provided when starting proxy"
+				" (restart proxy with --rsm option)"));
 		goto out;
 	}
 
@@ -3112,6 +3119,64 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
 	}
+
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_USER, &epp_user, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_CERTS, &epp_certs, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_COMMANDS, &epp_commands, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	zbx_free(value_str);
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_PASSWD, &value_str, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (NULL == (tmp = strchr(value_str, '|')))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "value of macro %s must contain separator |",
+				ZBX_MACRO_EPP_PASSWD));
+		goto out;
+	}
+
+	*tmp = '\0';
+	tmp++;
+
+	epp_passwd_enc_b64 = zbx_strdup(epp_passwd_enc_b64, value_str);
+	epp_passwd_salt_b64 = zbx_strdup(epp_passwd_salt_b64, tmp);
+
+	zbx_free(value_str);
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_KEYSALT, &value_str, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (NULL == (tmp = strchr(value_str, '|')))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "value of macro %s must contain separator |",
+				ZBX_MACRO_EPP_KEYSALT));
+		goto out;
+	}
+
+	*tmp = '\0';
+	tmp++;
+
+	secretkey_enc_b64 = zbx_strdup(secretkey_enc_b64, value_str);
+	secretkey_salt_b64 = zbx_strdup(secretkey_salt_b64, tmp);
 
 	/* get epp items */
 	if (0 == (items_num = zbx_get_epp_items(keyname, item, domain, &items, log_fd)))
@@ -3205,8 +3270,8 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	zbx_snprintf(cert_file, sizeof(cert_file), "%s/%s/%s/client.crt", EPP_BASE_DIR, domain, EPP_CERTS_DIR);
-	zbx_snprintf(key_file, sizeof(key_file), "%s/%s/%s/client.unsecured.key", EPP_BASE_DIR, domain, EPP_CERTS_DIR);
+	zbx_snprintf(cert_file, sizeof(cert_file), "%s/client.crt", epp_certs);
+	zbx_snprintf(key_file, sizeof(key_file), "%s/client.unsecured.key", epp_certs);
 
 	if (1 != SSL_use_certificate_file(ssl, cert_file, SSL_FILETYPE_PEM))
 	{
@@ -3247,28 +3312,46 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
-	if (SUCCEED != command_login(domain, COMMAND_LOGIN, ssl, &rtt1, log_fd, err, sizeof(err)))
+	if (SUCCEED != decrypt_ciphertext(epp_passphrase, strlen(epp_passphrase), secretkey_enc_b64,
+			strlen(secretkey_enc_b64), secretkey_salt_b64, strlen(secretkey_salt_b64), epp_passwd_enc_b64,
+			strlen(epp_passwd_enc_b64), epp_passwd_salt_b64, strlen(epp_passwd_salt_b64), &epp_passwd,
+			err, sizeof(err)))
+	{
+		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
+		zbx_dns_errf(log_fd, "cannot encrypt EPP password: %s", err);
+		goto out;
+	}
+
+	rv = command_login(epp_commands, COMMAND_LOGIN, ssl, &rtt1, log_fd, epp_user, epp_passwd, err, sizeof(err));
+
+	if (NULL != epp_passwd)
+	{
+		memset(epp_passwd, 0, strlen(epp_passwd));
+		zbx_free(epp_passwd);
+	}
+
+	if (SUCCEED != rv)
 	{
 		rtt2 = rtt3 = rtt1;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_update(domain, COMMAND_UPDATE, ssl, &rtt2, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_update(epp_commands, COMMAND_UPDATE, ssl, &rtt2, log_fd, err, sizeof(err)))
 	{
 		rtt3 = rtt2;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_info(domain, COMMAND_INFO, ssl, &rtt3, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_info(epp_commands, COMMAND_INFO, ssl, &rtt3, log_fd, err, sizeof(err)))
 	{
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
 
 	/* logout command errors should not affect the test results */
-	if (SUCCEED != command_logout(domain, COMMAND_LOGOUT, ssl, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_logout(epp_commands, COMMAND_LOGOUT, ssl, log_fd, err, sizeof(err)))
 		zbx_dns_err(log_fd, err);
 
 	zbx_dns_infof(log_fd, "end EPP test (ip %s):SUCCESS", ip);
@@ -3305,6 +3388,14 @@ out:
 
 		zbx_free(items);
 	}
+
+	zbx_free(epp_commands);
+	zbx_free(epp_certs);
+	zbx_free(epp_user);
+	zbx_free(epp_passwd_salt_b64);
+	zbx_free(epp_passwd_enc_b64);
+	zbx_free(secretkey_salt_b64);
+	zbx_free(secretkey_enc_b64);
 
 	if (NULL != cert)
 		X509_free(cert);

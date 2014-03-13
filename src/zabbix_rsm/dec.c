@@ -45,7 +45,7 @@ int	main(int argc, char *argv[])
 			secretkey_salt_b64, strlen(secretkey_salt_b64), password_enc_b64, strlen(password_enc_b64),
 			password_salt_b64, strlen(password_salt_b64), &password, err, sizeof(err)))
 	{
-		fprintf(stderr, "cannot encrypt password\n");
+		fprintf(stderr, "cannot encrypt password: %s\n", err);
 		goto out;
 	}
 
