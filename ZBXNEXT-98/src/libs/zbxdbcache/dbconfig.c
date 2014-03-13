@@ -4200,7 +4200,11 @@ int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail)
 {
 	int	num;
 
-	if (1 >= max_snmp_succeed)
+	/* The general strategy is to multiply request size by 3/2 in order to approach the limit faster. */
+	/* However, once we are over the limit, we change the strategy to increasing the value by 1. This */
+	/* is deemed better than going backwards from the error because less timeouts are going to occur. */
+
+	if (1 >= max_snmp_succeed || MAX_SNMP_ITEMS + 1 != min_snmp_fail)
 		num = max_snmp_succeed + 1;
 	else
 		num = max_snmp_succeed * 3 / 2;
