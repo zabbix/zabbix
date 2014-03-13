@@ -785,6 +785,7 @@ if ($host || $data['filter_search']) {
 				}
 			}
 
+			// input into rolling week calculation block
 			$services = array();
 
 			// get deleay items
@@ -831,6 +832,10 @@ if ($host || $data['filter_search']) {
 				)
 			));
 
+			// set rolling week time
+			$weekTimeFrom = time() - SEC_PER_WEEK;
+			$weekTimeTill = time();
+
 			// get SLA items
 			foreach ($items as $item) {
 				if ($item['key_'] === CALCULATED_DNS_ROLLWEEK_SLA || $item['key_'] === CALCULATED_RDDS_ROLLWEEK_SLA
@@ -838,7 +843,7 @@ if ($host || $data['filter_search']) {
 					// get last value
 					$itemValue = API::History()->get(array(
 						'itemids' => $item['itemid'],
-						'time_from' => $filterTimeFrom,
+						'time_from' => $weekTimeFrom,
 						'history' => $item['value_type'],
 						'output' => API_OUTPUT_EXTEND,
 						'limit' => 1
@@ -864,7 +869,7 @@ if ($host || $data['filter_search']) {
 					// get last value
 					$itemValue = API::History()->get(array(
 						'itemids' => $item['itemid'],
-						'time_till' => $filterTimeTill,
+						'time_till' => $weekTimeTill,
 						'sortorder' => ZBX_SORT_DOWN,
 						'sortfield' => array('clock'),
 						'history' => $item['value_type'],
@@ -896,30 +901,36 @@ if ($host || $data['filter_search']) {
 
 			foreach ($services as $key => $service) {
 				foreach ($data[$key]['events'] as &$event) {
-					// get failed tests time interval
-					if (!isset($event['endTime'])) {
-						$event['endTime'] = $filterTimeTill;
+					if ($event['false_positive'] || $event['startTime'] > $weekTimeTill) {
+						$incidentPercentDown = 0;
 					}
-					if ($event['startTime'] >= $filterTimeFrom && $event['endTime'] <= $filterTimeTill) {
-						$getFailedFrom = $event['startTime'];
-						$getFailedTill = $event['endTime'];
-					}
-					elseif ($event['startTime'] < $filterTimeFrom && $event['endTime'] <= $filterTimeTill) {
-						$getFailedFrom = $filterTimeFrom;
-						$getFailedTill = $event['endTime'];
-					}
-					elseif ($event['startTime'] >= $filterTimeFrom && $event['endTime'] > $filterTimeTill) {
-						$getFailedFrom = $event['startTime'];
-						$getFailedTill = $filterTimeTill;
-					}
+					else {
+						// if active incident
+						if (!isset($event['endTime'])) {
+							$event['endTime'] = $weekTimeTill;
+						}
 
-					// get failed tests count
-					$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom, $getFailedTill);
+						// get failed tests time interval
+						if ($event['startTime'] >= $weekTimeFrom && $event['endTime'] <= $weekTimeTill) {
+							$getFailedFrom = $event['startTime'];
+							$getFailedTill = $event['endTime'];
+						}
+						elseif ($event['startTime'] < $weekTimeFrom && $event['endTime'] <= $weekTimeTill) {
+							$getFailedFrom = $weekTimeFrom;
+							$getFailedTill = $event['endTime'];
+						}
+						elseif ($event['startTime'] >= $weekTimeFrom && $event['endTime'] > $weekTimeTill) {
+							$getFailedFrom = $event['startTime'];
+							$getFailedTill = $weekTimeTill;
+						}
 
-					// get percent
-					$event['incidentPercentDown'] = sprintf('%.3f',
-						(100 * $failedTests * $service['delay'] / 60) / $service['slaValue']
-					);
+						// get failed tests count
+						$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom, $getFailedTill);
+
+						// get percent
+						$incidentPercentDown = (100 * $failedTests * $service['delay'] / 60) / $service['slaValue'];
+					}
+					$event['incidentPercentDown'] = sprintf('%.3f', $incidentPercentDown);
 				}
 				unset($event);
 			}
