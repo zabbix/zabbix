@@ -676,7 +676,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, OID_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			bulk, status, level, running, ret = SUCCEED;
+	int			bulk, status, level, running, num_vars, ret = SUCCEED;
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
@@ -778,11 +778,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			goto next;
 		}
 
-		if (*max_succeed < max_vars)
-			*max_succeed = max_vars;
-
 		/* process response */
-		for (var = response->variables; NULL != var; var = var->next_variable)
+		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{
 			/* verify if we are in the same subtree */
 			if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
@@ -860,6 +857,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				break;
 			}
 		}
+
+		if (*max_succeed < num_vars)
+			*max_succeed = num_vars;
 next:
 		if (NULL != response)
 			snmp_free_pdu(response);
