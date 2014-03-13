@@ -55,6 +55,7 @@ abstract class CImportFormatter {
 				unset($data[$key]);
 			}
 		}
+
 		return $data;
 	}
 

@@ -376,6 +376,12 @@ else {
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
 }
 
+$hostList->addRow(_('Description'), new CTextArea('description',
+	(getRequest('hostid') > 0 && !hasRequest('form_refresh'))
+		? $this->data['dbHost']['description']
+		: getRequest('description')
+));
+
 // Proxy
 if (!$isDiscovered) {
 	$proxyControl = new CComboBox('proxy_hostid', $proxy_hostid);
