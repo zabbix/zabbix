@@ -39,6 +39,13 @@ class CRegistryFactory {
 	protected $instances = array();
 
 	/**
+	 * @param array $objects	array of defined objects
+	 */
+	public function __construct(array $objects = array()) {
+		$this->objects = $objects;
+	}
+
+	/**
 	 * Creates and returns an instance of the given object.
 	 *
 	 * @param $object

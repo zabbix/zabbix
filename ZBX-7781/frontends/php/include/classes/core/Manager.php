@@ -24,12 +24,6 @@
  */
 class Manager extends CRegistryFactory {
 
-	protected $objects = array(
-		'application' => 'CApplicationManager',
-		'history' => 'CHistoryManager',
-		'httptest' => 'CHttpTestManager'
-	);
-
 	/**
 	 * An instance of the manager factory.
 	 *
@@ -45,7 +39,11 @@ class Manager extends CRegistryFactory {
 	public static function getInstance() {
 		if (!self::$instance) {
 			$class = __CLASS__;
-			self::$instance = new $class();
+			self::$instance = new $class(array(
+				'application' => 'CApplicationManager',
+				'history' => 'CHistoryManager',
+				'httptest' => 'CHttpTestManager'
+			));
 		}
 
 		return self::$instance;

@@ -21,56 +21,53 @@
 
 class CApiServiceFactory extends CRegistryFactory {
 
-	/**
-	 * A map of classes that should handle the corresponding API objects requests.
-	 *
-	 * @var array
-	 */
-	protected $objects = array(
-		// a generic API class
-		'api' => 'CApiService',
+	public function __construct(array $objects = array()) {
+		parent::__construct(array_merge(array(
+			// a generic API class
+			'api' => 'CApiService',
 
-		// specific API classes
-		'action' => 'CAction',
-		'alert' => 'CAlert',
-		'apiinfo' => 'CAPIInfo',
-		'application' => 'CApplication',
-		'configuration' => 'CConfiguration',
-		'dcheck' => 'CDCheck',
-		'dhost' => 'CDHost',
-		'discoveryrule' => 'CDiscoveryRule',
-		'drule' => 'CDRule',
-		'dservice' => 'CDService',
-		'event' => 'CEvent',
-		'graph' => 'CGraph',
-		'graphitem' => 'CGraphItem',
-		'graphprototype' => 'CGraphPrototype',
-		'host' => 'CHost',
-		'hostgroup' => 'CHostGroup',
-		'hostprototype' => 'CHostPrototype',
-		'history' => 'CHistory',
-		'hostinterface' => 'CHostInterface',
-		'image' => 'CImage',
-		'iconmap' => 'CIconMap',
-		'item' => 'CItem',
-		'itemprototype' => 'CItemPrototype',
-		'maintenance' => 'CMaintenance',
-		'map' => 'CMap',
-		'mediatype' => 'CMediatype',
-		'proxy' => 'CProxy',
-		'service' => 'CService',
-		'screen' => 'CScreen',
-		'screenitem' => 'CScreenItem',
-		'script' => 'CScript',
-		'template' => 'CTemplate',
-		'templatescreen' => 'CTemplateScreen',
-		'templatescreenitem' => 'CTemplateScreenItem',
-		'trigger' => 'CTrigger',
-		'triggerprototype' => 'CTriggerPrototype',
-		'user' => 'CUser',
-		'usergroup' => 'CUserGroup',
-		'usermacro' => 'CUserMacro',
-		'usermedia' => 'CUserMedia',
-		'httptest' => 'CHttpTest'
-	);
+			// specific API classes
+			'action' => 'CAction',
+			'alert' => 'CAlert',
+			'apiinfo' => 'CAPIInfo',
+			'application' => 'CApplication',
+			'configuration' => 'CConfiguration',
+			'dcheck' => 'CDCheck',
+			'dhost' => 'CDHost',
+			'discoveryrule' => 'CDiscoveryRule',
+			'drule' => 'CDRule',
+			'dservice' => 'CDService',
+			'event' => 'CEvent',
+			'graph' => 'CGraph',
+			'graphitem' => 'CGraphItem',
+			'graphprototype' => 'CGraphPrototype',
+			'host' => 'CHost',
+			'hostgroup' => 'CHostGroup',
+			'hostprototype' => 'CHostPrototype',
+			'history' => 'CHistory',
+			'hostinterface' => 'CHostInterface',
+			'image' => 'CImage',
+			'iconmap' => 'CIconMap',
+			'item' => 'CItem',
+			'itemprototype' => 'CItemPrototype',
+			'maintenance' => 'CMaintenance',
+			'map' => 'CMap',
+			'mediatype' => 'CMediatype',
+			'proxy' => 'CProxy',
+			'service' => 'CService',
+			'screen' => 'CScreen',
+			'screenitem' => 'CScreenItem',
+			'script' => 'CScript',
+			'template' => 'CTemplate',
+			'templatescreen' => 'CTemplateScreen',
+			'templatescreenitem' => 'CTemplateScreenItem',
+			'trigger' => 'CTrigger',
+			'triggerprototype' => 'CTriggerPrototype',
+			'user' => 'CUser',
+			'usergroup' => 'CUserGroup',
+			'usermacro' => 'CUserMacro',
+			'usermedia' => 'CUserMedia',
+			'httptest' => 'CHttpTest'
+		), $objects));
+	}
 }
