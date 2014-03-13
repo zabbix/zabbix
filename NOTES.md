@@ -1,4 +1,4 @@
-## Zabbix usage insights notes
+## Zabbix DB usage insights notes
 
 ### Auditlog info
 
@@ -95,4 +95,25 @@ SELECT COUNT(itemid) as count, state, key_
  WHERE state=1 AND status!=1
  GROUP BY key_
  ORDER BY count DESC;
+```
+
+
+## Zabbix UI apache access log insights
+
+### Number of accesses grouped by client type and IP
+
+```sh
+grep "13\/Mar\/2014" /var/log/apache2/access.log \
+| awk -F[\ \"] '{for(i=17;i<=NF;++i) printf "%s ", $i; printf "%s\n", $1; }' \
+| sort | uniq -c | sort -n | less
+```
+
+
+### Access counts by hour:minute
+
+```sh
+grep "13\/Mar\/2014" /var/log/apache2/access.log \
+| grep -v "jsrpc.php" \
+| awk -F: '{print $2$3}' \
+| sort | uniq -c | less
 ```
