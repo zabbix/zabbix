@@ -38,6 +38,10 @@ static int		log_level = LOG_LEVEL_WARNING;
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
+#define ZBX_CHECK_LOG_LEVEL(level)	\
+		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
+
+
 #if !defined(_WINDOWS)
 void	redirect_std(const char *filename)
 {
@@ -192,6 +196,21 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
 	zbx_free(s);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zabbix_check_log_level                                           *
+ *                                                                            *
+ * Purpose: checks if the the specified log level must be logged              *
+ *                                                                            *
+ * Return value: SUCCEED - the log level must be logged                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int zabbix_check_log_level(int level)
+{
+	return ZBX_CHECK_LOG_LEVEL(level);
+}
+
 void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE			*log_file = NULL;
@@ -209,7 +228,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	struct timeval		current_time;
 #endif
 
-	if (LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (LOG_TYPE_FILE == log_type)

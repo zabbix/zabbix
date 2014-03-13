@@ -1934,6 +1934,65 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 	zbx_free(sql);
 }
 
+#ifdef HAVE_ORACLE
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_format_values                                             *
+ *                                                                            *
+ * Purpose: format bulk operation (insert, update) value list                 *
+ *                                                                            *
+ * Parameters: fields  - [IN] the field list                                  *
+ *             values  - [IN] the corresponding value list                    *
+ *             num     - [IN] the number of values to format                  *
+ *                                                                            *
+ * Return value: the formatted value list <value1>,<value2>...                *
+ *                                                                            *
+ * Comments: The returned string is allocated by this function and must be    *
+ *           freed by the caller later.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **values, int num)
+{
+	int	i;
+	char	*str = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+
+	for (i = 0; i < num; i++)
+	{
+		ZBX_FIELD		*field = fields[i];
+		const zbx_db_value_t	*value = values[i];
+
+		if (0 < i)
+			zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ',');
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_CHAR:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", value->str);
+				break;
+			case ZBX_TYPE_FLOAT:
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_DBL, value->dbl);
+				break;
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_UINT:
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64, value->ui64);
+				break;
+			case ZBX_TYPE_INT:
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%d", value->i32);
+				break;
+			default:
+				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "(unknown type)");
+				break;
+		}
+	}
+
+	return str;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_insert_prepare_dyn                                        *
@@ -2134,13 +2193,23 @@ int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **v
 	char		*value_esc;
 #endif
 
-	if (0 == self->fields.values_num || values_num != self->fields.values_num)
+	if (values_num != self->fields.values_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
 #ifdef HAVE_ORACLE
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char	*str;
+
+		str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, values_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+		zbx_free(str);
+	}
+
 	for (i = 0; i < self->fields.values_num; i++)
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
@@ -2157,6 +2226,12 @@ int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **v
 			default:
 				DBbind_parameter(i + 1, (void *)value, field->type);
 				break;
+		}
+
+		if (0 != zbx_db_txn_error())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to bind field: %s", field->name);
+			break;
 		}
 	}
 
