@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templates, hosts and proxies (Eduard, Sasha)
 ..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavel)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
@@ -32,6 +33,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-4998] fixed inconsistency of logging on Linux and Windows agents, and fixed information level logging at debug level 0 (igors)
 ....I..... [ZBX-6235] fixed unnecessary compilation of C code when only --enable-java is passed to ./configure (asaveljevs)
 ...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
@@ -65,6 +67,11 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7832] fixed screen item row- and colspans not being adjusted when reducing the size of a screen (Pavels)
+........S. [ZBX-7620] improved error messaging and debug logging for VMware items (wiper)
+........S. [ZBX-7897] fixed memory leak in trapper for log file items (Juris)
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
+........S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 ..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed graph and graph prototype update validation allowing to pass only 'gitemid' parameter without 'itemid' (Ivo)
 ........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
@@ -912,6 +919,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
+..F.....S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
 ........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
 ........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)

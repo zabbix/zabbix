@@ -114,8 +114,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	}
 
 #ifdef _WINDOWS
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd listener stopped");
-
 	ZBX_DO_EXIT();
 
 	zbx_thread_exit(0);
