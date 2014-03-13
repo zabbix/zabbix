@@ -108,10 +108,10 @@ class CProfile {
 	}
 
 	/**
-	 * Removes profile values from DB and profiles cache
+	 * Removes profile values from DB and profiles cache.
 	 *
-	 * @param string $idx	first identifier
-	 * @param mixed  $idx2	second identifier, which can be list of identifiers as well
+	 * @param string 		$idx	first identifier
+	 * @param int|array  	$idx2	second identifier, which can be list of identifiers as well
 	 */
 	public static function delete($idx, $idx2 = 0) {
 		if (is_null(self::$profiles)) {
@@ -122,18 +122,28 @@ class CProfile {
 			return;
 		}
 
-		if (!is_array($idx2)) {
-			$idx2 = array($idx2);
+		// pick existing Idx2
+		$deleteIdx2 = array();
+		foreach ((array) $idx2 as $checkIdx2) {
+			if (isset(self::$profiles[$idx][$checkIdx2])) {
+				$deleteIdx2[] = $checkIdx2;
+			}
+		}
+
+		if (!$deleteIdx2) {
+			return;
 		}
 
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
+		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $deleteIdx2));
 
 		// remove from cache
-		if (!is_null(self::$profiles)) {
-			foreach ($idx2 as $v) {
-				unset(self::$profiles[$idx][$v]);
-			}
+		foreach ($deleteIdx2 as $v) {
+			unset(self::$profiles[$idx][$v]);
+		}
+
+		if (!self::$profiles[$idx]) {
+			unset(self::$profiles[$idx]);
 		}
 	}
 
