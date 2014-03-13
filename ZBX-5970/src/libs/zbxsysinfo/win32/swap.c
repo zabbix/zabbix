@@ -66,7 +66,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		if (strcmp(mode, "total") == 0)
 		{
-			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
+			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys);
 			return SYSINFO_RET_OK;
 		}
 		else if (strcmp(mode, "free") == 0)
@@ -85,7 +85,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		if (strcmp(mode,"total") == 0)
 		{
-			SET_UI64_RESULT(result, ms.dwTotalPageFile);
+			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwTotalPhys);
 			return SYSINFO_RET_OK;
 		}
 		else if (strcmp(mode,"free") == 0)
