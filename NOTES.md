@@ -108,6 +108,15 @@ grep "13\/Mar\/2014" /var/log/apache2/access.log \
 | sort | uniq -c | sort -n | less
 ```
 
+### Number of accesses grouped by client type, IP, and hostname resolution
+
+```sh
+grep "13\/Mar\/2014" /var/log/apache2/access.log \
+| awk -F[\ \"] '{for(i=17;i<=NF;++i) printf "%s ", $i; printf " %s\n", $1;}' \
+| sort | uniq -c | sort -n \
+| awk '{d="dig -x " $(NF) " +short"; d |& getline z; printf "%s %s\n", $0, z;}' \
+| less
+```
 
 ### Access counts by hour:minute
 
