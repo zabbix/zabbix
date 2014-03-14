@@ -497,11 +497,7 @@ out:
  ******************************************************************************/
 static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
 {
-	if ((*update1)->sourceid < (*update2)->sourceid)
-		return -1;
-
-	if ((*update1)->sourceid > (*update2)->sourceid)
-		return 1;
+	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
 
 	return 0;
 }

@@ -238,6 +238,11 @@ return array(
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			),
+			'description' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			),
 		),
 	),
 	'groups' => array(

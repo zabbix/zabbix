@@ -37,13 +37,15 @@
 /* DBget_item_value() */
 #define ZBX_REQUEST_HOST_HOST		101
 #define ZBX_REQUEST_HOST_NAME		102
-#define ZBX_REQUEST_ITEM_ID		103
-#define ZBX_REQUEST_ITEM_NAME		104
-#define ZBX_REQUEST_ITEM_NAME_ORIG	105
-#define ZBX_REQUEST_ITEM_KEY		106
-#define ZBX_REQUEST_ITEM_KEY_ORIG	107
-#define ZBX_REQUEST_ITEM_DESCRIPTION	108
-#define ZBX_REQUEST_PROXY_NAME		109
+#define ZBX_REQUEST_HOST_DESCRIPTION	103
+#define ZBX_REQUEST_ITEM_ID		104
+#define ZBX_REQUEST_ITEM_NAME		105
+#define ZBX_REQUEST_ITEM_NAME_ORIG	106
+#define ZBX_REQUEST_ITEM_KEY		107
+#define ZBX_REQUEST_ITEM_KEY_ORIG	108
+#define ZBX_REQUEST_ITEM_DESCRIPTION	109
+#define ZBX_REQUEST_PROXY_NAME		110
+#define ZBX_REQUEST_PROXY_DESCRIPTION	111
 
 /* DBget_history_log_value() */
 #define ZBX_REQUEST_ITEM_LOG_DATE	201
@@ -642,31 +644,25 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_host_name_by_hostid                                        *
+ * Function: DBget_host_value                                                 *
  *                                                                            *
  * Purpose: request host name by hostid                                       *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
+static int	DBget_host_value(zbx_uint64_t hostid, char **replace_to, const char *field_name)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
 
 	result = DBselect(
-			"select host"
+			"select %s"
 			" from hosts"
 			" where hostid=" ZBX_FS_UI64,
-			hostid);
+			field_name, hostid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -1013,8 +1009,8 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select h.hostid,h.proxy_hostid,h.host,h.name,i.itemid,i.name,i.key_,i.description"
-				",ii.ip,ii.dns,ii.useip,ii.type,ii.main"
+			"select h.hostid,h.proxy_hostid,h.host,h.name,h.description,i.itemid,i.name,i.key_,"
+				"i.description,ii.ip,ii.dns,ii.useip,ii.type,ii.main"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 				" left join interface ii on ii.interfaceid=i.interfaceid"
@@ -1032,6 +1028,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
+			case ZBX_REQUEST_HOST_DESCRIPTION:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				ret = SUCCEED;
+				break;
 			case ZBX_REQUEST_HOST_IP:
 			case ZBX_REQUEST_HOST_DNS:
 			case ZBX_REQUEST_HOST_CONN:
@@ -1040,7 +1040,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = DBget_interface_value(hostid, replace_to, request, 0);
 				break;
 			case ZBX_REQUEST_ITEM_ID:
-				*replace_to = zbx_strdup(*replace_to, row[4]);
+				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
@@ -1050,22 +1050,22 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				strscpy(dc_item.host.host, row[2]);
 				strscpy(dc_item.host.name, row[3]);
 
-				if (SUCCEED != DBis_null(row[11]))	/* interface type */
+				if (SUCCEED != DBis_null(row[12]))	/* interface type */
 				{
-					dc_item.interface.type = (unsigned char)atoi(row[11]);
-					dc_item.interface.addr = ('1' == *row[10] ? dc_item.interface.ip_orig :
+					dc_item.interface.type = (unsigned char)atoi(row[12]);
+					dc_item.interface.addr = ('1' == *row[11] ? dc_item.interface.ip_orig :
 							dc_item.interface.dns_orig);
 
-					if ('1' != *row[12] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
+					if ('1' != *row[13] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
 					{
-						addr = zbx_strdup(addr, row[8]);	/* ip */
+						addr = zbx_strdup(addr, row[9]);	/* ip */
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item.host,
 								NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
 								0);
 						strscpy(dc_item.interface.ip_orig, addr);
 						zbx_free(addr);
 
-						addr = zbx_strdup(addr, row[9]);	/* dns */
+						addr = zbx_strdup(addr, row[10]);	/* dns */
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item.host,
 								NULL, &addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL,
 								0);
@@ -1074,19 +1074,19 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					}
 					else
 					{
-						strscpy(dc_item.interface.ip_orig, row[8]);
-						strscpy(dc_item.interface.dns_orig, row[9]);
+						strscpy(dc_item.interface.ip_orig, row[9]);
+						strscpy(dc_item.interface.dns_orig, row[10]);
 					}
 				}
 				else
 					dc_item.interface.type = INTERFACE_TYPE_UNKNOWN;
 
-				key = zbx_strdup(key, row[6]);
+				key = zbx_strdup(key, row[7]);
 				substitute_key_macros(&key, NULL, &dc_item, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
-					*replace_to = zbx_strdup(*replace_to, row[5]);
+					*replace_to = zbx_strdup(*replace_to, row[6]);
 					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
@@ -1098,15 +1098,15 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[5]);
-				ret = SUCCEED;
-				break;
-			case ZBX_REQUEST_ITEM_KEY_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[6]);
 				ret = SUCCEED;
 				break;
-			case ZBX_REQUEST_ITEM_DESCRIPTION:
+			case ZBX_REQUEST_ITEM_KEY_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[7]);
+				ret = SUCCEED;
+				break;
+			case ZBX_REQUEST_ITEM_DESCRIPTION:
+				*replace_to = zbx_strdup(*replace_to, row[8]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
@@ -1118,7 +1118,18 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					ret = SUCCEED;
 				}
 				else
-					ret = DBget_host_name_by_hostid(proxy_hostid, replace_to);
+					ret = DBget_host_value(proxy_hostid, replace_to, "host");
+				break;
+			case ZBX_REQUEST_PROXY_DESCRIPTION:
+				ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+
+				if (0 == proxy_hostid)
+				{
+					*replace_to = zbx_strdup(*replace_to, "");
+					ret = SUCCEED;
+				}
+				else
+					ret = DBget_host_value(proxy_hostid, replace_to, "description");
 				break;
 		}
 	}
@@ -1875,6 +1886,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
+#define MVAR_PROXY_DESCRIPTION		"{PROXY.DESCRIPTION}"
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_HOST_HOST			"{HOST.HOST}"
@@ -1883,6 +1895,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_HOST_METADATA		"{HOST.METADATA}"
 #define MVAR_HOST_NAME			"{HOST.NAME}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
+#define MVAR_HOST_DESCRIPTION		"{HOST.DESCRIPTION}"
 #define MVAR_HOST_PORT			"{HOST.PORT}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
@@ -2059,7 +2072,7 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
 	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
+	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
 	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
@@ -2589,6 +2602,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_NAME);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_DESCRIPTION))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_DESCRIPTION);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -2711,6 +2729,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_PROXY_NAME);
 				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_PROXY_DESCRIPTION);
+				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
@@ -2828,6 +2851,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_NAME);
 				}
+				else if (0 == strcmp(m, MVAR_HOST_DESCRIPTION))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_HOST_DESCRIPTION);
+				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -2898,6 +2926,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_PROXY_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_PROXY_DESCRIPTION);
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
@@ -3055,7 +3088,27 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 						if (0 == proxy_hostid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_name_by_hostid(proxy_hostid, &replace_to);
+							ret = DBget_host_value(proxy_hostid, &replace_to, "host");
+					}
+				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
+							"r.proxy_hostid")))
+					{
+						zbx_uint64_t	proxy_hostid;
+
+						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+
+						if (0 == proxy_hostid)
+						{
+							replace_to = zbx_strdup(replace_to, "");
+						}
+						else
+						{
+							ret = DBget_host_value(proxy_hostid, &replace_to,
+									"description");
+						}
 					}
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
@@ -3113,7 +3166,27 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 						if (0 == proxy_hostid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_name_by_hostid(proxy_hostid, &replace_to);
+							ret = DBget_host_value(proxy_hostid, &replace_to, "host");
+					}
+				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					if (SUCCEED == (ret = get_autoreg_value_by_event(c_event, &replace_to,
+							"proxy_hostid")))
+					{
+						zbx_uint64_t	proxy_hostid;
+
+						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+
+						if (0 == proxy_hostid)
+						{
+							replace_to = zbx_strdup(replace_to, "");
+						}
+						else
+						{
+							ret = DBget_host_value(proxy_hostid, &replace_to,
+									"description");
+						}
 					}
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
@@ -3151,6 +3224,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_DESCRIPTION))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_HOST_DESCRIPTION);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
@@ -3216,6 +3294,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
 				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_PROXY_DESCRIPTION);
+				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
@@ -3251,6 +3334,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_DESCRIPTION))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_HOST_DESCRIPTION);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
@@ -3315,6 +3403,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_PROXY_DESCRIPTION);
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
@@ -3919,7 +4012,6 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 {

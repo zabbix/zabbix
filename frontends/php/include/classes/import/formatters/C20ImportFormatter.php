@@ -28,6 +28,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!isset($this->data['groups'])) {
 			return array();
 		}
+
 		return array_values($this->data['groups']);
 	}
 
@@ -39,23 +40,25 @@ class C20ImportFormatter extends CImportFormatter {
 				$template = $this->renameData($template, array('template' => 'host'));
 
 				CArrayHelper::convertFieldToArray($template, 'templates');
+
 				if (empty($template['templates'])) {
 					unset($template['templates']);
 				}
+
 				CArrayHelper::convertFieldToArray($template, 'macros');
 				CArrayHelper::convertFieldToArray($template, 'groups');
-
 				CArrayHelper::convertFieldToArray($template, 'screens');
+
 				if (!empty($template['screens'])) {
 					foreach ($template['screens'] as &$screen) {
 						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
 					}
+
 					unset($screen);
 				}
 
-
 				$templatesData[] = CArrayHelper::getByKeys($template, array(
-					'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'
+					'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name', 'description'
 				));
 			}
 		}
@@ -71,6 +74,7 @@ class C20ImportFormatter extends CImportFormatter {
 				$host = $this->renameData($host, array('proxyid' => 'proxy_hostid'));
 
 				CArrayHelper::convertFieldToArray($host, 'interfaces');
+
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
@@ -78,9 +82,11 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 
 				CArrayHelper::convertFieldToArray($host, 'templates');
+
 				if (empty($host['templates'])) {
 					unset($host['templates']);
 				}
+
 				CArrayHelper::convertFieldToArray($host, 'macros');
 				CArrayHelper::convertFieldToArray($host, 'groups');
 
@@ -93,7 +99,7 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 
 				$hostsData[] = CArrayHelper::getByKeys($host, array(
-					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status', 'description',
 					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
 				));
 			}
@@ -114,6 +120,7 @@ class C20ImportFormatter extends CImportFormatter {
 				}
 			}
 		}
+
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['applications'])) {
@@ -140,6 +147,7 @@ class C20ImportFormatter extends CImportFormatter {
 						}
 
 						$item = $this->formatItem($item);
+
 						$itemsData[$host['host']][$item['key_']] = $item;
 					}
 				}
@@ -150,6 +158,7 @@ class C20ImportFormatter extends CImportFormatter {
 				if (!empty($template['items'])) {
 					foreach ($template['items'] as $item) {
 						$item = $this->formatItem($item);
+
 						$itemsData[$template['template']][$item['key_']] = $item;
 					}
 				}
@@ -218,8 +227,8 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['triggers'])) {
 			foreach ($this->data['triggers'] as $trigger) {
 				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
-				$triggersData[] = $this->renameTriggerFields($trigger);
 
+				$triggersData[] = $this->renameTriggerFields($trigger);
 			}
 		}
 
@@ -244,12 +253,14 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['maps'])) {
 			foreach ($this->data['maps'] as $map) {
 				CArrayHelper::convertFieldToArray($map, 'selements');
+
 				foreach ($map['selements'] as &$selement) {
 					CArrayHelper::convertFieldToArray($selement, 'urls');
 				}
 				unset($selement);
 
 				CArrayHelper::convertFieldToArray($map, 'links');
+
 				foreach ($map['links'] as &$link) {
 					CArrayHelper::convertFieldToArray($link, 'linktriggers');
 				}
@@ -270,7 +281,9 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['screens'])) {
 			foreach ($this->data['screens'] as $screen) {
 				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+
 				CArrayHelper::convertFieldToArray($screen, 'screenitems');
+
 				$screensData[] = $screen;
 			}
 		}
@@ -286,7 +299,9 @@ class C20ImportFormatter extends CImportFormatter {
 				if (!empty($template['screens'])) {
 					foreach ($template['screens'] as $screen) {
 						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+
 						CArrayHelper::convertFieldToArray($screen, 'screenitems');
+
 						$screensData[$template['template']][$screen['name']] = $screen;
 					}
 				}
@@ -326,6 +341,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($discoveryRule['item_prototypes'])) {
 			foreach ($discoveryRule['item_prototypes'] as &$prototype) {
 				$prototype = $this->renameItemFields($prototype);
+
 				CArrayHelper::convertFieldToArray($prototype, 'applications');
 			}
 			unset($prototype);
@@ -416,6 +432,7 @@ class C20ImportFormatter extends CImportFormatter {
 	 */
 	protected function renameTriggerFields(array $trigger) {
 		$trigger = $this->renameData($trigger, array('description' => 'comments'));
+
 		return $this->renameData($trigger, array('name' => 'description', 'severity' => 'priority'));
 	}
 
