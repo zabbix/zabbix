@@ -73,25 +73,36 @@ class CApiWrapper {
 	/**
 	 * A magic method for calling the public methods of the API client.
 	 *
-	 * @param string 	$method
-	 * @param array 	$params
+	 * @param string 	$method		API method name
+	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
 	public function __call($method, array $params) {
-		return $this->callClientMethod($method, reset($params), $this->auth);
+		return $this->callMethod($method, reset($params));
+	}
+
+	/**
+	 * Pre-process and call the client method.
+	 *
+	 * @param string 	$method		API method name
+	 * @param array 	$params		API method parameters
+	 *
+	 * @return CApiClientResponse
+	 */
+	protected function callMethod($method, array $params) {
+		return $this->callClientMethod($method, $params);
 	}
 
 	/**
 	 * Call the client method and return the result.
 	 *
-	 * @param string 	$method
-	 * @param array 	$params
-	 * @param string	$auth
+	 * @param string 	$method		API method name
+	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callClientMethod($method, array $params, $auth) {
-		return $this->client->callMethod($this->api, $method, $params, $auth);
+	protected function callClientMethod($method, array $params) {
+		return $this->client->callMethod($this->api, $method, $params, $this->auth);
 	}
 }
