@@ -70,7 +70,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	public function testCallIncorrect($api, $method, array $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
 		// setup a mock user API to authenticate the user
 		$userMock = $this->getMock('CUser', array('checkAuthentication'));
-		$userMock->method('checkAuthentication')->will($this->returnValue(array(
+		$userMock->expects($this->any())->method('checkAuthentication')->will($this->returnValue(array(
 			'debug_mode' => false
 		)));
 
@@ -83,7 +83,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 		)));
 
 		$response = $this->client->callMethod($api, $method, $params, $auth);
-		$this->assertInstanceOf('CApiClientResponse', $response);
+		$this->assertTrue($response instanceof CApiClientResponse);
 		$this->assertEquals($expectedErrorCode, $response->errorCode);
 		$this->assertEquals($expectedErrorMessage, $response->errorMessage);
 		$this->assertNull($response->data);
