@@ -37,6 +37,11 @@
 #define	ZBX_POLLER_TYPE_JAVA		4
 #define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
 
+#define MAX_JAVA_ITEMS		32
+#define MAX_SNMP_ITEMS		128
+#define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
+#define MAX_PINGER_ITEMS	128
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
@@ -59,6 +64,7 @@ extern int	CONFIG_PROXYDATA_FREQUENCY;
 
 typedef struct
 {
+	zbx_uint64_t	interfaceid;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
@@ -289,9 +295,12 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
 		int process_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
+void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
+int	DCconfig_get_interface_snmp_stats(zbx_uint64_t interfaceid, int *max_snmp_succeed, int *min_snmp_fail);
+int	DCconfig_get_suggested_snmp_vars(int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
