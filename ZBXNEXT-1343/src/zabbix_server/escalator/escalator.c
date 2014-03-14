@@ -613,17 +613,11 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 			{
 				case EVENT_OBJECT_DHOST:
 					zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" and ds.dhostid=" ZBX_FS_UI64
-							ZBX_SQL_NODE,
-							event->objectid,
-							DBand_node_local("h.hostid"));
+							" and ds.dhostid=" ZBX_FS_UI64, event->objectid);
 					break;
 				case EVENT_OBJECT_DSERVICE:
 					zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" and ds.dserviceid=" ZBX_FS_UI64
-							ZBX_SQL_NODE,
-							event->objectid,
-							DBand_node_local("h.hostid"));
+							" and ds.dserviceid=" ZBX_FS_UI64, event->objectid);
 					break;
 			}
 			break;
@@ -634,10 +628,8 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 						" and a.host=h.host"
 						" and h.status=%d"
 						" and h.flags<>%d"
-						" and a.autoreg_hostid=" ZBX_FS_UI64
-						ZBX_SQL_NODE,
-					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid,
-					DBand_node_local("h.hostid"));
+						" and a.autoreg_hostid=" ZBX_FS_UI64,
+					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
@@ -1586,9 +1578,7 @@ static int	process_escalations(int now, int *nextcheck)
 	result = DBselect(
 			"select escalationid,actionid,triggerid,eventid,r_eventid,nextcheck,esc_step,status,itemid"
 			" from escalations"
-			ZBX_SQL_NODE
-			" order by actionid,triggerid,itemid,escalationid",
-			DBwhere_node_local("escalationid"));
+			" order by actionid,triggerid,itemid,escalationid");
 
 	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
 	memset(&escalation, 0, sizeof(escalation));
