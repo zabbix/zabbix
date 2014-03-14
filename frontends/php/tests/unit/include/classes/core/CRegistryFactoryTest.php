@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once __DIR__.'/../../../../../include/classes/core/CRegistryFactory.php';
 
 class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
 
@@ -29,7 +28,10 @@ class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->factory = new CRegistryFactory(array(
-			'date' => 'DateTime'
+			'string' => 'DateTime',
+			'closure' => function() {
+				return new DateTime();
+			}
 		));
 	}
 
@@ -37,13 +39,14 @@ class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
 	 * Test that the factory creates the right objects.
 	 */
 	public function testObjectCreate() {
-		$this->assertEquals(get_class($this->factory->getObject('date')), 'DateTime');
+		$this->assertEquals(get_class($this->factory->getObject('string')), 'DateTime');
+		$this->assertEquals(get_class($this->factory->getObject('closure')), 'DateTime');
 	}
 
 	/**
 	 * Test that the factory creates the object only once and returns the same object after that.
 	 */
 	public function testObjectSame() {
-		$this->assertTrue($this->factory->getObject('date') === $this->factory->getObject('date'));
+		$this->assertTrue($this->factory->getObject('string') === $this->factory->getObject('string'));
 	}
 }
