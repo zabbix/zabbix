@@ -2645,19 +2645,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 	}
 }
 
-const char	*zbx_nodetype_string(unsigned char nodetype)
-{
-	switch (nodetype)
-	{
-		case ZBX_NODE_MASTER:
-			return "master";
-		case ZBX_NODE_SLAVE:
-			return "slave";
-		default:
-			return "unknown";
-	}
-}
-
 const char	*zbx_alert_type_string(unsigned char type)
 {
 	switch (type)

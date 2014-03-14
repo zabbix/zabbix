@@ -770,7 +770,7 @@ static int	DBpatch_2010080(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id = 1, applicationid, templateid, application_templateid;
+	zbx_uint64_t	applicationid, templateid, application_templateid = 1;
 	int		ret = FAIL;
 
 	result = DBselect("select applicationid,templateid from applications where templateid is not null");
@@ -779,13 +779,12 @@ static int	DBpatch_2010080(void)
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
 		ZBX_STR2UINT64(templateid, row[1]);
-		application_templateid = get_nodeid_by_id(applicationid) * ZBX_DM_MAX_HISTORY_IDS + id++;
 
 		if (ZBX_DB_OK > DBexecute(
 				"insert into application_template"
 					" (application_templateid,applicationid,templateid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				application_templateid, applicationid, templateid))
+				application_templateid++, applicationid, templateid))
 		{
 			goto out;
 		}
