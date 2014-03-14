@@ -1951,7 +1951,7 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
  *           freed by the caller later.                                       *
  *                                                                            *
  ******************************************************************************/
-static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **values, int values_num)
+static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *values, int values_num)
 {
 	int	i;
 	char	*str = NULL;
@@ -1960,7 +1960,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **val
 	for (i = 0; i < values_num; i++)
 	{
 		ZBX_FIELD		*field = fields[i];
-		const zbx_db_value_t	*value = values[i];
+		const zbx_db_value_t	*value = &values[i];
 
 		if (0 < i)
 			zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ',');
@@ -1995,6 +1995,54 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **val
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_insert_clean                                              *
+ *                                                                            *
+ * Purpose: releases resources allocated by bulk insert operations            *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clean(zbx_db_insert_t *self)
+{
+	int		i, j;
+
+#ifndef HAVE_ORACLE
+	zbx_free(self->sql_command);
+	zbx_free(self->sql);
+
+#	ifdef HAVE_MYSQL
+	zbx_free(self->sql_values);
+#	endif
+#endif
+
+	for (i = 0; i < self->rows.values_num; i++)
+	{
+		zbx_db_value_t	*row = (zbx_db_value_t *)self->rows.values[i];
+
+		for (j = 0; j < self->fields.values_num; j++)
+		{
+			ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[j];
+
+			switch (field->type)
+			{
+				case ZBX_TYPE_BLOB:
+				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
+				case ZBX_TYPE_LONGTEXT:
+					zbx_free(row[i].str);
+			}
+		}
+
+		zbx_free(row);
+	}
+
+	zbx_vector_ptr_destroy(&self->rows);
+
+	zbx_vector_ptr_destroy(&self->fields);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_db_insert_prepare_dyn                                        *
  *                                                                            *
  * Purpose: prepare for database bulk insert operation                        *
@@ -2018,6 +2066,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **val
  *             zbx_db_insert_add(&ins, (zbx_uint64_t)2, 2.0);                 *
  *               ...                                                          *
  *             zbx_db_insert_execute(&ins);                                   *
+ *             zbx_db_insert_clean(&ins);                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num)
@@ -2048,6 +2097,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 #	endif
 #endif
 	zbx_vector_ptr_create(&self->fields);
+	zbx_vector_ptr_create(&self->rows);
 
 	/* find the table and fields in database schema */
 
@@ -2176,22 +2226,14 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *             values      - [IN] the values to insert                        *
  *             fields_num  - [IN] the number of items in values array         *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
- *                                                                            *
  * Comments: The values must be listed in the same order as the field names   *
  *           for insert preparation functions.                                *
- *           Note that for Oracle databases or if the accumulated insert data *
- *           exceeded limits this function will do the actual inserting into  *
- *           database.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
 {
-	int		i, ret = FAIL;
-#ifndef HAVE_ORACLE
-	char		*value_esc;
-#endif
+	int		i;
+	zbx_db_value_t	*row;
 
 	if (values_num != self->fields.values_num)
 	{
@@ -2199,105 +2241,32 @@ int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **v
 		exit(EXIT_FAILURE);
 	}
 
+	row = zbx_malloc(NULL, self->fields.values_num * sizeof(zbx_db_value_t));
+
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		ZBX_FIELD		*field = self->fields.values[i];
+		const zbx_db_value_t	*value = values[i];
+
+		switch (field->type)
+		{
+			case ZBX_TYPE_CHAR:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		char	*str;
-
-		str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, values_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
-		zbx_free(str);
-	}
-
-	for (i = 0; i < self->fields.values_num; i++)
-	{
-		ZBX_FIELD		*field = self->fields.values[i];
-		const zbx_db_value_t	*value = values[i];
-
-		switch (field->type)
-		{
-			case ZBX_TYPE_CHAR:
-			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
-				DBbind_parameter(i + 1, (void *)value->str, field->type);
-				break;
-			default:
-				DBbind_parameter(i + 1, (void *)value, field->type);
-				break;
-		}
-
-		if (0 != zbx_db_txn_error())
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to bind field: %s", field->name);
-			break;
-		}
-	}
-
-	ret = ZBX_DB_OK < DBstatement_execute() ? SUCCEED : FAIL;
+				row[i].str = zbx_strdup(NULL, value->str);
 #else
-
-#	ifdef HAVE_MULTIROW_INSERT
-	if (16 > self->sql_offset)
-		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
-#	else
-	zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
-#	endif
-
-	zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '(');
-
-	for (i = 0; i < self->fields.values_num; i++)
-	{
-		const zbx_db_value_t	*value = values[i];
-		ZBX_FIELD		*field = self->fields.values[i];
-
-		if (0 != i)
-			zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ',');
-
-		switch (field->type)
-		{
-			case ZBX_TYPE_CHAR:
-			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
-				value_esc = DBdyn_escape_string(value->str);
-				zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
-				zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, value_esc);
-				zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
-				zbx_free(value_esc);
-				break;
-			case ZBX_TYPE_INT:
-				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%d", value->i32);
-				break;
-			case ZBX_TYPE_FLOAT:
-				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_DBL,
-						value->dbl);
-				break;
-			case ZBX_TYPE_UINT:
-				zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_UI64,
-						value->ui64);
-				break;
-			case ZBX_TYPE_ID:
-				zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset,
-						DBsql_id_ins(value->ui64));
+				row[i].str = DBdyn_escape_string(value->str);
+#endif
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				row[i] = *value;
+				break;
 		}
 	}
 
-#	ifdef HAVE_MYSQL
-	if (NULL != self->sql_values)
-		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_values);
-#	endif
-
-	zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ")" ZBX_ROW_DL);
-
-	ret = DBexecute_overflowed_sql(&self->sql, &self->sql_alloc, &self->sql_offset);
-#endif
-	return ret;
+	zbx_vector_ptr_append(&self->rows, row);
 }
 /******************************************************************************
  *                                                                            *
@@ -2316,11 +2285,11 @@ int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **v
  *           corresponding field types.                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 {
 	zbx_vector_ptr_t	values;
 	va_list			args;
-	int			ret, i;
+	int			i;
 	ZBX_FIELD		*field;
 	zbx_db_value_t		*value;
 
@@ -2362,12 +2331,10 @@ int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	ret = zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clean(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -2384,12 +2351,118 @@ int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
  ******************************************************************************/
 int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
-	int	ret = SUCCEED;
+	int	ret = FAIL, i, j;
 
-#ifndef HAVE_ORACLE
-	if (16 > self->sql_offset)
-		goto out;
+#ifdef HAVE_ORACLE
 
+	for (i = 0; i < self->rows.values_num; i++)
+	{
+		zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			char	*str;
+
+			str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, self->fields.values_num);
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+			zbx_free(str);
+		}
+
+		for (j = 0; j < self->fields.values_num; j++)
+		{
+			ZBX_FIELD		*field = self->fields.values[j];
+			const zbx_db_value_t	*value = &values[j];
+
+			switch (field->type)
+			{
+				case ZBX_TYPE_CHAR:
+				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
+				case ZBX_TYPE_LONGTEXT:
+					DBbind_parameter(j + 1, (void *)value->str, field->type);
+					break;
+				default:
+					DBbind_parameter(j + 1, (void *)value, field->type);
+					break;
+			}
+
+			if (0 != zbx_db_txn_error())
+			{
+				zabbix_log(LOG_LEVEL_ERR, "failed to bind field: %s", field->name);
+				goto out;
+			}
+		}
+		if (ZBX_DB_OK > DBstatement_execute())
+			goto out;
+
+	}
+	ret = SUCCEED;
+
+#else
+	for (i = 0; i < self->rows.values_num; i++)
+	{
+		zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+
+#	ifdef HAVE_MULTIROW_INSERT
+		if (16 > self->sql_offset)
+			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+#	else
+		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+#	endif
+
+		zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '(');
+
+		for (j = 0; j < self->fields.values_num; j++)
+		{
+			ZBX_FIELD		*field = self->fields.values[j];
+			const zbx_db_value_t	*value = &values[j];
+
+			if (0 != j)
+				zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ',');
+
+			switch (field->type)
+			{
+				case ZBX_TYPE_CHAR:
+				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
+				case ZBX_TYPE_LONGTEXT:
+					zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
+					zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, value->str);
+					zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
+					break;
+				case ZBX_TYPE_INT:
+					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%d", value->i32);
+					break;
+				case ZBX_TYPE_FLOAT:
+					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_DBL,
+							value->dbl);
+					break;
+				case ZBX_TYPE_UINT:
+					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_UI64,
+							value->ui64);
+					break;
+				case ZBX_TYPE_ID:
+					zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset,
+							DBsql_id_ins(value->ui64));
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					exit(EXIT_FAILURE);
+			}
+		}
+#	ifdef HAVE_MYSQL
+		if (NULL != self->sql_values)
+			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_values);
+#	endif
+
+		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ")" ZBX_ROW_DL);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&self->sql, &self->sql_alloc, &self->sql_offset)))
+			goto out;
+	}
+
+	if (16 < self->sql_offset)
+	{
 #	ifdef HAVE_MULTIROW_INSERT
 		if (',' == self->sql[self->sql_offset - 1])
 		{
@@ -2397,20 +2470,13 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ";\n");
 		}
 #	endif
-	DBend_multiple_update(sql, sql_alloc, sql_offset);
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
 
-	if (ZBX_DB_OK > DBexecute("%s", self->sql))
-		ret = FAIL;
-out:
-	zbx_free(self->sql);
-	zbx_free(self->sql_command);
-
-#	ifdef HAVE_MYSQL
-	zbx_free(self->sql_values);
-#	endif
+		if (ZBX_DB_OK > DBexecute("%s", self->sql))
+			ret = FAIL;
+	}
 #endif
-	zbx_vector_ptr_destroy(&self->fields);
 
+out:
 	return ret;
 }
-

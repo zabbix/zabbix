@@ -571,6 +571,8 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 			goto out;
 	}
 
+	ret = SUCCEED;
+
 	/* write generated service alarms into database */
 	if (0 != alarms->values_num)
 	{
@@ -585,18 +587,14 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 		{
 			zbx_status_update_t	*update = alarms->values[i];
 
-			if (SUCCEED != zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
-					update->clock))
-			{
-				goto out;
-			}
+			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status, update->clock);
 		}
 
-		if (SUCCEED != zbx_db_insert_execute(&db_insert))
-			goto out;
+		ret = zbx_db_insert_execute(&db_insert);
+
+		zbx_db_insert_clean(&db_insert);
 	}
 
-	ret = SUCCEED;
 out:
 	zbx_free(sql);
 

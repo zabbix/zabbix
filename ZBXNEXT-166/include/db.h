@@ -594,8 +594,10 @@ typedef struct
 {
 	/* the target table */
 	const ZBX_TABLE		*table;
-	/* the fields to insert */
+	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
 	zbx_vector_ptr_t	fields;
+	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
+	zbx_vector_ptr_t	rows;
 #ifndef HAVE_ORACLE
 	/* the current sql insert statement */
 	char			*sql;
@@ -614,8 +616,9 @@ zbx_db_insert_t;
 
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-int	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
-int	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
+void	zbx_db_insert_clean(zbx_db_insert_t *self);
 
 #endif
