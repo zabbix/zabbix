@@ -30,6 +30,17 @@
 
 #ifndef HAVE_SQLITE3
 
+static int	DBmodify_proxy_table_id_field(const char *table_name)
+{
+#ifdef HAVE_POSTGRESQL
+	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type(table_name, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
 /*********************************************************************************
  *                                                                               *
  * Function: parse_db_monitor_item_params                                        *
@@ -137,21 +148,6 @@ static int	DBpatch_2010002(void)
 static int	DBpatch_2010003(void)
 {
 	return DBmodify_proxy_table_id_field("proxy_history");
-}
-
-static int	DBpatch_2010004(void)
-{
-	return DBmodify_proxy_table_id_field("history_str_sync");
-}
-
-static int	DBpatch_2010005(void)
-{
-	return DBmodify_proxy_table_id_field("history_sync");
-}
-
-static int	DBpatch_2010006(void)
-{
-	return DBmodify_proxy_table_id_field("history_uint_sync");
 }
 
 static int	DBpatch_2010007(void)
@@ -880,33 +876,6 @@ static int	DBpatch_2010094(void)
 	}
 
 	return FAIL;
-}
-
-static int	DBpatch_2010095(void)
-{
-#ifdef HAVE_MYSQL
-	return DBdrop_index("history_sync", "id");
-#else
-	return SUCCEED;
-#endif
-}
-
-static int	DBpatch_2010096(void)
-{
-#ifdef HAVE_MYSQL
-	return DBdrop_index("history_uint_sync", "id");
-#else
-	return SUCCEED;
-#endif
-}
-
-static int	DBpatch_2010097(void)
-{
-#ifdef HAVE_MYSQL
-	return DBdrop_index("history_str_sync", "id");
-#else
-	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010098(void)
@@ -1802,9 +1771,6 @@ DBPATCH_START(2010)
 DBPATCH_ADD(2010001, 0, 1)
 DBPATCH_ADD(2010002, 0, 1)
 DBPATCH_ADD(2010003, 0, 1)
-DBPATCH_ADD(2010004, 0, 1)
-DBPATCH_ADD(2010005, 0, 1)
-DBPATCH_ADD(2010006, 0, 1)
 DBPATCH_ADD(2010007, 0, 0)
 DBPATCH_ADD(2010008, 0, 1)
 DBPATCH_ADD(2010009, 0, 1)
@@ -1891,9 +1857,6 @@ DBPATCH_ADD(2010091, 0, 1)
 DBPATCH_ADD(2010092, 0, 1)
 DBPATCH_ADD(2010093, 0, 1)
 DBPATCH_ADD(2010094, 0, 1)
-DBPATCH_ADD(2010095, 0, 0)
-DBPATCH_ADD(2010096, 0, 0)
-DBPATCH_ADD(2010097, 0, 0)
 DBPATCH_ADD(2010098, 0, 0)
 DBPATCH_ADD(2010099, 0, 0)
 DBPATCH_ADD(2010100, 0, 0)
