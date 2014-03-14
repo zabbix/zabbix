@@ -33,7 +33,10 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct utsname	name;
 
 	if (-1 == uname(&name))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uname."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, name.machine));
 
@@ -47,25 +50,52 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE	*f = NULL;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
 		return ret;
+	}
 
 	type = get_rparam(request, 0);
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full"))
-		f = fopen(SW_OS_FULL, "r");
+	{
+		if (NULL == (f = fopen(SW_OS_FULL, "r")))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_FULL "."));
+			return ret;
+		}
+	}
 	else if (0 == strcmp(type, "short"))
-		f = fopen(SW_OS_SHORT, "r");
+	{
+		if (NULL == (f = fopen(SW_OS_SHORT, "r")))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_SHORT "."));
+			return ret;
+		}
+	}
 	else if (0 == strcmp(type, "name"))
-		f = fopen(SW_OS_NAME, "r");
-
-	if (NULL == f)
+	{
+		if (NULL == (f = fopen(SW_OS_NAME, "r")))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_NAME "."));
+			return ret;
+		}
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: full, name, short."));
 		return ret;
+	}
 
 	if (NULL != fgets(line, sizeof(line), f))
 	{
 		ret = SYSINFO_RET_OK;
 		zbx_rtrim(line, ZBX_WHITESPACE);
 		SET_STR_RESULT(result, zbx_strdup(NULL, line));
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to read from file."));
 	}
 	zbx_fclose(f);
 
@@ -131,7 +161,10 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ZBX_PACKAGE_MANAGER	*mng;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional package, manager and mode are expected."));
 		return ret;
+	}
 
 	regex = get_rparam(request, 0);
 	manager = get_rparam(request, 1);
@@ -145,7 +178,10 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "short"))
 		show_pm = 0;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: full, short."));
 		return ret;
+	}
 
 	*buffer = '\0';
 	zbx_vector_str_create(&packages);
@@ -216,6 +252,8 @@ next:
 
 	if (SYSINFO_RET_OK == ret)
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of packages."));
 
 	return ret;
 }

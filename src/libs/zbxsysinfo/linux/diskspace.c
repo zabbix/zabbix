@@ -22,7 +22,7 @@
 #include "zbxjson.h"
 
 static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_t *free,
-		zbx_uint64_t *used, double *pfree, double *pused)
+		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -33,8 +33,17 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 #endif
 	struct ZBX_STATFS	s;
 
-	if (NULL == fsname || '\0' == *fsname || 0 != ZBX_STATFS(fsname, &s))
+	if (NULL == fsname || '\0' == *fsname)
+	{
+		*error = strdup("Filesystem name cannot be empty.");
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 != ZBX_STATFS(fsname, &s))
+	{
+		*error = strdup("Failed to get filesystem stats.");
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (total)
 		*total = (zbx_uint64_t)s.f_blocks * s.ZBX_BSIZE;
@@ -64,18 +73,24 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*fsname, *mode;
+	char		*fsname, *mode, *error;
 	zbx_uint64_t	total, free, used;
 	double		pfree, pused;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Filesystem and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	fsname = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 		SET_UI64_RESULT(result, total);
@@ -88,7 +103,10 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, pused);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, total, pfree, pused, used."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -134,6 +152,11 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f);
 
 		ret = SYSINFO_RET_OK;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/mounts."));
+		return SYSINFO_RET_OK;
 	}
 
 	zbx_json_close(&j);

@@ -28,7 +28,10 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	long	ncpu;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	type = get_rparam(request, 0);
 
@@ -37,7 +40,10 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(type, "max"))
 		name = _SC_NPROCESSORS_CONF;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be online or max."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (-1 == (ncpu = sysconf(name)))
 		return SYSINFO_RET_FAIL;
@@ -53,14 +59,20 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	cpu_num, state, mode;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu, type and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu num."));
 		return SYSINFO_RET_FAIL;
+	}
 	else
 		cpu_num++;
 
@@ -83,7 +95,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "steal"))
 		state = ZBX_CPU_STATE_STEAL;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of idle, nice, user, system, iowait, interrupt, softirq, steal."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 2);
 
@@ -94,7 +109,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return get_cpustat(result, cpu_num, state, mode);
 }
@@ -106,14 +124,20 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	load[ZBX_AVG_COUNT], value;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu. Must be one of all, percpu."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -124,17 +148,26 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (mode >= getloadavg(load, 3))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Getting load average failed."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	value = load[mode];
 
 	if (1 == per_cpu)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Getting number of online CPUs failed."));
 			return SYSINFO_RET_FAIL;
+		}
 		value /= cpu_num;
 	}
 
@@ -151,7 +184,10 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f;
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/stat."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -167,6 +203,9 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	zbx_fclose(f);
 
+	if (SYSINFO_RET_FAIL == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches from /proc/stat."));
+
 	return ret;
 }
 
@@ -178,7 +217,10 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f;
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/stat."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -193,6 +235,9 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		break;
 	}
 	zbx_fclose(f);
+
+	if (SYSINFO_RET_FAIL == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts from /proc/stat."));
 
 	return ret;
 }

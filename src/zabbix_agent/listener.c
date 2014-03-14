@@ -37,6 +37,7 @@ static void	process_listener(zbx_sock_t *s)
 {
 	AGENT_RESULT	result;
 	char		*command;
+	char		*buffer = NULL;
 	char		**value = NULL;
 	int		ret;
 
@@ -47,15 +48,29 @@ static void	process_listener(zbx_sock_t *s)
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
 		init_result(&result);
-		process(command, 0, &result);
 
-		if (NULL == (value = GET_TEXT_RESULT(&result)))
+		if (SUCCEED == process(command, 0, &result))
+		{
+			if (NULL != (value =  GET_TEXT_RESULT(&result)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
+				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
+			}
+		}
+		else
+		{
 			value = GET_MSG_RESULT(&result);
 
-		if (NULL != value)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-			ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
+			if (NULL != value)
+			{
+				buffer = zbx_dsprintf(buffer, ZBX_NOTSUPPORTED ":%s", *value);
+				ret = zbx_tcp_send_to(s, buffer, CONFIG_TIMEOUT);
+				zbx_free(buffer);
+			}
+			else
+			{
+				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, CONFIG_TIMEOUT);
+			}
 		}
 
 		free_result(&result);

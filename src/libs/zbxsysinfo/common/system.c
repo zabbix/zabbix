@@ -41,7 +41,10 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	type = get_rparam(request, 0);
 
@@ -87,7 +90,10 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_STR_RESULT(result, strdup(buf));
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter. Expected: empty, \"utc\" or \"local\"."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }

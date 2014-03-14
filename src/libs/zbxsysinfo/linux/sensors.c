@@ -377,17 +377,26 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	aggr = 0;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only device name, sensor name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	device = get_rparam(request, 0);
 	name = get_rparam(request, 1);
 	function = get_rparam(request, 2);
 
 	if (NULL == device || '\0' == *device)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Device name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sensor name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == function || '\0' == *function)
 		do_task = DO_ONE;
@@ -398,18 +407,27 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(function, "min"))
 		do_task = DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, max, min."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (DO_ONE != do_task && 0 != isdigit(name[strlen(name)-1]))
 		do_task = DO_ONE;
 
 	if (DO_ONE != do_task && 0 == isalpha(name[strlen(name)-1]))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sensor name must be alphabetic for selected mode."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	get_device_sensors(do_task, device, name, &aggr, &cnt);
 
 	if (0 == cnt)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get sensor stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (DO_AVG == do_task)
 		SET_DBL_RESULT(result, aggr / cnt);
