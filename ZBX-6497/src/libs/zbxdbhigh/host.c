@@ -481,7 +481,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 	return ret;
 }
 
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
+static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
 	DB_RESULT	result;
@@ -594,16 +594,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	int		res = SUCCEED;
-	zbx_uint64_t	graphid, interfaceids[4];
+	int		ret = SUCCEED, i;
+	zbx_uint64_t	graphid, interfaceids[INTERFACE_TYPE_COUNT];
 	unsigned char	t_flags, h_flags, type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (res = validate_inventory_links(hostid, templateids, error, max_error_len)))
+	if (SUCCEED != (ret = validate_inventory_links(hostid, templateids, error, max_error_len)))
 		goto out;
 
-	if (SUCCEED != (res = validate_httptests(hostid, templateids, error, max_error_len)))
+	if (SUCCEED != (ret = validate_httptests(hostid, templateids, error, max_error_len)))
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
@@ -619,7 +619,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 	tresult = DBselect("%s", sql);
 
-	while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
+	while (SUCCEED == ret && NULL != (trow = DBfetch(tresult)))
 	{
 		ZBX_STR2UINT64(graphid, trow[0]);
 		t_flags = (unsigned char)atoi(trow[2]);
@@ -658,7 +658,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 			if (t_flags != h_flags)
 			{
-				res = FAIL;
+				ret = FAIL;
 				zbx_snprintf(error, max_error_len,
 						"graph prototype and real graph \"%s\" have the same name", trow[1]);
 				break;
@@ -678,7 +678,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 			if (SUCCEED != DBcmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
 			{
-				res = FAIL;
+				ret = FAIL;
 				zbx_snprintf(error, max_error_len,
 						"graph \"%s\" already exists on the host (items are not identical)",
 						trow[1]);
@@ -689,7 +689,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	}
 	DBfree_result(tresult);
 
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -707,7 +707,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 		if (NULL != (trow = DBfetch(tresult)))
 		{
-			res = FAIL;
+			ret = FAIL;
 			zbx_snprintf(error, max_error_len,
 					"item prototype and real item \"%s\" have the same key", trow[0]);
 		}
@@ -715,7 +715,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	}
 
 	/* interfaces */
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 	{
 		memset(&interfaceids, 0, sizeof(interfaceids));
 
@@ -749,16 +749,30 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 		tresult = DBselect("%s", sql);
 
-		while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
+		while (SUCCEED == ret && NULL != (trow = DBfetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY != type && 0 == interfaceids[type - 1])
+			if (INTERFACE_TYPE_ANY == type)
 			{
-				res = FAIL;
+				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
+				{
+					if (0 != interfaceids[i])
+						break;
+				}
+
+				if (INTERFACE_TYPE_COUNT == i)
+				{
+					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
+					ret = FAIL;
+				}
+			}
+			else if (0 == interfaceids[type - 1])
+			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));
+				ret = FAIL;
 			}
 		}
 		DBfree_result(tresult);
@@ -768,9 +782,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	zbx_free(gitems);
 	zbx_free(chd_gitems);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -2852,7 +2866,14 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				upd_group_prototypes = 0;
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_itemid) values ";
+#ifdef HAVE_MYSQL
+	const char		*ins_hosts_sql =
+				"insert into hosts (hostid,host,name,status,flags,templateid,description) values ";
+	const char		*ex_hosts_values = ",''";
+#else
 	const char		*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags,templateid) values ";
+	const char		*ex_hosts_values = "";
+#endif
 	const char		*ins_hosts_templates_sql =
 				"insert into hosts_templates (hosttemplateid,hostid,templateid) values ";
 	const char		*ins_group_prototype_sql =
@@ -2945,9 +2966,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d," ZBX_FS_UI64 "%s)" ZBX_ROW_DL,
 					host_prototype->hostid, host_esc, name_esc, (int)host_prototype->status,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
+					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid, ex_hosts_values);
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					host_prototype->hostid, host_prototype->itemid);

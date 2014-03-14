@@ -69,6 +69,8 @@
 .inventory-host .formlist .formrow .overview-link { margin-top: 2px; margin-left: 10px; display: inline-block; }
 .inventory-host .formlist .formrow .link_menu { display: inline-block; }
 .inventory-host .formlist .formrow .interfaces { min-width: 500px; }
+.inventory-host .formlist .formrow .description { padding-top: 2px; width: 550px; white-space: pre-wrap; }
+.inventory-host .formlist .formrow .text-field { width: 550px; white-space: pre-wrap; }
 
 /* icon mapping */
 #iconMapTable .sortable { height: 30px; line-height: 30px; }
