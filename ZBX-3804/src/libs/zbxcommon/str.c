@@ -223,7 +223,8 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
 	int	written_len = 0;
 
-	if (0 < count)
+	/* manually handle erroneous cases */
+	if (NULL != str || NULL != fmt || 0 < count)
 	{
 		if (0 > (written_len = vsnprintf(str, count, fmt, args)))
 			written_len = (int)count - 1;		/* count an output error as a full buffer */
