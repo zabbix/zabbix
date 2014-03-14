@@ -111,7 +111,9 @@ if (isset($_REQUEST['save'])) {
 	if ($dbApplications) {
 		$applicationId = reset($dbApplications['applicationids']);
 
-		add_audit($auditAction, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationId.']');
+		add_audit($auditAction, AUDIT_RESOURCE_APPLICATION,
+			_('Application').' ['.$_REQUEST['appname'].'] ['.$applicationId.']'
+		);
 		unset($_REQUEST['form']);
 		clearCookies($dbApplications, $_REQUEST['hostid']);
 	}
