@@ -32,6 +32,13 @@ class CLocalApiClient extends CApiClient {
 	protected $serviceFactory;
 
 	/**
+	 * Whether debug mode is enabled.
+	 *
+	 * @var bool
+	 */
+	protected $debug = false;
+
+	/**
 	 * Set service factory.
 	 *
 	 * @param CRegistryFactory $factory
@@ -88,7 +95,7 @@ class CLocalApiClient extends CApiClient {
 			$response->errorMessage = $e->getMessage();
 
 			// add debug data
-			if (CWebUser::getDebugMode()) {
+			if ($this->debug) {
 				$response->debug = $e->getTrace();
 			}
 		}
@@ -112,11 +119,12 @@ class CLocalApiClient extends CApiClient {
 				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised'));
 			}
 
-			$this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
+			$user = $this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
+			$this->debug = $user['debug_mode'];
 		}
 		elseif ($auth !== null) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS,
-				_s('The "%1$s" method must be called without the "auth" parameter.', $method)
+				_s('The "%1$s.%2$s" method must be called without the "auth" parameter.', $api, $method)
 			);
 		}
 	}
@@ -140,7 +148,7 @@ class CLocalApiClient extends CApiClient {
 		// validate the method
 		if (!in_array($method, get_class_methods($apiService))) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s" for API "%2$s".', $method, $api)
+				_s('Incorrect method "%1$s.%2$s".', $api, $method)
 			);
 		}
 	}
