@@ -25,7 +25,8 @@
 class CRegistryFactory {
 
 	/**
-	 * Array of defined objects.
+	 * Array of defined objects. Each object can be defined either using the name of its class, or a closure that
+	 * returns an instance of the object.
 	 *
 	 * @var array
 	 */
@@ -54,8 +55,8 @@ class CRegistryFactory {
 	 */
 	public function getObject($object) {
 		if (!isset($this->instances[$object])) {
-			$class = $this->objects[$object];
-			$this->instances[$object] = new $class();
+			$definition = $this->objects[$object];
+			$this->instances[$object] = ($definition instanceof Closure) ? $definition() : new $definition();
 		}
 
 		return $this->instances[$object];
