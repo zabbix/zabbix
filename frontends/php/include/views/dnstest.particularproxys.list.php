@@ -37,7 +37,17 @@ $particularProxysInfoTable = new CTable(null, 'filter info-block');
 $particularProxysTable = new CTableInfo($noData);
 $particularProxysTable->setHeader($headers);
 
+// list generation
+$currentNs = null;
 foreach ($this->data['proxys'] as $proxy) {
+	// remove probe name from list
+	if ($proxy['ns'] === $currentNs) {
+		$proxy['ns'] = SPACE;
+	}
+	else {
+		$currentNs = $proxy['ns'];
+	}
+
 	if ($proxy['ms']) {
 		if (!$this->data['minMs']) {
 			$ms = $proxy['ms'];
