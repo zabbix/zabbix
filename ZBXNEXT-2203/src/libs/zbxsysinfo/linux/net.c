@@ -35,54 +35,65 @@ typedef struct
 }
 net_stat_t;
 
-static int	get_net_stat(const char *if_name, net_stat_t *result)
+static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], *p;
 	FILE	*f;
 
 	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
-	if (NULL != (f = fopen("/proc/net/dev", "r")))
 	{
-		while (NULL != fgets(line, sizeof(line), f))
-		{
-			if (NULL == (p = strstr(line, ":")))
-				continue;
-
-			*p = '\t';
-
-			if (10 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%*s\t%*s\t%*s\t%*s\t"
-					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-					ZBX_FS_UI64 "\t%*s\t" ZBX_FS_UI64 "\t%*s\t%*s\n",
-					name,
-					&(result->ibytes),	/* bytes */
-					&(result->ipackets),	/* packets */
-					&(result->ierr),	/* errs */
-					&(result->idrop),	/* drop */
-					&(result->obytes),	/* bytes */
-					&(result->opackets),	/* packets */
-					&(result->oerr),	/* errs */
-					&(result->odrop),	/* drop */
-					&(result->colls)))	/* icolls */
-			{
-				if (0 == strcmp(name, if_name))
-				{
-					ret = SYSINFO_RET_OK;
-					break;
-				}
-			}
-		}
-
-		zbx_fclose(f);
+		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
+		return SYSINFO_RET_FAIL;
 	}
 
-	if (ret != SYSINFO_RET_OK)
-		memset(result, 0, sizeof(net_stat_t));
+	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	{
+		*error = zbx_strdup(NULL, "Failed to open /proc/net/dev.");
+		return SYSINFO_RET_FAIL;
+	}
 
-	return ret;
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (NULL == (p = strstr(line, ":")))
+			continue;
+
+		*p = '\t';
+
+		if (10 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%*s\t%*s\t%*s\t%*s\t"
+				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+				ZBX_FS_UI64 "\t%*s\t" ZBX_FS_UI64 "\t%*s\t%*s\n",
+				name,
+				&(result->ibytes),	/* bytes */
+				&(result->ipackets),	/* packets */
+				&(result->ierr),	/* errs */
+				&(result->idrop),	/* drop */
+				&(result->obytes),	/* bytes */
+				&(result->opackets),	/* packets */
+				&(result->oerr),	/* errs */
+				&(result->odrop),	/* drop */
+				&(result->colls)))	/* icolls */
+		{
+			if (0 == strcmp(name, if_name))
+			{
+				ret = SYSINFO_RET_OK;
+				break;
+			}
+		}
+	}
+
+	zbx_fclose(f);
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		*error = zbx_strdup(NULL, "Failed to find network interface.");
+		return SYSINFO_RET_FAIL;
+	}
+
+	memset(result, 0, sizeof(net_stat_t));
+
+	return SYSINFO_RET_OK;
 }
 
 /******************************************************************************
@@ -127,16 +138,22 @@ static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ns.ibytes);
@@ -147,7 +164,10 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.idrop);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -155,16 +175,22 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ns.obytes);
@@ -175,7 +201,10 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.odrop);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -183,16 +212,22 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
@@ -203,7 +238,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ns.idrop + ns.odrop);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -211,15 +249,21 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
-	char		*if_name;
+	char		*if_name, *error;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 
-	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, ns.colls);
 
@@ -228,37 +272,37 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN], *p;
 	FILE		*f;
 	struct zbx_json	j;
+
+	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	if (NULL != (f = fopen("/proc/net/dev", "r")))
+	while (NULL != fgets(line, sizeof(line), f))
 	{
-		while (NULL != fgets(line, sizeof(line), f))
-		{
-			if (NULL == (p = strstr(line, ":")))
-				continue;
+		if (NULL == (p = strstr(line, ":")))
+			continue;
 
-			*p = '\0';
+		*p = '\0';
 
-			/* trim left spaces */
-			for (p = line; ' ' == *p && '\0' != *p; p++)
-				;
+		/* trim left spaces */
+		for (p = line; ' ' == *p && '\0' != *p; p++)
+			;
 
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#IFNAME}", p, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&j);
-		}
-
-		zbx_fclose(f);
-
-		ret = SYSINFO_RET_OK;
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#IFNAME}", p, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
 	}
+
+	zbx_fclose(f);
 
 	zbx_json_close(&j);
 
@@ -266,7 +310,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_free(&j);
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -277,12 +321,18 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only TCP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TCP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	buffer = zbx_malloc(NULL, buffer_alloc);
 
@@ -329,12 +379,18 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only UDP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid UDP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	buffer = zbx_malloc(NULL, buffer_alloc);
 

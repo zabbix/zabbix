@@ -174,8 +174,11 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
-	if (3 < request->nparam)	/* too many parameters? */
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device, type and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	devname = get_rparam(request, 0);
 	tmp = get_rparam(request, 1);
@@ -189,15 +192,24 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "operations"))
 		type = ZBX_DSTAT_TYPE_OPER;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of operations, ops, sectors, sps, ops."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (type == ZBX_DSTAT_TYPE_SECT || type == ZBX_DSTAT_TYPE_OPER)
 	{
 		if (request->nparam > 2)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Mode is supported only if type is in: operations, sectors."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (SUCCEED != get_diskstat(devname, dstats))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (ZBX_DSTAT_TYPE_SECT == type)
 			SET_UI64_RESULT(result, dstats[(ZBX_DEV_READ == rw ? ZBX_DSTAT_R_SECT : ZBX_DSTAT_W_SECT)]);
@@ -216,7 +228,10 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == collector)
 	{
@@ -232,15 +247,24 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
 		*kernel_devname = '\0';
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get device information."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
 		if (SUCCEED != get_diskstat(kernel_devname, dstats))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (NULL == (device = collector_diskdevice_add(kernel_devname)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to add disk device to agent collector."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	if (ZBX_DSTAT_TYPE_SPS == type)

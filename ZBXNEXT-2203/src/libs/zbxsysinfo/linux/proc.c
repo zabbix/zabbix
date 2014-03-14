@@ -222,7 +222,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double		memsize = 0;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional name, users, mode and cmdline are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
@@ -230,7 +233,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -246,12 +252,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "min"))
 		do_task = DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, max, min, sum."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -348,7 +360,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	proccount = 0;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional name, users, mode and cmdline are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
@@ -356,7 +371,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -372,12 +390,18 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: all, sleep, run, zomb."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != (entries = readdir(dir)))
 	{

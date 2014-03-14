@@ -25,7 +25,10 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uptime info."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, info.uptime);
 

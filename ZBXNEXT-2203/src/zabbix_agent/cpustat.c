@@ -632,12 +632,15 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		SET_MSG_RESULT(result, strdup("Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == (cpu = get_cpustat_by_num(&collector->cpus, cpu_num)))
+	{
+		SET_MSG_RESULT(result, strdup("Failed to get CPU stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (0 == cpu->h_count)
 	{
@@ -653,6 +656,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	if (SYSINFO_RET_FAIL == cpu->h_status[idx_curr])
 	{
 		UNLOCK_CPUSTATS;
+		SET_MSG_RESULT(result, strdup("Failed to get CPU stats."));
 		return SYSINFO_RET_FAIL;
 	}
 
