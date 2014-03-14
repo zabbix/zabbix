@@ -68,17 +68,17 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider incorrectCallProvider()
 	 */
 	public function testCallIncorrect($api, $method, array $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
+		// setup a mock user API to authenticate the user
+		$userMock = $this->getMock('CUser', array('checkAuthentication'));
+		$userMock->method('checkAuthentication')->will($this->returnValue(array(
+			'debug_mode' => false
+		)));
+
 		$this->client->setServiceFactory(new CRegistryFactory(array(
 			'host' => 'CHost',
 			'apiinfo' => 'CAPIInfo',
-			'user' => function() {
-				// setup a mock user API to authenticate the user
-				$mock = $this->getMock('CUser', array('checkAuthentication'));
-				$mock->method('checkAuthentication')->will($this->returnValue(array(
-					'debug_mode' => false
-				)));
-
-				return $mock;
+			'user' => function() use ($userMock) {
+				return $userMock;
 			}
 		)));
 
