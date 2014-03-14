@@ -2006,15 +2006,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
 	int		i, j;
 
-#ifndef HAVE_ORACLE
-	zbx_free(self->sql_command);
-	zbx_free(self->sql);
-
-#	ifdef HAVE_MYSQL
-	zbx_free(self->sql_values);
-#	endif
-#endif
-
 	for (i = 0; i < self->rows.values_num; i++)
 	{
 		zbx_db_value_t	*row = (zbx_db_value_t *)self->rows.values[i];
@@ -2072,12 +2063,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num)
 {
 	int		i;
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
 	const ZBX_FIELD	*field;
-#ifdef HAVE_MYSQL
-	size_t		sql_values_alloc = 0, sql_values_offset = 0;
-#endif
 
 	if (0 == fields_num)
 	{
@@ -2085,17 +2071,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 		exit(EXIT_FAILURE);
 	}
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-#ifndef HAVE_ORACLE
-	self->sql_alloc = 16 * ZBX_KIBIBYTE;
-	self->sql_offset = 0;
-	self->sql = zbx_malloc(NULL, self->sql_alloc);
-
-#	ifdef HAVE_MYSQL
-	self->sql_values = NULL;
-#	endif
-#endif
 	zbx_vector_ptr_create(&self->fields);
 	zbx_vector_ptr_create(&self->rows);
 
@@ -2117,65 +2092,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 
 		zbx_vector_ptr_append(&self->fields, (void *)field);
 	}
-
-	/* create sql insert statement command */
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into ");
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, self->table->table);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (");
-
-	for (i = 0; i < self->fields.values_num; i++)
-	{
-		field = (ZBX_FIELD *)self->fields.values[i];
-
-		if (0 != i)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, field->name);
-	}
-
-#ifdef HAVE_MYSQL
-	/* MySQL workaround - explicitly add missing text fields with '' default value */
-	for (field = (const ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
-	{
-		switch (field->type)
-		{
-			case ZBX_TYPE_BLOB:
-			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
-				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field, ZBX_DEFAULT_PTR_COMPARE_FUNC))
-					continue;
-
-				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, field->name);
-
-				zbx_strcpy_alloc(&self->sql_values, &sql_values_alloc, &sql_values_offset, ",''");
-				break;
-		}
-	}
-#endif
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ") values ");
-
-#ifdef HAVE_ORACLE
-	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
-
-	for (i = 0; i < self->fields.values_num; i++)
-	{
-		if (0 != i)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ":%d", i + 1);
-	}
-	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
-
-	DBstatement_prepare(sql);
-
-	zbx_free(sql);
-#else
-	self->sql_command = sql;
-
-	DBbegin_multiple_update(&self->sql, &self->sql_alloc, &self->sql_offset);
-#endif
 }
 
 /******************************************************************************
@@ -2351,9 +2267,76 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
  ******************************************************************************/
 int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
-	int	ret = FAIL, i, j;
+	int		ret = FAIL, i, j;
+	const ZBX_FIELD	*field;
+	char		*sql_command;
+	size_t		sql_command_alloc = 512, sql_command_offset = 0;
+
+#ifndef HAVE_ORACLE
+	char		*sql;
+	size_t		sql_offset = 0, sql_alloc = 16 * ZBX_KIBIBYTE;
+
+#	ifdef HAVE_MYSQL
+	char	*sql_values = NULL;
+	size_t	sql_values_alloc = 0, sql_values_offset = 0;
+#	endif
+
+	sql = zbx_malloc(NULL, sql_alloc);
+#endif
+	sql_command = zbx_malloc(NULL, sql_command_alloc);
+
+	/* create sql insert statement command */
+
+	zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, "insert into ");
+	zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, self->table->table);
+	zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, " (");
+
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		field = (ZBX_FIELD *)self->fields.values[i];
+
+		if (0 != i)
+			zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ',');
+
+		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
+	}
+
+#ifdef HAVE_MYSQL
+	/* Mysql_command workaround - explicitly add missing text fields with '' default value */
+	for (field = (const ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
+	{
+		switch (field->type)
+		{
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field, ZBX_DEFAULT_PTR_COMPARE_FUNC))
+					continue;
+
+				zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ',');
+				zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
+
+				zbx_strcpy_alloc(&sql_values, &sql_values_alloc, &sql_values_offset, ",''");
+				break;
+		}
+	}
+#endif
+	zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ") values ");
 
 #ifdef HAVE_ORACLE
+
+	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, '(');
+
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		if (0 != i)
+			zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ',');
+		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ":%d", i + 1);
+	}
+	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
+
+	DBstatement_prepare(sql_command);
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
@@ -2370,8 +2353,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			ZBX_FIELD		*field = self->fields.values[j];
 			const zbx_db_value_t	*value = &values[j];
+
+			field = self->fields.values[j];
 
 			switch (field->type)
 			{
@@ -2399,26 +2383,29 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	ret = SUCCEED;
 
 #else
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	for (i = 0; i < self->rows.values_num; i++)
 	{
 		zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
 
 #	ifdef HAVE_MULTIROW_INSERT
-		if (16 > self->sql_offset)
-			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+		if (16 > sql_offset)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_command);
 #	else
-		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_command);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_command);
 #	endif
 
-		zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '(');
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
 
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			ZBX_FIELD		*field = self->fields.values[j];
 			const zbx_db_value_t	*value = &values[j];
 
+			field = self->fields.values[j];
+
 			if (0 != j)
-				zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ',');
+				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 
 			switch (field->type)
 			{
@@ -2426,23 +2413,23 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 				case ZBX_TYPE_TEXT:
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
-					zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
-					zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, value->str);
-					zbx_chrcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, '\'');
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
-					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, "%d", value->i32);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
 					break;
 				case ZBX_TYPE_FLOAT:
-					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_DBL,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_DBL,
 							value->dbl);
 					break;
 				case ZBX_TYPE_UINT:
-					zbx_snprintf_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ZBX_FS_UI64,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64,
 							value->ui64);
 					break;
 				case ZBX_TYPE_ID:
-					zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset,
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 							DBsql_id_ins(value->ui64));
 					break;
 				default:
@@ -2451,32 +2438,42 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			}
 		}
 #	ifdef HAVE_MYSQL
-		if (NULL != self->sql_values)
-			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, self->sql_values);
+		if (NULL != sql_values)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_values);
 #	endif
 
-		zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ")" ZBX_ROW_DL);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&self->sql, &self->sql_alloc, &self->sql_offset)))
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	if (16 < self->sql_offset)
+	if (16 < sql_offset)
 	{
 #	ifdef HAVE_MULTIROW_INSERT
-		if (',' == self->sql[self->sql_offset - 1])
+		if (',' == sql[sql_offset - 1])
 		{
-			self->sql_offset--;
-			zbx_strcpy_alloc(&self->sql, &self->sql_alloc, &self->sql_offset, ";\n");
+			sql_offset--;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #	endif
 		DBend_multiple_update(sql, sql_alloc, sql_offset);
 
-		if (ZBX_DB_OK > DBexecute("%s", self->sql))
+		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
 	}
 #endif
 
 out:
+	zbx_free(sql_command);
+
+#ifndef HAVE_ORACLE
+	zbx_free(sql);
+
+#	ifdef HAVE_MYSQL
+	zbx_free(sql_values);
+#	endif
+
+#endif
 	return ret;
 }

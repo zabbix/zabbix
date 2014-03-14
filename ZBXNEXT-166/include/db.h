@@ -598,19 +598,6 @@ typedef struct
 	zbx_vector_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
 	zbx_vector_ptr_t	rows;
-#ifndef HAVE_ORACLE
-	/* the current sql insert statement */
-	char			*sql;
-	size_t			sql_alloc;
-	size_t			sql_offset;
-	/* the insert sql header */
-	char			*sql_command;
-
-#	ifdef HAVE_MYSQL
-	/* additional values to insert for MySQL databases */
-	char			*sql_values;
-#	endif
-#endif
 }
 zbx_db_insert_t;
 
