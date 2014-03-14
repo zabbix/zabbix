@@ -632,11 +632,7 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
  ******************************************************************************/
 static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx_vc_item_weight_t *d2)
 {
-	if (d1->weight > d2->weight)
-		return 1;
-
-	if (d1->weight < d2->weight)
-		return -1;
+	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
 }
@@ -2817,8 +2813,8 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	stats->misses = vc_cache->misses;
 	stats->low_memory = vc_cache->low_memory;
 
-	stats->total = vc_mem->total_size;
-	stats->used = vc_mem->used_size;
+	stats->total_size = vc_mem->total_size;
+	stats->free_size = vc_mem->free_size;
 
 	vc_try_unlock();
 

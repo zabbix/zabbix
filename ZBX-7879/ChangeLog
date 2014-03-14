@@ -1,11 +1,14 @@
 Changes for 2.2.3rc1
 
 New features:
+.......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-7919] fixed hashset entry allocation overhead (wiper)
+........S. [ZBX-7918] fixed value cache reporting more free space than actually available (wiper)
 A.F....... [ZBX-7832] fixed screen item row- and colspans not being adjusted when reducing the size of a screen (Pavels)
 ........S. [ZBX-7620] improved error messaging and debug logging for VMware items (wiper)
 ........S. [ZBX-7897] fixed memory leak in trapper for log file items (Juris)
