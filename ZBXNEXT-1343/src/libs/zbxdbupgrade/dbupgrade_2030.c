@@ -30,6 +30,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char daemon_type;
+
 static int	DBpatch_2030000(void)
 {
 	return SUCCEED;
@@ -341,6 +343,116 @@ static int	DBpatch_2030032(void)
 	return DBadd_field("hosts", &field);
 }
 
+static int	DBpatch_2030033(void)
+{
+	return DBdrop_table("history_sync");
+}
+
+static int	DBpatch_2030034(void)
+{
+	return DBdrop_table("history_uint_sync");
+}
+
+static int	DBpatch_2030035(void)
+{
+	return DBdrop_table("history_str_sync");
+}
+
+static int	DBpatch_2030036(void)
+{
+	return DBdrop_table("node_cksum");
+}
+
+static int	DBpatch_2030037(void)
+{
+	const ZBX_TABLE table =
+			{"ids_tmp", "", 0,
+				{
+					{"table_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"field_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"nextid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	if (ZBX_DAEMON_TYPE_SERVER == daemon_type)
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030038(void)
+{
+	if (ZBX_DAEMON_TYPE_SERVER == daemon_type)
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into ids_tmp ("
+				"select table_name,field_name,nextid"
+				" from ids"
+				" where nodeid=0"
+				" and ("
+					"(table_name='proxy_history' and field_name='history_lastid')"
+					" or (table_name='proxy_dhistory' and field_name='dhistory_lastid')"
+					" or (table_name='proxy_autoreg_host' and field_name='autoreg_host_lastid')"
+				")"
+			")"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030039(void)
+{
+	return DBdrop_table("ids");
+}
+
+static int	DBpatch_2030040(void)
+{
+	const ZBX_TABLE table =
+			{"ids", "table_name,field_name", 0,
+				{
+					{"table_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"field_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"nextid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2030041(void)
+{
+	if (ZBX_DAEMON_TYPE_SERVER == daemon_type)
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into ids (select table_name,field_name,nextid from ids_tmp)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030042(void)
+{
+	if (ZBX_DAEMON_TYPE_SERVER == daemon_type)
+		return SUCCEED;
+
+	return DBdrop_table("ids_tmp");
+}
+
+static int	DBpatch_2030043(void)
+{
+	return DBdrop_table("nodes");
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -380,5 +492,16 @@ DBPATCH_ADD(2030029, 0, 1)
 DBPATCH_ADD(2030030, 0, 1)
 DBPATCH_ADD(2030031, 0, 0)
 DBPATCH_ADD(2030032, 0, 1)
+DBPATCH_ADD(2030033, 0, 1)
+DBPATCH_ADD(2030034, 0, 1)
+DBPATCH_ADD(2030035, 0, 1)
+DBPATCH_ADD(2030036, 0, 1)
+DBPATCH_ADD(2030037, 0, 1)
+DBPATCH_ADD(2030038, 0, 1)
+DBPATCH_ADD(2030039, 0, 1)
+DBPATCH_ADD(2030040, 0, 1)
+DBPATCH_ADD(2030041, 0, 1)
+DBPATCH_ADD(2030042, 0, 1)
+DBPATCH_ADD(2030043, 0, 1)
 
 DBPATCH_END()

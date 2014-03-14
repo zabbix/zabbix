@@ -619,17 +619,6 @@ static int	DBset_version(int version, unsigned char mandatory)
 	return FAIL;
 }
 
-int	DBmodify_proxy_table_id_field(const char *table_name)
-{
-#ifdef HAVE_POSTGRESQL
-	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type(table_name, &field);
-#else
-	return SUCCEED;
-#endif
-}
-
 #endif	/* not HAVE_SQLITE3 */
 
 extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
