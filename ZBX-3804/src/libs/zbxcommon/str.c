@@ -230,8 +230,8 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 			written_len = (int)count - 1;		/* count an output error as a full buffer */
 		else
 			written_len = MIN(written_len, (int)count - 1);		/* result could be truncated */
+		str[written_len] = '\0';	/* for security reason write additional \0 character */
 	}
-	str[written_len] = '\0';	/* always write '\0', even if buffer size is 0 or vsnprintf() error */
 
 	return (size_t)written_len;
 }
