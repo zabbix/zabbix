@@ -1941,9 +1941,9 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
  *                                                                            *
  * Purpose: format bulk operation (insert, update) value list                 *
  *                                                                            *
- * Parameters: fields  - [IN] the field list                                  *
- *             values  - [IN] the corresponding value list                    *
- *             num     - [IN] the number of values to format                  *
+ * Parameters: fields     - [IN] the field list                               *
+ *             values     - [IN] the corresponding value list                 *
+ *             values_num - [IN] the number of values to format               *
  *                                                                            *
  * Return value: the formatted value list <value1>,<value2>...                *
  *                                                                            *
@@ -1951,13 +1951,13 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
  *           freed by the caller later.                                       *
  *                                                                            *
  ******************************************************************************/
-static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **values, int num)
+static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t **values, int values_num)
 {
 	int	i;
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	for (i = 0; i < num; i++)
+	for (i = 0; i < values_num; i++)
 	{
 		ZBX_FIELD		*field = fields[i];
 		const zbx_db_value_t	*value = values[i];

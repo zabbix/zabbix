@@ -574,24 +574,25 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 	/* write generated service alarms into database */
 	if (0 != alarms->values_num)
 	{
-		zbx_db_insert_t		ins;
+		zbx_db_insert_t	db_insert;
 
 		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
 
-		zbx_db_insert_prepare(&ins, "service_alarms", "servicealarmid", "serviceid", "value", "clock", NULL);
+		zbx_db_insert_prepare(&db_insert, "service_alarms", "servicealarmid", "serviceid", "value", "clock",
+				NULL);
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
 			zbx_status_update_t	*update = alarms->values[i];
 
-			if (SUCCEED != zbx_db_insert_add_values(&ins, alarmid++, update->sourceid, update->status,
+			if (SUCCEED != zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
 					update->clock))
 			{
 				goto out;
 			}
 		}
 
-		if (SUCCEED != zbx_db_insert_execute(&ins))
+		if (SUCCEED != zbx_db_insert_execute(&db_insert))
 			goto out;
 	}
 
