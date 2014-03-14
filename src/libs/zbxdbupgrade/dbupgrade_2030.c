@@ -453,6 +453,21 @@ static int	DBpatch_2030043(void)
 	return DBdrop_table("nodes");
 }
 
+static int	DBpatch_2030044(void)
+{
+	const char	*sql =
+			"delete from profiles"
+			" where idx in ("
+				"'web.nodes.php.sort','web.nodes.php.sortorder','web.nodes.switch_node',"
+				"'web.nodes.selected','web.popup_right.nodeid.last'"
+			")";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -503,5 +518,6 @@ DBPATCH_ADD(2030040, 0, 1)
 DBPATCH_ADD(2030041, 0, 1)
 DBPATCH_ADD(2030042, 0, 1)
 DBPATCH_ADD(2030043, 0, 1)
+DBPATCH_ADD(2030044, 0, 0)
 
 DBPATCH_END()
