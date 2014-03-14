@@ -114,7 +114,7 @@ grep "13\/Mar\/2014" /var/log/apache2/access.log \
 grep "13\/Mar\/2014" /var/log/apache2/access.log \
 | awk -F[\ \"] '{for(i=17;i<=NF;++i) printf "%s ", $i; printf " %s\n", $1;}' \
 | sort | uniq -c | sort -n \
-| awk '{d="dig -x " $(NF) " +short"; d |& getline z; printf "%s %s\n", $0, z;}' \
+| awk '{d="dig -x " $(NF) " +short | grep -o \".*\" || echo \"--\""; d | getline z; close(d); printf "%s %s\n", $0, z;}' \
 | less
 ```
 
