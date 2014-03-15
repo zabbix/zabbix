@@ -1,6 +1,3 @@
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -40,6 +37,13 @@ int	main(int argc, char *argv[])
 	secretkey_salt_b64 = argv[3];
 	password_enc_b64 = argv[4];
 	password_salt_b64 = argv[5];
+
+	/* initialize the library */
+	if (SUCCEED != rsm_ssl_init())
+	{
+		fprintf(stderr, "cannot initialize SSL library\n");
+		goto out;
+	}
 
 	if (SUCCEED != decrypt_ciphertext(passphrase, strlen(passphrase), secretkey_enc_b64, strlen(secretkey_enc_b64),
 			secretkey_salt_b64, strlen(secretkey_salt_b64), password_enc_b64, strlen(password_enc_b64),

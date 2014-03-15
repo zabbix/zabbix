@@ -1,13 +1,12 @@
 #ifndef _RSM_H_
 #define _RSM_H_
 
+#include <openssl/evp.h>
+
+int	rsm_ssl_init();
 int	get_random(void *data, int bytes);
-void	handleErrors(void);
 int	encrypt(const EVP_CIPHER *cipher, unsigned char *plaintext, int plaintext_len, unsigned char *key,
-		unsigned char *iv, unsigned char *ciphertext, int *ciphertext_len);
-int	decrypt(const EVP_CIPHER *cipher, unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-		unsigned char *iv, unsigned char *plaintext, int *plaintext_len);
-int	get_random(void *data, int bytes);
+		unsigned char *iv, unsigned char *ciphertext, int *ciphertext_len, char *err, size_t err_size);
 int	encrypt_cleartext(const char *passphrase, int passphrase_len, const char *secretkey_enc_b64,
 		int secretkey_enc_b64_len, const char *secretkey_salt_b64, int secretkey_salt_b64_len,
 		const char *cleartext, int cleartext_len, char **cleartext_b64, char **cleartext_salt_b64,

@@ -87,7 +87,11 @@ my $rv = GetOptions(\%OPTS,
 		    "ipv6!",
 		    "dnssec!",
 		    "epp-servers=s",
-		    "epp-dir=s",
+		    "epp-user=s",
+		    "epp-passwd=s",
+		    "epp-certs=s",
+		    "epp-commands=s",
+		    "epp-serverid=s",
 		    "ns-servers-v4=s",
 		    "ns-servers-v6=s",
 		    "rdds-ns-string=s",
@@ -1141,6 +1145,43 @@ sub update_root_servers {
     return ',,';
 }
 
+sub trim
+{
+    $_[0] =~ s/^\s*//g;
+    $_[0] =~ s/\s*$//g;
+}
+
+sub epp_encode_passwd {
+    my $passwd = shift;
+
+    # ask the user to enter the passphrase
+    my $passphrase;
+
+    print("Enter secret key passphrase: ");
+    system('stty', '-echo');
+    chomp($passphrase = <STDIN>);
+    system('stty', 'echo');
+
+    my $keysalt_file = "keysalt.txt";
+    if (! -r $keysalt_file)
+    {
+	pfail("cannot read file $keysalt_file");
+    }
+
+    my $keysalt = `cat $keysalt_file`;
+    trim($keysalt);
+    my $cmd = "/opt/zabbix/bin/rsm_epp_enc $passphrase $keysalt $passwd";
+
+    my $passsalt = `$cmd`;
+
+    exit 1 if ($passsalt !~ m/\|/);
+
+    trim($passsalt);
+
+    return $passsalt;
+}
+
+
 sub create_main_template {
     my $tld = shift;
     my $ns_servers = shift;
@@ -1225,6 +1266,15 @@ sub create_main_template {
     create_macro('{$DNSTEST.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
     create_macro('{$DNSTEST.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid);
+
+    if ($OPTS{'epp-servers'})
+    {
+	create_macro('{$DNSTEST.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
+	create_macro('{$DNSTEST.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
+	create_macro('{$DNSTEST.EPP.USER}', $OPTS{'epp-user'}, $templateid);
+	create_macro('{$DNSTEST.EPP.PASSWD}', epp_encode_passwd($OPTS{'epp-passwd'}), $templateid);
+	create_macro('{$DNSTEST.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
+    }
 
     return $templateid;
 }
@@ -1687,6 +1737,16 @@ Other options
                 list of RDDS80 servers separated by comma: "NAME1,NAME2,..."
         --epp-servers=STRING
                 list of EPP servers separated by comma: "NAME1,NAME2,..."
+        --epp-user
+                specify EPP username
+	--epp-passwd
+                speciry EPP password
+	--epp-serverid
+                specify expected EPP Server ID string in reply
+	--epp-certs
+                path to EPP certificates directory on the Probe node
+	--epp-commands
+                path to EPP command templates directory on the Probe node
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
@@ -1711,8 +1771,9 @@ sub validate_input {
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
-    $msg .= "none or both --epp-servers and --epp-dir must be specified\n" if ((defined($OPTS{'epp-servers'}) and not defined($OPTS{'epp-dir'})) or
-									       (defined($OPTS{'epp-dir'}) and not defined($OPTS{'epp-servers'})));
+    $msg .= "EPP user must be specified (--epp-user)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-user'});
+    $msg .= "EPP password must be specified (--epp-passwd)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-passwd'});
+    $msg .= "EPP server ID must be specified (--epp-serverid)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-serverid'});
 
     if ($msg ne "")
     {
@@ -1722,7 +1783,13 @@ sub validate_input {
 }
 
 sub lc_options {
-    $OPTS{$_} = lc($OPTS{$_}) foreach (keys(%OPTS));
+    foreach my $key (keys(%OPTS))
+    {
+	foreach ("tld", "rdds43-servers", "rdds80-servers=s", "epp-servers", "ns-servers-v4", "ns-servers-v6")
+	{
+	    $OPTS{$_} = lc($OPTS{$_}) if ($key eq $_);
+	}
+    }
 }
 
 sub create_probe_status_host {

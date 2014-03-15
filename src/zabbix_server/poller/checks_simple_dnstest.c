@@ -19,13 +19,6 @@
 
 #include <ldns/ldns.h>
 
-#include <openssl/bio.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/pem.h>
-#include <openssl/x509.h>
-#include <openssl/x509_vfy.h>
-
 #include "sysinfo.h"
 #include "checks_simple_dnstest.h"
 #include "zbxserver.h"
@@ -49,7 +42,6 @@
 #define COMMAND_BUF_SIZE	1024
 #define XML_VALUE_BUF_SIZE	512
 
-#define EXPECTED_SERVER_ID		"192.0.34.201/620:0:2d0:270:1::201"
 #define EXPECTED_RESULT_CODE		"1000"
 #define EXPECTED_RESULT_CODE_LOGOUT	"1500"
 
@@ -2587,7 +2579,7 @@ static int	set_command(char *command_buf, size_t command_buf_size, const char *f
 	return SUCCEED;
 }
 
-static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, char *err, size_t err_size)
+static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, const char *epp_serverid, char *err, size_t err_size)
 {
 	char	xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
@@ -2607,10 +2599,10 @@ static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, char *err, size_t
 		goto out;
 	}
 
-	if (0 != strcmp(EXPECTED_SERVER_ID, xml_value))
+	if (0 != strcmp(epp_serverid, xml_value))
 	{
 		zbx_snprintf(err, err_size, "invalid Server ID in the first message from server: \"%s\""
-				" (expected \"%s\")", xml_value, EXPECTED_SERVER_ID);
+				" (expected \"%s\")", xml_value, epp_serverid);
 		*res = ZBX_EC_EPP_FIRSTINVAL;
 		goto out;
 	}
@@ -2999,14 +2991,13 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 
 int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
-	static int		ssl_initialized = 0;
 	static char		cert_file[512], key_file[512];
 
 	ldns_resolver		*res = NULL;
 	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL,
 				*secretkey_enc_b64 = NULL, *secretkey_salt_b64 = NULL, *epp_passwd_enc_b64 = NULL,
 				*epp_passwd_salt_b64 = NULL, *epp_user = NULL, *epp_passwd = NULL, *epp_certs = NULL,
-				*epp_commands = NULL, *tmp;
+				*epp_commands = NULL, *epp_serverid = NULL, *tmp;
 	short			epp_port = 700;
 	X509			*cert = NULL;
 	const SSL_METHOD	*method;
@@ -3138,6 +3129,12 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 		goto out;
 	}
 
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_SERVERID, &epp_serverid, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
 	zbx_free(value_str);
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_PASSWD, &value_str, err, sizeof(err)))
 	{
@@ -3196,23 +3193,11 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 	/* from this point item will not become NOT_SUPPORTED */
 	ret = SYSINFO_RET_OK;
 
-	/* these function calls initialize openssl for correct work */
-	if (0 == ssl_initialized)
+	if (SUCCEED != rsm_ssl_init())
 	{
-		OpenSSL_add_all_algorithms();
-		ERR_load_BIO_strings();
-		ERR_load_crypto_strings();
-		SSL_load_error_strings();
-
-		/* initialize SSL library and register algorithms */
-		if (0 > SSL_library_init())
-		{
-			rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
-			zbx_dns_err(log_fd, "cannot initialize SSL library");
-			goto out;
-		}
-
-		ssl_initialized = 1;
+		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
+		zbx_dns_err(log_fd, "cannot initialize SSL library");
+		goto out;
 	}
 
 	/* set SSLv2 client hello, also announce SSLv3 and TLSv1 */
@@ -3305,12 +3290,15 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 
 	zbx_dns_infof(log_fd, "start EPP test (ip %s)", ip);
 
-	if (SUCCEED != get_first_message(ssl, &rv, log_fd, err, sizeof(err)))
+	if (SUCCEED != get_first_message(ssl, &rv, log_fd, epp_serverid, err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = rv;
 		zbx_dns_err(log_fd, err);
 		goto out;
 	}
+
+	zbx_dns_infof(log_fd, "epp_passphrase: %s, secretkey_enc_b64: %s, secretkey_salt_b64: %s, epp_passwd_enc_b64: %s, epp_passwd_salt_b64: %s",
+			epp_passphrase, secretkey_enc_b64, secretkey_salt_b64, epp_passwd_enc_b64, epp_passwd_salt_b64);
 
 	if (SUCCEED != decrypt_ciphertext(epp_passphrase, strlen(epp_passphrase), secretkey_enc_b64,
 			strlen(secretkey_enc_b64), secretkey_salt_b64, strlen(secretkey_salt_b64), epp_passwd_enc_b64,
@@ -3318,7 +3306,7 @@ int	check_dnstest_epp(DC_ITEM *item, const char *keyname, const char *params, AG
 			err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
-		zbx_dns_errf(log_fd, "cannot encrypt EPP password: %s", err);
+		zbx_dns_errf(log_fd, "cannot decrypt EPP password: %s", err);
 		goto out;
 	}
 

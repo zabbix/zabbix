@@ -1,5 +1,3 @@
-#include <openssl/conf.h>
-#include <openssl/evp.h>
 #include <openssl/err.h>
 #include <string.h>
 #include <sys/types.h>
@@ -24,7 +22,7 @@ int	main(int argc, char *argv[])
 	const EVP_MD		*digest;
 	unsigned char		*passphrase, salt[8], secret_key[64], key[EVP_MAX_KEY_LENGTH], iv[EVP_MAX_IV_LENGTH],
 				*secret_key_enc = NULL;
-	char			*secret_key_enc_b64 = NULL, *salt_b64 = NULL;
+	char			*secret_key_enc_b64 = NULL, *salt_b64 = NULL, err[128];
 	int			secret_key_enc_len, block_size, nrounds = 500;
 
 	progname = get_program_name(argv[0]);
@@ -37,10 +35,12 @@ int	main(int argc, char *argv[])
 
 	passphrase = (unsigned char *)argv[1];
 
-	/* initialise the library */
-	ERR_load_crypto_strings();
-	OpenSSL_add_all_algorithms();
-	OPENSSL_config(NULL);
+	/* initialize the library */
+	if (SUCCEED != rsm_ssl_init())
+	{
+		fprintf(stderr, "cannot initialize SSL library\n");
+		goto out;
+	}
 
 	cipher = EVP_aes_128_cbc();
 	digest = EVP_sha256();
@@ -72,7 +72,8 @@ int	main(int argc, char *argv[])
 	secret_key_enc = zbx_malloc(secret_key_enc, sizeof(secret_key) + block_size);
 
 	/* encrypt the secret key */
-	if (SUCCEED != encrypt(cipher, secret_key, sizeof(secret_key), key, iv, secret_key_enc, &secret_key_enc_len))
+	if (SUCCEED != encrypt(cipher, secret_key, sizeof(secret_key), key, iv, secret_key_enc, &secret_key_enc_len,
+			err, sizeof(err)))
 	{
 		fprintf(stderr, "cannot encrypt secret key\n");
 		goto out;
