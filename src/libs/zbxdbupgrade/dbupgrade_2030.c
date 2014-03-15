@@ -468,6 +468,17 @@ static int	DBpatch_2030044(void)
 	return FAIL;
 }
 
+static int	DBpatch_2030045(void)
+{
+	/* 21 - AUDIT_RESOURCE_NODE */
+	const char	*sql = "delete from auditlog where resourcetype=21";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -519,5 +530,6 @@ DBPATCH_ADD(2030041, 0, 1)
 DBPATCH_ADD(2030042, 0, 1)
 DBPATCH_ADD(2030043, 0, 1)
 DBPATCH_ADD(2030044, 0, 0)
+DBPATCH_ADD(2030045, 0, 0)
 
 DBPATCH_END()
