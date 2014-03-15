@@ -134,6 +134,9 @@ my $proxies = get_proxies_list();
 
 pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
 
+create_macro('{$DNSTEST.IP4.MIN.PROBE.ONLINE} ', 25, undef);
+create_macro('{$DNSTEST.IP6.MIN.PROBE.ONLINE} ', 20, undef);
+
 create_macro('{$DNSTEST.IP4.MIN.SERVERS}', 4, undef);
 create_macro('{$DNSTEST.IP6.MIN.SERVERS}', 4, undef);
 create_macro('{$DNSTEST.IP4.REPLY.MS}', 200, undef);
@@ -1927,15 +1930,15 @@ sub create_probe_status_host {
 
     create_trigger($options);
 
-    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP4.MIN.SERVERS}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$DNSTEST.IP4.MIN.SERVERS}',
+    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP4.MIN.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$DNSTEST.IP4.MIN.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP6.MIN.SERVERS}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$DNSTEST.IP6.MIN.SERVERS}',
+    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP6.MIN.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$DNSTEST.IP6.MIN.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
