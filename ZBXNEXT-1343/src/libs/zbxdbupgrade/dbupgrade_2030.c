@@ -479,6 +479,16 @@ static int	DBpatch_2030045(void)
 	return FAIL;
 }
 
+static int	DBpatch_2030046(void)
+{
+	/* 17 - CONDITION_TYPE_NODE */
+	const char	*sql = "delete from conditions where conditiontype=17";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif
 
 DBPATCH_START(2030)
@@ -530,6 +540,7 @@ DBPATCH_ADD(2030041, 0, 1)
 DBPATCH_ADD(2030042, 0, 1)
 DBPATCH_ADD(2030043, 0, 1)
 DBPATCH_ADD(2030044, 0, 0)
-DBPATCH_ADD(2030045, 0, 0)
+DBPATCH_ADD(2030045, 0, 1)
+DBPATCH_ADD(2030046, 0, 1)
 
 DBPATCH_END()
