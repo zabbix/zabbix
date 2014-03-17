@@ -68,6 +68,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7884] fixed incorrect layering of modal window and made modal windows draggable and opaque (Ivo)
 A......... [ZBX-7879] fixed creating and updating applications with multibyte characters in template which is linked to host while mbstring.func_overload set greater than 1 (Ivo)
 ...G...PS. [ZBX-7919] fixed hashset entry allocation overhead (wiper)
 ........S. [ZBX-7918] fixed value cache reporting more free space than actually available (wiper)
