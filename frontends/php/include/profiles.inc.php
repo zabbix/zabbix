@@ -172,7 +172,7 @@ class CProfile {
 	 */
 	protected static function deleteValues($idx, array $idx2) {
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
+		DB::delete('profiles', array('idx' => $idx, 'idx2' => $idx2));
 	}
 
 	/**
