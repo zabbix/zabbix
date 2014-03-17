@@ -841,13 +841,14 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		itemid = DBget_maxid_num("items", new_items);
 		itemdiscoveryid = DBget_maxid_num("item_discovery", new_items);
 
-		zbx_db_insert_prepare(&db_insert, "items", "itemid","name","key_","hostid","type","value_type",
-				"data_type","delay","delay_flex","history","trends","status", "trapper_hosts", "units",
-				"multiplier", "delta", "formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
-				"snmp_community", "snmp_oid", "port", "snmpv3_securityname", "snmpv3_securitylevel",
-				"snmpv3_authprotocol", "snmpv3_authpassphrase", "snmpv3_privprotocol",
-				"snmpv3_privpassphrase", "authtype", "username", "password", "publickey", "privatekey",
-				"description", "interfaceid", "flags", "snmpv3_contextname", NULL);
+		zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
+				"data_type", "delay", "delay_flex", "history", "trends", "status", "trapper_hosts",
+				"units", "multiplier", "delta", "formula", "logtimefmt", "valuemapid", "params",
+				"ipmi_sensor", "snmp_community", "snmp_oid", "port", "snmpv3_securityname",
+				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
+				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
+				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
+				NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
