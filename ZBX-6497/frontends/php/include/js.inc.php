@@ -283,17 +283,6 @@ function insert_javascript_for_visibilitybox() {
 	insert_js($js);
 }
 
-function play_sound($filename) {
-	insert_js('
-		if (IE) {
-			document.writeln(\'<bgsound src="'.$filename.'" loop="0" />\');
-		}
-		else {
-			document.writeln(\'<embed src="'.$filename.'" autostart="true" width="0" height="0" loop="0" />\');
-			document.writeln(\'<noembed><bgsound src="'.$filename.'" loop="0" /></noembed>\');
-		}');
-}
-
 function insert_js_function($fnct_name) {
 	switch ($fnct_name) {
 		case 'add_item_variable':

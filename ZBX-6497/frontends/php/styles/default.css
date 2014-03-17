@@ -574,3 +574,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* tabs */
 .tabs { visibility: hidden; }
+
+/* modal window */
+.ui-widget-overlay { z-index: 1000; }
+.ui-dialog { z-index: 1001; opacity: 1; }

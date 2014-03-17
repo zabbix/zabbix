@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
 A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templates, hosts and proxies (Eduard, Sasha)
 ..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavel)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
@@ -68,6 +69,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7884] fixed incorrect layering of modal window and made modal windows draggable and opaque (Ivo)
 A......... [ZBX-7879] fixed creating and updating applications with multibyte characters in template which is linked to host while mbstring.func_overload set greater than 1 (Ivo)
 ...G...PS. [ZBX-7919] fixed hashset entry allocation overhead (wiper)
 ........S. [ZBX-7918] fixed value cache reporting more free space than actually available (wiper)
