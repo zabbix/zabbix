@@ -35,6 +35,7 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// filter
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_field' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_field_value' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_exact' =>		array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
@@ -139,10 +140,19 @@ else {
 	));
 
 	// host inventory filter
+	if (hasRequest('filter_rst')) {
+		$data['filterField'] = '';
+		$data['filterFieldValue'] = '';
+		$data['filterExact'] = '';
+	}
+
 	if (hasRequest('filter_set')) {
 		$data['filterField'] = getRequest('filter_field');
 		$data['filterFieldValue'] = getRequest('filter_field_value');
 		$data['filterExact'] = getRequest('filter_exact');
+	}
+
+	if (hasRequest('filter_set') || hasRequest('filter_rst')) {
 		CProfile::update('web.hostinventories.filter_field', $data['filterField'], PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_field_value', $data['filterFieldValue'], PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_exact', $data['filterExact'], PROFILE_TYPE_INT);
