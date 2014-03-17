@@ -587,14 +587,14 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 		{
 			zbx_status_update_t	*update = alarms->values[i];
 
-			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status, update->clock);
+			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
+					update->clock);
 		}
 
 		ret = zbx_db_insert_execute(&db_insert);
 
 		zbx_db_insert_clean(&db_insert);
 	}
-
 out:
 	zbx_free(sql);
 
