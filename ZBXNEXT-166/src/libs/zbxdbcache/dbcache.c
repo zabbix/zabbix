@@ -1510,8 +1510,8 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
-				history[i].timestamp, history[i].value.str, history[i].severity,
-				history[i].value_orig.str, history[i].logeventid);
+				history[i].timestamp, (NULL != history[i].value.str ? history[i].value.str : ""),
+				history[i].severity, history[i].value_orig.str, history[i].logeventid);
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -1700,8 +1700,8 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid,history[i].ts.sec, history[i].ts.ns,
-				history[i].timestamp, history[i].value.str, history[i].severity,
-				history[i].value_orig.str, history[i].logeventid);
+				history[i].timestamp, NULL !=  history[i].value.str ? history[i].value.str : "",
+				history[i].severity, history[i].value_orig.str, history[i].logeventid);
 	}
 
 	zbx_db_insert_execute(&db_insert);

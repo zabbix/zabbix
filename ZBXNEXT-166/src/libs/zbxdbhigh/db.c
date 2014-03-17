@@ -2171,7 +2171,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = zbx_strdup(NULL, NULL != value->str ? value->str : "");
+				row[i].str = zbx_strdup(NULL, value->str);
 #else
 				row[i].str = DBdyn_escape_string(value->str);
 #endif
