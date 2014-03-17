@@ -137,6 +137,7 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filter_rst' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -233,8 +234,33 @@ if (!empty($hosts)) {
 	$_REQUEST['filter_hostid'] = $host['hostid'];
 }
 
-// filter
-if (isset($_REQUEST['filter_set'])) {
+/*
+ * Filter
+ */
+if (hasRequest('filter_rst')) {
+	$_REQUEST['filter_groupid'] = 0;
+	$_REQUEST['filter_hostid'] = 0;
+	$_REQUEST['filter_application'] = '';
+	$_REQUEST['filter_name'] = '';
+	$_REQUEST['filter_type'] = -1;
+	$_REQUEST['filter_key'] = '';
+	$_REQUEST['filter_snmp_community'] = '';
+	$_REQUEST['filter_snmpv3_securityname'] = '';
+	$_REQUEST['filter_snmp_oid'] = '';
+	$_REQUEST['filter_port'] = '';
+	$_REQUEST['filter_value_type'] = -1;
+	$_REQUEST['filter_data_type'] = -1;
+	$_REQUEST['filter_delay'] = '';
+	$_REQUEST['filter_history'] = '';
+	$_REQUEST['filter_trends'] = '';
+	$_REQUEST['filter_status'] = -1;
+	$_REQUEST['filter_state'] = -1;
+	$_REQUEST['filter_templated_items'] = -1;
+	$_REQUEST['filter_with_triggers'] = -1;
+	$_REQUEST['filter_ipmi_sensor'] = '';
+}
+
+if (hasRequest('filter_set')) {
 	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
 	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
 	$_REQUEST['filter_application'] = get_request('filter_application');
@@ -255,7 +281,9 @@ if (isset($_REQUEST['filter_set'])) {
 	$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
+}
 
+if (hasRequest('filter_set') || hasRequest('filter_rst')) {
 	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);

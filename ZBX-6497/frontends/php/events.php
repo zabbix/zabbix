@@ -72,7 +72,7 @@ $fields = array(
 	'load'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		null),
 	'fullscreen'=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'csv_export'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_rst'=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN(array(0,1)), null),
+	'filter_rst'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
@@ -355,8 +355,7 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 	)));
 
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-	$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-		'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 }
 
 $eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
