@@ -1040,6 +1040,7 @@ int	is_function_char(char c);
 int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
+int	is_snmp_type(unsigned char type);
 
 int	parse_host(char **exp, char **host);
 int	parse_key(char **exp, char **key);

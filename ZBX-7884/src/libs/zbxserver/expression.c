@@ -3920,7 +3920,6 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	int		i, j;

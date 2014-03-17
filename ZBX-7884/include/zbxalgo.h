@@ -71,6 +71,13 @@ void	zbx_default_mem_free_func(void *ptr);
 #define ZBX_DEFAULT_MEM_REALLOC_FUNC	zbx_default_mem_realloc_func
 #define ZBX_DEFAULT_MEM_FREE_FUNC	zbx_default_mem_free_func
 
+#define ZBX_RETURN_IF_NOT_EQUAL(a, b)	\
+					\
+	if ((a) < (b))			\
+		return -1;		\
+	if ((a) > (b))			\
+		return +1
+
 int	is_prime(int n);
 int	next_prime(int n);
 
