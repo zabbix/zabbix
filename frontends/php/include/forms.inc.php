@@ -1336,7 +1336,14 @@ function getTriggerMassupdateFormData() {
 	return $data;
 }
 
-function getTriggerFormData() {
+/**
+ * Generate data for the trigger configuration form.
+ *
+ * @param string $exprAction	expression constructor action, see remakeExpression() for a list of supported values
+ *
+ * @return array
+ */
+function getTriggerFormData($exprAction = null) {
 	$data = array(
 		'form' => get_request('form'),
 		'form_refresh' => get_request('form_refresh'),
@@ -1442,9 +1449,10 @@ function getTriggerFormData() {
 		$analyze = analyzeExpression($data['expression']);
 		if ($analyze !== false) {
 			list($data['outline'], $data['eHTMLTree']) = $analyze;
-			if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
+			if ($exprAction !== null && $data['eHTMLTree'] != null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-						$_REQUEST['expr_action'], $data['expr_temp']);
+					$exprAction, $data['expr_temp']
+				);
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
 					$analyze = analyzeExpression($data['expression']);
