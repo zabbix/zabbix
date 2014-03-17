@@ -105,21 +105,22 @@ if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid'])
 /*
  * Actions
  */
+$exprAction = null;
 if (isset($_REQUEST['add_expression'])) {
 	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
 	$_REQUEST['expr_temp'] = '';
 }
 elseif (isset($_REQUEST['and_expression'])) {
-	$_REQUEST['expr_action'] = '&';
+	$exprAction = 'and';
 }
 elseif (isset($_REQUEST['or_expression'])) {
-	$_REQUEST['expr_action'] = '|';
+	$exprAction = 'or';
 }
 elseif (isset($_REQUEST['replace_expression'])) {
-	$_REQUEST['expr_action'] = 'r';
+	$exprAction = 'r';
 }
 elseif (isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])) {
-	$_REQUEST['expr_action'] = 'R';
+	$exprAction = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
@@ -328,7 +329,7 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
+	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
 	$triggersView->render();
 	$triggersView->show();
 }
