@@ -274,14 +274,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock, inserts_num[ITEM_VALUE_TYPE_MAX] = {0};
+	int		num, i, clock, inserts_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
 	int		ids_alloc, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
-	zbx_db_insert_t	db_insert_float, db_insert_uint64;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, *trends_num);
 
@@ -315,14 +315,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
 
-		inserts_num[trend->value_type]++;
-
 		if (ZBX_SYNC_MAX == ids_num)
 		{
 			trends_to = i + 1;
 			break;
 		}
 	}
+
+	inserts_num = ids_num;
 
 	if (0 != ids_num)
 	{
@@ -475,7 +475,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			trend->itemid = 0;
 
-			inserts_num[trend->value_type]--;
+			inserts_num--;
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -513,11 +513,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		UNLOCK_TRENDS;
 	}
 
-	sql_offset = 0;
-
-	if (value_type == ITEM_VALUE_TYPE_FLOAT && 0 < inserts_num[ITEM_VALUE_TYPE_FLOAT])
+	if (0 != inserts_num)
 	{
-		zbx_db_insert_prepare(&db_insert_float, "trends", "itemid", "clock", "num", "value_min", "value_avg",
+		zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
 				"value_max", NULL);
 
 		for (i = 0; i < trends_to; i++)
@@ -530,58 +528,29 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
 
-			zbx_db_insert_add_values(&db_insert_float, trend->itemid, trend->clock, trend->num,
-					trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl);
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
+						trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl);
+
+			}
+			else
+			{
+				zbx_uint128_t	avg;
+
+				/* calculate the trend average value */
+				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+
+				zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
+						trend->value_min.ui64, avg.lo, trend->value_max.ui64);
+			}
 
 			trend->itemid = 0;
 		}
+
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
-
-	if (value_type == ITEM_VALUE_TYPE_UINT64 && 0 < inserts_num[ITEM_VALUE_TYPE_UINT64])
-	{
-		zbx_db_insert_prepare(&db_insert_uint64, "trends_uint", "itemid", "clock", "num", "value_min", "value_avg",
-				"value_max", NULL);
-
-		for (i = 0; i < trends_to; i++)
-		{
-			zbx_uint128_t	avg;
-
-			trend = &trends[i];
-
-			if (0 == trend->itemid)
-				continue;
-
-			if (clock != trend->clock || value_type != trend->value_type)
-				continue;
-
-			/* calculate the trend average value */
-			udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-
-			zbx_db_insert_add_values(&db_insert_uint64, trend->itemid, trend->clock, trend->num,
-					trend->value_min.ui64, avg.lo, trend->value_max.ui64);
-
-			trend->itemid = 0;
-		}
-	}
-
-	if (0 != sql_offset)
-	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
-	}
-
-	if (0 < inserts_num[ITEM_VALUE_TYPE_FLOAT])
-	{
-		zbx_db_insert_execute(&db_insert_float);
-		zbx_db_insert_clean(&db_insert_float);
-	}
-
-	if (0 < inserts_num[ITEM_VALUE_TYPE_UINT64])
-	{
-		zbx_db_insert_execute(&db_insert_uint64);
-		zbx_db_insert_clean(&db_insert_uint64);
-	}
-
 
 	/* clean trends */
 	for (i = 0, num = 0; i < *trends_num; i++)
@@ -1493,11 +1462,10 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 {
 	int		i;
 	zbx_uint64_t	id;
-
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "history_log", "id", "itemid", "clock", "ns", "timestamp", "source",
-			"serverity", "value", "logeventid", NULL);
+			"severity", "value", "logeventid", NULL);
 
 	id = DBget_maxid_num("history_log", hlog_num);
 
@@ -1699,7 +1667,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
-		zbx_db_insert_add_values(&db_insert, history[i].itemid,history[i].ts.sec, history[i].ts.ns,
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
 				history[i].timestamp, NULL !=  history[i].value.str ? history[i].value.str : "",
 				history[i].severity, history[i].value_orig.str, history[i].logeventid);
 	}
@@ -1727,7 +1695,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
 		if (ITEM_STATE_NOTSUPPORTED != history[i].state)
 			continue;
 
-		zbx_db_insert_add_values(&db_insert ,history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
 				history[i].value_orig.err, (int)history[i].state);
 	}
 
