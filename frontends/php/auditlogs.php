@@ -36,19 +36,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'action' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null),
 	'resourcetype' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 31), null),
-	'filter_rst' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'alias' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'left' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'alias' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'left' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
+	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
 

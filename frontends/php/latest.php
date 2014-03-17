@@ -45,7 +45,7 @@ $fields = array(
 	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
@@ -306,9 +306,7 @@ $filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filt
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
-));
+$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));

@@ -95,6 +95,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// filter
 	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
+	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
@@ -152,22 +153,31 @@ if ($exportData) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_set'])) {
-	$_REQUEST['filter_ip'] = get_request('filter_ip');
-	$_REQUEST['filter_dns'] = get_request('filter_dns');
-	$_REQUEST['filter_host'] = get_request('filter_host');
-	$_REQUEST['filter_port'] = get_request('filter_port');
+if (hasRequest('filter_rst')) {
+	$filterIp = '';
+	$filterDns = '';
+	$filterHost = '';
+	$filterPort = '';
+}
 
-	CProfile::update('web.hosts.filter_ip', $_REQUEST['filter_ip'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_dns', $_REQUEST['filter_dns'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_port', $_REQUEST['filter_port'], PROFILE_TYPE_STR);
+if (hasRequest('filter_set')) {
+	$filterIp = getRequest('filter_ip');
+	$filterDns = getRequest('filter_dns');
+	$filterHost = getRequest('filter_host');
+	$filterPort = getRequest('filter_port');
+}
+
+if (hasRequest('filter_set') || hasRequest('filter_rst')) {
+	CProfile::update('web.hosts.filter_ip', $filterIp, PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_dns', $filterDns, PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_host', $filterHost, PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_port', $filterPort, PROFILE_TYPE_STR);
 }
 else {
-	$_REQUEST['filter_ip'] = CProfile::get('web.hosts.filter_ip');
-	$_REQUEST['filter_dns'] = CProfile::get('web.hosts.filter_dns');
-	$_REQUEST['filter_host'] = CProfile::get('web.hosts.filter_host');
-	$_REQUEST['filter_port'] = CProfile::get('web.hosts.filter_port');
+	$filterIp = CProfile::get('web.hosts.filter_ip');
+	$filterDns = CProfile::get('web.hosts.filter_dns');
+	$filterHost = CProfile::get('web.hosts.filter_host');
+	$filterPort = CProfile::get('web.hosts.filter_port');
 }
 
 /*
@@ -797,18 +807,16 @@ else {
 	// filter
 	$filterTable = new CTable('', 'filter');
 	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
+		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filterHost, 20)),
+		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filterDns, 20)),
+		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filterIp, 20)),
+		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filterPort, 20))
 	));
 
-	$filter = new CButton('filter', _('Filter'),
-		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
-	);
+	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$filter->useJQueryStyle('main');
 
-	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$reset->useJQueryStyle();
 
 	$divButtons = new CDiv(array($filter, SPACE, $reset));
@@ -859,12 +867,12 @@ else {
 			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
-				'name' => empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host'],
-				'ip' => empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip'],
-				'dns' => empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']
+				'name' => $filterHost ? $filterHost : null,
+				'ip' => $filterIp ? $filterIp : null,
+				'dns' => $filterDns ? $filterDns : null
 			),
 			'filter' => array(
-				'port' => empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']
+				'port' => $filterPort ? $filterPort : null
 			)
 		));
 	}

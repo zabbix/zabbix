@@ -33,19 +33,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'mode' =>				array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),		null),
-	'hostgroupid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'tpl_triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
+	'mode' =>				array(T_ZBX_INT,	O_OPT,	P_SYS,			IN('0,1'),	null),
+	'hostgroupid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'tpl_triggerid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'triggerid' =>			array(T_ZBX_INT,	O_OPT,	P_SYS|P_NZERO,	DB_ID,		null),
 	// filter
-	'filter_groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'filter_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN(array(0, 1)),	null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,			null),
-	'filter_timesince' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
-	'filter_timetill' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
+	'filter_groupid'=>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'filter_hostid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'filter_rst'=>			array(T_ZBX_STR,	O_OPT,	P_SYS,			null,		null),
+	'filter_set' =>			array(T_ZBX_STR,	O_OPT,	P_SYS,			null,		null),
+	'filter_timesince' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null),
+	'filter_timetill' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null),
 	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,			null)
+	'filterState' =>		array(T_ZBX_INT,	O_OPT,	P_ACT,			null,		null)
 );
 check_fields($fields);
 
@@ -101,6 +101,10 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_hostid'] = 0;
 	$_REQUEST['filter_timesince'] = 0;
 	$_REQUEST['filter_timetill'] = 0;
+
+	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		$_REQUEST['tpl_triggerid'] = 0;
+	}
 }
 
 $config = select_config();
@@ -386,8 +390,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	// filter buttons
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
-	$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-		'javascript: var url = new Curl(location.href); url.setArgument("filter_rst", 1); location.href = url.getUrl();'));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 	$reportWidget->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 
