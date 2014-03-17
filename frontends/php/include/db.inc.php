@@ -872,10 +872,11 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$start = is_null($options['startSearch']) ? '%' : '';
 	$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
+	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
 
 	$search = array();
-	foreach ($options['search'] as $field => $pattern) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) {
+	foreach ($options['search'] as $field => $patterns) {
+		if (!isset($tableSchema['fields'][$field]) || zbx_empty($patterns)) {
 			continue;
 		}
 		if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
@@ -883,26 +884,35 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			continue;
 		}
 
-		// escaping parameter that is about to be used in LIKE statement
-		$pattern = str_replace("!", "!!", $pattern);
-		$pattern = str_replace("%", "!%", $pattern);
-		$pattern = str_replace("_", "!_", $pattern);
+		$fieldSearch = array();
+		foreach ((array) $patterns as $pattern) {
+			if (zbx_empty($pattern)) {
+				continue;
+			}
 
-		if (empty($options['searchWildcardsEnabled'])) {
-			$search[$field] =
-				' UPPER('.$tableShort.'.'.$field.') '.
-				$exclude.' LIKE '.
-				zbx_dbstr($start.zbx_strtoupper($pattern).'%').
-				" ESCAPE '!'";
+			// escaping parameter that is about to be used in LIKE statement
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
+
+			if (!$options['searchWildcardsEnabled']) {
+				$fieldSearch[] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+					" ESCAPE '!'";
+			}
+			else {
+				$pattern = str_replace("*", "%", $pattern);
+				$fieldSearch[] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr(zbx_strtoupper($pattern)).
+					" ESCAPE '!'";
+			}
 		}
-		else {
-			$pattern = str_replace("*", "%", $pattern);
-			$search[$field] =
-				' UPPER('.$tableShort.'.'.$field.') '.
-				$exclude.' LIKE '.
-				zbx_dbstr(zbx_strtoupper($pattern)).
-				" ESCAPE '!'";
-		}
+
+		$search[$field] = '( '.implode($glue, $fieldSearch).' )';
 	}
 
 	if (!empty($search)) {
@@ -910,7 +920,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			$search[] = $sql_parts['where']['search'];
 		}
 
-		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
 		$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
 		return true;
 	}
