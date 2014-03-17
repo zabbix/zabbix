@@ -341,6 +341,74 @@ static int	DBpatch_2030032(void)
 	return DBadd_field("hosts", &field);
 }
 
+static int	DBpatch_2030033(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*p, *q, *expr = NULL, *expr_esc;
+	size_t		expr_alloc = 0, expr_offset;
+
+	result = DBselect("select triggerid,expression from triggers");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		p = row[1];
+		expr_offset = 0;
+
+		while (NULL != (q = strpbrk(p, "#&|")))
+		{
+			zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset, p, q - p);
+
+			if (('&' == *q || '|' == *q) && row[1] != q && ' ' != *(q - 1))
+				zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, ' ');
+
+			switch (*q)
+			{
+				case '#':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "<>");
+					break;
+				case '&':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "and");
+					break;
+				case '|':
+					zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "or");
+					break;
+			}
+
+			if (('&' == *q || '|' == *q) && ' ' != *(q + 1))
+				zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, ' ');
+
+			p = q + 1;
+		}
+
+		zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, p);
+
+		if (2048 < expr_offset && 2048 /* TRIGGER_EXPRESSION_LEN */ < zbx_strlen_utf8(expr))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger expression \"%s\":"
+					" resulting trigger expression is too long", row[1]);
+		}
+		else if (0 != strcmp(row[1], expr))
+		{
+			expr_esc = DBdyn_escape_string(expr);
+
+			if (ZBX_DB_OK > DBexecute("update triggers set expression='%s' where triggerid=%s",
+					expr_esc, row[0]))
+			{
+				ret = FAIL;
+			}
+
+			zbx_free(expr_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(expr);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -380,5 +448,6 @@ DBPATCH_ADD(2030029, 0, 1)
 DBPATCH_ADD(2030030, 0, 1)
 DBPATCH_ADD(2030031, 0, 0)
 DBPATCH_ADD(2030032, 0, 1)
+DBPATCH_ADD(2030033, 0, 1)
 
 DBPATCH_END()
