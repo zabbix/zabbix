@@ -187,7 +187,6 @@ static int	vmware_counter_get(const char *stats, const char *instance, zbx_uint6
 
 	int		ret = SYSINFO_RET_FAIL;
 	char		xpath[MAX_STRING_LEN], *value;
-	zbx_uint64_t	value_ui64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s: " ZBX_FS_UI64, __function_name, instance, counterid);
 
@@ -200,12 +199,8 @@ static int	vmware_counter_get(const char *stats, const char *instance, zbx_uint6
 		goto out;
 	}
 
-	if (SUCCEED == is_uint64(value, &value_ui64))
-	{
-		SET_UI64_RESULT(result, value_ui64 * coeff);
-
+	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, value))
 		ret = SYSINFO_RET_OK;
-	}
 
 	zbx_free(value);
 out:
@@ -392,8 +387,8 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_FAILED))
 	{
-		if (NULL != service->data->error)
-			SET_MSG_RESULT(result, zbx_strdup(NULL, service->data->error));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, NULL != service->data->error ? service->data->error :
+				"Unknown VMware service error"));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service at %s: %s",
 				(NULL == service->data->error ? "unknown error" : service->data->error));
