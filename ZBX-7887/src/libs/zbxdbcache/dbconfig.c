@@ -79,8 +79,10 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
 	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
+	const char		*units;
 	ZBX_DC_TRIGGER		**triggers;
 	int			delay;
 	int			nextcheck;
@@ -916,6 +918,8 @@ static void	DCsync_items(DB_RESULT result)
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
+		ZBX_DBROW2UINT64(item->valuemapid, row[33]);
+		DCstrpool_replace(found, &item->units, row[34]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
@@ -2570,7 +2574,7 @@ void	DCsync_configuration(void)
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.flags,i.interfaceid,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
-				"i.snmpv3_contextname,i.lastlogsize,i.mtime"
+				"i.snmpv3_contextname,i.lastlogsize,i.mtime, i.valuemapid, i.units"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -3464,6 +3468,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->flags = src_item->flags;
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
+	dst_item->valuemapid = src_item->valuemapid;
+	strscpy(dst_item->units, src_item->units);
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);

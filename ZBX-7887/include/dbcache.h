@@ -104,10 +104,12 @@ typedef struct
 	DC_INTERFACE	interface;
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	lastlogsize;
+	zbx_uint64_t	valuemapid;
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
+	char		units[ITEM_UNITS_LEN_MAX];
 	int		delay;
 	int		nextcheck;
 	int		lastclock;
