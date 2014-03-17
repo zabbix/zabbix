@@ -360,7 +360,7 @@ static int	DBpatch_2030033(void)
 		{
 			zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset, p, q - p);
 
-			if (('&' == *q || '|' == *q) && row[1] != q && ' ' != *(q - 1))
+			if (('&' == *q || '|' == *q) && 0 != expr_offset && ' ' != expr[expr_offset - 1])
 				zbx_chrcpy_alloc(&expr, &expr_alloc, &expr_offset, ' ');
 
 			switch (*q)
@@ -387,7 +387,7 @@ static int	DBpatch_2030033(void)
 		if (2048 < expr_offset && 2048 /* TRIGGER_EXPRESSION_LEN */ < zbx_strlen_utf8(expr))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger expression \"%s\":"
-					" resulting trigger expression is too long", row[1]);
+					" resulting expression is too long", row[1]);
 		}
 		else if (0 != strcmp(row[1], expr))
 		{
@@ -405,6 +405,93 @@ static int	DBpatch_2030033(void)
 	DBfree_result(result);
 
 	zbx_free(expr);
+
+	return ret;
+}
+
+static int	DBpatch_2030034(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+	char		*p, *q, *params = NULL, *params_esc;
+	size_t		params_alloc = 0, params_offset;
+
+	result = DBselect("select itemid,params from items where type=%d", 15 /* ITEM_TYPE_CALCULATED */);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		params_offset = 0;
+
+		for (p = row[1]; '\0' != *p; p++)
+		{
+			if (NULL != strchr(ZBX_WHITESPACE, *p))
+			{
+				zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
+				continue;
+			}
+
+			if (NULL != strchr("#&|", *p))
+			{
+				if (('&' == *p || '|' == *p) && 0 != params_offset &&
+						NULL == strchr(ZBX_WHITESPACE, params[params_offset - 1]))
+				{
+					zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ' ');
+				}
+
+				switch (*p)
+				{
+					case '#':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "<>");
+						break;
+					case '&':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "and");
+						break;
+					case '|':
+						zbx_strcpy_alloc(&params, &params_alloc, &params_offset, "or");
+						break;
+				}
+
+				if (('&' == *p || '|' == *p) && NULL == strchr(ZBX_WHITESPACE, *(p + 1)))
+					zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ' ');
+
+				continue;
+			}
+
+			q = p;
+
+			if (SUCCEED == parse_function(&q, NULL, NULL))
+			{
+				zbx_strncpy_alloc(&params, &params_alloc, &params_offset, p, q - p);
+				p = q - 1;
+				continue;
+			}
+
+			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
+		}
+
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
+		if (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+#else
+		if (65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+#endif
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\":"
+					" resulting expression is too long", row[1]);
+		}
+		else if (0 != strcmp(row[1], params))
+		{
+			params_esc = DBdyn_escape_string(params);
+
+			if (ZBX_DB_OK > DBexecute("update items set params='%s' where itemid=%s", params_esc, row[0]))
+				ret = FAIL;
+
+			zbx_free(params_esc);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(params);
 
 	return ret;
 }
@@ -449,5 +536,6 @@ DBPATCH_ADD(2030030, 0, 1)
 DBPATCH_ADD(2030031, 0, 0)
 DBPATCH_ADD(2030032, 0, 1)
 DBPATCH_ADD(2030033, 0, 1)
+DBPATCH_ADD(2030034, 0, 1)
 
 DBPATCH_END()
