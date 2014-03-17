@@ -852,8 +852,6 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
-
-		flags |= ZBX_FLAG_LLD_ITEM_UPDATE;
 	}
 
 	if (0 != new_applications)

@@ -1172,8 +1172,6 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerdiscoveryid", "triggerid",
 				"parent_triggerid", NULL);
-
-		flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE;
 	}
 
 	if (0 != new_functions)
