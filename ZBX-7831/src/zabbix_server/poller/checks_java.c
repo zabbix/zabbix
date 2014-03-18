@@ -25,8 +25,8 @@
 
 #include "checks_java.h"
 
-static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
-		char *response, char *error, int max_error_len)
+static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, char *response,
+		char *error, int max_error_len)
 {
 	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
@@ -118,7 +118,7 @@ exit:
 	return ret;
 }
 
-int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result)
 {
 	int	errcode = SUCCEED;
 
@@ -127,7 +127,7 @@ int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
 {
 	const char	*__function_name = "get_values_java";
 
@@ -140,7 +140,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
 
-	for (j = 0; j < num; j++)	/* locate first supported item */
+	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
 		if (SUCCEED == errcodes[j])
 			break;
@@ -193,7 +193,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 		assert(0);
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
-	for (i = 0; i < num; i++)
+	for (i = j; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])
 			continue;
@@ -230,18 +230,15 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 exit:
 	if (NETWORK_ERROR == err || GATEWAY_ERROR == err)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Getting Java values failed: %s", error);
+		zabbix_log(LOG_LEVEL_DEBUG, "getting Java values failed: %s", error);
 
-		for (i = 0; i < num; i++)
+		for (i = j; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			if (!ISSET_MSG(&results[i]))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = err;
-			}
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = err;
 		}
 	}
 out:

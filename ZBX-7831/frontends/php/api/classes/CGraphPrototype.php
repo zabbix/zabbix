@@ -683,8 +683,11 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true,
 			'editable' => true,
 			'output' => array('name', 'value_type', 'flags'),
+			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+			)
 		));
 
 		foreach ($itemIds as $itemid) {
@@ -693,33 +696,21 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			$hasPrototype = false;
-			if ($graph['gitems']) {
-				// check if the graph has at least one prototype
-				foreach ($graph['gitems'] as $gitem) {
-					// $allowedItems used because it is possible to make API call without full item data
-					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$hasPrototype = true;
-						break;
-					}
-				}
-			}
-
-			if (!$graph['gitems'] || !$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-			}
-		}
+		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 
 		parent::validateCreate($graphs);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				if (!in_array($allowedItems[$gitem['itemid']]['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+						$allowedItems[$gitem['itemid']]['name'],
+						$graph['name']
+					));
+				}
 			}
 		}
 	}
@@ -735,6 +726,20 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		// check for "itemid" when updating graph prototype with only "gitemid" passed
+		foreach ($graphs as &$graph) {
+			if (isset($graph['gitems'])) {
+				foreach ($graph['gitems'] as &$gitem) {
+					if (isset($gitem['gitemid']) && !isset($gitem['itemid'])) {
+						$dbGitems = zbx_toHash($dbGraphs[$graph['graphid']]['gitems'], 'gitemid');
+						$gitem['itemid'] = $dbGitems[$gitem['gitemid']]['itemid'];
+					}
+				}
+				unset($gitem);
+			}
+		}
+		unset($graph);
+
 		$itemIds = $this->validateItemsUpdate($graphs);
 
 		$allowedItems = API::Item()->get(array(
@@ -743,45 +748,72 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true,
 			'editable' => true,
 			'output' => array('name', 'value_type', 'flags'),
+			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+			)
 		));
 
-		foreach ($itemIds as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
+		foreach ($itemIds as $itemId) {
+			if (!isset($allowedItems[$itemId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			if (isset($graph['gitems'])) {
-				$hasPrototype = false;
-				if ($graph['gitems']) {
-					// check if the graph has at least one prototype
-					foreach ($graph['gitems'] as $gitem) {
-						// $allowedItems used because it is possible to make API call without full item data
-						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$hasPrototype = true;
-							break;
-						}
-					}
-				}
-
-				if (!$graph['gitems'] || !$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-				}
-			}
-		}
+		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 
 		parent::validateUpdate($graphs, $dbGraphs);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		foreach ($allowedItems as $item) {
-			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
-				);
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				if (!in_array($allowedItems[$gitem['itemid']]['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
+						$allowedItems[$gitem['itemid']]['name'],
+						$graph['name']
+					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if graph prototype has at least one item prototype and belongs to one discovery rule.
+	 *
+	 * @throws APIException if graph prototype has no item prototype or items belong to multiple discovery rules.
+	 *
+	 * @param array  $graphs				array of graphs
+	 * @param array  $graphs['gitems']		array of graphs items
+	 * @param string $graphs['name']		graph name
+	 * @param array  $items					array of existing graph items and ones that user has permission to access
+	 */
+	protected function checkDiscoveryRuleCount(array $graphs, array $items) {
+		foreach ($graphs as $graph) {
+			// for update method we will skip this step, if no items are set
+			if (isset($graph['gitems'])) {
+				$itemDiscoveryIds = array();
+
+				foreach ($graph['gitems'] as $gitem) {
+					if ($items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$itemDiscoveryIds[$items[$gitem['itemid']]['itemDiscovery']['parent_itemid']] = true;
+					}
+				}
+
+				if (count($itemDiscoveryIds) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" contains item prototypes from multiple discovery rules.',
+						$graph['name']
+					));
+				}
+				elseif (!$itemDiscoveryIds) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" must have at least one item prototype.',
+						$graph['name']
+					));
+				}
 			}
 		}
 	}
