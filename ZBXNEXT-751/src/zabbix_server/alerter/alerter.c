@@ -53,16 +53,40 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 {
 	const char	*__function_name = "execute_action";
 
-	int 	res = FAIL;
+	char		*sendto_dyn, *subject_dyn, *message_dyn;
+	int 		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
+
+	/* substitute_simple_macros(zbx_uint64_t *actionid,
+	 * 							 const DB_EVENT *event,
+	 * 							 DB_EVENT *r_event,
+	 * 							 zbx_uint64_t *userid,
+	 * 							 zbx_uint64_t *hostid,
+	 * 							 DC_HOST *dc_host,
+	 * 							 DC_ITEM *dc_item,
+	 * 							 char **data,
+	 * 							 int macro_type,
+	 * 							 char *error,
+	 * 							 int maxerrlen) */
+
+	sendto_dyn = zbx_strdup(NULL, alert->sendto);
+	subject_dyn = zbx_strdup(NULL, alert->subject);
+	message_dyn = zbx_strdup(NULL, alert->message);
+
+	substitute_simple_macros(&alert->actionid, NULL, NULL, NULL, NULL, NULL, NULL,
+			&sendto_dyn, MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros(&alert->actionid, NULL, NULL, NULL, NULL, NULL, NULL,
+			&subject_dyn, MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros(&alert->actionid, NULL, NULL, NULL, NULL, NULL, NULL,
+			&message_dyn, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
 		alarm(ALARM_ACTION_TIMEOUT);
 		res = send_email(mediatype->smtp_server, mediatype->smtp_helo, mediatype->smtp_email,
-				alert->sendto, alert->subject, alert->message, error, max_error_len);
+				sendto_dyn, subject_dyn, message_dyn, error, max_error_len);
 		alarm(0);
 	}
 #ifdef HAVE_JABBER
@@ -70,19 +94,19 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	{
 		/* Jabber uses its own timeouts */
 		res = send_jabber(mediatype->username, mediatype->passwd,
-				alert->sendto, alert->subject, alert->message, error, max_error_len);
+				sendto_dyn, subject_dyn, message_dyn, error, max_error_len);
 	}
 #endif
 	else if (MEDIA_TYPE_SMS == mediatype->type)
 	{
 		/* SMS uses its own timeouts */
-		res = send_sms(mediatype->gsm_modem, alert->sendto, alert->message, error, max_error_len);
+		res = send_sms(mediatype->gsm_modem, sendto_dyn, message_dyn, error, max_error_len);
 	}
 	else if (MEDIA_TYPE_EZ_TEXTING == mediatype->type)
 	{
 		/* Ez Texting uses its own timeouts */
 		res = send_ez_texting(mediatype->username, mediatype->passwd,
-				alert->sendto, alert->message, mediatype->exec_path, error, max_error_len);
+				sendto_dyn, message_dyn, mediatype->exec_path, error, max_error_len);
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
@@ -96,9 +120,9 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 		if (0 == access(cmd, X_OK))
 		{
-			send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
-			subject = zbx_dyn_escape_string(alert->subject, "\"\\");
-			message = zbx_dyn_escape_string(alert->message, "\"\\");
+			send_to = zbx_dyn_escape_string(sendto_dyn, "\"\\");
+			subject = zbx_dyn_escape_string(subject_dyn, "\"\\");
+			message = zbx_dyn_escape_string(message_dyn, "\"\\");
 
 			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\" \"%s\" \"%s\"",
 					send_to, subject, message);
@@ -125,6 +149,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		zbx_snprintf(error, max_error_len, "unsupported media type [%d]", mediatype->type);
 		zabbix_log(LOG_LEVEL_ERR, "alert ID [" ZBX_FS_UI64 "]: %s", alert->alertid, error);
 	}
+
+	zbx_free(message_dyn);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
