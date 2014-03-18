@@ -2571,7 +2571,19 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+					{
+						cache_trigger_hostids(&hostids, event->trigger.expression);
+						DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					}
+					else
+					{
+						DCget_user_macro(NULL, 0, m, &replace_to);
+					}
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2820,7 +2832,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					else
+						DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2991,7 +3010,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					else
+						DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3118,7 +3144,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					else
+						DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3196,7 +3229,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_ITEM == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					else
+						DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3306,7 +3346,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_LLDRULE == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					if (NULL != hostid)
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					else
+						DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
