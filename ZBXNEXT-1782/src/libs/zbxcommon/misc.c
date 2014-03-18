@@ -1248,6 +1248,11 @@ int	int_in_list(char *list, int value)
 	return ret;
 }
 
+int	zbx_double_compare(double a, double b)
+{
+	return fabs(a - b) < ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: is_double_suffix                                                 *

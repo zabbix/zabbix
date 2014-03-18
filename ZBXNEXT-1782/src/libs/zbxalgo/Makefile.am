@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxalgo.a
 libzbxalgo_a_SOURCES = \
 	algodefs.c \
 	binaryheap.c \
+	evaluate.c \
 	hashmap.c \
 	hashset.c \
 	vector.c \
