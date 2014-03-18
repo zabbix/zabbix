@@ -144,6 +144,8 @@ class CMaintenance extends CZBXAPI{
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
 
+				$maintenanceids = array_keys(array_flip($maintenanceids));
+
 				$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 			}
 		}
@@ -238,6 +240,8 @@ class CMaintenance extends CZBXAPI{
 			while($miantenace = DBfetch($res)){
 				$maintenanceids[] = $miantenace['maintenanceid'];
 			}
+
+			$maintenanceids = array_keys(array_flip($maintenanceids));
 
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
