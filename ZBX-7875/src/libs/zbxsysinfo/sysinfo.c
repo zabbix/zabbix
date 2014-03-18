@@ -835,6 +835,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 		if (ERROR_SUCCESS != RegQueryValueEx(hKeyRegistry, wsource, NULL, NULL,
 				(LPBYTE)lpNameStrings, &dwBuffer))
 		{
+			zbx_free(lpNameStrings);
 			return ret;
 		}
 		else
@@ -863,6 +864,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 
 	if( ERROR_SUCCESS != RegCloseKey(hKeyRegistry) )
 	{
+		zbx_free(lpNameStrings);
 		return ret;
 	}
 
@@ -871,6 +873,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	/* open key in different part of registry */
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &hKeyRegistry))
 	{
+		zbx_free(lpNameStrings);
 		return ret;
 	}
 
@@ -880,6 +883,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	if(ERROR_SUCCESS != RegQueryValueEx(hKeyRegistry, wsource, NULL, NULL,
 			(LPBYTE)lpNameStrings, &dwBuffer))
 	{
+		zbx_free(lpNameStrings);
 		return ret;
 	}
 	else
@@ -891,6 +895,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	/* close registry key */
 	if( ERROR_SUCCESS != RegCloseKey(hKeyRegistry) )
 	{
+		zbx_free(lpNameStrings);
 		return ret;
 	}
 
