@@ -789,7 +789,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 	() # match empty and only empty part
 )');
 define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
-(?<param>( # name parameter group used in recursion
+(?P<param>( # name parameter group used in recursion
 	\[ # match opening bracket
 		(
 			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
