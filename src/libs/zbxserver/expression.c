@@ -2473,7 +2473,7 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: cache_expression_hostids                                         *
+ * Function: cache_trigger_hostids                                            *
  *                                                                            *
  * Purpose: cache host identifiers referenced by trigger expression           *
  *                                                                            *
@@ -2491,6 +2491,32 @@ static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expr
 		get_functionids(&functionids, expression);
 		DCget_functions_hostids(hostids, &functionids);
 		zbx_vector_uint64_destroy(&functionids);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_item_hostid                                                *
+ *                                                                            *
+ * Purpose: cache host identifier referenced by an item or a lld-rule         *
+ *                                                                            *
+ * Parameters: hostids - [OUT] the host identifier cache                      *
+ *             itemid  - [IN]  the item identifier                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		DC_ITEM	item;
+		int	errcode;
+
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+		if (SUCCEED == errcode)
+			zbx_vector_uint64_append(hostids, item.host.hostid);
+
+		DCconfig_clean_items(&item, &errcode, 1);
 	}
 }
 
@@ -2573,15 +2599,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-					{
-						cache_trigger_hostids(&hostids, event->trigger.expression);
-						DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-					}
-					else
-					{
-						DCget_user_macro(NULL, 0, m, &replace_to);
-					}
+					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -2834,10 +2853,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					else
-						DCget_user_macro(NULL, 0, m, &replace_to);
+					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -3012,10 +3029,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					else
-						DCget_user_macro(NULL, 0, m, &replace_to);
+					DCget_user_macro(NULL, 0, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -3146,10 +3160,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					else
-						DCget_user_macro(NULL, 0, m, &replace_to);
+					DCget_user_macro(NULL, 0, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -3231,10 +3242,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					else
-						DCget_user_macro(NULL, 0, m, &replace_to);
+					cache_item_hostid(&hostids, c_event->objectid);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -3348,10 +3357,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					if (NULL != hostid)
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					else
-						DCget_user_macro(NULL, 0, m, &replace_to);
+					cache_item_hostid(&hostids, c_event->objectid);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
