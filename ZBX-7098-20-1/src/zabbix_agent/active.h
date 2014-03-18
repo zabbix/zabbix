@@ -57,15 +57,17 @@ extern int	CONFIG_LISTEN_PORT;
 
 typedef struct
 {
-	char		*key, *key_orig;
-	zbx_uint64_t	lastlogsize;
-	int		refresh;
-	int		nextcheck;
-	int		status;
+	char			*key, *key_orig;
+	zbx_uint64_t		lastlogsize;
+	int			refresh;
+	int			nextcheck;
+	int			status;
 /* must be long for fseek() */
-	int		mtime;
-	unsigned char	skip_old_data;	/* for processing [event]log metrics */
-	int		big_rec;	/* for reading logfiles: 0 - normal record, 1 - long unfinished record */
+	int			mtime;
+	unsigned char		skip_old_data;	/* for processing [event]log metrics */
+	int			big_rec;	/* for logfile reading: 0 - normal record, 1 - long unfinished record */
+	int			logfiles_num;
+	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */
 }
 ZBX_ACTIVE_METRIC;
 

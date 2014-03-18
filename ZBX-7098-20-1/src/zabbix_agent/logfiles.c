@@ -25,6 +25,8 @@
 #	include "gnuregex.h"
 #endif /* _WINDOWS */
 
+#define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
+
 /******************************************************************************
  *                                                                            *
  * Function: split_string                                                     *
@@ -212,44 +214,244 @@ out:
 	return ret;
 }
 
-struct st_logfile
+/******************************************************************************
+ *                                                                            *
+ * Function: file_part_md5sum                                                 *
+ *                                                                            *
+ * Purpose: calculate MD5 sum of a specified part of the file                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     filename - [IN] full pathname                                          *
+ *     offset   - [IN] offset from the beginning of the file                  *
+ *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
+ *     md5buf   - [OUT] output buffer, 16-bytes long, where the calculated    *
+ *                MD5 sum is placed                                           *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	file_part_md5sum(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf)
 {
-	char	*filename;
-	int	mtime;
-};
+	int		ret = FAIL, f;
+	md5_state_t	state;
+	char		buf[MAX_LEN_MD5];
+
+	if (MAX_LEN_MD5 < length)
+		return ret;
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		return ret;
+	}
+
+	if (0 < offset && (zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for file \"%s\": %s",
+				offset, filename, zbx_strerror(errno));
+		return ret;
+	}
+
+	if (length != (int)read(f, buf, (size_t)length))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
+				(zbx_fs_size_t)length, filename, zbx_strerror(errno));
+		return ret;
+	}
+
+	md5_init(&state);
+	md5_append(&state, (const md5_byte_t *)buf, length);
+	md5_finish(&state, md5buf);
+
+	ret = SUCCEED;
+
+	if (0 != close(f))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+
+	return ret;
+}
+
+static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
+{
+	int	i;
+
+	for (i = 0; i < logfiles_num; i++)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
+				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino:" ZBX_FS_UI64 " md5size:%d "
+				"md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
+				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino,
+				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
+				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
+				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
+				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
+				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
+				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+	}
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: free_logfiles                                                    *
+ * Function: is_same_file                                                     *
  *                                                                            *
- * Purpose: releases memory allocated for logfiles                            *
+ * Purpose: find out wheter a file from the old list and a file from the new  *
+ *          list could be the same file                                       *
  *                                                                            *
- * Parameters: logfiles - pointer to the list of logfiles                     *
- *             logfiles_alloc - number of logfiles memory was allocated for   *
- *             logfiles_num - number of already inserted logfiles             *
+ * Parameters:                                                                *
+ *          old - [IN] file from the old list                                 *
+ *          new - [IN] file from the new list                                 *
  *                                                                            *
- * Return value: none                                                         *
+ * Return value: 0 - it is not the same file,                                 *
+ *               1 - it could be the same file,                               *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments: none                                                             *
+ * Comments: In some cases we can say that it IS NOT the same file.           *
+ *           We can never say that it IS the same file.                       *
  *                                                                            *
  ******************************************************************************/
-static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new)
 {
-	const char	*__function_name = "free_logfiles";
-	int		i;
+	if (old->ino != new->ino || old->dev != new->dev)
+	{
+		/* File's inode and device id cannot differ. */
+		goto not_same;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() logfiles_num:%d", __function_name, *logfiles_num);
+	if (old->mtime > new->mtime)
+	{
+		/* File's mtime cannot decrease unless manipulated. */
+		goto not_same;
+	}
 
-	for (i = 0; i < *logfiles_num; i++)
-		zbx_free((*logfiles)[i].filename);
+	if (old->size > new->size)
+	{
+		/* File's size cannot decrease. Truncating or replacing a file with a smaller one */
+		/* counts as 2 different files. */
+		goto not_same;
+	}
 
-	zbx_free(*logfiles);
-	*logfiles_alloc = 0;
-	*logfiles_num = 0;
+	if (old->md5size > new->md5size)
+	{
+		/* File's initial block size from which MD5 sum is calculated cannot decrease. */
+		goto not_same;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	if (old->size == new->size && old->mtime < new->mtime)
+	{
+		/* File's mtime cannot increase without changing size unless manipulated. */
+		goto not_same;
+	}
+
+	if (old->md5size == new->md5size)
+	{
+		if (0 != memcmp(old->md5buf, new->md5buf, sizeof(new->md5buf)))
+		{
+			/* MD5 sums differ */
+			goto not_same;
+		}
+	}
+	else
+	{
+		if (0 < old->md5size)
+		{
+			md5_byte_t	md5tmp;
+
+			/* MD5 for the old file has been calculated from a smaller initial block */
+			if (SUCCEED == file_part_md5sum(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp))
+			{
+				if (0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
+					goto not_same;
+			}
+			/* if recalculating MD5 sum for the new file failed we count it as "could be the same file" */
+		}
+	}
+
+	/* In all remaining cases old->md5size < new->md5size. It could be the same file. */
+	return 1;
+not_same:
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: setup_old2new                                                    *
+ *                                                                            *
+ * Purpose: fill an array of possible mappings from the old log files to the  *
+ *          new log files.                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          old2new - [IN] two dimensional array of possible mappings         *
+ *          old     - [IN] old file list                                      *
+ *          num_old - [IN] number of elements in the old file list            *
+ *          new     - [IN] new file list                                      *
+ *          num_new - [IN] number of elements in the new file list            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *          old2new[i][j] = "0" - i-th old file cannot be the j-th new file   *
+ *          old2new[i][j] = "1" - i-th old file could be the j-th new file    *
+ *                                                                            *
+ ******************************************************************************/
+static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
+		const struct st_logfile *new, int num_new)
+{
+	int	i, j;
+	char	*p = old2new;
+
+	for (i = 0; i < num_old; i++)
+	{
+		for (j = 0; j < num_new; j++)
+		{
+			if (1 == is_same_file(old + i, new + j))
+				*(p + j) = '1';
+			else
+				*(p + j) = '0';
+
+			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
+					(old + i)->filename, (new + j)->filename, *(p + j));
+		}
+		p += (size_t)num_new * sizeof(char);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: find_old2new_uni                                                 *
+ *                                                                            *
+ * Purpose: find a mapping from old to new file if the mapping is unique.     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          old2new - [IN] two dimensional array of possible mappings         *
+ *          num_new - [IN] number of elements in the new file list            *
+ *          i_old   - [IN] index of the old file                              *
+ *                                                                            *
+ * Return value: index of the new file or                                     *
+ *               -1 if the mapping is not unique.                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	find_old2new_uni(char *old2new, int num_new, int i_old)
+{
+	int	i, m = -1, ones = 0;
+	char	*p;
+
+	/* Is there 1:1 mapping ? */
+
+	p = old2new + (size_t)i_old * (size_t)num_new * sizeof(char);
+
+	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
+	{
+		if ('1' == *(p + i))
+		{
+			if (2 == ++ones)
+				break;
+
+			m = i;
+		}
+	}
+
+	if (1 == ones)			/* 1:1 mapping */
+		return m;
+	else				/* 1:M mapping */
+		return -1;
 }
 
 /******************************************************************************
@@ -263,32 +465,29 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  *             logfiles_num - number of already inserted logfiles             *
  *             filename - name of a logfile (without a path)                  *
  *             mtime - modification time of a logfile                         *
+ *             size  - logfile size in bytes                                  *
  *                                                                            *
  * Return value: none                                                         *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
- * Comments: Must change sorting order to decrease a number of memory moves!  *
- *           Do not forget to change process_log() accordingly!               *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, int mtime)
+static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
+		struct stat *st)
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
 
-	assert(NULL != logfiles);
-	assert(NULL != logfiles_alloc);
-	assert(NULL != logfiles_num);
-	assert(0 <= *logfiles_num);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d", __function_name, filename, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __function_name, filename,
+			(int)st->st_mtime, (zbx_uint64_t)st->st_size);
 
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
 		*logfiles_alloc += 64;
-		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
+		*logfiles = zbx_realloc(*logfiles, (size_t)*logfiles_alloc * sizeof(struct st_logfile));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
 				__function_name, *logfiles, *logfiles_alloc);
@@ -312,10 +511,10 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	for (; i < *logfiles_num; i++)
 	{
-		if (mtime > (*logfiles)[i].mtime)
+		if (st->st_mtime > (*logfiles)[i].mtime)
 			continue;	/* (1) sort by ascending mtime */
 
-		if (mtime == (*logfiles)[i].mtime)
+		if (st->st_mtime == (*logfiles)[i].mtime)
 		{
 			if (0 > (cmp = strcmp(filename, (*logfiles)[i].filename)))
 				continue;	/* (2) sort by descending name */
@@ -341,8 +540,20 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
 
-	(*logfiles)[i].filename = strdup(filename);
-	(*logfiles)[i].mtime = mtime;
+	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
+	(*logfiles)[i].mtime = st->st_mtime;
+	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
+	(*logfiles)[i].processed_size = 0;
+	(*logfiles)[i].seq = 0;
+#ifndef _WINDOWS
+	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
+	(*logfiles)[i].ino = (zbx_uint64_t)st->st_ino;
+#endif
+	(*logfiles)[i].md5size = (zbx_uint64_t)MAX_LEN_MD5 > (zbx_uint64_t)st->st_size ? (int)st->st_size : MAX_LEN_MD5;
+
+	if (SUCCEED != file_part_md5sum(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf))
+		(*logfiles)[i].md5size = -1;
+
 	++(*logfiles_num);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -355,36 +566,39 @@ out:
  * Purpose: Find new records in logfiles with rotation                        *
  *                                                                            *
  * Parameters:                                                                *
- *     filename       - [IN] logfile name (regular expression with a path)    *
- *     lastlogsize    - [IN/OUT] offset from the beginning of the file        *
- *     mtime          - [IN/OUT] last modification time of the file           *
- *     skip_old_data  - [IN/OUT] start from the beginning of the file or      *
- *                      jump to the end                                       *
- *     big_rec        - [IN/OUT] state variable to remember whether a long    *
- *                      record is being processed                             *
- *     encoding       - [IN] text string describing encoding.                 *
- *                        The following encodings are recognized:             *
- *                          "UNICODE"                                         *
- *                          "UNICODEBIG"                                      *
- *                          "UNICODEFFFE"                                     *
- *                          "UNICODELITTLE"                                   *
- *                          "UTF-16"   "UTF16"                                *
- *                          "UTF-16BE" "UTF16BE"                              *
- *                          "UTF-16LE" "UTF16LE"                              *
- *                          "UTF-32"   "UTF32"                                *
- *                          "UTF-32BE" "UTF32BE"                              *
- *                          "UTF-32LE" "UTF32LE".                             *
- *                        "" (empty string) means a single-byte character set.*
- *     regexps        - [IN] array of regexps                                 *
- *     regexps_num    - [IN] number of regexp                                 *
- *     pattern        - [IN] pattern to match                                 *
- *     p_count        - [IN/OUT] limit of records to be processed             *
- *     s_count        - [IN/OUT] limit of records to be sent to server        *
- *     process_value  - [IN] pointer to function process_value()              *
- *     server         - [IN] server to send data to                           *
- *     port           - [IN] port to send data to                             *
- *     hostname       - [IN] hostname the data comes from                     *
- *     key            - [IN] item key the data belongs to                     *
+ *     filename         - [IN] logfile name (regular expression with a path)  *
+ *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
+ *     mtime            - [IN/OUT] last modification time of the file         *
+ *     skip_old_data    - [IN/OUT] start from the beginning of the file or    *
+ *                        jump to the end                                     *
+ *     big_rec          - [IN/OUT] state variable to remember whether a long  *
+ *                        record is being processed                           *
+ *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
+ *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
+ *     encoding         - [IN] text string describing encoding.               *
+ *                          The following encodings are recognized:           *
+ *                            "UNICODE"                                       *
+ *                            "UNICODEBIG"                                    *
+ *                            "UNICODEFFFE"                                   *
+ *                            "UNICODELITTLE"                                 *
+ *                            "UTF-16"   "UTF16"                              *
+ *                            "UTF-16BE" "UTF16BE"                            *
+ *                            "UTF-16LE" "UTF16LE"                            *
+ *                            "UTF-32"   "UTF32"                              *
+ *                            "UTF-32BE" "UTF32BE"                            *
+ *                            "UTF-32LE" "UTF32LE".                           *
+ *                          "" (empty string) means a single-byte character   *
+ *                             set.                                           *
+ *     regexps          - [IN] array of regexps                               *
+ *     regexps_num      - [IN] number of regexp                               *
+ *     pattern          - [IN] pattern to match                               *
+ *     p_count          - [IN/OUT] limit of records to be processed           *
+ *     s_count          - [IN/OUT] limit of records to be sent to server      *
+ *     process_value    - [IN] pointer to function process_value()            *
+ *     server           - [IN] server to send data to                         *
+ *     port             - [IN] port to send data to                           *
+ *     hostname         - [IN] hostname the data comes from                   *
+ *     key              - [IN] item key the data belongs to                   *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -393,13 +607,16 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		int *big_rec, struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
+		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key)
 {
 	const char		*__function_name = "process_logrt";
-	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;
-	char			err_buf[MAX_STRING_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
+	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, reg_error, seq = 1,
+				max_old_seq = 0, old_last, first_file = 0;
+	char			err_buf[MAX_STRING_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL,
+				*old2new = NULL;
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
@@ -467,7 +684,6 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		zbx_free(find_path);
 		goto out;
 	}
-	zbx_free(find_path);
 
 	do
 	{
@@ -480,17 +696,23 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 					0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name,
-						(int)file_buf.st_mtime);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf);
 			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 		zbx_free(logfile_candidate);
-
 	}
 	while (0 == _findnext(find_handle, &find_data));
+
+	if (-1 == _findclose(find_handle))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
+				zbx_strerror(errno));
+	}
+
+	zbx_free(find_path);
 
 #else	/* _WINDOWS */
 	if (NULL == (dir = opendir(directory)))
@@ -513,8 +735,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name,
-						(int)file_buf.st_mtime);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf);
 			}
 		}
 		else
@@ -522,64 +743,141 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 		zbx_free(logfile_candidate);
 	}
+
+	if (-1 == closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
+
 #endif	/*_WINDOWS*/
 
 	regfree(&re);
 
-	i = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
+	start_idx = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
 
-	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
-	for (j = i + 1; j < logfiles_num; j++)
+	/* mark files to be skipped as processed */
+	for (i = 0; i < start_idx; i++)
 	{
-		if (logfiles[j].mtime == logfiles[i].mtime)
-			i = j;	/* moving to the newer one */
-		else
-			break;	/* all next mtimes are bigger */
+		logfiles[i].processed_size = logfiles[i].size;
+		logfiles[i].seq = seq++;
 	}
 
-	/* processing matched logfiles starting from the older one to the newer one */
-	for (; i < logfiles_num; i++)
+	if (0 < *logfiles_num_old && 0 < logfiles_num)
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
+		/* set up a mapping matrix from old files to new files */
+		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
+		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
+	}
 
-		if (SUCCEED != (ret = process_log(logfile_candidate, lastlogsize, mtime, skip_old_data, big_rec,
-				encoding, regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
-				hostname, key)) || 0 >= *p_count || 0 >= *s_count)
+	/* Find and mark for skipping files processed during the previous check. Such files can get into the new file */
+	/* list if several files had the same mtime but their processing was not finished because of error or */
+	/* maxlines limit. */
+	for (i = 0; i < *logfiles_num_old; i++)
+	{
+		if ((*logfiles_old)[i].processed_size == (*logfiles_old)[i].size
+				&& -1 != (j = find_old2new_uni(old2new, logfiles_num, i))
+				&& logfiles[j].size == (*logfiles_old)[i].size)
 		{
-			/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible */
-			/* (can happen during a rotation). Maybe during the next check all will be well. */
-			ret = SUCCEED;
-			break;
+			logfiles[j].processed_size = logfiles[j].size;
+			logfiles[j].seq = seq++;
 		}
 
-		if (i != logfiles_num - 1)
+		/* find the last file processed in the previous check */
+		if (max_old_seq < (*logfiles_old)[i].seq)
 		{
-			zbx_free(logfile_candidate);
+			max_old_seq = (*logfiles_old)[i].seq;
+			old_last = i;
+		}
+	}
+
+	/* find the first file to continue with in the new file list */
+	if (0 < max_old_seq)
+	{
+		if (-1 == (start_idx = find_old2new_uni(old2new, logfiles_num, old_last)))
+		{
+			/* Cannot find the successor of the last processed file from the previous check. */
+			/* 'lastlogsize' does not apply in this case. */
 			*lastlogsize = 0;
+			start_idx = 0;
 		}
+		else
+			first_file = 1;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
+	if (NULL != *logfiles_old)
+		print_logfile_list(*logfiles_old, *logfiles_num_old);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
+			" start_idx:%d)", *mtime, *lastlogsize, start_idx);
+	if (NULL != logfiles)
+		print_logfile_list(logfiles, logfiles_num);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+
+	/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible (can happen during */
+	/* a rotation) or there are no matching log files at all. Problems will be logged in agent log. */
+	ret = SUCCEED;
+
+	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
+	i = start_idx;
+
+	while (i < logfiles_num)
+	{
+		if (logfiles[i].size != logfiles[i].processed_size)
+		{
+			ret = process_log(logfiles[i].filename, lastlogsize, mtime, skip_old_data, big_rec, encoding,
+					regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
+					hostname, key);
+
+			logfiles[i].processed_size = *lastlogsize;
+			logfiles[i].seq = seq++;
+
+			if (SUCCEED != ret || 0 >= *p_count || 0 >= *s_count)
+			{
+				ret = SUCCEED;
+				break;
+			}
+
+			if (i != logfiles_num - 1)
+				*lastlogsize = 0;
+		}
+
+		if (0 != first_file)
+		{
+			first_file = 0;
+			i = 0;
+			continue;
+		}
+
+		i++;
 	}
 
 	if (0 == logfiles_num)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
-
-		/* do not make a logrt[] item NOTSUPPORTED if there are no matching files in the directory */
 		ret = SUCCEED;
 	}
 
-	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-
-#ifdef _WINDOWS
-	if (0 != find_handle && -1 == _findclose(find_handle))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle: %s", zbx_strerror(errno));
-#else
-	if (NULL != dir && -1 == closedir(dir))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
-#endif
-
-	zbx_free(logfile_candidate);
+	zbx_free(old2new);
 	zbx_free(directory);
 	zbx_free(format);
+
+	/* delete the old logfile list from the previous check */
+	if (NULL != *logfiles_old)
+	{
+		for (i = 0; i < *logfiles_num_old; i++)
+			zbx_free((*logfiles_old)[i].filename);
+
+		*logfiles_num_old = 0;
+		zbx_free(*logfiles_old);
+	}
+
+	/* remember the composed list of log files for using in the next check */
+	*logfiles_num_old = logfiles_num;
+
+	if (0 < logfiles_num)
+		*logfiles_old = logfiles;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

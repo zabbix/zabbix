@@ -87,7 +87,7 @@ static void	disable_all_metrics(void)
 #ifdef _WINDOWS
 static void	free_active_metrics(void)
 {
-	int	i;
+	int	i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_active_metrics()");
 
@@ -95,6 +95,11 @@ static void	free_active_metrics(void)
 	{
 		zbx_free(active_metrics[i].key);
 		zbx_free(active_metrics[i].key_orig);
+
+		for (j = 0; j < active_metrics[i].logfiles_num; j++)
+			zbx_free(active_metrics[i].logfiles[j].filename);
+
+		zbx_free(active_metrics[i].logfiles);
 	}
 
 	zbx_free(active_metrics);
@@ -141,11 +146,19 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 		if (0 != strcmp(active_metrics[i].key, key))
 		{
+			int	j;
+
 			zbx_free(active_metrics[i].key);
-			active_metrics[i].key = strdup(key);
+			active_metrics[i].key = zbx_strdup(NULL, key);
 			active_metrics[i].lastlogsize = lastlogsize;
 			active_metrics[i].mtime = mtime;
 			active_metrics[i].big_rec = 0;
+
+			for (j = 0; j < active_metrics[i].logfiles_num; j++)
+				zbx_free(active_metrics[i].logfiles[j].filename);
+
+			zbx_free(active_metrics[i].logfiles);
+			active_metrics[i].logfiles_num = 0;
 		}
 
 		/* replace metric */
@@ -170,6 +183,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	/* can skip existing log[] and eventlog[] data */
 	active_metrics[i].skip_old_data = active_metrics[i].lastlogsize ? 0 : 1;
 	active_metrics[i].big_rec = 0;
+	active_metrics[i].logfiles_num = 0;
+	active_metrics[i].logfiles = NULL;
 
 	/* move to the last metric */
 	i++;
@@ -902,7 +917,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
 				ret = process_logrt(filename, &active_metrics[i].lastlogsize, &active_metrics[i].mtime,
-						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec, encoding,
+						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec,
+						&active_metrics[i].logfiles, &active_metrics[i].logfiles_num, encoding,
 						regexps, regexps_num, pattern, &p_count, &s_count, process_value,
 						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}

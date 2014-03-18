@@ -20,13 +20,29 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
+#include "md5.h"
+
+struct st_logfile
+{
+	char		*filename;
+	int		mtime;		/* st_mtime from stat() */
+	int		md5size;	/* size of the initial part for which the md5 sum is calculated */
+	int		seq;		/* number in processing order */
+	zbx_uint64_t	dev;		/* ID of device containing file */
+	zbx_uint64_t	ino;		/* inode number */
+	zbx_uint64_t	size;		/* st_size from stat() */
+	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
+	md5_byte_t	md5buf[16];	/* md5 sum of the initial part of the file */
+};
+
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
 		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key);
 
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key);
+		int *big_rec, struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
+		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key);
 #endif
