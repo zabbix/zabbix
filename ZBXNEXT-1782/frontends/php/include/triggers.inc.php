@@ -1708,7 +1708,8 @@ function analyzeExpression($expression) {
  * @param int 		$level          	parameter only for recursive call
  * @param string 	$operator       	parameter only for recursive call
  *
- * @return bool                 returns true if element is found, false - otherwise
+ * @return array	array containing the trigger expression formula as the first element and an array describing the
+ *					expression tree as the second
  */
 function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null) {
 	$treeList = array();
@@ -1723,7 +1724,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				$next[$level] = ($key != $lastKey);
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
-				$expr[] = italic($element['operator'] == 'and' ? _('AND') : _('OR'));
+				$expr[] = ($element['operator'] === 'and') ? _('And') : _('Or');
 				$levelDetails = array(
 					'list' => $expr,
 					'id' => $element['id'],

@@ -1472,11 +1472,6 @@ function getTriggerFormData($exprAction = null) {
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = 'yes';
 			$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
-			$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), null, 'formlist');
-			$data['expression_macro_button']->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
-			if ($data['limited'] == 'yes') {
-				$data['expression_macro_button']->setAttribute('disabled', 'disabled');
-			}
 		}
 		else {
 			show_messages(false, '', _('Expression Syntax Error.'));

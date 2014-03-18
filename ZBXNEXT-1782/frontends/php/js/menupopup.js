@@ -734,9 +734,9 @@ function getMenuPopupTriggerMacro(options) {
 			'TRIGGER.VALUE=0': 0,
 			'TRIGGER.VALUE=1': 1,
 			'TRIGGER.VALUE=2': 2,
-			'TRIGGER.VALUE#0': 10,
-			'TRIGGER.VALUE#1': 11,
-			'TRIGGER.VALUE#2': 12
+			'TRIGGER.VALUE<>0': 10,
+			'TRIGGER.VALUE<>1': 11,
+			'TRIGGER.VALUE<>2': 12
 		};
 
 	jQuery.each(data, function(label, value) {
@@ -753,7 +753,7 @@ function getMenuPopupTriggerMacro(options) {
 
 				if (value >= 10) {
 					valueString = value % 10;
-					sign = '#';
+					sign = '<>';
 				}
 				else {
 					valueString = value;

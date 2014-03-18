@@ -88,10 +88,16 @@ if ($this->data['limited'] == 'yes') {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
 $expressionRow = array($expressionTextBox, $addExpressionButton);
-if (!empty($this->data['expression_macro_button'])) {
-	array_push($expressionRow, $this->data['expression_macro_button']);
-}
+
 if ($this->data['input_method'] == IM_TREE) {
+	// insert macro button
+	$insertMacroButton = new CButton('insert_macro', _('Insert macro'), null, 'formlist');
+	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
+	if ($this->data['limited']) {
+		$insertMacroButton->setAttribute('disabled', 'disabled');
+	}
+	$expressionRow[] = $insertMacroButton;
+
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
 		// add button
@@ -103,14 +109,14 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 	else {
 		// add button
-		$addExpressionButton = new CSubmit('and_expression', _('AND'), null, 'formlist');
+		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'formlist');
 		if ($this->data['limited'] == 'yes') {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
-		$orExpressionButton = new CSubmit('or_expression', _('OR'), null, 'formlist');
+		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'formlist');
 		if ($this->data['limited'] == 'yes') {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
