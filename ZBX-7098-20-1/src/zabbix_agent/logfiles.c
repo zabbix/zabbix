@@ -306,7 +306,8 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *               1 - it could be the same file,                               *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
- *           We can never say that it IS the same file.                       *
+ *           We can never say that it IS the same file and it has not been    *
+ *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
 static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new)
@@ -330,15 +331,21 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 		goto not_same;
 	}
 
-	if (old->md5size > new->md5size)
-	{
-		/* File's initial block size from which MD5 sum is calculated cannot decrease. */
-		goto not_same;
-	}
-
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
 		/* File's mtime cannot increase without changing size unless manipulated. */
+		goto not_same;
+	}
+
+	if (-1 == old->md5size || -1 == new->md5size)
+	{
+		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
+		goto not_same;
+	}
+
+	if (old->md5size > new->md5size)
+	{
+		/* File's initial block size from which MD5 sum is calculated cannot decrease. */
 		goto not_same;
 	}
 
@@ -357,16 +364,14 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			md5_byte_t	md5tmp;
 
 			/* MD5 for the old file has been calculated from a smaller initial block */
-			if (SUCCEED == file_part_md5sum(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp))
+			if (FAIL == file_part_md5sum(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp)
+					|| 0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
 			{
-				if (0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
-					goto not_same;
+				goto not_same;
 			}
-			/* if recalculating MD5 sum for the new file failed we count it as "could be the same file" */
 		}
 	}
 
-	/* In all remaining cases old->md5size < new->md5size. It could be the same file. */
 	return 1;
 not_same:
 	return 0;
