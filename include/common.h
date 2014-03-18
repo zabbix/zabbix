@@ -109,6 +109,9 @@ zbx_timespec_t;
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
+#define ZBX_DOUBLE_EPSILON	0.000001
+int	zbx_double_compare(double a, double b);
+
 /* item types */
 typedef enum
 {
