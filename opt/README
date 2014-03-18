@@ -1,5 +1,5 @@
 This directory contains set of scripts that is part of extensive DNS
-service monitoring (DNSTest).
+service monitoring (RSM).
 
 zabbix/scripts/add_tld.pl
   script to add TLD
@@ -7,13 +7,13 @@ zabbix/scripts/add_tld.pl
 zabbix/alertscripts
   directory containing Zabbix alertscripts
 
-zabbix/scripts/dnstest.conf.example
-  DNSTest configuration file
+zabbix/scripts/rsm.conf.example
+  RSM configuration file
 
-zabbix/scripts/DNSTest.pm
+zabbix/scripts/RSM.pm
   basic Perl module for getting configuration
 
-zabbix/scripts/DNSTestSLV.pm
+zabbix/scripts/RSMSLV.pm
   Perl helper module for SLV scripts
 
 zabbix/externalscripts

@@ -3330,8 +3330,8 @@ unlock:
  * Function: DCconfig_get_host_items_by_keypart                               *
  *                                                                            *
  * Purpose: Get array of active items of specified host and type that match   *
- *          the specified beginning key part (e. g. "dnstest.dns.udp.ns.rtt"  *
- *          will match keypart "dnstest.dns.udp.").                           *
+ *          the specified beginning key part (e. g. "rsm.dns.udp.ns.rtt"  *
+ *          will match keypart "rsm.dns.udp.").                           *
  *                                                                            *
  * Parameters: items        - [OUT] pointer to DC_ITEM structures             *
  *             hostid       - [IN]  host ID of the items                      *

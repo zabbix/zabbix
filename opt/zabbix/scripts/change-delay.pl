@@ -2,11 +2,11 @@
 
 use lib '/opt/zabbix/scripts';
 
-use DNSTest;
-use DNSTestSLV;
+use RSM;
+use RSMSLV;
 use Getopt::Long;
 
-set_slv_config(get_dnstest_config());
+set_slv_config(get_rsm_config());
 
 my %OPTS;
 __usage() unless (GetOptions(\%OPTS, "type=n", "delay=n", "help!"));
@@ -16,23 +16,23 @@ __usage() unless (__validate_input() == SUCCESS);
 my ($key_part, $macro);
 if ($OPTS{'type'} == 1)
 {
-    $key_part = 'dnstest.dns.udp[%';
-    $macro = '{$DNSTEST.DNS.UDP.DELAY}';
+    $key_part = 'rsm.dns.udp[%';
+    $macro = '{$RSM.DNS.UDP.DELAY}';
 }
 elsif ($OPTS{'type'} == 2)
 {
-    $key_part = 'dnstest.dns.tcp[%';
-    $macro = '{$DNSTEST.DNS.TCP.DELAY}';
+    $key_part = 'rsm.dns.tcp[%';
+    $macro = '{$RSM.DNS.TCP.DELAY}';
 }
 elsif ($OPTS{'type'} == 3)
 {
-    $key_part = 'dnstest.rdds[%';
-    $macro = '{$DNSTEST.RDDS.DELAY}';
+    $key_part = 'rsm.rdds[%';
+    $macro = '{$RSM.RDDS.DELAY}';
 }
 elsif ($OPTS{'type'} == 4)
 {
-    $key_part = 'dnstest.epp[%';
-    $macro = '{$DNSTEST.EPP.DELAY}';
+    $key_part = 'rsm.epp[%';
+    $macro = '{$RSM.EPP.DELAY}';
 }
 
 db_connect();

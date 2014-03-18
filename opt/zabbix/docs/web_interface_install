@@ -21,7 +21,7 @@ Actual information about repository can be founded at http://wiki.nginx.org/Inst
     yum install nginx php-fpm php-bcmath php-common php-gd php-mbstring php-mysql php-pdo php-xml
 
 5. Checkout SVN repository (there is always actual source code) and go to zbx-2.0 folder:
-    mkdir -p zbx-2.0 && svn co svn://svn.zabbix.com/branches/2.0.dnstest/ ./zbx-2.0 && cd zbx-2.0
+    mkdir -p zbx-2.0 && svn co svn://svn.zabbix.com/branches/2.0.rsm/ ./zbx-2.0 && cd zbx-2.0
 
 6. Replace default nginx configuration by suggested configuration:
     cp ./zbx-2.0/opt/zabbix/docs/config/nginx.conf /etc/nginx/nginx.conf
@@ -35,7 +35,7 @@ Actual information about repository can be founded at http://wiki.nginx.org/Inst
 8. Create folder /usr/share/zabbix for Web-interface and copy to the folder web-interface from SVN:
     mkdir -p /usr/share/zabbix/
     cd /usr/share/zabbix/
-    svn co svn://svn.zabbix.com/branches/2.0.dnstest/frontends/php/ ./
+    svn co svn://svn.zabbix.com/branches/2.0.rsm/frontends/php/ ./
     chown -R nginx:nginx /usr/share/zabbix/
 
 9. Generate own certificates or use company certificates:

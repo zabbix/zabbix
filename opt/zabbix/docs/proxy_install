@@ -24,7 +24,7 @@ Actual information about repository can be founded on https://downloads.mariadb.
     useradd zabbix
 
 7. Checkout SVN repository (there is always actual source code) and go to the zbx-2.0 folder:
-    svn co svn://svn.zabbix.com/branches/2.0.dnstest/ ./zbx-2.0 && cd zbx-2.0
+    svn co svn://svn.zabbix.com/branches/2.0.rsm/ ./zbx-2.0 && cd zbx-2.0
 
 5. Edit default MySQL configuration with recommended initial parameters server.cnf from ./config/ folder:
     cp /opt/zabbix/docs/config/mysql_proxy.cnf /etc/my.cnf.d/server.cnf

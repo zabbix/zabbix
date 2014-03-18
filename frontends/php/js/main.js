@@ -103,7 +103,7 @@ var PageRefresh = {
  * Main menu
  */
 var MMenu = {
-	menus:			{'empty': 0, 'dnstest': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
+	menus:			{'empty': 0, 'rsm': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 	def_label:		null,
 	sub_active: 	false,
 	timeout_reset:	null,

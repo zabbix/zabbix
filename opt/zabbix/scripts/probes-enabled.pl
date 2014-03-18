@@ -5,10 +5,10 @@ use lib '/opt/zabbix/scripts';
 use strict;
 use warnings;
 use Zabbix;
-use DNSTest;
+use RSM;
 use Data::Dumper;
 
-my $config = get_dnstest_config();
+my $config = get_rsm_config();
 my $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, user => $config->{'zapi'}->{'user'}, password => $config->{'zapi'}->{'password'}});
 
 my $result = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'], 'preservekeys' => 1 });
@@ -33,7 +33,7 @@ foreach my $ph (@proxy_hosts)
 
     $hostid = $result->{'hostid'};
 
-    $macro = '{$DNSTEST.RDDS.ENABLED}';
+    $macro = '{$RSM.RDDS.ENABLED}';
     $result = $zabbix->get('usermacro', {'output' => 'extend', 'hostids' => $hostid, 'filter' => {'macro' => $macro}});
     if (defined($result->{'value'}) and $result->{'value'} != 0)
     {
@@ -41,7 +41,7 @@ foreach my $ph (@proxy_hosts)
 	$rdds = "yes";
     }
 
-    $macro = '{$DNSTEST.EPP.ENABLED}';
+    $macro = '{$RSM.EPP.ENABLED}';
     $result = $zabbix->get('usermacro', {'output' => 'extend', 'hostids' => $hostid, 'filter' => {'macro' => $macro}});
     if (defined($result->{'value'}) and $result->{'value'} != 0)
     {

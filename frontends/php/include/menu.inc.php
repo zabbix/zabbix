@@ -97,28 +97,28 @@ $ZBX_MENU = array(
 			)
 		)
 	),
-	'dnstest' => array(
+	'rsm' => array(
 		'label'				=> _('SLA monitoring'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
 		'node_perm'			=> PERM_READ_LIST,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
-				'url' => 'dnstest.rollingweekstatus.php',
+				'url' => 'rsm.rollingweekstatus.php',
 				'label' => _('Rolling week status')
 			),
 			array(
-				'url' => 'dnstest.incidents.php',
+				'url' => 'rsm.incidents.php',
 				'label' => _('Incidents'),
 				'sub_pages' => array(
-					'dnstest.incidentdetails.php',
-					'dnstest.tests.php',
-					'dnstest.particulartests.php',
-					'dnstest.particularproxys.php'
+					'rsm.incidentdetails.php',
+					'rsm.tests.php',
+					'rsm.particulartests.php',
+					'rsm.particularproxys.php'
 				)
 			),
 			array(
-				'url' => 'dnstest.monthlyreports.php',
+				'url' => 'rsm.monthlyreports.php',
 				'label' => _('Monthly reports')
 			)
 		)

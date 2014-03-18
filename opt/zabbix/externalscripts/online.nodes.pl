@@ -6,7 +6,7 @@ use lib '/opt/zabbix/scripts';
 use strict;
 use Zabbix;
 use DBI;
-use DNSTest;
+use RSM;
 use Data::Dumper;
 
 my $command = shift || 'total';
@@ -15,7 +15,7 @@ my $type = shift || 'dns';
 
 my $hosts;
 
-my $config = get_dnstest_config();
+my $config = get_rsm_config();
 
 
 my $dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
@@ -26,7 +26,7 @@ my $sql = "select IFNULL(value, 60) FROM globalmacro gm WHERE macro = ?";
 
 my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 
-$sth->execute('{$DNSTEST.PROBE.AVAIL.LIMIT}') or die $dbh->errstr;
+$sth->execute('{$RSM.PROBE.AVAIL.LIMIT}') or die $dbh->errstr;
 
 my @macro = $sth->fetchrow_array;
 
@@ -63,7 +63,7 @@ while (my $row = $sth->fetchrow_hashref) {
 	$sth->finish;
     }
 
-    my $sql = "SELECT IFNULL(min(lastvalue),1) as value FROM items where hostid = ? AND key_ LIKE 'dnstest.probe.status[%]'";
+    my $sql = "SELECT IFNULL(min(lastvalue),1) as value FROM items where hostid = ? AND key_ LIKE 'rsm.probe.status[%]'";
 
     my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 
@@ -75,7 +75,7 @@ while (my $row = $sth->fetchrow_hashref) {
 
     $sth->finish;
 
-    my $sql = "SELECT lastclock, lastvalue FROM items i JOIN hosts h USING (hostid) where h.host = ? AND key_ = 'zabbix[proxy,{\$DNSTEST.PROXY_NAME},lastaccess]'";
+    my $sql = "SELECT lastclock, lastvalue FROM items i JOIN hosts h USING (hostid) where h.host = ? AND key_ = 'zabbix[proxy,{\$RSM.PROXY_NAME},lastaccess]'";
 
     my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 
@@ -99,20 +99,20 @@ foreach my $hostid (keys %{$hosts}) {
 	$total++;
     }
     elsif ($type eq 'epp') {
-	$online++ if $status == 1 and $hosts->{$hostid}->{'{$DNSTEST.EPP.ENABLED}'} == 1;
-	$total++ if $hosts->{$hostid}->{'{$DNSTEST.EPP.ENABLED}'} == 1;
+	$online++ if $status == 1 and $hosts->{$hostid}->{'{$RSM.EPP.ENABLED}'} == 1;
+	$total++ if $hosts->{$hostid}->{'{$RSM.EPP.ENABLED}'} == 1;
     }
     elsif ($type eq 'rdds') {
-	$online++ if $status == 1 and $hosts->{$hostid}->{'{$DNSTEST.RDDS.ENABLED}'} == 1;
-	$total++ if $hosts->{$hostid}->{'{$DNSTEST.RDDS.ENABLED}'} == 1;
+	$online++ if $status == 1 and $hosts->{$hostid}->{'{$RSM.RDDS.ENABLED}'} == 1;
+	$total++ if $hosts->{$hostid}->{'{$RSM.RDDS.ENABLED}'} == 1;
     }
     elsif ($type eq 'ipv4') {
-        $online++ if $status == 1 and $hosts->{$hostid}->{'{$DNSTEST.IP4.ENABLED}'} == 1;
-        $total++ if $hosts->{$hostid}->{'{$DNSTEST.IP4.ENABLED}'} == 1;
+        $online++ if $status == 1 and $hosts->{$hostid}->{'{$RSM.IP4.ENABLED}'} == 1;
+        $total++ if $hosts->{$hostid}->{'{$RSM.IP4.ENABLED}'} == 1;
     }
     elsif ($type eq 'ipv6') {
-        $online++ if $status == 1 and $hosts->{$hostid}->{'{$DNSTEST.IP6.ENABLED}'} == 1;
-        $total++ if $hosts->{$hostid}->{'{$DNSTEST.IP6.ENABLED}'} == 1;
+        $online++ if $status == 1 and $hosts->{$hostid}->{'{$RSM.IP6.ENABLED}'} == 1;
+        $total++ if $hosts->{$hostid}->{'{$RSM.IP6.ENABLED}'} == 1;
     }
 }
 

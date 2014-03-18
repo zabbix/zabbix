@@ -18,7 +18,7 @@
 **/
 
 #include "checks_simple.h"
-#include "checks_simple_dnstest.h"
+#include "checks_simple_rsm.h"
 #include "simple.h"
 #include "log.h"
 
@@ -38,7 +38,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (0 == strncmp(key, "dnstest.", 8))
+	if (0 == strncmp(key, "rsm.", 8))
 	{
 		const char	*kp = key + 8;	/* move forward */
 
@@ -48,23 +48,23 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 			if (0 == strcmp(kp, "udp"))
 			{
-				if (SYSINFO_RET_OK == check_dnstest_dns(item, key, params, result, ZBX_DNSTEST_UDP))
+				if (SYSINFO_RET_OK == check_rsm_dns(item, key, params, result, ZBX_RSM_UDP))
 					ret = SUCCEED;
 			}
 			else if (0 == strcmp(kp, "tcp"))
 			{
-				if (SYSINFO_RET_OK == check_dnstest_dns(item, key, params, result, ZBX_DNSTEST_TCP))
+				if (SYSINFO_RET_OK == check_rsm_dns(item, key, params, result, ZBX_RSM_TCP))
 					ret = SUCCEED;
 			}
 		}
 		else if (0 == strcmp(kp, "rdds"))
 		{
-			if (SYSINFO_RET_OK == check_dnstest_rdds(item, key, params, result))
+			if (SYSINFO_RET_OK == check_rsm_rdds(item, key, params, result))
 				ret = SUCCEED;
 		}
 		else if (0 == strcmp(kp, "epp"))
 		{
-			if (SYSINFO_RET_OK == check_dnstest_epp(item, key, params, result))
+			if (SYSINFO_RET_OK == check_rsm_epp(item, key, params, result))
 				ret = SUCCEED;
 		}
 		else if (0 == strcmp(kp, "probe.status"))
@@ -73,7 +73,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 			get_param(params, 1, mode, sizeof(mode));
 
-			if (0 == strcmp("automatic", mode) && SYSINFO_RET_OK == check_dnstest_probe_status(item, key, params, result))
+			if (0 == strcmp("automatic", mode) && SYSINFO_RET_OK == check_rsm_probe_status(item, key, params, result))
 				ret = SUCCEED;
 		}
 	}

@@ -15,9 +15,9 @@ use strict;
 use WWW::Salesforce;
 use Getopt::Long;
 use Data::Dumper;
-use DNSTest;
+use RSM;
 
-my $config = get_dnstest_config();
+my $config = get_rsm_config();
 
 my $tld;
 my $target = 'DNS';

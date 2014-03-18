@@ -1,32 +1,32 @@
 #!/usr/bin/perl
 #
-# - DNS availability test		(data collection)	dnstest.dns.udp			(simple, every minute)
-#								dnstest.dns.tcp			(simple, every 50 minutes)
-#								dnstest.dns.udp.rtt		(trapper)
-#								dnstest.dns.tcp.rtt		-|-
-#								dnstest.dns.udp.upd		-|-
-# - RDDS availability test		(data collection)	dnstest.rdds			(simple, every minutes)
-#   (also RDDS43 and RDDS80					dnstest.rdds.43.ip		(trapper)
-#   availability at a particular				dnstest.rdds.43.rtt		-|-
-#   minute)							dnstest.rdds.43.upd		-|-
-#								dnstest.rdds.80.ip		-|-
-#								dnstest.rdds.80.rtt		-|-
+# - DNS availability test		(data collection)	rsm.dns.udp			(simple, every minute)
+#								rsm.dns.tcp			(simple, every 50 minutes)
+#								rsm.dns.udp.rtt		(trapper)
+#								rsm.dns.tcp.rtt		-|-
+#								rsm.dns.udp.upd		-|-
+# - RDDS availability test		(data collection)	rsm.rdds			(simple, every minutes)
+#   (also RDDS43 and RDDS80					rsm.rdds.43.ip		(trapper)
+#   availability at a particular				rsm.rdds.43.rtt		-|-
+#   minute)							rsm.rdds.43.upd		-|-
+#								rsm.rdds.80.ip		-|-
+#								rsm.rdds.80.rtt		-|-
 #
-# - DNS NS availability			(given minute)		dnstest.slv.dns.ns.avail	-|-	+
-# - DNS NS monthly availability		(monthly)		dnstest.slv.dns.ns.month	-|-	+
-# - DNS monthly resolution RTT		(monthly)		dnstest.slv.dns.ns.rtt.udp.month-|-	+
-# - DNS monthly resolution RTT (TCP)	(monthly, TCP)		dnstest.slv.dns.ns.rtt.tcp.month-|-	+
-# - DNS monthly update time		(monthly)		dnstest.slv.dns.ns.upd.month	-|-	+
-# - DNS availability			(given minute)		dnstest.slv.dns.avail		-|-	+
-# - DNS rolling week			(rolling week)		dnstest.slv.dns.rollweek	-|-	+
-# - DNSSEC proper resolution		(given minute)		dnstest.slv.dnssec.avail	-|-	+
-# - DNSSEC rolling week			(rolling week)		dnstest.slv.dnssec.rollweek	-|-	+
+# - DNS NS availability			(given minute)		rsm.slv.dns.ns.avail	-|-	+
+# - DNS NS monthly availability		(monthly)		rsm.slv.dns.ns.month	-|-	+
+# - DNS monthly resolution RTT		(monthly)		rsm.slv.dns.ns.rtt.udp.month-|-	+
+# - DNS monthly resolution RTT (TCP)	(monthly, TCP)		rsm.slv.dns.ns.rtt.tcp.month-|-	+
+# - DNS monthly update time		(monthly)		rsm.slv.dns.ns.upd.month	-|-	+
+# - DNS availability			(given minute)		rsm.slv.dns.avail		-|-	+
+# - DNS rolling week			(rolling week)		rsm.slv.dns.rollweek	-|-	+
+# - DNSSEC proper resolution		(given minute)		rsm.slv.dnssec.avail	-|-	+
+# - DNSSEC rolling week			(rolling week)		rsm.slv.dnssec.rollweek	-|-	+
 #
-# - RDDS availability			(given minute)		dnstest.slv.rdds.avail		-|-	-
-# - RDDS rolling week			(rolling week)		dnstest.slv.rdds.rollweek	-|-	-
-# - RDDS43 monthly resolution RTT	(monthly)		dnstest.slv.rdds.43.rtt.month	-|-	-
-# - RDDS80 monthly resolution RTT	(monthly)		dnstest.slv.rdds.80.rtt.month	-|-	-
-# - RDDS monthly update time		(monthly)		dnstest.slv.rdds.upd.month	-|-	-
+# - RDDS availability			(given minute)		rsm.slv.rdds.avail		-|-	-
+# - RDDS rolling week			(rolling week)		rsm.slv.rdds.rollweek	-|-	-
+# - RDDS43 monthly resolution RTT	(monthly)		rsm.slv.rdds.43.rtt.month	-|-	-
+# - RDDS80 monthly resolution RTT	(monthly)		rsm.slv.rdds.80.rtt.month	-|-	-
+# - RDDS monthly update time		(monthly)		rsm.slv.rdds.upd.month	-|-	-
 #
 
 use lib '/opt/zabbix/scripts';
@@ -36,7 +36,7 @@ use warnings;
 use Zabbix;
 use Getopt::Long;
 use Data::Dumper;
-use DNSTest;
+use RSM;
 
 use constant LINUX_TEMPLATEID => 10001;
 
@@ -73,8 +73,8 @@ use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
 use constant cfg_probe_status_delay => 60;
 use constant cfg_default_rdds_ns_string => 'Name Server:';
 
-use constant dnstest_host => 'dnstest'; # global config history
-use constant dnstest_group => 'dnstest';
+use constant rsm_host => 'rsm'; # global config history
+use constant rsm_group => 'rsm';
 
 my %OPTS;
 my $rv = GetOptions(\%OPTS,
@@ -106,25 +106,25 @@ validate_input();
 lc_options();
 
 # TODO: add command-line parameters:
-# - rdds43 hosts (2nd parameter of dnstest.rdds)
-# - rdds80 hosts (3rd parameter of dnstest.rdds)
+# - rdds43 hosts (2nd parameter of rsm.rdds)
+# - rdds80 hosts (3rd parameter of rsm.rdds)
 # ...
 
 my $main_templateid;
 my $ns_servers;
 
-use constant value_mappings => {'dnstest_dns' => 13,
-				'dnstest_probe' => 14,
-				'dnstest_rdds_rttudp' => 15,
-				'dnstest_avail' => 16,
-				'dnstest_rdds_avail' => 18,
-                                'dnstest_epp' => 19};
+use constant value_mappings => {'rsm_dns' => 13,
+				'rsm_probe' => 14,
+				'rsm_rdds_rttudp' => 15,
+				'rsm_avail' => 16,
+				'rsm_rdds_avail' => 18,
+                                'rsm_epp' => 19};
 
 use constant APP_SLV_MONTHLY => 'SLV monthly';
 use constant APP_SLV_ROLLWEEK => 'SLV rolling week';
 use constant APP_SLV_PARTTEST => 'SLV particular test';
 
-my $config = get_dnstest_config();
+my $config = get_rsm_config();
 my $zabbix = Zabbix->new({'url' => $config->{'zapi'}->{'url'}, user => $config->{'zapi'}->{'user'}, password => $config->{'zapi'}->{'password'}});
 
 create_cron_items();
@@ -134,47 +134,47 @@ my $proxies = get_proxies_list();
 
 pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
 
-create_macro('{$DNSTEST.IP4.MIN.PROBE.ONLINE} ', 25, undef);
-create_macro('{$DNSTEST.IP6.MIN.PROBE.ONLINE} ', 20, undef);
+create_macro('{$RSM.IP4.MIN.PROBE.ONLINE} ', 25, undef);
+create_macro('{$RSM.IP6.MIN.PROBE.ONLINE} ', 20, undef);
 
-create_macro('{$DNSTEST.IP4.MIN.SERVERS}', 4, undef);
-create_macro('{$DNSTEST.IP6.MIN.SERVERS}', 4, undef);
-create_macro('{$DNSTEST.IP4.REPLY.MS}', 200, undef);
-create_macro('{$DNSTEST.IP6.REPLY.MS}', 200, undef);
+create_macro('{$RSM.IP4.MIN.SERVERS}', 4, undef);
+create_macro('{$RSM.IP6.MIN.SERVERS}', 4, undef);
+create_macro('{$RSM.IP4.REPLY.MS}', 200, undef);
+create_macro('{$RSM.IP6.REPLY.MS}', 200, undef);
 
-create_macro('{$DNSTEST.DNS.TCP.RTT.LOW}', 1500, undef);
-create_macro('{$DNSTEST.DNS.TCP.RTT.HIGH}', 7500, undef);
-create_macro('{$DNSTEST.DNS.UDP.RTT.LOW}', 500, undef);
-create_macro('{$DNSTEST.DNS.UDP.RTT.HIGH}', 2500, undef);
-create_macro('{$DNSTEST.DNS.UDP.DELAY}', 60, undef);
-create_macro('{$DNSTEST.DNS.TCP.DELAY}', 3000, undef);
-create_macro('{$DNSTEST.DNS.UPDATE.TIME}', 3600, undef);
-create_macro('{$DNSTEST.DNS.PROBE.ONLINE}', 20, undef);
-create_macro('{$DNSTEST.DNS.AVAIL.MINNS}', 2, undef);
-create_macro('{$DNSTEST.DNS.ROLLWEEK.SLA}', 240, undef);
+create_macro('{$RSM.DNS.TCP.RTT.LOW}', 1500, undef);
+create_macro('{$RSM.DNS.TCP.RTT.HIGH}', 7500, undef);
+create_macro('{$RSM.DNS.UDP.RTT.LOW}', 500, undef);
+create_macro('{$RSM.DNS.UDP.RTT.HIGH}', 2500, undef);
+create_macro('{$RSM.DNS.UDP.DELAY}', 60, undef);
+create_macro('{$RSM.DNS.TCP.DELAY}', 3000, undef);
+create_macro('{$RSM.DNS.UPDATE.TIME}', 3600, undef);
+create_macro('{$RSM.DNS.PROBE.ONLINE}', 20, undef);
+create_macro('{$RSM.DNS.AVAIL.MINNS}', 2, undef);
+create_macro('{$RSM.DNS.ROLLWEEK.SLA}', 240, undef);
 
-create_macro('{$DNSTEST.RDDS.RTT.LOW}', 2000, undef);
-create_macro('{$DNSTEST.RDDS.RTT.HIGH}', 10000, undef);
-create_macro('{$DNSTEST.RDDS.DELAY}', 300, undef);
-create_macro('{$DNSTEST.RDDS.UPDATE.TIME}', 3600, undef);
-create_macro('{$DNSTEST.RDDS.PROBE.ONLINE}', 10, undef);
-create_macro('{$DNSTEST.RDDS.ROLLWEEK.SLA}', 48, undef);
-create_macro('{$DNSTEST.RDDS.MAXREDIRS}', 10, undef);
+create_macro('{$RSM.RDDS.RTT.LOW}', 2000, undef);
+create_macro('{$RSM.RDDS.RTT.HIGH}', 10000, undef);
+create_macro('{$RSM.RDDS.DELAY}', 300, undef);
+create_macro('{$RSM.RDDS.UPDATE.TIME}', 3600, undef);
+create_macro('{$RSM.RDDS.PROBE.ONLINE}', 10, undef);
+create_macro('{$RSM.RDDS.ROLLWEEK.SLA}', 48, undef);
+create_macro('{$RSM.RDDS.MAXREDIRS}', 10, undef);
 
-create_macro('{$DNSTEST.EPP.DELAY}', 300, undef);
-create_macro('{$DNSTEST.EPP.LOGIN.RTT.LOW}', 4000, undef);
-create_macro('{$DNSTEST.EPP.LOGIN.RTT.HIGH}', 20000, undef);
-create_macro('{$DNSTEST.EPP.UPDATE.RTT.LOW}', 4000, undef);
-create_macro('{$DNSTEST.EPP.UPDATE.RTT.HIGH}', 20000, undef);
-create_macro('{$DNSTEST.EPP.INFO.RTT.LOW}', 2000, undef);
-create_macro('{$DNSTEST.EPP.INFO.RTT.HIGH}', 10000, undef);
-create_macro('{$DNSTEST.EPP.PROBE.ONLINE}', 5, undef);
-create_macro('{$DNSTEST.EPP.ROLLWEEK.SLA}', 48, undef);
+create_macro('{$RSM.EPP.DELAY}', 300, undef);
+create_macro('{$RSM.EPP.LOGIN.RTT.LOW}', 4000, undef);
+create_macro('{$RSM.EPP.LOGIN.RTT.HIGH}', 20000, undef);
+create_macro('{$RSM.EPP.UPDATE.RTT.LOW}', 4000, undef);
+create_macro('{$RSM.EPP.UPDATE.RTT.HIGH}', 20000, undef);
+create_macro('{$RSM.EPP.INFO.RTT.LOW}', 2000, undef);
+create_macro('{$RSM.EPP.INFO.RTT.HIGH}', 10000, undef);
+create_macro('{$RSM.EPP.PROBE.ONLINE}', 5, undef);
+create_macro('{$RSM.EPP.ROLLWEEK.SLA}', 48, undef);
 
-create_macro('{$DNSTEST.PROBE.ONLINE.DELAY}', 180, undef);
+create_macro('{$RSM.PROBE.ONLINE.DELAY}', 180, undef);
 
-create_macro('{$DNSTEST.TRIG.DOWNCOUNT}', '#1', undef);
-create_macro('{$DNSTEST.TRIG.UPCOUNT}', '#3', undef);
+create_macro('{$RSM.TRIG.DOWNCOUNT}', '#1', undef);
+create_macro('{$RSM.TRIG.UPCOUNT}', '#3', undef);
 
 create_macro('{$INCIDENT.DNS.FAIL}', 3, undef);
 create_macro('{$INCIDENT.DNS.RECOVER}', 3, undef);
@@ -185,54 +185,54 @@ create_macro('{$INCIDENT.RDDS.RECOVER}', 2, undef);
 create_macro('{$INCIDENT.EPP.FAIL}', 2, undef);
 create_macro('{$INCIDENT.EPP.RECOVER}', 2, undef);
 
-create_macro('{$DNSTEST.SLV.DNS.UDP.RTT}', 99, undef);
-create_macro('{$DNSTEST.SLV.DNS.TCP.RTT}', 99, undef);
-create_macro('{$DNSTEST.SLV.NS.AVAIL}', 99, undef);
-create_macro('{$DNSTEST.SLV.RDDS43.RTT}', 99, undef);
-create_macro('{$DNSTEST.SLV.RDDS80.RTT}', 99, undef);
-create_macro('{$DNSTEST.SLV.RDDS.UPD}', 99, undef);
-create_macro('{$DNSTEST.SLV.DNS.NS.UPD}', 99, undef);
-create_macro('{$DNSTEST.SLV.EPP.LOGIN}', 99, undef);
-create_macro('{$DNSTEST.SLV.EPP.UPDATE}', 99, undef);
-create_macro('{$DNSTEST.SLV.EPP.INFO}', 99, undef);
+create_macro('{$RSM.SLV.DNS.UDP.RTT}', 99, undef);
+create_macro('{$RSM.SLV.DNS.TCP.RTT}', 99, undef);
+create_macro('{$RSM.SLV.NS.AVAIL}', 99, undef);
+create_macro('{$RSM.SLV.RDDS43.RTT}', 99, undef);
+create_macro('{$RSM.SLV.RDDS80.RTT}', 99, undef);
+create_macro('{$RSM.SLV.RDDS.UPD}', 99, undef);
+create_macro('{$RSM.SLV.DNS.NS.UPD}', 99, undef);
+create_macro('{$RSM.SLV.EPP.LOGIN}', 99, undef);
+create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
+create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
 
 create_macro('{$ROLLING.WEEK.STATUS.PAGE.SLV}', '0,5,10,25,50,75,100', undef);
-create_macro('{$DNSTEST.PROBE.AVAIL.LIMIT}', '60', undef);
+create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef);
 
 my $result;
-my $m = '{$DNSTEST.DNS.UDP.DELAY}';
+my $m = '{$RSM.DNS.UDP.DELAY}';
 unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
 	and defined $result->{'value'}) {
     pfail('cannot get macro ', $m);
 }
 my $cfg_dns_udp_delay = $result->{'value'};
-$m = '{$DNSTEST.DNS.TCP.DELAY}';
+$m = '{$RSM.DNS.TCP.DELAY}';
 unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
 	and defined $result->{'value'}) {
     pfail('cannot get macro ', $m);
 }
 my $cfg_dns_tcp_delay = $result->{'value'};
-$m = '{$DNSTEST.RDDS.DELAY}';
+$m = '{$RSM.RDDS.DELAY}';
 unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
 	and defined $result->{'value'}) {
     pfail('cannot get macro ', $m);
 }
 my $cfg_rdds_delay = $result->{'value'};
-$m = '{$DNSTEST.EPP.DELAY}';
+$m = '{$RSM.EPP.DELAY}';
 unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
 	         and defined $result->{'value'}) {
         pfail('cannot get macro ', $m);
     }
 my $cfg_epp_delay = $result->{'value'};
 
-my $dnstest_groupid = create_group(dnstest_group);
+my $rsm_groupid = create_group(rsm_group);
 
-my $dnstest_hostid = create_host({'groups' => [{'groupid' => $dnstest_groupid}],
-			      'host' => dnstest_host,
+my $rsm_hostid = create_host({'groups' => [{'groupid' => $rsm_groupid}],
+			      'host' => rsm_host,
 			      'interfaces' => [{'type' => 1, 'main' => 1, 'useip' => 1, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
-create_dnstest_items($dnstest_hostid);
+create_rsm_items($rsm_hostid);
 
 $ns_servers = get_ns_servers($OPTS{'tld'});
 
@@ -256,7 +256,7 @@ my $probes_mon_groupid = create_group('Probes - Mon');
 
 my $proxy_mon_templateid = create_template('Template Proxy Health', LINUX_TEMPLATEID);
 
-my $item_key = 'zabbix[proxy,{$DNSTEST.PROXY_NAME},lastaccess]';
+my $item_key = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
 
 my $options = {'name' => 'Availability of $2 Probe',
                                           'key_'=> $item_key,
@@ -267,7 +267,7 @@ my $options = {'name' => 'Availability of $2 Probe',
 
 create_item($options);
 
-$options = { 'description' => 'PROBE {HOST.NAME}: Probe {$DNSTEST.PROXY_NAME} is not available',
+$options = { 'description' => 'PROBE {HOST.NAME}: Probe {$RSM.PROXY_NAME} is not available',
                      'expression' => '{Template Proxy Health:'.$item_key.'.fuzzytime(2m)}=0',
                     'priority' => '4',
             };
@@ -302,7 +302,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
                                                             'dns' => '', 'port' => '10050'}]
             		    });
 
-    create_macro('{$DNSTEST.PROXY_NAME}', $probe_name, $hostid, 1);
+    create_macro('{$RSM.PROXY_NAME}', $probe_name, $hostid, 1);
 
     create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $proxy_groupid}],
                                           'templates' => [{'templateid' => $main_templateid}, {'templateid' => $probe_templateid}],
@@ -536,20 +536,20 @@ sub create_item_dns_rtt {
     my $proto_lc = lc($proto);
     my $proto_uc = uc($proto);
 
-    my $item_key = 'dnstest.dns.'.$proto_lc.'.rtt[{$DNSTEST.TLD},'.$ns_name.','.$ip.']';
+    my $item_key = 'rsm.dns.'.$proto_lc.'.rtt[{$RSM.TLD},'.$ns_name.','.$ip.']';
 
     my $options = {'name' => 'DNS RTT of $2 ($3) ('.$proto_uc.')',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'dnstest_dns'}};
+                                              'valuemapid' => value_mappings->{'rsm_dns'}};
 
     create_item($options);
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from Name Server '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY.
-					    '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+					    '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
@@ -557,7 +557,7 @@ sub create_item_dns_rtt {
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - Invalid reply from Name Server '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
@@ -565,7 +565,7 @@ sub create_item_dns_rtt {
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - UNIX timestamp is missing from '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
@@ -573,7 +573,7 @@ sub create_item_dns_rtt {
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - Invalid UNIX timestamp from '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
                 };
 
@@ -582,7 +582,7 @@ sub create_item_dns_rtt {
     if (defined($OPTS{'dnssec'})) {
 	$options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.']',
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 		     'priority' => '2',
 	};
 
@@ -591,7 +591,7 @@ sub create_item_dns_rtt {
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from resolver',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
                 };
 
@@ -599,7 +599,7 @@ sub create_item_dns_rtt {
 
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 2 - AD bit is missing from '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT.
-                                            '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
                 };
 
@@ -623,7 +623,7 @@ sub create_slv_item {
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 3,
 					      'applications' => $applicationids,
-					      'valuemapid' => value_mappings->{'dnstest_avail'}};
+					      'valuemapid' => value_mappings->{'rsm_avail'}};
     }
     elsif ($value_type == VALUE_TYPE_PERC) {
 	$options = {'name' => $name,
@@ -649,11 +649,11 @@ sub create_item_dns_udp_upd {
     my $proto_uc = 'UDP';
 
     my $options = {'name' => 'DNS update time of $2 ($3)',
-                                              'key_'=> 'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ip.']',
+                                              'key_'=> 'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ip.']',
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'dnstest_dns'},
+                                              'valuemapid' => value_mappings->{'rsm_dns'},
 		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
     return create_item($options);
 }
@@ -664,7 +664,7 @@ sub create_items_dns {
 
     my $proto = 'tcp';
     my $proto_uc = uc($proto);
-    my $item_key = 'dnstest.dns.'.$proto.'[{$DNSTEST.TLD}]';
+    my $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
 
     my $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
                                               'key_'=> $item_key,
@@ -675,8 +675,8 @@ sub create_items_dns {
 
     create_item($options);
 
-    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
+    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$RSM.DNS.AVAIL.MINNS} NS servers have answered succesfully',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$RSM.DNS.AVAIL.MINNS}',
 			'priority' => '4',
                 };
 
@@ -684,19 +684,19 @@ sub create_items_dns {
 
     $proto = 'udp';
     $proto_uc = uc($proto);
-    $item_key = 'dnstest.dns.'.$proto.'[{$DNSTEST.TLD}]';
+    $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
 
     $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_dns_udp_delay, 'valuemapid' => value_mappings->{'dnstest_dns'}};
+                                              'delay' => $cfg_dns_udp_delay, 'valuemapid' => value_mappings->{'rsm_dns'}};
 
     create_item($options);
 
-    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$DNSTEST.DNS.AVAIL.MINNS} NS servers have answered succesfully',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$DNSTEST.DNS.AVAIL.MINNS}',
+    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$RSM.DNS.AVAIL.MINNS} NS servers have answered succesfully',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$RSM.DNS.AVAIL.MINNS}',
 			'priority' => '4',
                 };
 
@@ -710,24 +710,24 @@ sub create_items_rdds {
     my $applicationid_43 = get_application_id('RDDS43', $templateid);
     my $applicationid_80 = get_application_id('RDDS80', $templateid);
 
-    my $item_key = 'dnstest.rdds.43.ip[{$DNSTEST.TLD}]';
+    my $item_key = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 
     my $options = {'name' => 'RDDS43 IP of $1',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
+                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
-    $item_key = 'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]';
+    $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 
     $options = {'name' => 'RDDS43 RTT of $1',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
+                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
     $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
@@ -737,7 +737,7 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - The server output does not contain "{$DNSTEST.RDDS.NS.STRING}"',
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - The server output does not contain "{$RSM.RDDS.NS.STRING}"',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NONS,
                         'priority' => '2',
                 };
@@ -766,14 +766,14 @@ sub create_items_rdds {
     create_trigger($options);
 
     if (defined($OPTS{'epp-servers'})) {
-	$item_key = 'dnstest.rdds.43.upd[{$DNSTEST.TLD}]';
+	$item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
 
 	$options = {'name' => 'RDDS43 update time of $1',
 		    'key_'=> $item_key,
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'},
+		    'valuemapid' => value_mappings->{'rsm_rdds_rttudp'},
 		    'status' => 0};
 	create_item($options);
 
@@ -785,7 +785,7 @@ sub create_items_rdds {
 	create_trigger($options);
     }
 
-    $item_key = 'dnstest.rdds.80.ip[{$DNSTEST.TLD}]';
+    $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
 
     $options = {'name' => 'RDDS80 IP of $1',
                                               'key_'=> $item_key,
@@ -794,14 +794,14 @@ sub create_items_rdds {
                                               'type' => 2, 'value_type' => 1};
     create_item($options);
 
-    $item_key = 'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]';
+    $item_key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 
     $options = {'name' => 'RDDS80 RTT of $1',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => value_mappings->{'dnstest_rdds_rttudp'}};
+                                              'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
     $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
@@ -832,7 +832,7 @@ sub create_items_rdds {
 
     create_trigger($options);
 
-    $item_key = 'dnstest.rdds[{$DNSTEST.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
+    $item_key = 'rsm.rdds[{$RSM.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
 
     $options = {'name' => 'RDDS availability of $1',
                                               'key_'=> $item_key,
@@ -840,7 +840,7 @@ sub create_items_rdds {
                                               'applications' => [get_application_id('RDDS', $templateid)],
                                               'type' => 3, 'value_type' => 3,
 					      'delay' => $cfg_rdds_delay,
-                                              'valuemapid' => value_mappings->{'dnstest_rdds_avail'}};
+                                              'valuemapid' => value_mappings->{'rsm_rdds_avail'}};
     create_item($options);
 }
 
@@ -852,18 +852,18 @@ sub create_items_epp {
 
     my ($item_key, $options);
 
-    $item_key = 'dnstest.epp[{$DNSTEST.TLD},"'.$OPTS{'epp-servers'}.'"]';
+    $item_key = 'rsm.epp[{$RSM.TLD},"'.$OPTS{'epp-servers'}.'"]';
 
     $options = {'name' => 'EPP service availability at $1 ($2)',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 3, 'value_type' => 3,
-		'delay' => $cfg_epp_delay, 'valuemapid' => value_mappings->{'dnstest_avail'}};
+		'delay' => $cfg_epp_delay, 'valuemapid' => value_mappings->{'rsm_avail'}};
 
     create_item($options);
 
-    $item_key = 'dnstest.epp.ip[{$DNSTEST.TLD}]';
+    $item_key = 'rsm.epp.ip[{$RSM.TLD}]';
 
     $options = {'name' => 'EPP IP of $1',
 		'key_'=> $item_key,
@@ -873,36 +873,36 @@ sub create_items_epp {
 
     create_item($options);
 
-    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},login]';
+    $item_key = 'rsm.epp.rtt[{$RSM.TLD},login]';
 
     $options = {'name' => 'EPP $2 command RTT of $1',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'dnstest_epp'}};
+		'valuemapid' => value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
-    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},update]';
+    $item_key = 'rsm.epp.rtt[{$RSM.TLD},update]';
 
     $options = {'name' => 'EPP $2 command RTT of $1',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'dnstest_epp'}};
+		'valuemapid' => value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
-    $item_key = 'dnstest.epp.rtt[{$DNSTEST.TLD},info]';
+    $item_key = 'rsm.epp.rtt[{$RSM.TLD},info]';
 
     $options = {'name' => 'EPP $2 command RTT of $1',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => value_mappings->{'dnstest_epp'}};
+		'valuemapid' => value_mappings->{'rsm_epp'}};
 
     create_item($options);
 
@@ -1028,16 +1028,16 @@ sub create_probe_status_template {
     my $templateid = create_template($template_name, $child_templateid);
 
     my $options = {'name' => 'Probe status ($1)',
-                                              'key_'=> 'dnstest.probe.status[automatic,'.$root_servers_macros.']',
+                                              'key_'=> 'rsm.probe.status[automatic,'.$root_servers_macros.']',
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('Probe status', $templateid)],
                                               'type' => 3, 'value_type' => 3, 'delay' => cfg_probe_status_delay,
-                                              'valuemapid' => value_mappings->{'dnstest_probe'}};
+                                              'valuemapid' => value_mappings->{'rsm_probe'}};
 
     create_item($options);
 
     $options = { 'description' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago',
-                         'expression' => '{'.$template_name.':dnstest.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
+                         'expression' => '{'.$template_name.':rsm.probe.status[manual].max({$IP.MAX.OFFLINE.MANUAL}h)}=0',
                         'priority' => '3',
                 };
 
@@ -1045,16 +1045,16 @@ sub create_probe_status_template {
 
 
     $options = {'name' => 'Probe status ($1)',
-                                              'key_'=> 'dnstest.probe.status[manual]',
+                                              'key_'=> 'rsm.probe.status[manual]',
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('Probe status', $templateid)],
                                               'type' => 2, 'value_type' => 3,
-                                              'valuemapid' => value_mappings->{'dnstest_probe'}};
+                                              'valuemapid' => value_mappings->{'rsm_probe'}};
 
     create_item($options);
 
     $options = { 'description' => 'PROBE {HOST.NAME}: 8.2 - Probe has been disabled by tests',
-                         'expression' => '{'.$template_name.':dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"].last(0)}=0',
+                         'expression' => '{'.$template_name.':rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"].last(0)}=0',
                         'priority' => '4',
                 };
 
@@ -1070,11 +1070,11 @@ sub create_probe_template {
 
     my $templateid = create_template('Template '.$root_name);
 
-    create_macro('{$DNSTEST.IP4.ENABLED}', '1', $templateid);
-    create_macro('{$DNSTEST.IP6.ENABLED}', '1', $templateid);
-    create_macro('{$DNSTEST.RESOLVER}', '127.0.0.1', $templateid);
-    create_macro('{$DNSTEST.RDDS.ENABLED}', '1', $templateid);
-    create_macro('{$DNSTEST.EPP.ENABLED}', '1', $templateid);
+    create_macro('{$RSM.IP4.ENABLED}', '1', $templateid);
+    create_macro('{$RSM.IP6.ENABLED}', '1', $templateid);
+    create_macro('{$RSM.RESOLVER}', '127.0.0.1', $templateid);
+    create_macro('{$RSM.RDDS.ENABLED}', '1', $templateid);
+    create_macro('{$RSM.EPP.ENABLED}', '1', $templateid);
 
     return $templateid;
 }
@@ -1094,9 +1094,9 @@ sub update_root_servers {
     for my $str (split("\n", $content)) {
 	if ($str=~/.+ROOT\-SERVERS.+\sA\s+(.+)$/ and $OPTS{'ipv4'} == 1) {
 	    if (defined($macro_value_v4) and length($macro_value_v4.','.$1) > 255) {
-                $macros_v4 = $macros_v4.','.'{$DNSTEST.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' if defined($macros_v4);
-                $macros_v4 = '{$DNSTEST.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' unless defined $macros_v4;
-                create_macro('{$DNSTEST.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
+                $macros_v4 = $macros_v4.','.'{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' if defined($macros_v4);
+                $macros_v4 = '{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}' unless defined $macros_v4;
+                create_macro('{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
                 undef $macro_value_v4;
                 $cnt_macros_v4++;
             }
@@ -1107,9 +1107,9 @@ sub update_root_servers {
 
 	if ($str=~/.+ROOT\-SERVERS.+AAAA\s+(.+)$/ and $OPTS{'ipv6'} == 1) {
             if (defined($macro_value_v6) and length($macro_value_v6.','.$1) > 255) {
-                $macros_v6 = $macros_v6.','.'{$DNSTEST.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' if defined($macros_v6);
-                $macros_v6 = '{$DNSTEST.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' unless defined $macros_v6;
-                create_macro('{$DNSTEST.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
+                $macros_v6 = $macros_v6.','.'{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' if defined($macros_v6);
+                $macros_v6 = '{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}' unless defined $macros_v6;
+                create_macro('{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
                 undef $macro_value_v6;
                 $cnt_macros_v6++;
             }
@@ -1121,24 +1121,24 @@ sub update_root_servers {
 
     unless (defined($macros_v4)) {
 	if (defined($macro_value_v4)) {
-	    $macros_v4 = '{$DNSTEST.IP4.ROOTSERVERS1}';
-	    create_macro('{$DNSTEST.IP4.ROOTSERVERS1}', $macro_value_v4);
+	    $macros_v4 = '{$RSM.IP4.ROOTSERVERS1}';
+	    create_macro('{$RSM.IP4.ROOTSERVERS1}', $macro_value_v4);
 	}
     }
     else {
-	$macros_v4 = $macros_v4.','.'{$DNSTEST.IP4.ROOTSERVERS'.$cnt_macros_v4.'}';
-	create_macro('{$DNSTEST.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
+	$macros_v4 = $macros_v4.','.'{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}';
+	create_macro('{$RSM.IP4.ROOTSERVERS'.$cnt_macros_v4.'}', $macro_value_v4);
     }
 
     unless (defined($macros_v6)) {
 	if (defined($macro_value_v6)) {
-            $macros_v6 = '{$DNSTEST.IP6.ROOTSERVERS1}';
-            create_macro('{$DNSTEST.IP6.ROOTSERVERS1}', $macro_value_v6);
+            $macros_v6 = '{$RSM.IP6.ROOTSERVERS1}';
+            create_macro('{$RSM.IP6.ROOTSERVERS1}', $macro_value_v6);
         }
     }
     else {
-        $macros_v6 = $macros_v6.','.'{$DNSTEST.IP6.ROOTSERVERS'.$cnt_macros_v6.'}';
-        create_macro('{$DNSTEST.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
+        $macros_v6 = $macros_v6.','.'{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}';
+        create_macro('{$RSM.IP6.ROOTSERVERS'.$cnt_macros_v6.'}', $macro_value_v6);
     }
 
     return '"'.$macros_v4.'","'.$macros_v6.'"' if defined $macros_v4 and defined $macros_v6;
@@ -1199,7 +1199,7 @@ sub create_main_template {
     my $appid = get_application_id('Configuration', $templateid);
     my ($options, $key);
 
-    foreach my $m ('DNSTEST.IP4.ENABLED', 'DNSTEST.IP6.ENABLED') {
+    foreach my $m ('RSM.IP4.ENABLED', 'RSM.IP6.ENABLED') {
         $key = 'probe.configvalue['.$m.']';
 
         $options = {'name' => 'Value of $1 variable',
@@ -1229,8 +1229,8 @@ sub create_main_template {
     		create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv4[$i_ipv4].']',
-            	             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
-					     '&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP4.ENABLED]'.'.last(0)}=1',
+            	             'expression' => '{'.$template_name.':'.'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+					     '&{'.$template_name.':'.'probe.configvalue[RSM.IP4.ENABLED]'.'.last(0)}=1',
                 	    'priority' => '2',
                 };
 
@@ -1248,8 +1248,8 @@ sub create_main_template {
     		create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid);
 
 		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv6[$i_ipv6].']',
-                             'expression' => '{'.$template_name.':'.'dnstest.dns.udp.upd[{$DNSTEST.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
-						'&{'.$template_name.':'.'probe.configvalue[DNSTEST.IP6.ENABLED]'.'.last(0)}=1',
+                             'expression' => '{'.$template_name.':'.'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+						'&{'.$template_name.':'.'probe.configvalue[RSM.IP6.ENABLED]'.'.last(0)}=1',
                             'priority' => '2',
                 };
 
@@ -1262,21 +1262,21 @@ sub create_main_template {
     create_items_rdds($templateid, $template_name) if (defined($OPTS{'rdds43-servers'}));
     create_items_epp($templateid, $template_name) if (defined($OPTS{'epp-servers'}));
 
-    create_macro('{$DNSTEST.TLD}', $tld, $templateid);
-    create_macro('{$DNSTEST.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid);
-    create_macro('{$DNSTEST.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid) if (defined($OPTS{'rdds-test-prefix'}));
-    create_macro('{$DNSTEST.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid);
-    create_macro('{$DNSTEST.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
-    create_macro('{$DNSTEST.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
-    create_macro('{$DNSTEST.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid);
+    create_macro('{$RSM.TLD}', $tld, $templateid);
+    create_macro('{$RSM.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid);
+    create_macro('{$RSM.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid) if (defined($OPTS{'rdds-test-prefix'}));
+    create_macro('{$RSM.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid);
+    create_macro('{$RSM.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid);
+    create_macro('{$RSM.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid);
+    create_macro('{$RSM.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid);
 
     if ($OPTS{'epp-servers'})
     {
-	create_macro('{$DNSTEST.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
-	create_macro('{$DNSTEST.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
-	create_macro('{$DNSTEST.EPP.USER}', $OPTS{'epp-user'}, $templateid);
-	create_macro('{$DNSTEST.EPP.PASSWD}', epp_encode_passwd($OPTS{'epp-passwd'}), $templateid);
-	create_macro('{$DNSTEST.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
+	create_macro('{$RSM.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
+	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
+	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid);
+	create_macro('{$RSM.EPP.PASSWD}', epp_encode_passwd($OPTS{'epp-passwd'}), $templateid);
+	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
     }
 
     return $templateid;
@@ -1287,11 +1287,11 @@ sub create_all_slv_ns_items {
     my $ip = shift;
     my $hostid = shift;
 
-    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'dnstest.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'dnstest.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
-    create_slv_item('DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'dnstest.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'rsm.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'rsm.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
+    create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
 
 sub create_slv_ns_items {
@@ -1323,7 +1323,7 @@ sub create_slv_items {
 
     create_slv_ns_items($ns_servers, $hostid);
 
-    create_slv_item('DNS availability', 'dnstest.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+    create_slv_item('DNS availability', 'rsm.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
     my $options;
 
@@ -1331,128 +1331,128 @@ sub create_slv_items {
     # priority must be set to 0!
     $options = { 'description' => 'DNS-AVAIL {HOST.NAME}: 5.2.4 - The service is not available',
                          'expression' => '({TRIGGER.VALUE}=0&'.
-						'{'.$host_name.':dnstest.slv.dns.avail.count(#{$INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
+						'{'.$host_name.':rsm.slv.dns.avail.count(#{$INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
 					 '({TRIGGER.VALUE}=1&'.
-						'{'.$host_name.':dnstest.slv.dns.avail.count(#{$INCIDENT.DNS.RECOVER},0,"ne")}<{$INCIDENT.DNS.RECOVER})',
+						'{'.$host_name.':rsm.slv.dns.avail.count(#{$INCIDENT.DNS.RECOVER},0,"ne")}<{$INCIDENT.DNS.RECOVER})',
                         'priority' => '0',
                 };
 
     create_trigger($options);
 
-    create_slv_item('DNS weekly unavailability', 'dnstest.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+    create_slv_item('DNS weekly unavailability', 'rsm.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-                         'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=10|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>10)&'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<25',
+                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=10|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>10)&'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<25',
                         'priority' => '2',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-                         'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=25|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>25)&'.
-                                        '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<50',
+                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=25|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>25)&'.
+                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<50',
                         'priority' => '3',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-                         'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=50|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>50)&'.
-                                        '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<75',
+                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=50|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>50)&'.
+                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<75',
                         'priority' => '3',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-                         'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>75|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>75)&'.
-                                        '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<90',
+                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}>75|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>75)&'.
+                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<90',
                         'priority' => '4',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-                         'expression' => '({'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=90|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>90)&'.
-                                        '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}<100',
+                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=90|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>90)&'.
+                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<100',
                         'priority' => '4',
                 };
 
     create_trigger($options);
 
     $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-                         'expression' => '{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}=100|'.
-					'{'.$host_name.':dnstest.slv.dns.rollweek.last(0)}>100',
+                         'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}=100|'.
+					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>100',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
     if (defined($OPTS{'dnssec'})) {
-	create_slv_item('DNSSEC availability', 'dnstest.slv.dnssec.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('DNSSEC availability', 'rsm.slv.dnssec.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
 	$options = { 'description' => 'DNSSEC-AVAIL {HOST.NAME}: 5.3.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.FAIL},0,"eq")}={$INCIDENT.DNSSEC.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.FAIL},0,"eq")}={$INCIDENT.DNSSEC.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.RECOVER},0,"ne")}<{$INCIDENT.DNSSEC.RECOVER})',
+			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.RECOVER},0,"ne")}<{$INCIDENT.DNSSEC.RECOVER})',
 			 'priority' => '0',
 	};
 
 	create_trigger($options);
 
-	create_slv_item('DNSSEC weekly unavailability', 'dnstest.slv.dnssec.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('DNSSEC weekly unavailability', 'rsm.slv.dnssec.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 10%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>10&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<25',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>10&'.
+			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<25',
 			 'priority' => '2',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 25%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>25&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<50',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>25&'.
+			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<50',
 			 'priority' => '3',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 50%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>50&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<75',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>50&'.
+			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<75',
 			 'priority' => '3',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 75%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>75&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<90',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>75&'.
+			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<90',
 			 'priority' => '4',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 90%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>90&'.
-			 '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}<100',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>90&'.
+			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<100',
 			 'priority' => '4',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 100%',
-		     'expression' => '{'.$host_name.':dnstest.slv.dnssec.rollweek.last(0)}>100',
+		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>100',
 		     'priority' => '5',
 	};
 
@@ -1460,142 +1460,142 @@ sub create_slv_items {
     }
 
     if (defined($OPTS{'rdds43-servers'})) {
-	create_slv_item('RDDS availability', 'dnstest.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
 	$options = { 'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':dnstest.slv.rdds.avail.count(#{$INCIDENT.RDDS.FAIL},0,"eq")}={$INCIDENT.RDDS.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$INCIDENT.RDDS.FAIL},0,"eq")}={$INCIDENT.RDDS.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':dnstest.slv.rdds.avail.count(#{$INCIDENT.RDDS.RECOVER},0,"ne")}<{$INCIDENT.RDDS.RECOVER})',
+			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$INCIDENT.RDDS.RECOVER},0,"ne")}<{$INCIDENT.RDDS.RECOVER})',
 			 'priority' => '0',
 	};
 
 	create_trigger($options);
 
-	create_slv_item('RDDS weekly unavailability', 'dnstest.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
         $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>10&'.
-			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<25',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>10&'.
+			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<25',
 			 'priority' => '2',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>25&'.
-			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<50',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>25&'.
+			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<50',
 			 'priority' => '3',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>50&'.
-			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<75',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>50&'.
+			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<75',
 			 'priority' => '3',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>75&'.
-			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<90',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>75&'.
+			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<90',
 			 'priority' => '4',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>90&'.
-			 '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}<100',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>90&'.
+			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<100',
 			 'priority' => '4',
 	};
 
 	create_trigger($options);
 
 	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-		     'expression' => '{'.$host_name.':dnstest.slv.rdds.rollweek.last(0)}>100',
+		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>100',
 		     'priority' => '5',
 	};
 
 	create_trigger($options);
 
-	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'dnstest.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'dnstest.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly RDDS update time', 'dnstest.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
+	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'rsm.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'rsm.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly RDDS update time', 'rsm.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     }
 
     if (defined($OPTS{'epp-servers'})) {
-	create_slv_item('EPP availability', 'dnstest.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-	create_slv_item('EPP weekly unavailability', 'dnstest.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
+	create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
+	create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'dnstest.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'dnstest.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'dnstest.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'rsm.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'rsm.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'rsm.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
 	$options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':dnstest.slv.epp.avail.count(#{$INCIDENT.EPP.RECOVER},0,"ne")}<{$INCIDENT.EPP.RECOVER})',
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$INCIDENT.EPP.RECOVER},0,"ne")}<{$INCIDENT.EPP.RECOVER})',
 			 'priority' => '0',
 	};
 
 	create_trigger($options);
 
         $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=10|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>10)&'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<25',
+                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=10|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>10)&'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<25',
                         'priority' => '2',
                 };
 
 	create_trigger($options);
 
 	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=25|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>25)&'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<50',
+                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=25|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>25)&'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<50',
                         'priority' => '3',
                 };
 
 	create_trigger($options);
 
 	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=50|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>50)&'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<75',
+                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=50|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>50)&'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<75',
                         'priority' => '3',
                 };
 
 	create_trigger($options);
 
 	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>75)&'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<90',
+                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}>75|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>75)&'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<90',
                         'priority' => '4',
                 };
 
 	create_trigger($options);
 
 	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-                         'expression' => '({'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=90|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>90)&'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}<100',
+                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=90|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>90)&'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<100',
                         'priority' => '4',
                 };
 
 	create_trigger($options);
 
         $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-                         'expression' => '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}=100|'.
-                                        '{'.$host_name.':dnstest.slv.epp.rollweek.last(0)}>100',
+                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}=100|'.
+                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>100',
                         'priority' => '5',
                 };
 
@@ -1605,7 +1605,7 @@ sub create_slv_items {
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
-sub create_dnstest_items {
+sub create_rsm_items {
     my $hostid = shift;
 
     my $options;
@@ -1621,17 +1621,17 @@ sub create_dnstest_items {
 	'INCIDENT.RDDS.RECOVER',
 	'INCIDENT.EPP.FAIL',
 	'INCIDENT.EPP.RECOVER',
-	'DNSTEST.DNS.UDP.DELAY',
-	'DNSTEST.RDDS.DELAY',
-	'DNSTEST.EPP.DELAY',
-	'DNSTEST.DNS.UDP.RTT.HIGH',
-	'DNSTEST.DNS.AVAIL.MINNS',
-	'DNSTEST.DNS.ROLLWEEK.SLA',
-	'DNSTEST.RDDS.ROLLWEEK.SLA',
-	'DNSTEST.EPP.ROLLWEEK.SLA')
+	'RSM.DNS.UDP.DELAY',
+	'RSM.RDDS.DELAY',
+	'RSM.EPP.DELAY',
+	'RSM.DNS.UDP.RTT.HIGH',
+	'RSM.DNS.AVAIL.MINNS',
+	'RSM.DNS.ROLLWEEK.SLA',
+	'RSM.RDDS.ROLLWEEK.SLA',
+	'RSM.EPP.ROLLWEEK.SLA')
     {
 	$options = {'name' => '$1 value',
-		   'key_'=> 'dnstest.configvalue['.$m.']',
+		   'key_'=> 'rsm.configvalue['.$m.']',
 		   'hostid' => $hostid,
 		   'applications' => [$appid],
 		   'params' => '{$'.$m.'}',
@@ -1643,19 +1643,19 @@ sub create_dnstest_items {
 
     $delay = 60 * 60 * 24; # every day
     foreach my $m (
-	'DNSTEST.SLV.DNS.UDP.RTT',
-	'DNSTEST.SLV.DNS.TCP.RTT',
-	'DNSTEST.SLV.NS.AVAIL',
-	'DNSTEST.SLV.RDDS43.RTT',
-	'DNSTEST.SLV.RDDS80.RTT',
-	'DNSTEST.SLV.RDDS.UPD',
-	'DNSTEST.SLV.DNS.NS.UPD',
-	'DNSTEST.SLV.EPP.LOGIN',
-	'DNSTEST.SLV.EPP.UPDATE',
-	'DNSTEST.SLV.EPP.INFO')
+	'RSM.SLV.DNS.UDP.RTT',
+	'RSM.SLV.DNS.TCP.RTT',
+	'RSM.SLV.NS.AVAIL',
+	'RSM.SLV.RDDS43.RTT',
+	'RSM.SLV.RDDS80.RTT',
+	'RSM.SLV.RDDS.UPD',
+	'RSM.SLV.DNS.NS.UPD',
+	'RSM.SLV.EPP.LOGIN',
+	'RSM.SLV.EPP.UPDATE',
+	'RSM.SLV.EPP.INFO')
     {
 	$options = {'name' => '$1 value',
-		   'key_'=> 'dnstest.configvalue['.$m.']',
+		   'key_'=> 'rsm.configvalue['.$m.']',
 		   'hostid' => $hostid,
 		   'applications' => [$appid],
 		   'params' => '{$'.$m.'}',
@@ -1683,7 +1683,7 @@ sub create_cron_items {
 
     my $slv_file;
     while (($slv_file = readdir DIR)) {
-	next unless ($slv_file =~ /^dnstest\.slv\..*\.pl$/);
+	next unless ($slv_file =~ /^rsm\.slv\..*\.pl$/);
 
 	if ($slv_file =~ /\.slv\..*\.month\.pl$/) {
 	    # check monthly data once a day
@@ -1909,36 +1909,36 @@ sub create_probe_status_host {
                                               };
     create_item($options);
 
-    $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.DNS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$DNSTEST.DNS.PROBE.ONLINE}',
+    $options = { 'description' => 'DNS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.DNS.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,dns].last(0)}<{$RSM.DNS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.RDDS.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,rdds].last(0)}<{$DNSTEST.RDDS.PROBE.ONLINE}',
+    $options = { 'description' => 'RDDS-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.RDDS.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,rdds].last(0)}<{$RSM.RDDS.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.EPP.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$DNSTEST.EPP.PROBE.ONLINE}',
+    $options = { 'description' => 'EPP-PROBE: 12.2 - Online probes for test [{ITEM.LASTVALUE1}] is less than [{$RSM.EPP.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,epp].last(0)}<{$RSM.EPP.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP4.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$DNSTEST.IP4.MIN.PROBE.ONLINE}',
+    $options = { 'description' => 'IPv4-PROBE: 12.2 - Online probes with IPv4 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP4.MIN.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv4].last(0)}<{$RSM.IP4.MIN.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 
     create_trigger($options);
 
-    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$DNSTEST.IP6.MIN.PROBE.ONLINE}]',
-                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$DNSTEST.IP6.MIN.PROBE.ONLINE}',
+    $options = { 'description' => 'IPv6-PROBE: 12.2 - Online probes with IPv6 [{ITEM.LASTVALUE1}] is less than [{$RSM.IP6.MIN.PROBE.ONLINE}]',
+                         'expression' => '{'.$name.':online.nodes.pl[online,ipv6].last(0)}<{$RSM.IP6.MIN.PROBE.ONLINE}',
                         'priority' => '5',
                 };
 

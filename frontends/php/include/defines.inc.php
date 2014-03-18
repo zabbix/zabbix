@@ -899,28 +899,28 @@ define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 define('SLA_MONITORING_START_YEAR',	2014);
 
 // SLA monitoring services
-define('DNSTEST_DNS',			0);
-define('DNSTEST_DNSSEC',		1);
-define('DNSTEST_RDDS',			2);
-define('DNSTEST_EPP',			3);
+define('RSM_DNS',			0);
+define('RSM_DNSSEC',		1);
+define('RSM_RDDS',			2);
+define('RSM_EPP',			3);
 
 // SLA monitoring macros
-define('DNSTEST_PAGE_SLV',			'{$ROLLING.WEEK.STATUS.PAGE.SLV}');
-define('DNSTEST_MIN_DNS_COUNT',		'{$DNSTEST.DNS.AVAIL.MINNS}');
-define('DNSTEST_DNS_UDP_DELAY',		'{$DNSTEST.DNS.UDP.DELAY}');
-define('DNSTEST_RDDS_DELAY',		'{$DNSTEST.RDDS.DELAY}');
+define('RSM_PAGE_SLV',			'{$RSM.ROLLWEEK.THRESHOLDS}');
+define('RSM_MIN_DNS_COUNT',		'{$RSM.DNS.AVAIL.MINNS}');
+define('RSM_DNS_UDP_DELAY',		'{$RSM.DNS.UDP.DELAY}');
+define('RSM_RDDS_DELAY',		'{$RSM.RDDS.DELAY}');
 
 // SLA monitoring rolling week items keys
-define('DNSTEST_SLV_DNS_ROLLWEEK',		'dnstest.slv.dns.rollweek');
-define('DNSTEST_SLV_DNSSEC_ROLLWEEK',	'dnstest.slv.dnssec.rollweek');
-define('DNSTEST_SLV_RDDS_ROLLWEEK',		'dnstest.slv.rdds.rollweek');
-define('DNSTEST_SLV_EPP_ROLLWEEK',		'dnstest.slv.epp.rollweek');
+define('RSM_SLV_DNS_ROLLWEEK',		'rsm.slv.dns.rollweek');
+define('RSM_SLV_DNSSEC_ROLLWEEK',	'rsm.slv.dnssec.rollweek');
+define('RSM_SLV_RDDS_ROLLWEEK',		'rsm.slv.rdds.rollweek');
+define('RSM_SLV_EPP_ROLLWEEK',		'rsm.slv.epp.rollweek');
 
 // SLA monitoring availability items keys
-define('DNSTEST_SLV_DNS_AVAIL',		'dnstest.slv.dns.avail');
-define('DNSTEST_SLV_DNSSEC_AVAIL',	'dnstest.slv.dnssec.avail');
-define('DNSTEST_SLV_RDDS_AVAIL',	'dnstest.slv.rdds.avail');
-define('DNSTEST_SLV_EPP_AVAIL',		'dnstest.slv.epp.avail');
+define('RSM_SLV_DNS_AVAIL',		'rsm.slv.dns.avail');
+define('RSM_SLV_DNSSEC_AVAIL',	'rsm.slv.dnssec.avail');
+define('RSM_SLV_RDDS_AVAIL',	'rsm.slv.rdds.avail');
+define('RSM_SLV_EPP_AVAIL',		'rsm.slv.epp.avail');
 
 // SLA monitoring incident status
 define('INCIDENT_ACTIVE',			0);
@@ -928,55 +928,55 @@ define('INCIDENT_RESOLVED',			1);
 define('INCIDENT_FALSE_POSITIVE',	2);
 
 // SLA monitoring incident status
-define('DNSTEST_NO_REPLY_ERROR_CODE',	-200);
+define('DNS_NO_REPLY_ERROR_CODE',	-200);
 define('DNSSEC_FAIL_ERROR_CODE',		-204);
 
 define('MIN_PROBE_OK_RESULT_PERCENTAGE',	49);
 
 // SLA monitoring calculated items keys
-define('CALCULATED_ITEM_DNS_FAIL',				'dnstest.configvalue[INCIDENT.DNS.FAIL]');
-define('CALCULATED_ITEM_DNS_RECOVERY',			'dnstest.configvalue[INCIDENT.DNS.RECOVER]');
-define('CALCULATED_ITEM_DNSSEC_FAIL',			'dnstest.configvalue[INCIDENT.DNSSEC.FAIL]');
-define('CALCULATED_ITEM_DNSSEC_RECOVERY',		'dnstest.configvalue[INCIDENT.DNSSEC.RECOVER]');
-define('CALCULATED_ITEM_RDDS_FAIL',				'dnstest.configvalue[INCIDENT.RDDS.FAIL]');
-define('CALCULATED_ITEM_RDDS_RECOVERY',			'dnstest.configvalue[INCIDENT.RDDS.RECOVER]');
-define('CALCULATED_ITEM_EPP_FAIL',				'dnstest.configvalue[INCIDENT.EPP.FAIL]');
-define('CALCULATED_ITEM_EPP_RECOVERY',			'dnstest.configvalue[INCIDENT.EPP.RECOVER]');
-define('CALCULATED_ITEM_DNS_DELAY',				'dnstest.configvalue[DNSTEST.DNS.UDP.DELAY]');
-define('CALCULATED_ITEM_RDDS_DELAY',			'dnstest.configvalue[DNSTEST.RDDS.DELAY]');
-define('CALCULATED_ITEM_EPP_DELAY',				'dnstest.configvalue[DNSTEST.EPP.DELAY]');
-define('CALCULATED_ITEM_DNS_AVAIL_MINNS',		'dnstest.configvalue[DNSTEST.DNS.AVAIL.MINNS]');
-define('CALCULATED_ITEM_DNS_UDP_RTT_HIGH',		'dnstest.configvalue[DNSTEST.DNS.UDP.RTT.HIGH]');
-define('CALCULATED_ITEM_SLV_DNS_NS_RTT_UDP',	'dnstest.configvalue[DNSTEST.SLV.DNS.UDP.RTT]');
-define('CALCULATED_ITEM_SLV_DNS_NS_RTT_TCP',	'dnstest.configvalue[DNSTEST.SLV.DNS.TCP.RTT]');
-define('CALCULATED_ITEM_SLV_DNS_NS_UPD',		'dnstest.configvalue[DNSTEST.SLV.DNS.NS.UPD]');
-define('CALCULATED_ITEM_SLV_DNS_NS',			'dnstest.configvalue[DNSTEST.SLV.NS.AVAIL]');
-define('CALCULATED_ITEM_SLV_RDDS43_RTT',		'dnstest.configvalue[DNSTEST.SLV.RDDS43.RTT]');
-define('CALCULATED_ITEM_SLV_RDDS80_RTT',		'dnstest.configvalue[DNSTEST.SLV.RDDS80.RTT]');
-define('CALCULATED_ITEM_SLV_RDDS_UPD',			'dnstest.configvalue[DNSTEST.SLV.RDDS.UPD]');
-define('CALCULATED_ITEM_SLV_EPP_INFO',			'dnstest.configvalue[DNSTEST.SLV.EPP.INFO]');
-define('CALCULATED_ITEM_SLV_EPP_LOGIN',			'dnstest.configvalue[DNSTEST.SLV.EPP.LOGIN]');
-define('CALCULATED_ITEM_EPP_UPDATE',			'dnstest.configvalue[DNSTEST.SLV.EPP.UPDATE]');
-define('CALCULATED_DNS_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.DNS.ROLLWEEK.SLA]');
-define('CALCULATED_RDDS_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.RDDS.ROLLWEEK.SLA]');
-define('CALCULATED_EPP_ROLLWEEK_SLA',			'dnstest.configvalue[DNSTEST.EPP.ROLLWEEK.SLA]');
+define('CALCULATED_ITEM_DNS_FAIL',				'rsm.configvalue[RSM.INCIDENT.DNS.FAIL]');
+define('CALCULATED_ITEM_DNS_RECOVERY',			'rsm.configvalue[RSM.INCIDENT.DNS.RECOVER]');
+define('CALCULATED_ITEM_DNSSEC_FAIL',			'rsm.configvalue[RSM.INCIDENT.DNSSEC.FAIL]');
+define('CALCULATED_ITEM_DNSSEC_RECOVERY',		'rsm.configvalue[RSM.INCIDENT.DNSSEC.RECOVER]');
+define('CALCULATED_ITEM_RDDS_FAIL',				'rsm.configvalue[RSM.INCIDENT.RDDS.FAIL]');
+define('CALCULATED_ITEM_RDDS_RECOVERY',			'rsm.configvalue[RSM.INCIDENT.RDDS.RECOVER]');
+define('CALCULATED_ITEM_EPP_FAIL',				'rsm.configvalue[RSM.INCIDENT.EPP.FAIL]');
+define('CALCULATED_ITEM_EPP_RECOVERY',			'rsm.configvalue[RSM.INCIDENT.EPP.RECOVER]');
+define('CALCULATED_ITEM_DNS_DELAY',				'rsm.configvalue[RSM.DNS.UDP.DELAY]');
+define('CALCULATED_ITEM_RDDS_DELAY',			'rsm.configvalue[RSM.RDDS.DELAY]');
+define('CALCULATED_ITEM_EPP_DELAY',				'rsm.configvalue[RSM.EPP.DELAY]');
+define('CALCULATED_ITEM_DNS_AVAIL_MINNS',		'rsm.configvalue[RSM.DNS.AVAIL.MINNS]');
+define('CALCULATED_ITEM_DNS_UDP_RTT_HIGH',		'rsm.configvalue[RSM.DNS.UDP.RTT.HIGH]');
+define('CALCULATED_ITEM_SLV_DNS_NS_RTT_UDP',	'rsm.configvalue[RSM.SLV.DNS.UDP.RTT]');
+define('CALCULATED_ITEM_SLV_DNS_NS_RTT_TCP',	'rsm.configvalue[RSM.SLV.DNS.TCP.RTT]');
+define('CALCULATED_ITEM_SLV_DNS_NS_UPD',		'rsm.configvalue[RSM.SLV.DNS.NS.UPD]');
+define('CALCULATED_ITEM_SLV_DNS_NS',			'rsm.configvalue[RSM.SLV.NS.AVAIL]');
+define('CALCULATED_ITEM_SLV_RDDS43_RTT',		'rsm.configvalue[RSM.SLV.RDDS43.RTT]');
+define('CALCULATED_ITEM_SLV_RDDS80_RTT',		'rsm.configvalue[RSM.SLV.RDDS80.RTT]');
+define('CALCULATED_ITEM_SLV_RDDS_UPD',			'rsm.configvalue[RSM.SLV.RDDS.UPD]');
+define('CALCULATED_ITEM_SLV_EPP_INFO',			'rsm.configvalue[RSM.SLV.EPP.INFO]');
+define('CALCULATED_ITEM_SLV_EPP_LOGIN',			'rsm.configvalue[RSM.SLV.EPP.LOGIN]');
+define('CALCULATED_ITEM_EPP_UPDATE',			'rsm.configvalue[RSM.SLV.EPP.UPDATE]');
+define('CALCULATED_DNS_ROLLWEEK_SLA',			'rsm.configvalue[RSM.DNS.ROLLWEEK.SLA]');
+define('CALCULATED_RDDS_ROLLWEEK_SLA',			'rsm.configvalue[RSM.RDDS.ROLLWEEK.SLA]');
+define('CALCULATED_EPP_ROLLWEEK_SLA',			'rsm.configvalue[RSM.EPP.ROLLWEEK.SLA]');
 
 // SLA monitoring probe status items keys
-define('PROBE_STATUS_AUTOMATIC',	'dnstest.probe.status[automatic,"{$DNSTEST.IP4.ROOTSERVERS1}","{$DNSTEST.IP6.ROOTSERVERS1}"]');
-define('PROBE_STATUS_MANUAL',		'dnstest.probe.status[manual]');
-define('PROBE_DNS_UDP_ITEM',		'dnstest.dns.udp[{$DNSTEST.TLD}]');
-define('PROBE_DNS_UDP_ITEM_RTT',	'dnstest.dns.udp.rtt[');
-define('PROBE_RDDS_ITEM',			'dnstest.rdds[');
-define('PROBE_EPP_RESULT',			'dnstest.epp[');
-define('PROBE_EPP_IP',				'dnstest.epp.ip[{$DNSTEST.TLD}]');
-define('PROBE_EPP_UPDATE',			'dnstest.epp.rtt[{$DNSTEST.TLD},update]');
-define('PROBE_EPP_INFO',			'dnstest.epp.rtt[{$DNSTEST.TLD},info]');
-define('PROBE_EPP_LOGIN',			'dnstest.epp.rtt[{$DNSTEST.TLD},login]');
-define('PROBE_RDDS43_IP',			'dnstest.rdds.43.ip[{$DNSTEST.TLD}]');
-define('PROBE_RDDS43_RTT',			'dnstest.rdds.43.rtt[{$DNSTEST.TLD}]');
-define('PROBE_RDDS43_UPD',			'dnstest.rdds.43.upd[{$DNSTEST.TLD}]');
-define('PROBE_RDDS80_IP',			'dnstest.rdds.80.ip[{$DNSTEST.TLD}]');
-define('PROBE_RDDS80_RTT',			'dnstest.rdds.80.rtt[{$DNSTEST.TLD}]');
+define('PROBE_STATUS_AUTOMATIC',	'rsm.probe.status[automatic,"{$RSM.IP4.ROOTSERVERS1}","{$RSM.IP6.ROOTSERVERS1}"]');
+define('PROBE_STATUS_MANUAL',		'rsm.probe.status[manual]');
+define('PROBE_DNS_UDP_ITEM',		'rsm.dns.udp[{$RSM.TLD}]');
+define('PROBE_DNS_UDP_ITEM_RTT',	'rsm.dns.udp.rtt[');
+define('PROBE_RDDS_ITEM',			'rsm.rdds[');
+define('PROBE_EPP_RESULT',			'rsm.epp[');
+define('PROBE_EPP_IP',				'rsm.epp.ip[{$RSM.TLD}]');
+define('PROBE_EPP_UPDATE',			'rsm.epp.rtt[{$RSM.TLD},update]');
+define('PROBE_EPP_INFO',			'rsm.epp.rtt[{$RSM.TLD},info]');
+define('PROBE_EPP_LOGIN',			'rsm.epp.rtt[{$RSM.TLD},login]');
+define('PROBE_RDDS43_IP',			'rsm.rdds.43.ip[{$RSM.TLD}]');
+define('PROBE_RDDS43_RTT',			'rsm.rdds.43.rtt[{$RSM.TLD}]');
+define('PROBE_RDDS43_UPD',			'rsm.rdds.43.upd[{$RSM.TLD}]');
+define('PROBE_RDDS80_IP',			'rsm.rdds.80.ip[{$RSM.TLD}]');
+define('PROBE_RDDS80_RTT',			'rsm.rdds.80.rtt[{$RSM.TLD}]');
 
 // SLA monitoring NS names
 define('NS_NO_RESULT',	0);
@@ -991,19 +991,19 @@ define('PROBE_UP',		1);
 define('MONTHLY_REPORTS_APPLICATION',	'SLV monthly');
 
 // SLA monitoring monthly reports item keys
-define('MONTHLY_REPORTS_DNS_NS_RTT_UDP',	'dnstest.slv.dns.ns.rtt.udp.month');
-define('MONTHLY_REPORTS_DNS_NS_RTT_TCP',	'dnstest.slv.dns.ns.rtt.tcp.month');
-define('MONTHLY_REPORTS_DNS_NS_UPD',		'dnstest.slv.dns.ns.upd.month');
-define('MONTHLY_REPORTS_DNS_NS',			'dnstest.slv.dns.ns.month');
-define('MONTHLY_REPORTS_RDDS43_RTT',		'dnstest.slv.rdds.43.rtt.month');
-define('MONTHLY_REPORTS_RDDS80_RTT',		'dnstest.slv.rdds.80.rtt.month');
-define('MONTHLY_REPORTS_RDDS_UPD',			'dnstest.slv.rdds.upd.month');
-define('MONTHLY_REPORTS_EPP_INFO',			'dnstest.slv.epp.rtt.info.month');
-define('MONTHLY_REPORTS_EPP_LOGIN',			'dnstest.slv.epp.rtt.login.month');
-define('MONTHLY_REPORTS_EPP_UPDATE',		'dnstest.slv.epp.rtt.update.month');
+define('MONTHLY_REPORTS_DNS_NS_RTT_UDP',	'rsm.slv.dns.ns.rtt.udp.month');
+define('MONTHLY_REPORTS_DNS_NS_RTT_TCP',	'rsm.slv.dns.ns.rtt.tcp.month');
+define('MONTHLY_REPORTS_DNS_NS_UPD',		'rsm.slv.dns.ns.upd.month');
+define('MONTHLY_REPORTS_DNS_NS',			'rsm.slv.dns.ns.month');
+define('MONTHLY_REPORTS_RDDS43_RTT',		'rsm.slv.rdds.43.rtt.month');
+define('MONTHLY_REPORTS_RDDS80_RTT',		'rsm.slv.rdds.80.rtt.month');
+define('MONTHLY_REPORTS_RDDS_UPD',			'rsm.slv.rdds.upd.month');
+define('MONTHLY_REPORTS_EPP_INFO',			'rsm.slv.epp.rtt.info.month');
+define('MONTHLY_REPORTS_EPP_LOGIN',			'rsm.slv.epp.rtt.login.month');
+define('MONTHLY_REPORTS_EPP_UPDATE',		'rsm.slv.epp.rtt.update.month');
 
-// SLA monitoring "dnstest" host name
-define('DNSTEST_HOST',	'dnstest');
+// SLA monitoring "rsm" host name
+define('RSM_HOST',	'rsm');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

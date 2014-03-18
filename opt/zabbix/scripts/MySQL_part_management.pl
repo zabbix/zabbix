@@ -16,11 +16,11 @@ use DBI;
 use Sys::Syslog qw(:standard :macros);
 use DateTime;
 use POSIX qw(strftime);
-use DNSTest;
+use RSM;
 
 openlog("mysql_zbx_part", "ndelay,pid", LOG_LOCAL0);
 
-my $config = get_dnstest_config();
+my $config = get_rsm_config();
 
 my $db_schema = $config->{'db'}->{'name'};
 
