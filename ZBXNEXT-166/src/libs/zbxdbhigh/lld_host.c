@@ -1276,13 +1276,17 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 		}
 		else
 		{
-			name_esc = DBdyn_escape_string(group->name);
-
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update groups set ");
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
+				{
+					name_esc = DBdyn_escape_string(group->name);
+
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
+
+					zbx_free(name_esc);
+				}
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						" where groupid=" ZBX_FS_UI64 ";\n", group->groupid);
 			}
@@ -1307,8 +1311,6 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 				else
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
-
-			zbx_free(name_esc);
 		}
 	}
 
@@ -1763,9 +1765,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		host_esc = DBdyn_escape_string(host->host);
-		name_esc = DBdyn_escape_string(host->name);
-
 		if (0 == host->hostid)
 		{
 			host->hostid = hostid++;
@@ -1788,14 +1787,22 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set ");
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 				{
+					host_esc = DBdyn_escape_string(host->host);
+
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "host='%s'", host_esc);
 					d = ",";
+
+					zbx_free(host_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 				{
+					name_esc = DBdyn_escape_string(host->name);
+
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sname='%s'", d, name_esc);
 					d = ",";
+
+					zbx_free(name_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_PROXY))
 				{
@@ -1947,9 +1954,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_free(value_esc);
 		}
-
-		zbx_free(name_esc);
-		zbx_free(host_esc);
 	}
 
 	if (0 != new_hosts)
