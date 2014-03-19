@@ -51,7 +51,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 	const char	*__function_name = "parse_cfg_object";
 
-	int		ret = SUCCEED;
+	int		ret = FAIL;
 
 #ifdef _WINDOWS
 	WIN32_FIND_DATAA	find_file_data;
@@ -64,18 +64,14 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (MAX_PATH - 3 < (i_path_len = strlen(cfg_file)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s: path is too long", cfg_file);
-		ret = FAIL;
-		goto finish;
+		goto out;
 	}
 
 	zbx_snprintf(cFileName, sizeof(cFileName), "%s\\*", cfg_file);
 
 	h_find = FindFirstFileA(cFileName, &find_file_data);
 	if (INVALID_HANDLE_VALUE == h_find)
-	{
-		ret = FAIL;
-		goto finish;
-	}
+		goto out;
 
 	while (0 != FindNextFileA(h_find, &find_file_data))
 	{
@@ -93,7 +89,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (FAIL == __parse_cfg_file(cFileName, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
 			FindClose(h_find);
-			ret = FAIL;
+			goto out;
 		}
 	}
 
@@ -109,21 +105,19 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (-1 == stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		ret = FAIL;
-		goto finish;
+		goto out;
 	}
 
 	if (!S_ISDIR(sb.st_mode))
 	{
 		ret = __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-		goto finish;
+		goto out;
 	}
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		ret = FAIL;
-		goto finish;
+		goto out;
 	}
 
 	while (NULL != (d = readdir(dir)))
@@ -134,20 +128,18 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
-		{
-			ret = FAIL;
 			break;
-		}
 	}
 	zbx_free(incl_file);
 
 	if (-1 == closedir(dir))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		ret = FAIL;
+		goto out;
 	}
 #endif
-finish:
+	ret = SUCCEED;	/* if all operations succeeded and no one called "goto out" */
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 }
