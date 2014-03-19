@@ -875,8 +875,8 @@ static void	zbx_set_dns_values(const char *item_ns, const char *item_ip, int rtt
 		size_t keypart_size, const DC_ITEM *items, size_t items_num)
 {
 	size_t		i;
-	const DC_ITEM	*item;
 	const char	*p;
+	const DC_ITEM	*item;
 	char		rtt_set = 0, upd_set = 0, ns[ZBX_HOST_BUF_SIZE], ip[ZBX_IP_BUF_SIZE];
 
 	if (ZBX_NO_VALUE == upd)

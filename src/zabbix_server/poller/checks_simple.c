@@ -26,6 +26,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_simple";
 
+	const char	*tmp;
 	char		key[32], params[MAX_STRING_LEN];
 	int		ret = NOTSUPPORTED;
 
@@ -38,11 +39,13 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (0 == strncmp(key, "rsm.", 8))
+	tmp = "rsm.";
+	if (0 == strncmp(key, tmp, strlen(tmp)))
 	{
 		const char	*kp = key + 8;	/* move forward */
 
-		if (0 == strncmp(kp, "dns.", 4))
+		tmp = "dns.";
+		if (0 == strncmp(kp, tmp, strlen(tmp)))
 		{
 			kp += 4;	/* move forward */
 
