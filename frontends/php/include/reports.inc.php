@@ -127,10 +127,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
-
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
@@ -270,10 +267,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
-
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
@@ -451,11 +445,9 @@ function valueComparisonFormForMultiplePeriods() {
 	$paletteTypeCmb->addItem(2, _('Brighten'));
 
 	$reportForm->addRow(_('Palette'), array($paletteCmb, $paletteTypeCmb));
-	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
