@@ -968,6 +968,18 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 #ifdef _WINDOWS
+typedef struct
+{
+	char ProductName[128];		/* "Windows ..." */
+	char CSDVersion[64];		/* "Service pack ..." */
+	char CurrentBuild[32];		/* "6xxx" */
+	char CurrentVersion[32];	/* "6.x" */
+	char ProcessorArchitecture[64];	/* "x86" | "x64" | "Intel Itanium-based" */
+	char ComputerName[64];		/* DNS name of computer */
+}
+OS_WIN_VERSION;
+
+int	get_win_version(OS_WIN_VERSION *os_version);
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
