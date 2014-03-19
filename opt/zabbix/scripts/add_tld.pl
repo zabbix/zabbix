@@ -176,14 +176,14 @@ create_macro('{$RSM.PROBE.ONLINE.DELAY}', 180, undef);
 create_macro('{$RSM.TRIG.DOWNCOUNT}', '#1', undef);
 create_macro('{$RSM.TRIG.UPCOUNT}', '#3', undef);
 
-create_macro('{$INCIDENT.DNS.FAIL}', 3, undef);
-create_macro('{$INCIDENT.DNS.RECOVER}', 3, undef);
-create_macro('{$INCIDENT.DNSSEC.FAIL}', 3, undef);
-create_macro('{$INCIDENT.DNSSEC.RECOVER}', 3, undef);
-create_macro('{$INCIDENT.RDDS.FAIL}', 2, undef);
-create_macro('{$INCIDENT.RDDS.RECOVER}', 2, undef);
-create_macro('{$INCIDENT.EPP.FAIL}', 2, undef);
-create_macro('{$INCIDENT.EPP.RECOVER}', 2, undef);
+create_macro('{$RSM.INCIDENT.DNS.FAIL}', 3, undef);
+create_macro('{$RSM.INCIDENT.DNS.RECOVER}', 3, undef);
+create_macro('{$RSM.INCIDENT.DNSSEC.FAIL}', 3, undef);
+create_macro('{$RSM.INCIDENT.DNSSEC.RECOVER}', 3, undef);
+create_macro('{$RSM.INCIDENT.RDDS.FAIL}', 2, undef);
+create_macro('{$RSM.INCIDENT.RDDS.RECOVER}', 2, undef);
+create_macro('{$RSM.INCIDENT.EPP.FAIL}', 2, undef);
+create_macro('{$RSM.INCIDENT.EPP.RECOVER}', 2, undef);
 
 create_macro('{$RSM.SLV.DNS.UDP.RTT}', 99, undef);
 create_macro('{$RSM.SLV.DNS.TCP.RTT}', 99, undef);
@@ -196,7 +196,7 @@ create_macro('{$RSM.SLV.EPP.LOGIN}', 99, undef);
 create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
 create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
 
-create_macro('{$ROLLING.WEEK.STATUS.PAGE.SLV}', '0,5,10,25,50,75,100', undef);
+create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', '0,5,10,25,50,75,100', undef);
 create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef);
 
 my $result;
@@ -1331,9 +1331,9 @@ sub create_slv_items {
     # priority must be set to 0!
     $options = { 'description' => 'DNS-AVAIL {HOST.NAME}: 5.2.4 - The service is not available',
                          'expression' => '({TRIGGER.VALUE}=0&'.
-						'{'.$host_name.':rsm.slv.dns.avail.count(#{$INCIDENT.DNS.FAIL},0,"eq")}={$INCIDENT.DNS.FAIL})|'.
+						'{'.$host_name.':rsm.slv.dns.avail.count(#{$RSM.INCIDENT.DNS.FAIL},0,"eq")}={$RSM.INCIDENT.DNS.FAIL})|'.
 					 '({TRIGGER.VALUE}=1&'.
-						'{'.$host_name.':rsm.slv.dns.avail.count(#{$INCIDENT.DNS.RECOVER},0,"ne")}<{$INCIDENT.DNS.RECOVER})',
+						'{'.$host_name.':rsm.slv.dns.avail.count(#{$RSM.INCIDENT.DNS.RECOVER},0,"ne")}<{$RSM.INCIDENT.DNS.RECOVER})',
                         'priority' => '0',
                 };
 
@@ -1401,9 +1401,9 @@ sub create_slv_items {
 	# priority must be set to 0!
 	$options = { 'description' => 'DNSSEC-AVAIL {HOST.NAME}: 5.3.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.FAIL},0,"eq")}={$INCIDENT.DNSSEC.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$RSM.INCIDENT.DNSSEC.FAIL},0,"eq")}={$RSM.INCIDENT.DNSSEC.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$INCIDENT.DNSSEC.RECOVER},0,"ne")}<{$INCIDENT.DNSSEC.RECOVER})',
+			 '{'.$host_name.':rsm.slv.dnssec.avail.count(#{$RSM.INCIDENT.DNSSEC.RECOVER},0,"ne")}<{$RSM.INCIDENT.DNSSEC.RECOVER})',
 			 'priority' => '0',
 	};
 
@@ -1466,9 +1466,9 @@ sub create_slv_items {
 	# priority must be set to 0!
 	$options = { 'description' => 'RDDS-AVAIL {HOST.NAME}: 6.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$INCIDENT.RDDS.FAIL},0,"eq")}={$INCIDENT.RDDS.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.FAIL},0,"eq")}={$RSM.INCIDENT.RDDS.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$INCIDENT.RDDS.RECOVER},0,"ne")}<{$INCIDENT.RDDS.RECOVER})',
+			 '{'.$host_name.':rsm.slv.rdds.avail.count(#{$RSM.INCIDENT.RDDS.RECOVER},0,"ne")}<{$RSM.INCIDENT.RDDS.RECOVER})',
 			 'priority' => '0',
 	};
 
@@ -1540,9 +1540,9 @@ sub create_slv_items {
 	# priority must be set to 0!
 	$options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
 		     'expression' => '({TRIGGER.VALUE}=0&'.
-			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$INCIDENT.EPP.FAIL},0,"eq")}={$INCIDENT.EPP.FAIL})|'.
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
 			 '({TRIGGER.VALUE}=1&'.
-			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$INCIDENT.EPP.RECOVER},0,"ne")}<{$INCIDENT.EPP.RECOVER})',
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
 			 'priority' => '0',
 	};
 
@@ -1613,14 +1613,14 @@ sub create_rsm_items {
 
     my $delay = 60; # every minute
     foreach my $m (
-	'INCIDENT.DNS.FAIL',
-	'INCIDENT.DNS.RECOVER',
-	'INCIDENT.DNSSEC.FAIL',
-	'INCIDENT.DNSSEC.RECOVER',
-	'INCIDENT.RDDS.FAIL',
-	'INCIDENT.RDDS.RECOVER',
-	'INCIDENT.EPP.FAIL',
-	'INCIDENT.EPP.RECOVER',
+	'RSM.INCIDENT.DNS.FAIL',
+	'RSM.INCIDENT.DNS.RECOVER',
+	'RSM.INCIDENT.DNSSEC.FAIL',
+	'RSM.INCIDENT.DNSSEC.RECOVER',
+	'RSM.INCIDENT.RDDS.FAIL',
+	'RSM.INCIDENT.RDDS.RECOVER',
+	'RSM.INCIDENT.EPP.FAIL',
+	'RSM.INCIDENT.EPP.RECOVER',
 	'RSM.DNS.UDP.DELAY',
 	'RSM.RDDS.DELAY',
 	'RSM.EPP.DELAY',
