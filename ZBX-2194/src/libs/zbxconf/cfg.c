@@ -49,75 +49,81 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
-	const char      *__function_name = "parse_cfg_object";
+	const char	*__function_name = "parse_cfg_object";
 
 	int		ret = SUCCEED;
 
 #ifdef _WINDOWS
-	WIN32_FIND_DATAA	FindFileData;
-	HANDLE				hFind = NULL;
-	char				cFileName[MAX_PATH] = {0};
-	int					iPathLen = 0;
+	WIN32_FIND_DATAA	find_file_data;
+	HANDLE			h_find;
+	char			cFileName[MAX_PATH]; /* camel-case needed by WIN API */
+	int			i_path_len;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %i", __function_name, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (MAX_PATH - 3 < (iPathLen = strlen(cfg_file)))
+	if (MAX_PATH - 3 < (i_path_len = strlen(cfg_file)))
 	{
-		zabbix_log(LOG_LEVEL_ERR,"%s: path is too long", cfg_file);
-		return FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "%s: path is too long", cfg_file);
+		ret = FAIL;
+		goto finish;
 	}
 
 	zbx_snprintf(cFileName, sizeof(cFileName), "%s\\*", cfg_file);
 
-	hFind = FindFirstFileA(cFileName, &FindFileData);
-	if (INVALID_HANDLE_VALUE == hFind)
+	h_find = FindFirstFileA(cFileName, &find_file_data);
+	if (INVALID_HANDLE_VALUE == h_find)
 	{
-		return FAIL;
+		ret = FAIL;
+		goto finish;
 	}
 
-	while (0 != FindNextFileA(hFind, &FindFileData))
+	while (0 != FindNextFileA(h_find, &find_file_data))
 	{
-		if ( 0 != (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
-		if (MAX_PATH < strlen(FindFileData.cFileName) + iPathLen)
+		if (MAX_PATH < strlen(find_file_data.cFileName) + i_path_len)
 		{
-			zabbix_log(LOG_LEVEL_WARNING,"%s: Skipping, path is too long", FindFileData.cFileName);
+			zabbix_log(LOG_LEVEL_WARNING, "%s: Skipping, path is too long", find_file_data.cFileName);
 			continue;
 		}
 
-		zbx_snprintf(cFileName, sizeof(cFileName), "%s\\%s", cfg_file, FindFileData.cFileName);
+		zbx_snprintf(cFileName, sizeof(cFileName), "%s\\%s", cfg_file, find_file_data.cFileName);
 
 		if (FAIL == __parse_cfg_file(cFileName, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
-			FindClose(hFind);
-			return FAIL;
+			FindClose(h_find);
+			ret = FAIL;
 		}
 	}
 
-	FindClose(hFind);
+	FindClose(h_find);
 #else
 	DIR		*dir;
 	struct stat	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
-	int		result = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %i", __function_name, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (-1 == stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto finish;
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-		return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+	{
+		ret = __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		goto finish;
+	}
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto finish;
 	}
 
 	while (NULL != (d = readdir(dir)))
@@ -129,7 +135,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
-			result = FAIL;
+			ret = FAIL;
 			break;
 		}
 	}
@@ -138,9 +144,10 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (-1 == closedir(dir))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
 	}
 #endif
+finish:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 }
