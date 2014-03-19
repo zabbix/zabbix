@@ -2281,7 +2281,12 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	char		*sql_values = NULL;
 	size_t		sql_values_alloc = 0, sql_values_offset = 0;
 #	endif
+#endif
 
+	if (0 == self->rows.values_num)
+		return SUCCEED;
+
+#ifndef HAVE_ORACLE
 	sql = zbx_malloc(NULL, sql_alloc);
 #endif
 	sql_command = zbx_malloc(NULL, sql_command_alloc);
