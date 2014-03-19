@@ -867,7 +867,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
 		if ($items) {
-			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+			$itemDiscoveries = API::getApiService()->select('item_discovery', array(
 				'nodeids' => get_current_nodeid(true),
 				'output' => array('parent_itemid'),
 				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
