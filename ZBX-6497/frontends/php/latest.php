@@ -109,17 +109,17 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 /*
  * Filter
  */
-$filterSelect = getRequest('select');
-$filterShowWithoutData = getRequest('show_without_data', 0);
-$filterShowDetails = getRequest('show_details', 0);
-
 if (hasRequest('filter_rst')) {
-	$filterSelect = '';
-	$filterShowWithoutData = 1;
-	$filterShowDetails = 0;
+	CProfile::delete('web.latest.filter.select');
+	CProfile::delete('web.latest.filter.show_without_data');
+	CProfile::delete('web.latest.filter.show_details');
 }
 
-if (hasRequest('filter_set') || hasRequest('filter_rst')) {
+if (hasRequest('filter_set')) {
+	$filterSelect = getRequest('select');
+	$filterShowWithoutData = getRequest('show_without_data', 0);
+	$filterShowDetails = getRequest('show_details', 0);
+
 	CProfile::update('web.latest.filter.select', $filterSelect, PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', $filterShowWithoutData, PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', $filterShowDetails, PROFILE_TYPE_INT);

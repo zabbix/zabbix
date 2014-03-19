@@ -141,18 +141,16 @@ else {
 
 	// host inventory filter
 	if (hasRequest('filter_rst')) {
-		$data['filterField'] = '';
-		$data['filterFieldValue'] = '';
-		$data['filterExact'] = '';
+		CProfile::delete('web.hostinventories.filter_field');
+		CProfile::delete('web.hostinventories.filter_field_value');
+		CProfile::delete('web.hostinventories.filter_exact');
 	}
 
 	if (hasRequest('filter_set')) {
 		$data['filterField'] = getRequest('filter_field');
 		$data['filterFieldValue'] = getRequest('filter_field_value');
 		$data['filterExact'] = getRequest('filter_exact');
-	}
 
-	if (hasRequest('filter_set') || hasRequest('filter_rst')) {
 		CProfile::update('web.hostinventories.filter_field', $data['filterField'], PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_field_value', $data['filterFieldValue'], PROFILE_TYPE_STR);
 		CProfile::update('web.hostinventories.filter_exact', $data['filterExact'], PROFILE_TYPE_INT);
