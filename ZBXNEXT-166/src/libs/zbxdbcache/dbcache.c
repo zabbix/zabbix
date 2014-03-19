@@ -274,11 +274,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock, inserts_num;
+	int		num, i, clock, inserts_num = 0, ds_alloc, ids_num = 0, trends_to = *trends_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
-	int		ids_alloc, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 	zbx_db_insert_t	db_insert;
@@ -310,6 +309,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
 
+		inserts_num++;
+
 		if (0 != trend->disable_from)
 			continue;
 
@@ -321,8 +322,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			break;
 		}
 	}
-
-	inserts_num = ids_num;
 
 	if (0 != ids_num)
 	{
