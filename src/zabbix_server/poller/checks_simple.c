@@ -28,6 +28,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 	const char	*tmp;
 	char		key[32], params[MAX_STRING_LEN];
+	size_t		tmp_len;
 	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'",
@@ -40,14 +41,16 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	tmp = "rsm.";
-	if (0 == strncmp(key, tmp, strlen(tmp)))
+	tmp_len = strlen(tmp);
+	if (0 == strncmp(key, tmp, tmp_len))
 	{
-		const char	*kp = key + 8;	/* move forward */
+		const char	*kp = key + tmp_len;	/* move forward */
 
 		tmp = "dns.";
-		if (0 == strncmp(kp, tmp, strlen(tmp)))
+		tmp_len = strlen(tmp);
+		if (0 == strncmp(kp, tmp, tmp_len))
 		{
-			kp += 4;	/* move forward */
+			kp += tmp_len;	/* move forward */
 
 			if (0 == strcmp(kp, "udp"))
 			{
