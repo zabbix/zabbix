@@ -24,7 +24,6 @@
 #include "zbxserver.h"
 #include "comms.h"
 #include "log.h"	/* TODO: tracking down crash when adding a value, remove later */
-
 #include "rsm.h"
 
 #define ZBX_HOST_BUF_SIZE	128
@@ -2390,6 +2389,7 @@ out:
 		fclose(log_fd);
 
 	zbx_free(testprefix);
+	zbx_free(rdds_ns_string);
 	zbx_free(res_ip);
 	zbx_free(value_str);
 
