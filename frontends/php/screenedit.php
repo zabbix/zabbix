@@ -207,7 +207,7 @@ if (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 
-	$screenitemid = API::ScreenItem()->delete(array($_REQUEST['screenitemid']));
+	$screenitemid = API::ScreenItem()->delete(array(getRequest('screenitemid')));
 
 	if ($screenitemid) {
 		$screenitemid = reset($screenitemid);
