@@ -598,6 +598,8 @@ typedef struct
 	zbx_vector_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
 	zbx_vector_ptr_t	rows;
+	/* index of autoincrement field */
+	int			autoincrement;
 }
 zbx_db_insert_t;
 
@@ -607,5 +609,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *fieldname);
 
 #endif

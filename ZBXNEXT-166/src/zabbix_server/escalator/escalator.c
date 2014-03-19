@@ -596,7 +596,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	alertid;
 	int		now, severity, medias_num = 0, status;
 	char		error[MAX_STRING_LEN], *perror;
 	DB_EVENT	*c_event;
@@ -649,8 +648,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 			continue;
 		}
 
-		alertid = DBget_maxid("alerts");
-
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
 			status = ALERT_STATUS_NOT_SENT;
@@ -669,7 +666,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 					"alerttype", NULL);
 		}
 
-		zbx_db_insert_add_values(&db_insert, alertid, action->actionid, c_event->eventid, userid, now,
+		zbx_db_insert_add_values(&db_insert, 0, action->actionid, c_event->eventid, userid, now,
 				mediatypeid, row[1], subject, message, status, perror, escalation->esc_step,
 				(int)ALERT_TYPE_MESSAGE);
 
@@ -682,17 +679,16 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
-		alertid = DBget_maxid("alerts");
-
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype", NULL);
 
-		zbx_db_insert_add_values(&db_insert, alertid, action->actionid, c_event->eventid, userid, now, subject,
+		zbx_db_insert_add_values(&db_insert, 0, action->actionid, c_event->eventid, userid, now, subject,
 				message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error, escalation->esc_step,
 				(int)ALERT_TYPE_MESSAGE);
 
 	}
 
+	zbx_db_insert_autoincrement(&db_insert, "alertid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 

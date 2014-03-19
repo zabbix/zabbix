@@ -2071,6 +2071,8 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 		exit(EXIT_FAILURE);
 	}
 
+	self->autoincrement = -1;
+
 	zbx_vector_ptr_create(&self->fields);
 	zbx_vector_ptr_create(&self->rows);
 
@@ -2286,6 +2288,21 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	if (0 == self->rows.values_num)
 		return SUCCEED;
 
+	/* process the auto increment field */
+	if (-1 != self->autoincrement)
+	{
+		zbx_uint64_t	id;
+
+		id = DBget_maxid_num(self->table->table, self->rows.values_num);
+
+		for (i = 0; i < self->rows.values_num; i++)
+		{
+			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+
+			values[self->autoincrement].ui64 = id++;
+		}
+	}
+
 #ifndef HAVE_ORACLE
 	sql = zbx_malloc(NULL, sql_alloc);
 #endif
@@ -2475,4 +2492,35 @@ out:
 #	endif
 #endif
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_execute                                            *
+ *                                                                            *
+ * Purpose: executes the prepared database bulk insert operation              *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *fieldname)
+{
+	int	i;
+
+	for (i = 0; i < self->fields.values_num; i++)
+	{
+		ZBX_FIELD	*field = self->fields.values[i];
+
+		if (ZBX_TYPE_ID == field->type && 0 == strcmp(fieldname, field->name))
+		{
+			self->autoincrement = i;
+			return;
+		}
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(FAIL);
 }
