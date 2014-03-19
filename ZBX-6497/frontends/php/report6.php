@@ -63,6 +63,7 @@ $fields = array(
 	'delete_period' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
 	// filter
 	'report_show' =>		array(T_ZBX_STR, O_OPT,	P_SYS,			null,			null),
+	'report_reset' =>		array(T_ZBX_STR, O_OPT,	P_SYS,			null,			null),
 	'report_timesince' =>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null),
 	'report_timetill' =>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null),
 	// ajax
@@ -70,7 +71,16 @@ $fields = array(
 );
 $isValid = check_fields($fields);
 
-if (isset($_REQUEST['new_graph_item'])) {
+// filter reset
+if (hasRequest('report_reset')) {
+	foreach ($_REQUEST as $key => $request) {
+		if ($key !== 'config' && $key !== 'sid') {
+			unset($_REQUEST[$key]);
+		}
+	}
+}
+
+if (hasRequest('new_graph_item')) {
 	$_REQUEST['items'] = get_request('items', array());
 	$newItem = get_request('new_graph_item', array());
 
@@ -226,7 +236,7 @@ switch ($config) {
 
 $rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
-if (isset($_REQUEST['report_show'])) {
+if (hasRequest('report_show')) {
 	$items = ($config == 3)
 		? array(array('itemid' => get_request('itemid')))
 		: get_request('items');
