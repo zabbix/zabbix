@@ -104,6 +104,7 @@ if (isset($_REQUEST['filter_rst'])) {
 
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		$_REQUEST['tpl_triggerid'] = 0;
+		$_REQUEST['hostgroupid'] = 0;
 	}
 }
 

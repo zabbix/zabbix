@@ -154,30 +154,28 @@ if ($exportData) {
  * Filter
  */
 if (hasRequest('filter_rst')) {
-	$filterIp = '';
-	$filterDns = '';
-	$filterHost = '';
-	$filterPort = '';
+	CProfile::delete('web.hosts.filter_ip');
+	CProfile::delete('web.hosts.filter_dns');
+	CProfile::delete('web.hosts.filter_host');
+	CProfile::delete('web.hosts.filter_port');
 }
 
 if (hasRequest('filter_set')) {
-	$filterIp = getRequest('filter_ip');
-	$filterDns = getRequest('filter_dns');
-	$filterHost = getRequest('filter_host');
-	$filterPort = getRequest('filter_port');
-}
+	$filter['ip'] = getRequest('filter_ip');
+	$filter['dns'] = getRequest('filter_dns');
+	$filter['host'] = getRequest('filter_host');
+	$filter['port'] = getRequest('filter_port');
 
-if (hasRequest('filter_set') || hasRequest('filter_rst')) {
-	CProfile::update('web.hosts.filter_ip', $filterIp, PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_dns', $filterDns, PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_host', $filterHost, PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_port', $filterPort, PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_ip', $filter['ip'], PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_dns', $filter['dns'], PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_host', $filter['host'], PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_port', $filter['port'], PROFILE_TYPE_STR);
 }
 else {
-	$filterIp = CProfile::get('web.hosts.filter_ip');
-	$filterDns = CProfile::get('web.hosts.filter_dns');
-	$filterHost = CProfile::get('web.hosts.filter_host');
-	$filterPort = CProfile::get('web.hosts.filter_port');
+	$filter['ip'] = CProfile::get('web.hosts.filter_ip');
+	$filter['dns'] = CProfile::get('web.hosts.filter_dns');
+	$filter['host'] = CProfile::get('web.hosts.filter_host');
+	$filter['port'] = CProfile::get('web.hosts.filter_port');
 }
 
 /*
@@ -807,19 +805,19 @@ else {
 	// filter
 	$filterTable = new CTable('', 'filter');
 	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filterHost, 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filterDns, 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filterIp, 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filterPort, 20))
+		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
+		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
+		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
+		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
 	));
 
-	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$filter->useJQueryStyle('main');
+	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
+	$filterButton->useJQueryStyle('main');
 
-	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$reset->useJQueryStyle();
+	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
+	$resetButton->useJQueryStyle();
 
-	$divButtons = new CDiv(array($filter, SPACE, $reset));
+	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');
 
 	$filterTable->addRow(new CCol($divButtons, 'center', 4));
@@ -867,12 +865,12 @@ else {
 			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
-				'name' => $filterHost ? $filterHost : null,
-				'ip' => $filterIp ? $filterIp : null,
-				'dns' => $filterDns ? $filterDns : null
+				'name' => $filter['host'] === null ? null : $filter['host'],
+				'ip' => $filter['ip'] === null ? null : $filter['ip'],
+				'dns' => $filter['dns'] === null ? null : $filter['dns']
 			),
 			'filter' => array(
-				'port' => $filterPort ? $filterPort : null
+				'port' => $filter['port'] ? $filter['port'] : null
 			)
 		));
 	}

@@ -238,26 +238,25 @@ if (!empty($hosts)) {
  * Filter
  */
 if (hasRequest('filter_rst')) {
-	$_REQUEST['filter_groupid'] = 0;
-	$_REQUEST['filter_hostid'] = 0;
-	$_REQUEST['filter_application'] = '';
-	$_REQUEST['filter_name'] = '';
-	$_REQUEST['filter_type'] = -1;
-	$_REQUEST['filter_key'] = '';
-	$_REQUEST['filter_snmp_community'] = '';
-	$_REQUEST['filter_snmpv3_securityname'] = '';
-	$_REQUEST['filter_snmp_oid'] = '';
-	$_REQUEST['filter_port'] = '';
-	$_REQUEST['filter_value_type'] = -1;
-	$_REQUEST['filter_data_type'] = -1;
-	$_REQUEST['filter_delay'] = '';
-	$_REQUEST['filter_history'] = '';
-	$_REQUEST['filter_trends'] = '';
-	$_REQUEST['filter_status'] = -1;
-	$_REQUEST['filter_state'] = -1;
-	$_REQUEST['filter_templated_items'] = -1;
-	$_REQUEST['filter_with_triggers'] = -1;
-	$_REQUEST['filter_ipmi_sensor'] = '';
+	CProfile::delete('web.items.filter_groupid');
+	CProfile::delete('web.items.filter_application');
+	CProfile::delete('web.items.filter_name');
+	CProfile::delete('web.items.filter_type');
+	CProfile::delete('web.items.filter_key');
+	CProfile::delete('web.items.filter_snmp_community');
+	CProfile::delete('web.items.filter_snmpv3_securityname');
+	CProfile::delete('web.items.filter_snmp_oid');
+	CProfile::delete('web.items.filter_port');
+	CProfile::delete('web.items.filter_value_type');
+	CProfile::delete('web.items.filter_data_type');
+	CProfile::delete('web.items.filter_delay');
+	CProfile::delete('web.items.filter_history');
+	CProfile::delete('web.items.filter_trends');
+	CProfile::delete('web.items.filter_status');
+	CProfile::delete('web.items.filter_state');
+	CProfile::delete('web.items.filter_templated_items');
+	CProfile::delete('web.items.filter_with_triggers');
+	CProfile::delete('web.items.filter_ipmi_sensor');
 }
 
 if (hasRequest('filter_set')) {
@@ -281,9 +280,7 @@ if (hasRequest('filter_set')) {
 	$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
-}
 
-if (hasRequest('filter_set') || hasRequest('filter_rst')) {
 	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
