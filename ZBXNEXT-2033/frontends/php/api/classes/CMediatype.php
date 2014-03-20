@@ -48,7 +48,6 @@ class CMediatype extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$userType = self::$userData['type'];
 
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
@@ -85,11 +84,11 @@ class CMediatype extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
-		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
-		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		elseif ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN) {
 			return array();
 		}
 
