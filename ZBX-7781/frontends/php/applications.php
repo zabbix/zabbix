@@ -170,7 +170,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 			continue;
 		}
 
-		$result &= (bool) API::Application()->delete($dbApplication['applicationid']);
+		$result &= (bool) API::Application()->delete(array($dbApplication['applicationid']));
 
 		if ($result) {
 			$host = get_host_by_hostid($dbApplication['hostid']);
