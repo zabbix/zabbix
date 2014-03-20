@@ -24,185 +24,429 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_simple                                                  *
+ *                     Module for evaluating expressions                      *
+ *                  ---------------------------------------                   *
  *                                                                            *
- * Purpose: evaluate simple expression                                        *
+ * Global variables are used for efficiency reasons so that arguments do not  *
+ * have to be passed to each of evaluate_termX() functions. For this reason,  *
+ * too, this module is isolated into a separate file.                         *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result - value of the      *
- *                         expression                                         *
- *               FAIL    - otherwise                                          *
+ * The priority of supported operators is as follows:                         *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ *   - (unary)   evaluate_term8()                                             *
+ *   not         evaluate_term7()                                             *
+ *   * /         evaluate_term6()                                             *
+ *   + -         evaluate_term5()                                             *
+ *   < <= >= >   evaluate_term4()                                             *
+ *   = <>        evaluate_term3()                                             *
+ *   and         evaluate_term2()                                             *
+ *   or          evaluate_term1()                                             *
  *                                                                            *
- * Comments: format: <double> or <double> <operator> <double>                 *
- *                                                                            *
- *           It is recursive function!                                        *
+ * Function evaluate_term9() is used for parsing tokens on the lowest level:  *
+ * those can be suffixed numbers like "12.345K" or parenthesized expressions. *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_simple(double *result, char *expression, char *error, int maxerrlen)
+
+#define ZBX_INFINITY	(1.0 / 0.0)	/* value used as an error code */
+
+static const char	*ptr;		/* character being looked at */
+static char		*buffer;	/* error message buffer      */
+static int		max_buffer_len;	/* error message buffer size */
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether the character delimits a numeric or symbolic token  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_token_delimiter(unsigned char c)
 {
-	double	value1, value2;
-	char	*p, c;
-
-	zbx_lrtrim(expression, " ");
-
-	/* compress repeating - and + and add prefix N to negative numbers */
-	compress_signs(expression);
-
-	/* we should process negative prefix, i.e. N123 == -123 */
-	if ('N' == *expression && SUCCEED == is_double_suffix(expression + 1))
-	{
-		/* str2double supports suffixes */
-		*result = -str2double(expression + 1);
-		return SUCCEED;
-	}
-	else if ('N' != *expression && SUCCEED == is_double_suffix(expression))
-	{
-		/* str2double supports suffixes */
-		*result = str2double(expression);
-		return SUCCEED;
-	}
-
-	/* operators with lowest priority come first */
-	/* HIGHEST / * - + < > # = & | LOWEST */
-	if (NULL != (p = strchr(expression, '|')) || NULL != (p = strchr(expression, '&')) ||
-			NULL != (p = strchr(expression, '=')) || NULL != (p = strchr(expression, '#')) ||
-			NULL != (p = strchr(expression, '>')) || NULL != (p = strchr(expression, '<')) ||
-			NULL != (p = strchr(expression, '+')) || NULL != (p = strrchr(expression, '-')) ||
-			NULL != (p = strchr(expression, '*')) || NULL != (p = strrchr(expression, '/')))
-	{
-		c = *p;
-		*p = '\0';
-
-		if (SUCCEED != evaluate_simple(&value1, expression, error, maxerrlen) ||
-				SUCCEED != evaluate_simple(&value2, p + 1, error, maxerrlen))
-		{
-			*p = c;
-			return FAIL;
-		}
-
-		*p = c;
-	}
-	else
-	{
-		zbx_snprintf(error, maxerrlen, "Format error or unsupported operator. Exp: [%s]", expression);
-		return FAIL;
-	}
-
-	switch (c)
-	{
-		case '|':
-			*result = (SUCCEED != zbx_double_compare(value1, 0) || SUCCEED != zbx_double_compare(value2, 0));
-			break;
-		case '&':
-			*result = (SUCCEED != zbx_double_compare(value1, 0) && SUCCEED != zbx_double_compare(value2, 0));
-			break;
-		case '=':
-			*result = (SUCCEED == zbx_double_compare(value1, value2));
-			break;
-		case '#':
-			*result = (SUCCEED != zbx_double_compare(value1, value2));
-			break;
-		case '>':
-			*result = (value1 >= value2 + ZBX_DOUBLE_EPSILON);
-			break;
-		case '<':
-			*result = (value1 <= value2 - ZBX_DOUBLE_EPSILON);
-			break;
-		case '+':
-			*result = value1 + value2;
-			break;
-		case '-':
-			*result = value1 - value2;
-			break;
-		case '*':
-			*result = value1 * value2;
-			break;
-		case '/':
-			if (SUCCEED == zbx_double_compare(value2, 0))
-			{
-				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", expression);
-				return FAIL;
-			}
-
-			*result = value1 / value2;
-			break;
-	}
-
-	return SUCCEED;
+	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate                                                         *
- *                                                                            *
- * Purpose: evaluate simplified expression                                    *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result - value of the      *
- *                         expression                                         *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: example: "(26.416>10) or (0=1)"                                  *
+ * Purpose: evaluate a suffixed number like "12.345K"                         *
  *                                                                            *
  ******************************************************************************/
-int	evaluate(double *value, const char *expression, char *error, int maxerrlen)
+static double	evaluate_number()
+{
+	int		digits = 0, dots = 0;
+	const char	*start;
+	zbx_uint64_t	factor = 1;
+
+	start = ptr;
+
+	while (1)
+	{
+		if (0 != isdigit((unsigned char)*ptr))
+		{
+			ptr++;
+			digits++;
+			continue;
+		}
+
+		if ('.' == *ptr)
+		{
+			ptr++;
+			dots++;
+			continue;
+		}
+
+		if (1 > digits || 1 < dots)
+			return ZBX_INFINITY;
+
+		if (0 != isalpha((unsigned char)*ptr))
+		{
+			if (0 == (factor = suffix2factor(*ptr)))
+				return ZBX_INFINITY;
+
+			ptr++;
+		}
+
+		if (SUCCEED != is_token_delimiter(*ptr))
+			return ZBX_INFINITY;
+
+		return atof(start) * factor;
+	}
+}
+
+static double	evaluate_term1();
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate a suffixed number or a parenthesized expression          *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term9()
+{
+	double	result;
+
+	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+		ptr++;
+
+	if ('\0' == *ptr)
+	{
+		zbx_strlcpy(buffer, "Cannot evaluate expression: unexpected end of expression.", max_buffer_len);
+		return ZBX_INFINITY;
+	}
+
+	if ('(' == *ptr)
+	{
+		ptr++;
+
+		if (ZBX_INFINITY == (result = evaluate_term1()))
+			return ZBX_INFINITY;
+
+		if (')' != *ptr)
+		{
+			zbx_strlcpy(buffer, "Cannot evaluate expression: missing closing parenthesis.", max_buffer_len);
+			return ZBX_INFINITY;
+		}
+
+		ptr++;
+	}
+	else
+	{
+		if (ZBX_INFINITY == (result = evaluate_number()))
+		{
+			zbx_strlcpy(buffer, "Cannot evaluate expression: unrecognized number format.", max_buffer_len);
+			return ZBX_INFINITY;
+		}
+	}
+
+	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+		ptr++;
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "-" (unary)                                              *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term8()
+{
+	double	result;
+
+	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+		ptr++;
+
+	if ('-' == *ptr)
+	{
+		ptr++;
+
+		if (ZBX_INFINITY == (result = evaluate_term9()))
+			return ZBX_INFINITY;
+
+		result = -result;
+	}
+	else
+		result = evaluate_term9();
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "not"                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term7()
+{
+	double	result;
+
+	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+		ptr++;
+
+	if (0 == strncmp("not", ptr, 3) && SUCCEED == is_token_delimiter(*(ptr + 3)))
+	{
+		ptr += 3;
+
+		if (ZBX_INFINITY == (result = evaluate_term8()))
+			return ZBX_INFINITY;
+
+		result = (SUCCEED == zbx_double_compare(result, 0) ? 1 : 0);
+	}
+	else
+		result = evaluate_term8();
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "*" and "/"                                              *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term6()
+{
+	char	op;
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term7()))
+		return ZBX_INFINITY;
+
+	while ('*' == *ptr || '/' == *ptr)
+	{
+		op = *ptr++;
+
+		if (ZBX_INFINITY == (operand = evaluate_term7()))
+			return ZBX_INFINITY;
+
+		if ('*' == op)
+		{
+			result *= operand;
+		}
+		else
+		{
+			if (SUCCEED == zbx_double_compare(operand, 0))
+			{
+				zbx_strlcpy(buffer, "Cannot evaluate expression: division by zero.", max_buffer_len);
+				return ZBX_INFINITY;
+			}
+
+			result /= operand;
+		}
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "+" and "-"                                              *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term5()
+{
+	char	op;
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term6()))
+		return ZBX_INFINITY;
+
+	while ('+' == *ptr || '-' == *ptr)
+	{
+		op = *ptr++;
+
+		if (ZBX_INFINITY == (operand = evaluate_term6()))
+			return ZBX_INFINITY;
+
+		if ('+' == op)
+			result += operand;
+		else
+			result -= operand;
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "<", "<=", ">=", ">"                                     *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term4()
+{
+	char	op;
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term5()))
+		return ZBX_INFINITY;
+
+	while (1)
+	{
+		if (0 == strncmp("<=", ptr, 2))
+		{
+			op = 'l';
+			ptr += 2;
+		}
+		else if (0 == strncmp(">=", ptr, 2))
+		{
+			op = 'g';
+			ptr += 2;
+		}
+		else if ('<' == *ptr || '>' == *ptr)
+		{
+			op = *ptr++;
+		}
+		else
+			break;
+
+		if (ZBX_INFINITY == (operand = evaluate_term5()))
+			return ZBX_INFINITY;
+
+		if ('<' == op)
+			result = (result <= operand - ZBX_DOUBLE_EPSILON);
+		else if ('l' == op)
+			result = (result < operand + ZBX_DOUBLE_EPSILON);
+		else if ('g' == op)
+			result = (result > operand - ZBX_DOUBLE_EPSILON);
+		else
+			result = (result >= operand + ZBX_DOUBLE_EPSILON);
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "=" and "<>"                                             *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term3()
+{
+	char	op;
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term4()))
+		return ZBX_INFINITY;
+
+	while (1)
+	{
+		if ('=' == *ptr)
+		{
+			op = *ptr++;
+		}
+		else if (0 == strncmp("<>", ptr, 2))
+		{
+			op = '#';
+			ptr += 2;
+		}
+		else
+			break;
+
+		if (ZBX_INFINITY == (operand = evaluate_term4()))
+			return ZBX_INFINITY;
+
+		if ('=' == op)
+			result = (SUCCEED == zbx_double_compare(result, operand));
+		else
+			result = (SUCCEED != zbx_double_compare(result, operand));
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "and"                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term2()
+{
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term3()))
+		return ZBX_INFINITY;
+
+	while (0 == strncmp("and", ptr, 3) && SUCCEED == is_token_delimiter(*(ptr + 3)))
+	{
+		ptr += 3;
+
+		if (ZBX_INFINITY == (operand = evaluate_term3()))
+			return ZBX_INFINITY;
+
+		result = (SUCCEED != zbx_double_compare(result, 0) && SUCCEED != zbx_double_compare(operand, 0));
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate "or"                                                     *
+ *                                                                            *
+ ******************************************************************************/
+static double	evaluate_term1()
+{
+	double	result, operand;
+
+	if (ZBX_INFINITY == (result = evaluate_term2()))
+		return ZBX_INFINITY;
+
+	while (0 == strncmp("or", ptr, 2) && SUCCEED == is_token_delimiter(*(ptr + 2)))
+	{
+		ptr += 2;
+
+		if (ZBX_INFINITY == (operand = evaluate_term2()))
+			return ZBX_INFINITY;
+
+		result = (SUCCEED != zbx_double_compare(result, 0) || SUCCEED != zbx_double_compare(operand, 0));
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate an expression like "(26.416>10) or (0=1)"                *
+ *                                                                            *
+ ******************************************************************************/
+int	evaluate(double *value, const char *expression, char *error, int max_error_len)
 {
 	const char	*__function_name = "evaluate";
-	char		*res = NULL, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			value_str[MAX_STRING_LEN], c;
-	int		i, l, r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
 
-	strscpy(tmp, expression);
+	ptr = expression;
+	buffer = error;
+	max_buffer_len = max_error_len;
 
-	while (NULL != strchr(tmp, ')'))
+	*value = evaluate_term1();
+
+	if (ZBX_INFINITY != *value && '\0' != *ptr)
 	{
-		l = -1;
-		r = strchr(tmp, ')') - tmp;
-
-		for (i = r; i >= 0; i--)
-		{
-			if ('(' == tmp[i])
-			{
-				l = i;
-				break;
-			}
-		}
-
-		if (-1 == l)
-		{
-			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", tmp);
-			return FAIL;
-		}
-
-		for (i = l + 1; i < r; i++)
-			simple[i - l - 1] = tmp[i];
-
-		simple[r - l - 1] = '\0';
-
-		if (SUCCEED != evaluate_simple(value, simple, error, maxerrlen))
-			return FAIL;
-
-		c = tmp[l];
-		tmp[l] = '\0';
-		res = zbx_strdcat(res, tmp);
-		tmp[l] = c;
-
-		zbx_snprintf(value_str, sizeof(value_str), ZBX_FS_DBL, *value);
-		res = zbx_strdcat(res, value_str);
-		res = zbx_strdcat(res, tmp + r + 1);
-
-		zbx_remove_spaces(res);
-		strscpy(tmp, res);
-
-		zbx_free(res);
+		zbx_snprintf(error, max_error_len, "Cannot evaluate expression starting from \"%s\".", ptr);
+		*value = ZBX_INFINITY;
 	}
 
-	if (SUCCEED != evaluate_simple(value, tmp, error, maxerrlen))
+	if (ZBX_INFINITY == *value)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
 		return FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
 
