@@ -38,12 +38,17 @@ class CRemedyService {
 	/**
 	 * Initialize the Remedy service. First check if event trigger severity corresponds to minimum required severity to
 	 * create, update or request a ticket. Then check if current user has Remedy service as media type.
+	 * If everything so far is ok, in next step check if Zabbix server is online. In case it's not possible to connect
+	 * to Zabbix server, it's not possibe to start the Remedy Service and return false with error message from
+	 * Zabbix server.
 	 *
 	 * @param string $event['triggerSeverity']		current event trigger severity
 	 *
 	 * @return bool
 	 */
 	public static function init(array $event) {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
 		if (isset($event['triggerSeverity']) && $event['triggerSeverity'] >= self::minTriggerSeverity) {
 			self::$enabled = (bool) API::MediaType()->get(array(
 				'userids' => CWebUser::$data['userid'],
@@ -51,6 +56,25 @@ class CRemedyService {
 				'output' => array('mediatypeid'),
 				'limit' => 1
 			));
+
+			// if trigger severity is valid, media type is set up as Remedy Service
+			// then next check if server is online to do futher requests.
+			if (self::$enabled) {
+				$zabbixServer = new CZabbixServer(
+					$ZBX_SERVER,
+					$ZBX_SERVER_PORT,
+					ZBX_SOCKET_REMEDY_TIMEOUT,
+					ZBX_SOCKET_BYTES_LIMIT
+				);
+
+				self::$enabled = $zabbixServer->isRunning();
+
+				if (!self::$enabled) {
+					show_error_message(_('Cannot start Remedy Service'));
+
+					error($zabbixServer->getError());
+				}
+			}
 		}
 
 		return self::$enabled;

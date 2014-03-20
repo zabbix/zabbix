@@ -2617,13 +2617,13 @@ function hasErrorMesssages() {
 
 	if ($ZBX_MESSAGES !== null) {
 		foreach ($ZBX_MESSAGES as $message) {
-			if ($message['type'] == 'error') {
-				return false;
+			if ($message['type'] === 'error') {
+				return true;
 			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 /**

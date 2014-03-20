@@ -129,6 +129,11 @@ if (!$bulk) {
 		$eventAcknowledged = $event['acknowledged'];
 
 		CRemedyService::init(array('triggerSeverity' => $event['relatedObject']['priority']));
+
+		// if trigger severity is valid, media type is set up as Remedy Service, but server is offline, show error
+		if (!CRemedyService::$enabled && hasErrorMesssages()) {
+			show_messages();
+		}
 	}
 
 	$_REQUEST['events'] = $_REQUEST['eventid'];
