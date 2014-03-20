@@ -75,6 +75,9 @@
 #	define PATH_SEPARATOR	'\\'
 #endif
 
+typedef __int64	zbx_offset_t;
+#define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
+
 #else	/* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
@@ -111,6 +114,9 @@
 #	define PATH_SEPARATOR	'/'
 #endif
 
+typedef off_t	zbx_offset_t;
+#define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
+
 #endif	/* _WINDOWS */
 
 #ifndef S_ISREG
@@ -124,6 +130,8 @@
 #define ZBX_STR2UINT64(uint, string) sscanf(string, ZBX_FS_UI64, &uint)
 #define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
+
+#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
 #define ZBX_CONST_STRING(str) ""str
 

@@ -862,6 +862,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 		}
+
+		DBflush_itservice_updates();
 	}
 clean_triggers:
 	zbx_hashset_destroy(&trigger_info);
@@ -2864,7 +2866,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
-			DBlld_process_discovery_rule(itemid, value->text, ts);
+			lld_process_discovery_rule(itemid, value->text, ts);
 		else
 			DCadd_history_lld(itemid, value->text, ts);
 

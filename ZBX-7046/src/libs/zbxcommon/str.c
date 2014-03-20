@@ -3086,7 +3086,7 @@ int	is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
 	{
-		if (0 != ((1<<7) & *str)) /* check for range 0..127 */
+		if (0 != ((1 << 7) & *str))	/* check for range 0..127 */
 			return FAIL;
 
 		str++;

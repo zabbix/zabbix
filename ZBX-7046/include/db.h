@@ -36,7 +36,6 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum
 {
@@ -524,8 +523,6 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
-
-#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
@@ -551,8 +548,11 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_host(zbx_uint64_t hostid);
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
+
+void	DBqueue_itservice_update(zbx_uint64_t triggerid, int status, int clock);
+int	DBflush_itservice_updates();
+int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
@@ -597,12 +597,12 @@ int	DBtxn_ongoing();
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 
-void	zbx_create_services_lock();
-void	zbx_destroy_services_lock();
+void	zbx_create_itservices_lock();
+void	zbx_destroy_itservices_lock();
 
 #ifdef HAVE_POSTGRESQL
-size_t	DBbytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	DBbytea_unescape(u_char *io);
+#	define DBbytea_escape	zbx_db_bytea_escape
+size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
 
 #endif
