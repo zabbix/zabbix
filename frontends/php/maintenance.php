@@ -619,24 +619,36 @@ include_once('include/page_header.php');
 
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
+
+		// get only maintenance IDs for paging
 		$options = array(
-			'extendoutput' => 1,
-			'editable' => 1,
+			'output' => array('maintenanceid'),
+			'editable' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
+			'limit' => ($config['search_limit'] + 1)
 		);
-		if($pageFilter->groupsSelected){
-			if($pageFilter->groupid > 0)
+
+		if ($pageFilter->groupsSelected) {
+			if ($pageFilter->groupid > 0) {
 				$options['groupids'] = $pageFilter->groupid;
-			else
+			}
+			else {
 				$options['groupids'] = array_keys($pageFilter->groups);
+			}
 		}
-		else{
+		else {
 			$options['groupids'] = array();
 		}
 
 		$maintenances = CMaintenance::get($options);
+		$paging = getPagingLine($maintenances);
+
+		// get list of maintenances
+		$maintenances = CMaintenance::get(array(
+			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
+			'extendoutput' => true
+		));
 
 		$form = new CForm();
 		$form->setName('maintenances');
@@ -659,7 +671,6 @@ include_once('include/page_header.php');
 				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_ACTIVE;
 		}
 		order_result($maintenances, $sortfield, $sortorder);
-		$paging = getPagingLine($maintenances);
 
 		foreach($maintenances as $mnum => $maintenance){
 			$maintenanceid = $maintenance['maintenanceid'];

@@ -1,5 +1,6 @@
 Changes for 1.8.21rc1
 
+A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20
 
