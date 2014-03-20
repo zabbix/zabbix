@@ -7,6 +7,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F....... [ZBX-7831] fixed regexp compilation errors for installations that use PHP with PCRE older than 7.0 (Pavels)
 ..F....... [ZBX-7884] fixed incorrect layering of modal window and made modal windows draggable and opaque (Ivo)
 A......... [ZBX-7879] fixed creating and updating applications with multibyte characters in template which is linked to host while mbstring.func_overload set greater than 1 (Ivo)
