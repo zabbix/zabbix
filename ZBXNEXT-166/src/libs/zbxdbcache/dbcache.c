@@ -274,7 +274,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock, inserts_num = 0, ds_alloc, ids_num = 0, trends_to = *trends_num;
+	int		num, i, clock, inserts_num = 0, ids_alloc, ids_num = 0, trends_to = *trends_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
