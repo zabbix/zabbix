@@ -2055,8 +2055,10 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 				NULL);
 
 		for (i = 0; i < links.values_num; i++)
+		{
 			zbx_db_insert_add_values(&db_insert, triggerdepid++, links.values[i].first,
 					links.values[i].second);
+		}
 
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
