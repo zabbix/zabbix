@@ -720,8 +720,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 		imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
 
 		$imgg = imagerotate($imgg, $angle, $transparentColor);
-		ImageAlphaBlending($imgg, false);
-		imageSaveAlpha($imgg, true);
+		imagealphablending($imgg, false);
+		imagesavealpha($imgg, true);
 		imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width'] + 1);
 		imagedestroy($imgg);
 	}
