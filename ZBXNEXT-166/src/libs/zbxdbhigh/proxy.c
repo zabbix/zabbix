@@ -821,7 +821,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				NULL == (pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
-			goto clean;
+			goto clean2;
 		}
 
 		/* check whether we need to update existing entry or insert a new one */
@@ -842,7 +842,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
-					goto clean;
+					goto clean2;
 				}
 
 				/* find the field requiring special preprocessing in JSON record */
@@ -855,7 +855,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					{
 						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 								jp_row.end - jp_row.start + 1, jp_row.start);
-						goto clean;
+						goto clean2;
 					}
 
 					if (move_field_nr == f)
@@ -913,7 +913,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					del->values_num);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto clean;
+				goto clean2;
 
 			zbx_vector_uint64_clear(del);
 		}
@@ -935,7 +935,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					moves.values_num);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto clean;
+				goto clean2;
 		}
 	}
 
@@ -1011,8 +1011,17 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					case ZBX_TYPE_FLOAT:
 						value->dbl = atof(buf);
 						break;
-					default:
+					case ZBX_TYPE_CHAR:
+					case ZBX_TYPE_TEXT:
+					case ZBX_TYPE_SHORTTEXT:
+					case ZBX_TYPE_LONGTEXT:
 						value->str = zbx_strdup(NULL, buf);
+						break;
+					default:
+						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
+								fields[f]->type, table->table, fields[f]->name);
+						goto clean;
+
 				}
 
 				zbx_vector_ptr_append(&values, value);
@@ -1149,7 +1158,7 @@ clean:
 		zbx_db_insert_clean(&db_insert);
 		zbx_vector_ptr_destroy(&values);
 	}
-
+clean2:
 	zbx_hashset_destroy(&h_id_offsets);
 	zbx_hashset_destroy(&h_del);
 	zbx_vector_uint64_destroy(&ins);
