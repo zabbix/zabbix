@@ -342,15 +342,14 @@ class CHttpTest extends CApiService {
 	/**
 	 * Delete web scenario.
 	 *
-	 * @param $httpTestIds
+	 * @param array $httpTestIds
 	 *
 	 * @return array
 	 */
-	public function delete($httpTestIds, $nopermissions = false) {
+	public function delete(array $httpTestIds, $nopermissions = false) {
 		if (empty($httpTestIds)) {
 			return true;
 		}
-		$httpTestIds = zbx_toArray($httpTestIds);
 
 		$delHttpTests = $this->get(array(
 			'httptestids' => $httpTestIds,

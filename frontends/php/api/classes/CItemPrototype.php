@@ -438,18 +438,17 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Delete Item prototypes.
 	 *
-	 * @param int|string|array $prototypeids
-	 * @param bool             $nopermissions
+	 * @param array $prototypeids
+	 * @param bool 	$nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($prototypeids, $nopermissions = false) {
+	public function delete(array $prototypeids, $nopermissions = false) {
 		if (empty($prototypeids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delItemPrototypeIds = zbx_toArray($prototypeids);
-		$prototypeids = zbx_toHash($prototypeids);
+		$prototypeids = array_keys(array_flip($prototypeids));
 
 		$options = array(
 			'itemids' => $prototypeids,
@@ -553,7 +552,7 @@ class CItemPrototype extends CItemGeneral {
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('prototypeids' => $delItemPrototypeIds);
+		return array('prototypeids' => $prototypeids);
 	}
 
 	public function syncTemplates($data) {

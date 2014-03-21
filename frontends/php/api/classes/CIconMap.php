@@ -294,12 +294,12 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Delete IconMap.
+	 *
 	 * @param array $iconmapids
+	 *
 	 * @return array
 	 */
-	public function delete($iconmapids) {
-		$iconmapids = zbx_toArray($iconmapids);
-
+	public function delete(array $iconmapids) {
 		if (empty($iconmapids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}

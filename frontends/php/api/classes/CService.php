@@ -348,12 +348,11 @@ class CService extends CApiService {
 	/**
 	 * Delete services.
 	 *
-	 * @param $serviceIds
+	 * @param array $serviceIds
 	 *
 	 * @return array
 	 */
-	public function delete($serviceIds) {
-		$serviceIds = zbx_toArray($serviceIds);
+	public function delete(array $serviceIds) {
 		$this->validateDelete($serviceIds);
 
 		DB::delete($this->tableName(), array('serviceid' => $serviceIds));

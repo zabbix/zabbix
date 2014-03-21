@@ -265,9 +265,7 @@ class CScript extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete($scriptIds) {
-		$scriptIds = zbx_toArray($scriptIds);
-
+	public function delete(array $scriptIds) {
 		$this->validateDelete($scriptIds);
 
 		DB::delete('scripts', array('scriptid' => $scriptIds));

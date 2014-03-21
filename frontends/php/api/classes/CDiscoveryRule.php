@@ -361,13 +361,12 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($ruleids, $nopermissions = false) {
+	public function delete(array $ruleids, $nopermissions = false) {
 		if (empty($ruleids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delRuleIds = zbx_toArray($ruleids);
-		$ruleids = zbx_toHash($ruleids);
+		$ruleids = array_keys(array_flip($ruleids));
 
 		$delRules = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
@@ -449,7 +448,7 @@ class CDiscoveryRule extends CItemGeneral {
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('ruleids' => $delRuleIds);
+		return array('ruleids' => $ruleids);
 	}
 
 	/**

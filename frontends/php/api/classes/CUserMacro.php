@@ -523,13 +523,11 @@ class CUserMacro extends CApiService {
 	/**
 	 * Remove Macros from Hosts
 	 *
-	 * @param mixed $hostMacroIds
+	 * @param array $hostMacroIds
 	 *
 	 * @return boolean
 	 */
-	public function delete($hostMacroIds) {
-		$hostMacroIds = zbx_toArray($hostMacroIds);
-
+	public function delete(array $hostMacroIds) {
 		$this->validateDelete($hostMacroIds);
 
 		DB::delete('hostmacro', array('hostmacroid' => $hostMacroIds));

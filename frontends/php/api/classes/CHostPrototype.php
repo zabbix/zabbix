@@ -915,13 +915,12 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Delete host prototypes.
 	 *
-	 * @param string|array 	$hostPrototypeIds
-	 * @param bool 			$nopermissions		if set to true, permission and template checks will be skipped
+	 * @param array 	$hostPrototypeIds
+	 * @param bool 		$nopermissions		if set to true, permission and template checks will be skipped
 	 *
 	 * @return array
 	 */
-	public function delete($hostPrototypeIds, $nopermissions = false) {
-		$hostPrototypeIds = zbx_toArray($hostPrototypeIds);
+	public function delete(array $hostPrototypeIds, $nopermissions = false) {
 		$this->validateDelete($hostPrototypeIds, $nopermissions);
 
 		// include child IDs

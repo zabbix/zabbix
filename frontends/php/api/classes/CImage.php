@@ -451,9 +451,7 @@ class CImage extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete($imageids) {
-		$imageids = zbx_toArray($imageids);
-
+	public function delete(array $imageids) {
 		if (empty($imageids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty parameters'));
 		}

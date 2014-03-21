@@ -1251,8 +1251,14 @@ class CAction extends CApiService {
 		DB::delete('operations', array('operationid' => $operationids));
 	}
 
-	public function delete($actionids) {
-		$actionids = zbx_toArray($actionids);
+	/**
+	 * Delete actions.
+	 *
+	 * @param array $actionids
+	 *
+	 * @return array
+	 */
+	public function delete(array $actionids) {
 		if (empty($actionids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
