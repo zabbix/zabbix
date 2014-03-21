@@ -135,7 +135,10 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 	int	i;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	devname_str = get_rparam(request, 0);
 
@@ -157,6 +160,7 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 			return (fl[i].function)(devname, result);
 	}
 
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, operations."));
 	return SYSINFO_RET_FAIL;
 }
 

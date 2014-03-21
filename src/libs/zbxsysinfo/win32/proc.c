@@ -107,13 +107,19 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		uname[MAX_NAME];
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional procname and user are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procName = get_rparam(request, 0);
 	userName = get_rparam(request, 1);
 
 	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	max_proc_cnt = dwSize / sizeof(DWORD);
 	proccount = 0;
@@ -309,14 +315,20 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		i, proc_cnt, counter, attr_id, type_id, ret = SYSINFO_RET_OK;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only procname and optional attribute and type are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proc_name = get_rparam(request, 0);
 	attr = get_rparam(request, 1);
 	type = get_rparam(request, 2);
 
 	if (NULL == proc_name || '\0' == *proc_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Procname cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* Get attribute code from string */
 	if (NULL == attr || '\0' == *attr)
@@ -331,7 +343,10 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == attrList[attr_id])     /* Unsupported attribute */
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid attribute. Must be one of: gdiobj, io_other_b, io_other_op, io_read_b, io_read_op, io_write_b, io_write_op, ktime, pf, utime, userobj, vmsize, wkset"));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* Get type code from string */
 	if (NULL == type || '\0' == *type)
@@ -345,12 +360,19 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 			;
 	}
 
-	if (NULL == typeList[type_id])
-		return SYSINFO_RET_FAIL;     /* Unsupported type */
+	if (NULL == typeList[type_id])	/* Unsupported type */
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: avg, min, max, sum."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	procList = (DWORD *)malloc(MAX_PROCESSES * sizeof(DWORD));
 
-	EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize);
+	if ( 0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	proc_cnt = dwSize / sizeof(DWORD);
 	counter = 0;
@@ -372,6 +394,8 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK == ret)
 		SET_DBL_RESULT(result, value);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get process stats."));
 
 	return ret;
 }

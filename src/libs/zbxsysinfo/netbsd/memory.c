@@ -24,11 +24,14 @@ static int			mib[] = {CTL_VM, VM_UVMEXP2};
 static size_t			len;
 static struct uvmexp_sysctl	uvm;
 
-#define ZBX_SYSCTL(value)				\
-							\
-	len = sizeof(value);				\
-	if (0 != sysctl(mib, 2, &value, &len, NULL, 0))	\
-		return SYSINFO_RET_FAIL
+#define ZBX_SYSCTL(value)								\
+											\
+	len = sizeof(value);								\
+	if (0 != sysctl(mib, 2, &value, &len, NULL, 0))					\
+	{										\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));		\
+		return SYSINFO_RET_FAIL;						\
+	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
@@ -116,7 +119,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	ZBX_SYSCTL(uvm);
 
 	if (0 == uvm.npages)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, (uvm.npages - uvm.free) / (double)uvm.npages * 100);
 
@@ -143,7 +149,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	ZBX_SYSCTL(uvm);
 
 	if (0 == uvm.npages)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	available = uvm.inactive + uvm.execpages + uvm.filepages + uvm.free;
 
@@ -190,7 +199,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
@@ -225,7 +237,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: active, anon, available, buffers, cached, exec, file, free, inactive, pavailable, pused, shared, total, used, wired."));
 		ret = SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }

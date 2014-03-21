@@ -102,7 +102,10 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device, type and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
@@ -131,15 +134,24 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "operations"))
 		type = ZBX_DSTAT_TYPE_OPER;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: bps, bytes, operations, ops."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (type == ZBX_DSTAT_TYPE_BYTE || type == ZBX_DSTAT_TYPE_OPER)
 	{
 		if (request->nparam > 2)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Mode is supported only if type is in: bytes, operations."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (FAIL == get_diskstat(pd, dstats))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (ZBX_DSTAT_TYPE_BYTE == type)
 			SET_UI64_RESULT(result, dstats[(ZBX_DEV_READ == rw ? ZBX_DSTAT_R_BYTE : ZBX_DSTAT_W_BYTE)]);
@@ -158,7 +170,10 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == collector)
 	{
@@ -174,10 +189,16 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if (NULL == (device = collector_diskdevice_get(pd)))
 	{
 		if (FAIL == get_diskstat(pd, dstats))	/* validate device name */
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (NULL == (device = collector_diskdevice_add(pd)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	if (ZBX_DSTAT_TYPE_BPS == type)	/* default parameter */

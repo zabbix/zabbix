@@ -22,11 +22,14 @@
 
 static u_int	pagesize = 0;
 
-#define ZBX_SYSCTLBYNAME(name, value)				\
-								\
-	len = sizeof(value);					\
-	if (0 != sysctlbyname(name, &value, &len, NULL, 0))	\
-		return SYSINFO_RET_FAIL
+#define ZBX_SYSCTLBYNAME(name, value)							\
+											\
+	len = sizeof(value);								\
+	if (0 != sysctlbyname(name, &value, &len, NULL, 0))				\
+	{										\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctlbyname."));	\
+		return SYSINFO_RET_FAIL;						\
+	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
@@ -126,7 +129,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_page_count", totalpages);
 
 	if (0 == totalpages)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, (activepages + wiredpages + cachedpages) / (double)totalpages * 100);
 
@@ -159,7 +165,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_page_count", totalpages);
 
 	if (0 == totalpages)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, (inactivepages + cachedpages + freepages) / (double)totalpages * 100);
 
@@ -185,7 +194,10 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 	int		mib[] = {CTL_VM, VM_METER};
 
 	if (0 != sysctl(mib, 2, &vm, &len, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)(vm.t_vmshr + vm.t_rmshr) * pagesize);
 
@@ -198,7 +210,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (0 == pagesize)
 	{
@@ -234,7 +249,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "shared"))
 		VM_MEMORY_SHARED(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: active, available, buffers, cached, free, inactive, pavailable, pused, shared, total, used, wired."));
 		ret = SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }

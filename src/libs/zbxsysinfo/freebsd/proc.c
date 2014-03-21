@@ -109,15 +109,21 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd		*usrinfo;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional name, users, mode and cmdline are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -133,7 +139,10 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "min"))
 		do_task = DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, max, min, sum."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
@@ -160,12 +169,16 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -237,15 +250,21 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd		*usrinfo;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional name, users, mode and cmdline are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -261,7 +280,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: all, sleep, run, zomb."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
@@ -286,12 +308,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
 	}
 

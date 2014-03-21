@@ -34,13 +34,25 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct ZBX_STATFS	s;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only filesystem name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	fsname = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == fsname || '\0' == *fsname || 0 != ZBX_STATFS(fsname, &s))
+	if (NULL == fsname || '\0' == *fsname)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Filesystem name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 != ZBX_STATFS(fsname, &s))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get filesystem stats."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 		SET_UI64_RESULT(result, s.f_files);
@@ -57,7 +69,10 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 != total)
 			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
@@ -68,10 +83,16 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 != total)
 			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }

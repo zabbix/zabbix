@@ -232,7 +232,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
@@ -370,7 +370,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;

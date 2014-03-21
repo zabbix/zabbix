@@ -29,7 +29,10 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (NULL == (kc = kstat_open()))
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL != (kp = kstat_lookup(kc, "unix", 0, "system_misc")))
 	{
@@ -44,6 +47,11 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 	kstat_close(kc);
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+	}
 
 	return ret;
 }

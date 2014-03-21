@@ -193,7 +193,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		type = ZBX_DSTAT_TYPE_OPER;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of operations, ops, sectors, sps, ops."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: operations, ops, sectors, sps, ops."));
 		return SYSINFO_RET_FAIL;
 	}
 

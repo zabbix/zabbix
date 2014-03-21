@@ -35,7 +35,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only file name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. File name is expected."));
 		goto err;
 	}
 
@@ -49,7 +49,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to stat file."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
 		goto err;
 	}
 
@@ -83,7 +83,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to stat file."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
 		goto err;
 	}
 
@@ -95,7 +95,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, buf.st_ctime);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter. Expected: empty, \"access\", \"change\" or \"modify\"."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: access, change, modify."));
 		goto err;
 	}
 
@@ -171,7 +171,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &stat_buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to stat file."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
 		goto err;
 	}
 
@@ -406,7 +406,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		start_line = 0;
 	else if (FAIL == is_uint32(start_line_str, &start_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Start line parameter should be numeric."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid start line."));
 		goto err;
 	}
 
@@ -414,13 +414,13 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		end_line = 0xffffffff;
 	else if (FAIL == is_uint32(end_line_str, &end_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "End line parameter should be numeric."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid end line."));
 		goto err;
 	}
 
 	if (start_line > end_line)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Start line parameter must not exceed end line."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Start line must not exceed end line."));
 		goto err;
 	}
 

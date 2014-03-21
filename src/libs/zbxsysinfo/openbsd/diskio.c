@@ -136,7 +136,10 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device and type are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	devname = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
@@ -146,7 +149,15 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "bytes"))
 		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: bytes, operations."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL = ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+	}
 
 	return ret;
 }
@@ -157,7 +168,10 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device and type are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	devname = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
@@ -167,7 +181,15 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "bytes"))
 		ret = VFS_DEV_READ_BYTES(devname, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: bytes, operations."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL = ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+	}
 
 	return ret;
 }

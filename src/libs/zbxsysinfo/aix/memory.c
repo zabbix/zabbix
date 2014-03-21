@@ -72,7 +72,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	if (0 == m.real_total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, m.real_inuse / (double)m.real_total * 100);
 
@@ -93,7 +96,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	if (0 == m.real_total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, m.real_free / (double)m.real_total * 100);
 
@@ -113,13 +119,15 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-
 #ifdef HAVE_LIBPERFSTAT
+	int	ret = SYSINFO_RET_FAIL;
 	char	*mode;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
@@ -140,7 +148,19 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "cached"))
 		ret = VM_MEMORY_CACHED(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, cached, free, pavailable, pinned, pused, total, used."));
 		ret = SYSINFO_RET_FAIL;
-#endif
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get memory stats."));
+	}
+
 	return ret;
+#else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "No libperfstat available."));
+	return SYSINFO_RET_FAIL;
+#endif
 }

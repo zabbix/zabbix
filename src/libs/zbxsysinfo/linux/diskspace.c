@@ -104,7 +104,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, pused);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, total, pfree, pused, used."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -113,51 +113,46 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype;
 	FILE		*f;
 	struct zbx_json	j;
+
+	if (NULL == (f = fopen("/proc/mounts", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/mounts."));
+		return SYSINFO_RET_OK;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	if (NULL != (f = fopen("/proc/mounts", "r")))
+	while (NULL != fgets(line, sizeof(line), f))
 	{
-		while (NULL != fgets(line, sizeof(line), f))
-		{
-			if (NULL == (p = strchr(line, ' ')))
-				continue;
+		if (NULL == (p = strchr(line, ' ')))
+			continue;
 
-			mpoint = ++p;
+		mpoint = ++p;
 
-			if (NULL == (p = strchr(mpoint, ' ')))
-				continue;
+		if (NULL == (p = strchr(mpoint, ' ')))
+			continue;
 
-			*p = '\0';
+		*p = '\0';
 
-			mtype = ++p;
+		mtype = ++p;
 
-			if (NULL == (p = strchr(mtype, ' ')))
-				continue;
+		if (NULL == (p = strchr(mtype, ' ')))
+			continue;
 
-			*p = '\0';
+		*p = '\0';
 
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#FSNAME}", mpoint, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#FSTYPE}", mtype, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&j);
-		}
-
-		zbx_fclose(f);
-
-		ret = SYSINFO_RET_OK;
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#FSTYPE}", mtype, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
 	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/mounts."));
-		return SYSINFO_RET_OK;
-	}
+
+	zbx_fclose(f);
 
 	zbx_json_close(&j);
 
@@ -165,5 +160,5 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_free(&j);
 
-	return ret;
+	return SYSINFO_RET_OK;
 }

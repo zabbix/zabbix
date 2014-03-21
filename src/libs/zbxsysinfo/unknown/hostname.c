@@ -25,5 +25,6 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname, unknown platform."));
 	return SYSINFO_RET_FAIL;
 }

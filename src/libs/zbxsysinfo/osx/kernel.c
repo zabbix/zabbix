@@ -26,7 +26,10 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t	len = sizeof(maxfiles);
 
 	if (0 != sysctl(mib, 2, &maxfiles, &len, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, maxfiles);
 
@@ -39,7 +42,10 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t	len = sizeof(maxproc);
 
 	if (0 != sysctl(mib, 2, &maxproc, &len, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, maxproc);
 

@@ -86,6 +86,8 @@ point them all to the same buffer */
 #endif
 #endif
 
+/* TODO everywhere in the file */
+
 static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP

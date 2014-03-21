@@ -28,7 +28,10 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	long	ncpu;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
@@ -37,10 +40,16 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "max"))
 		name = _SC_NPROCESSORS_CONF;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: max, online."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (-1 == (ncpu = sysconf(name)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, ncpu);
 
@@ -53,14 +62,20 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	cpu_num, state, mode;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu, type and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu num."));
 		return SYSINFO_RET_FAIL;
+	}
 	else
 		cpu_num++;
 
@@ -75,7 +90,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "idle"))
 		state = ZBX_CPU_STATE_IDLE;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: idle, iowait, system, user."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 2);
 
@@ -86,7 +104,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return get_cpustat(result, cpu_num, state, mode);
 }
@@ -135,14 +156,20 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu. Must be one of: all, percpu."));
 		return SYSINFO_RET_FAIL;
+	}
 
 #if defined(HAVE_GETLOADAVG)
 	tmp = get_rparam(request, 1);
@@ -170,19 +197,29 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		key = "avenrun_15min";
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_kstat_system_misc(key, &load))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get load average."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	value = (double)load / FSCALE;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent does not support load average stats."));
 	return SYSINFO_RET_FAIL;
 #endif
 	if (1 == per_cpu)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
 			return SYSINFO_RET_FAIL;
+		}
 		value /= cpu_num;
 	}
 
@@ -219,7 +256,10 @@ int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (0 == cpu_count)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, swt_count);
 
@@ -254,7 +294,10 @@ int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (0 == cpu_count)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, intr_count);
 

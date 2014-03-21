@@ -36,7 +36,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))	/* default parameter */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be all or empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
 	}
 

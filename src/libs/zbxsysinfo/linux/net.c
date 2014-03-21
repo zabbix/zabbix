@@ -278,7 +278,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/net/dev", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/net/dev."));
 		return SYSINFO_RET_FAIL;
 	}
 

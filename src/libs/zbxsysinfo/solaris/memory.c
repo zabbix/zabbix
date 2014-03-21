@@ -50,7 +50,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	zbx_uint64_t	used, total;
 
 	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	used = total - sysconf(_SC_AVPHYS_PAGES);
 
@@ -71,7 +74,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	zbx_uint64_t	total;
 
 	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)total * 100);
 
@@ -84,7 +90,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
@@ -101,7 +110,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pavailable"))
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, free, pavailable, pused, total, used."));
 		ret = SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }

@@ -167,12 +167,18 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -187,7 +193,15 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "pused"))
 		ret = SYSTEM_SWAP_PUSED(request, result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+	}
 
 	return ret;
 }
@@ -255,12 +269,18 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -269,13 +289,19 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, &value, NULL, NULL);
 	else
-		ret =  SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: count, pages."));
+		return SYSINFO_RET_FAIL;
+	}
 
-	if (ret != SYSINFO_RET_OK)
-		return ret;
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -285,12 +311,18 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -299,11 +331,17 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, NULL, NULL, &value);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: count, pages."));
+		return SYSINFO_RET_FAIL;
+	}
 
-	if (ret != SYSINFO_RET_OK)
-		return ret;
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
-	return ret;
+	return SYSINFO_RET_OK;
 }

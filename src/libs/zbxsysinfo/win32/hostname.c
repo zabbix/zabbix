@@ -26,6 +26,7 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int	ret = SYSINFO_RET_FAIL;
 	DWORD	dwSize = 256;
 	TCHAR	computerName[256];
 	char	*type, buffer[256];
@@ -33,7 +34,10 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	WSADATA sockInfo;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	type = get_rparam(request, 0);
 
@@ -42,7 +46,10 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(type, "host"))
 		netbios = 0;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: host, netbios."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (1 == netbios)
 	{
@@ -50,22 +57,30 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
 		/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
 		if (0 == GetComputerName(computerName, &dwSize))
+		{
 			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
-		else
-			SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. GetComputerName() failed."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
 	}
 	else
 	{
 		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+		{
 			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. WSAStartup() failed."));
+			return SYSINFO_RET_FAIL;
+		}
 		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
 			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
-		else
-			SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. gethostname() failed."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 
-	if (ISSET_STR(result))
-		return SYSINFO_RET_OK;
-
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }

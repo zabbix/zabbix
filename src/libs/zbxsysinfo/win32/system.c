@@ -225,7 +225,10 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	vi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	if (TRUE != GetVersionEx((OSVERSIONINFO *)&vi))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get version of OS."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL != (pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo")))
 		pGNSI(&si);
