@@ -29,16 +29,25 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*swapdev, *mode;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be all or empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if(1 != perfstat_memory_total(NULL, &mem, sizeof(perfstat_memory_total_t), 1))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, mem.pgsp_free << ZBX_PERFSTAT_PAGE_SHIFT);
@@ -51,9 +60,13 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 #endif
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "No libperfstat available."));
 	return SYSINFO_RET_FAIL;
 }

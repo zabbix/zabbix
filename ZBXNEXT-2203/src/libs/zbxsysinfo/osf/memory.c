@@ -77,7 +77,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	total = result_tmp.ui64;
 
 	if (0 == total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		goto clean;
+	}
 
 	SET_UI64_RESULT(result, (total - free) / (double)total * 100);
 
@@ -112,7 +115,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	total = result_tmp.ui64;
 
 	if (0 == total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
 		goto clean;
+	}
 
 	SET_UI64_RESULT(result, free / (double)total * 100);
 
@@ -146,7 +152,10 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pavailable"))
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, free, pavailable, pused, total, used."));
 		ret = SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }

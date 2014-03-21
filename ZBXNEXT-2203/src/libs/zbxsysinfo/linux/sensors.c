@@ -408,7 +408,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		do_task = DO_MIN;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, max, min."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, empty, max, min."));
 		return SYSINFO_RET_FAIL;
 	}
 

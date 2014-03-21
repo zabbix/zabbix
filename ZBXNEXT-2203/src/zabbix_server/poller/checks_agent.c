@@ -47,7 +47,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_sock_t	s;
-	char		*buf, buffer[MAX_STRING_LEN];
+	char		*buf, *tmp, buffer[MAX_STRING_LEN];
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -71,9 +71,18 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", buf);
 
-		if (0 == strcmp(buf, ZBX_NOTSUPPORTED))
+		if (0 == strncmp(buf, ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED)-1))
 		{
-			zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent");
+			/* 'ZBX_NOTSUPPORTED:<error message>' */
+			if (NULL !=  (tmp = strchr(buf, ':')))
+			{
+				zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent. %s",
+					tmp + 1);
+			}
+			else
+			{
+				zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent");
+			}
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NOTSUPPORTED;
 		}

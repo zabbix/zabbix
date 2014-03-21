@@ -28,14 +28,20 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*swapdev, *mode;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	/* only 'all' parameter supported */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device name. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
@@ -50,7 +56,10 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullAvailPageFile);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, total, used."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
@@ -63,7 +72,10 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwAvailPageFile);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, total, used."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	return SYSINFO_RET_OK;

@@ -34,17 +34,23 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters. Only counter name is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	counter = get_rparam(request, 0);
 
 	if (NULL == counter || '\0' == *counter)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Counter name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (SUCCEED != perf_collector_started())
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
-		return ret;
+		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started.");
+		return SYSINFO_RET_FAIL;
 	}
 
 	for (perfs = ppsd.pPerfCounterList; NULL != perfs; perfs = perfs->next)
@@ -71,6 +77,11 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -87,12 +98,18 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (2 < request->nparam)
-		goto clean;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only counter name and optional interval are expected."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp)
-		goto clean;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Counter name cannot be empty."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	strscpy(counterpath, tmp);
 
@@ -101,7 +118,10 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp || '\0' == *tmp)
 		interval = 1;
 	else if (FAIL == is_uint31(tmp, &interval))
-		goto clean;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid interval."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == check_counter_path(counterpath))
 		goto clean;
@@ -110,7 +130,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (SUCCEED != perf_collector_started())
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");
+			zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started.");
 			goto clean;
 		}
 
@@ -139,7 +159,13 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, value);
 		ret = SYSINFO_RET_OK;
 	}
+
 clean:
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;

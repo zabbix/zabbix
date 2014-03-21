@@ -261,7 +261,7 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VM_MEMORY_SHARED(result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, buffers, cached, free, pavailable, pused, shared, total, used"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, buffers, cached, free, pavailable, pused, shared, total, used."));
 		ret = SYSINFO_RET_FAIL;
 	}
 

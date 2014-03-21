@@ -147,16 +147,25 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets);
@@ -167,7 +176,10 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -178,16 +190,25 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwOutOctets);
@@ -198,7 +219,10 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, pIfRow.dwOutDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -209,16 +233,25 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets + pIfRow.dwOutOctets);
@@ -231,7 +264,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos +
 				pIfRow.dwOutDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -245,10 +281,6 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
 	LPSTR		utf8_descr;
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -264,8 +296,13 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
 		goto clean;
 	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
@@ -352,6 +389,7 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
 		goto clean;
 	}
 
@@ -369,6 +407,7 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
 		goto clean;
 	}
 
@@ -431,12 +470,20 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*port_str;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only TCP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TCP port."));
 		return SYSINFO_RET_FAIL;
+	}
+
+/* TODO no MSG set below */
 
 	dwSize = sizeof(MIB_TCPTABLE);
 	pTcpTable = (MIB_TCPTABLE *)zbx_malloc(pTcpTable, dwSize);

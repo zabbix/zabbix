@@ -190,17 +190,26 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*if_name;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Network interface cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &kn))
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	else
+	if (SUCCEED != get_kstat_named_field(if_name, "collisions", &kn))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network interface stats."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
 
 	return SYSINFO_RET_OK;
 }
@@ -212,12 +221,18 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		res;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only TCP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TCP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
 
@@ -237,12 +252,18 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		res;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only UDP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid UDP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);
 
@@ -261,22 +282,36 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		ret = NET_IF_IN_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_IN_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_IN_ERRORS(if_name, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, errors, packets."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network interface stats."));
+	}
 
 	return ret;
 }
@@ -287,22 +322,36 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
 		ret = NET_IF_OUT_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_OUT_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_OUT_ERRORS(if_name, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, errors, packets."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network interface stats."));
+	}
 
 	return ret;
 }
@@ -313,22 +362,36 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interface name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
 		ret = NET_IF_TOTAL_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_TOTAL_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_TOTAL_ERRORS(if_name, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, errors, packets."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network interface stats."));
+	}
 
 	return ret;
 }
@@ -339,11 +402,17 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json		j;
 	int			i;
 
+	if (NULL == (ni = if_nameindex()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		return SYSINFO_RET_FAIL;
+	}
+
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
+	for (i = 0; 0 != ni[i].if_index; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", ni[i].if_name, ZBX_JSON_TYPE_STRING);

@@ -136,14 +136,26 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	aggr = 0;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only device name, sensor name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	device = get_rparam(request, 0);
 	name = get_rparam(request, 1);
 	function = get_rparam(request, 2);
 
-	if (NULL == device || NULL == name)
+	if (NULL == device || '\0' == *device)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Device name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sensor name cannot be empty."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == function || '\0' == *function)
 		do_task = DO_ONE;
@@ -154,7 +166,10 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(function, "min"))
 		do_task = DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, empty, max, min."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mib[0] = CTL_HW;
 	mib[1] = HW_SENSORS;
@@ -180,12 +195,18 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 				(DO_ONE != do_task && NULL != zbx_regexp_match(sensordev.xname, device, NULL)))
 		{
 			if (SUCCEED != get_device_sensors(do_task, mib, &sensordev, name, &aggr, &cnt))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get sensor stats."));
 				return SYSINFO_RET_FAIL;
+			}
 		}
 	}
 
 	if (0 == cnt)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get sensor stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (DO_AVG == do_task)
 		SET_DBL_RESULT(result, aggr / cnt);
@@ -199,6 +220,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Kernel does not support sysctl for getting sensor stats."));
 	return SYSINFO_RET_FAIL;
 }
 

@@ -28,18 +28,25 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Filesystem and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	path = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == path || '\0' == *path)
+	{
+		SET_MSG_RESULT(result, "Filesystem cannot be empty.");
 		return SYSINFO_RET_FAIL;
+	}
 
 	wpath = zbx_utf8_to_unicode(path);
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
 	{
 		zbx_free(wpath);
+		SET_MSG_RESULT(result, "Failed to get filesystem stats.");
 		return SYSINFO_RET_FAIL;
 	}
 	zbx_free(wpath);
@@ -56,7 +63,10 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, (double)((__int64)totalBytes.QuadPart - (__int64)freeBytes.QuadPart) * 100. /
 				(double)(__int64)totalBytes.QuadPart);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -73,7 +83,10 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* Make an initial call to GetLogicalDriveStrings to
 	   get the necessary size into the dwSize variable */
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	buffer = (LPTSTR)zbx_malloc(buffer, (dwSize + 1) * sizeof(TCHAR));
 
@@ -82,6 +95,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
 	{
 		zbx_free(buffer);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
 		return SYSINFO_RET_FAIL;
 	}
 

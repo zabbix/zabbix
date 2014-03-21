@@ -31,18 +31,27 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		hertz = sysconf(_SC_CLK_TCK);
 
-		/* make sure we do not divide by 0 */
-		assert(hertz);
+	}
+
+	/* make sure we do not divide by 0 */
+	if (0 == hertz)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uptime info."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	/* AIX 6.1 */
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uptime info."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)((double)ps_cpu_total.lbolt / hertz));
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent does not support uptime stats."));
 	return SYSINFO_RET_FAIL;
 #endif
 }

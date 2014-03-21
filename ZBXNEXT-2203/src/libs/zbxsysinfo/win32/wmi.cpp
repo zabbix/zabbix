@@ -86,10 +86,16 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int			ret = SYSINFO_RET_FAIL;
 
 	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only WMI namespace and query are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (SUCCEED != zbx_co_initialize())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to initialize COM library."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	wmi_namespace = get_rparam(request, 0);
 	wmi_query = get_rparam(request, 1);
@@ -226,6 +232,10 @@ out:
 
 	if (0 != pLoc)
 		pLoc->Release();
+
+
+	if (SYSINFO_RET_FAIL == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get WMI stats."));
 
 	return ret;
 };

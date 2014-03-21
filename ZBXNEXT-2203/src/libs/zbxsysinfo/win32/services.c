@@ -32,15 +32,24 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SERVICE_STATUS	status;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only service name is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	name = get_rparam(request, 0);
 
 	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Service name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == (mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to call OpenSCManager."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	wname = zbx_utf8_to_unicode(name);
 
@@ -184,7 +193,10 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type, service state and exclude list are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	type = get_rparam(request, 0);
 	state = get_rparam(request, 1);
@@ -199,7 +211,10 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(type, "disabled"))
 		start_type = ZBX_SRV_STARTTYPE_DISABLED;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: all, automatic, disabled, manual."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == state || '\0' == *state || 0 == strcmp(state, "all"))	/* default parameter */
 		service_state = ZBX_SRV_STATE_ALL;
@@ -220,10 +235,16 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(state, "paused"))
 		service_state = ZBX_SRV_STATE_PAUSED;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid service state. Must be one of: all, continue_pending, paused, paused_pending, running, started, start_pending, stopped, stop_pending"));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to call OpenSCManager."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (0 != (ret = EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
 			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL)) || ERROR_MORE_DATA == GetLastError())

@@ -58,7 +58,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct pst_status	pst[ZBX_BURST];
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional name, users, mode and cmdline are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	if (NULL != procname && '\0' == *procname)
@@ -67,8 +70,11 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 1);
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -83,7 +89,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: all, sleep, run, zomb."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 	if (NULL != proccomm && '\0' == *proccomm)
@@ -91,6 +100,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	memset(pst, 0, sizeof(pst));
 
+/* TODO is it possible to replace it with if() */
 	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx)))
 	{
 		for (i = 0; i < count; i++)
@@ -115,7 +125,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (-1 == count)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, proccount);
 

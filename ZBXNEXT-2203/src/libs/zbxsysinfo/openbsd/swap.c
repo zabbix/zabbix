@@ -118,14 +118,20 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	/* default parameter */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
-		return SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device. Must be one of: all."));
+		ret = SYSINFO_RET_FAIL;
+	}
 
 	/* default parameter */
 	if (NULL == mode || *mode == '\0' || 0 == strcmp(mode, "free"))
@@ -139,7 +145,15 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pused"))
 		ret = SYSTEM_SWAP_PUSED(result);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		ret = SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+	}
 
 	return ret;
 }
@@ -182,68 +196,91 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int		ret = SYSINFO_RET_FAIL;
 	char		*swapdev, *mode;
 	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	/* the only supported parameter */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* default parameter */
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 	{
-		if (SYSINFO_RET_OK != get_swap_io(&value, NULL, NULL, NULL))
-			return SYSINFO_RET_FAIL;
+		ret = get_swap_io(&value, NULL, NULL, NULL);
 	}
 	else if (0 == strcmp(mode, "pages"))
 	{
-		if (SYSINFO_RET_OK != get_swap_io(NULL, &value, NULL, NULL))
-			return SYSINFO_RET_FAIL;
+		ret = get_swap_io(NULL, &value, NULL, NULL);
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: count, pages."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	SET_UI64_RESULT(result, value);
+	if (SYSINFO_RET_OK == ret)
+		SET_UI64_RESULT(result, value);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int		ret = SYSINFO_RET_FAIL;
 	char		*swapdev, *mode;
 	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	/* the only supported parameter */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid swap device. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* default parameter */
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 	{
-		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, &value, NULL))
-			return SYSINFO_RET_FAIL;
+		ret = get_swap_io(NULL, NULL, &value, NULL);
 	}
 	else if (0 == strcmp(mode, "pages"))
 	{
-		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, NULL, &value))
-			return SYSINFO_RET_FAIL;
+		ret = get_swap_io(NULL, NULL, NULL, &value);
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: count, pages."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	SET_UI64_RESULT(result, value);
+	if (SYSINFO_RET_OK == ret)
+		SET_UI64_RESULT(result, value);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+
 
 	return SYSINFO_RET_OK;
 }

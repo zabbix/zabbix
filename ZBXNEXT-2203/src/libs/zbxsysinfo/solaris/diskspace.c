@@ -135,13 +135,19 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Filesystem and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	fsname = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == fsname || '\0' == *fsname)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Filesystem name cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		ret = VFS_FS_TOTAL(fsname, result);
@@ -154,38 +160,47 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pused"))
 		ret = VFS_FS_PUSED(fsname, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get filesystem stats."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	return ret;
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
 	struct mnttab	mt;
 	FILE		*f;
 	struct zbx_json	j;
+
+	/* opening the mounted filesystems file */
+	if (NULL == (f = fopen("/etc/mnttab", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /etc/mnttab."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	/* opening the mounted filesystems file */
-	if (NULL != (f = fopen("/etc/mnttab", "r")))
+	/* fill mnttab structure from file */
+	while (-1 != getmntent(f, &mt))
 	{
-		/* fill mnttab structure from file */
-		while (-1 != getmntent(f, &mt))
-		{
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#FSNAME}", mt.mnt_mountp, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#FSTYPE}", mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&j);
-		}
-
-		zbx_fclose(f);
-
-		ret = SYSINFO_RET_OK;
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", mt.mnt_mountp, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#FSTYPE}", mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
 	}
+
+	zbx_fclose(f);
 
 	zbx_json_close(&j);
 
@@ -193,5 +208,5 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_free(&j);
 
-	return ret;
+	return SYSINFO_RET_OK;
 }

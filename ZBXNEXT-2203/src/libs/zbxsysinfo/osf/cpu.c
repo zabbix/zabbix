@@ -27,19 +27,28 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu, type and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid CPU num. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 2);
 
 	/* only "avg1" (default) for parameter "mode" is supported */
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -52,7 +61,15 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "idle"))
 		ret = EXECUTE_DBL("iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: idle, nice, user, system."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get CPU stats."));
+	}
 
 	return ret;
 }
@@ -63,13 +80,19 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
 	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid CPU num. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -80,7 +103,15 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		ret = EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", result);
 	else
-		ret = SYSINFO_RET_FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1, avg5, avg15."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get CPU stats."));
+	}
 
 	return ret;
 }

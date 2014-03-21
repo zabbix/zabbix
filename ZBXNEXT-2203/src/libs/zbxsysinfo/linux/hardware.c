@@ -307,7 +307,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
 	else if (FAIL == is_uint31(param, (uint32_t*)&cpu))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid CPU num. Must be one of: all or a CPU num."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid CPU num. Must be one of: all."));
 		return SYSINFO_RET_FAIL;
 	}
 

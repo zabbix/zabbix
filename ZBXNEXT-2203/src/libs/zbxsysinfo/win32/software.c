@@ -49,6 +49,7 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_strdup(os, "Intel Itanium-based");
 			break;
 		default :
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown processor architecture."));
 			return SYSINFO_RET_FAIL;
 	}
 

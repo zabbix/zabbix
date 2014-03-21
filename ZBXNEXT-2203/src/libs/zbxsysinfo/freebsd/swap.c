@@ -33,14 +33,20 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	total = 0, used = 0;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional swap device name and mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	sz = ARRSIZE(mib);
 	if (-1 == sysctlnametomib("vm.swap_info", mib, &sz))
-		return FAIL;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctlnametomib."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	mib_sz = sz + 1;
 	mib_dev = &(mib[sz]);
@@ -70,10 +76,14 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, total ? ((double)used * 100.0 / (double)total) : 0.0);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: free, pfree, pused, total, used."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent does not support swap stats."));
 	return SYSINFO_RET_FAIL;
 #endif
 }

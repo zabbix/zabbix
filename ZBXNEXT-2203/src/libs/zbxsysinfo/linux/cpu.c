@@ -41,12 +41,15 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		name = _SC_NPROCESSORS_CONF;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be online or max."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: max, online."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (-1 == (ncpu = sysconf(name)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, ncpu);
 
@@ -96,7 +99,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		state = ZBX_CPU_STATE_STEAL;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of idle, nice, user, system, iowait, interrupt, softirq, steal."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: idle, interrupt, iowait, nice, softirq, steal, system, user."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -110,7 +113,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mode = ZBX_AVG15;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -135,7 +138,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu. Must be one of all, percpu."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cpu. Must be one of: all, percpu."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -149,13 +152,13 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mode = ZBX_AVG15;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of avg1, avg5, avg15."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg1, avg5, avg15."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (mode >= getloadavg(load, 3))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Getting load average failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get load average."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -165,7 +168,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Getting number of online CPUs failed."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;

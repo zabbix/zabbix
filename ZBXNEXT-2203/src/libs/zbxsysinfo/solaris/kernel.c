@@ -43,5 +43,10 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 		kstat_close(kc);
 	}
 
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Faile to get max files."));
+	}
+
 	return ret;
 }

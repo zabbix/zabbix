@@ -30,7 +30,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		SET_MSG_RESULT(result, strdup("Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -47,27 +47,49 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		if (0 == collector->vmstat.data_available)
+		{
+			SET_MSG_RESULT(result, strdup("No data available in collector."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only section and optional type are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	section = get_rparam(request, 0);
 	type = get_rparam(request, 1);
 
 	if (NULL == section)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Section cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (0 == strcmp(section, "ent"))
 	{
-		if (1 == request->nparam && collector->vmstat.shared_enabled)
-			SET_DBL_RESULT(result, collector->vmstat.ent);
-		else
+		if (1 != request->nparam && collector->vmstat.shared_enabled)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. It should be empty for given section."));
 			return SYSINFO_RET_FAIL;
+		}
+		else if (!collector->vmstat.shared_enabled)
+		{
+			SET_MSG_RESULT(result, strdup("No data available in collector."));
+			return SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			SET_DBL_RESULT(result, collector->vmstat.ent);
+		}
 	}
 	else if (NULL == type)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. It cannot be empty."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (0 == strcmp(section, "kthr"))
 	{
@@ -76,7 +98,10 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "b"))
 			SET_DBL_RESULT(result, collector->vmstat.kthr_b);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: b, r."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(section, "page"))
 	{
@@ -93,7 +118,10 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "sr"))
 			SET_DBL_RESULT(result, collector->vmstat.sr);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: fi, fo, fr, pi, po, sr."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(section, "faults"))
 	{
@@ -104,7 +132,10 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "cs"))
 			SET_DBL_RESULT(result, collector->vmstat.cs);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: cs, in, sy."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(section, "cpu"))
 	{
@@ -125,7 +156,10 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "app") && collector->vmstat.shared_enabled && collector->vmstat.pool_util_authority)
 			SET_DBL_RESULT(result, collector->vmstat.cpu_app);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: app, ec, id, lbusy, pc, sy, us, wa."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(section, "disk"))
 	{
@@ -134,7 +168,10 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "tps"))
 			SET_DBL_RESULT(result, collector->vmstat.disk_tps);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: bps, tps."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else if (0 == strcmp(section, "memory"))
 	{
@@ -143,10 +180,16 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(type, "fre"))
 			SET_UI64_RESULT(result, collector->vmstat.mem_fre);
 		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: avm, fre."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid section. Must be one of: cpu, disk, ent, faults, kthr, memory, page."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }

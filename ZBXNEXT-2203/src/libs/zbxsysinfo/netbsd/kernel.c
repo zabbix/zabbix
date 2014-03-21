@@ -32,13 +32,18 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	len = sizeof(maxfiles);
 
+/* TODO different message? */
 	if (0 != sysctl(mib, 2, &maxfiles, &len, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, maxfiles);
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Kernel does not support sysctl for getting max files."));
 	return SYSINFO_RET_FAIL;
 #endif
 }
@@ -56,12 +61,16 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 	len = sizeof(maxproc);
 
 	if (0 != sysctl(mib, 2, &maxproc, &len, NULL, 0))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, maxproc);
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Kernel does not support sysctl for getting max proc."));
 	return SYSINFO_RET_FAIL;
 #endif
 }

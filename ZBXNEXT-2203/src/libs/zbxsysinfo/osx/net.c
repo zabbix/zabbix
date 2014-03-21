@@ -23,13 +23,16 @@
 
 static struct ifmibdata	ifmd;
 
-static int	get_ifmib_general(const char *if_name)
+static int	get_ifmib_general(const char *if_name, char **error)
 {
 	int	mib[6], ifcount;
 	size_t	len;
 
 	if (NULL == if_name || '\0'== *if_name)
+	{
+		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
 		return SYSINFO_RET_FAIL;
+	}
 
 	mib[0] = CTL_NET;
 	mib[1] = PF_LINK;
@@ -40,7 +43,10 @@ static int	get_ifmib_general(const char *if_name)
 	len = sizeof(ifcount);
 
 	if (-1 == sysctl(mib, 5, &ifcount, &len, NULL, 0))
-		return FAIL;
+	{
+		*error = zbx_strdup(NULL, "Failed sysctl."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	mib[3] = IFMIB_IFDATA;
 	mib[5] = IFDATA_GENERAL;
@@ -61,21 +67,28 @@ static int	get_ifmib_general(const char *if_name)
 			return SUCCEED;
 	}
 
+	*error = zbx_strdup(NULL, "Failed to find network interface.");
 	return FAIL;
 }
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name))
+	if (FAIL == get_ifmib_general(if_name, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ibytes);
@@ -86,23 +99,32 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_iqdrops);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name))
+	if (FAIL == get_ifmib_general(if_name, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_obytes);
@@ -111,23 +133,32 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "errors"))
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_oerrors);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	*if_name, *mode, *error;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name))
+	if (FAIL == get_ifmib_general(if_name, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ibytes + ifmd.ifmd_data.ifi_obytes);
@@ -136,7 +167,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "errors"))
 		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ierrors + ifmd.ifmd_data.ifi_oerrors);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -148,12 +182,18 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		res;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only TCP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TCP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
@@ -173,12 +213,18 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		res;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only UDP port is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid UDP port."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
@@ -193,15 +239,21 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*if_name;
+	char	*if_name, *error;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 
-	if (FAIL == get_ifmib_general(if_name))
+	if (FAIL == get_ifmib_general(if_name, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_collisions);
 

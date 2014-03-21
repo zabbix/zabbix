@@ -162,16 +162,20 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json		j;
 	char			*if_name;
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-
 #if HPUX_VERSION < 1131
 	if_list = zbx_malloc(if_list, if_list_alloc);
 	*if_list = '\0';
 
 	if (FAIL == get_if_names(&if_list, &if_list_alloc, &if_list_offset))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
+		zbx_free(if_list);
 		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	if_name = if_list;
 
@@ -398,13 +402,19 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	Ext_mib_t	mib;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (FAIL == get_net_stat(&mib, if_name))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		SET_UI64_RESULT(result, mib.mib_if.ifInOctets);
@@ -415,7 +425,10 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, mib.mib_if.ifInDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -426,13 +439,19 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	Ext_mib_t	mib;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (FAIL == get_net_stat(&mib, if_name))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		SET_UI64_RESULT(result, mib.mib_if.ifOutOctets);
@@ -443,7 +462,10 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, mib.mib_if.ifOutDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -454,13 +476,19 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	Ext_mib_t	mib;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (FAIL == get_net_stat(&mib, if_name))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 	{
@@ -480,7 +508,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, mib.mib_if.ifInDiscards + mib.mib_if.ifOutDiscards);
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
