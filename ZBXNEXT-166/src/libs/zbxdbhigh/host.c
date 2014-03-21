@@ -2351,6 +2351,7 @@ zbx_group_prototype_t;
 static void	DBgroup_prototype_clean(zbx_group_prototype_t *group_prototype)
 {
 	zbx_free(group_prototype->name);
+	zbx_free(group_prototype);
 }
 
 static void	DBgroup_prototypes_clean(zbx_vector_ptr_t *group_prototypes)
