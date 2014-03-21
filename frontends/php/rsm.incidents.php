@@ -906,21 +906,18 @@ if ($host || $data['filter_search']) {
 							$incidentPercentDown = 0;
 						}
 						else {
-							// if active incident
-							if (!isset($event['endTime'])) {
-								$event['endTime'] = $weekTimeTill;
-							}
+							$endTime = isset($event['endTime']) ? $event['endTime'] : $weekTimeTill;
 
 							// get failed tests time interval
-							if ($event['startTime'] >= $weekTimeFrom && $event['endTime'] <= $weekTimeTill) {
+							if ($event['startTime'] >= $weekTimeFrom && $endTime <= $weekTimeTill) {
 								$getFailedFrom = $event['startTime'];
-								$getFailedTill = $event['endTime'];
+								$getFailedTill = $endTime;
 							}
-							elseif ($event['startTime'] < $weekTimeFrom && $event['endTime'] <= $weekTimeTill) {
+							elseif ($event['startTime'] < $weekTimeFrom && $endTime <= $weekTimeTill) {
 								$getFailedFrom = $weekTimeFrom;
-								$getFailedTill = $event['endTime'];
+								$getFailedTill = $endTime;
 							}
-							elseif ($event['startTime'] >= $weekTimeFrom && $event['endTime'] > $weekTimeTill) {
+							elseif ($event['startTime'] >= $weekTimeFrom && $endTime > $weekTimeTill) {
 								$getFailedFrom = $event['startTime'];
 								$getFailedTill = $weekTimeTill;
 							}
