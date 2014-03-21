@@ -73,10 +73,27 @@ $isValid = check_fields($fields);
 
 // filter reset
 if (hasRequest('report_reset')) {
-	foreach ($_REQUEST as $key => $request) {
-		if ($key !== 'config' && $key !== 'sid') {
-			unset($_REQUEST[$key]);
-		}
+	// get requests keys
+	if (getRequest('config') == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
+		$unsetRequests = array('title', 'xlabel', 'ylabel', 'showlegend', 'scaletype', 'items', 'report_timesince',
+			'report_timetill', 'report_show'
+		);
+	}
+	elseif (getRequest('config') == BR_DISTRIBUTION_MULTIPLE_ITEMS) {
+		$unsetRequests = array('periods', 'items', 'title', 'xlabel', 'ylabel', 'showlegend', 'sorttype',
+			'report_show'
+		);
+	}
+	else {
+		$unsetRequests = array('report_timesince', 'report_timetill', 'sortorder', 'groupids', 'hostids', 'itemid',
+			'title', 'xlabel', 'ylabel', 'showlegend', 'groupid', 'scaletype', 'avgperiod', 'palette', 'palettetype',
+			'report_show'
+		);
+	}
+
+	// requests unseting
+	foreach ($unsetRequests as $unsetRequests) {
+		unset($_REQUEST[$unsetRequests]);
 	}
 }
 
@@ -99,7 +116,7 @@ if (hasRequest('new_graph_item')) {
 }
 
 // validate permissions
-if (get_request('config') == 3) {
+if (get_request('config') == BR_COMPARE_VALUE_MULTIPLE_PERIODS) {
 	if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 		access_deny();
 	}
@@ -184,14 +201,14 @@ elseif (isset($_REQUEST['delete_period']) && isset($_REQUEST['group_pid'])) {
 }
 
 // item validation
-$config = $_REQUEST['config'] = get_request('config', 1);
+$config = $_REQUEST['config'] = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 // items array validation
-if ($config != 3) {
+if ($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) {
 	$items = get_request('items');
 	$validItems = validateBarReportItems($items);
 
-	if ($config == 2) {
+	if ($config == BR_DISTRIBUTION_MULTIPLE_ITEMS) {
 		$validPeriods = validateBarReportPeriods(get_request('periods'));
 	}
 }
@@ -205,9 +222,9 @@ $rep6_wdgt = new CWidget();
 
 $r_form = new CForm();
 $cnfCmb = new CComboBox('config', $config, 'submit();');
-$cnfCmb->addItem(1, _('Distribution of values for multiple periods'));
-$cnfCmb->addItem(2, _('Distribution of values for multiple items'));
-$cnfCmb->addItem(3, _('Compare values for multiple periods'));
+$cnfCmb->addItem(BR_DISTRIBUTION_MULTIPLE_PERIODS, _('Distribution of values for multiple periods'));
+$cnfCmb->addItem(BR_DISTRIBUTION_MULTIPLE_ITEMS, _('Distribution of values for multiple items'));
+$cnfCmb->addItem(BR_COMPARE_VALUE_MULTIPLE_PERIODS, _('Compare values for multiple periods'));
 
 $r_form->addItem(array(_('Reports').SPACE, $cnfCmb));
 
@@ -223,25 +240,26 @@ $rep_tab->setAttribute('border', 0);
 
 switch ($config) {
 	default:
-	case 1:
+	case BR_DISTRIBUTION_MULTIPLE_PERIODS:
 		$rep_form = valueDistributionFormForMultiplePeriods($validItems);
 		break;
-	case 2:
+	case BR_DISTRIBUTION_MULTIPLE_ITEMS:
 		$rep_form = valueDistributionFormForMultipleItems($validItems, $validPeriods);
 		break;
-	case 3:
+	case BR_COMPARE_VALUE_MULTIPLE_PERIODS:
 		$rep_form = valueComparisonFormForMultiplePeriods();
 		break;
 }
 
-$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
+$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', BR_DISTRIBUTION_MULTIPLE_PERIODS));
 
 if (hasRequest('report_show')) {
-	$items = ($config == 3)
+	$items = ($config == BR_COMPARE_VALUE_MULTIPLE_PERIODS)
 		? array(array('itemid' => get_request('itemid')))
 		: get_request('items');
 
-	if ($isValid && (($config != 3) ? $validItems : true) && (($config == 2) ? $validPeriods : true)) {
+	if ($isValid && (($config != BR_COMPARE_VALUE_MULTIPLE_PERIODS) ? $validItems : true)
+			&& (($config == BR_DISTRIBUTION_MULTIPLE_ITEMS) ? $validPeriods : true)) {
 		$src = 'chart_bar.php?'.
 			'config='.$config.
 			url_param('title').
