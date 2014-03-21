@@ -316,6 +316,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$result = true;
 	$group_httptestid = $_REQUEST['group_httptestid'];
+
+	DBStart();
+
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
 			continue;
