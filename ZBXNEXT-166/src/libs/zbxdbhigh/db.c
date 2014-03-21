@@ -2060,10 +2060,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             zbx_db_insert_clean(&ins);                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const char *fields[], int fields_num)
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields, int fields_num)
 {
-	int		i;
-	const ZBX_FIELD	*field;
+	int	i;
 
 	if (0 == fields_num)
 	{
@@ -2076,24 +2075,10 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
 	zbx_vector_ptr_create(&self->fields);
 	zbx_vector_ptr_create(&self->rows);
 
-	/* find the table and fields in database schema */
-
-	if (NULL == (self->table = DBget_table(table)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
+	self->table = table;
 
 	for (i = 0; i < fields_num; i++)
-	{
-		if (NULL == (field = DBget_field(self->table, fields[i])))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-		}
-
-		zbx_vector_ptr_append(&self->fields, (void *)field);
-	}
+		zbx_vector_ptr_append(&self->fields, (ZBX_FIELD *)fields[i]);
 }
 
 /******************************************************************************
@@ -2116,22 +2101,38 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const char *table, const c
  ******************************************************************************/
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 {
-	zbx_vector_str_t	fields;
+	zbx_vector_ptr_t	fields;
 	va_list			args;
 	char			*field;
+	const ZBX_TABLE		*ptable;
+	const ZBX_FIELD		*pfield;
+
+	/* find the table and fields in database schema */
+	if (NULL == (ptable = DBget_table(table)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	va_start(args, table);
 
-	zbx_vector_str_create(&fields);
+	zbx_vector_ptr_create(&fields);
 
 	while (NULL != (field = va_arg(args, char *)))
-		zbx_vector_str_append(&fields, field);
+	{
+		if (NULL == (pfield = DBget_field(ptable, field)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+		zbx_vector_ptr_append(&fields, (ZBX_FIELD *)pfield);
+	}
 
 	va_end(args);
 
-	zbx_db_insert_prepare_dyn(self, table, (const char **)fields.values, fields.values_num);
+	zbx_db_insert_prepare_dyn(self, ptable, (const ZBX_FIELD **)fields.values, fields.values_num);
 
-	zbx_vector_str_destroy(&fields);
+	zbx_vector_ptr_destroy(&fields);
 }
 
 /******************************************************************************
@@ -2525,3 +2526,4 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(FAIL);
 }
+
