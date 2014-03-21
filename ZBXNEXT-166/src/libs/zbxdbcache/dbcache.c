@@ -531,7 +531,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
 						trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl);
-
 			}
 			else
 			{
@@ -716,6 +715,8 @@ static void	DCsync_trends()
 		DCflush_trends(trends, &trends_num, 0);
 
 	DBcommit();
+
+	zbx_free(trends);
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data done");
 
