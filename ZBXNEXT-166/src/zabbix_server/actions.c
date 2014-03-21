@@ -1704,7 +1704,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 	zbx_vector_uint64_pair_destroy(&rec_mapping);
 	zbx_vector_uint64_destroy(&rec_actionids);
 
-	if (0 < escalations_num)
+	if (0 != escalations_num)
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);

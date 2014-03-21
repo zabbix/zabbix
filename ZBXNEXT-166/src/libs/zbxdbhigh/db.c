@@ -2053,8 +2053,8 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             zbx_db_insert_t ins;                                           *
  *                                                                            *
  *             zbx_db_insert_prepare(&ins, "history", "id", "value");         *
- *             zbx_db_insert_add(&ins, (zbx_uint64_t)1, 1.0);                 *
- *             zbx_db_insert_add(&ins, (zbx_uint64_t)2, 2.0);                 *
+ *             zbx_db_insert_add_values(&ins, (zbx_uint64_t)1, 1.0);          *
+ *             zbx_db_insert_add_values(&ins, (zbx_uint64_t)2, 2.0);          *
  *               ...                                                          *
  *             zbx_db_insert_execute(&ins);                                   *
  *             zbx_db_insert_clean(&ins);                                     *
@@ -2136,7 +2136,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_add_dyn                                            *
+ * Function: zbx_db_insert_add_values_dyn                                     *
  *                                                                            *
  * Purpose: adds row values for database bulk insert operation                *
  *                                                                            *
@@ -2189,7 +2189,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_add                                                *
+ * Function: zbx_db_insert_add_values                                         *
  *                                                                            *
  * Purpose: adds row values for database bulk insert operation                *
  *                                                                            *
@@ -2199,7 +2199,8 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
  * Return value: Returns SUCCEED if the operation completed successfully or   *
  *               FAIL otherwise.                                              *
  *                                                                            *
- * Comments: This is a convenience wrapper for zbx_db_insert_add() function.  *
+ * Comments: This is a convenience wrapper for zbx_db_insert_add_values_dyn() *
+ *           function.                                                        *
  *           Note that the types of the passed values must conform to the     *
  *           corresponding field types.                                       *
  *                                                                            *
@@ -2506,7 +2507,7 @@ out:
  *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *fieldname)
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 {
 	int	i;
 
@@ -2514,7 +2515,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *fieldname)
 	{
 		ZBX_FIELD	*field = self->fields.values[i];
 
-		if (ZBX_TYPE_ID == field->type && 0 == strcmp(fieldname, field->name))
+		if (ZBX_TYPE_ID == field->type && 0 == strcmp(field_name, field->name))
 		{
 			self->autoincrement = i;
 			return;

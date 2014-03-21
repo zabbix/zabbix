@@ -1726,7 +1726,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	}
 
 	if (0 != new_host_inventories)
+	{
 		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", NULL);
+	}
 
 	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
 	{

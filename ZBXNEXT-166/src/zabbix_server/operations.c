@@ -132,6 +132,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	result = DBselect("%s", sql);
 
+	zbx_free(sql);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
@@ -163,8 +165,6 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
-
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -317,7 +317,6 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const 
 		zbx_uint64_t actionid, int esc_step, const char *command, zbx_alert_status_t status, const char *error)
 {
 	const char	*__function_name = "add_command_alert";
-	zbx_uint64_t	alertid;
 	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
 	char		*tmp = NULL;
 
@@ -329,11 +328,10 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const 
 				"status", "error", "esc_step", "alerttype", NULL);
 	}
 
-	alertid = DBget_maxid("alerts");
 	now = (int)time(NULL);
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, NULL == command ? "" : command);
 
-	zbx_db_insert_add_values(db_insert, alertid, actionid, eventid, now, tmp, alert_status, error, esc_step,
+	zbx_db_insert_add_values(db_insert, __UINT64_C(0), actionid, eventid, now, tmp, alert_status, error, esc_step,
 			(int)alerttype);
 
 	zbx_free(tmp);
@@ -582,6 +580,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 	if (0 < alerts_num)
 	{
+		zbx_db_insert_autoincrement(&db_insert, "alertid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
@@ -666,10 +665,9 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 					"alerttype", NULL);
 		}
 
-		zbx_db_insert_add_values(&db_insert, 0, action->actionid, c_event->eventid, userid, now,
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, c_event->eventid, userid, now,
 				mediatypeid, row[1], subject, message, status, perror, escalation->esc_step,
 				(int)ALERT_TYPE_MESSAGE);
-
 	}
 
 	DBfree_result(result);
@@ -682,10 +680,9 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype", NULL);
 
-		zbx_db_insert_add_values(&db_insert, 0, action->actionid, c_event->eventid, userid, now, subject,
-				message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error, escalation->esc_step,
-				(int)ALERT_TYPE_MESSAGE);
-
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), action->actionid, c_event->eventid, userid, now,
+				subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
+				escalation->esc_step, (int)ALERT_TYPE_MESSAGE);
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "alertid");
