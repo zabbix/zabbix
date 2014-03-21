@@ -348,9 +348,7 @@ class CScreenItem extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete($screenItemIds) {
-		$screenItemIds = zbx_toArray($screenItemIds);
-
+	public function delete(array $screenItemIds) {
 		// check permissions
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid'),

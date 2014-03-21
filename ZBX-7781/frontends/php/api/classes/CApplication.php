@@ -395,11 +395,10 @@ class CApplication extends CApiService {
 	 * Delete Applications
 	 *
 	 * @param array $applicationids
+	 *
 	 * @return array
 	 */
-	public function delete($applicationids, $nopermissions = false) {
-		$applicationids = zbx_toArray($applicationids);
-		$delApplicationIds = $applicationids;
+	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'applicationids' => $applicationids,
@@ -454,7 +453,7 @@ class CApplication extends CApiService {
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
 
-		return array('applicationids' => $delApplicationIds);
+		return array('applicationids' => $applicationids);
 	}
 
 	/**

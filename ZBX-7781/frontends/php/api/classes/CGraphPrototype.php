@@ -524,13 +524,10 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($graphids, $nopermissions = false) {
+	public function delete(array $graphids, $nopermissions = false) {
 		if (empty($graphids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$graphids = zbx_toArray($graphids);
-		$delGraphPrototypeIds = $graphids;
 
 		$delGraphs = $this->get(array(
 			'graphids' => $graphids,
@@ -580,7 +577,7 @@ class CGraphPrototype extends CGraphGeneral {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));
 		}
 
-		return array('graphids' => $delGraphPrototypeIds);
+		return array('graphids' => $graphids);
 	}
 
 	protected function createReal($graph) {

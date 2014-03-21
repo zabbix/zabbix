@@ -799,9 +799,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($triggerIds, $nopermissions = false) {
-		$triggerIds = zbx_toArray($triggerIds);
-
+	public function delete(array $triggerIds, $nopermissions = false) {
 		$this->validateDelete($triggerIds, $nopermissions);
 
 		// get child triggers

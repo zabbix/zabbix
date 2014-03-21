@@ -834,7 +834,7 @@ class CMap extends CMapElement {
 	 *
 	 * @return array
 	 */
-	public function delete($sysmapIds) {
+	public function delete(array $sysmapIds) {
 		$maps = zbx_toObject($sysmapIds, 'sysmapid');
 
 		$this->checkInput($maps, __FUNCTION__);

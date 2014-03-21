@@ -620,9 +620,7 @@ class CScreen extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete($screenIds) {
-		$screenIds = zbx_toArray($screenIds);
-
+	public function delete(array $screenIds) {
 		$this->validateDelete($screenIds);
 
 		DB::delete('screens_items', array('screenid' => $screenIds));

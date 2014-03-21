@@ -623,13 +623,12 @@ class CItem extends CItemGeneral {
 	 *
 	 * @param array $itemids
 	 */
-	public function delete($itemids, $nopermissions = false) {
+	public function delete(array $itemids, $nopermissions = false) {
 		if (empty($itemids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delItemIds = zbx_toArray($itemids);
-		$itemids = zbx_toHash($itemids);
+		$itemids = array_keys(array_flip($itemids));
 
 		$delItems = $this->get(array(
 			'itemids' => $itemids,
@@ -740,7 +739,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $delItemIds);
+		return array('itemids' => $itemids);
 	}
 
 	public function syncTemplates($data) {

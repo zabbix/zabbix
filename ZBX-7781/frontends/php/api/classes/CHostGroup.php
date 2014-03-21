@@ -532,11 +532,10 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete($groupids, $nopermissions = false) {
+	public function delete(array $groupids, $nopermissions = false) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-		$groupids = zbx_toArray($groupids);
 		sort($groupids);
 
 		$delGroups = $this->get(array(
