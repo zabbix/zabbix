@@ -54,9 +54,12 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int		ret = FAIL;
 
 #ifdef _WINDOWS
-	WIN32_FIND_DATAA	find_file_data;
+	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char			cFileName[MAX_PATH]; /* camel-case needed by WIN API */
+	char			file_name_1[MAX_PATH], file_name_2[MAX_PATH];
+	char			*fn_1 = &file_name_1[0], *fn_2 = &file_name_2[0];
+	wchar_t			file_name_tmp[MAX_PATH];
+	wchar_t			*file_name = &file_name_tmp[MAX_PATH];
 	int			i_path_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -67,32 +70,32 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		goto out;
 	}
 
-	zbx_snprintf(cFileName, sizeof(cFileName), "%s\\*", cfg_file);
-
-	h_find = FindFirstFileA(cFileName, &find_file_data);
+	zbx_snprintf(file_name_1, sizeof(file_name_1), "%s\\*", cfg_file);
+	file_name = zbx_utf8_to_unicode(file_name_1);
+	h_find = FindFirstFileW(file_name, &find_file_data);
 	if (INVALID_HANDLE_VALUE == h_find)
 		goto out;
 
-	while (0 != FindNextFileA(h_find, &find_file_data))
+	while (0 != FindNextFileW(h_find, &find_file_data))
 	{
 		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
-		if (MAX_PATH < strlen(find_file_data.cFileName) + i_path_len)
+		if (MAX_PATH < lstrlenW(find_file_data.cFileName) + i_path_len)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s: Skipping, path is too long", find_file_data.cFileName);
+			zabbix_log(LOG_LEVEL_WARNING, "Skipping, path to conf file is too long");
 			continue;
 		}
 
-		zbx_snprintf(cFileName, sizeof(cFileName), "%s\\%s", cfg_file, find_file_data.cFileName);
+		fn_1 = zbx_unicode_to_utf8(find_file_data.cFileName);
+		zbx_snprintf(file_name_2, sizeof(file_name_2), "%s\\%s", cfg_file, fn_1);
 
-		if (FAIL == __parse_cfg_file(cFileName, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		if (FAIL == __parse_cfg_file(file_name_2, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
 			FindClose(h_find);
 			goto out;
 		}
 	}
-
 	FindClose(h_find);
 #else
 	DIR		*dir;
@@ -175,7 +178,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	int		i, lineno, param_valid;
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
-
+#ifdef _WINDOWS
+	wchar_t		file_name_1[MAX_PATH], *file_name_1p = &file_name_1[0];
+#endif
 	if (++level > ZBX_MAX_INCLUDE_LEVEL)
 	{
 		zbx_error("Recursion detected! Skipped processing of '%s'.", cfg_file);
@@ -184,9 +189,15 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (NULL != cfg_file)
 	{
+#ifdef _WINDOWS
+		/* this section needed when processing directory with config files */
+		file_name_1p = zbx_utf8_to_unicode(cfg_file);
+		if (NULL == (file = _wfopen(file_name_1p, L"r")))
+			goto cannot_open;
+#else
 		if (NULL == (file = fopen(cfg_file, "r")))
 			goto cannot_open;
-
+#endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
