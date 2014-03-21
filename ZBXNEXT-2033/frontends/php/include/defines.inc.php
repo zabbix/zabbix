@@ -824,12 +824,6 @@ define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
 define('ZBX_SOCKET_REMEDY_TIMEOUT',	25);
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
 
-define('REMEDY_SERVICE_WEB_URL',    'https://bt-dev.onbmc.com/arsys/'. // server
-	'forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'. // link to web form in remedy
-		'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'. // additional params
-		'&F303647600=SearchTicketWithQual&F304255610=\'1000000161\'%3D' // additional params then followed by ticked ID
-);
-
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
 
