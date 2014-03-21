@@ -159,24 +159,17 @@ if (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_host');
 	CProfile::delete('web.hosts.filter_port');
 }
-
-if (hasRequest('filter_set')) {
-	$filter['ip'] = getRequest('filter_ip');
-	$filter['dns'] = getRequest('filter_dns');
-	$filter['host'] = getRequest('filter_host');
-	$filter['port'] = getRequest('filter_port');
-
-	CProfile::update('web.hosts.filter_ip', $filter['ip'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_dns', $filter['dns'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_host', $filter['host'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_port', $filter['port'], PROFILE_TYPE_STR);
+elseif (hasRequest('filter_set')) {
+	CProfile::update('web.hosts.filter_ip', getRequest('filter_ip'), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns'), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_host', getRequest('filter_host'), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_port', getRequest('filter_port'), PROFILE_TYPE_STR);
 }
-else {
-	$filter['ip'] = CProfile::get('web.hosts.filter_ip');
-	$filter['dns'] = CProfile::get('web.hosts.filter_dns');
-	$filter['host'] = CProfile::get('web.hosts.filter_host');
-	$filter['port'] = CProfile::get('web.hosts.filter_port');
-}
+
+$filter['ip'] = CProfile::get('web.hosts.filter_ip');
+$filter['dns'] = CProfile::get('web.hosts.filter_dns');
+$filter['host'] = CProfile::get('web.hosts.filter_host');
+$filter['port'] = CProfile::get('web.hosts.filter_port');
 
 /*
  * Actions
@@ -865,12 +858,12 @@ else {
 			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
-				'name' => $filter['host'] === null ? null : $filter['host'],
-				'ip' => $filter['ip'] === null ? null : $filter['ip'],
-				'dns' => $filter['dns'] === null ? null : $filter['dns']
+				'name' => ($filter['host'] === '') ? null : $filter['host'],
+				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
 			),
 			'filter' => array(
-				'port' => $filter['port'] ? $filter['port'] : null
+				'port' => ($filter['port'] === '') ? null : $filter['port']
 			)
 		));
 	}
