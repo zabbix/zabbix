@@ -165,7 +165,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 			$ticket = CRemedyService::mediaAcknowledge(array(
 				'eventid' => getRequest('eventid'),
 				'message' => getRequest('message'),
-				'subject' => trigger_value2str($event['relatedObject']['value'])
+				'subject' => trigger_value2str($event['relatedObject']['value']).': '.$eventTriggerName
 			));
 
 			$result = (bool) $ticket;
@@ -311,8 +311,7 @@ $message->attr('autofocus', 'autofocus');
 
 $messageTable->addRow(_('Message'), $message);
 
-if (CRemedyService::$enabled) {
-
+if (CRemedyService::$enabled && ((!$ticket && $event['relatedObject']['value'] == TRIGGER_VALUE_TRUE) || $ticket)) {
 	$ticketStatusMessage = $ticket ? array(_('Update ticket').' ', $ticket['link']) : _('Create ticket');
 
 	$messageTable->addRow($ticketStatusMessage,
