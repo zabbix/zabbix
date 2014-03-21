@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Trigger form');
 $page['file'] = 'tr_logform.php';
+$page['scripts'] = array('tr_logform.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -62,7 +63,9 @@ if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid'])
 
 $itemid = get_request('itemid', 0);
 
-//------------------------ <ACTIONS> ---------------------------
+/**
+ * Save a trigger
+ */
 if (isset($_REQUEST['save_trigger'])) {
 	show_messages();
 
@@ -157,7 +160,6 @@ if (isset($_REQUEST['save_trigger'])) {
 		}
 	}
 }
-//------------------------ </ACTIONS> --------------------------
 
 //------------------------ <FORM> ---------------------------
 

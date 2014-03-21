@@ -84,6 +84,7 @@ $availableJScripts = array(
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'tr_logform.js' => 'pages/',
 );
 
 $tranStrings = array(
