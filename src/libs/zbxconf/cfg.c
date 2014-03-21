@@ -64,7 +64,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (MAX_PATH - 3 < (i_path_len = strlen(cfg_file)))
+	if (MAX_PATH - 3 < (i_path_len = zbx_strlen_utf8(cfg_file) - 1))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s: path is too long", cfg_file);
 		goto out;
