@@ -28,7 +28,8 @@
 /* -1   .. -199    internal monitoring software errors */
 /* -200 .. -999    service errors (registry operator fault) */
 
-#define ZBX_EC_INTERNAL			-1	/* Zabbix or ldns error */
+#define ZBX_EC_INTERNAL			-1	/* general internal error */
+#define ZBX_EC_INTERNAL_IP_UNSUP	-2	/* IP version not supported by Probe */
 #define ZBX_EC_DNS_NS_NOREPLY		-200	/* no reply from Name Server */
 #define ZBX_EC_DNS_NS_EREPLY		-201	/* invalid reply from Name Server */
 #define ZBX_EC_DNS_NS_NOTS		-202	/* no UNIX timestamp */

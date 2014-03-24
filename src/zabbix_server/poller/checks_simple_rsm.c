@@ -1845,6 +1845,29 @@ out:
 	return ret;
 }
 
+static void	zbx_delete_unsupported_ips(zbx_vector_str_t *ips, char ipv4_enabled, char ipv6_enabled)
+{
+	size_t	i;
+	char	is_ipv4;
+
+	for (i = 0; i < ips->values_num; i++)
+	{
+		if (SUCCEED != zbx_validate_ip(ips->values[i], ipv4_enabled, ipv6_enabled, NULL, &is_ipv4))
+		{
+			zbx_free(ips->values[i]);
+			zbx_vector_str_remove(ips, i--);
+
+			continue;
+		}
+
+		if ((0 != is_ipv4 && 0 == ipv4_enabled) || (0 == is_ipv4 && 0 == ipv6_enabled))
+		{
+			zbx_free(ips->values[i]);
+			zbx_vector_str_remove(ips, i--);
+		}
+	}
+}
+
 static int	zbx_validate_host_list(const char *list, char delim)
 {
 	const char	*p;
@@ -2208,13 +2231,25 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	random_host = hosts43.values[i];
 
 	/* start RDDS43 test, resolve host to ips */
-	if (SUCCEED != zbx_resolve_host(res, random_host, &ips43, ipv4_enabled, ipv6_enabled, log_fd, err, sizeof(err)))
+	if (SUCCEED != zbx_resolve_host(res, random_host, &ips43, 1, 1, log_fd, err, sizeof(err)))
 	{
 		rtt43 = ZBX_EC_RDDS_ERES;
 		zbx_dns_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
 	}
 
 	/* if RDDS43 fails we should still process RDDS80 */
+
+	if (SUCCEED == zbx_ec_noerror(rtt43))
+	{
+		zbx_delete_unsupported_ips(&ips43, ipv4_enabled, ipv6_enabled);
+
+		if (0 == ips43.values_num)
+		{
+			rtt43 = ZBX_EC_INTERNAL_IP_UNSUP;
+			zbx_dns_errf(log_fd, "RDDS43 \"%s\": IP address(es) of host not supported by this probe",
+					random_host);
+		}
+	}
 
 	if (SUCCEED == zbx_ec_noerror(rtt43))
 	{
@@ -2310,6 +2345,15 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 		goto out;
 	}
 
+	zbx_delete_unsupported_ips(&ips80, ipv4_enabled, ipv6_enabled);
+
+	if (0 == ips80.values_num)
+	{
+		rtt80 = ZBX_EC_INTERNAL_IP_UNSUP;
+		zbx_dns_errf(log_fd, "RDDS80 \"%s\": IP address(es) of host not supported by this probe", random_host);
+		goto out;
+	}
+
 	/* choose random IP */
 	i = zbx_random(ips80.values_num);
 	ip80 = ips80.values[i];
@@ -2367,8 +2411,6 @@ out:
 		zbx_add_value_uint(item, item->nextcheck, rdds_result);
 	}
 
-	zbx_free(answer);
-
 	if (0 != items_num)
 	{
 		for (i = 0; i < items_num; i++)
@@ -2388,8 +2430,9 @@ out:
 	if (NULL != log_fd)
 		fclose(log_fd);
 
-	zbx_free(testprefix);
+	zbx_free(answer);
 	zbx_free(rdds_ns_string);
+	zbx_free(testprefix);
 	zbx_free(res_ip);
 	zbx_free(value_str);
 
@@ -3235,6 +3278,15 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
+	zbx_delete_unsupported_ips(&epp_ips, ipv4_enabled, ipv6_enabled);
+
+	if (0 == epp_ips.values_num)
+	{
+		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL_IP_UNSUP;
+		zbx_dns_errf(log_fd, "EPP \"%s\": IP address(es) of host not supported by this probe", random_host);
+		goto out;
+	}
+
 	/* choose random IP */
 	i = zbx_random(epp_ips.values_num);
 	ip = epp_ips.values[i];
@@ -3272,7 +3324,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	/* try to SSL-connect, returns 1 for success */
+	/* try to SSL-connect, returns 1 on success */
 	if (1 != SSL_connect(ssl))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
