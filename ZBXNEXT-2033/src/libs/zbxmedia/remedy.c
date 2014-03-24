@@ -817,7 +817,9 @@ static char	*remedy_get_ticketid_by_eventid(zbx_uint64_t eventid)
 	char		*ticketid = NULL;
 
 	/* first check if the event is linked to an incident */
-	result = DBselect("select externalid from ticket where eventid=" ZBX_FS_UI64, eventid);
+	result = DBselect("select externalid from ticket"
+			" where eventid=" ZBX_FS_UI64
+			" order by clock desc", eventid);
 
 	if (NULL != (row = DBfetch(result)))
 		ticketid = zbx_strdup(NULL, row[0]);
@@ -1455,7 +1457,7 @@ out:
 			if (state == ZBX_REMEDY_PROCESS_AUTOMATED && ZBX_REMEDY_ACK_NONE != acknowledge_status)
 				remedy_acknowledge_event(eventid, userid, incident_number, acknowledge_status);
 
-			if (0 == is_registered)
+			if (0 == is_registered || 1 == is_new)
 				remedy_register_ticket(incident_number, eventid, triggerid, is_new);
 		}
 
