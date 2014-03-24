@@ -258,49 +258,29 @@ if (hasRequest('filter_rst')) {
 	CProfile::delete('web.items.filter_with_triggers');
 	CProfile::delete('web.items.filter_ipmi_sensor');
 }
-
-if (hasRequest('filter_set')) {
-	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
-	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
-	$_REQUEST['filter_application'] = get_request('filter_application');
-	$_REQUEST['filter_name'] = get_request('filter_name');
-	$_REQUEST['filter_type'] = get_request('filter_type', -1);
-	$_REQUEST['filter_key'] = get_request('filter_key');
-	$_REQUEST['filter_snmp_community'] = get_request('filter_snmp_community');
-	$_REQUEST['filter_snmpv3_securityname'] = get_request('filter_snmpv3_securityname');
-	$_REQUEST['filter_snmp_oid'] = get_request('filter_snmp_oid');
-	$_REQUEST['filter_port'] = get_request('filter_port');
-	$_REQUEST['filter_value_type'] = get_request('filter_value_type', -1);
-	$_REQUEST['filter_data_type'] = get_request('filter_data_type', -1);
-	$_REQUEST['filter_delay'] = get_request('filter_delay');
-	$_REQUEST['filter_history'] = get_request('filter_history');
-	$_REQUEST['filter_trends'] = get_request('filter_trends');
-	$_REQUEST['filter_status'] = get_request('filter_status', -1);
-	$_REQUEST['filter_state'] = get_request('filter_state', -1);
-	$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
-	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
-	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
-
-	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
-	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
-	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmpv3_securityname', $_REQUEST['filter_snmpv3_securityname'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmp_oid', $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_port', $_REQUEST['filter_port'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_value_type', $_REQUEST['filter_value_type'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_data_type', $_REQUEST['filter_data_type'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_delay', $_REQUEST['filter_delay'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_history', $_REQUEST['filter_history'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_trends', $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_state', $_REQUEST['filter_state'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
+elseif (hasRequest('filter_set')) {
+	CProfile::update('web.items.filter_groupid', get_request('filter_groupid', 0), PROFILE_TYPE_ID);
+	CProfile::update('web.items.filter_hostid', get_request('filter_hostid', 0), PROFILE_TYPE_ID);
+	CProfile::update('web.items.filter_application', get_request('filter_application'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_name', get_request('filter_name'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_type', get_request('filter_type', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_key', get_request('filter_key'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_snmp_community', get_request('filter_snmp_community'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_snmpv3_securityname', get_request('filter_snmpv3_securityname'),
+		PROFILE_TYPE_STR
+	);
+	CProfile::update('web.items.filter_snmp_oid', get_request('filter_snmp_oid'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_port', get_request('filter_port'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_value_type', get_request('filter_value_type', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_data_type', get_request('filter_data_type', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_delay', get_request('filter_delay'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_history', get_request('filter_history'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_trends', get_request('filter_trends'), PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_status', get_request('filter_status', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_state', get_request('filter_state', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_templated_items', get_request('filter_templated_items', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_with_triggers', get_request('filter_with_triggers', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_ipmi_sensor', get_request('filter_ipmi_sensor'), PROFILE_TYPE_STR);
 
 	// subfilters
 	foreach ($subfiltersList as $name) {
@@ -308,44 +288,44 @@ if (hasRequest('filter_set')) {
 		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 	}
 }
-else {
-	$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
-	$_REQUEST['filter_hostid'] = CProfile::get('web.items.filter_hostid');
-	$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
-	$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
-	$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
-	$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
-	$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
-	$_REQUEST['filter_snmpv3_securityname'] = CProfile::get('web.items.filter_snmpv3_securityname');
-	$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid');
-	$_REQUEST['filter_port'] = CProfile::get('web.items.filter_port');
-	$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
-	$_REQUEST['filter_data_type'] = CProfile::get('web.items.filter_data_type', -1);
-	$_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay');
-	$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history');
-	$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends');
-	$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
-	$_REQUEST['filter_state'] = CProfile::get('web.items.filter_state');
-	$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
-	$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
-	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 
-	// subfilters
-	foreach ($subfiltersList as $name) {
-		if (isset($_REQUEST['subfilter_set'])) {
-			$_REQUEST[$name] = get_request($name, array());
-			CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
-		}
-		else {
-			$_REQUEST[$name] = array();
-			$subfiltersVal = CProfile::get('web.items.'.$name);
-			if (!zbx_empty($subfiltersVal)) {
-				$_REQUEST[$name] = explode(';', $subfiltersVal);
-				$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
-			}
+$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
+$_REQUEST['filter_hostid'] = CProfile::get('web.items.filter_hostid');
+$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
+$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
+$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
+$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
+$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
+$_REQUEST['filter_snmpv3_securityname'] = CProfile::get('web.items.filter_snmpv3_securityname');
+$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid');
+$_REQUEST['filter_port'] = CProfile::get('web.items.filter_port');
+$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
+$_REQUEST['filter_data_type'] = CProfile::get('web.items.filter_data_type', -1);
+$_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay');
+$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history');
+$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends');
+$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
+$_REQUEST['filter_state'] = CProfile::get('web.items.filter_state', -1);
+$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
+$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
+$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
+
+// subfilters
+foreach ($subfiltersList as $name) {
+	if (isset($_REQUEST['subfilter_set'])) {
+		$_REQUEST[$name] = get_request($name, array());
+		CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
+	}
+	else {
+		$_REQUEST[$name] = array();
+		$subfiltersVal = CProfile::get('web.items.'.$name);
+		if (!zbx_empty($subfiltersVal)) {
+			$_REQUEST[$name] = explode(';', $subfiltersVal);
+			$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
 		}
 	}
 }
+
 
 if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 	if (!isset($host)) {
