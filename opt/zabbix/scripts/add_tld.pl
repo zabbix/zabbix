@@ -1160,14 +1160,20 @@ sub get_epp_passsalt {
     my $bin = "/opt/zabbix/bin/rsm_epp_enc";
     pfail("$bin not found") unless (-x $bin);
 
-    my $keysalt_file = "keysalt.txt";
-    pfail("cannot read file $keysalt_file") unless (-r $keysalt_file);
-
-    my $keysalt = `cat $keysalt_file`;
+    my $m = '{$RSM.EPP.KEYSALT}';
+    unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
+	    and defined $result->{'value'}) {
+	pfail('cannot get macro ', $m);
+    }
+    my $keysalt = $result->{'value'};
     trim($keysalt);
-    my $cmd = "/opt/zabbix/bin/rsm_epp_enc $keysalt";
+    pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
 
-    my $passsalt = `$cmd`;
+    $keysalt =~ s/\|/ /;
+    pfail("invalid output from $bin") unless ($passsalt =~ m/\|/);
+
+    print("Please enter EPP passphrase, then <ENTER> and then EPP password:\n");
+    my $passsalt = `$bin $keysalt noprompt`;
     pfail("invalid output from $bin") unless ($passsalt =~ m/\|/);
 
     trim($passsalt);
