@@ -358,6 +358,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */

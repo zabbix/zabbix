@@ -392,9 +392,10 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Delete Applications
+	 * Delete Applications.
 	 *
 	 * @param array $applicationids
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */

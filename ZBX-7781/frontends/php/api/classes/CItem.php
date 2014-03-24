@@ -622,6 +622,8 @@ class CItem extends CItemGeneral {
 	 * Delete items.
 	 *
 	 * @param array $itemids
+	 *
+	 * @return array
 	 */
 	public function delete(array $itemids, $nopermissions = false) {
 		if (empty($itemids)) {
