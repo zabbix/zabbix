@@ -75,8 +75,7 @@ $data['pageFilter'] = new CPageFilter(array(
 	),
 	'applications' => array('templated' => false),
 	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null),
-	'application' => get_request('application', null)
+	'groupid' => get_request('groupid', null)
 ));
 
 $data['groupid'] = $data['pageFilter']->groupid;

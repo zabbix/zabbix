@@ -203,7 +203,7 @@ class CPageFilter {
 
 	/**
 	 * Initialize filter features.
-	 * Supported: Host groups, Hosts, Triggers, Graphs, Applications, Discovery rules, Minimum trigger severities.
+	 * Supported: Host groups, Hosts, Triggers, Graphs, Discovery rules, Minimum trigger severities.
 	 *
 	 * @param array  $options
 	 * @param array  $options['config']
@@ -223,8 +223,6 @@ class CPageFilter {
 	 * @param string $options['triggerid']
 	 * @param array  $options['drules']
 	 * @param string $options['druleid']
-	 * @param array  $options['applications']
-	 * @param string $options['application']
 	 * @param array  $options['severitiesMin']
 	 * @param int    $options['severitiesMin']['default']
 	 * @param string $options['severitiesMin']['mapId']
@@ -292,11 +290,6 @@ class CPageFilter {
 			$this->_initDiscoveries($options['druleid'], $options['drules']);
 		}
 
-		// applications
-		if (isset($options['applications'])) {
-			$this->_initApplications($options['application'], $options['applications']);
-		}
-
 		// severities min
 		if (isset($options['severitiesMin'])) {
 			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin']);
@@ -322,7 +315,6 @@ class CPageFilter {
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
 		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
-		$this->_profileIdx['application'] = 'web.'.$profileSection.'.application';
 		$this->_profileIdx['severityMin'] = 'web.maps.severity_min';
 
 		if ($this->config['select_latest']) {
@@ -331,7 +323,6 @@ class CPageFilter {
 			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
-			$this->_profileIds['application'] = '';
 			$this->_profileIds['severityMin'] = null;
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
@@ -340,7 +331,6 @@ class CPageFilter {
 			$this->_profileIds['graphid'] = 0;
 			$this->_profileIds['triggerid'] = 0;
 			$this->_profileIds['druleid'] = 0;
-			$this->_profileIds['application'] = '';
 			$this->_profileIds['severityMin'] = null;
 		}
 		else {
@@ -349,7 +339,6 @@ class CPageFilter {
 			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
-			$this->_profileIds['application'] = CProfile::get($this->_profileIdx['application']);
 
 			// minimum severity
 			$mapId = isset($options['severitiesMin']['mapId']) ? $options['severitiesMin']['mapId'] : null;
@@ -361,7 +350,6 @@ class CPageFilter {
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
 		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
-		$this->_requestIds['application'] = isset($options['application']) ? $options['application'] : null;
 		$this->_requestIds['severityMin'] = isset($options['severityMin']) ? $options['severityMin'] : null;
 	}
 
@@ -677,54 +665,6 @@ class CPageFilter {
 	}
 
 	/**
-	 * Set applications related variables.
-	 *  - applications: all applications available for dropdown on page
-	 *  - application: application curently selected, can be '' for 'all' or 'not selected'
-	 *  - applicationsSelected: if an application selected, i.e. not 'not selected'
-	 * Applications are dependent on groups.
-	 *
-	 * @param int   $application
-	 * @param array $options
-	 */
-	private function _initApplications($application, array $options) {
-		$this->data['applications'] = array();
-
-		if (!$this->groupsSelected) {
-			$application = '';
-		}
-		else {
-			$def_options = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => array('name'),
-				'groupids' => ($this->groupid > 0) ? $this->groupid : null
-			);
-			$options = zbx_array_merge($def_options, $options);
-			$applications = API::Application()->get($options);
-
-			foreach ($applications as $app) {
-				$this->data['applications'][$app['name']] = $app;
-			}
-
-			// select remembered selection
-			if (is_null($application) && $this->_profileIds['application']) {
-				$application = $this->_profileIds['application'];
-			}
-
-			// nonexisting or unset application
-			if ((!isset($this->data['applications'][$application]) && $application !== '') || is_null($application)) {
-				$application = '';
-			}
-		}
-
-		if (!is_null($this->_requestIds['application'])) {
-			CProfile::update($this->_profileIdx['application'], $application, PROFILE_TYPE_STR);
-		}
-		$this->isSelected['applicationsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['applications'])) || $application !== '';
-		$this->isSelected['applicationsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['applications']) && $application === '';
-		$this->ids['application'] = $application;
-	}
-
-	/**
 	 * Initialize minimum trigger severities.
 	 *
 	 * @param string $severityMin
@@ -830,23 +770,6 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get applications combobox with selected item.
-	 *
-	 * @param bool $withNode
-	 *
-	 * @return CComboBox
-	 */
-	public function getApplicationsCB($withNode = false) {
-		$items = array();
-		foreach ($this->applications as $id => $application) {
-			$items[$id] = $application['name'];
-		}
-		return $this->_getCB('application', $this->application, $items, $withNode, array(
-			'objectName' => 'applications'
-		));
-	}
-
-	/**
 	 * Get minimum trigger severities combobox with selected item.
 	 *
 	 * @return CComboBox
@@ -890,12 +813,7 @@ class CPageFilter {
 				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
 			}
 
-			if ($name == 'application') {
-				$items = array('' => $firstLabel) + $items;
-			}
-			else {
-				$items = array($firstLabel) + $items;
-			}
+			$items = array($firstLabel) + $items;
 		}
 
 		foreach ($items as $id => $name) {
