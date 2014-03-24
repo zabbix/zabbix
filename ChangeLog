@@ -69,7 +69,7 @@ New features:
 .......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
