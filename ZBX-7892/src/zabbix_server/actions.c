@@ -1525,13 +1525,16 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	get_escalation_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_uint64_t actionid, const DB_EVENT *event, unsigned char recovery)
+static void	escalation_add_values(zbx_db_insert_t *db_insert, int escalations_num, zbx_uint64_t actionid,
+		const DB_EVENT *event, unsigned char recovery)
 {
 	zbx_uint64_t	escalationid, triggerid = 0, itemid = 0, eventid = 0, r_eventid = 0;
-	const char	*ins_escalation_sql =
-			"insert into escalations (escalationid,actionid,status,triggerid,itemid,eventid,r_eventid)"
-			" values ";
+
+	if (0 == escalations_num)
+	{
+		zbx_db_insert_prepare(db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
+				"itemid", "eventid", "r_eventid", NULL);
+	}
 
 	escalationid = DBget_maxid("escalations");
 
@@ -1551,20 +1554,8 @@ static void	get_escalation_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	else
 		r_eventid = event->eventid;
 
-	if (NULL == *sql)
-	{
-		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ins_escalation_sql);
-#endif
-	}
-
-#ifndef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ins_escalation_sql);
-#endif
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%s,%s,%s,%s)" ZBX_ROW_DL,
-			escalationid, actionid, ESCALATION_STATUS_ACTIVE, DBsql_id_ins(triggerid), DBsql_id_ins(itemid),
-			DBsql_id_ins(eventid), DBsql_id_ins(r_eventid));
+	zbx_db_insert_add_values(db_insert, escalationid, actionid, (int)ESCALATION_STATUS_ACTIVE, triggerid, itemid,
+			eventid, r_eventid);
 }
 
 /******************************************************************************
@@ -1585,11 +1576,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 	DB_ROW				row;
 	zbx_uint64_t			actionid;
 	unsigned char			evaltype;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0, i;
+	size_t				i;
 	zbx_vector_uint64_t		rec_actionids;	/* actionids of possible recovery events */
 	zbx_vector_uint64_pair_t	rec_mapping;	/* which action is possibly recovered by which event */
 	const DB_EVENT			*event;
+	zbx_db_insert_t			db_insert;
+	int				escalations_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -1614,7 +1606,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 			if (SUCCEED == check_action_conditions(event, actionid, evaltype))
 			{
-				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 0);
+				escalation_add_values(&db_insert, escalations_num++, actionid, event, 0);
 
 				if (EVENT_SOURCE_DISCOVERY == event->source ||
 						EVENT_SOURCE_AUTO_REGISTRATION == event->source)
@@ -1642,23 +1634,23 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 	if (0 != rec_actionids.values_num)
 	{
-		char		*sql2 = NULL;
-		size_t		sql2_alloc = 0, sql2_offset = 0;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
 		zbx_uint64_t	triggerid, itemid;
 
 		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		/* list of ongoing escalations matching actionids collected before */
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select actionid,triggerid,itemid"
 				" from escalations"
 				" where eventid is not null"
 					" and");
-		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "actionid",
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid",
 				rec_actionids.values, rec_actionids.values_num);
-		result = DBselect("%s", sql2);
-		zbx_free(sql2);
+		result = DBselect("%s", sql);
+		zbx_free(sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -1701,7 +1693,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 						continue;
 				}
 
-				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 1);
+				escalation_add_values(&db_insert, escalations_num++, actionid, event, 1);
 
 				break;
 			}
@@ -1712,15 +1704,10 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 	zbx_vector_uint64_pair_destroy(&rec_mapping);
 	zbx_vector_uint64_destroy(&rec_actionids);
 
-	if (NULL != sql)
+	if (0 != escalations_num)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
-		zbx_free(sql);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
