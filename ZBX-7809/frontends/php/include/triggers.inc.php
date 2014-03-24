@@ -2242,7 +2242,7 @@ function get_item_function_info($expr) {
 
 	$type_of_value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_BIG_DBL,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
 		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
@@ -2340,7 +2340,7 @@ function get_item_function_info($expr) {
 				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
 				$result['type'] = $result['type'][$itemFound['value_type']];
 
-				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_BIG_DBL) {
+				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
