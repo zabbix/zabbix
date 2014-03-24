@@ -492,7 +492,7 @@ out:
 #if defined(HAVE_SQLITE3)
 void	zbx_create_sqlite3_mutex(const char *dbname)
 {
-	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+	if (PHP_MUTEX_OK != php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("cannot create mutex for SQLite3");
 		exit(EXIT_FAILURE);
@@ -768,9 +768,10 @@ static sword	zbx_oracle_statement_prepare(const char *sql)
 static sword	zbx_oracle_bind_parameter(ub4 position, void *buffer, sb4 buffer_sz, ub2 dty)
 {
 	OCIBind	*bindhp = NULL;
+	sb2	is_null = -1;
 
 	return OCIBindByPos(oracle.stmthp, &bindhp, oracle.errhp, position, buffer, buffer_sz, dty,
-			0, 0, 0, 0, 0, (ub4)OCI_DEFAULT);
+			(dvoid *)(NULL == buffer ? &is_null : 0), 0, 0, 0, 0, (ub4)OCI_DEFAULT);
 }
 
 static sword	zbx_oracle_statement_execute(ub4 *nrows)
@@ -831,11 +832,24 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	switch (type)
 	{
 		case ZBX_TYPE_ID:
+			if ( 0 != *(zbx_uint64_t *)buffer)
+			{
+				err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(zbx_uint64_t),
+						SQLT_INT);
+			}
+			else
+				err = zbx_oracle_bind_parameter((ub4)position, NULL, 0, SQLT_INT);
+			break;
+		case ZBX_TYPE_UINT:
 			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(zbx_uint64_t), SQLT_INT);
 			break;
 		case ZBX_TYPE_INT:
 			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(int), SQLT_INT);
 			break;
+		case ZBX_TYPE_FLOAT:
+			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(double), SQLT_FLT);
+			break;
+		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:

@@ -1,3 +1,71 @@
+Changes for 2.2.3rc1
+
+New features:
+.......PS. [ZBXNEXT-2137] increased maximum cache size limit to 8gb from 2gb (Juris)
+.......PS. [ZBXNEXT-166] implemented variable binding for bulk inserts with Oracle database (wiper)
+.......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
+.D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
+A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
+A......... [ZBX-7409] fixed inherited web items being added to incorrect applications when updating a template web scenario (Pavels)
+..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
+..F....... [ZBX-7831] fixed regexp compilation errors for installations that use PHP with PCRE older than 7.0 (Pavels)
+..F....... [ZBX-7884] fixed incorrect layering of modal window and made modal windows draggable and opaque (Ivo)
+A......... [ZBX-7879] fixed creating and updating applications with multibyte characters in template which is linked to host while mbstring.func_overload set greater than 1 (Ivo)
+...G...PS. [ZBX-7919] fixed hashset entry allocation overhead (wiper)
+........S. [ZBX-7918] fixed value cache reporting more free space than actually available (wiper)
+A.F....... [ZBX-7832] fixed screen item row- and colspans not being adjusted when reducing the size of a screen (Pavels)
+........S. [ZBX-7620] improved error messaging and debug logging for VMware items (wiper)
+........S. [ZBX-7897] fixed memory leak in trapper for log file items (Juris)
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
+........S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
+..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed graph and graph prototype update validation allowing to pass only 'gitemid' parameter without 'itemid' (Ivo)
+........S. [ZBX-7737] fixed host inventory item update order to prevent database deadlocks (Juris)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
+...G...... [ZBX-7740] fixed agent crash if logrt and log items are not supported (Andris)
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
+.......PS. [ZBX-7840] fixed icmppingloss[] calculation when a DNS name is pingable by both IPv4 and IPv6 (asaveljevs)
+..F....... [ZBX-7883] fixed JS error when adding slides in configuration page (Ivo)
+........S. [ZBX-7836] fixed possible crash when a value older than the last item value was added to the value cache (wiper)
+..F....... [ZBX-7851] fixed item, trigger and discovery rule sorting by "Status" field (Ivo)
+..F....... [ZBX-7858] fixed some triggers not being displayed in Monitoring -> Triggers (Pavels)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+.......PS. [ZBX-7614] fixed incorrect activation of inactive host if its item has bad syntax (igors)
+A.F....... [ZBX-7829] fixed reserving of new ids for standalone installations (Sasha)
+A......... [ZBX-6742] fixed templated graph item validation when items seem to belong to multiple hosts (Ivo)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
+..F....... [ZBX-7808] fixed latest data columns width proportions (Eduard)
+........S. [ZBX-7817] fixed SQL errors while linking applications to a host (Sasha)
+..F....... [ZBX-7754] fixed possibility to add a trigger expression with log function selected and improved error messaging in trigger expression pop-up (Ivo)
+..F....... [ZBX-7768] fixed item valuemap import (Eduard)
+..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
+........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
+........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
+..F....... [ZBX-7772] fixed HTTP authentication error (Eduard)
+...G...PS. [ZBX-7670] added typecasts to void pointers when used in arithmetic to avoid compile warnings/errors (Juris)
+........S. [ZBX-7572] fixed processing of JSON object by trapper (igors)
+.......PS. [ZBX-7763] fixed checking the wrong exit code of php_get_sem() (igors)
+..F....... [ZBX-7770] removed web.page.perf item key from simple check item type (Eduard)
+..F....... [ZBX-7242] fixed jQuery sortable objects not to change with when dragging them (Ivo)
+..F....... [ZBX-7736] fixed incorrectly working global regular expression type "Any character string included" (Ivo)
+..F....... [ZBX-7756] fixed SQL error in Monitoring > Maps page (Ivo)
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
+..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
+..F....... [ZBX-7651] fixed item configuration flexible interval adding (Eduard)
+..F....... [ZBX-7630] fixed latest issues link on monitoring events (Eduard)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.2
 
 2.2.2rc3 was released as 2.2.2 without any changes
@@ -46,7 +114,7 @@ A......... [ZBX-7703] fixed being able to switch users without proper credential
 ........S. [ZBX-7561] fixed SQL errors while processing host prototypes under MySQL (Sasha)
 ..F....... [ZBX-7688] fixed discovery item import (Eduard)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
-...G...... [ZBX-7687] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
+...G...... [ZBX-7697] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
 ..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
@@ -63,7 +131,7 @@ A......... [ZBX-7660] fixed host.get returning the "templates" property even if 
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
 ..F....... [ZBX-7632] allow to add favourite graph from disable host (Eduard)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7590] fixed displaying functional macros in graph names when host visible name is not empty (Ivo)
 A......... [ZBX-7591] fixed deleting web scenario steps on template linked to host (Ivo)
@@ -352,7 +420,7 @@ Changes for 2.1.6
 
 New features:
 ..F....... [ZBX-2616] upgraded the bundled DejaVu font from 2.33 to 2.34 (Richlv)
-..F....... [ZBXNEXT-1763] added links to inventory in Monitoring -> Maps and Monitoring -> Latest Data (Oleg)
+..F....... [ZBXNEXT-1763] added link to inventory in Monitoring -> Maps and displayed link to inventory page for hosts without inventory data in Monitoring -> Latest Data (Oleg)
 ..F....... [ZBXNEXT-1763] added host related information under Monitoring (Oleg)
 ..F....... [ZBX-6983] changed the "Status of host group triggers" and "Status of host triggers" screen elements and the "Latest 20 issues" to display triggers without events (Pavels)
 ..F....... [ZBX-6983] renamed the "Status of host group triggers" screen element to "Latest host group issues" and "Status of host triggers" to "Latest host issues" (Pavels)
@@ -574,8 +642,8 @@ A......... [ZBXNEXT-109] improved discovery rule check deleting (Eduard)
 ...GI..PS. [ZBXNEXT-1550] added support of loadable modules for extending Zabbix agent checks, also server and proxy simple checks (Alexei)
 ........S. [ZBX-6226] added command request (global script) result logging (wiper)
 ...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
-A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
-A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
+A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavels, Sasha)
+A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavels, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete methods to accept both objects and IDs (Pavels)
 ...G...PS. [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file and allowed hosts for trapper items (wiper)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
@@ -795,6 +863,34 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.12rc1
+
+New features:
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
+.D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
+..F.....S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
+........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
+........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
+A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
+..F....... [ZBX-7739] removed unused label in screen configuration page when no elements exist (Eduard)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.11
 
 2.0.11rc2 was released as 2.0.11 without any changes
@@ -828,7 +924,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
@@ -2284,6 +2380,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.21rc1
+
+A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
+
 Changes for 1.8.20
 
 1.8.20rc2 was released as 1.8.20 without any changes

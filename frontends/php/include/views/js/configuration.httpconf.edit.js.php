@@ -24,7 +24,8 @@
 
 	function recalculateSortOrder() {
 		var i = 0;
-		jQuery('#httpStepTable').find('tr.sortable .rowNum').each(function() {
+
+		jQuery('#httpStepTable tr.sortable .rowNum').each(function() {
 			var step = (i == 0) ? '0' : i;
 
 			// rewrite ids to temp
@@ -44,8 +45,9 @@
 			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
 
 			// set order number
-			jQuery(this).attr('new_step', i);
-			jQuery(this).text((i + 1) + ':');
+			jQuery(this)
+				.attr('new_step', i)
+				.text((i + 1) + ':');
 			i++;
 		});
 
@@ -74,8 +76,8 @@
 			jQuery('#steps_' + newStep + '_httptestid').attr('name', 'steps[' + newStep + '][httptestid]');
 			jQuery('#steps_' + newStep + '_name').attr('name', 'steps[' + newStep + '][name]');
 			jQuery('#steps_' + newStep + '_no')
-					.attr('name', 'steps[' + newStep + '][no]')
-					.val(parseInt(newStep) + 1);
+				.attr('name', 'steps[' + newStep + '][no]')
+				.val(parseInt(newStep) + 1);
 			jQuery('#steps_' + newStep + '_url').attr('name', 'steps[' + newStep + '][url]');
 			jQuery('#steps_' + newStep + '_timeout').attr('name', 'steps[' + newStep + '][timeout]');
 			jQuery('#steps_' + newStep + '_posts').attr('name', 'steps[' + newStep + '][posts]');
@@ -89,10 +91,17 @@
 	}
 
 	jQuery(function($) {
-		'use strict';
+		var stepTable = $('#httpStepTable'),
+			stepTableWidth = stepTable.width(),
+			stepTableColumns = $('#httpStepTable .header td'),
+			stepTableColumnWidths = [];
 
-		$('#httpStepTable').sortable({
-			disabled: ($('#httpStepTable').find('tr.sortable').length <= 1),
+		stepTableColumns.each(function() {
+			stepTableColumnWidths[stepTableColumnWidths.length] = $(this).width();
+		});
+
+		stepTable.sortable({
+			disabled: (stepTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -100,14 +109,36 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
+			create: function () {
+				// force not to change table width
+				stepTable.width(stepTableWidth);
+			},
 			helper: function(e, ui) {
-				ui.children().each(function() {
-					jQuery(this).width(jQuery(this).width());
+				ui.children().each(function(i) {
+					var td = $(this);
+
+					td.width(stepTableColumnWidths[i]);
 				});
+
+				// when dragging element on safari, it jumps out of the table
+				if (SF) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				stepTableColumns.each(function(i) {
+					$(this).width(stepTableColumnWidths[i]);
+				});
+
 				return ui;
 			},
 			start: function(e, ui) {
+				// fix placeholder not to change height while object is beeing dragged
 				$(ui.placeholder).height($(ui.helper).height());
+
+				if (IE8) {
+					$('#stepTab #httpFormList ul.formlist').find('li.formrow');
+				}
 			}
 		});
 

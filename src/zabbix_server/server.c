@@ -341,7 +341,7 @@ static void	zbx_load_config()
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(8) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_UINT64,
@@ -658,7 +658,7 @@ int	MAIN_ZABBIX_ENTRY()
 	/* initialize history value cache */
 	zbx_vc_init();
 
-	zbx_create_services_lock();
+	zbx_create_itservices_lock();
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
@@ -920,7 +920,7 @@ void	zbx_on_exit()
 	/* free history value cache */
 	zbx_vc_destroy();
 
-	zbx_destroy_services_lock();
+	zbx_destroy_itservices_lock();
 
 	zbx_mutex_destroy(&node_sync_access);
 

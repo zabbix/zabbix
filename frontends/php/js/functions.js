@@ -1038,8 +1038,7 @@ function executeScript(hostId, scriptId, confirmation) {
 				id: 'scriptDialog',
 				css: {
 					display: 'none',
-					'white-space': 'normal',
-					'z-index': 1000
+					'white-space': 'normal'
 				}
 			});
 
@@ -1058,7 +1057,7 @@ function executeScript(hostId, scriptId, confirmation) {
 						jQuery(this).dialog('destroy');
 					}}
 				],
-				draggable: false,
+				draggable: true,
 				modal: true,
 				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
 				resizable: false,
@@ -1128,8 +1127,7 @@ function showModalWindow(title, text, buttons) {
 			css: {
 				padding: '10px',
 				display: 'none',
-				'white-space': 'normal',
-				'z-index': 1000
+				'white-space': 'normal'
 			}
 		});
 

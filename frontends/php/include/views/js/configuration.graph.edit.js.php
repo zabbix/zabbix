@@ -8,6 +8,9 @@
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
 		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
+		<?php endif; ?>
 	</td>
 
 	<!-- row number -->
@@ -28,8 +31,6 @@
 				<option value="<?php echo GRAPH_ITEM_SUM; ?>"><?php echo _('Graph sum'); ?></option>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
 	<?php endif; ?>
 
 	<!-- function -->
@@ -117,7 +118,7 @@
 		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
-		activateSortable();
+		initSortable();
 		incrementNextColor();
 		rewriteNameLinks();
 	}
@@ -246,102 +247,118 @@
 		rewriteNameLinks();
 	}
 
+	function initSortable() {
+		var itemsTable = jQuery('#itemsTable'),
+			itemsTableWidth = itemsTable.width(),
+			itemsTableColumns = jQuery('#itemsTable .header td'),
+			itemsTableColumnWidths = [];
+
+		itemsTableColumns.each(function() {
+			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
+		});
+
+		itemsTable.sortable({
+			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
+			items: 'tbody tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			handle: 'span.ui-icon-arrowthick-2-n-s',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			update: recalculateSortOrder,
+			create: function () {
+				// force not to change table width
+				itemsTable.width(itemsTableWidth);
+			},
+			helper: function(e, ui) {
+				ui.children().each(function(i) {
+					var td = jQuery(this);
+
+					td.width(itemsTableColumnWidths[i]);
+				});
+
+				// when dragging element on safari, it jumps out of the table
+				if (SF) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				itemsTableColumns.each(function(i) {
+					jQuery(this).width(itemsTableColumnWidths[i]);
+				});
+
+				return ui;
+			},
+			start: function(e, ui) {
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+			}
+		});
+	}
+
 	function activateSortable() {
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
 
-	function initSortable() {
-		jQuery(document).ready(function() {
-			'use strict';
-
-			jQuery('#itemsTable').sortable({
-				disabled: (jQuery('#itemsTable tr.sortable').length < 2),
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				cursor: 'move',
-				handle: 'span.ui-icon-arrowthick-2-n-s',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				update: recalculateSortOrder,
-				helper: function(e, ui) {
-					ui.children().each(function() {
-						jQuery(this).width(jQuery(this).width());
-					});
-					return ui;
-				},
-				start: function(e, ui) {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-				}
-			});
-		});
-	}
-
-	initSortable();
-
-	jQuery(document).ready(function() {
-		jQuery('#tab_previewTab').click(function() {
+	jQuery(function($) {
+		$('#tab_previewTab').click(function() {
 			var name = 'chart3.php';
-			var src = '&name=' + encodeURIComponent(jQuery('#name').val())
-						+ '&width=' + jQuery('#width').val()
-						+ '&height=' + jQuery('#height').val()
-						+ '&graphtype=' + jQuery('#graphtype').val()
-						+ '&legend=' + (jQuery('#show_legend').is(':checked') ? 1 : 0);
+			var src = '&name=' + encodeURIComponent($('#name').val())
+						+ '&width=' + $('#width').val()
+						+ '&height=' + $('#height').val()
+						+ '&graphtype=' + $('#graphtype').val()
+						+ '&legend=' + ($('#show_legend').is(':checked') ? 1 : 0);
 
 			<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 				name = 'chart7.php';
-				src += '&graph3d=' + (jQuery('#show_3d').is(':checked') ? 1 : 0);
+				src += '&graph3d=' + ($('#show_3d').is(':checked') ? 1 : 0);
 
 			<?php else: ?>
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-					src += '&percent_left=' + jQuery('#percent_left').val()
-							+ '&percent_right=' + jQuery('#percent_right').val();
+					src += '&percent_left=' + $('#percent_left').val()
+							+ '&percent_right=' + $('#percent_right').val();
 				<?php endif; ?>
 
-				src += '&ymin_type=' + jQuery('#ymin_type').val()
-							+ '&ymax_type=' + jQuery('#ymax_type').val()
-							+ '&yaxismin=' + jQuery('#yaxismin').val()
-							+ '&yaxismax=' + jQuery('#yaxismax').val()
-							+ '&ymin_itemid=' + jQuery('#ymin_itemid').val()
-							+ '&ymax_itemid=' + jQuery('#ymax_itemid').val()
-							+ '&showworkperiod=' + (jQuery('#show_work_period').is(':checked') ? 1 : 0)
-							+ '&showtriggers=' + (jQuery('#show_triggers').is(':checked') ? 1 : 0);
+				src += '&ymin_type=' + $('#ymin_type').val()
+							+ '&ymax_type=' + $('#ymax_type').val()
+							+ '&yaxismin=' + $('#yaxismin').val()
+							+ '&yaxismax=' + $('#yaxismax').val()
+							+ '&ymin_itemid=' + $('#ymin_itemid').val()
+							+ '&ymax_itemid=' + $('#ymax_itemid').val()
+							+ '&showworkperiod=' + ($('#show_work_period').is(':checked') ? 1 : 0)
+							+ '&showtriggers=' + ($('#show_triggers').is(':checked') ? 1 : 0);
 			<?php endif; ?>
 
-			jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
-				if (!jQuery.isEmptyObject(value) && value.name != null) {
+			$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
+				if (!$.isEmptyObject(value) && value.name != null) {
 					src += '&' + value.name + '=' + value.value;
 				}
 			});
 
-			jQuery('#previewTab img')
+			$('#previewTab img')
 				.attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif')
 				.width(80)
 				.height(12);
-			jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
-				jQuery('#previewChar img').remove();
-				jQuery('#previewChar').append(jQuery(this));
+			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
+				$('#previewChar img').remove();
+				$('#previewChar').append($(this));
 			});
 		});
-	});
 
-	<?php if (!empty($this->data['templateid'])): ?>
-		jQuery(document).ready(function() {
-			'use strict';
-
-			jQuery('#graphTab input, #graphTab select').each(function() {
-				jQuery(this).attr('disabled', 'disabled');
-				jQuery('#itemsTable').sortable({disabled: true});
+		<?php if (!empty($this->data['templateid'])): ?>
+			$('#graphTab input, #graphTab select').each(function() {
+				$(this).attr('disabled', 'disabled');
+				$('#itemsTable').sortable({disabled: true});
 			});
 
-			var size = jQuery('#itemsTable tr.sortable').length;
+			var size = $('#itemsTable tr.sortable').length;
 			for (var i = 0; i < size; i++) {
-				jQuery('.ui-icon').attr('class', 'ui-icon ui-icon-arrowthick-2-n-s state-disabled');
-				jQuery('#items_' + i + '_name').removeAttr('onclick');
-				jQuery('#items_' + i + '_name').removeAttr('class');
-				jQuery('#items_' + i + '_color').removeAttr('onchange');
-				jQuery('#lbl_items_' + i + '_color').removeAttr('onclick');
-				jQuery('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
+				$('.ui-icon').attr('class', 'ui-icon ui-icon-arrowthick-2-n-s state-disabled');
+				$('#items_' + i + '_name').removeAttr('onclick');
+				$('#items_' + i + '_name').removeAttr('class');
+				$('#items_' + i + '_color').removeAttr('onchange');
+				$('#lbl_items_' + i + '_color').removeAttr('onclick');
+				$('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
 			}
-		});
-	<?php endif; ?>
+		<?php endif; ?>
+	});
 </script>
