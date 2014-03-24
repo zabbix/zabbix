@@ -343,6 +343,7 @@ class CHttpTest extends CApiService {
 	 * Delete web scenario.
 	 *
 	 * @param array $httpTestIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */

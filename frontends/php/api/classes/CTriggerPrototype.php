@@ -568,7 +568,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Delete triggers.
+	 * Delete trigger prototypes.
 	 *
 	 * @param array 	$triggerIds array with trigger ids
 	 * @param bool      $nopermissions

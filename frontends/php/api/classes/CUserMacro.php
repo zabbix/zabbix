@@ -521,11 +521,11 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
-	 * Remove Macros from Hosts
+	 * Remove Macros from Hosts.
 	 *
 	 * @param array $hostMacroIds
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete(array $hostMacroIds) {
 		$this->validateDelete($hostMacroIds);
