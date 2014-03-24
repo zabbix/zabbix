@@ -64,6 +64,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.3rc1
 
 New features:
+.......PS. [ZBXNEXT-2137] increased maximum cache size limit to 8gb from 2gb (Juris)
 .......PS. [ZBXNEXT-166] implemented variable binding for bulk inserts with Oracle database (wiper)
 .......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
