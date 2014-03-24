@@ -51,28 +51,23 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 	const char	*__function_name = "parse_cfg_object";
 
-	int		ret = FAIL;
-
 #ifdef _WINDOWS
+	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char			file_name_1[MAX_PATH], file_name_2[MAX_PATH];
-	char			*fn_1 = &file_name_1[0], *fn_2 = &file_name_2[0];
-	wchar_t			file_name_tmp[MAX_PATH];
-	wchar_t			*file_name = &file_name_tmp[MAX_PATH];
-	int			i_path_len;
+	char 			*path_to_files_ansi = NULL, *path_to_files_ansi_2 = NULL;
+	wchar_t			*path_to_files_utf8 = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (MAX_PATH - 3 < (i_path_len = zbx_strlen_utf8(cfg_file) - 1))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "%s: path is too long", cfg_file);
-		goto out;
-	}
+	path_to_files_ansi = zbx_malloc(path_to_files_ansi, strlen(cfg_file) + 1);
 
-	zbx_snprintf(file_name_1, sizeof(file_name_1), "%s\\*", cfg_file);
-	file_name = zbx_utf8_to_unicode(file_name_1);
-	h_find = FindFirstFileW(file_name, &find_file_data);
+	zbx_snprintf(path_to_files_ansi, strlen(cfg_file) + 3, "%s\\*", cfg_file);
+
+	path_to_files_utf8 = zbx_malloc(path_to_files_utf8, strlen(path_to_files_ansi) * sizeof(wchar_t));
+	path_to_files_utf8 = zbx_utf8_to_unicode(path_to_files_ansi);
+
+	h_find = FindFirstFileW(path_to_files_utf8, &find_file_data);
 	if (INVALID_HANDLE_VALUE == h_find)
 		goto out;
 
@@ -81,46 +76,48 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
-		if (MAX_PATH < lstrlenW(find_file_data.cFileName) + i_path_len)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Skipping, path to conf file is too long");
-			continue;
-		}
+		path_to_files_ansi = zbx_unicode_to_utf8(find_file_data.cFileName);
+		path_to_files_ansi_2 = zbx_malloc(path_to_files_ansi_2,
+				strlen(cfg_file) + strlen(path_to_files_ansi) + 2);
+		zbx_snprintf(path_to_files_ansi_2,
+				strlen(cfg_file) + strlen(path_to_files_ansi) + 2,
+				"%s\\%s", cfg_file, path_to_files_ansi);
 
-		fn_1 = zbx_unicode_to_utf8(find_file_data.cFileName);
-		zbx_snprintf(file_name_2, sizeof(file_name_2), "%s\\%s", cfg_file, fn_1);
-
-		if (FAIL == __parse_cfg_file(file_name_2, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		if (FAIL == __parse_cfg_file(path_to_files_ansi_2, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
+			zbx_free(path_to_files_ansi_2);
 			FindClose(h_find);
 			goto out;
 		}
+		zbx_free(path_to_files_ansi_2);
 	}
 	FindClose(h_find);
+	ret = SUCCEED;
+out:
+	zbx_free(path_to_files_ansi);
+	zbx_free(path_to_files_utf8);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	return ret;
 #else
 	DIR		*dir;
 	struct stat	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	int		result = SUCCEED;
 
 	if (-1 == stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		goto out;
+		return FAIL;
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-	{
-		ret = __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-		goto out;
-	}
+		return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		goto out;
+		return FAIL;
 	}
 
 	while (NULL != (d = readdir(dir)))
@@ -131,20 +128,21 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		{
+			result = FAIL;
 			break;
+		}
 	}
 	zbx_free(incl_file);
 
 	if (-1 == closedir(dir))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		goto out;
+		return FAIL;
 	}
+
+	return result;
 #endif
-	ret = SUCCEED;	/* if all operations succeeded and no one called "goto out" */
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-	return ret;
 }
 
 /******************************************************************************
