@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 18:28+0200\n"
-"PO-Revision-Date: 2014-02-03 04:30+0300\n"
+"POT-Creation-Date: 2014-03-24 18:44+0200\n"
+"PO-Revision-Date: 2014-03-14 03:45+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391394612.0\n"
+"X-POOTLE-MTIME: 1394761527.0\n"
 
 #: api/classes/CMaintenance.php:354 api/classes/CMaintenance.php:359
 #: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:473
@@ -6114,7 +6114,6 @@ msgstr "横位置"
 #: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
 #: report2.php:364 report2.php:400 report5.php:59 tr_status.php:304
 #: tr_status.php:460
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
@@ -7424,7 +7423,7 @@ msgstr "ソースの値が正しくありません。"
 #: api/classes/CHost.php:570
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"のステータスが正しくありません。"
 
 #: api/classes/CHostPrototype.php:185
 #, c-format
@@ -7734,22 +7733,22 @@ msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのディスカバリルール\"%2$s\"のアイテムキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテム\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
 #: api/classes/CDRule.php:288 discoveryconf.php:97
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "キー\"%1$s\": %2$sが正しくありません。"
 
 #: maintenance.php:313
 msgid "Invalid maintenance period"
@@ -7860,7 +7859,7 @@ msgstr "アイテム"
 #: jsLoader.php:195
 #, c-format
 msgid "Item \"%1$s\""
-msgstr ""
+msgstr "アイテム\"%1$s\""
 
 #: api/classes/CItem.php:37
 #, c-format
@@ -7949,7 +7948,7 @@ msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在�
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "アイテムのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在します。"
 
 #: disc_prototypes.php:300
 msgid "Item prototype added"
@@ -8208,7 +8207,7 @@ msgstr "LDAP認証"
 
 #: authentication.php:132
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP認証を変更しました"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8562,11 +8561,11 @@ msgstr "ログイン失敗\"%s\""
 #: api/classes/CUser.php:1054
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "ユーザー名\"%1$s\"がHTTP認証で利用したユーザー名\"%2$s\"と一致しません。"
 
 #: authentication.php:122
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "ログイン名かパスワードが間違っています!"
 
 #: api/classes/CUser.php:934 api/classes/CUser.php:953
 #: api/classes/CUser.php:1002
@@ -11570,7 +11569,7 @@ msgstr "更新(秒)"
 
 #: jsLoader.php:207
 msgid "Refresh time"
-msgstr ""
+msgstr "リフレッシュ間隔"
 
 #: jsLoader.php:208
 msgid "Refresh time multiplier"
@@ -11692,7 +11691,7 @@ msgstr "削除"
 
 #: jsLoader.php:210
 msgid "Remove all"
-msgstr ""
+msgstr "すべて削除"
 
 #: include/views/configuration.sysmap.constructor.php:30
 msgid "Remove element"
@@ -12643,7 +12642,7 @@ msgstr "サービス"
 #: jsLoader.php:212
 #, c-format
 msgid "Service \"%1$s\""
-msgstr ""
+msgstr "サービス\"%1$s\""
 
 #: api/classes/CService.php:1301
 #, c-format
@@ -15860,7 +15859,7 @@ msgstr "期間中"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15877,7 +15876,7 @@ msgstr "アイテム"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "キーが設定されていません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1807
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:82
@@ -16114,7 +16113,7 @@ msgstr "検索文字列を入力"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "キーの末尾が間違っています"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337
