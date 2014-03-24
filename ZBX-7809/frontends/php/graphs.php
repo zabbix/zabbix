@@ -413,8 +413,8 @@ elseif (isset($_REQUEST['form'])) {
 		$data['height'] = $graph['height'];
 		$data['ymin_type'] = $graph['ymin_type'];
 		$data['ymax_type'] = $graph['ymax_type'];
-		$data['yaxismin'] = round($graph['yaxismin'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
-		$data['yaxismax'] = round($graph['yaxismax'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+		$data['yaxismin'] = $graph['yaxismin'];
+		$data['yaxismax'] = $graph['yaxismax'];
 		$data['ymin_itemid'] = $graph['ymin_itemid'];
 		$data['ymax_itemid'] = $graph['ymax_itemid'];
 		$data['show_work_period'] = $graph['show_work_period'];

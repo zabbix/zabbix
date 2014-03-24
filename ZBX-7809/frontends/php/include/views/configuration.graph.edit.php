@@ -69,25 +69,21 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Show triggers'), new CCheckBox('show_triggers', $this->data['show_triggers'], null, 1));
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
-		if (is_numeric($this->data['percent_left'])) {
-			$this->data['percent_left'] = sprintf('%2.2f', $this->data['percent_left']);
-		}
-		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 5, 'no', 6);
+		// percent left
+		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 6, 'no', 7);
 		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: showHideVisible("percent_left");', 1);
 
-		if (strcmp($this->data['percent_left'], '0.00') == 0) {
+		if ($this->data['percent_left'] == 0) {
 			$percentLeftTextBox->attr('style', 'visibility: hidden;');
 			$percentLeftCheckbox->setChecked(0);
 		}
 		$graphFormList->addRow(_('Percentile line (left)'), array($percentLeftCheckbox, SPACE, $percentLeftTextBox));
 
-		if (is_numeric($this->data['percent_right'])) {
-			$this->data['percent_right'] = sprintf('%2.2f', $this->data['percent_right']);
-		}
-		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 5, 'no', 6);
+		// percent right
+		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 6, 'no', 7);
 		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: showHideVisible("percent_right");', 1);
 
-		if (strcmp($this->data['percent_right'], '0.00') == 0) {
+		if ($this->data['percent_right'] == 0) {
 			$percentRightTextBox->attr('style', 'visibility: hidden;');
 			$percentRightCheckbox->setChecked(0);
 		}
