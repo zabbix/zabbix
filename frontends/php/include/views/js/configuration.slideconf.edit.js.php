@@ -127,10 +127,10 @@
 				slideTable.width(slideTableWidth);
 			},
 			helper: function(e, ui) {
-				ui.children().each(function() {
+				ui.children().each(function(i) {
 					var td = jQuery(this);
 
-					td.width(td.width());
+					td.width(slideTableColumnWidths[i]);
 				});
 
 				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
