@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:15+0200\n"
-"PO-Revision-Date: 2014-02-20 14:19+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2014-03-24 16:38+0200\n"
+"PO-Revision-Date: 2014-03-14 03:25+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392898787.0\n"
+"X-POOTLE-MTIME: 1394760335.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2084,7 +2084,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "トリガー条件式を追加できません"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -5392,7 +5392,7 @@ msgstr "関数"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "関数\"%1$s\"は選択されたアイテム\"%2$s\"と一緒に利用できません"
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -7804,7 +7804,7 @@ msgstr "アイテムが\"取得不可\"の状態"
 
 #: popup_trexpr.php:781
 msgid "Item not selected"
-msgstr ""
+msgstr "アイテムが選択されていません"
 
 #: include/forms.inc.php:1134
 msgid "Item prototype"

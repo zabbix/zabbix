@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:15+0200\n"
-"PO-Revision-Date: 2013-12-22 19:46+0300\n"
-"Last-Translator: Murat <murat@profelis.com.tr>\n"
+"POT-Creation-Date: 2014-03-24 16:38+0200\n"
+"PO-Revision-Date: 2014-03-24 14:43+0300\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: American English <>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1387734398.0\n"
+"X-POOTLE-MTIME: 1395665016.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -919,7 +919,7 @@ msgstr "Eksen yanı"
 #: include/func.inc.php:433
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
@@ -1067,7 +1067,7 @@ msgstr "SİMGE HARİTASI YAPILANDIRMASI"
 
 #: adm.images.php:150
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "RESİMLERİN YAPILANDIRMASI"
 
 #: include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.list.php:25
@@ -1447,7 +1447,7 @@ msgstr "Web senaryosu eklenemiyor"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Kimlik doğrulama değiştirilemiyor"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -2126,7 +2126,7 @@ msgstr ""
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "Kullanıcı iletişim aracı eklenemiyor."
 
 #: api/classes/CHost.php:1265
 msgid "Cannot link template"
@@ -2630,7 +2630,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:511
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
-msgstr ""
+msgstr "Dosya var mı diye kontrol et. 0 -  dosya yok, 1- dosya var."
 
 #: include/classes/items/CHelpItems.php:583
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
@@ -2914,7 +2914,7 @@ msgstr "Uygulamalarin yapılandırması"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Kimlik doğrulama yapılandırması"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
@@ -4445,12 +4445,12 @@ msgstr "Keşif kuralı"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" keşif kuralı zaten var, başka bir şablondan miras kalmış."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" keşif kuralı zaten var."
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -4460,7 +4460,7 @@ msgstr ""
 #: api/classes/CDRule.php:450 api/classes/CDRule.php:519
 #, c-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr ""
+msgstr "\"%s\" keşif kuralı zaten var."
 
 #: discoveryconf.php:140 host_discovery.php:263
 msgid "Discovery rule created"
@@ -4907,7 +4907,7 @@ msgstr "Seçilen öğeler etkinleştirilsin mi?"
 
 #: include/views/administration.mediatypes.list.php:114
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "Seçili iletişim aracı tipleri etkinleştirilsin mi?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected trigger prototypes?"
@@ -5573,19 +5573,19 @@ msgstr "Grafik"
 #: api/classes/CGraph.php:448 api/classes/CGraphPrototype.php:463
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" grafiği zaten var (başka bir şablondan miras kalmış)."
 
 #: api/classes/CGraph.php:469 api/classes/CGraph.php:476
 #: api/classes/CGraphPrototype.php:485 api/classes/CGraphPrototype.php:492
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" grafiği zaten var (öğeler eş değil)."
 
 #: api/classes/CGraph.php:427 api/classes/CGraphPrototype.php:441
 #: include/graphs.inc.php:365
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" grafiği zaten var."
 
 #: api/classes/CGraph.php:401 api/classes/CGraphPrototype.php:407
 #, c-format
@@ -5893,7 +5893,7 @@ msgstr "HTTP"
 
 #: authentication.php:222
 msgid "HTTP authentication"
-msgstr ""
+msgstr "HTTP kimlik doğrulaması"
 
 #: include/views/configuration.httpconf.edit.php:144
 msgid "HTTP proxy"
@@ -6073,7 +6073,7 @@ msgstr "Konak"
 #: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" konağı zaten var."
 
 #: api/classes/CProxy.php:591
 #, c-format
@@ -6143,7 +6143,7 @@ msgstr "Konak grubu"
 #: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
 #, c-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" konak grubu zaten var."
 
 #: api/classes/CHostGroup.php:645
 #, c-format
@@ -6243,12 +6243,12 @@ msgstr "Konak ağları"
 #: api/classes/CHostPrototype.php:785
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" konak prototipi zaten var, başka bir şablondan miras kalmış."
 
 #: api/classes/CHostPrototype.php:773
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" konak prototipi zaten var."
 
 #: api/classes/CHostPrototype.php:189
 #, c-format
@@ -6715,7 +6715,7 @@ msgstr "Resim"
 #: api/classes/CImage.php:257 api/classes/CImage.php:373
 #, c-format
 msgid "Image \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" resmi zaten var."
 
 #: adm.images.php:61
 msgid "Image added"
@@ -7001,12 +7001,12 @@ msgstr "Yönteme geçersiz değişkenler geçirildi."
 #: api/classes/CDRule.php:353
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" keşif kuralı için geçersiz kimlik doğrulama protokolü."
 
 #: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" öğesi için geçersiz kimlik doğrulama protokolü."
 
 #: api/classes/CService.php:1145
 #, c-format
@@ -7779,7 +7779,7 @@ msgstr "Öğe"
 #: api/classes/CItem.php:37
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" öğesi zaten var, başka bir şablondan miras kalmış."
 
 #: api/classes/CItem.php:38
 #, c-format
@@ -7865,7 +7865,7 @@ msgstr "Öğe prototipi \"%1$s\" zaten \"%2$s üzerinde bulunuyor, başka bir ş
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" öğesi zaten var."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8121,11 +8121,11 @@ msgstr "LDAP"
 
 #: authentication.php:219
 msgid "LDAP authentication"
-msgstr ""
+msgstr "LDAP kimlik doğrulaması"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP kimlik doğrulaması değiştirildi"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8566,7 +8566,7 @@ msgstr "Makro"
 #: api/classes/CUserMacro.php:757
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" makrosu zaten var."
 
 #: api/classes/CUserMacro.php:802
 #, c-format
@@ -8946,7 +8946,7 @@ msgstr "İletişim aracı tipleri"
 #: api/classes/CMediatype.php:346
 #, c-format
 msgid "Media types used by action \"%s\"."
-msgstr ""
+msgstr "\"%s\" eylemi tarafından kullanılan iletişim aracı tipleri."
 
 #: include/func.inc.php:677
 msgid "Mega"
@@ -9455,17 +9455,17 @@ msgstr "Hayır"
 #: api/classes/CGraphPrototype.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph prototype."
-msgstr ""
+msgstr "Grafik prototipi için hiçbir \"%1$s\" verilmemiş."
 
 #: api/classes/CGraph.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph."
-msgstr ""
+msgstr "Grafik için hiçbir \"%1$s\" verilmemiş."
 
 #: api/classes/CHostPrototype.php:457
 #, c-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr ""
+msgstr "Konak prototipi için hiçbir \"%1$s\" verilmemiş."
 
 #: api/classes/CScreen.php:487
 #, c-format
@@ -9480,17 +9480,17 @@ msgstr ""
 #: api/classes/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" konak prototipi için hiçbir \"%2$s\" verilmemiş."
 
 #: include/classes/import/CXmlImport18.php:1568
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
-msgstr ""
+msgstr "\"%s\" grafiği için \"ymax_type\" alanı yok."
 
 #: include/classes/import/CXmlImport18.php:1564
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
-msgstr ""
+msgstr "\"%s\" grafiği için \"ymin_type\" alanı yok."
 
 #: include/views/configuration.host.edit.php:373
 #: include/views/configuration.host.prototype.edit.php:143
@@ -9533,7 +9533,7 @@ msgstr "Hiçbir erişilebilir kaynak yok"
 
 #: include/acknow.inc.php:48
 msgid "No acknowledges found."
-msgstr ""
+msgstr "Hiçbir onaylama bulunmadı."
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
@@ -9573,7 +9573,7 @@ msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı i
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
-msgstr ""
+msgstr "Hiçbir kimlik doğrulama kullanıcı adı belirtilmedi."
 
 #: api/classes/CAction.php:1341
 msgid "No command specified for action operation."
@@ -9610,7 +9610,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:273
 #: include/views/configuration.triggers.massupdate.php:84
 msgid "No dependencies defined."
-msgstr ""
+msgstr "Hiçbir bağımlılık tanımlanmadı."
 
 #: api/rpc/class.cjsonrpc.php:207 api/rpc/class.cjsonrpc.php:212
 #: api/rpc/class.cjsonrpc.php:217
@@ -9619,16 +9619,16 @@ msgstr "Hiçbir detay yok"
 
 #: include/views/monitoring.discovery.php:36
 msgid "No discovered devices found."
-msgstr ""
+msgstr "Hiçbir keşfedilmiş aygıt bulunmadı."
 
 #: api/classes/CHostPrototype.php:112
 #, c-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" konak prototipi için hiçbir keşif kural ID verilmedi."
 
 #: api/classes/CDiscoveryRule.php:444
 msgid "No discovery rule IDs given."
-msgstr ""
+msgstr "Hiçbir keşif kural ID verilmedi."
 
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.host.discovery.list.php:42 popup.php:1396
@@ -9664,7 +9664,7 @@ msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:156
 msgid "No file was uploaded."
-msgstr ""
+msgstr "Hiçbir dosya yüklenmedi."
 
 #: include/views/configuration.item.edit.php:273
 #: include/views/configuration.item.massupdate.php:318
@@ -9673,16 +9673,16 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:482
 msgid "No graph ID provided for screen element."
-msgstr ""
+msgstr "Ekran elemanı için hiçbir grafik ID sağlanmadı."
 
 #: include/graphs.inc.php:294
 #, c-format
 msgid "No graph item with graphid \"%s\"."
-msgstr ""
+msgstr "\"%s\" graphid için hiçbir grafik öğesi yok."
 
 #: include/views/configuration.graph.list.php:73
 msgid "No graph prototypes found."
-msgstr ""
+msgstr "Hiçbir grafik prototipi yok."
 
 #: include/blocks.inc.php:28
 msgid "No graphs added."
@@ -9696,11 +9696,11 @@ msgstr "Hiçbir grafik bulunmadı."
 #: api/classes/CHost.php:701 api/classes/CHost.php:711
 #, c-format
 msgid "No groups for host \"%s\"."
-msgstr ""
+msgstr "\"%s\" konağı için hiçbir grup yok."
 
 #: api/classes/CHost.php:1076
 msgid "No groups for hosts."
-msgstr ""
+msgstr "Konaklar için hiçbir grup yok."
 
 #: api/classes/CTemplate.php:833
 msgid "No groups for template"
@@ -10321,7 +10321,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:631
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor üzerindeki işlemci çekirdeği sayısı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10329,7 +10329,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:691
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware hypervisor üzerindeki işlemci sayısı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: popup_trexpr.php:479
 msgid "Number of seconds since the Epoch is < N"
@@ -10422,7 +10422,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:683
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor üzerindeki sanal makina sayısı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/forms.inc.php:425 include/items.inc.php:123
 #: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
@@ -10618,7 +10618,7 @@ msgstr "Yalnızca bir kontrol tekil olabilir."
 
 #: api/classes/CUserGroup.php:420
 msgid "Only one user group name can be changed at a time."
-msgstr ""
+msgstr "Bir kerede yalnızca bir kullanıcı grup adı değiştirilebilir."
 
 #: include/services.inc.php:299
 #, c-format
@@ -12206,7 +12206,7 @@ msgstr ""
 #: api/classes/CScreen.php:396 api/classes/CScreen.php:469
 #, c-format
 msgid "Screen \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" ekranı zaten var."
 
 #: api/classes/CScreenItem.php:821 api/classes/CScreenItem.php:845
 #, c-format
@@ -12292,7 +12292,7 @@ msgstr "Betik"
 #: api/classes/CScript.php:617
 #, c-format
 msgid "Script \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" betiği zaten var."
 
 #: scripts.php:126
 msgid "Script added"
@@ -12816,7 +12816,7 @@ msgstr "Slayt gösterisi"
 #: include/screens.inc.php:243
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" slayt gösterisi zaten var."
 
 #: include/screens.inc.php:181
 #, c-format
@@ -13160,7 +13160,7 @@ msgstr ""
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr ""
+msgstr "Kimlik doğrulama yöntemini değiştirmek bu oturum dışındaki bütün oturumları resetler! Devam edilsin mi?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:139
 msgid "System default"
@@ -13269,7 +13269,7 @@ msgstr "Şablon"
 #: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" şablonu zaten var."
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, c-format
@@ -13312,7 +13312,7 @@ msgstr "Şablon ismi"
 #: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" şablon ekranı zaten var."
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
@@ -13708,7 +13708,7 @@ msgstr "Tetik"
 #: api/classes/CTriggerGeneral.php:283
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\" üzerinde \"%1$s\" tetiği zaten var."
 
 #: include/classes/import/CConfigurationImport.php:1106
 #: include/classes/import/CConfigurationImport.php:1142
@@ -14638,11 +14638,11 @@ msgstr "Bloklaması kaldırılmış kullanıcılar"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
-msgstr ""
+msgstr "VMware önbellek istatistikleri. Geçerli modlar: total, free, pfree, used ve pused."
 
 #: include/classes/items/CHelpItems.php:587
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
-msgstr ""
+msgstr "VMware cluster durumu,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:591
 msgid "VMware event log, <url> - VMware service URL"
@@ -14650,7 +14650,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:647
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor BIOS uuid,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14658,7 +14658,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:603
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor cluster adı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:611
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -14670,11 +14670,11 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:643
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor modeli,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor adı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -14686,23 +14686,23 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor işlemci frekansı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor işlemci modeli,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:607
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor Hz olarak işlemci kullanımı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor durumu,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor toplam bellek miktarı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14710,15 +14710,15 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor kullanılan bellek miktarı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor üretici adı,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor versiyonu,<url> - VMware servis URL, <uuid> - VMware hypervisor konak adı"
 
 #: include/classes/items/CHelpItems.php:595
 msgid "VMware service full name, <url> - VMware service URL"
@@ -14738,19 +14738,19 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware sanal makina sıkıştırılmış bellek miktarı,<url> - VMware servis URL, <uuid> - VMware sanal makina konak adı"
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware sanal makina disk aygıtı okuma istatistikleri,<url> - VMware servis URL, <uuid> - VMware sanal makina konak adı, <instance> - disk aygıtı durumu instance, <mode> - bps/ops - saniyedeki byte/operasyon"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware sanal makina disk aygıtı yazma istatistikleri,<url> - VMware servis URL, <uuid> - VMware sanal makina konak adı, <instance> - disk aygıtı durumu instance, <mode> - bps/ops - saniyedeki byte/operasyon"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
-msgstr ""
+msgstr "VMware sanal makina dosya sistemi istatistikleri, <url> - VMware servis URL, <uuid> - VMware sanal makina konak adı, <fsname> - dosya sistemi adı, <mode> - total/free/used/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15010,7 +15010,7 @@ msgstr ""
 #: api/classes/CHttpTest.php:479 api/classes/CHttpTest.php:531
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" web senaryosu zaten var."
 
 #: httpconf.php:122 httpconf.php:326
 msgid "Web scenario deleted"
@@ -15040,7 +15040,7 @@ msgstr ""
 #: api/classes/CHttpTest.php:610
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" web senaryo adımı zaten var."
 
 #: api/classes/CHttpTest.php:590
 msgid "Web scenario step name should contain only printable characters."
@@ -15143,25 +15143,25 @@ msgstr "Yaz"
 #: api/classes/CService.php:397
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için olan bağımlılıklar için yanlış alanlar:"
 
 #: api/classes/CMapElement.php:55
 msgid "Wrong fields for element."
-msgstr ""
+msgstr "Eleman için yanlış alanlar."
 
 #: api/classes/CHost.php:665
 #, c-format
 msgid "Wrong fields for host \"%s\"."
-msgstr ""
+msgstr "\"%s\" konağı için yanlış alanlar."
 
 #: api/classes/CImage.php:254
 #, c-format
 msgid "Wrong fields for image \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" resmi için yanlış alanlar."
 
 #: api/classes/CImage.php:362
 msgid "Wrong fields for image."
-msgstr ""
+msgstr "Resim için yanlış alanlar."
 
 #: api/classes/CMapElement.php:497
 msgid "Wrong fields for linktrigger delete."
@@ -15179,7 +15179,7 @@ msgstr ""
 #: api/classes/CUserMacro.php:438 api/classes/CUserMacro.php:498
 #, c-format
 msgid "Wrong fields for macro \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" makrosu için yanlış alanlar."
 
 #: api/classes/CMapElement.php:181
 msgid "Wrong fields for map link."
@@ -15187,30 +15187,30 @@ msgstr ""
 
 #: api/classes/CMediatype.php:232 api/classes/CMediatype.php:283
 msgid "Wrong fields for media type."
-msgstr ""
+msgstr "İletişim aracı tipi için yanlış alanlar."
 
 #: api/classes/CProxy.php:207
 #, c-format
 msgid "Wrong fields for proxy \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" vekili için yanlış alanlar."
 
 #: api/classes/CScript.php:405
 msgid "Wrong fields for script."
-msgstr ""
+msgstr "Betik için yanlış alanlar."
 
 #: api/classes/CService.php:127 api/classes/CService.php:238
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için yanlış alanlar."
 
 #: api/classes/CService.php:481
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için olan zaman için yanlış alanlar."
 
 #: api/classes/CTriggerPrototype.php:501 api/classes/CTriggerPrototype.php:557
 msgid "Wrong fields for trigger."
-msgstr ""
+msgstr "Tetik için yanlış alanlar."
 
 #: api/classes/CUser.php:283
 #, c-format
@@ -15220,7 +15220,7 @@ msgstr "\"%s\" kullanıcısı için yanlış alanlar."
 #: api/classes/CUserMacro.php:656
 #, c-format
 msgid "Wrong macro \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" makrosu yanlış."
 
 #: include/views/js/configuration.sysmaps.js.php:167
 msgid "X"
@@ -15540,7 +15540,7 @@ msgstr "[H:i:s]"
 #: include/func.inc.php:158
 #, c-format
 msgid "[Wrong value for day: \"%s\" ]"
-msgstr ""
+msgstr "[Gün için yanlış değer: \"%s\" ]"
 
 #: include/func.inc.php:143
 #, c-format

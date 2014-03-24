@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:15+0200\n"
-"PO-Revision-Date: 2014-02-02 16:12+0300\n"
+"POT-Creation-Date: 2014-03-24 16:38+0200\n"
+"PO-Revision-Date: 2014-03-05 23:16+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391350328.0\n"
+"X-POOTLE-MTIME: 1394054209.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2159,7 +2159,7 @@ msgstr "Nie je možné vložiť view súbor \"%s\"."
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Nie je možné vložiť výraz spúšťača"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -5474,7 +5474,7 @@ msgstr "Funkcia"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "Funkcia \"%1$s\" nemôže byť použitá s vybranou položkou \"%2$s\""
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -7898,7 +7898,7 @@ msgstr "Položka je v \"not supported\" stave"
 
 #: popup_trexpr.php:781
 msgid "Item not selected"
-msgstr ""
+msgstr "Položka nevybraná"
 
 #: include/forms.inc.php:1134
 msgid "Item prototype"
