@@ -55,47 +55,39 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path_to_files_ansi = NULL, *path_to_files_ansi_2 = NULL;
-	wchar_t			*path_to_files_utf8 = NULL;
+	char 			*path = NULL;
+	wchar_t			*wpath = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	path_to_files_ansi = zbx_malloc(path_to_files_ansi, strlen(cfg_file) + 1);
+	path  = zbx_dsprintf(path, "%s\\*", cfg_file);
+	wpath = zbx_utf8_to_unicode(path);
+	zbx_free(path);
 
-	zbx_snprintf(path_to_files_ansi, strlen(cfg_file) + 3, "%s\\*", cfg_file);
-
-	path_to_files_utf8 = zbx_malloc(path_to_files_utf8, strlen(path_to_files_ansi) * sizeof(wchar_t));
-	path_to_files_utf8 = zbx_utf8_to_unicode(path_to_files_ansi);
-
-	h_find = FindFirstFileW(path_to_files_utf8, &find_file_data);
-	if (INVALID_HANDLE_VALUE == h_find)
+	if (INVALID_HANDLE_VALUE == (h_find = FindFirstFileW(wpath, &find_file_data)))
+	{
+		zbx_free(wpath);
 		goto out;
+	}
+	zbx_free(wpath);
 
 	while (0 != FindNextFileW(h_find, &find_file_data))
 	{
 		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
-		path_to_files_ansi = zbx_unicode_to_utf8(find_file_data.cFileName);
-		path_to_files_ansi_2 = zbx_malloc(path_to_files_ansi_2,
-				strlen(cfg_file) + strlen(path_to_files_ansi) + 2);
-		zbx_snprintf(path_to_files_ansi_2,
-				strlen(cfg_file) + strlen(path_to_files_ansi) + 2,
-				"%s\\%s", cfg_file, path_to_files_ansi);
-
-		if (FAIL == __parse_cfg_file(path_to_files_ansi_2, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		path = zbx_dsprintf(path, "%s\\%s", cfg_file, zbx_unicode_to_utf8(find_file_data.cFileName));
+		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
-			zbx_free(path_to_files_ansi_2);
+			zbx_free(path);
 			FindClose(h_find);
 			goto out;
 		}
-		zbx_free(path_to_files_ansi_2);
+		zbx_free(path);
 	}
 	FindClose(h_find);
 	ret = SUCCEED;
 out:
-	zbx_free(path_to_files_ansi);
-	zbx_free(path_to_files_utf8);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 #else
