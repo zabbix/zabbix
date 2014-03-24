@@ -1,12 +1,14 @@
 Changes for 2.2.3rc1
 
 New features:
+.......PS. [ZBXNEXT-166] implemented variable binding for bulk inserts with Oracle database (wiper)
 .......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-7409] fixed inherited web items being added to incorrect applications when updating a template web scenario (Pavels)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F....... [ZBX-7831] fixed regexp compilation errors for installations that use PHP with PCRE older than 7.0 (Pavels)
