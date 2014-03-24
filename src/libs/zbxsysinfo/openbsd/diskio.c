@@ -154,7 +154,7 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_FAIL = ret)
+	if (SYSINFO_RET_FAIL == ret)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 	}
@@ -186,7 +186,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_FAIL = ret)
+	if (SYSINFO_RET_FAIL == ret)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
 	}
