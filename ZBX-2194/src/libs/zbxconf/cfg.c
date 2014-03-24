@@ -167,7 +167,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
-	wchar_t		file_name_1[MAX_PATH], *file_name_1p = &file_name_1[0];
+	wchar_t		*file_name;
 #endif
 	if (++level > ZBX_MAX_INCLUDE_LEVEL)
 	{
@@ -179,8 +179,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	{
 #ifdef _WINDOWS
 		/* this section needed when processing directory with config files */
-		file_name_1p = zbx_utf8_to_unicode(cfg_file);
-		if (NULL == (file = _wfopen(file_name_1p, L"r")))
+		file_name = zbx_utf8_to_unicode(cfg_file);
+		file = _wfopen(file_name, L"r");
+		zbx_free(file_name);
+		if (NULL == file)
 			goto cannot_open;
 #else
 		if (NULL == (file = fopen(cfg_file, "r")))
