@@ -74,12 +74,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-$_REQUEST['alias'] = isset($_REQUEST['filter_rst'])
-	? ''
-	: get_request('alias', CProfile::get('web.auditacts.filter.alias', ''));
-
-if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
-	CProfile::update('web.auditacts.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
+if (hasRequest('filter_set')) {
+	CProfile::update('web.auditacts.filter.alias', getRequest('alias'), PROFILE_TYPE_STR);
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::delete('web.auditacts.filter.alias');
 }
 
 /*
@@ -89,7 +88,7 @@ $effectivePeriod = navigation_bar_calc('web.auditacts.timeline', 0, true);
 
 $data = array(
 	'stime' => getRequest('stime'),
-	'alias' => getRequest('alias'),
+	'alias' => CProfile::get('web.auditacts.filter.alias', ''),
 	'users' => array(),
 	'alerts' => array(),
 	'paging' => null

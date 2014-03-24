@@ -153,17 +153,17 @@ if ($exportData) {
 /*
  * Filter
  */
-if (hasRequest('filter_rst')) {
-	CProfile::delete('web.hosts.filter_ip');
-	CProfile::delete('web.hosts.filter_dns');
-	CProfile::delete('web.hosts.filter_host');
-	CProfile::delete('web.hosts.filter_port');
-}
-elseif (hasRequest('filter_set')) {
+if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_ip', getRequest('filter_ip'), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns'), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host'), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port'), PROFILE_TYPE_STR);
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::delete('web.hosts.filter_ip');
+	CProfile::delete('web.hosts.filter_dns');
+	CProfile::delete('web.hosts.filter_host');
+	CProfile::delete('web.hosts.filter_port');
 }
 
 $filter['ip'] = CProfile::get('web.hosts.filter_ip');

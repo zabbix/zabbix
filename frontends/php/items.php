@@ -237,28 +237,7 @@ if (!empty($hosts)) {
 /*
  * Filter
  */
-if (hasRequest('filter_rst')) {
-	CProfile::delete('web.items.filter_groupid');
-	CProfile::delete('web.items.filter_application');
-	CProfile::delete('web.items.filter_name');
-	CProfile::delete('web.items.filter_type');
-	CProfile::delete('web.items.filter_key');
-	CProfile::delete('web.items.filter_snmp_community');
-	CProfile::delete('web.items.filter_snmpv3_securityname');
-	CProfile::delete('web.items.filter_snmp_oid');
-	CProfile::delete('web.items.filter_port');
-	CProfile::delete('web.items.filter_value_type');
-	CProfile::delete('web.items.filter_data_type');
-	CProfile::delete('web.items.filter_delay');
-	CProfile::delete('web.items.filter_history');
-	CProfile::delete('web.items.filter_trends');
-	CProfile::delete('web.items.filter_status');
-	CProfile::delete('web.items.filter_state');
-	CProfile::delete('web.items.filter_templated_items');
-	CProfile::delete('web.items.filter_with_triggers');
-	CProfile::delete('web.items.filter_ipmi_sensor');
-}
-elseif (hasRequest('filter_set')) {
+if (hasRequest('filter_set')) {
 	CProfile::update('web.items.filter_groupid', getRequest('filter_groupid', 0), PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_hostid', getRequest('filter_hostid', 0), PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', getRequest('filter_application'), PROFILE_TYPE_STR);
@@ -287,6 +266,27 @@ elseif (hasRequest('filter_set')) {
 		$_REQUEST[$name] = array();
 		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
 	}
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::delete('web.items.filter_groupid');
+	CProfile::delete('web.items.filter_application');
+	CProfile::delete('web.items.filter_name');
+	CProfile::delete('web.items.filter_type');
+	CProfile::delete('web.items.filter_key');
+	CProfile::delete('web.items.filter_snmp_community');
+	CProfile::delete('web.items.filter_snmpv3_securityname');
+	CProfile::delete('web.items.filter_snmp_oid');
+	CProfile::delete('web.items.filter_port');
+	CProfile::delete('web.items.filter_value_type');
+	CProfile::delete('web.items.filter_data_type');
+	CProfile::delete('web.items.filter_delay');
+	CProfile::delete('web.items.filter_history');
+	CProfile::delete('web.items.filter_trends');
+	CProfile::delete('web.items.filter_status');
+	CProfile::delete('web.items.filter_state');
+	CProfile::delete('web.items.filter_templated_items');
+	CProfile::delete('web.items.filter_with_triggers');
+	CProfile::delete('web.items.filter_ipmi_sensor');
 }
 
 $_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
