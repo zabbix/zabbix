@@ -352,6 +352,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$decimalValidator = new CDecimalValidator(array(
 			'label' => $caption,
 			'maxScale' => 4,
+			'messageFormat' => _('Value "%1$s" of "%2$s" has incorrect decimal format.'),
 			'messageScale' => _(
 				'Value "%1$s" of "%2$s" has too many digits after the decimal point: '.
 				'it cannot have more then %3$s digits.'
