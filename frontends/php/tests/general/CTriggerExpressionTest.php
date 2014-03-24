@@ -71,23 +71,23 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key}', null, false),
 			array('{host:key.str}', null, false),
 
-			array('{host:key.diff()} & {TRIGGER.VALUE}', null, true),
-			array('{host:key.diff()}& {TRIGGER.VALUE}', null, true),
-			array('{host:key.diff()}  &{TRIGGER.VALUE}', null, true),
-			array('{host:key.diff()}&{TRIGGER.VALUE}', null, true),
-			array('{host:key.diff()}&+{TRIGGER.VALUE}', null, false),
-			array('{host:key.diff()}&-{TRIGGER.VALUE}', null, true),
-			array('{host:key.diff()} & + {TRIGGER.VALUE}', null, false),
-			array('{host:key.diff()} & - {TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()} and {TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()}and {TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()}  and{TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()}and{TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()}and+{TRIGGER.VALUE}', null, false),
+			array('{host:key.diff()}and-{TRIGGER.VALUE}', null, true),
+			array('{host:key.diff()} and + {TRIGGER.VALUE}', null, false),
+			array('{host:key.diff()} and - {TRIGGER.VALUE}', null, true),
 
-			array('{host:key.diff()} & {$USERMACRO}', null, true),
-			array('{host:key.diff()}& {$USERMACRO}', null, true),
-			array('{host:key.diff()} &{$USERMACRO}', null, true),
-			array('{host:key.diff()}&{$USERMACRO}', null, true),
-			array('{host:key.diff()}&+{$USERMACRO}', null, false),
-			array('{host:key.diff()}&-{$USERMACRO}', null, true),
-			array('{host:key.diff()} & + {$USERMACRO}', null, false),
-			array('{host:key.diff()} & - {$USERMACRO}', null, true),
+			array('{host:key.diff()} and {$USERMACRO}', null, true),
+			array('{host:key.diff()}and {$USERMACRO}', null, true),
+			array('{host:key.diff()} and{$USERMACRO}', null, true),
+			array('{host:key.diff()}and{$USERMACRO}', null, true),
+			array('{host:key.diff()}and+{$USERMACRO}', null, false),
+			array('{host:key.diff()}and-{$USERMACRO}', null, true),
+			array('{host:key.diff()} and + {$USERMACRO}', null, false),
+			array('{host:key.diff()} and - {$USERMACRO}', null, true),
 
 			array('{host:key.diff()}=00', null, true),
 			array('{host:key.diff()}=0 0', null, false),
@@ -173,388 +173,388 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.last(1)} + (-1)', null, true),
 			array('{host:key.last(1)} - (-1)', null, true),
 			array('{host:key.last(1)} = (-1)', null, true),
-			array('{host:key.last(1)} # (-1)', null, true),
+			array('{host:key.last(1)} <> (-1)', null, true),
 			array('{host:key.last(1)} < (-1)', null, true),
 			array('{host:key.last(1)} > (-1)', null, true),
-			array('{host:key.last(1)} & (-1)', null, true),
-			array('{host:key.last(1)} | (-1)', null, true),
+			array('{host:key.last(1)} and (-1)', null, true),
+			array('{host:key.last(1)} or (-1)', null, true),
 
 			array('{host:key.last(1)}* (-1)', null, true),
 			array('{host:key.last(1)}/ (-1)', null, true),
 			array('{host:key.last(1)}+ (-1)', null, true),
 			array('{host:key.last(1)}- (-1)', null, true),
 			array('{host:key.last(1)}= (-1)', null, true),
-			array('{host:key.last(1)}# (-1)', null, true),
+			array('{host:key.last(1)}<> (-1)', null, true),
 			array('{host:key.last(1)}< (-1)', null, true),
 			array('{host:key.last(1)}> (-1)', null, true),
-			array('{host:key.last(1)}& (-1)', null, true),
-			array('{host:key.last(1)}| (-1)', null, true),
+			array('{host:key.last(1)}and (-1)', null, true),
+			array('{host:key.last(1)}or (-1)', null, true),
 
 			array('{host:key.last(1)} *(-1)', null, true),
 			array('{host:key.last(1)} /(-1)', null, true),
 			array('{host:key.last(1)} +(-1)', null, true),
 			array('{host:key.last(1)} -(-1)', null, true),
 			array('{host:key.last(1)} =(-1)', null, true),
-			array('{host:key.last(1)} #(-1)', null, true),
+			array('{host:key.last(1)} <>(-1)', null, true),
 			array('{host:key.last(1)} <(-1)', null, true),
 			array('{host:key.last(1)} >(-1)', null, true),
-			array('{host:key.last(1)} &(-1)', null, true),
-			array('{host:key.last(1)} |(-1)', null, true),
+			array('{host:key.last(1)} and(-1)', null, true),
+			array('{host:key.last(1)} or(-1)', null, true),
 
 			array('{host:key.last(1)}*(-1)', null, true),
 			array('{host:key.last(1)}/(-1)', null, true),
 			array('{host:key.last(1)}+(-1)', null, true),
 			array('{host:key.last(1)}-(-1)', null, true),
 			array('{host:key.last(1)}=(-1)', null, true),
-			array('{host:key.last(1)}#(-1)', null, true),
+			array('{host:key.last(1)}<>(-1)', null, true),
 			array('{host:key.last(1)}<(-1)', null, true),
 			array('{host:key.last(1)}>(-1)', null, true),
-			array('{host:key.last(1)}&(-1)', null, true),
-			array('{host:key.last(1)}|(-1)', null, true),
+			array('{host:key.last(1)}and(-1)', null, true),
+			array('{host:key.last(1)}or(-1)', null, true),
 
 			array('{host:key.last(1)} * -1', null, true),
 			array('{host:key.last(1)} / -1', null, true),
 			array('{host:key.last(1)} + -1', null, true),
 			array('{host:key.last(1)} - -1', null, true),
 			array('{host:key.last(1)} = -1', null, true),
-			array('{host:key.last(1)} # -1', null, true),
+			array('{host:key.last(1)} <> -1', null, true),
 			array('{host:key.last(1)} < -1', null, true),
 			array('{host:key.last(1)} > -1', null, true),
-			array('{host:key.last(1)} & -1', null, true),
-			array('{host:key.last(1)} | -1', null, true),
+			array('{host:key.last(1)} and -1', null, true),
+			array('{host:key.last(1)} or -1', null, true),
 
 			array('{host:key.last(1)}* -1', null, true),
 			array('{host:key.last(1)}/ -1', null, true),
 			array('{host:key.last(1)}+ -1', null, true),
 			array('{host:key.last(1)}- -1', null, true),
 			array('{host:key.last(1)}= -1', null, true),
-			array('{host:key.last(1)}# -1', null, true),
+			array('{host:key.last(1)}<> -1', null, true),
 			array('{host:key.last(1)}< -1', null, true),
 			array('{host:key.last(1)}> -1', null, true),
-			array('{host:key.last(1)}& -1', null, true),
-			array('{host:key.last(1)}| -1', null, true),
+			array('{host:key.last(1)}and -1', null, true),
+			array('{host:key.last(1)}or -1', null, true),
 
 			array('{host:key.last(1)} *-1', null, true),
 			array('{host:key.last(1)} /-1', null, true),
 			array('{host:key.last(1)} +-1', null, true),
 			array('{host:key.last(1)} --1', null, true),
 			array('{host:key.last(1)} =-1', null, true),
-			array('{host:key.last(1)} #-1', null, true),
+			array('{host:key.last(1)} <>-1', null, true),
 			array('{host:key.last(1)} <-1', null, true),
 			array('{host:key.last(1)} >-1', null, true),
-			array('{host:key.last(1)} &-1', null, true),
-			array('{host:key.last(1)} |-1', null, true),
+			array('{host:key.last(1)} and-1', null, true),
+			array('{host:key.last(1)} or-1', null, true),
 
 			array('{host:key.last(1)}*-1', null, true),
 			array('{host:key.last(1)}/-1', null, true),
 			array('{host:key.last(1)}+-1', null, true),
 			array('{host:key.last(1)}--1', null, true),
 			array('{host:key.last(1)}=-1', null, true),
-			array('{host:key.last(1)}#-1', null, true),
+			array('{host:key.last(1)}<>-1', null, true),
 			array('{host:key.last(1)}<-1', null, true),
 			array('{host:key.last(1)}>-1', null, true),
-			array('{host:key.last(1)}&-1', null, true),
-			array('{host:key.last(1)}|-1', null, true),
+			array('{host:key.last(1)}and-1', null, true),
+			array('{host:key.last(1)}or-1', null, true),
 
 			array('{host:key.last(1)} * (- 1)', null, true),
 			array('{host:key.last(1)} / (- 1)', null, true),
 			array('{host:key.last(1)} + (- 1)', null, true),
 			array('{host:key.last(1)} - (- 1)', null, true),
 			array('{host:key.last(1)} = (- 1)', null, true),
-			array('{host:key.last(1)} # (- 1)', null, true),
+			array('{host:key.last(1)} <> (- 1)', null, true),
 			array('{host:key.last(1)} < (- 1)', null, true),
 			array('{host:key.last(1)} > (- 1)', null, true),
-			array('{host:key.last(1)} & (- 1)', null, true),
-			array('{host:key.last(1)} | (- 1)', null, true),
+			array('{host:key.last(1)} and (- 1)', null, true),
+			array('{host:key.last(1)} or (- 1)', null, true),
 
 			array('{host:key.last(1)}* (- 1)', null, true),
 			array('{host:key.last(1)}/ (- 1)', null, true),
 			array('{host:key.last(1)}+ (- 1)', null, true),
 			array('{host:key.last(1)}- (- 1)', null, true),
 			array('{host:key.last(1)}= (- 1)', null, true),
-			array('{host:key.last(1)}# (- 1)', null, true),
+			array('{host:key.last(1)}<> (- 1)', null, true),
 			array('{host:key.last(1)}< (- 1)', null, true),
 			array('{host:key.last(1)}> (- 1)', null, true),
-			array('{host:key.last(1)}& (- 1)', null, true),
-			array('{host:key.last(1)}| (- 1)', null, true),
+			array('{host:key.last(1)}and (- 1)', null, true),
+			array('{host:key.last(1)}or (- 1)', null, true),
 
 			array('{host:key.last(1)} *(- 1)', null, true),
 			array('{host:key.last(1)} /(- 1)', null, true),
 			array('{host:key.last(1)} +(- 1)', null, true),
 			array('{host:key.last(1)} -(- 1)', null, true),
 			array('{host:key.last(1)} =(- 1)', null, true),
-			array('{host:key.last(1)} #(- 1)', null, true),
+			array('{host:key.last(1)} <>(- 1)', null, true),
 			array('{host:key.last(1)} <(- 1)', null, true),
 			array('{host:key.last(1)} >(- 1)', null, true),
-			array('{host:key.last(1)} &(- 1)', null, true),
-			array('{host:key.last(1)} |(- 1)', null, true),
+			array('{host:key.last(1)} and(- 1)', null, true),
+			array('{host:key.last(1)} or(- 1)', null, true),
 
 			array('{host:key.last(1)}*(- 1)', null, true),
 			array('{host:key.last(1)}/(- 1)', null, true),
 			array('{host:key.last(1)}+(- 1)', null, true),
 			array('{host:key.last(1)}-(- 1)', null, true),
 			array('{host:key.last(1)}=(- 1)', null, true),
-			array('{host:key.last(1)}#(- 1)', null, true),
+			array('{host:key.last(1)}<>(- 1)', null, true),
 			array('{host:key.last(1)}<(- 1)', null, true),
 			array('{host:key.last(1)}>(- 1)', null, true),
-			array('{host:key.last(1)}&(- 1)', null, true),
-			array('{host:key.last(1)}|(- 1)', null, true),
+			array('{host:key.last(1)}and(- 1)', null, true),
+			array('{host:key.last(1)}or(- 1)', null, true),
 
 			array('{host:key.last(1)} * - 1', null, true),
 			array('{host:key.last(1)} / - 1', null, true),
 			array('{host:key.last(1)} + - 1', null, true),
 			array('{host:key.last(1)} - - 1', null, true),
 			array('{host:key.last(1)} = - 1', null, true),
-			array('{host:key.last(1)} # - 1', null, true),
+			array('{host:key.last(1)} <> - 1', null, true),
 			array('{host:key.last(1)} < - 1', null, true),
 			array('{host:key.last(1)} > - 1', null, true),
-			array('{host:key.last(1)} & - 1', null, true),
-			array('{host:key.last(1)} | - 1', null, true),
+			array('{host:key.last(1)} and - 1', null, true),
+			array('{host:key.last(1)} or - 1', null, true),
 
 			array('{host:key.last(1)}* - 1', null, true),
 			array('{host:key.last(1)}/ - 1', null, true),
 			array('{host:key.last(1)}+ - 1', null, true),
 			array('{host:key.last(1)}- - 1', null, true),
 			array('{host:key.last(1)}= - 1', null, true),
-			array('{host:key.last(1)}# - 1', null, true),
+			array('{host:key.last(1)}<> - 1', null, true),
 			array('{host:key.last(1)}< - 1', null, true),
 			array('{host:key.last(1)}> - 1', null, true),
-			array('{host:key.last(1)}& - 1', null, true),
-			array('{host:key.last(1)}| - 1', null, true),
+			array('{host:key.last(1)}and - 1', null, true),
+			array('{host:key.last(1)}or - 1', null, true),
 
 			array('{host:key.last(1)} *- 1', null, true),
 			array('{host:key.last(1)} /- 1', null, true),
 			array('{host:key.last(1)} +- 1', null, true),
 			array('{host:key.last(1)} -- 1', null, true),
 			array('{host:key.last(1)} =- 1', null, true),
-			array('{host:key.last(1)} #- 1', null, true),
+			array('{host:key.last(1)} <>- 1', null, true),
 			array('{host:key.last(1)} <- 1', null, true),
 			array('{host:key.last(1)} >- 1', null, true),
-			array('{host:key.last(1)} &- 1', null, true),
-			array('{host:key.last(1)} |- 1', null, true),
+			array('{host:key.last(1)} and- 1', null, true),
+			array('{host:key.last(1)} or- 1', null, true),
 
 			array('{host:key.last(1)}*- 1', null, true),
 			array('{host:key.last(1)}/- 1', null, true),
 			array('{host:key.last(1)}+- 1', null, true),
 			array('{host:key.last(1)}-- 1', null, true),
 			array('{host:key.last(1)}=- 1', null, true),
-			array('{host:key.last(1)}#- 1', null, true),
+			array('{host:key.last(1)}<>- 1', null, true),
 			array('{host:key.last(1)}<- 1', null, true),
 			array('{host:key.last(1)}>- 1', null, true),
-			array('{host:key.last(1)}&- 1', null, true),
-			array('{host:key.last(1)}|- 1', null, true),
+			array('{host:key.last(1)}and- 1', null, true),
+			array('{host:key.last(1)}or- 1', null, true),
 
 			array('{host:key.last(1)} * (+1)', null, false),
 			array('{host:key.last(1)} / (+1)', null, false),
 			array('{host:key.last(1)} + (+1)', null, false),
 			array('{host:key.last(1)} - (+1)', null, false),
 			array('{host:key.last(1)} = (+1)', null, false),
-			array('{host:key.last(1)} # (+1)', null, false),
+			array('{host:key.last(1)} <> (+1)', null, false),
 			array('{host:key.last(1)} < (+1)', null, false),
 			array('{host:key.last(1)} > (+1)', null, false),
-			array('{host:key.last(1)} & (+1)', null, false),
-			array('{host:key.last(1)} | (+1)', null, false),
+			array('{host:key.last(1)} and (+1)', null, false),
+			array('{host:key.last(1)} or (+1)', null, false),
 
 			array('{host:key.last(1)}* (+1)', null, false),
 			array('{host:key.last(1)}/ (+1)', null, false),
 			array('{host:key.last(1)}+ (+1)', null, false),
 			array('{host:key.last(1)}- (+1)', null, false),
 			array('{host:key.last(1)}= (+1)', null, false),
-			array('{host:key.last(1)}# (+1)', null, false),
+			array('{host:key.last(1)}<> (+1)', null, false),
 			array('{host:key.last(1)}< (+1)', null, false),
 			array('{host:key.last(1)}> (+1)', null, false),
-			array('{host:key.last(1)}& (+1)', null, false),
-			array('{host:key.last(1)}| (+1)', null, false),
+			array('{host:key.last(1)}and (+1)', null, false),
+			array('{host:key.last(1)}or (+1)', null, false),
 
 			array('{host:key.last(1)} *(+1)', null, false),
 			array('{host:key.last(1)} /(+1)', null, false),
 			array('{host:key.last(1)} +(+1)', null, false),
 			array('{host:key.last(1)} -(+1)', null, false),
 			array('{host:key.last(1)} =(+1)', null, false),
-			array('{host:key.last(1)} #(+1)', null, false),
+			array('{host:key.last(1)} <>(+1)', null, false),
 			array('{host:key.last(1)} <(+1)', null, false),
 			array('{host:key.last(1)} >(+1)', null, false),
-			array('{host:key.last(1)} &(+1)', null, false),
-			array('{host:key.last(1)} |(+1)', null, false),
+			array('{host:key.last(1)} and(+1)', null, false),
+			array('{host:key.last(1)} or(+1)', null, false),
 
 			array('{host:key.last(1)}*(+1)', null, false),
 			array('{host:key.last(1)}/(+1)', null, false),
 			array('{host:key.last(1)}+(+1)', null, false),
 			array('{host:key.last(1)}-(+1)', null, false),
 			array('{host:key.last(1)}=(+1)', null, false),
-			array('{host:key.last(1)}#(+1)', null, false),
+			array('{host:key.last(1)}<>(+1)', null, false),
 			array('{host:key.last(1)}<(+1)', null, false),
 			array('{host:key.last(1)}>(+1)', null, false),
-			array('{host:key.last(1)}&(+1)', null, false),
-			array('{host:key.last(1)}|(+1)', null, false),
+			array('{host:key.last(1)}and(+1)', null, false),
+			array('{host:key.last(1)}or(+1)', null, false),
 
 			array('{host:key.last(1)} * +1', null, false),
 			array('{host:key.last(1)} / +1', null, false),
 			array('{host:key.last(1)} + +1', null, false),
 			array('{host:key.last(1)} - +1', null, false),
 			array('{host:key.last(1)} = +1', null, false),
-			array('{host:key.last(1)} # +1', null, false),
+			array('{host:key.last(1)} <> +1', null, false),
 			array('{host:key.last(1)} < +1', null, false),
 			array('{host:key.last(1)} > +1', null, false),
-			array('{host:key.last(1)} & +1', null, false),
-			array('{host:key.last(1)} | +1', null, false),
+			array('{host:key.last(1)} and +1', null, false),
+			array('{host:key.last(1)} or +1', null, false),
 
 			array('{host:key.last(1)}* +1', null, false),
 			array('{host:key.last(1)}/ +1', null, false),
 			array('{host:key.last(1)}+ +1', null, false),
 			array('{host:key.last(1)}- +1', null, false),
 			array('{host:key.last(1)}= +1', null, false),
-			array('{host:key.last(1)}# +1', null, false),
+			array('{host:key.last(1)}<> +1', null, false),
 			array('{host:key.last(1)}< +1', null, false),
 			array('{host:key.last(1)}> +1', null, false),
-			array('{host:key.last(1)}& +1', null, false),
-			array('{host:key.last(1)}| +1', null, false),
+			array('{host:key.last(1)}and +1', null, false),
+			array('{host:key.last(1)}or +1', null, false),
 
 			array('{host:key.last(1)} *+1', null, false),
 			array('{host:key.last(1)} /+1', null, false),
 			array('{host:key.last(1)} ++1', null, false),
 			array('{host:key.last(1)} -+1', null, false),
 			array('{host:key.last(1)} =+1', null, false),
-			array('{host:key.last(1)} #+1', null, false),
+			array('{host:key.last(1)} <>+1', null, false),
 			array('{host:key.last(1)} <+1', null, false),
 			array('{host:key.last(1)} >+1', null, false),
-			array('{host:key.last(1)} &+1', null, false),
-			array('{host:key.last(1)} |+1', null, false),
+			array('{host:key.last(1)} and+1', null, false),
+			array('{host:key.last(1)} or+1', null, false),
 
 			array('{host:key.last(1)}*+1', null, false),
 			array('{host:key.last(1)}/+1', null, false),
 			array('{host:key.last(1)}++1', null, false),
 			array('{host:key.last(1)}-+1', null, false),
 			array('{host:key.last(1)}=+1', null, false),
-			array('{host:key.last(1)}#+1', null, false),
+			array('{host:key.last(1)}<>+1', null, false),
 			array('{host:key.last(1)}<+1', null, false),
 			array('{host:key.last(1)}>+1', null, false),
-			array('{host:key.last(1)}&+1', null, false),
-			array('{host:key.last(1)}|+1', null, false),
+			array('{host:key.last(1)}and+1', null, false),
+			array('{host:key.last(1)}or+1', null, false),
 
 			array('{host:key.last(1)} * (+ 1)', null, false),
 			array('{host:key.last(1)} / (+ 1)', null, false),
 			array('{host:key.last(1)} + (+ 1)', null, false),
 			array('{host:key.last(1)} - (+ 1)', null, false),
 			array('{host:key.last(1)} = (+ 1)', null, false),
-			array('{host:key.last(1)} # (+ 1)', null, false),
+			array('{host:key.last(1)} <> (+ 1)', null, false),
 			array('{host:key.last(1)} < (+ 1)', null, false),
 			array('{host:key.last(1)} > (+ 1)', null, false),
-			array('{host:key.last(1)} & (+ 1)', null, false),
-			array('{host:key.last(1)} | (+ 1)', null, false),
+			array('{host:key.last(1)} and (+ 1)', null, false),
+			array('{host:key.last(1)} or (+ 1)', null, false),
 
 			array('{host:key.last(1)}* (+ 1)', null, false),
 			array('{host:key.last(1)}/ (+ 1)', null, false),
 			array('{host:key.last(1)}+ (+ 1)', null, false),
 			array('{host:key.last(1)}- (+ 1)', null, false),
 			array('{host:key.last(1)}= (+ 1)', null, false),
-			array('{host:key.last(1)}# (+ 1)', null, false),
+			array('{host:key.last(1)}<> (+ 1)', null, false),
 			array('{host:key.last(1)}< (+ 1)', null, false),
 			array('{host:key.last(1)}> (+ 1)', null, false),
-			array('{host:key.last(1)}& (+ 1)', null, false),
-			array('{host:key.last(1)}| (+ 1)', null, false),
+			array('{host:key.last(1)}and (+ 1)', null, false),
+			array('{host:key.last(1)}or (+ 1)', null, false),
 
 			array('{host:key.last(1)} *(+ 1)', null, false),
 			array('{host:key.last(1)} /(+ 1)', null, false),
 			array('{host:key.last(1)} +(+ 1)', null, false),
 			array('{host:key.last(1)} -(+ 1)', null, false),
 			array('{host:key.last(1)} =(+ 1)', null, false),
-			array('{host:key.last(1)} #(+ 1)', null, false),
+			array('{host:key.last(1)} <>(+ 1)', null, false),
 			array('{host:key.last(1)} <(+ 1)', null, false),
 			array('{host:key.last(1)} >(+ 1)', null, false),
-			array('{host:key.last(1)} &(+ 1)', null, false),
-			array('{host:key.last(1)} |(+ 1)', null, false),
+			array('{host:key.last(1)} and(+ 1)', null, false),
+			array('{host:key.last(1)} or(+ 1)', null, false),
 
 			array('{host:key.last(1)}*(+ 1)', null, false),
 			array('{host:key.last(1)}/(+ 1)', null, false),
 			array('{host:key.last(1)}+(+ 1)', null, false),
 			array('{host:key.last(1)}-(+ 1)', null, false),
 			array('{host:key.last(1)}=(+ 1)', null, false),
-			array('{host:key.last(1)}#(+ 1)', null, false),
+			array('{host:key.last(1)}<>(+ 1)', null, false),
 			array('{host:key.last(1)}<(+ 1)', null, false),
 			array('{host:key.last(1)}>(+ 1)', null, false),
-			array('{host:key.last(1)}&(+ 1)', null, false),
-			array('{host:key.last(1)}|(+ 1)', null, false),
+			array('{host:key.last(1)}and(+ 1)', null, false),
+			array('{host:key.last(1)}or(+ 1)', null, false),
 
 			array('{host:key.last(1)} * + 1', null, false),
 			array('{host:key.last(1)} / + 1', null, false),
 			array('{host:key.last(1)} + + 1', null, false),
 			array('{host:key.last(1)} - + 1', null, false),
 			array('{host:key.last(1)} = + 1', null, false),
-			array('{host:key.last(1)} # + 1', null, false),
+			array('{host:key.last(1)} <> + 1', null, false),
 			array('{host:key.last(1)} < + 1', null, false),
 			array('{host:key.last(1)} > + 1', null, false),
-			array('{host:key.last(1)} & + 1', null, false),
-			array('{host:key.last(1)} | + 1', null, false),
+			array('{host:key.last(1)} and + 1', null, false),
+			array('{host:key.last(1)} or + 1', null, false),
 
 			array('{host:key.last(1)}* + 1', null, false),
 			array('{host:key.last(1)}/ + 1', null, false),
 			array('{host:key.last(1)}+ + 1', null, false),
 			array('{host:key.last(1)}- + 1', null, false),
 			array('{host:key.last(1)}= + 1', null, false),
-			array('{host:key.last(1)}# + 1', null, false),
+			array('{host:key.last(1)}<> + 1', null, false),
 			array('{host:key.last(1)}< + 1', null, false),
 			array('{host:key.last(1)}> + 1', null, false),
-			array('{host:key.last(1)}& + 1', null, false),
-			array('{host:key.last(1)}| + 1', null, false),
+			array('{host:key.last(1)}and + 1', null, false),
+			array('{host:key.last(1)}or + 1', null, false),
 
 			array('{host:key.last(1)} *+ 1', null, false),
 			array('{host:key.last(1)} /+ 1', null, false),
 			array('{host:key.last(1)} ++ 1', null, false),
 			array('{host:key.last(1)} -+ 1', null, false),
 			array('{host:key.last(1)} =+ 1', null, false),
-			array('{host:key.last(1)} #+ 1', null, false),
+			array('{host:key.last(1)} <>+ 1', null, false),
 			array('{host:key.last(1)} <+ 1', null, false),
 			array('{host:key.last(1)} >+ 1', null, false),
-			array('{host:key.last(1)} &+ 1', null, false),
-			array('{host:key.last(1)} |+ 1', null, false),
+			array('{host:key.last(1)} and+ 1', null, false),
+			array('{host:key.last(1)} or+ 1', null, false),
 
 			array('{host:key.last(1)}*+ 1', null, false),
 			array('{host:key.last(1)}/+ 1', null, false),
 			array('{host:key.last(1)}++ 1', null, false),
 			array('{host:key.last(1)}-+ 1', null, false),
 			array('{host:key.last(1)}=+ 1', null, false),
-			array('{host:key.last(1)}#+ 1', null, false),
+			array('{host:key.last(1)}<>+ 1', null, false),
 			array('{host:key.last(1)}<+ 1', null, false),
 			array('{host:key.last(1)}>+ 1', null, false),
-			array('{host:key.last(1)}&+ 1', null, false),
-			array('{host:key.last(1)}|+ 1', null, false),
+			array('{host:key.last(1)}and+ 1', null, false),
+			array('{host:key.last(1)}or+ 1', null, false),
 
 			array('{host:key.diff()} + 1', null, true),
 			array('{host:key.diff()} - 1', null, true),
 			array('{host:key.diff()} / 1', null, true),
 			array('{host:key.diff()} * 1', null, true),
 			array('{host:key.diff()} = 1', null, true),
-			array('{host:key.diff()} # 1', null, true),
-			array('{host:key.diff()} & 1', null, true),
-			array('{host:key.diff()} | 1', null, true),
+			array('{host:key.diff()} <> 1', null, true),
+			array('{host:key.diff()} and 1', null, true),
+			array('{host:key.diff()} or 1', null, true),
 
 			array('{host:key.diff()}+ 1', null, true),
 			array('{host:key.diff()}- 1', null, true),
 			array('{host:key.diff()}/ 1', null, true),
 			array('{host:key.diff()}* 1', null, true),
 			array('{host:key.diff()}= 1', null, true),
-			array('{host:key.diff()}# 1', null, true),
-			array('{host:key.diff()}& 1', null, true),
-			array('{host:key.diff()}| 1', null, true),
+			array('{host:key.diff()}<> 1', null, true),
+			array('{host:key.diff()}and 1', null, true),
+			array('{host:key.diff()}or 1', null, true),
 
 			array('{host:key.diff()} +1', null, true),
 			array('{host:key.diff()} -1', null, true),
 			array('{host:key.diff()} /1', null, true),
 			array('{host:key.diff()} *1', null, true),
 			array('{host:key.diff()} =1', null, true),
-			array('{host:key.diff()} #1', null, true),
-			array('{host:key.diff()} &1', null, true),
-			array('{host:key.diff()} |1', null, true),
+			array('{host:key.diff()} <>1', null, true),
+			array('{host:key.diff()} and1', null, true),
+			array('{host:key.diff()} or1', null, true),
 
 			array('{host:key.diff()}+1', null, true),
 			array('{host:key.diff()}-1', null, true),
 			array('{host:key.diff()}/1', null, true),
 			array('{host:key.diff()}*1', null, true),
 			array('{host:key.diff()}=1', null, true),
-			array('{host:key.diff()}#1', null, true),
-			array('{host:key.diff()}&1', null, true),
-			array('{host:key.diff()}|1', null, true),
+			array('{host:key.diff()}<>1', null, true),
+			array('{host:key.diff()}and1', null, true),
+			array('{host:key.diff()}or1', null, true),
 
 			array('{host:key.diff()}=1K', null, true),
 			array('{host:key.diff()}=1M', null, true),
@@ -581,72 +581,72 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.diff()} / 1.173640', null, true),
 			array('{host:key.diff()} * 1.173640', null, true),
 			array('{host:key.diff()} = 1.173640', null, true),
-			array('{host:key.diff()} # 1.173640', null, true),
-			array('{host:key.diff()} & 1.173640', null, true),
-			array('{host:key.diff()} | 1.173640', null, true),
+			array('{host:key.diff()} <> 1.173640', null, true),
+			array('{host:key.diff()} and 1.173640', null, true),
+			array('{host:key.diff()} or 1.173640', null, true),
 
 			array('{host:key.diff()}+ 1.173640', null, true),
 			array('{host:key.diff()}- 1.173640', null, true),
 			array('{host:key.diff()}/ 1.173640', null, true),
 			array('{host:key.diff()}* 1.173640', null, true),
 			array('{host:key.diff()}= 1.173640', null, true),
-			array('{host:key.diff()}# 1.173640', null, true),
-			array('{host:key.diff()}& 1.173640', null, true),
-			array('{host:key.diff()}| 1.173640', null, true),
+			array('{host:key.diff()}<> 1.173640', null, true),
+			array('{host:key.diff()}and 1.173640', null, true),
+			array('{host:key.diff()}or 1.173640', null, true),
 
 			array('{host:key.diff()} +1.173640', null, true),
 			array('{host:key.diff()} -1.173640', null, true),
 			array('{host:key.diff()} /1.173640', null, true),
 			array('{host:key.diff()} *1.173640', null, true),
 			array('{host:key.diff()} =1.173640', null, true),
-			array('{host:key.diff()} #1.173640', null, true),
-			array('{host:key.diff()} &1.173640', null, true),
-			array('{host:key.diff()} |1.173640', null, true),
+			array('{host:key.diff()} <>1.173640', null, true),
+			array('{host:key.diff()} and1.173640', null, true),
+			array('{host:key.diff()} or1.173640', null, true),
 
 			array('{host:key.diff()}+1.173640', null, true),
 			array('{host:key.diff()}-1.173640', null, true),
 			array('{host:key.diff()}/1.173640', null, true),
 			array('{host:key.diff()}*1.173640', null, true),
 			array('{host:key.diff()}=1.173640', null, true),
-			array('{host:key.diff()}#1.173640', null, true),
-			array('{host:key.diff()}&1.173640', null, true),
-			array('{host:key.diff()}|1.173640', null, true),
+			array('{host:key.diff()}<>1.173640', null, true),
+			array('{host:key.diff()}and1.173640', null, true),
+			array('{host:key.diff()}or1.173640', null, true),
 
-			array('{host:key.diff()} + 1 | {host:key.diff()}', null, true),
-			array('{host:key.diff()} - 1 & {host:key.diff()}', null, true),
-			array('{host:key.diff()} / 1 # {host:key.diff()}', null, true),
+			array('{host:key.diff()} + 1 or {host:key.diff()}', null, true),
+			array('{host:key.diff()} - 1 and {host:key.diff()}', null, true),
+			array('{host:key.diff()} / 1 <> {host:key.diff()}', null, true),
 			array('{host:key.diff()} * 1 = {host:key.diff()}', null, true),
 			array('{host:key.diff()} = 1 * {host:key.diff()}', null, true),
-			array('{host:key.diff()} # 1 / {host:key.diff()}', null, true),
-			array('{host:key.diff()} & 1 - {host:key.diff()}', null, true),
-			array('{host:key.diff()} | 1 + {host:key.diff()}', null, true),
+			array('{host:key.diff()} <> 1 / {host:key.diff()}', null, true),
+			array('{host:key.diff()} and 1 - {host:key.diff()}', null, true),
+			array('{host:key.diff()} or 1 + {host:key.diff()}', null, true),
 
 			array('{host:key.diff()} -- 1', null, true),
 			array('{host:key.diff()} ++ 1', null, false),
 			array('{host:key.diff()} // 1', null, false),
 			array('{host:key.diff()} ** 1', null, false),
 			array('{host:key.diff()} == 1', null, false),
-			array('{host:key.diff()} ## 1', null, false),
-			array('{host:key.diff()} && 1', null, false),
-			array('{host:key.diff()} || 1', null, false),
+			array('{host:key.diff()} <><> 1', null, false),
+			array('{host:key.diff()} andand 1', null, false),
+			array('{host:key.diff()} oror 1', null, false),
 
 			array('{host:key.diff()} +', null, false),
 			array('{host:key.diff()} -', null, false),
 			array('{host:key.diff()} /', null, false),
 			array('{host:key.diff()} *', null, false),
 			array('{host:key.diff()} =', null, false),
-			array('{host:key.diff()} #', null, false),
-			array('{host:key.diff()} &', null, false),
-			array('{host:key.diff()} |', null, false),
+			array('{host:key.diff()} <>', null, false),
+			array('{host:key.diff()} and', null, false),
+			array('{host:key.diff()} or', null, false),
 
 			array('- {host:key.diff()}', null, true),
 			array('+ {host:key.diff()}', null, false),
 			array('/ {host:key.diff()}', null, false),
 			array('* {host:key.diff()}', null, false),
 			array('= {host:key.diff()}', null, false),
-			array('# {host:key.diff()}', null, false),
-			array('& {host:key.diff()}', null, false),
-			array('| {host:key.diff()}', null, false),
+			array('<> {host:key.diff()}', null, false),
+			array('and {host:key.diff()}', null, false),
+			array('or {host:key.diff()}', null, false),
 
 			array('{host:key.diff()}=0', null, true),
 			array('{host:key.count(1,)}=0', null, true),
@@ -753,7 +753,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 			array('{host:key.last(0)}=0', null, true),
 			array('{host:key.str(aaa()}=0', null, true),
-			array('({hostA:keyA.str("abc")}=0) | ({hostB:keyB.last(123)}=0)', null, true),
+			array('({hostA:keyA.str("abc")}=0) or ({hostB:keyB.last(123)}=0)', null, true),
 			array('{host:key[asd[].str(aaa()}=0', null, true),
 			array('{host:key["param].diff()"].diff()}=0', null, true),
 			array('{host:key[param].diff()].diff()}', null, false),
@@ -761,20 +761,20 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key[[],[],[]].str()}=0', null, true),
 			array('{host:key[].count(1,[],[])}=0', null, true),
 			array('({hostA:keyA.str("abc")}) / ({hostB:keyB.last(123)})=(0)', null, true),
-			array('({hostA:keyA.str("abc")}=0) | ({hostB:keyB.last(123)}=0)', null, true),
-			array('({hostA:keyA.str("abc")}=0) & ({hostB:keyB.last(123)}=0)', null, true),
+			array('({hostA:keyA.str("abc")}=0) or ({hostB:keyB.last(123)}=0)', null, true),
+			array('({hostA:keyA.str("abc")}=0) and ({hostB:keyB.last(123)}=0)', null, true),
 
 			array('{hostkey.last(0)}=0', null, false),
 			array('{host:keylast(0)}=0', null, false),
 			array('{host:key.last(0}=0', null, false),
 			array('{host:key.last(0)}=', null, false),
 			array('{host:key.str()=0', null, false),
-			array('{host:key.last()}#0}', null, false),
+			array('{host:key.last()}<>0}', null, false),
 			array('{host:key.str()}<>0', null, false),
 			array('({host:key.str(aaa()}=0', null, false),
 			array('(({host:key.str(aaa()}=0)', null, false),
 			array('{host:key.str(aaa()}=0)', null, false),
-			array('({hostA:keyA.str("abc")}=0) || ({hostB:keyB.last(123)}=0)', null, false),
+			array('({hostA:keyA.str("abc")}=0) oror ({hostB:keyB.last(123)}=0)', null, false),
 			array('{host:key.last()}<>0', null, false),
 			array('{hostA:keyA.str("abc")} / ({hostB:keyB.last(123)}=0', null, false),
 			array('({hostA:keyA.str("abc")} / ({hostB:keyB.last(123)})=0', null, false),
@@ -812,7 +812,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('0={host:key[].str(")}")}', null, true),
 			array('0={host:key[].str( ")}")}', null, true),
 			array(
-				'({host1:key1.last(0)}/{host2:key2.last(5)})/10+2*{TRIGGER.VALUE}&{$USERMACRO1}+(-{$USERMACRO2})+'.
+				'({host1:key1.last(0)}/{host2:key2.last(5)})/10+2*{TRIGGER.VALUE}and{$USERMACRO1}+(-{$USERMACRO2})+'.
 					'-{$USERMACRO3}*-12K+12.5m',
 				array(
 					'error' => '',
@@ -858,7 +858,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				true
 			),
 			array(
-				'-12+{TRIGGER.VALUE}/(({host1:key1[].last(5)}+(5*(1-(-3*5&((7|9))#1)*{host2:key2[""].last(123)})/10'.
+				'-12+{TRIGGER.VALUE}/(({host1:key1[].last(5)}+(5*(1-(-3*5and((7or9))<>1)*{host2:key2[""].last(123)})/10'.
 					'/10/10)+{$USERMACRO1})-{$USERMACRO2})',
 				null,
 				true
@@ -923,7 +923,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.last(0)}+{$lowercase}', null, false),
 			array('{host:key.last(1.23)}', null, true),
 			array('{host:key.last(1.23s)}', null, true),
-			array('{host:key.last(#1.23)}', null, true),
+			array('{host:key.last(<>1.23)}', null, true),
 			array('{host:key.abschange()}', null, true),
 			array('{host:key.abschange(0)}', null, true),
 			array('{host:key.abschange(0,)}', null, true),
@@ -1077,9 +1077,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+1.)/({host:key.last(0)}+1.)', null, false),
 			array('({host:key.last(0)}+1.)-({host:key.last(0)}+1.)', null, false),
 			array('({host:key.last(0)}+1.)+({host:key.last(0)}+1.)', null, false),
-			array('({host:key.last(0)}+1.)|({host:key.last(0)}+1.)', null, false),
-			array('({host:key.last(0)}+1.)&({host:key.last(0)}+1.)', null, false),
-			array('({host:key.last(0)}+1.)&({host:key.last(0)}+1.)/({host:key.last(0)}+1.)', null, false),
+			array('({host:key.last(0)}+1.)or({host:key.last(0)}+1.)', null, false),
+			array('({host:key.last(0)}+1.)and({host:key.last(0)}+1.)', null, false),
+			array('({host:key.last(0)}+1.)and({host:key.last(0)}+1.)/({host:key.last(0)}+1.)', null, false),
 			array('({host:key.last(0)}+1.)+({host:key.last(0)}+1.)/({host:key.last(0)}+1.)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+1.))+(({host:key.last(0)}+1.))/({host:key.last(0)}+1.)/({host:key.last('.
@@ -1097,9 +1097,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+.1)/({host:key.last(0)}+.1)', null, false),
 			array('({host:key.last(0)}+.1)-({host:key.last(0)}+.1)', null, false),
 			array('({host:key.last(0)}+.1)+({host:key.last(0)}+.1)', null, false),
-			array('({host:key.last(0)}+.1)|({host:key.last(0)}+.1)', null, false),
-			array('({host:key.last(0)}+.1)&({host:key.last(0)}+.1)', null, false),
-			array('({host:key.last(0)}+.1)&({host:key.last(0)}+.1)/({host:key.last(0)}+.1)', null, false),
+			array('({host:key.last(0)}+.1)or({host:key.last(0)}+.1)', null, false),
+			array('({host:key.last(0)}+.1)and({host:key.last(0)}+.1)', null, false),
+			array('({host:key.last(0)}+.1)and({host:key.last(0)}+.1)/({host:key.last(0)}+.1)', null, false),
 			array('({host:key.last(0)}+.1)+({host:key.last(0)}+.1)/({host:key.last(0)}+.1)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+.1))+(({host:key.last(0)}+.1))/({host:key.last(0)}+.1)/({host:key.last('.
@@ -1117,9 +1117,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+0 .1)/({host:key.last(0)}+0 .1)', null, false),
 			array('({host:key.last(0)}+0 .1)-({host:key.last(0)}+0 .1)', null, false),
 			array('({host:key.last(0)}+0 .1)+({host:key.last(0)}+0 .1)', null, false),
-			array('({host:key.last(0)}+0 .1)|({host:key.last(0)}+0 .1)', null, false),
-			array('({host:key.last(0)}+0 .1)&({host:key.last(0)}+0 .1)', null, false),
-			array('({host:key.last(0)}+0 .1)&({host:key.last(0)}+0 .1)/({host:key.last(0)}+0 .1)', null, false),
+			array('({host:key.last(0)}+0 .1)or({host:key.last(0)}+0 .1)', null, false),
+			array('({host:key.last(0)}+0 .1)and({host:key.last(0)}+0 .1)', null, false),
+			array('({host:key.last(0)}+0 .1)and({host:key.last(0)}+0 .1)/({host:key.last(0)}+0 .1)', null, false),
 			array('({host:key.last(0)}+0 .1)+({host:key.last(0)}+0 .1)/({host:key.last(0)}+0 .1)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+0 .1))+(({host:key.last(0)}+0 .1))/({host:key.last(0)}+0 .1)/({host:key'.
@@ -1137,9 +1137,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+1 K)/({host:key.last(0)}+1 K)', null, false),
 			array('({host:key.last(0)}+1 K)-({host:key.last(0)}+1 K)', null, false),
 			array('({host:key.last(0)}+1 K)+({host:key.last(0)}+1 K)', null, false),
-			array('({host:key.last(0)}+1 K)|({host:key.last(0)}+1 K)', null, false),
-			array('({host:key.last(0)}+1 K)&({host:key.last(0)}+1 K)', null, false),
-			array('({host:key.last(0)}+1 K)&({host:key.last(0)}+1 K)/({host:key.last(0)}+1 K)', null, false),
+			array('({host:key.last(0)}+1 K)or({host:key.last(0)}+1 K)', null, false),
+			array('({host:key.last(0)}+1 K)and({host:key.last(0)}+1 K)', null, false),
+			array('({host:key.last(0)}+1 K)and({host:key.last(0)}+1 K)/({host:key.last(0)}+1 K)', null, false),
 			array('({host:key.last(0)}+1 K)+({host:key.last(0)}+1 K)/({host:key.last(0)}+1 K)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+1 K))+(({host:key.last(0)}+1 K))/({host:key.last(0)}+1 K)/({host:key.la'.
@@ -1157,9 +1157,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+.)/({host:key.last(0)}+.)', null, false),
 			array('({host:key.last(0)}+.)-({host:key.last(0)}+.)', null, false),
 			array('({host:key.last(0)}+.)+({host:key.last(0)}+.)', null, false),
-			array('({host:key.last(0)}+.)|({host:key.last(0)}+.)', null, false),
-			array('({host:key.last(0)}+.)&({host:key.last(0)}+.)', null, false),
-			array('({host:key.last(0)}+.)&({host:key.last(0)}+.)/({host:key.last(0)}+.)', null, false),
+			array('({host:key.last(0)}+.)or({host:key.last(0)}+.)', null, false),
+			array('({host:key.last(0)}+.)and({host:key.last(0)}+.)', null, false),
+			array('({host:key.last(0)}+.)and({host:key.last(0)}+.)/({host:key.last(0)}+.)', null, false),
 			array('({host:key.last(0)}+.)+({host:key.last(0)}+.)/({host:key.last(0)}+.)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+.))+(({host:key.last(0)}+.))/({host:key.last(0)}+.)/({host:key.last(0)}'.
@@ -1177,9 +1177,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+.K)/({host:key.last(0)}+.K)', null, false),
 			array('({host:key.last(0)}+.K)-({host:key.last(0)}+.K)', null, false),
 			array('({host:key.last(0)}+.K)+({host:key.last(0)}+.K)', null, false),
-			array('({host:key.last(0)}+.K)|({host:key.last(0)}+.K)', null, false),
-			array('({host:key.last(0)}+.K)&({host:key.last(0)}+.K)', null, false),
-			array('({host:key.last(0)}+.K)&({host:key.last(0)}+.K)/({host:key.last(0)}+.K)', null, false),
+			array('({host:key.last(0)}+.K)or({host:key.last(0)}+.K)', null, false),
+			array('({host:key.last(0)}+.K)and({host:key.last(0)}+.K)', null, false),
+			array('({host:key.last(0)}+.K)and({host:key.last(0)}+.K)/({host:key.last(0)}+.K)', null, false),
 			array('({host:key.last(0)}+.K)+({host:key.last(0)}+.K)/({host:key.last(0)}+.K)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+.K))+(({host:key.last(0)}+.K))/({host:key.last(0)}+.K)/({host:key.last('.
@@ -1197,9 +1197,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)}+K)/({host:key.last(0)}+K)', null, false),
 			array('({host:key.last(0)}+K)-({host:key.last(0)}+K)', null, false),
 			array('({host:key.last(0)}+K)+({host:key.last(0)}+K)', null, false),
-			array('({host:key.last(0)}+K)|({host:key.last(0)}+K)', null, false),
-			array('({host:key.last(0)}+K)&({host:key.last(0)}+K)', null, false),
-			array('({host:key.last(0)}+K)&({host:key.last(0)}+K)/({host:key.last(0)}+K)', null, false),
+			array('({host:key.last(0)}+K)or({host:key.last(0)}+K)', null, false),
+			array('({host:key.last(0)}+K)and({host:key.last(0)}+K)', null, false),
+			array('({host:key.last(0)}+K)and({host:key.last(0)}+K)/({host:key.last(0)}+K)', null, false),
 			array('({host:key.last(0)}+K)+({host:key.last(0)}+K)/({host:key.last(0)}+K)', null, false),
 			array(
 				'1 - (1/({host:key.last(0)}+K))+(({host:key.last(0)}+K))/({host:key.last(0)}+K)/({host:key.last(0)}'.
@@ -1208,14 +1208,14 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				false
 			),
 			array(
-				'({host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}) + + ({host:key.last(1)}+(1/2+2*2-3|4)'.
-					'|23-34>{host:key.last(#1)})',
+				'({host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}) + + ({host:key.last(1)}+(1/2+2*2-3or4)'.
+					'or23-34>{host:key.last(#1)})',
 				null,
 				false
 			),
 			array(
-				'({host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}) + - ({host:key.last(1)}+(1/2+2*2-3|'.
-					'4)|23-34>{host:key.last(#1)})',
+				'({host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}) + - ({host:key.last(1)}+(1/2+2*2-3or'.
+					'4)or23-34>{host:key.last(#1)})',
 				array(
 					'error' => '',
 					'expressions' => array(
@@ -1231,7 +1231,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						),
 						1 => array(
 							'expression' => '{host:key.last(#1)}',
-							'pos'=> 40,
+							'pos'=> 42,
 							'host' => 'host',
 							'item' => 'key',
 							'function' => 'last(#1)',
@@ -1241,7 +1241,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						),
 						2 => array(
 							'expression' => '{host:key.last(1)}',
-							'pos'=> 66,
+							'pos'=> 68,
 							'host' => 'host',
 							'item' => 'key',
 							'function' => 'last(1)',
@@ -1251,7 +1251,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						),
 						3 => array(
 							'expression' => '{host:key.last(#1)}',
-							'pos'=> 105,
+							'pos'=> 109,
 							'host' => 'host',
 							'item' => 'key',
 							'function' => 'last(#1)',
@@ -1266,91 +1266,91 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				true
 			),
 			array(
-				'({host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}) + ({host:key.last(1)}+(1/2+2*2-3|4)|'.
+				'({host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}) + ({host:key.last(1)}+(1/2+2*2-3or4)or'.
 					'23-34>{host:key.last(#1)})',
 				null,
 				true
 			),
-			array('({host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)})', null, true),
-			array('(--{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)})', null, false),
-			array('(+{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)})', null, false),
-			array('(/{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)})', null, false),
+			array('({host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)})', null, true),
+			array('(--{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)})', null, false),
+			array('(+{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)})', null, false),
+			array('(/{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)})', null, false),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
 					'>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}-{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}-{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
 					'>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}+{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}+{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
 					'>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}|{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}or{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
 					'>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}&{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}and{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
 					'>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}&{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
-					'>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}',
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}and{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
+					'>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}+{host:key.last(1)}+(1/2+2*2-3|4)|23-34'.
-					'>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}',
+				'{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}+{host:key.last(1)}+(1/2+2*2-3or4)or23-34'.
+					'>{host:key.last(#1)}/{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}',
 				null,
 				true
 			),
 			array(
-				'1 - (1/{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)})+({host:key.last(1)}+(1/2+2*2-3|'.
-					'4)|23-34>{host:key.last(#1)})/{host:key.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}/{host:ke'.
-					'y.last(1)}+(1/2+2*2-3|4)|23-34>{host:key.last(#1)}',
+				'1 - (1/{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)})+({host:key.last(1)}+(1/2+2*2-3or'.
+					'4)or23-34>{host:key.last(#1)})/{host:key.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}/{host:ke'.
+					'y.last(1)}+(1/2+2*2-3or4)or23-34>{host:key.last(#1)}',
 				null,
 				true
 			),
-			array('({host:key.last(0)}+(1/2+2*2-3|4)|23-34) + + ({host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, false),
-			array('({host:key.last(0)}+(1/2+2*2-3|4)|23-34) + - ({host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, true),
-			array('({host:key.last(0)}+(1/2+2*2-3|4)|23-34) + ({host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, true),
-			array('({host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, true),
-			array('(--{host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, false),
-			array('(+{host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, false),
-			array('(/{host:key.last(0)}+(1/2+2*2-3|4)|23-34)', null, false),
-			array('{host:key.last(0)}+(1/2+2*2-3|4)|23-34/{host:key.last(0)}+(1/2+2*2-3|4)|23-34', null, true),
-			array('{host:key.last(0)}+(1/2+2*2-3|4)|23-34-{host:key.last(0)}+(1/2+2*2-3|4)|23-34', null, true),
-			array('{host:key.last(0)}+(1/2+2*2-3|4)|23-34+{host:key.last(0)}+(1/2+2*2-3|4)|23-34', null, true),
-			array('{host:key.last(0)}+(1/2+2*2-3|4)|23-34|{host:key.last(0)}+(1/2+2*2-3|4)|23-34', null, true),
-			array('{host:key.last(0)}+(1/2+2*2-3|4)|23-34&{host:key.last(0)}+(1/2+2*2-3|4)|23-34', null, true),
+			array('({host:key.last(0)}+(1/2+2*2-3or4)or23-34) + + ({host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, false),
+			array('({host:key.last(0)}+(1/2+2*2-3or4)or23-34) + - ({host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, true),
+			array('({host:key.last(0)}+(1/2+2*2-3or4)or23-34) + ({host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, true),
+			array('({host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, true),
+			array('(--{host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, false),
+			array('(+{host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, false),
+			array('(/{host:key.last(0)}+(1/2+2*2-3or4)or23-34)', null, false),
+			array('{host:key.last(0)}+(1/2+2*2-3or4)or23-34/{host:key.last(0)}+(1/2+2*2-3or4)or23-34', null, true),
+			array('{host:key.last(0)}+(1/2+2*2-3or4)or23-34-{host:key.last(0)}+(1/2+2*2-3or4)or23-34', null, true),
+			array('{host:key.last(0)}+(1/2+2*2-3or4)or23-34+{host:key.last(0)}+(1/2+2*2-3or4)or23-34', null, true),
+			array('{host:key.last(0)}+(1/2+2*2-3or4)or23-34or{host:key.last(0)}+(1/2+2*2-3or4)or23-34', null, true),
+			array('{host:key.last(0)}+(1/2+2*2-3or4)or23-34and{host:key.last(0)}+(1/2+2*2-3or4)or23-34', null, true),
 			array(
-				'{host:key.last(0)}+(1/2+2*2-3|4)|23-34&{host:key.last(0)}+(1/2+2*2-3|4)|23-34/{host:key.last(0)}+('.
-					'1/2+2*2-3|4)|23-34',
-				null,
-				true
-			),
-			array(
-				'{host:key.last(0)}+(1/2+2*2-3|4)|23-34+{host:key.last(0)}+(1/2+2*2-3|4)|23-34/{host:key.last(0)}+(1'.
-					'/2+2*2-3|4)|23-34',
+				'{host:key.last(0)}+(1/2+2*2-3or4)or23-34and{host:key.last(0)}+(1/2+2*2-3or4)or23-34/{host:key.last(0)}+('.
+					'1/2+2*2-3or4)or23-34',
 				null,
 				true
 			),
 			array(
-				'1 - (1/{host:key.last(0)}+(1/2+2*2-3|4)|23-34)+({host:key.last(0)}+(1/2+2*2-3|4)|23-34)/{host:key.'.
-					'last(0)}+(1/2+2*2-3|4)|23-34/{host:key.last(0)}+(1/2+2*2-3|4)|23-34',
+				'{host:key.last(0)}+(1/2+2*2-3or4)or23-34+{host:key.last(0)}+(1/2+2*2-3or4)or23-34/{host:key.last(0)}+(1'.
+					'/2+2*2-3or4)or23-34',
+				null,
+				true
+			),
+			array(
+				'1 - (1/{host:key.last(0)}+(1/2+2*2-3or4)or23-34)+({host:key.last(0)}+(1/2+2*2-3or4)or23-34)/{host:key.'.
+					'last(0)}+(1/2+2*2-3or4)or23-34/{host:key.last(0)}+(1/2+2*2-3or4)or23-34',
 				null,
 				true
 			),
@@ -1364,9 +1364,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.{a}}/{host:key.{a}}', null, false),
 			array('{host:key.{a}}-{host:key.{a}}', null, false),
 			array('{host:key.{a}}+{host:key.{a}}', null, false),
-			array('{host:key.{a}}|{host:key.{a}}', null, false),
-			array('{host:key.{a}}&{host:key.{a}}', null, false),
-			array('{host:key.{a}}&{host:key.{a}}/{host:key.{a}}', null, false),
+			array('{host:key.{a}}or{host:key.{a}}', null, false),
+			array('{host:key.{a}}and{host:key.{a}}', null, false),
+			array('{host:key.{a}}and{host:key.{a}}/{host:key.{a}}', null, false),
 			array('{host:key.{a}}+{host:key.{a}}/{host:key.{a}}', null, false),
 			array('1 - (1/{host:key.{a}})+({host:key.{a}})/{host:key.{a}}/{host:key.{a}}', null, false),
 			array('({host::key.last{a}}) + + ({host::key.last{a}})', null, false),
@@ -1379,9 +1379,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host::key.last{a}}/{host::key.last{a}}', null, false),
 			array('{host::key.last{a}}-{host::key.last{a}}', null, false),
 			array('{host::key.last{a}}+{host::key.last{a}}', null, false),
-			array('{host::key.last{a}}|{host::key.last{a}}', null, false),
-			array('{host::key.last{a}}&{host::key.last{a}}', null, false),
-			array('{host::key.last{a}}&{host::key.last{a}}/{host::key.last{a}}', null, false),
+			array('{host::key.last{a}}or{host::key.last{a}}', null, false),
+			array('{host::key.last{a}}and{host::key.last{a}}', null, false),
+			array('{host::key.last{a}}and{host::key.last{a}}/{host::key.last{a}}', null, false),
 			array('{host::key.last{a}}+{host::key.last{a}}/{host::key.last{a}}', null, false),
 			array(
 				'1 - (1/{host::key.last{a}})+({host::key.last{a}})/{host::key.last{a}}/{host::key.last{a}}',
@@ -1398,9 +1398,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host::key.(0)}/{host::key.(0)}', null, false),
 			array('{host::key.(0)}-{host::key.(0)}', null, false),
 			array('{host::key.(0)}+{host::key.(0)}', null, false),
-			array('{host::key.(0)}|{host::key.(0)}', null, false),
-			array('{host::key.(0)}&{host::key.(0)}', null, false),
-			array('{host::key.(0)}&{host::key.(0)}/{host::key.(0)}', null, false),
+			array('{host::key.(0)}or{host::key.(0)}', null, false),
+			array('{host::key.(0)}and{host::key.(0)}', null, false),
+			array('{host::key.(0)}and{host::key.(0)}/{host::key.(0)}', null, false),
 			array('{host::key.(0)}+{host::key.(0)}/{host::key.(0)}', null, false),
 			array('1 - (1/{host::key.(0)})+({host::key.(0)})/{host::key.(0)}/{host::key.(0)}', null, false),
 			array('({:key.(0)}) + + ({:key.(0)})', null, false),
@@ -1413,9 +1413,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{:key.(0)}/{:key.(0)}', null, false),
 			array('{:key.(0)}-{:key.(0)}', null, false),
 			array('{:key.(0)}+{:key.(0)}', null, false),
-			array('{:key.(0)}|{:key.(0)}', null, false),
-			array('{:key.(0)}&{:key.(0)}', null, false),
-			array('{:key.(0)}&{:key.(0)}/{:key.(0)}', null, false),
+			array('{:key.(0)}or{:key.(0)}', null, false),
+			array('{:key.(0)}and{:key.(0)}', null, false),
+			array('{:key.(0)}and{:key.(0)}/{:key.(0)}', null, false),
 			array('{:key.(0)}+{:key.(0)}/{:key.(0)}', null, false),
 			array('1 - (1/{:key.(0)})+({:key.(0)})/{:key.(0)}/{:key.(0)}', null, false),
 			array('({:key.last(0)}) + + ({:key.last(0)})', null, false),
@@ -1428,9 +1428,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{:key.last(0)}/{:key.last(0)}', null, false),
 			array('{:key.last(0)}-{:key.last(0)}', null, false),
 			array('{:key.last(0)}+{:key.last(0)}', null, false),
-			array('{:key.last(0)}|{:key.last(0)}', null, false),
-			array('{:key.last(0)}&{:key.last(0)}', null, false),
-			array('{:key.last(0)}&{:key.last(0)}/{:key.last(0)}', null, false),
+			array('{:key.last(0)}or{:key.last(0)}', null, false),
+			array('{:key.last(0)}and{:key.last(0)}', null, false),
+			array('{:key.last(0)}and{:key.last(0)}/{:key.last(0)}', null, false),
 			array('{:key.last(0)}+{:key.last(0)}/{:key.last(0)}', null, false),
 			array('1 - (1/{:key.last(0)})+({:key.last(0)})/{:key.last(0)}/{:key.last(0)}', null, false),
 			array('(({host:key.last(0)})) + + (({host:key.last(0)}))', null, false),
@@ -1443,9 +1443,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('({host:key.last(0)})/({host:key.last(0)})', null, true),
 			array('({host:key.last(0)})-({host:key.last(0)})', null, true),
 			array('({host:key.last(0)})+({host:key.last(0)})', null, true),
-			array('({host:key.last(0)})|({host:key.last(0)})', null, true),
-			array('({host:key.last(0)})&({host:key.last(0)})', null, true),
-			array('({host:key.last(0)})&({host:key.last(0)})/({host:key.last(0)})', null, true),
+			array('({host:key.last(0)})or({host:key.last(0)})', null, true),
+			array('({host:key.last(0)})and({host:key.last(0)})', null, true),
+			array('({host:key.last(0)})and({host:key.last(0)})/({host:key.last(0)})', null, true),
 			array('({host:key.last(0)})+({host:key.last(0)})/({host:key.last(0)})', null, true),
 			array(
 				'1 - (1/({host:key.last(0)}))+(({host:key.last(0)}))/({host:key.last(0)})/({host:key.last(0)})',
@@ -1462,9 +1462,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:.last(0)}/{host:.last(0)}', null, false),
 			array('{host:.last(0)}-{host:.last(0)}', null, false),
 			array('{host:.last(0)}+{host:.last(0)}', null, false),
-			array('{host:.last(0)}|{host:.last(0)}', null, false),
-			array('{host:.last(0)}&{host:.last(0)}', null, false),
-			array('{host:.last(0)}&{host:.last(0)}/{host:.last(0)}', null, false),
+			array('{host:.last(0)}or{host:.last(0)}', null, false),
+			array('{host:.last(0)}and{host:.last(0)}', null, false),
+			array('{host:.last(0)}and{host:.last(0)}/{host:.last(0)}', null, false),
 			array('{host:.last(0)}+{host:.last(0)}/{host:.last(0)}', null, false),
 			array('1 - (1/{host:.last(0)})+({host:.last(0)})/{host:.last(0)}/{host:.last(0)}', null, false),
 			array('({$}+{host:key.last(0)}) + + ({$}+{host:key.last(0)})', null, false),
@@ -1477,9 +1477,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{$}+{host:key.last(0)}/{$}+{host:key.last(0)}', null, false),
 			array('{$}+{host:key.last(0)}-{$}+{host:key.last(0)}', null, false),
 			array('{$}+{host:key.last(0)}+{$}+{host:key.last(0)}', null, false),
-			array('{$}+{host:key.last(0)}|{$}+{host:key.last(0)}', null, false),
-			array('{$}+{host:key.last(0)}&{$}+{host:key.last(0)}', null, false),
-			array('{$}+{host:key.last(0)}&{$}+{host:key.last(0)}/{$}+{host:key.last(0)}', null, false),
+			array('{$}+{host:key.last(0)}or{$}+{host:key.last(0)}', null, false),
+			array('{$}+{host:key.last(0)}and{$}+{host:key.last(0)}', null, false),
+			array('{$}+{host:key.last(0)}and{$}+{host:key.last(0)}/{$}+{host:key.last(0)}', null, false),
 			array('{$}+{host:key.last(0)}+{$}+{host:key.last(0)}/{$}+{host:key.last(0)}', null, false),
 			array(
 				'1 - (1/{$}+{host:key.last(0)})+({$}+{host:key.last(0)})/{$}+{host:key.last(0)}/{$}+{host:key.last('.
@@ -1497,10 +1497,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array(' - {$MACRO}+{host:key.last(0)}/ - {$MACRO}+{host:key.last(0)}', null, true),
 			array(' - {$MACRO}+{host:key.last(0)}- - {$MACRO}+{host:key.last(0)}', null, true),
 			array(' - {$MACRO}+{host:key.last(0)}+ - {$MACRO}+{host:key.last(0)}', null, true),
-			array(' - {$MACRO}+{host:key.last(0)}| - {$MACRO}+{host:key.last(0)}', null, true),
-			array(' - {$MACRO}+{host:key.last(0)}& - {$MACRO}+{host:key.last(0)}', null, true),
+			array(' - {$MACRO}+{host:key.last(0)}or - {$MACRO}+{host:key.last(0)}', null, true),
+			array(' - {$MACRO}+{host:key.last(0)}and - {$MACRO}+{host:key.last(0)}', null, true),
 			array(
-				' - {$MACRO}+{host:key.last(0)}& - {$MACRO}+{host:key.last(0)}/ - {$MACRO}+{host:key.last(0)}',
+				' - {$MACRO}+{host:key.last(0)}and - {$MACRO}+{host:key.last(0)}/ - {$MACRO}+{host:key.last(0)}',
 				null,
 				true
 			),
@@ -1525,9 +1525,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('100G+{host:key.last(0)}/100G+{host:key.last(0)}', null, true),
 			array('100G+{host:key.last(0)}-100G+{host:key.last(0)}', null, true),
 			array('100G+{host:key.last(0)}+100G+{host:key.last(0)}', null, true),
-			array('100G+{host:key.last(0)}|100G+{host:key.last(0)}', null, true),
-			array('100G+{host:key.last(0)}&100G+{host:key.last(0)}', null, true),
-			array('100G+{host:key.last(0)}&100G+{host:key.last(0)}/100G+{host:key.last(0)}', null, true),
+			array('100G+{host:key.last(0)}or100G+{host:key.last(0)}', null, true),
+			array('100G+{host:key.last(0)}and100G+{host:key.last(0)}', null, true),
+			array('100G+{host:key.last(0)}and100G+{host:key.last(0)}/100G+{host:key.last(0)}', null, true),
 			array('100G+{host:key.last(0)}+100G+{host:key.last(0)}/100G+{host:key.last(0)}', null, true),
 			array(
 				'1 - (1/100G+{host:key.last(0)})+(100G+{host:key.last(0)})/100G+{host:key.last(0)}/100G+{host:key.l'.
@@ -1545,38 +1545,38 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.last(0)}/{host:key.last(0)}', null, true),
 			array('{host:key.last(0)}-{host:key.last(0)}', null, true),
 			array('{host:key.last(0)}+{host:key.last(0)}', null, true),
-			array('{host:key.last(0)}|{host:key.last(0)}', null, true),
-			array('{host:key.last(0)}&{host:key.last(0)}', null, true),
-			array('{host:key.last(0)}&{host:key.last(0)}/{host:key.last(0)}', null, true),
+			array('{host:key.last(0)}or{host:key.last(0)}', null, true),
+			array('{host:key.last(0)}and{host:key.last(0)}', null, true),
+			array('{host:key.last(0)}and{host:key.last(0)}/{host:key.last(0)}', null, true),
 			array('{host:key.last(0)}+{host:key.last(0)}/{host:key.last(0)}', null, true),
 			array('1 - (1/{host:key.last(0)})+({host:key.last(0)})/{host:key.last(0)}/{host:key.last(0)}', null, true),
-			array('({host:key.str(0 - 1 / 2 |-4*-56.34K)}) + + ({host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, false),
-			array('({host:key.str(0 - 1 / 2 |-4*-56.34K)}) + - ({host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, true),
-			array('({host:key.str(0 - 1 / 2 |-4*-56.34K)}) + ({host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, true),
-			array('({host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, true),
-			array('(--{host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, false),
-			array('(+{host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, false),
-			array('(/{host:key.str(0 - 1 / 2 |-4*-56.34K)})', null, false),
-			array('{host:key.str(0 - 1 / 2 |-4*-56.34K)}/{host:key.str(0 - 1 / 2 |-4*-56.34K)}', null, true),
-			array('{host:key.str(0 - 1 / 2 |-4*-56.34K)}-{host:key.str(0 - 1 / 2 |-4*-56.34K)}', null, true),
-			array('{host:key.str(0 - 1 / 2 |-4*-56.34K)}+{host:key.str(0 - 1 / 2 |-4*-56.34K)}', null, true),
-			array('{host:key.str(0 - 1 / 2 |-4*-56.34K)}|{host:key.str(0 - 1 / 2 |-4*-56.34K)}', null, true),
-			array('{host:key.str(0 - 1 / 2 |-4*-56.34K)}&{host:key.str(0 - 1 / 2 |-4*-56.34K)}', null, true),
+			array('({host:key.str(0 - 1 / 2 or-4*-56.34K)}) + + ({host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, false),
+			array('({host:key.str(0 - 1 / 2 or-4*-56.34K)}) + - ({host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, true),
+			array('({host:key.str(0 - 1 / 2 or-4*-56.34K)}) + ({host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, true),
+			array('({host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, true),
+			array('(--{host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, false),
+			array('(+{host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, false),
+			array('(/{host:key.str(0 - 1 / 2 or-4*-56.34K)})', null, false),
+			array('{host:key.str(0 - 1 / 2 or-4*-56.34K)}/{host:key.str(0 - 1 / 2 or-4*-56.34K)}', null, true),
+			array('{host:key.str(0 - 1 / 2 or-4*-56.34K)}-{host:key.str(0 - 1 / 2 or-4*-56.34K)}', null, true),
+			array('{host:key.str(0 - 1 / 2 or-4*-56.34K)}+{host:key.str(0 - 1 / 2 or-4*-56.34K)}', null, true),
+			array('{host:key.str(0 - 1 / 2 or-4*-56.34K)}or{host:key.str(0 - 1 / 2 or-4*-56.34K)}', null, true),
+			array('{host:key.str(0 - 1 / 2 or-4*-56.34K)}and{host:key.str(0 - 1 / 2 or-4*-56.34K)}', null, true),
 			array(
-				'{host:key.str(0 - 1 / 2 |-4*-56.34K)}&{host:key.str(0 - 1 / 2 |-4*-56.34K)}/{host:key.str(0 - 1 / '.
-					'2 |-4*-56.34K)}',
+				'{host:key.str(0 - 1 / 2 or-4*-56.34K)}and{host:key.str(0 - 1 / 2 or-4*-56.34K)}/{host:key.str(0 - 1 / '.
+					'2 or-4*-56.34K)}',
 				null,
 				true
 			),
 			array(
-				'{host:key.str(0 - 1 / 2 |-4*-56.34K)}+{host:key.str(0 - 1 / 2 |-4*-56.34K)}/{host:key.str(0 - 1 / '.
-					'2 |-4*-56.34K)}',
+				'{host:key.str(0 - 1 / 2 or-4*-56.34K)}+{host:key.str(0 - 1 / 2 or-4*-56.34K)}/{host:key.str(0 - 1 / '.
+					'2 or-4*-56.34K)}',
 				null,
 				true
 			),
 			array(
-				'1 - (1/{host:key.str(0 - 1 / 2 |-4*-56.34K)})+({host:key.str(0 - 1 / 2 |-4*-56.34K)})/{host:key.st'.
-					'r(0 - 1 / 2 |-4*-56.34K)}/{host:key.str(0 - 1 / 2 |-4*-56.34K)}',
+				'1 - (1/{host:key.str(0 - 1 / 2 or-4*-56.34K)})+({host:key.str(0 - 1 / 2 or-4*-56.34K)})/{host:key.st'.
+					'r(0 - 1 / 2 or-4*-56.34K)}/{host:key.str(0 - 1 / 2 or-4*-56.34K)}',
 				null,
 				true
 			),
@@ -1590,9 +1590,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.str(^$$$^%)}/{host:key.str(^$$$^%)}', null, true),
 			array('{host:key.str(^$$$^%)}-{host:key.str(^$$$^%)}', null, true),
 			array('{host:key.str(^$$$^%)}+{host:key.str(^$$$^%)}', null, true),
-			array('{host:key.str(^$$$^%)}|{host:key.str(^$$$^%)}', null, true),
-			array('{host:key.str(^$$$^%)}&{host:key.str(^$$$^%)}', null, true),
-			array('{host:key.str(^$$$^%)}&{host:key.str(^$$$^%)}/{host:key.str(^$$$^%)}', null, true),
+			array('{host:key.str(^$$$^%)}or{host:key.str(^$$$^%)}', null, true),
+			array('{host:key.str(^$$$^%)}and{host:key.str(^$$$^%)}', null, true),
+			array('{host:key.str(^$$$^%)}and{host:key.str(^$$$^%)}/{host:key.str(^$$$^%)}', null, true),
 			array('{host:key.str(^$$$^%)}+{host:key.str(^$$$^%)}/{host:key.str(^$$$^%)}', null, true),
 			array(
 				'1 - (1/{host:key.str(^$$$^%)})+({host:key.str(^$$$^%)})/{host:key.str(^$$$^%)}/{host:key.str(^$$$'.
@@ -1610,10 +1610,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.str("(^*&%#$%)*")}/{host:key.str("(^*&%#$%)*")}', null, true),
 			array('{host:key.str("(^*&%#$%)*")}-{host:key.str("(^*&%#$%)*")}', null, true),
 			array('{host:key.str("(^*&%#$%)*")}+{host:key.str("(^*&%#$%)*")}', null, true),
-			array('{host:key.str("(^*&%#$%)*")}|{host:key.str("(^*&%#$%)*")}', null, true),
-			array('{host:key.str("(^*&%#$%)*")}&{host:key.str("(^*&%#$%)*")}', null, true),
-			array('{host:key.str("(^*&%#$%)*")}&{host:key.str("(^*&%#$%)*")}/{host:key.str("(^*&%#$%)*")}', null, true),
-			array('{host:key.str("(^*&%#$%)*")}+{host:key.str("(^*&%#$%)*")}/{host:key.str("(^*&%#$%)*")}', null, true),
+			array('{host:key.str("(^*&%#$%)*")}or{host:key.str("(^*&%#$%)*")}', null, true),
+			array('{host:key.str("(^*&%#$%)*")}and{host:key.str("(^*&%#$%)*")}', null, true),
+			array('{host:key.str("(^*&%#$%)*")}and{host:key.str("(^*&%#$%)*")}/{host:key.str("(^*&%#$%)*")}', null, true),
+			array('{host:key.str("(^*%#$%)*")}+{host:key.str("(^*&%#$%)*")}/{host:key.str("(^*&%#$%)*")}', null, true),
 			array(
 				'1 - (1/{host:key.str("(^*&%#$%)*")})+({host:key.str("(^*&%#$%)*")})/{host:key.str("(^*&%#$%)*")}/{'.
 					'host:key.str("(^*&%#$%)*")}',
@@ -1630,10 +1630,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('((((((({host:key.str("")})))))))/((((((({host:key.str("")})))))))', null, true),
 			array('((((((({host:key.str("")})))))))-((((((({host:key.str("")})))))))', null, true),
 			array('((((((({host:key.str("")})))))))+((((((({host:key.str("")})))))))', null, true),
-			array('((((((({host:key.str("")})))))))|((((((({host:key.str("")})))))))', null, true),
-			array('((((((({host:key.str("")})))))))&((((((({host:key.str("")})))))))', null, true),
+			array('((((((({host:key.str("")})))))))or((((((({host:key.str("")})))))))', null, true),
+			array('((((((({host:key.str("")})))))))and((((((({host:key.str("")})))))))', null, true),
 			array(
-				'((((((({host:key.str("")})))))))&((((((({host:key.str("")})))))))/((((((({host:key.str("")})))))))',
+				'((((((({host:key.str("")})))))))and((((((({host:key.str("")})))))))/((((((({host:key.str("")})))))))',
 				null,
 				true
 			),
@@ -1670,10 +1670,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('(1 - 1-2-((((((({host:key.str("0")}))))))))/(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
 			array('(1 - 1-2-((((((({host:key.str("0")}))))))))-(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
 			array('(1 - 1-2-((((((({host:key.str("0")}))))))))+(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
-			array('(1 - 1-2-((((((({host:key.str("0")}))))))))|(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
-			array('(1 - 1-2-((((((({host:key.str("0")}))))))))&(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
+			array('(1 - 1-2-((((((({host:key.str("0")}))))))))or(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
+			array('(1 - 1-2-((((((({host:key.str("0")}))))))))and(1 - 1-2-((((((({host:key.str("0")}))))))))', null, true),
 			array(
-				'(1 - 1-2-((((((({host:key.str("0")}))))))))&(1 - 1-2-((((((({host:key.str("0")}))))))))/'.
+				'(1 - 1-2-((((((({host:key.str("0")}))))))))and(1 - 1-2-((((((({host:key.str("0")}))))))))/'.
 					'(1 - 1-2-((((((({host:key.str("0")}))))))))',
 				null,
 				true
@@ -1713,9 +1713,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				null,
 				true
 			),
-			array('{host:key.str({$M})} | {host:key.str({$M})} | {$M} + {TRIGGER.VALUE}', null, true),
-			array('{$M} | {host:key.str({$M})}', null, true),
-			array('({$M} + 5) | {host:key.str({$M})}', null, true),
+			array('{host:key.str({$M})} or {host:key.str({$M})} or {$M} + {TRIGGER.VALUE}', null, true),
+			array('{$M} or {host:key.str({$M})}', null, true),
+			array('({$M} + 5) or {host:key.str({$M})}', null, true),
 			array(
 				'{hostA:keyA[1,2,3].str("abc",123)}*{hostB:keyB.last(123,"abc","def")}/{host:key["param","abc"].'.
 					'last(1,2,3,4,5)}+{host:key.diff()}+{TRIGGER.VALUE}/{$M}-{$M1234}*{$CUSTOM}-{TRIGGER.VALUE}',
@@ -1786,227 +1786,228 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}+{$M}',
 				null,
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}+{$M',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}+{$',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}+{',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}+',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE}',
 				null,
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALUE',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VALU',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VAL',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.VA',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.V',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER.',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGER',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGGE',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIGG',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRIG',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TRI',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{TR',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{T',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+{',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)'.
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)'.
 					'+',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1)',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1)',
 				null,
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-1',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-1',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(-',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(-',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-(',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-(',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+-',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+-',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)+',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)+',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5)',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5)',
 				null,
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-5',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-5',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4-',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4-',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(4',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(4',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+(',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+(',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)+',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)+',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3)',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3)',
 				null,
 				true
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(3',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(3',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -(',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -(',
 				null,
 				false
 			),
 			array(
-				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & -',
+				'{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and -',
 				null,
 				false
 			),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m & ', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m &', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m ', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9m', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=9', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8=', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#8', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7#', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<7', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6<', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>6', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5>', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&5', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4&', null, false),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|4', null, true),
-			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3|', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and ', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m and', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m ', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9m', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=9', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8=', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>8', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<>', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7<', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<7', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6<', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>6', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5>', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and5', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4and', null, false),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or4', null, true),
+			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3or', null, false),
 			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+3', null, true),
 			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2+', null, false),
 			array('{host:key[p1, p2 ,"p3", "p4\"" ].func(p1, p2 ,"p3", "p4\"" )}*0/1-2', null, true),
