@@ -933,25 +933,10 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	zbx_vector_ptr_t	upd_gitems; 	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t	del_gitemids;
 
-	zbx_uint64_t		graphid = 0, gitemid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
-				*name_esc, *color_esc;
-	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
-				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
-				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
-				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0;
-	const char		*ins_graphs_sql =
-				"insert into graphs"
-				" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,show_triggers,"
-					"graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,"
-					"ymin_itemid,ymax_type,ymax_itemid,flags)"
-				" values ";
-	const char		*ins_graph_discovery_sql =
-				"insert into graph_discovery (graphid,parent_graphid) values ";
-	const char		*ins_graphs_items_sql =
-				"insert into graphs_items"
-				" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
-				" values ";
+	zbx_uint64_t		graphid = 0, graphdiscoveryid = 0, gitemid = 0;
+	char			*sql = NULL, *name_esc, *color_esc;
+	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_db_insert_t		db_insert, db_insert_gdiscovery, db_insert_gitems;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1001,32 +986,29 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	if (0 != new_graphs)
 	{
 		graphid = DBget_maxid_num("graphs", new_graphs);
+		graphdiscoveryid = DBget_maxid_num("graph_discovery", new_graphs);
 
-		sql1 = zbx_malloc(sql1, sql1_alloc);
-		sql2 = zbx_malloc(sql2, sql2_alloc);
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_graphs_sql);
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_graph_discovery_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
+				"yaxismax", "show_work_period", "show_triggers", "graphtype", "show_legend", "show_3d",
+				"percent_left", "percent_right", "ymin_type", "ymin_itemid", "ymax_type",
+				"ymax_itemid", "flags", NULL);
+
+		zbx_db_insert_prepare(&db_insert_gdiscovery, "graph_discovery", "graphdiscoveryid", "graphid",
+				"parent_graphid", NULL);
 	}
 
 	if (0 != new_gitems)
 	{
 		gitemid = DBget_maxid_num("graphs_items", new_gitems);
 
-		sql3 = zbx_malloc(sql3, sql3_alloc);
-		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_graphs_items_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert_gitems, "graphs_items", "gitemid", "graphid", "itemid", "drawtype",
+				"sortorder", "color", "yaxisside", "calc_fnc", "type", NULL);
 	}
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		sql4 = zbx_malloc(sql4, sql4_alloc);
-		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		sql = zbx_malloc(sql, sql_alloc);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < graphs->values_num; i++)
@@ -1038,145 +1020,132 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 
 		if (0 == graph->graphid)
 		{
-			name_esc = DBdyn_escape_string(graph->name);
+			zbx_db_insert_add_values(&db_insert, graphid, graph->name, width, height, yaxismin, yaxismax,
+					(int)show_work_period, (int)show_triggers, (int)graphtype, (int)show_legend,
+					(int)show_3d, percent_left, percent_right, (int)ymin_type, graph->ymin_itemid,
+					(int)ymax_type, graph->ymax_itemid, (int)ZBX_FLAG_DISCOVERY_CREATED);
 
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_graphs_sql);
-#endif
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL ",%d,%d,%d,%d,%d,"
-						ZBX_FS_DBL "," ZBX_FS_DBL ",%d,%s,%d,%s,%d)" ZBX_ROW_DL,
-					graphid, name_esc, width, height, yaxismin, yaxismax, (int)show_work_period,
-					(int)show_triggers, (int)graphtype, (int)show_legend, (int)show_3d,
-					percent_left, percent_right, (int)ymin_type, DBsql_id_ins(graph->ymin_itemid),
-					(int)ymax_type, DBsql_id_ins(graph->ymax_itemid), ZBX_FLAG_DISCOVERY_CREATED);
-
-			zbx_free(name_esc);
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_graph_discovery_sql);
-#endif
-			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL, graphid, parent_graphid);
+			zbx_db_insert_add_values(&db_insert_gdiscovery, graphdiscoveryid, graphid, parent_graphid);
 
 			graph->graphid = graphid++;
+			graphdiscoveryid++;
 		}
 		else if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE))
 		{
 			const char	*d = "";
 
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update graphs set ");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set ");
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			{
 				name_esc = DBdyn_escape_string(graph->name);
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "name='%s'", name_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
 				zbx_free(name_esc);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_WIDTH))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%swidth=%d", d, width);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%swidth=%d", d, width);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_HEIGHT))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sheight=%d", d, height);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, height);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMIN))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%syaxismin=" ZBX_FS_DBL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL, d,
 						yaxismin);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMAX))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%syaxismax=" ZBX_FS_DBL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL, d,
 						yaxismax);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_WORK_PERIOD))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sshow_work_period=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_work_period=%d", d,
 						(int)show_work_period);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_TRIGGERS))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sshow_triggers=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_triggers=%d", d,
 						(int)show_triggers);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_GRAPHTYPE))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sgraphtype=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sgraphtype=%d", d,
 						(int)graphtype);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_LEGEND))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sshow_legend=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_legend=%d", d,
 						(int)show_legend);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_3D))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sshow_3d=%d", d, (int)show_3d);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d, (int)show_3d);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_LEFT))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spercent_left=" ZBX_FS_DBL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_left=" ZBX_FS_DBL, d,
 						percent_left);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_RIGHT))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spercent_right=" ZBX_FS_DBL, d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_right=" ZBX_FS_DBL, d,
 						percent_right);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMIN_TYPE))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%symin_type=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_type=%d", d,
 						(int)ymin_type);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMIN_ITEMID))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%symin_itemid=%s", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_itemid=%s", d,
 						DBsql_id_ins(graph->ymin_itemid));
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_TYPE))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%symax_type=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_type=%d", d,
 						(int)ymax_type);
 				d = ",";
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_ITEMID))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%symax_itemid=%s", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
 						DBsql_id_ins(graph->ymax_itemid));
 			}
 
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where graphid=" ZBX_FS_UI64 ";\n",
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where graphid=" ZBX_FS_UI64 ";\n",
 					graph->graphid);
 		}
 
@@ -1192,18 +1161,9 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 
 			if (0 == gitem->gitemid)
 			{
-				color_esc = DBdyn_escape_string(gitem->color);
-
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_graphs_items_sql);
-#endif
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,%d,%d)"
-						ZBX_ROW_DL, gitemid, graph->graphid, gitem->itemid, gitem->drawtype,
-						gitem->sortorder, color_esc, gitem->yaxisside, gitem->calc_fnc,
-						gitem->type);
-
-				zbx_free(color_esc);
+				zbx_db_insert_add_values(&db_insert_gitems, gitemid, graph->graphid, gitem->itemid,
+						(int)gitem->drawtype, gitem->sortorder, gitem->color,
+						(int)gitem->yaxisside, (int)gitem->calc_fnc, (int)gitem->type);
 
 				gitem->gitemid = gitemid++;
 			}
@@ -1216,51 +1176,51 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 
 		gitem = (zbx_lld_gitem_t *)upd_gitems.values[i];
 
-		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update graphs_items set ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs_items set ");
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_ITEMID))
 		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "itemid=" ZBX_FS_UI64, gitem->itemid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "itemid=" ZBX_FS_UI64, gitem->itemid);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_DRAWTYPE))
 		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdrawtype=%d", d, (int)gitem->drawtype);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdrawtype=%d", d, (int)gitem->drawtype);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_SORTORDER))
 		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%ssortorder=%d", d, gitem->sortorder);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ssortorder=%d", d, gitem->sortorder);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_COLOR))
 		{
 			color_esc = DBdyn_escape_string(gitem->color);
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%scolor='%s'", d, color_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scolor='%s'", d, color_esc);
 			zbx_free(color_esc);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_YAXISSIDE))
 		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%syaxisside=%d", d,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxisside=%d", d,
 					(int)gitem->yaxisside);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_CALC_FNC))
 		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%scalc_fnc=%d", d, (int)gitem->calc_fnc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scalc_fnc=%d", d, (int)gitem->calc_fnc);
 			d = ",";
 		}
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_TYPE))
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%stype=%d", d, (int)gitem->type);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, (int)gitem->type);
 
-		zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where gitemid=" ZBX_FS_UI64 ";\n",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where gitemid=" ZBX_FS_UI64 ";\n",
 				gitem->gitemid);
 	}
 
@@ -1268,44 +1228,32 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	{
 		zbx_vector_uint64_sort(&del_gitemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "delete from graphs_items where");
-		DBadd_condition_alloc(&sql4, &sql4_alloc, &sql4_offset, "gitemid",
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs_items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gitemid",
 				del_gitemids.values, del_gitemids.values_num);
-		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
-	}
-
-	if (0 != new_graphs)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql1_offset--;
-		sql2_offset--;
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-		DBexecute("%s", sql1);
-		DBexecute("%s", sql2);
-		zbx_free(sql1);
-		zbx_free(sql2);
-	}
-
-	if (0 != new_gitems)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql3_offset--;
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBexecute("%s", sql3);
-		zbx_free(sql3);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
-		DBexecute("%s", sql4);
-		zbx_free(sql4);
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+
+	if (0 != new_graphs)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		zbx_db_insert_execute(&db_insert_gdiscovery);
+		zbx_db_insert_clean(&db_insert_gdiscovery);
+	}
+
+	if (0 != new_gitems)
+	{
+		zbx_db_insert_execute(&db_insert_gitems);
+		zbx_db_insert_clean(&db_insert_gitems);
 	}
 
 	DBcommit();

@@ -576,4 +576,39 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
 
+/* bulk insert support */
+
+/* database field value */
+typedef union
+{
+	int		i32;
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_db_value_t;
+
+/* database bulk insert data */
+typedef struct
+{
+	/* the target table */
+	const ZBX_TABLE		*table;
+	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
+	zbx_vector_ptr_t	fields;
+	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
+	zbx_vector_ptr_t	rows;
+	/* index of autoincrement field */
+	int			autoincrement;
+}
+zbx_db_insert_t;
+
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+		int fields_num);
+void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
+int	zbx_db_insert_execute(zbx_db_insert_t *self);
+void	zbx_db_insert_clean(zbx_db_insert_t *self);
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+
 #endif
