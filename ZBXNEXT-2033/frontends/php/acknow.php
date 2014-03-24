@@ -312,7 +312,7 @@ $message->attr('autofocus', 'autofocus');
 $messageTable->addRow(_('Message'), $message);
 
 if (CRemedyService::$enabled && ((!$ticket && $event['value'] == TRIGGER_VALUE_TRUE) || $ticket)) {
-	$ticketStatusMessage = (!$ticket || ($ticket['status'] === 'Closed' || $ticket['status'] === 'Cancelled'))
+	$ticketStatusMessage = (!$ticket || $ticket['status'] === 'Closed' || $ticket['status'] === 'Cancelled')
 		? _('Create ticket')
 		: array(_('Update ticket').' ', $ticket['link']);
 
