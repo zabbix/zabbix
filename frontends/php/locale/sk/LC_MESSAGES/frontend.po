@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 18:28+0200\n"
-"PO-Revision-Date: 2014-02-10 21:40+0300\n"
+"POT-Creation-Date: 2014-03-24 18:44+0200\n"
+"PO-Revision-Date: 2014-03-23 23:37+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392061248.0\n"
+"X-POOTLE-MTIME: 1395610652.0\n"
 
 #: api/classes/CMaintenance.php:354 api/classes/CMaintenance.php:359
 #: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:473
@@ -7520,7 +7520,7 @@ msgstr "Neplatné poradie sorder pre službu \"%1$s\"."
 
 #: api/classes/CEvent.php:384
 msgid "Incorrect source value."
-msgstr "Neplatný stav hosta \"%1$s\"."
+msgstr "Neplatná zdrojová hodnota."
 
 #: api/classes/CHost.php:570
 #, c-format
