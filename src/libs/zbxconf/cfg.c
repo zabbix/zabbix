@@ -55,39 +55,37 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL;
-	wchar_t			*wpath = NULL;
+	char 			*path = NULL, *file_name = NULL;
+	wchar_t			*wpath;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	path  = zbx_dsprintf(path, "%s\\*", cfg_file);
+	path = zbx_dsprintf(path, "%s\\*", cfg_file);
 	wpath = zbx_utf8_to_unicode(path);
-	zbx_free(path);
 
 	if (INVALID_HANDLE_VALUE == (h_find = FindFirstFileW(wpath, &find_file_data)))
-	{
-		zbx_free(wpath);
 		goto out;
-	}
-	zbx_free(wpath);
 
 	while (0 != FindNextFileW(h_find, &find_file_data))
 	{
 		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
+		zbx_free(file_name);
+		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
-		path = zbx_dsprintf(path, "%s\\%s", cfg_file, zbx_unicode_to_utf8(find_file_data.cFileName));
-		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
-		{
-			zbx_free(path);
-			FindClose(h_find);
-			goto out;
-		}
 		zbx_free(path);
+		path = zbx_dsprintf(path, "%s\\%s", cfg_file, file_name);
+
+		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+			goto out;
+
 	}
-	FindClose(h_find);
 	ret = SUCCEED;
 out:
+	zbx_free(file_name);
+	zbx_free(path);
+	zbx_free(wpath);
+	FindClose(h_find);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 #else
