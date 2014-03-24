@@ -33,6 +33,7 @@
 
 #include "daemon.h"
 #include "zbxself.h"
+#include "rsm.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
@@ -56,7 +57,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix proxy";
-const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
+const char	usage_message[] = "[-hVr] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
@@ -67,7 +68,7 @@ const char	*help_message[] = {
 	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
 	"",
 	"Other options:",
-	"  -r --rsm                        Enable Registry SLA Monitoring (RSM) mode",
+	"  -r --rsm                        Enable Registry SLA Monitoring (RSM) support",
 	"  -h --help                       Give this help",
 	"  -V --version                    Display version number",
 	NULL	/* end of text */
@@ -87,7 +88,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hVR:";
+static char	shortopts[] = "c:n:hrVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -189,7 +190,7 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;
 ZBX_MUTEX	node_sync_access;
 
 /* a passphrase for EPP data encryption used in proxy poller */
-char	*epp_passphrase			= NULL;
+char	epp_passphrase[128]		= "";
 
 /******************************************************************************
  *                                                                            *
@@ -489,7 +490,12 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'r':
-				epp_passphrase = getpass("Enter a passphrase for EPP data encryption: ");
+				if (SUCCEED != zbx_read_stdin("Enter a passphrase for EPP data encryption: ",
+						epp_passphrase, sizeof(epp_passphrase)))
+				{
+					printf("an error occured while requesting EPP passphrase\n");
+					exit(EXIT_FAILURE);
+				}
 				break;
 			case 'h':
 				help();
@@ -620,10 +626,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
@@ -647,10 +650,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
 
@@ -660,10 +660,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_HEARTBEAT, CONFIG_HEARTBEAT_FORKS);
 
@@ -673,10 +670,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_DATASENDER, CONFIG_DATASENDER_FORKS);
 
@@ -699,10 +693,7 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
 
@@ -712,10 +703,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_TRAPPER, CONFIG_TRAPPER_FORKS);
 
@@ -725,10 +713,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_PINGER, CONFIG_PINGER_FORKS);
 
@@ -738,10 +723,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_HOUSEKEEPER, CONFIG_HOUSEKEEPER_FORKS);
 
@@ -751,10 +733,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_HTTPPOLLER, CONFIG_HTTPPOLLER_FORKS);
 
@@ -767,10 +746,7 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
 
@@ -780,10 +756,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_HISTSYNCER, CONFIG_HISTSYNCER_FORKS);
 
@@ -793,10 +766,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_IPMIPOLLER, CONFIG_IPMIPOLLER_FORKS);
 
@@ -806,10 +776,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_JAVAPOLLER, CONFIG_JAVAPOLLER_FORKS);
 
@@ -819,10 +786,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_SNMPTRAPPER, CONFIG_SNMPTRAPPER_FORKS);
 
@@ -832,10 +796,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* does not need EPP passphrase */
 		if (NULL != epp_passphrase)
-		{
 			memset(epp_passphrase, 0, strlen(epp_passphrase));
-			zbx_free(epp_passphrase);
-		}
 
 		INIT_PROXY(ZBX_PROCESS_TYPE_SELFMON, CONFIG_SELFMON_FORKS);
 

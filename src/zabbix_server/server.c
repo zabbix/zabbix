@@ -187,7 +187,7 @@ int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 ZBX_MUTEX	node_sync_access;
 
 /* a passphrase for EPP data encryption used in proxy poller */
-char	*epp_passphrase			= NULL;
+char	epp_passphrase[128]		= "";
 
 /******************************************************************************
  *                                                                            *

@@ -10,30 +10,45 @@
 const char      *progname = NULL;
 const char	title_message[] = "Password encrypter";
 const char	*help_message[] = {NULL};
-const char	usage_message[] = "<passphrase> <secretkey_enc_b64> <secretkey_salt_b64> <password>\n"
+const char	usage_message[] = "<secretkey_enc_b64> <secretkey_salt_b64>\n"
+		"Encrypt EPP password using secret key and salt\n"
 		"Parameters:\n"
-		"    <passphrase>                a passphrase for secret key decryption\n"
 		"    <secretkey_enc_b64>         encrypted secret key for password encryption, base64-encoded\n"
 		"    <secretkey_salt_b64>        salt for secret key decryption, base64-encoded\n"
-		"    <password>                  a password to encrypt";
+		"Optional:\n"
+		"    <noprompt>                  do not print prompt when requesting EPP passphrase and password";
 
 int	main(int argc, char *argv[])
 {
-	const char	*passphrase, *secretkey_enc_b64, *secretkey_salt_b64, *password;
-	char		*password_enc_b64 = NULL, *password_salt_b64 = NULL, err[128];
+	const char	*secretkey_enc_b64, *secretkey_salt_b64, *prompt = 0;
+	char		*password_enc_b64 = NULL, *password_salt_b64 = NULL, passphrase[128], password[128], err[128];
 
 	progname = get_program_name(argv[0]);
 
-	if (argc != 5)
+	if (argc < 3)
 	{
 		usage();
 		exit(1);
 	}
 
-	passphrase = argv[1];
-	secretkey_enc_b64 = argv[2];
-	secretkey_salt_b64 = argv[3];
-	password = argv[4];
+	if (3 == argc || 0 != strcmp("noprompt", argv[3]))
+		prompt = "Enter EPP passphrase: ";
+	if (SUCCEED != zbx_read_stdin(prompt, passphrase, sizeof(passphrase)))
+	{
+		fprintf(stderr, "an error occured while requesting EPP passphrase\n");
+		goto out;
+	}
+
+	if (3 == argc || 0 != strcmp("noprompt", argv[3]))
+		prompt = "Enter EPP password: ";
+	if (SUCCEED != zbx_read_stdin(prompt, password, sizeof(password)))
+	{
+		fprintf(stderr, "an error occured while requesting EPP password\n");
+		goto out;
+	}
+
+	secretkey_enc_b64 = argv[1];
+	secretkey_salt_b64 = argv[2];
 
 	/* initialize the library */
 	if (SUCCEED != rsm_ssl_init())
@@ -52,11 +67,8 @@ int	main(int argc, char *argv[])
 
 	printf("%s|%s\n", password_enc_b64, password_salt_b64);
 out:
-	if (NULL != password_enc_b64)
-		zbx_free(password_enc_b64);
-
-	if (NULL != password_salt_b64)
-		zbx_free(password_salt_b64);
+	zbx_free(password_enc_b64);
+	zbx_free(password_salt_b64);
 
 	return 0;
 }

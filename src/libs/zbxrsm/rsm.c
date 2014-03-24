@@ -324,3 +324,27 @@ out:
 
 	return ret;
 }
+
+int	zbx_read_stdin(const char *prompt, char *output, size_t output_size)
+{
+	struct termios	oflags, nflags;
+
+	/* disable echo */
+	tcgetattr(fileno(stdin), &oflags);
+	nflags = oflags;
+	nflags.c_lflag &= ~ECHO;
+	nflags.c_lflag |= ECHONL;
+
+	if (0 != tcsetattr(fileno(stdin), TCSANOW, &nflags))
+		return FAIL;
+
+	printf(prompt);
+	fgets(output, output_size, stdin);
+	output[strlen(output) - 1] = 0;
+
+	/* restore terminal */
+	if (0 != tcsetattr(fileno(stdin), TCSANOW, &oflags))
+		return FAIL;
+
+	return SUCCEED;
+}

@@ -508,7 +508,6 @@ static void	zbx_destroy_owners(zbx_vector_ptr_t *owners)
 
 	for (i = 0; i < owners->values_num; i++)
 		ldns_rdf_deep_free((ldns_rdf *)owners->values[i]);
-
 	zbx_vector_ptr_destroy(owners);
 }
 
@@ -2053,6 +2052,15 @@ static int	zbx_ec_noerror(int ec)
 	return FAIL;
 }
 
+static void	zbx_vector_str_clean_and_destroy(zbx_vector_str_t *v)
+{
+	size_t	i;
+
+	for (i = 0; i < v->values_num; i++)
+		zbx_free(v->values[i]);
+	zbx_vector_str_destroy(v);
+}
+
 int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
@@ -2436,11 +2444,11 @@ out:
 	zbx_free(res_ip);
 	zbx_free(value_str);
 
-	zbx_vector_str_destroy(&nss);
-	zbx_vector_str_destroy(&ips80);
-	zbx_vector_str_destroy(&ips43);
-	zbx_vector_str_destroy(&hosts80);
-	zbx_vector_str_destroy(&hosts43);
+	zbx_vector_str_clean_and_destroy(&nss);
+	zbx_vector_str_clean_and_destroy(&ips80);
+	zbx_vector_str_clean_and_destroy(&ips43);
+	zbx_vector_str_clean_and_destroy(&hosts80);
+	zbx_vector_str_clean_and_destroy(&hosts43);
 
 	return ret;
 }
@@ -3457,8 +3465,8 @@ out:
 	zbx_free(value_str);
 	zbx_free(res_ip);
 
-	zbx_vector_str_destroy(&epp_ips);
-	zbx_vector_str_destroy(&epp_hosts);
+	zbx_vector_str_clean_and_destroy(&epp_ips);
+	zbx_vector_str_clean_and_destroy(&epp_hosts);
 
 	return ret;
 }
@@ -3774,10 +3782,10 @@ out:
 	zbx_free(value_str);
 
 	if (0 != ips6_init)
-		zbx_vector_str_destroy(&ips6);
+		zbx_vector_str_clean_and_destroy(&ips6);
 
 	if (0 != ips4_init)
-		zbx_vector_str_destroy(&ips4);
+		zbx_vector_str_clean_and_destroy(&ips4);
 
 	if (NULL != query_rdf)
 		ldns_rdf_deep_free(query_rdf);

@@ -12,28 +12,31 @@
 const char      *progname = NULL;
 const char	title_message[] = "Key generator";
 const char	*help_message[] = {NULL};
-const char	usage_message[] = "<passphrase>\n"
-		"Parameters:\n"
-		"    <passphrase>                a passphrase for secret key generation";
+const char	usage_message[] = "\n"
+		"Generate secret key encrypted by a passphrase and salt. The result key and salt are base64-encoded.";
 
 int	main(int argc, char *argv[])
 {
 	const EVP_CIPHER	*cipher;
 	const EVP_MD		*digest;
-	unsigned char		*passphrase, salt[8], secret_key[64], key[EVP_MAX_KEY_LENGTH], iv[EVP_MAX_IV_LENGTH],
+	unsigned char		passphrase[128], salt[8], secret_key[64], key[EVP_MAX_KEY_LENGTH], iv[EVP_MAX_IV_LENGTH],
 				*secret_key_enc = NULL;
 	char			*secret_key_enc_b64 = NULL, *salt_b64 = NULL, err[128];
 	int			secret_key_enc_len, block_size, nrounds = 500;
 
 	progname = get_program_name(argv[0]);
 
-	if (argc != 2)
+	if (argc != 1)
 	{
 		usage();
 		exit(1);
 	}
 
-	passphrase = (unsigned char *)argv[1];
+	if (SUCCEED != zbx_read_stdin("Enter EPP passphrase: ", (char *)passphrase, sizeof(passphrase)))
+	{
+		fprintf(stderr, "an error occured while requesting EPP passphrase\n");
+		goto out;
+	}
 
 	/* initialize the library */
 	if (SUCCEED != rsm_ssl_init())

@@ -88,7 +88,6 @@ my $rv = GetOptions(\%OPTS,
 		    "dnssec!",
 		    "epp-servers=s",
 		    "epp-user=s",
-		    "epp-passwd=s",
 		    "epp-certs=s",
 		    "epp-commands=s",
 		    "epp-serverid=s",
@@ -1154,30 +1153,22 @@ sub trim
     $_[0] =~ s/\s*$//g;
 }
 
-sub epp_encode_passwd {
-    my $passwd = shift;
-
+sub get_epp_passsalt {
     # ask the user to enter the passphrase
     my $passphrase;
 
-    print("Enter secret key passphrase: ");
-    system('stty', '-echo');
-    chomp($passphrase = <STDIN>);
-    system('stty', 'echo');
+    my $bin = "/opt/zabbix/bin/rsm_epp_enc";
+    pfail("$bin not found") unless (-x $bin);
 
     my $keysalt_file = "keysalt.txt";
-    if (! -r $keysalt_file)
-    {
-	pfail("cannot read file $keysalt_file");
-    }
+    pfail("cannot read file $keysalt_file") unless (-r $keysalt_file);
 
     my $keysalt = `cat $keysalt_file`;
     trim($keysalt);
-    my $cmd = "/opt/zabbix/bin/rsm_epp_enc $passphrase $keysalt $passwd";
+    my $cmd = "/opt/zabbix/bin/rsm_epp_enc $keysalt";
 
     my $passsalt = `$cmd`;
-
-    exit 1 if ($passsalt !~ m/\|/);
+    pfail("invalid output from $bin") unless ($passsalt =~ m/\|/);
 
     trim($passsalt);
 
@@ -1275,7 +1266,7 @@ sub create_main_template {
 	create_macro('{$RSM.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
 	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
 	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid);
-	create_macro('{$RSM.EPP.PASSWD}', epp_encode_passwd($OPTS{'epp-passwd'}), $templateid);
+	create_macro('{$RSM.EPP.PASSWD}', get_epp_passsalt(), $templateid);
 	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
     }
 
@@ -1742,8 +1733,6 @@ Other options
                 list of EPP servers separated by comma: "NAME1,NAME2,..."
         --epp-user
                 specify EPP username
-	--epp-passwd
-                speciry EPP password
 	--epp-serverid
                 specify expected EPP Server ID string in reply
 	--epp-certs
@@ -1775,7 +1764,6 @@ sub validate_input {
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
     $msg .= "EPP user must be specified (--epp-user)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-user'});
-    $msg .= "EPP password must be specified (--epp-passwd)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-passwd'});
     $msg .= "EPP server ID must be specified (--epp-serverid)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-serverid'});
 
     if ($msg ne "")

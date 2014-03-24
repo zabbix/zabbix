@@ -2,6 +2,7 @@
 #define _RSM_H_
 
 #include <openssl/evp.h>
+#include <termios.h>
 
 int	rsm_ssl_init();
 int	get_random(void *data, int bytes);
@@ -15,5 +16,6 @@ int	decrypt_ciphertext(const char *passphrase, int passphrase_len, const char *s
 		int secretkey_enc_b64_len, const char *secretkey_salt_b64, int secretkey_salt_b64_len,
 		const char *cleartext_enc_b64, int cleartext_enc_b64_len, const char *cleartext_salt_b64,
 		int cleartext_salt_b64_len, char **cleartext, char *err, size_t err_size);
+int	zbx_read_stdin(const char *prompt, char *output, size_t output_size);
 
 #endif /* _RSM_H_ */
