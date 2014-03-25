@@ -84,13 +84,13 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
 	access_deny();
 }
-if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+if (getRequest('triggerid') && !API::Trigger()->isReadable(array(getRequest('triggerid')))) {
 	access_deny();
 }
 
@@ -117,15 +117,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_rst'])) {
+if (hasRequest('filter_rst')) {
 	$_REQUEST['triggerid'] = 0;
 }
 
-$source = (get_request('triggerid') > 0)
-	? EVENT_SOURCE_TRIGGERS
-	: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
-
-$_REQUEST['triggerid'] = get_request('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+$_REQUEST['triggerid'] = getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
 
 // change triggerId filter if change hostId
 if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
@@ -209,9 +205,18 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	}
 }
 
-if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
-	CProfile::update('web.events.filter.triggerid', $_REQUEST['triggerid'], PROFILE_TYPE_ID);
+if (hasRequest('filter_set')) {
+	CProfile::update('web.events.filter.triggerid', getRequest('triggerid'), PROFILE_TYPE_ID);
 }
+elseif (hasRequest('filter_rst')) {
+	CProfile::delete('web.events.filter.triggerid');
+}
+
+$triggerId = getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+
+$source = ($triggerId > 0)
+	? EVENT_SOURCE_TRIGGERS
+	: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
@@ -234,7 +239,7 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
 	if ($pageFilter->triggerid > 0) {
-		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+		$triggerId = $pageFilter->triggerid;
 	}
 }
 
@@ -253,8 +258,8 @@ if (isset($_REQUEST['period'])) {
 }
 $frmForm->addVar('page', getPageNumber(), 'page_csv');
 if ($source == EVENT_SOURCE_TRIGGERS) {
-	if ($_REQUEST['triggerid']) {
-		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+	if ($triggerId) {
+		$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
 	}
 	else {
 		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
@@ -306,13 +311,13 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 	$filterForm = new CFormTable(null, null, 'get');
 	$filterForm->setAttribute('name', 'zbx_filter');
 	$filterForm->setAttribute('id', 'zbx_filter');
-	$filterForm->addVar('triggerid', get_request('triggerid'));
+	$filterForm->addVar('triggerid', $triggerId);
 	$filterForm->addVar('stime', get_request('stime'));
 	$filterForm->addVar('period', get_request('period'));
 
-	if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
+	if (hasRequest('triggerid') && $triggerId > 0) {
 		$dbTrigger = API::Trigger()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
+			'triggerids' => $triggerId,
 			'output' => array('description', 'expression'),
 			'selectHosts' => array('name'),
 			'preservekeys' => true,
@@ -325,7 +330,7 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 			$trigger = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
 		}
 		else {
-			$_REQUEST['triggerid'] = 0;
+			$triggerId = 0;
 		}
 	}
 	if (!isset($trigger)) {
@@ -377,7 +382,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
-		'objectids' => !empty($_REQUEST['triggerid']) ? $_REQUEST['triggerid'] : null,
+		'objectids' => !empty($triggerId) ? $triggerId : null,
 		'sortfield' => array('clock'),
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
@@ -605,8 +610,8 @@ else {
 				'output' => array('triggerid'),
 				'monitored' => true
 			);
-			if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
-				$options['triggerids'] = $_REQUEST['triggerid'];
+			if (hasRequest('triggerid') && $triggerId > 0) {
+				$options['triggerids'] = $triggerId;
 			}
 			else if ($pageFilter->hostid > 0) {
 				$options['hostids'] = $pageFilter->hostid;
