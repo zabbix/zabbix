@@ -54,7 +54,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *file_name = NULL, *pt_1;
+	char 			*path = NULL, *file_name, *pt_1;
 	wchar_t			*wpath;
 	struct _stat		sb;
 	size_t			offset = 0, path_len;
@@ -106,7 +106,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 	ret = SUCCEED;
 out:
-	zbx_free(file_name);
 	zbx_free(path);
 	zbx_free(wpath);
 	FindClose(h_find);
