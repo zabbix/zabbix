@@ -49,29 +49,39 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
-	const char	*__function_name = "parse_cfg_object";
-
 #ifdef _WINDOWS
-	int			ret = FAIL;
+	const char		*__function_name = "parse_cfg_object";
+	int			ret = FAIL, i = 0;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *file_name = NULL;
+	char 			*path = NULL, *file_name = NULL, *pt_1;
 	wchar_t			*wpath;
+	struct _stat		sb;
+	size_t			offset = 0, path_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 != _wstat(wpath = zbx_utf8_to_unicode(cfg_file), &sb))
+	pt_1 = strrchr(cfg_file, '\\');
+	path_len = strlen(cfg_file) - 1;
+	if ((pt_1 - cfg_file) == path_len)
+		zbx_strncpy_alloc(&path, &path_len, &offset, cfg_file, (pt_1 - cfg_file) );
+	else
+		zbx_strcpy_alloc(&path, &path_len, &offset, cfg_file);
+
+	if (0 != _wstat(wpath = zbx_utf8_to_unicode(path), &sb))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto out;
 	}
 	zbx_free(wpath);
 
 	if (0 == S_ISDIR(sb.st_mode))
 	{
-		__parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		__parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 		goto out;
 	}
+
+	zbx_free(path);
 
 	path = zbx_dsprintf(path, "%s\\*", cfg_file);
 	wpath = zbx_utf8_to_unicode(path);
@@ -83,17 +93,17 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	{
 		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			continue;
-		zbx_free(file_name);
+
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
-		zbx_free(path);
 		path = zbx_dsprintf(path, "%s\\%s", cfg_file, file_name);
+
+		zbx_free(file_name);
 
 		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto out;
 
 	}
-
 	ret = SUCCEED;
 out:
 	zbx_free(file_name);
