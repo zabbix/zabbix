@@ -190,7 +190,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
-	wchar_t		*file_name;
+	wchar_t		*wcfg_file;
 #endif
 	if (++level > ZBX_MAX_INCLUDE_LEVEL)
 	{
@@ -201,9 +201,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (NULL != cfg_file)
 	{
 #ifdef _WINDOWS
-		file_name = zbx_utf8_to_unicode(cfg_file);
-		file = _wfopen(file_name, L"r");
-		zbx_free(file_name);
+		wcfg_file = zbx_utf8_to_unicode(cfg_file);
+		file = _wfopen(wcfg_file, L"r");
+		zbx_free(wcfg_file);
+
 		if (NULL == file)
 			goto cannot_open;
 #else
