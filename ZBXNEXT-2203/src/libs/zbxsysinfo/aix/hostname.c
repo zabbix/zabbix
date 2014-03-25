@@ -33,7 +33,8 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == uname(&name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get host name: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

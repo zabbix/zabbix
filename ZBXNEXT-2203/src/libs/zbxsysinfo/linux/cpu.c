@@ -47,7 +47,8 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (ncpu = sysconf(name)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of CPUs: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -168,7 +169,8 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of CPUs: %s",
+				zbx_strerror(errno)));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;
@@ -188,7 +190,8 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/stat."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of context switches. Unable to open /proc/stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -207,7 +210,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches from /proc/stat."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches from /proc/stat: ctxt information not found."));
 
 	return ret;
 }
@@ -221,7 +224,8 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/stat."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of interrupts. Unable to open /proc/stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -240,7 +244,7 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts from /proc/stat."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts from /proc/stat: intr information not found."));
 
 	return ret;
 }

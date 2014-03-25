@@ -29,7 +29,8 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == uname(&name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uname."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uname: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
