@@ -2270,7 +2270,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 		$imageHeight = 0;
 		foreach ($imageMessages as &$msg) {
 			$size = imageTextSize($imageFontSize, 0, $msg['text']);
-			$msg['height'] = $size['height'];
+			$msg['height'] = $size['height'] - $size['baseline'];
 
 			// calculate the total size of the image
 			$imageWidth = max($imageWidth, $size['width']);
