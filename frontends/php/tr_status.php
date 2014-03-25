@@ -102,11 +102,13 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 
 // reset filter
 if (hasRequest('filter_set')) {
-	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details'), PROFILE_TYPE_INT);
-	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance'), PROFILE_TYPE_INT);
-	CProfile::update('web.tr_status.filter.show_severity', getRequest('show_severity'), PROFILE_TYPE_INT);
-	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select'), PROFILE_TYPE_STR);
-	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change'), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		PROFILE_TYPE_INT
+	);
+	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
 
 	// show events
 	$showEvents = getRequest('show_events');
