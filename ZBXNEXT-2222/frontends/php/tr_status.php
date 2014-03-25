@@ -337,7 +337,10 @@ $filterFormView = new CView('common.filter.trigger', array(
 	'txtSelect' => getRequest('txt_select'),
 	'application' => $filter['application'],
 	'inventory' => $filter['inventory'],
-	'showMaintenance' => getRequest('show_maintenance')
+	'showMaintenance' => getRequest('show_maintenance'),
+	'hostId' => getRequest('hostid'),
+	'groupId' => getRequest('groupid'),
+	'fullScreen' => getRequest('fullScreen')
 ));
 $filterForm = $filterFormView->render();
 
