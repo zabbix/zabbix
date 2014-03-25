@@ -53,19 +53,14 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *file_name, *pt_1;
+	char 			*path = NULL, *file_name;
 	wchar_t			*wpath;
 	struct _stat		sb;
-	size_t			offset = 0, path_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	pt_1 = strrchr(cfg_file, '\\');
-	path_len = strlen(cfg_file) - 1;
-	if ((pt_1 - cfg_file) == path_len)
-		zbx_strncpy_alloc(&path, &path_len, &offset, cfg_file, (pt_1 - cfg_file));
-	else
-		zbx_strcpy_alloc(&path, &path_len, &offset, cfg_file);
+	path = zbx_strdup(NULL, cfg_file);
+	zbx_rtrim(path, "\\");
 
 	wpath = zbx_utf8_to_unicode(path);
 
@@ -79,7 +74,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (0 == S_ISDIR(sb.st_mode))
 	{
 		__parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-		ret = SECCEED;
+		ret = SUCCEED;
 		goto out;
 	}
 
@@ -104,7 +99,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto out;
-
 	}
 	ret = SUCCEED;
 out:
