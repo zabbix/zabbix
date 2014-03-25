@@ -63,7 +63,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	pt_1 = strrchr(cfg_file, '\\');
 	path_len = strlen(cfg_file) - 1;
 	if ((pt_1 - cfg_file) == path_len)
-		zbx_strncpy_alloc(&path, &path_len, &offset, cfg_file, (pt_1 - cfg_file) );
+		zbx_strncpy_alloc(&path, &path_len, &offset, cfg_file, (pt_1 - cfg_file));
 	else
 		zbx_strcpy_alloc(&path, &path_len, &offset, cfg_file);
 
@@ -79,6 +79,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (0 == S_ISDIR(sb.st_mode))
 	{
 		__parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		ret = SECCEED;
 		goto out;
 	}
 
