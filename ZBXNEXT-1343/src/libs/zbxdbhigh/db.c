@@ -889,7 +889,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			DBfree_result(result);
 
 			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
-					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
+					" values ('%s','%s'," ZBX_FS_UI64 ")",
 					table->table, table->recid, ret1);
 
 			if (ZBX_DB_OK > dbres)
