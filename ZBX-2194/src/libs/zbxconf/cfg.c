@@ -51,7 +51,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 #ifdef _WINDOWS
 	const char		*__function_name = "parse_cfg_object";
-	int			ret = FAIL, i = 0;
+	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*path = NULL, *file_name = NULL, *pt_1;
