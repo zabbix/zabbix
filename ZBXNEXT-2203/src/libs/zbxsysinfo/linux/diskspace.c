@@ -119,7 +119,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/mounts", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/mounts."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get list of filesystems. Unable to open /proc/mounts: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_OK;
 	}
 

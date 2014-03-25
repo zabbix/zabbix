@@ -331,7 +331,8 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen(HW_CPU_INFO_FILE, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " HW_CPU_INFO_FILE "."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get CPU stats. Unable to open " HW_CPU_INFO_FILE ": %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -387,7 +388,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get CPU info."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get CPU stats."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -452,7 +453,8 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (s = socket(AF_INET, SOCK_DGRAM, 0)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to create socket."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get MAC address: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -462,7 +464,8 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 == ioctl(s, SIOCGIFCONF, &ifc))
 	{
 		close(s);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get socket details."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get MAC address: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 	ifr = ifc.ifc_req;

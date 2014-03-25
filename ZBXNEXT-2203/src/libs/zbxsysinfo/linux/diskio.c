@@ -92,7 +92,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	}
 
 	if (NULL == (f = fopen(INFO_FILE_NAME, "r")))
-		return ret;
+		return FAIL;
 
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
