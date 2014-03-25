@@ -49,7 +49,8 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (NULL == (f = fopen("/proc/net/dev", "r")))
 	{
-		*error = zbx_strdup(NULL, "Failed to open /proc/net/dev.");
+		*error = zbx_dsprintf(NULL, "Failed to get network stats. Unable to open /proc/net/dev: %s",
+			zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -278,7 +279,8 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/net/dev", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc/net/dev."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to list of network interfaces. Unable to open /proc/net/dev: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -261,7 +261,8 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (dir = opendir("/proc")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to list of processes. Unable to open /proc: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -399,7 +400,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (dir = opendir("/proc")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open /proc."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to list of processes. Unable to open /proc: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

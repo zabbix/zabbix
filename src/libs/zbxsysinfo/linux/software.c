@@ -34,7 +34,8 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == uname(&name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uname."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get architecture details: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -61,7 +62,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == (f = fopen(SW_OS_FULL, "r")))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_FULL "."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get OS details. Unable to open " SW_OS_FULL ": %s",
+				zbx_strerror(errno)));
 			return ret;
 		}
 	}
@@ -69,7 +71,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == (f = fopen(SW_OS_SHORT, "r")))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_SHORT "."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get OS details. Unable to open " SW_OS_SHORT ": %s",
+				zbx_strerror(errno)));
 			return ret;
 		}
 	}
@@ -77,7 +80,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == (f = fopen(SW_OS_NAME, "r")))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open " SW_OS_NAME "."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get OS details. Unable to open " SW_OS_NAME ": %s",
+				zbx_strerror(errno)));
 			return ret;
 		}
 	}
