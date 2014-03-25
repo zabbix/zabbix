@@ -60,6 +60,19 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (0 != _wstat(wpath = zbx_utf8_to_unicode(cfg_file), &sb))
+	{
+		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		goto out;
+	}
+	zbx_free(wpath);
+
+	if (0 == S_ISDIR(sb.st_mode))
+	{
+		__parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		goto out;
+	}
+
 	path = zbx_dsprintf(path, "%s\\*", cfg_file);
 	wpath = zbx_utf8_to_unicode(path);
 
@@ -80,6 +93,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			goto out;
 
 	}
+
 	ret = SUCCEED;
 out:
 	zbx_free(file_name);
@@ -178,7 +192,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (NULL != cfg_file)
 	{
 #ifdef _WINDOWS
-		/* this section needed when processing directory with config files */
 		file_name = zbx_utf8_to_unicode(cfg_file);
 		file = _wfopen(file_name, L"r");
 		zbx_free(file_name);
