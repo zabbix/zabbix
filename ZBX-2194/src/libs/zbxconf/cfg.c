@@ -51,6 +51,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 #ifdef _WINDOWS
 	const char		*__function_name = "parse_cfg_object";
+
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
@@ -68,7 +69,9 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	else
 		zbx_strcpy_alloc(&path, &path_len, &offset, cfg_file);
 
-	if (0 != _wstat(wpath = zbx_utf8_to_unicode(path), &sb))
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (0 != _wstat(wpath, &sb))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto out;
