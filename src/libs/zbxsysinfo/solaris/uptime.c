@@ -30,7 +30,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (kc = kstat_open()))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

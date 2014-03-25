@@ -91,7 +91,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter. Expected: empty, \"utc\" or \"local\"."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: utc, local."));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -32,7 +32,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
@@ -47,7 +48,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysctl(mib, 2, &uptime, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -69,7 +71,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	kc = kstat_open();
 	if (0 == kc)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -78,14 +81,16 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == kp)
 	{
 		kstat_close(kc);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (-1 == kstat_read(kc, kp, 0))
 	{
 		kstat_close(kc);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");

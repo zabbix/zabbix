@@ -36,14 +36,14 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* make sure we do not divide by 0 */
 	if (0 == hertz)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uptime info."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	/* AIX 6.1 */
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get uptime info."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
 		return SYSINFO_RET_FAIL;
 	}
 

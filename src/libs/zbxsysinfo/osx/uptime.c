@@ -28,7 +28,8 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysctl(mib, 2, &boottime, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

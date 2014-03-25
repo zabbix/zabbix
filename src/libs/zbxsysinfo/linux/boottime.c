@@ -29,7 +29,8 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unable to open /proc/stat."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get boot time. Unable to open /proc/stat: %s",
+			zbx_strerror(errno)));
 		return ret;
 	}
 
@@ -49,7 +50,7 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unable to get boot time from /proc/stat."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get boot time from /proc/stat: btime information not found."));
 
 	return ret;
 }
