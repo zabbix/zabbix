@@ -1153,7 +1153,9 @@ sub trim
     $_[0] =~ s/\s*$//g;
 }
 
-sub get_epp_passsalt {
+sub encrypt_sensdata {
+    my $prompt = shift;
+
     # ask the user to enter the passphrase
     my $passphrase;
 
@@ -1170,15 +1172,14 @@ sub get_epp_passsalt {
     pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
 
     $keysalt =~ s/\|/ /;
-    pfail("invalid output from $bin") unless ($passsalt =~ m/\|/);
 
-    print("Please enter EPP passphrase, then <ENTER> and then EPP password:\n");
-    my $passsalt = `$bin $keysalt noprompt`;
-    pfail("invalid output from $bin") unless ($passsalt =~ m/\|/);
+    print($prompt);
+    my $encrypted_sensdata = `$bin $keysalt noprompt`;
+    pfail("invalid output from $bin") unless ($encrypted_sensdata =~ m/\|/);
 
-    trim($passsalt);
+    trim($encrypted_sensdata);
 
-    return $passsalt;
+    return $encrypted_sensdata;
 }
 
 
@@ -1272,7 +1273,8 @@ sub create_main_template {
 	create_macro('{$RSM.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
 	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
 	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid);
-	create_macro('{$RSM.EPP.PASSWD}', get_epp_passsalt(), $templateid);
+	create_macro('{$RSM.EPP.PASSWD}', encrypt_sensdata("Please enter EPP passphrase, then <ENTER> and then EPP password:\n"), $templateid);
+	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase, then <ENTER> and then EPP Client private key:\n"), $templateid);
 	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
     }
 
