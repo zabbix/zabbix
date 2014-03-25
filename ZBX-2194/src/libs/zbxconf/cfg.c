@@ -44,8 +44,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing object                               *
  *                                                                            *
- * Author: Windows part - Nikolajs Agafonovs                                  *
- *                                                                            *
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
