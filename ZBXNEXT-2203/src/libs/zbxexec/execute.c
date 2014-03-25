@@ -436,7 +436,7 @@ close:
 #endif	/* _WINDOWS */
 
 	if (TIMEOUT_ERROR == ret)
-		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+		zbx_strlcpy(error, "Timeout while executing a shell script.", max_error_len);
 	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
