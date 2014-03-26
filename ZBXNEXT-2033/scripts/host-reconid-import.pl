@@ -16,16 +16,22 @@ sub display_usage
 	printf "    --url=<url>             - Zabbix frontend URL\n";
 	printf "    --username=<username>   - Zabbix user name\n";
 	printf "    --password=<password>   - Zabbix user password\n";
+	printf "    --ci=<pos>              - CI field position (default: 1)\n";
+	printf "    --reconid=<pos>         - Recon ID field position (default: 3)\n";
 }
 
 my $URL;
 my $USER;
 my $PASSWORD;
+my $CI = 1;
+my $RECONID = 3;
 
 GetOptions(
 	"url=s" => \$URL,
 	"username=s" => \$USER,
-	"password=s" => \$PASSWORD
+	"password=s" => \$PASSWORD,
+	"ci=s" => \$CI,
+	"reconid=s" => \$RECONID
 ) or die("Error in command line arguments\n");
 
 $URL = $URL . "/api_jsonrpc.php";
@@ -60,7 +66,7 @@ my $json = {
 $response = $client->call($URL, $json);
 
 # Check if response was successful
-die "Authentication failed\n" unless $response->content->{'result'};
+die "Authentication failed\n" unless $response and $response->content->{'result'};
 
 $authID = $response->content->{'result'};
 
@@ -101,25 +107,36 @@ $json = {
 
 # Update host inventory in database
 
-while (<FP>) {
+FILE_LOOP: while (<FP>) {
  	chomp;
  	my @fields = split "," , $_;
+	my $hostname = $fields[$CI];
+	my $i;
 	
-	if (exists $fields[1] and exists $hosts{$fields[1]}) {
-		printf "Importing CI '%s' ReconID '%s'\n", $fields[1] , $fields[3];
-		
-		$json->{params}->{hostid} = $hosts{$fields[1]};
-		$json->{params}->{inventory}->{tag} = $fields[3];
-		
-		$response = $client->call($URL, $json);
+	if (!exists $fields[$CI]) {
+		next;
+	}
+	
+	foreach $i (1, 2) {
+		if (exists $hosts{$hostname}) {
+			printf "Importing CI '%s' ReconID '%s' to host '%s'\n", $fields[$CI] , $fields[$RECONID], $hostname;
+			
+			$json->{params}->{hostid} = $hosts{$hostname};
+			$json->{params}->{inventory}->{tag} = $fields[$RECONID];
+			
+			$response = $client->call($URL, $json);
 
-		# Check if response was successful
-		die "Host update failed for host '" . $fields[1] . "' (" . $hosts{$fields[1]} . ")\n" 
-			unless $response->content->{result};
+			# Check if response was successful
+			die "Host update failed for host '" . $hostname . "' (" . $hosts{$hostname} . ")\n" 
+				unless $response->content->{result};
+				
+			next FILE_LOOP;
+		}
+		
+		$hostname = uc($hostname);
 	}
-	else {
-		printf "Host '%s' was not found in Zabbix\n", $fields[1]
-	}
+	
+	printf "Host '%s' was not found in Zabbix\n", $fields[$CI]
 }
  
 close (FP); 
