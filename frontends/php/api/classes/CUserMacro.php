@@ -900,8 +900,8 @@ class CUserMacro extends CZBXAPI {
 	 * @throws APIException if the field is too long.
 	 */
 	protected function checkValue(array $macro) {
-		if (isset($macro['value']) && zbx_strlen($macro['value']) > 255) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
+		if (isset($macro['value']) && zbx_strlen($macro['value']) > 65535) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 65535 chars.', $macro['macro']));
 		}
 	}
 

@@ -30,7 +30,7 @@ foreach ($macros as $macroid => $macro) {
 	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
 	$text1->setAttribute('placeholder', '{$MACRO}');
 	$text1->setAttribute('style', 'text-transform:uppercase;');
-	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
+	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 65535);
 	$text2->setAttribute('placeholder', _('value'));
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');

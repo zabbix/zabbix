@@ -555,14 +555,14 @@ FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
 TABLE|globalmacro|globalmacroid|ZBX_SYNC,ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|value		|t_text		|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_SYNC,ZBX_DATA
 FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|hosts
 FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|value		|t_text		|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,macro
 
 TABLE|hosts_groups|hostgroupid|ZBX_SYNC,ZBX_DATA
