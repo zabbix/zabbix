@@ -226,10 +226,12 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	size_t			os_alloc, os_offset = 0;
 
 	os_alloc =  sizeof(os_version_info) + 14;
-	os = zbx_malloc(os, os_alloc);
-	memset( &os_version_info, '\0', sizeof(os_version_info) );
 
-	if( 0 == get_win_version(&os_version_info ))
+	os = zbx_malloc(os, os_alloc);
+
+	memset(&os_version_info, '\0', sizeof(os_version_info));
+
+	if(0 == get_win_version(&os_version_info))
 	{
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "Windows %s %s.%s %s %s %s",
 				os_version_info.ComputerName,
