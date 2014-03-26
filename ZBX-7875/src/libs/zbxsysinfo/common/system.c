@@ -148,9 +148,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 
 	/* open key of registry */
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
-	{
 		return ret;
-	}
 
 	/* allocate memory for registry value */
 	lp_name_strings = zbx_malloc(&lp_name_strings, dw_buffer);
@@ -163,8 +161,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 		if (ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
 				(LPBYTE)lp_name_strings, &dw_buffer))
 		{
-			zbx_free(lp_name_strings);
-			return ret;
+			goto out;
 		}
 		else
 		{
@@ -192,41 +189,27 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 
 	/* close registry key */
 	if( ERROR_SUCCESS != RegCloseKey(h_key_registry) )
-	{
-		zbx_free(lp_name_strings);
-		return ret;
-	}
+		goto out;
 
 	wsource = zbx_utf8_to_unicode(sys_key_2);
 
 	/* open key in different part of registry */
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
-	{
-		zbx_free(lp_name_strings);
-		return ret;
-	}
+		goto out;
 
 	wsource = zbx_utf8_to_unicode(win_keys[4]);
 
 	/* get CPU type string from registry key */
 	if(ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
 			(LPBYTE)lp_name_strings, &dw_buffer))
-	{
-		zbx_free(lp_name_strings);
-		return ret;
-	}
+		goto out;
 	else
-	{
 		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
 				zbx_unicode_to_utf8( (LPCTSTR)lp_name_strings));
-	}
 
 	/* close registry key */
 	if( ERROR_SUCCESS != RegCloseKey(h_key_registry) )
-	{
-		zbx_free(lp_name_strings);
-		return ret;
-	}
+		goto out;
 
 	zbx_free(lp_name_strings);
 
@@ -236,6 +219,9 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 		os_version->ComputerName[i] = toupper(os_version->ComputerName[i]);
 
 	return SUCCEED;
+out:
+	zbx_free(lp_name_strings);
+	return FAIL;
 }
 #endif
 
