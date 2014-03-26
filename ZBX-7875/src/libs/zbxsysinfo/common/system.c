@@ -137,23 +137,20 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 			"PROCESSOR_ARCHITECTURE"};
 	const char	sys_key_1[] = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
 	const char	sys_key_2[] = "System\\CurrentControlSet\\Control\\Session Manager\\Environment";
-	int		i;				/* counter */
-	HKEY		h_key_registry;	/* handle to registry key */
-	DWORD		dw_buffer;		/* bytes to allocate for buffers */
-	LPSTR		lp_name_strings;	/* temporal key value storage */
-	LPCTSTR		wsource;		/* variable to contain reg key path (unicode) */
+	int		i;
+	HKEY		h_key_registry;
+	DWORD		dw_buffer;
+	LPSTR		lp_name_strings;
+	LPCTSTR		wsource;
 
 	wsource = zbx_utf8_to_unicode(sys_key_1);
 	dw_buffer = 256;
 
-	/* open key of registry */
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		return ret;
 
-	/* allocate memory for registry value */
 	lp_name_strings = zbx_malloc(&lp_name_strings, dw_buffer);
 
-	/* get version string from registry keys */
 	for (i = 0; i < 4; i++)
 	{
 		wsource = zbx_utf8_to_unicode(win_keys[i]);
@@ -187,19 +184,16 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 		}
 	}
 
-	/* close registry key */
 	if( ERROR_SUCCESS != RegCloseKey(h_key_registry) )
 		goto out;
 
 	wsource = zbx_utf8_to_unicode(sys_key_2);
 
-	/* open key in different part of registry */
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
 
 	wsource = zbx_utf8_to_unicode(win_keys[4]);
 
-	/* get CPU type string from registry key */
 	if(ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
 			(LPBYTE)lp_name_strings, &dw_buffer))
 		goto out;
@@ -207,13 +201,11 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
 				zbx_unicode_to_utf8( (LPCTSTR)lp_name_strings));
 
-	/* close registry key */
 	if( ERROR_SUCCESS != RegCloseKey(h_key_registry) )
 		goto out;
 
 	zbx_free(lp_name_strings);
 
-	/* get host name as computer name and convert it to upper case */
 	gethostname(os_version->ComputerName, sizeof(os_version->ComputerName));
 	for(i = 0; os_version->ComputerName[i]; i++)
 		os_version->ComputerName[i] = toupper(os_version->ComputerName[i]);
