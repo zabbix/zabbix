@@ -363,6 +363,7 @@ FIELD		|def_longdata	|t_shorttext	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|r_longdata	|t_shorttext	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|
 INDEX		|1		|eventsource,status
 
 TABLE|operations|operationid|ZBX_SYNC,ZBX_DATA
@@ -1307,4 +1308,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030032	|2030032
+ROW		|2030033	|2030033

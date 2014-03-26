@@ -341,6 +341,14 @@ static int	DBpatch_2030032(void)
 	return DBadd_field("hosts", &field);
 }
 
+static int	DBpatch_2030033(void)
+{
+	const ZBX_FIELD	field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+
 #endif
 
 DBPATCH_START(2030)
@@ -380,5 +388,6 @@ DBPATCH_ADD(2030029, 0, 1)
 DBPATCH_ADD(2030030, 0, 1)
 DBPATCH_ADD(2030031, 0, 0)
 DBPATCH_ADD(2030032, 0, 1)
+DBPATCH_ADD(2030033, 0, 1)
 
 DBPATCH_END()
