@@ -1029,7 +1029,7 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 
-typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *, unsigned char state,
 		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
 
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
