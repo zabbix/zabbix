@@ -77,8 +77,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		goto out;
 	}
 
-	zbx_free(path);
-
 	path = zbx_dsprintf(path, "%s\\*", cfg_file);
 	wpath = zbx_utf8_to_unicode(path);
 
