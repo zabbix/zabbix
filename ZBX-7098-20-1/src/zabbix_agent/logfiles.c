@@ -267,50 +267,49 @@ static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int le
 	}
 
 #ifdef _WINDOWS
-	if (1 == use_ino || 2 == use_ino)
+	if (-1 == (h = _get_osfhandle(f)))
 	{
-		if (-1 == (h = _get_osfhandle(f)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get file handle from file descriptor for '%s'", filename);
+		return ret;
+	}
+
+	if (1 == use_ino || 0 == use_ino)
+	{
+		/* Although nFileIndexHigh and nFileIndexLow cannot be reliably used to identify files when */
+		/* use_ino = 0 (e.g. on FAT32, exFAT), we copy indexes to have at least correct debug logs. */
+		if (0 != GetFileInformationByHandle((HANDLE)h, &hfi))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get file handle from file descriptor for '%s'", filename);
+			*dev = hfi.dwVolumeSerialNumber;
+			*ino_lo = (zbx_uint64_t)hfi.nFileIndexHigh << 32 | (zbx_uint64_t)hfi.nFileIndexLow;
+			*ino_hi = 0;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
+					filename, GetLastError());
 			return ret;
 		}
-
-		if (1 == use_ino)
+	}
+	else if (2 == use_ino)
+	{
+		if (NULL != zbx_GetFileInformationByHandleEx)
 		{
-			if (0 != GetFileInformationByHandle((HANDLE)h, &hfi))
+			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
 			{
-				*dev = hfi.dwVolumeSerialNumber;
-				*ino_lo = (zbx_uint64_t)hfi.nFileIndexHigh << 32 | (zbx_uint64_t)hfi.nFileIndexLow;
-				*ino_hi = 0;
+				*dev = fid.VolumeSerialNumber;
+				*ino_lo = fid.FileId.LowPart;
+				*ino_hi = fid.FileId.HighPart;
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
-						filename, GetLastError());
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
+						"\"%s\", error code:%u", filename, GetLastError());
 				return ret;
 			}
 		}
-		else /* 2 == use_ino */
-		{
-			if (NULL != zbx_GetFileInformationByHandleEx)
-			{
-				if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
-				{
-					*dev = fid.VolumeSerialNumber;
-					*ino_lo = fid.FileId.LowPart;
-					*ino_hi = fid.FileId.HighPart;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
-							"\"%s\", error code:%u", filename, GetLastError());
-					return ret;
-				}
-			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
 	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 #endif
 	if (0 < offset && (zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
 	{
