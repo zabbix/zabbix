@@ -229,7 +229,7 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 // show triggers
 // the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
 // whole page inaccessible on large installations.
-$showTriggers = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
+$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
 
 
 /*
