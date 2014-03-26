@@ -312,7 +312,7 @@ $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
 $ackStatus = $_REQUEST['ack_status'];
 
-$triggerWidget = new CWidget(null, 'trigger-mon');
+$triggerWidget = new CWidget();
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
@@ -328,28 +328,24 @@ $triggerWidget->addHeaderRowNumber();
 
 // filter
 $filterFormView = new CView('common.filter.trigger', array(
-	'showTriggers' => getRequest('show_triggers'),
-	'ackStatus' => getRequest('ack_status'),
-	'showEvents' => getRequest('show_events'),
-	'showSeverity' => getRequest('show_severity'),
-	'statusChange' => getRequest('status_change'),
-	'statusChangeDays' => getRequest('status_change_days'),
-	'txtSelect' => getRequest('txt_select'),
-	'application' => $filter['application'],
-	'inventory' => $filter['inventory'],
-	'showMaintenance' => getRequest('show_maintenance'),
-	'hostId' => getRequest('hostid'),
-	'groupId' => getRequest('groupid'),
-	'fullScreen' => getRequest('fullScreen')
+	'overview' => false,
+	'filter' => array(
+		'showTriggers' => getRequest('show_triggers'),
+		'ackStatus' => getRequest('ack_status'),
+		'showEvents' => getRequest('show_events'),
+		'showSeverity' => getRequest('show_severity'),
+		'statusChange' => getRequest('status_change'),
+		'statusChangeDays' => getRequest('status_change_days'),
+		'txtSelect' => getRequest('txt_select'),
+		'application' => $filter['application'],
+		'inventory' => $filter['inventory'],
+		'showMaintenance' => getRequest('show_maintenance'),
+		'hostId' => getRequest('hostid'),
+		'groupId' => getRequest('groupid'),
+		'fullScreen' => getRequest('fullScreen')
+	)
 ));
 $filterForm = $filterFormView->render();
-
-// show details
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', getRequest('show_details'), null, 1));
-
-// buttons
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
 
 $triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 

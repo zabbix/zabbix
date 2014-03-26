@@ -52,18 +52,34 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
 	access_deny();
 }
 
+// overview type
+if (hasRequest('type')) {
+	CProfile::update('web.overview.type', getRequest('type'), PROFILE_TYPE_INT);
+}
+$type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
+
 /*
  * Display
  */
 $data = array(
-	'fullscreen' => $_REQUEST['fullscreen']
+	'fullscreen' => $_REQUEST['fullscreen'],
+	'type' => $type,
+	'filter' => array(
+		'showTriggers' => getRequest('show_triggers'),
+		'ackStatus' => getRequest('ack_status'),
+		'showEvents' => getRequest('show_events'),
+		'showSeverity' => getRequest('show_severity'),
+		'statusChange' => getRequest('status_change'),
+		'statusChangeDays' => getRequest('status_change_days'),
+		'txtSelect' => getRequest('txt_select'),
+		'application' => getRequest('application'),
+		'inventory' => getRequest('inventory'),
+		'showMaintenance' => getRequest('show_maintenance')
+	)
 );
 
 $data['view_style'] = get_request('view_style', CProfile::get('web.overview.view.style', STYLE_TOP));
 CProfile::update('web.overview.view.style', $data['view_style'], PROFILE_TYPE_INT);
-
-$data['type'] = get_request('type', CProfile::get('web.overview.type', SHOW_TRIGGERS));
-CProfile::update('web.overview.type', $data['type'], PROFILE_TYPE_INT);
 
 $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
@@ -79,6 +95,7 @@ $data['pageFilter'] = new CPageFilter(array(
 ));
 
 $data['groupid'] = $data['pageFilter']->groupid;
+$data['hostid'] = $data['pageFilter']->hostid;
 
 // render view
 $overviewView = new CView('monitoring.overview', $data);

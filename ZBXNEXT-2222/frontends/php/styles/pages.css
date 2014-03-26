@@ -104,10 +104,6 @@
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
-/* trigger monitoring */
-.trigger-mon #inventory-filter td { padding-left: 0px; padding-right: 3px; }
-.trigger-mon .filter-button { height: 16px; }
-
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
 #testResultTable tr td { padding: 1px 3px; }

@@ -462,6 +462,10 @@ table.filter tr.item-list-row { height: 26px; }
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
 
+/* old-style trigger filter */
+.old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
+.old-filter .filter-button { height: 16px; }
+
 /* invisible */
 table.invisible { border: 0; margin: 0; padding: 0; }
 table.invisible tr > td { border: 0; margin: 0; padding: 0; }
@@ -574,3 +578,4 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 /* modal window */
 .ui-widget-overlay { z-index: 1000; }
 .ui-dialog { z-index: 1001; opacity: 1; }
+
