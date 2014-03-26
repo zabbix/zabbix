@@ -23,8 +23,8 @@ sub display_usage
 my $URL;
 my $USER;
 my $PASSWORD;
-my $CI = 1;
-my $RECONID = 3;
+my $CI = 2;
+my $RECONID = 4;
 
 GetOptions(
 	"url=s" => \$URL,
@@ -43,6 +43,9 @@ if (!$filename or !$URL or !$USER or !$PASSWORD)
 	display_usage();
 	exit;
 }
+
+$CI--;
+$RECONID--;
 
 # Update host inventory in database
 open (FP, $filename) or die "Failed to open input file '" . $filename . "'";
