@@ -129,7 +129,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
-	const char	win_keys[5][32] = {
+	const char	*win_keys[5] = {
 			"ProductName",
 			"CSDVersion",
 			"CurrentBuild",
