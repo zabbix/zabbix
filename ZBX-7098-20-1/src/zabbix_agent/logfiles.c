@@ -23,6 +23,7 @@
 
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
+#	include "symbols.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
@@ -177,7 +178,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 	if (separator < filename)
 		goto out;
 
-#else/* _WINDOWS */
+#else /* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "filename '%s' does not contain any path separator '%c'", filename, PATH_SEPARATOR);
@@ -204,7 +205,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		zbx_free(*format);
 		goto out;
 	}
-#endif/* _WINDOWS */
+#endif /* _WINDOWS */
 
 	ret = SUCCEED;
 out:
@@ -216,9 +217,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: file_part_md5sum                                                 *
+ * Function: file_part_md5sum_id                                              *
  *                                                                            *
- * Purpose: calculate MD5 sum of a specified part of the file                 *
+ * Purpose: calculate MD5 sum of a specified part of the file and             *
+ *          (optionally, only on Microsoft Windows) obtain 64-bit FileIndex   *
+ *          or 128-bit FileId.                                                *
  *                                                                            *
  * Parameters:                                                                *
  *     filename - [IN] full pathname                                          *
@@ -226,25 +229,89 @@ out:
  *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
  *     md5buf   - [OUT] output buffer, 16-bytes long, where the calculated    *
  *                MD5 sum is placed                                           *
+ *     use_ino  - [IN] how to use file IDs (on Microsoft Windows)             *
+ *     dev      - [OUT] device ID                                             *
+ *     use_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
+ *     use_hi   - [OUT] higher 64-bits of FileId                              *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
+ * Comments: Calculating MD5 sum and getting FileIndex or FileId both require *
+ *           opening of file. For efficiency they are combined into one       *
+ *           function.                                                        *
+ *                                                                            *
  ******************************************************************************/
-static int	file_part_md5sum(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf)
+#ifdef _WINDOWS
+static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf,
+		int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, zbx_uint64_t *ino_hi)
+#else
+static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf)
+#endif
 {
 	int		ret = FAIL, f;
 	md5_state_t	state;
 	char		buf[MAX_LEN_MD5];
+#ifdef _WINDOWS
+	intptr_t			h;	/* file HANDLE */
+	BY_HANDLE_FILE_INFORMATION	hfi;
+	FILE_ID_INFO			fid;
+#endif
 
 	if (MAX_LEN_MD5 < length)
 		return ret;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", filename, zbx_strerror(errno));
 		return ret;
 	}
 
+#ifdef _WINDOWS
+	if (1 == use_ino || 2 == use_ino)
+	{
+		if (-1 == (h = _get_osfhandle(f)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get file handle from file descriptor for '%s'", filename);
+			return ret;
+		}
+
+		if (1 == use_ino)
+		{
+			if (0 != GetFileInformationByHandle((HANDLE)h, &hfi))
+			{
+				*dev = hfi.dwVolumeSerialNumber;
+				*ino_lo = (zbx_uint64_t)hfi.nFileIndexHigh << 32 | (zbx_uint64_t)hfi.nFileIndexLow;
+				*ino_hi = 0;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
+						filename, GetLastError());
+				return ret;
+			}
+		}
+		else /* 2 == use_ino */
+		{
+			if (NULL != zbx_GetFileInformationByHandleEx)
+			{
+				if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
+				{
+					*dev = fid.VolumeSerialNumber;
+					*ino_lo = fid.FileId.LowPart;
+					*ino_hi = fid.FileId.HighPart;
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
+							"\"%s\", error code:%u", filename, GetLastError());
+					return ret;
+				}
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+#endif
 	if (0 < offset && (zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for file \"%s\": %s",
@@ -277,17 +344,31 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
 
 	for (i = 0; i < logfiles_num; i++)
 	{
+#ifdef _WINDOWS
+		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
+				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:" ZBX_FS_UI64
+				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
+				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino_hi,
+				logfiles[i].ino_lo, logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
+				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
+				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
+				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
+				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
+				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+#else /* not _WINDOWS */
 		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
 				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino:" ZBX_FS_UI64 " md5size:%d "
 				"md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino,
+				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino_lo,
 				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
 				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
 				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
 				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
 				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
 				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+#endif /* _WINDOWS */
 	}
 }
 
@@ -299,8 +380,11 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *          list could be the same file                                       *
  *                                                                            *
  * Parameters:                                                                *
- *          old - [IN] file from the old list                                 *
- *          new - [IN] file from the new list                                 *
+ *          old     - [IN] file from the old list                             *
+ *          new     - [IN] file from the new list                             *
+ *          use_ino - [IN] 0 - do not use inodes in comparison,               *
+ *                         1 - use up to 64-bit inodes in comparison,         *
+ *                         2 - use 128-bit inodes in comparison.              *
  *                                                                            *
  * Return value: 0 - it is not the same file,                                 *
  *               1 - it could be the same file,                               *
@@ -310,13 +394,30 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
+#ifdef _WINDOWS
+static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
+#else
 static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new)
+#endif
 {
-	if (old->ino != new->ino || old->dev != new->dev)
+#ifdef _WINDOWS
+	if (1 == use_ino || 2 == use_ino)
 	{
-		/* File's inode and device id cannot differ. */
+#endif
+		if (old->ino_lo != new->ino_lo || old->dev != new->dev)
+		{
+			/* File's inode and device id cannot differ. */
+			goto not_same;
+		}
+#ifdef _WINDOWS
+	}
+
+	if (2 == use_ino && (old->ino_hi != new->ino_hi))
+	{
+		/* File's inode (older 64-bits) cannot differ. */
 		goto not_same;
 	}
+#endif
 
 	if (old->mtime > new->mtime)
 	{
@@ -364,8 +465,13 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			md5_byte_t	md5tmp;
 
 			/* MD5 for the old file has been calculated from a smaller initial block */
-			if (FAIL == file_part_md5sum(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp)
+#ifdef _WINDOWS
+			if (FAIL == file_part_md5sum_id(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp, 0, NULL,
+					NULL, NULL) || 0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
+#else
+			if (FAIL == file_part_md5sum_id(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp)
 					|| 0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
+#endif
 			{
 				goto not_same;
 			}
@@ -390,14 +496,20 @@ not_same:
  *          num_old - [IN] number of elements in the old file list            *
  *          new     - [IN] new file list                                      *
  *          num_new - [IN] number of elements in the new file list            *
+ *          use_ino - [IN] how to use inodes in is_same_file()                *
  *                                                                            *
  * Comments:                                                                  *
  *          old2new[i][j] = "0" - i-th old file cannot be the j-th new file   *
  *          old2new[i][j] = "1" - i-th old file could be the j-th new file    *
  *                                                                            *
  ******************************************************************************/
+#ifdef _WINDOWS
+static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
+		const struct st_logfile *new, int num_new, int use_ino)
+#else
 static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
 		const struct st_logfile *new, int num_new)
+#endif
 {
 	int	i, j;
 	char	*p = old2new;
@@ -406,7 +518,11 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
 	{
 		for (j = 0; j < num_new; j++)
 		{
+#ifdef _WINDOWS
+			if (1 == is_same_file(old + i, new + j, use_ino))
+#else
 			if (1 == is_same_file(old + i, new + j))
+#endif
 				*(p + j) = '1';
 			else
 				*(p + j) = '0';
@@ -469,8 +585,8 @@ static int	find_old2new_uni(char *old2new, int num_new, int i_old)
  *             logfiles_alloc - number of logfiles memory was allocated for   *
  *             logfiles_num - number of already inserted logfiles             *
  *             filename - name of a logfile (without a path)                  *
- *             mtime - modification time of a logfile                         *
- *             size  - logfile size in bytes                                  *
+ *             st - structure returned by stat()                              *
+ *             use_ino - parameter passed to file_part_md5sum()               *
  *                                                                            *
  * Return value: none                                                         *
  *                                                                            *
@@ -479,8 +595,13 @@ static int	find_old2new_uni(char *old2new, int num_new, int i_old)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+#ifdef _WINDOWS
+static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
+		struct stat *st, int use_ino)
+#else
 static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		struct stat *st)
+#endif
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
@@ -550,14 +671,20 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
 	(*logfiles)[i].seq = 0;
-#ifndef _WINDOWS
-	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
-	(*logfiles)[i].ino = (zbx_uint64_t)st->st_ino;
-#endif
 	(*logfiles)[i].md5size = (zbx_uint64_t)MAX_LEN_MD5 > (zbx_uint64_t)st->st_size ? (int)st->st_size : MAX_LEN_MD5;
 
-	if (SUCCEED != file_part_md5sum(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf))
+#ifdef _WINDOWS
+	if (SUCCEED != file_part_md5sum_id(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf,
+			use_ino, &(*logfiles)[i].dev, &(*logfiles)[i].ino_lo, &(*logfiles)[i].ino_hi))
+#else
+	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
+	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
+
+	if (SUCCEED != file_part_md5sum_id(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf))
+#endif
+	{
 		(*logfiles)[i].md5size = -1;
+	}
 
 	++(*logfiles_num);
 out:
@@ -578,6 +705,7 @@ out:
  *                        jump to the end                                     *
  *     big_rec          - [IN/OUT] state variable to remember whether a long  *
  *                        record is being processed                           *
+ *     use_ino          - [IN/OUT] how to use inode numbers                   *
  *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
  *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
  *     encoding         - [IN] text string describing encoding.               *
@@ -612,10 +740,10 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
-		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		int *big_rec, int *use_ino, struct st_logfile **logfiles_old, int *logfiles_num_old,
+		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
+		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
+		const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, reg_error, seq = 1,
@@ -625,9 +753,12 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
+	int			win_err = 0;
 	char			*find_path = NULL;
 	intptr_t		find_handle;
 	struct _finddata_t	find_data;
+	char			*utf8;
+	TCHAR			*find_path_uni, volume_mount_point[MAX_PATH + 1], fs_type[MAX_PATH + 1];
 #else
 	DIR			*dir = NULL;
 	struct dirent		*d_ent = NULL;
@@ -683,12 +814,55 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
+		win_err = 1;
+	}
+
+	if (0 == win_err)
+	{
+		find_path_uni = zbx_utf8_to_unicode(find_path);
+
+		if (0 == GetVolumePathName(find_path_uni, volume_mount_point,
+			sizeof(volume_mount_point) / sizeof(TCHAR)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": error code:%u",
+					find_path, GetLastError());
+			win_err = 1;
+		}
+
+		zbx_free(find_path_uni);
+	}
+
+	/* Which file system type this directory resides on ? */
+	if (0 == win_err && 0 == GetVolumeInformation(volume_mount_point, NULL, 0, NULL, NULL, NULL, fs_type,
+			sizeof(fs_type) / sizeof(TCHAR)))
+	{
+		utf8 = zbx_unicode_to_utf8(volume_mount_point);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume information for \"%s\": error code:%u", utf8,
+				GetLastError());
+		zbx_free(utf8);
+		win_err = 1;
+	}
+
+	if (1 == win_err)
+	{
 		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
 		zbx_free(find_path);
 		goto out;
 	}
+
+	utf8 = zbx_unicode_to_utf8(fs_type);
+
+	if (0 == strcmp(utf8, "NTFS"))
+		*use_ino = 1;			/* 64-bit FileIndex */
+	else if (0 == strcmp(utf8, "ReFS"))
+		*use_ino = 2;			/* 128-bit FileId */
+	else
+		*use_ino = 0;			/* cannot use inodes to identify files */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "log files reside on '%s' file system", utf8);
+	zbx_free(utf8);
 
 	do
 	{
@@ -701,7 +875,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 					0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf);
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf,
+						*use_ino);
 			}
 		}
 		else
@@ -719,7 +894,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 	zbx_free(find_path);
 
-#else	/* _WINDOWS */
+#else	/* not _WINDOWS */
 	if (NULL == (dir = opendir(directory)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
@@ -728,6 +903,9 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		zbx_free(format);
 		goto out;
 	}
+
+	/* on UNIX file systems we assume that inodes can be used to identify files */
+	/* i.e. use_ino = 1; */
 
 	while (NULL != (d_ent = readdir(dir)))
 	{
@@ -769,7 +947,11 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	{
 		/* set up a mapping matrix from old files to new files */
 		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
+#ifdef _WINDOWS
+		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num, *use_ino);
+#else
 		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
+#endif
 	}
 
 	/* Find and mark for skipping files processed during the previous check. Such files can get into the new file */

@@ -66,6 +66,10 @@ typedef struct
 	int			mtime;
 	unsigned char		skip_old_data;	/* for processing [event]log metrics */
 	int			big_rec;	/* for logfile reading: 0 - normal record, 1 - long unfinished record */
+	int			use_ino;	/* 0 - do not use inodes (on FAT, FAT32) */
+						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */
+						/* 2 - use 128-bit FileID (currently only on ReFS) to identify files */
+						/* on a file system */
 	int			logfiles_num;
 	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */
 }

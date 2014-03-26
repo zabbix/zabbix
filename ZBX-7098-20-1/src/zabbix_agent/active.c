@@ -153,6 +153,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			active_metrics[i].lastlogsize = lastlogsize;
 			active_metrics[i].mtime = mtime;
 			active_metrics[i].big_rec = 0;
+			active_metrics[i].use_ino = 0;
 
 			for (j = 0; j < active_metrics[i].logfiles_num; j++)
 				zbx_free(active_metrics[i].logfiles[j].filename);
@@ -183,6 +184,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	/* can skip existing log[] and eventlog[] data */
 	active_metrics[i].skip_old_data = active_metrics[i].lastlogsize ? 0 : 1;
 	active_metrics[i].big_rec = 0;
+	active_metrics[i].use_ino = 0;
 	active_metrics[i].logfiles_num = 0;
 	active_metrics[i].logfiles = NULL;
 
@@ -918,9 +920,10 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				ret = process_logrt(filename, &active_metrics[i].lastlogsize, &active_metrics[i].mtime,
 						&active_metrics[i].skip_old_data, &active_metrics[i].big_rec,
-						&active_metrics[i].logfiles, &active_metrics[i].logfiles_num, encoding,
-						regexps, regexps_num, pattern, &p_count, &s_count, process_value,
-						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
+						&active_metrics[i].use_ino, &active_metrics[i].logfiles,
+						&active_metrics[i].logfiles_num, encoding, regexps, regexps_num,
+						pattern, &p_count, &s_count, process_value, server, port,
+						CONFIG_HOSTNAME, active_metrics[i].key_orig);
 			}
 			while (0);
 
