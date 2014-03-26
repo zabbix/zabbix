@@ -666,7 +666,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	int		err, opt, timeout = 10, ret = FAIL;
 	char		xml[MAX_STRING_LEN], *error_object = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s'", __function_name, service->url, service->username);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
@@ -923,12 +923,13 @@ out:
 static int	vmware_get_group_perfcounters(const char *data, int size, const char *group,
 		zbx_perfcounter_mapping_t *counters)
 {
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	char		*xpath = NULL;
-	int		i, ret = FAIL;
+	xmlDoc				*doc;
+	xmlXPathContext			*xpathCtx;
+	xmlXPathObject			*xpathObj;
+	xmlNodeSetPtr			nodeset;
+	char				*xpath = NULL, *key, *counterId;
+	int				i, ret = FAIL;
+	zbx_perfcounter_mapping_t	*counter;
 
 	if (NULL == (doc = xmlReadMemory(data, size, "noname.xml", NULL, 0)))
 		goto out;
@@ -948,9 +949,6 @@ static int	vmware_get_group_perfcounters(const char *data, int size, const char 
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char				*key, *counterId;
-		zbx_perfcounter_mapping_t	*counter;
-
 		if (NULL == (key = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
 				"*[local-name()='nameInfo']/*[local-name()='key']")))
 		{
@@ -973,6 +971,20 @@ static int	vmware_get_group_perfcounters(const char *data, int size, const char 
 		}
 
 		zbx_free(key);
+	}
+
+	for (counter = counters; NULL != counter->key; counter++)
+	{
+		if (0 == *counter->pcounter)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to retrieve VMware performance counter: %s/%s",
+					group, counter->key);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "found VMware performance counter %s/%s: " ZBX_FS_UI64,
+					group, counter->key, *counter->pcounter);
+		}
 	}
 
 	ret = SUCCEED;
@@ -1095,7 +1107,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

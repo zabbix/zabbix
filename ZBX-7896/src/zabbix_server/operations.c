@@ -132,6 +132,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	result = DBselect("%s", sql);
 
+	zbx_free(sql);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
@@ -148,36 +150,21 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	if (0 != groupids->values_num)
 	{
-		const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 		zbx_uint64_t	hostgroupid;
+		zbx_db_insert_t	db_insert;
 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
-		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+
 		for (i = 0; i < groupids->values_num; i++)
 		{
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					hostgroupid++, hostid, groupids->values[i]);
+			zbx_db_insert_add_values(&db_insert, hostgroupid++, hostid, groupids->values[i]);
 		}
 
-#ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		DBexecute("%s", sql);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
-
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

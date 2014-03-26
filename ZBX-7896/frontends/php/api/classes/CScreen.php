@@ -436,28 +436,14 @@ class CScreen extends CZBXAPI {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $screens
+	 * @param array $dbScreens	array of existing screens with screen IDs as keys
 	 */
-	protected function validateUpdate(array $screens) {
-		$screenDBfields = array(
-			'screenid' => null
-		);
-
-		foreach ($screens as $screen) {
-			if (!check_db_fields($screenDBfields, $screen)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
-		}
-
-		$dbScreens = $this->get(array(
-			'screenids' => zbx_objectValues($screens, 'screenid'),
-			'editable' => true,
-			'output' => array('screenid'),
-			'preservekeys' => true
-		));
-
+	protected function validateUpdate(array $screens, array $dbScreens) {
 		foreach ($screens as $screen) {
 			if (!isset($dbScreens[$screen['screenid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
@@ -496,9 +482,35 @@ class CScreen extends CZBXAPI {
 	public function update(array $screens) {
 		$screens = zbx_toArray($screens);
 
-		$this->validateUpdate($screens);
+		// check screen IDs before doing anything
+		$this->checkObjectIds($screens, 'screenid',
+			_('No "%1$s" given for screen.'),
+			_('Empty screen ID for screen.'),
+			_('Incorrect screen ID.')
+		);
 
-		$update = $screenIds = array();
+		$dbScreens = $this->get(array(
+			'output' => array('screenid', 'hsize', 'vsize'),
+			'selectScreenItems' => array('screenitemid', 'x', 'y', 'colspan', 'rowspan'),
+			'screenids' => zbx_objectValues($screens, 'screenid'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+
+		$this->validateUpdate($screens, $dbScreens);
+		$this->updateReal($screens);
+		$this->truncateScreenItems($screens, $dbScreens);
+
+		return array('screenids' => zbx_objectValues($screens, 'screenid'));
+	}
+
+	/**
+	 * Saves screens and screen items.
+	 *
+	 * @param array $screens
+	 */
+	protected function updateReal(array $screens) {
+		$update = array();
 
 		foreach ($screens as $screen) {
 			$screenId = $screen['screenid'];
@@ -510,8 +522,6 @@ class CScreen extends CZBXAPI {
 					'where' => array('screenid' => $screenId)
 				);
 			}
-
-			$screenIds[] = $screenId;
 		}
 
 		DB::update('screens', $update);
@@ -522,38 +532,74 @@ class CScreen extends CZBXAPI {
 				$this->replaceItems($screen['screenid'], $screen['screenitems']);
 			}
 		}
+	}
 
-		// delete outside screen items
-		$dbScreenItems = API::getApi()->select('screens_items', array(
-			'filter' => array('screenid' => $screenIds),
-			'output' => array('screenitemid', 'screenid', 'x', 'y'),
-		));
-
+	/**
+	 * Delete or reduce the size of screens items when reducing the size of the screens.
+	 *
+	 * Each array in the $screens array must have the following values:
+	 * - screenid
+	 * - hsize
+	 * - vsize
+	 *
+	 * Each array in the $dbScreens array must have the following values:
+	 * - screenid
+	 * - hsize
+	 * - vsize
+	 * - screenitems
+	 *
+	 * @param array $screens
+	 * @param array $dbScreens	array of existing screens with screen IDs as keys
+	 */
+	protected function truncateScreenItems(array $screens, array $dbScreens) {
 		$deleteScreenItemIds = array();
-
+		$updateScreenItems = array();
 		foreach ($screens as $screen) {
+			$dbScreen = $dbScreens[$screen['screenid']];
+			$dbScreenItems = $dbScreen['screenitems'];
+
 			if (isset($screen['hsize'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
-					if ($dbScreenItem['screenid'] == $screen['screenid'] && $dbScreenItem['x'] > $screen['hsize'] - 1) {
+					// delete screen items that are located on the deleted columns
+					if ($dbScreenItem['x'] > $screen['hsize'] - 1) {
 						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
+					}
+					// reduce the colspan of screenitems that are displayed on the deleted columns
+					elseif (($dbScreenItem['x'] + $dbScreenItem['colspan']) > $screen['hsize']) {
+						$colspan = $screen['hsize'] - $dbScreenItem['x'];
+
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['colspan'] = $colspan;
 					}
 				}
 			}
 
 			if (isset($screen['vsize'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
-					if ($dbScreenItem['screenid'] == $screen['screenid'] && $dbScreenItem['y'] > $screen['vsize'] - 1) {
+					// delete screen items that are located on the deleted rows
+					if ($dbScreenItem['y'] > $screen['vsize'] - 1) {
 						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
+					}
+					// reduce the rowspan of screenitems that are displayed on the deleted rows
+					elseif (($dbScreenItem['y'] + $dbScreenItem['rowspan']) > $screen['vsize']) {
+						$rowspan = $screen['vsize'] - $dbScreenItem['y'];
+
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['rowspan'] = $rowspan;
 					}
 				}
 			}
 		}
 
 		if ($deleteScreenItemIds) {
-			API::ScreenItem()->delete($deleteScreenItemIds);
+			DB::delete('screens_items', array('screenitemid' => $deleteScreenItemIds));
 		}
 
-		return array('screenids' => $screenIds);
+		foreach ($updateScreenItems as $screenItem) {
+			DB::updateByPk('screens_items', $screenItem['screenitemid'], $screenItem);
+		}
 	}
 
 	/**

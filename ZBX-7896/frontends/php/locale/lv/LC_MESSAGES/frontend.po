@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:19+0200\n"
+"POT-Creation-Date: 2014-03-24 16:15+0200\n"
 "PO-Revision-Date: 2013-10-15 07:19+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -623,7 +623,7 @@ msgstr "Jebkurš"
 msgid "Any character string included"
 msgstr ""
 
-#: applications.php:117 httpconf.php:42 include/actions.inc.php:90
+#: applications.php:118 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:577
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
@@ -644,7 +644,7 @@ msgstr ""
 msgid "Application added"
 msgstr "Rādītāju grupa pievienota"
 
-#: applications.php:140 applications.php:179
+#: applications.php:142 applications.php:181
 msgid "Application deleted"
 msgstr "Rādītāju grupa izdzēsta"
 
@@ -1280,12 +1280,12 @@ msgstr "Atcelt"
 msgid "Cannot acknowledge event"
 msgstr "Notikumu nav iespējams apstiprināt"
 
-#: api/classes/CGraph.php:721 api/classes/CGraph.php:735
+#: api/classes/CGraph.php:735 api/classes/CGraph.php:749
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr ""
 
-#: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
+#: api/classes/CGraphPrototype.php:709 api/classes/CGraphPrototype.php:774
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
@@ -1569,7 +1569,7 @@ msgstr ""
 msgid "Cannot delete action"
 msgstr ""
 
-#: applications.php:140 applications.php:179
+#: applications.php:142 applications.php:181
 msgid "Cannot delete application"
 msgstr ""
 
@@ -1751,7 +1751,7 @@ msgstr ""
 msgid "Cannot delete templated items."
 msgstr ""
 
-#: api/classes/CTrigger.php:1899 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1899 api/classes/CTriggerPrototype.php:649
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr ""
@@ -1781,7 +1781,7 @@ msgstr ""
 msgid "Cannot delete triggers"
 msgstr "Trigerus nav iespējams izdzēst"
 
-#: api/classes/CTriggerPrototype.php:712
+#: api/classes/CTriggerPrototype.php:687
 msgid "Cannot delete triggers created by low level discovery."
 msgstr ""
 
@@ -1836,7 +1836,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:211 items.php:682
+#: applications.php:213 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
@@ -1928,7 +1928,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:210 items.php:681
+#: applications.php:212 items.php:681
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
@@ -2132,7 +2132,7 @@ msgid "Cannot have empty visible template name"
 msgstr ""
 
 #: api/classes/CTrigger.php:1120 api/classes/CTrigger.php:1259
-#: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
+#: api/classes/CTriggerPrototype.php:730 api/classes/CTriggerPrototype.php:788
 #, c-format
 msgid "Cannot implode expression \"%s\"."
 msgstr ""
@@ -2367,17 +2367,17 @@ msgstr ""
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr ""
 
-#: api/classes/CScreen.php:471
+#: api/classes/CScreen.php:457
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:617
+#: api/classes/CTemplateScreen.php:635
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:576
+#: api/classes/CTriggerPrototype.php:563
 #, c-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
@@ -3174,7 +3174,7 @@ msgstr "Koordinātes"
 msgid "Copy"
 msgstr "Kopēt"
 
-#: include/views/configuration.graph.list.php:155
+#: include/views/configuration.graph.list.php:157
 #: include/views/configuration.item.list.php:284
 #: include/views/configuration.triggers.list.php:281
 msgid "Copy selected to ..."
@@ -3357,7 +3357,7 @@ msgstr ""
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Izveidots: Trigeris \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:763
+#: api/classes/CTriggerPrototype.php:738
 #, c-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Izveidots trigera prototips \"%1$s\" on \"%2$s\"."
@@ -3901,7 +3901,7 @@ msgstr "Vai dzēst skriptu?"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
 #: include/views/configuration.discovery.list.php:77
-#: include/views/configuration.graph.list.php:158
+#: include/views/configuration.graph.list.php:160
 #: include/views/configuration.host.discovery.list.php:144
 #: include/views/configuration.hostgroups.list.php:167
 #: include/views/configuration.host.prototype.list.php:127
@@ -3937,11 +3937,11 @@ msgstr ""
 msgid "Delete selected elements?"
 msgstr "Vai dzēst iezīmētos elementus?"
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:163
 msgid "Delete selected graph prototypes?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:163
 msgid "Delete selected graphs?"
 msgstr "Vai dzēst izvēlētos grafikus?"
 
@@ -4140,7 +4140,7 @@ msgstr ""
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:718
+#: api/classes/CTriggerPrototype.php:693
 #, c-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -4780,7 +4780,7 @@ msgstr ""
 #: api/classes/CService.php:377 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:624
 #: api/classes/CTrigger.php:882 api/classes/CTrigger.php:962
-#: api/classes/CTrigger.php:1052 api/classes/CTriggerPrototype.php:652
+#: api/classes/CTrigger.php:1052 api/classes/CTriggerPrototype.php:627
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
 #: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
@@ -4827,6 +4827,14 @@ msgstr ""
 #: include/classes/server/CZabbixServer.php:232
 #, c-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
+msgstr ""
+
+#: api/classes/CScreen.php:488
+msgid "Empty screen ID for screen."
+msgstr ""
+
+#: api/classes/CTemplateScreen.php:602
+msgid "Empty screen ID for template screen."
 msgstr ""
 
 #: include/classes/validators/CTimePeriodValidator.php:46
@@ -5552,7 +5560,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:109
 #: include/views/configuration.application.list.php:124
 #: include/views/configuration.discovery.list.php:81
-#: include/views/configuration.graph.list.php:165
+#: include/views/configuration.graph.list.php:167
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.hostgroups.list.php:170
 #: include/views/configuration.host.prototype.list.php:131
@@ -5664,6 +5672,16 @@ msgstr "Grafika nosaukums"
 msgid "Graph prototype"
 msgstr ""
 
+#: api/classes/CGraphPrototype.php:807
+#, c-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:813
+#, c-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr ""
+
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -5680,10 +5698,6 @@ msgstr ""
 
 #: graphs.php:273
 msgid "Graph prototype deleted"
-msgstr ""
-
-#: api/classes/CGraphPrototype.php:710 api/classes/CGraphPrototype.php:771
-msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
 #: graphs.php:224
@@ -6803,7 +6817,7 @@ msgstr "Imports veiksmīgs"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr ""
 
-#: screenedit.php:240 screenedit.php:255
+#: screenedit.php:248 screenedit.php:271
 msgid "Impossible to remove last row and column."
 msgstr ""
 
@@ -7349,6 +7363,10 @@ msgstr ""
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
 msgstr ""
 
+#: api/classes/CScreen.php:489
+msgid "Incorrect screen ID."
+msgstr ""
+
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
 msgstr ""
@@ -7386,6 +7404,10 @@ msgstr ""
 
 #: api/classes/CDRule.php:265
 msgid "Incorrect status."
+msgstr ""
+
+#: api/classes/CTemplateScreen.php:603
+msgid "Incorrect template screen ID."
 msgstr ""
 
 #: api/classes/CUser.php:362
@@ -7687,13 +7709,12 @@ msgid "Invalid maintenance period"
 msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:241
-#: api/classes/CScreenItem.php:302 api/classes/CScreen.php:447
-#: api/classes/CScript.php:442 api/classes/CService.php:206
-#: api/classes/CService.php:382 api/classes/CService.php:1472
-#: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
-#: api/classes/CUser.php:673 api/classes/CUser.php:693
-#: api/classes/CUser.php:851 api/classes/CUser.php:896
-#: api/rpc/class.cjsonrpc.php:197
+#: api/classes/CScreenItem.php:302 api/classes/CScript.php:442
+#: api/classes/CService.php:206 api/classes/CService.php:382
+#: api/classes/CService.php:1472 api/classes/CUserMacro.php:339
+#: api/classes/CUserMacro.php:472 api/classes/CUser.php:673
+#: api/classes/CUser.php:693 api/classes/CUser.php:851
+#: api/classes/CUser.php:896 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
 
@@ -7842,14 +7863,14 @@ msgstr "Rādītāju skaits"
 msgid "Item deleted"
 msgstr "Rādītājs izdzēsts"
 
-#: applications.php:208 items.php:679
+#: applications.php:210 items.php:679
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: applications.php:207 items.php:678
+#: applications.php:209 items.php:678
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
@@ -7969,8 +7990,8 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/managers/CHttpTestManager.php:709
-#: api/classes/managers/CHttpTestManager.php:840
+#: api/classes/managers/CHttpTestManager.php:710
+#: api/classes/managers/CHttpTestManager.php:841
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -9493,6 +9514,16 @@ msgstr ""
 msgid "No \"%1$s\" given for host prototype."
 msgstr ""
 
+#: api/classes/CScreen.php:487
+#, c-format
+msgid "No \"%1$s\" given for screen."
+msgstr ""
+
+#: api/classes/CTemplateScreen.php:601
+#, c-format
+msgid "No \"%1$s\" given for template screen."
+msgstr ""
+
 #: api/classes/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
@@ -9943,8 +9974,8 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:452 api/classes/CDiscoveryRule.php:457
 #: api/classes/CDRule.php:248 api/classes/CDRule.php:789
 #: api/classes/CEvent.php:735 api/classes/CGraphGeneral.php:65
-#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:707
-#: api/classes/CGraphPrototype.php:692 api/classes/CGraphPrototype.php:752
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:721
+#: api/classes/CGraphPrototype.php:695 api/classes/CGraphPrototype.php:760
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
 #: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
 #: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
@@ -9967,14 +9998,14 @@ msgstr ""
 #: api/classes/CMap.php:389 api/classes/CProxy.php:172
 #: api/classes/CProxy.php:213 api/classes/CProxy.php:285
 #: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
-#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:460
-#: api/classes/CScreen.php:573 api/classes/CService.php:1255
+#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:445
+#: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:573
-#: api/classes/CTemplateScreen.php:606 api/classes/CTemplateScreen.php:658
-#: api/classes/CTemplateScreen.php:664 api/classes/CTrigger.php:636
+#: api/classes/CTemplateScreen.php:624 api/classes/CTemplateScreen.php:676
+#: api/classes/CTemplateScreen.php:682 api/classes/CTrigger.php:636
 #: api/classes/CTrigger.php:981 api/classes/CTrigger.php:1002
-#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:566
-#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
+#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:553
+#: api/classes/CTriggerPrototype.php:644 api/classes/CUserMacro.php:589
 #: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
 #: api/classes/CUser.php:859 api/classes/CUser.php:879
 #: api/classes/CUser.php:938 api/classes/CUser.php:1363
@@ -12216,11 +12247,11 @@ msgstr "Ekrāns"
 msgid "Screen \"%1$s\" added."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:700
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr ""
 
-#: api/classes/CScreen.php:396 api/classes/CScreen.php:483
+#: api/classes/CScreen.php:396 api/classes/CScreen.php:469
 #, c-format
 msgid "Screen \"%1$s\" already exists."
 msgstr ""
@@ -12275,7 +12306,7 @@ msgstr ""
 msgid "Screen deleted"
 msgstr ""
 
-#: screenedit.php:239 screenedit.php:254
+#: screenedit.php:247 screenedit.php:270
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
@@ -13326,7 +13357,7 @@ msgstr "Šablonu saraksts"
 msgid "Template name"
 msgstr "Šablonu nosaukums"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:633
+#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr ""
@@ -13802,7 +13833,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr ""
 
-#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:776
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -13844,6 +13875,16 @@ msgstr "Trigera nosaukums"
 msgid "Trigger prototype"
 msgstr "Trigera prototips"
 
+#: api/classes/CTriggerPrototype.php:927
+#, c-format
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:933
+#, c-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
+msgstr ""
+
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
 msgstr ""
@@ -13865,11 +13906,6 @@ msgid_plural "Trigger prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#: api/classes/CTriggerPrototype.php:530 api/classes/CTriggerPrototype.php:605
-#, c-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr ""
 
 #: trigger_prototypes.php:163
 msgid "Trigger prototype updated"
@@ -14125,7 +14161,7 @@ msgstr "ASV (160 rakstzīmes)"
 msgid "USER PROFILE"
 msgstr "LIETOTĀJA PROFILA"
 
-#: include/func.inc.php:2611
+#: include/func.inc.php:2612
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14417,12 +14453,12 @@ msgstr ""
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:840
+#: api/classes/CTriggerPrototype.php:815
 #, c-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/managers/CHttpTestManager.php:263
+#: api/classes/managers/CHttpTestManager.php:264
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -15022,8 +15058,8 @@ msgstr "Tīmeklis"
 msgid "Web monitoring"
 msgstr "Tīmekļa uzraudzība"
 
-#: api/classes/managers/CHttpTestManager.php:382
-#: api/classes/managers/CHttpTestManager.php:390
+#: api/classes/managers/CHttpTestManager.php:383
+#: api/classes/managers/CHttpTestManager.php:391
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
@@ -15231,7 +15267,7 @@ msgstr ""
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:501 api/classes/CTriggerPrototype.php:570
+#: api/classes/CTriggerPrototype.php:501 api/classes/CTriggerPrototype.php:557
 msgid "Wrong fields for trigger."
 msgstr ""
 

@@ -582,11 +582,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($strList as $str) {
 			// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
 			// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-			preg_match_all('/(?<macros>{'.
-				'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
-				'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
-				'(?<functions>(last|max|min|avg))\('.
-				'(?<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
+			preg_match_all('/(?P<macros>{'.
+				'(?P<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
+				'(?P<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
+				'(?P<functions>(last|max|min|avg))\('.
+				'(?P<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 			if (!empty($matches['hosts'])) {
