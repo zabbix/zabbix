@@ -59,7 +59,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	path = zbx_strdup(NULL, cfg_file);
+	path = zbx_strdup(path, cfg_file);
 	zbx_rtrim(path, "\\");
 
 	wpath = zbx_utf8_to_unicode(path);
@@ -100,12 +100,15 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto out;
 	}
+
 	ret = SUCCEED;
 out:
-	zbx_free(path);
-	zbx_free(wpath);
 	FindClose(h_find);
+	zbx_free(wpath);
+	zbx_free(path);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 #else
 	DIR		*dir;
