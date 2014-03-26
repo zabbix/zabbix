@@ -107,17 +107,17 @@ class CDecimalValidator extends CValidator {
 		}
 
 		if ($this->maxPrecision !== null) {
+			$maxNaturals = $this->maxPrecision - $this->maxScale;
+
 			// validate precision
 			if ($naturalSize + $scaleSize > $this->maxPrecision) {
-				$this->error($this->messagePrecision, $value, $this->label, $this->maxPrecision);
+				$this->error($this->messagePrecision, $value, $this->label, $maxNaturals, $this->maxScale);
 
 				return false;
 			}
 
 			// validate digits before point
 			if ($this->maxScale !== null) {
-				$maxNaturals = $this->maxPrecision - $this->maxScale;
-
 				if ($naturalSize > $maxNaturals) {
 					$this->error($this->messageNatural, $value, $this->label, $maxNaturals);
 

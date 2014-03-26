@@ -332,7 +332,10 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			'maxPrecision' => 16,
 			'maxScale' => 4,
 			'messageFormat' => _('Value "%1$s" of "%2$s" has incorrect decimal format.'),
-			'messagePrecision' => _('Value "%1$s" of "%2$s" is too long: the maximum length is %3$s digits.'),
+			'messagePrecision' => _(
+				'Value "%1$s" of "%2$s" is too long: it cannot have more than %3$s digits before the decimal point '.
+				'and more than %4$s digits after the decimal point.'
+			),
 			'messageNatural' => _(
 				'Value "%1$s" of "%2$s" has too many digits before the decimal point: '.
 				'it cannot have more than %3$s digits.'
