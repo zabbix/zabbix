@@ -8,20 +8,20 @@
 #include "rsm.h"
 
 const char      *progname = NULL;
-const char	title_message[] = "Password decrypter";
+const char	title_message[] = "Zabbix decrypter";
 const char	*help_message[] = {NULL};
-const char	usage_message[] = "<secretkey_enc_b64> <secretkey_salt_b64> <password_enc_b64> <password_salt_b64>\n"
-		"Decrypt EPP password using secret key and salt\n"
+const char	usage_message[] = "<secretkey_enc_b64> <secretkey_salt_b64> <sensdata_enc_b64> <sensdata_salt_b64>\n"
+		"Decrypt sensitive data using secret key.\n"
 		"Parameters:\n"
-		"    <secretkey_enc_b64>         encrypted secret key for password decryption, base64-encoded\n"
-		"    <secretkey_salt_b64>        salt for secret key decryption, base64-encoded\n"
-		"    <password_enc_b64>          encrypted password, base64-encoded\n"
-		"    <password_salt_b64>         password salt, base64-encoded";
+		"    <secretkey_enc_b64>         secret key, encrypted with passphrase, base64-encoded\n"
+		"    <secretkey_salt_b64>        secret key salt, base64-encoded\n"
+		"    <sensdata_enc_b64>          encryped sensitive data, base64-encoded\n"
+		"    <sensdata_salt_b64>         sensitive data salt, base64-encoded";
 
 int	main(int argc, char *argv[])
 {
-	const char	*secretkey_enc_b64, *secretkey_salt_b64, *password_enc_b64, *password_salt_b64;
-	char		passphrase[128], *password = NULL, err[128];
+	const char	*secretkey_enc_b64, *secretkey_salt_b64, *sensdata_enc_b64, *sensdata_salt_b64;
+	char		passphrase[RSM_EPP_PASSPHRASE_MAX], *sensdata = NULL, err[128];
 
 	progname = get_program_name(argv[0]);
 
@@ -33,12 +33,12 @@ int	main(int argc, char *argv[])
 
 	secretkey_enc_b64 = argv[1];
 	secretkey_salt_b64 = argv[2];
-	password_enc_b64 = argv[3];
-	password_salt_b64 = argv[4];
+	sensdata_enc_b64 = argv[3];
+	sensdata_salt_b64 = argv[4];
 
-	if (SUCCEED != zbx_read_stdin("Enter EPP passphrase: ", passphrase, sizeof(passphrase)))
+	if (SUCCEED != zbx_read_stdin("Enter EPP passphrase: ", passphrase, sizeof(passphrase), err, sizeof(err)))
 	{
-		fprintf(stderr, "an error occured while requesting EPP passphrase\n");
+		fprintf(stderr, "cannot get EPP passphrase: %s\n", err);
 		goto out;
 	}
 
@@ -50,20 +50,16 @@ int	main(int argc, char *argv[])
 	}
 
 	if (SUCCEED != decrypt_ciphertext(passphrase, strlen(passphrase), secretkey_enc_b64, strlen(secretkey_enc_b64),
-			secretkey_salt_b64, strlen(secretkey_salt_b64), password_enc_b64, strlen(password_enc_b64),
-			password_salt_b64, strlen(password_salt_b64), &password, err, sizeof(err)))
+			secretkey_salt_b64, strlen(secretkey_salt_b64), sensdata_enc_b64, strlen(sensdata_enc_b64),
+			sensdata_salt_b64, strlen(sensdata_salt_b64), &sensdata, err, sizeof(err)))
 	{
-		fprintf(stderr, "cannot encrypt password: %s\n", err);
+		fprintf(stderr, "cannot encrypt sensitive data: %s\n", err);
 		goto out;
 	}
 
-	printf("password: %s\n", password);
+	printf("sensitive data: %s\n", sensdata);
 out:
-	if (NULL != password)
-	{
-		memset(password, 0, strlen(password));
-		zbx_free(password);
-	}
+	zbx_free(sensdata);
 
 	return 0;
 }

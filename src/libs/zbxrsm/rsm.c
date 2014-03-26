@@ -325,9 +325,10 @@ out:
 	return ret;
 }
 
-int	zbx_read_stdin(const char *prompt, char *output, size_t output_size)
+int	zbx_read_stdin(const char *prompt, char *output, size_t output_size, char *err, size_t err_size)
 {
 	struct termios	oflags, nflags;
+	int		ret = FAIL;
 
 	/* disable echo */
 	tcgetattr(fileno(stdin), &oflags);
@@ -336,15 +337,40 @@ int	zbx_read_stdin(const char *prompt, char *output, size_t output_size)
 	nflags.c_lflag |= ECHONL;
 
 	if (0 != tcsetattr(fileno(stdin), TCSANOW, &nflags))
-		return FAIL;
+	{
+		if (NULL != err)
+			zbx_strlcpy(err, "cannot disable terminal echo", err_size);
+		goto out;
+	}
 
 	printf(prompt);
-	fgets(output, output_size, stdin);
-	output[strlen(output) - 1] = 0;
+	if (output != fgets(output, output_size, stdin))
+	{
+		if (NULL != err)
+			zbx_strlcpy(err, "cannot read input line", err_size);
+		goto out;
+	}
 
-	/* restore terminal */
-	if (0 != tcsetattr(fileno(stdin), TCSANOW, &oflags))
-		return FAIL;
+	if ('\n' != output[strlen(output) - 1])
+	{
+		char	buf[128];
 
-	return SUCCEED;
+		do
+		{
+			fgets(buf, sizeof(buf), stdin);
+		}
+		while ('\n' != buf[strlen(buf) - 1]);
+
+		if (NULL != err)
+			zbx_snprintf(err, err_size, "input line over limit (" ZBX_FS_SIZE_T " characters)", output_size);
+		goto out;
+	}
+
+	output[strlen(output) - 1] = '\0';
+
+	ret = SUCCEED;
+out:
+	tcsetattr(fileno(stdin), TCSANOW, &oflags);
+
+	return ret;
 }

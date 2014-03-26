@@ -32,9 +32,10 @@ int	main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (SUCCEED != zbx_read_stdin("Enter EPP passphrase: ", (char *)passphrase, sizeof(passphrase)))
+	if (SUCCEED != zbx_read_stdin("Enter EPP passphrase: ", (char *)passphrase, sizeof(passphrase),
+			err, sizeof(err)))
 	{
-		fprintf(stderr, "an error occured while requesting EPP passphrase\n");
+		fprintf(stderr, "cannot get EPP passphrase: %s\n", err);
 		goto out;
 	}
 

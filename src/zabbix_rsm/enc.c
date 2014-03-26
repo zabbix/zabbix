@@ -8,20 +8,21 @@
 #include "rsm.h"
 
 const char      *progname = NULL;
-const char	title_message[] = "Password encrypter";
+const char	title_message[] = "Zabbix encrypter";
 const char	*help_message[] = {NULL};
 const char	usage_message[] = "<secretkey_enc_b64> <secretkey_salt_b64>\n"
-		"Encrypt EPP password using secret key and salt\n"
+		"Encrypt sensitive data using secret key.\n"
 		"Parameters:\n"
-		"    <secretkey_enc_b64>         encrypted secret key for password encryption, base64-encoded\n"
-		"    <secretkey_salt_b64>        salt for secret key decryption, base64-encoded\n"
+		"    <secretkey_enc_b64>         secret key, encrypted with passphrase, base64-encoded\n"
+		"    <secretkey_salt_b64>        secret key salt, base64-encoded\n"
 		"Optional:\n"
-		"    <noprompt>                  do not print prompt when requesting EPP passphrase and password";
+		"    <noprompt>                  do not print prompts when requesting passphrase and sensitive data";
 
 int	main(int argc, char *argv[])
 {
 	const char	*secretkey_enc_b64, *secretkey_salt_b64, *prompt = 0;
-	char		*password_enc_b64 = NULL, *password_salt_b64 = NULL, passphrase[128], password[128], err[128];
+	char		*sensdata_enc_b64 = NULL, *sensdata_salt_b64 = NULL, passphrase[128],
+			sensdata[RSM_EPP_SENSDATA_MAX], err[128];
 
 	progname = get_program_name(argv[0]);
 
@@ -33,17 +34,17 @@ int	main(int argc, char *argv[])
 
 	if (3 == argc || 0 != strcmp("noprompt", argv[3]))
 		prompt = "Enter EPP passphrase: ";
-	if (SUCCEED != zbx_read_stdin(prompt, passphrase, sizeof(passphrase)))
+	if (SUCCEED != zbx_read_stdin(prompt, passphrase, sizeof(passphrase), err, sizeof(err)))
 	{
-		fprintf(stderr, "an error occured while requesting EPP passphrase\n");
+		fprintf(stderr, "cannot get EPP passphrase: %s\n", err);
 		goto out;
 	}
 
 	if (3 == argc || 0 != strcmp("noprompt", argv[3]))
-		prompt = "Enter EPP password: ";
-	if (SUCCEED != zbx_read_stdin(prompt, password, sizeof(password)))
+		prompt = "Enter EPP sensitive data to encrypt: ";
+	if (SUCCEED != zbx_read_stdin(prompt, sensdata, sizeof(sensdata), err, sizeof(err)))
 	{
-		fprintf(stderr, "an error occured while requesting EPP password\n");
+		fprintf(stderr, "cannot get EPP sensitive data: %s\n", err);
 		goto out;
 	}
 
@@ -58,17 +59,17 @@ int	main(int argc, char *argv[])
 	}
 
 	if (SUCCEED != encrypt_cleartext(passphrase, strlen(passphrase), secretkey_enc_b64, strlen(secretkey_enc_b64),
-			secretkey_salt_b64, strlen(secretkey_salt_b64), password, strlen(password), &password_enc_b64,
-			&password_salt_b64, err, sizeof(err)))
+			secretkey_salt_b64, strlen(secretkey_salt_b64), sensdata, strlen(sensdata), &sensdata_enc_b64,
+			&sensdata_salt_b64, err, sizeof(err)))
 	{
-		fprintf(stderr, "cannot encrypt password: %s\n", err);
+		fprintf(stderr, "cannot encrypt sensitive data: %s\n", err);
 		goto out;
 	}
 
-	printf("%s|%s\n", password_enc_b64, password_salt_b64);
+	printf("%s|%s\n", sensdata_enc_b64, sensdata_salt_b64);
 out:
-	zbx_free(password_enc_b64);
-	zbx_free(password_salt_b64);
+	zbx_free(sensdata_enc_b64);
+	zbx_free(sensdata_salt_b64);
 
 	return 0;
 }
