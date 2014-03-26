@@ -2,8 +2,10 @@
 Changes for 2.3.0
 
 New features:
+........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
+A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
 A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templates, hosts and proxies (Eduard, Sasha)
-..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavel)
+..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavels)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
@@ -13,7 +15,7 @@ A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templ
 A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macros (Pavels, wiper)
 ..F....... [ZBX-7361] implemented alphabetic host ordering when trigger has many hosts (Ivo)
 ..F....... [ZBXNEXT-1632] added goto graphs link in host menu popup (Eduard)
-..F....... [ZBXNEXT-1735] removed graph and history link from items in lates data page, if history and trends are disabled (Oleg)
+..F....... [ZBXNEXT-1735] removed graph and history link from items in latest data page, if history and trends are disabled (Oleg)
 ..F....... [ZBXNEXT-1910] added active since and active till columns in maintenance page (Eduard)
 ..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
 ..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
@@ -37,9 +39,9 @@ Bug fixes:
 ....I..... [ZBX-6235] fixed unnecessary compilation of C code when only --enable-java is passed to ./configure (asaveljevs)
 ...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
-........S. [ZBX-7140] fixed sql query to retrieve data for host updates sorted from the database (Juris)
+........S. [ZBX-7140] fixed SQL query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
-..F....... [ZBX-7786] fixed cell limit formating with ellipsis (Eduard)
+..F....... [ZBX-7786] fixed cell limit formatting with ellipsis (Eduard)
 ..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
 ....I..... [ZBX-5789] removed unused fields in graph_discovery table (Sasha)
 ..F....... [ZBX-6350] fixed incorrectly displayed table cell width in Event source details and Event details blocks (Ivo)
@@ -62,11 +64,27 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.3rc1
 
 New features:
+.......PS. [ZBXNEXT-2137] increased maximum cache size limit to 8gb from 2gb (Juris)
+.......PS. [ZBXNEXT-166] implemented variable binding for bulk inserts with Oracle database (wiper)
+.......PS. [ZBXNEXT-98] implemented bulk requests for SNMP monitoring (asaveljevs)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Japanese translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
+A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
+A......... [ZBX-7409] fixed inherited web items being added to incorrect applications when updating a template web scenario (Pavels)
+..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
+..F....... [ZBX-7831] fixed regexp compilation errors for installations that use PHP with PCRE older than 7.0 (Pavels)
+..F....... [ZBX-7884] fixed incorrect layering of modal window and made modal windows draggable and opaque (Ivo)
+A......... [ZBX-7879] fixed creating and updating applications with multibyte characters in template which is linked to host while mbstring.func_overload set greater than 1 (Ivo)
+...G...PS. [ZBX-7919] fixed hashset entry allocation overhead (wiper)
+........S. [ZBX-7918] fixed value cache reporting more free space than actually available (wiper)
+A.F....... [ZBX-7832] fixed screen item row- and colspans not being adjusted when reducing the size of a screen (Pavels)
+........S. [ZBX-7620] improved error messaging and debug logging for VMware items (wiper)
+........S. [ZBX-7897] fixed memory leak in trapper for log file items (Juris)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
 ........S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 ..F.....I. [ZBX-7849] fixed not being able to save actions with a "Maintenance status" condition after upgrading from 2.0 (Pavels)
@@ -687,8 +705,8 @@ A......... [ZBXNEXT-109] improved discovery rule check deleting (Eduard)
 ...GI..PS. [ZBXNEXT-1550] added support of loadable modules for extending Zabbix agent checks, also server and proxy simple checks (Alexei)
 ........S. [ZBX-6226] added command request (global script) result logging (wiper)
 ...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
-A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
-A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
+A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavels, Sasha)
+A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavels, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete methods to accept both objects and IDs (Pavels)
 ...G...PS. [ZBXNEXT-1334] added whitespace trimming for server lists in agent conf file and allowed hosts for trapper items (wiper)
 .......PS. [ZBX-4393] added usage of configuration parameter Timeout for SNMP checks (dimir)
@@ -916,6 +934,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
 ..F.....S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
 A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
@@ -2425,6 +2445,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20
 
