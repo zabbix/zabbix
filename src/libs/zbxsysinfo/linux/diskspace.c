@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -41,7 +42,8 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 
 	if (0 != ZBX_STATFS(fsname, &s))
 	{
-		*error = strdup("Failed to get filesystem stats.");
+		*error = zbx_dsprintf(NULL, "Failed to get filesystem stats: %s",
+			zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 typedef struct
 {
