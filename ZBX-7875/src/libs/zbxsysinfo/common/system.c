@@ -149,7 +149,7 @@ int	get_win_version(OS_WIN_VERSION *os_version)
 
 	lp_name_strings = zbx_malloc(&lp_name_strings, 256);
 
-	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
 
 	for (i = 0; i < 4; i++)
@@ -185,24 +185,24 @@ int	get_win_version(OS_WIN_VERSION *os_version)
 		}
 	}
 
-	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
 		goto out;
 
 	wsource = zbx_utf8_to_unicode(sys_key_2);
 
-	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
 
 	wsource = zbx_utf8_to_unicode(win_keys[4]);
 
-	if(ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
+	if (ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
 			(LPBYTE)lp_name_strings, &dw_buffer))
 		goto out;
 	else
 		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
 				zbx_unicode_to_utf8( (LPCTSTR)lp_name_strings));
 
-	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
 		goto out;
 
 	if (0 != gethostname(os_version->ComputerName, sizeof(os_version->ComputerName)))
@@ -231,7 +231,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	memset(&os_version_info, '\0', sizeof(os_version_info));
 
-	if(0 == get_win_version(&os_version_info))
+	if (0 == get_win_version(&os_version_info))
 	{
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "Windows %s %s.%s %s %s %s",
 				os_version_info.ComputerName,
