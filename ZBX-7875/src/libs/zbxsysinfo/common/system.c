@@ -125,7 +125,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 int		get_win_version(OS_WIN_VERSION *os_version)
 {
 	const char		*__function_name = "get_win_version";
-	int				ret = FAIL;
+	int			ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
