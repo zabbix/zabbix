@@ -37,16 +37,11 @@ elsif ($OPTS{'type'} == 4)
 
 db_connect();
 
-my $tlds_ref = get_tlds();
+my $sql = "update items set delay=? where type=3 and key_ like ?";
 
-foreach my $tld (@$tlds_ref)
-{
-    my $sql = "update items i,hosts h set delay=? where i.hostid=h.hostid and i.templateid is null and i.key_ like ? and host like 'Template %'";
+$sth = $dbh->prepare($sql) or die $dbh->errstr;
 
-    $sth = $dbh->prepare($sql) or die $dbh->errstr;
-
-    $sth->execute($OPTS{'delay'}, $key_part) or die $dbh->errstr;
-}
+$sth->execute($OPTS{'delay'}, $key_part) or die $dbh->errstr;
 
 my $sql = "update globalmacro set value=? where macro=?";
 
