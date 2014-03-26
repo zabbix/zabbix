@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -50,7 +51,8 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != ZBX_STATFS(fsname, &s))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get filesystem stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get filesystem stats: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

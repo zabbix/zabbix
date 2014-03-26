@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "hardware.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {

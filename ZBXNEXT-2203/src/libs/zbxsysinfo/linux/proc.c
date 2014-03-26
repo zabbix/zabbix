@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 #define DO_SUM 0
 #define DO_MAX 1
