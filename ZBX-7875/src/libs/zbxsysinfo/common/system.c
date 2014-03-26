@@ -240,12 +240,13 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 #endif
 
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
+{sbprintf();
 #ifdef _WINDOWS
 	OS_WIN_VERSION		os_version_info;
-	char			*os = NULL;
-	size_t			os_alloc = 256, os_offset = 0;
+	char			*os;
+	size_t			os_alloc, os_offset = 0;
 
+	os_alloc =  sizeof(os_version_info) + 14;
 	os = zbx_malloc(os, os_alloc);
 	memset( &os_version_info, '\0', sizeof(os_version_info) );
 

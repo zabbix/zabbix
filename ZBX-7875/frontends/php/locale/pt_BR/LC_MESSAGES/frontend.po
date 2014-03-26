@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 17:42+0200\n"
+"POT-Creation-Date: 2014-03-24 15:56+0200\n"
 "PO-Revision-Date: 2014-02-19 17:24+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -121,15 +121,15 @@ msgstr "----[RECONHECIMENTO EM MASSA]----"
 msgid "0 or 1"
 msgstr "0 ou 1"
 
-#: queue.php:162 queue.php:225
+#: queue.php:166 queue.php:229
 msgid "1 minute"
 msgstr "1 minuto"
 
-#: queue.php:160 queue.php:223
+#: queue.php:164 queue.php:227
 msgid "10 seconds"
 msgstr "10 segundos"
 
-#: queue.php:161 queue.php:224
+#: queue.php:165 queue.php:228
 msgid "30 seconds"
 msgstr "30 segundos"
 
@@ -137,11 +137,11 @@ msgstr "30 segundos"
 msgid "3D view"
 msgstr "visão 3D"
 
-#: queue.php:163 queue.php:226
+#: queue.php:167 queue.php:230
 msgid "5 minutes"
 msgstr "5 minutos"
 
-#: queue.php:159 queue.php:222
+#: queue.php:163 queue.php:226
 msgid "5 seconds"
 msgstr "5 segundos"
 
@@ -1382,7 +1382,7 @@ msgstr "Gráfico não foi removido"
 msgid "Cannot delete graph prototype"
 msgstr "Não foi possível excluir o protótipo de gráfico"
 
-#: api/classes/CItem.php:985
+#: api/classes/CItem.php:986
 msgid "Cannot delete graph."
 msgstr "Gráfico não foi removido."
 
@@ -1502,7 +1502,7 @@ msgstr "Não foi possível remover template"
 msgid "Cannot delete templated graphs."
 msgstr "Não é possível excluir gráficos do template."
 
-#: api/classes/CItem.php:949
+#: api/classes/CItem.php:950
 msgid "Cannot delete templated item."
 msgstr "Não é possível deletar item do template."
 
@@ -1514,7 +1514,7 @@ msgstr "Não é possível excluir itens de template"
 msgid "Cannot delete templated items."
 msgstr "Não é possível deletar itens do template."
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:903
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Não é possível excluir a trigger \"%1$s:%2$s\", ela é oriunda de um template."
@@ -1527,7 +1527,7 @@ msgstr "Trigger não foi removida"
 msgid "Cannot delete trigger prototype"
 msgstr "Não foi possível excluir o protótipo de trigger"
 
-#: api/classes/CItem.php:1001
+#: api/classes/CItem.php:1002
 msgid "Cannot delete trigger."
 msgstr "Trigger não foi excluída."
 
@@ -1535,7 +1535,7 @@ msgstr "Trigger não foi excluída."
 msgid "Cannot delete triggers"
 msgstr "Triggers não foram removidas"
 
-#: api/classes/CTriggerPrototype.php:965
+#: api/classes/CTriggerPrototype.php:941
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Não é possível excluir triggers criadas pelo processo de descoberta (LLD)."
 
@@ -1674,8 +1674,8 @@ msgid "Cannot have empty visible template name"
 msgstr "Não pode ter espaço vazio no nome do template"
 
 #: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
-#: api/classes/CTriggerPrototype.php:1008
-#: api/classes/CTriggerPrototype.php:1066
+#: api/classes/CTriggerPrototype.php:984
+#: api/classes/CTriggerPrototype.php:1042
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Não foi possível agrupar a expressão \"%s\"."
@@ -1864,7 +1864,7 @@ msgstr "Não foi possível atualizar o \"templateid\" para a tela \"%1$s\"."
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "Não foi possível atualizar o \"templateid\" para a trigger \"%1$s\"."
 
-#: api/classes/CTriggerPrototype.php:833
+#: api/classes/CTriggerPrototype.php:820
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Não foi possível atualizar o \"templateid\" para o protótipo de trigger \"%1$s\"."
@@ -2538,7 +2538,7 @@ msgstr "Coordenadas"
 msgid "Copy"
 msgstr "Copiar"
 
-#: include/views/configuration.graph.list.php:138
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2687,7 +2687,7 @@ msgstr "Criado: Aplicação \"%1$s\" em \"%2$s\"."
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Regra de descoberta \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CItem.php:850
+#: api/classes/CItem.php:851
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Item \"%1$s\" em \"%2$s\"."
@@ -2702,7 +2702,7 @@ msgstr "Criado: Protótipo de item \"%1$s\" em \"%2$s\"."
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Trigger \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1015
+#: api/classes/CTriggerPrototype.php:991
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Criado: Protótipo de trigger \"%1$s\" em \"%2$s\"."
@@ -3149,7 +3149,7 @@ msgstr "Espera"
 msgid "Delay (in sec)"
 msgstr "Espera (em segundos)"
 
-#: queue.php:247
+#: queue.php:251
 msgid "Delayed by"
 msgstr "Atrasado por"
 
@@ -3262,7 +3262,7 @@ msgstr "Remover script?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:141
+#: include/views/configuration.graph.list.php:143
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3298,7 +3298,7 @@ msgstr "Remover regras de descoberta selecionadas?"
 msgid "Delete selected elements?"
 msgstr "Remover elementos selecionados?"
 
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:144
 msgid "Delete selected graphs?"
 msgstr "Remover gráficos selecionados?"
 
@@ -3447,7 +3447,7 @@ msgstr "Apagado: Gráfico \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Apagado: Host \"%1$s\"."
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Apagado: Item \"%1$s\" em \"%2$s\"."
@@ -3473,7 +3473,7 @@ msgstr "Apagado: Template \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Apagado: Trigger \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:971
+#: api/classes/CTriggerPrototype.php:947
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Apagado: Protótipo de trigger \"%1$s\" em \"%2$s\"."
@@ -4059,12 +4059,12 @@ msgstr "A condição da ação está vazia."
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:929 api/classes/CItemPrototype.php:708
+#: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:885
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4728,7 +4728,7 @@ msgstr "Scripts globais"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:145
+#: include/views/configuration.graph.list.php:147
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4829,6 +4829,16 @@ msgstr "Item do gráfico"
 msgid "Graph name"
 msgstr "Nome do gráfico"
 
+#: api/classes/CGraphPrototype.php:881
+#, php-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:887
+#, php-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr ""
+
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -4838,10 +4848,6 @@ msgstr "O protótipo de gráfico \"%1$s\" possui itens de template, esta situaç
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "O protótipo de gráfico \"%s\" foi excluído."
-
-#: api/classes/CGraphPrototype.php:856
-msgid "Graph prototype must have at least one prototype."
-msgstr "Protótipo de gráfico deve possuir pelo menos um protótipo de item."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
@@ -5176,7 +5182,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
-#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:249
+#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:253
 #: report2.php:235 report5.php:60 tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Host"
@@ -6559,7 +6565,7 @@ msgstr "Item"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "O item \"%1$s\" já existe em \"%2$s\", herdado de outro template."
 
-#: api/classes/CItem.php:1216
+#: api/classes/CItem.php:1217
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "O item \"%1$s\" não pode popular um campo inexistente no host \"%2$d\". As opções são: de 0 (não popular) até %3$d."
@@ -6677,7 +6683,7 @@ msgstr "Já existe item com a chave \"%s\"."
 #: include/views/configuration.host.edit.php:338
 #: include/views/configuration.item.list.php:34
 #: include/views/configuration.template.edit.php:240
-#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:158
+#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:162
 #: search.php:137 search.php:164 search.php:183 search.php:369 search.php:393
 #: search.php:416 templates.php:459 templates.php:523
 msgid "Items"
@@ -7814,7 +7820,7 @@ msgstr "Mês"
 msgid "Monthly"
 msgstr "Mensal"
 
-#: queue.php:164 queue.php:227
+#: queue.php:168 queue.php:231
 msgid "More than 10 minutes"
 msgstr "Mais de 10 minutos"
 
@@ -7926,7 +7932,7 @@ msgstr "Autenticação NTLM"
 #: popup.php:1321 popup.php:1350 popup.php:1448 popup.php:1451 popup.php:1521
 #: popup.php:1524 popup.php:1581 popup.php:1585 popup.php:1636 popup.php:1667
 #: popup.php:1698 popup.php:1738 popup.php:1754 popup.php:1777 popup.php:1806
-#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:250
+#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:254
 #: report2.php:236 screenconf.php:50 services.php:42 slideconf.php:38
 #: sysmaps.php:48 sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41
 #: tr_status.php:293 users.php:46
@@ -8025,7 +8031,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Próximo"
 
-#: queue.php:246
+#: queue.php:250
 msgid "Next check"
 msgstr "Próxima checagem"
 
@@ -8446,7 +8452,7 @@ msgstr "Sem permissões para aceso ao sistema."
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:580 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:838
+#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:841
 #: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
@@ -8454,7 +8460,7 @@ msgstr "Sem permissões para aceso ao sistema."
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:726
+#: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
@@ -8466,8 +8472,8 @@ msgstr "Sem permissões para aceso ao sistema."
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
-#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:824
-#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
+#: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
 #: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
@@ -8615,7 +8621,7 @@ msgstr "Não foram definidos cenários web."
 #: include/triggers.inc.php:1622 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
-#: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
+#: popup_right.php:66 queue.php:252 report2.php:234 report5.php:59
 #: search.php:128 search.php:257 search.php:366 tr_status.php:291
 msgid "Node"
 msgstr "Nodo"
@@ -9688,7 +9694,7 @@ msgid "Proxies"
 msgstr "Proxies"
 
 #: include/actions.inc.php:92 include/audit.inc.php:46
-#: include/views/administration.proxy.edit.php:86 queue.php:221
+#: include/views/administration.proxy.edit.php:86 queue.php:225
 msgid "Proxy"
 msgstr "Proxy"
 
@@ -10851,7 +10857,7 @@ msgid "Serial number B"
 msgstr "Número serial B"
 
 #: include/views/administration.script.list.php:67 popup.php:1859
-#: queue.php:186
+#: queue.php:190
 msgid "Server"
 msgstr "Servidor"
 
@@ -11698,7 +11704,7 @@ msgstr[1] "A imagem é utilizada nos mapas %2$s."
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s)."
 
-#: queue.php:121
+#: queue.php:125
 msgid "The queue is empty"
 msgstr "A fila está vazia"
 
@@ -11862,7 +11868,7 @@ msgid "Top"
 msgstr "Acima"
 
 #: include/blocks.inc.php:377 include/classes/class.chostsinfo.php:128
-#: queue.php:289
+#: queue.php:293
 msgid "Total"
 msgstr "Total"
 
@@ -11916,11 +11922,6 @@ msgstr "A trigger \"%1$s\" já existe em \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "A trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
 
-#: api/classes/CTriggerPrototype.php:885
-#, php-format
-msgid "Trigger \"%1$s\" does not have item prototype."
-msgstr "A trigger \"%1$s\" não possui protótipos de item."
-
 #: include/classes/import/CXmlImport18.php:1434
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
@@ -11961,7 +11962,7 @@ msgstr "Opções de exibição de trigger"
 msgid "Trigger expression condition"
 msgstr "Expressão de condição da trigger"
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1030
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "A expressão precisa conter pelo menos uma referência a host:chave."
 
@@ -11995,10 +11996,15 @@ msgstr "Nome da trigger"
 msgid "Trigger prototype"
 msgstr "Protótipo de trigger"
 
-#: api/classes/CTriggerPrototype.php:791
+#: api/classes/CTriggerPrototype.php:1106
 #, php-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr "O protótipo de trigger \"%1$s\" precisa conter pelo menos um protótipo de trigger."
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:1112
+#, php-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
+msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
@@ -12087,7 +12093,7 @@ msgstr "Top 100 triggers"
 msgid "Triggers with severity"
 msgstr "Triggers com severidade"
 
-#: queue.php:289
+#: queue.php:293
 msgid "Truncated"
 msgstr "Truncado"
 
@@ -12113,7 +12119,7 @@ msgstr "Turco (tr_TR)"
 msgid "Two elements should be selected"
 msgstr "Dois elementos devem estar selecionados"
 
-#: api/classes/CItem.php:1277
+#: api/classes/CItem.php:1278
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular o mesmo campo no inventário \"%3$s\", isso levaria a um conflito."
@@ -12238,7 +12244,7 @@ msgstr "EUA (160 caracteres)"
 msgid "USER PROFILE"
 msgstr "PROFILE DO USUÁRIO"
 
-#: include/config.inc.php:760
+#: include/config.inc.php:761
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12483,7 +12489,7 @@ msgstr "Atualizado: Aplicação \"%1$s\" em \"%2$s\"."
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Atualizado: Regra de descoberta \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CItem.php:902
+#: api/classes/CItem.php:903
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Atualizado: Item \"%1$s\" em \"%2$s\"."
@@ -12498,7 +12504,7 @@ msgstr "Atualizado: Protótipo de item \"%1$s\" em \"%2$s\"."
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Atualizado: Trigger \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1085
+#: api/classes/CTriggerPrototype.php:1061
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Atualizado: Protótipo de trigger \"%1$s\" em \"%2$s\"."
@@ -13103,7 +13109,7 @@ msgstr "Campos errados para o serviço \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Campos errados para o tempo do serviço \"%1$s\"."
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:815
 msgid "Wrong fields for trigger."
 msgstr "Campos errados para trigger."
 
