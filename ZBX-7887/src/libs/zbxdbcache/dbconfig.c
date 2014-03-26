@@ -242,6 +242,13 @@ ZBX_DC_HOST_PH;
 
 typedef struct
 {
+	const char	*host;
+	ZBX_DC_HOST	*host_ptr;
+}
+ZBX_DC_HOST_H;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
@@ -383,6 +390,7 @@ typedef struct
 	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_ph;		/* proxy_hostid, host */
+	zbx_hashset_t		hosts_h;		/* host */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		ipmihosts;
 	zbx_hashset_t		htmpls;
@@ -634,7 +642,7 @@ static ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
 		return item_hk->item_ptr;
 }
 
-static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *host)
+static ZBX_DC_HOST	*DCfind_host_ph(zbx_uint64_t proxy_hostid, const char *host)
 {
 	ZBX_DC_HOST_PH	*host_ph, host_ph_local;
 
@@ -646,6 +654,18 @@ static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *host)
 		return NULL;
 	else
 		return host_ph->host_ptr;
+}
+
+static ZBX_DC_HOST	*DCfind_host_h(const char *host)
+{
+	ZBX_DC_HOST_H	*host_h, host_h_local;
+
+	host_h_local.host = host;
+
+	if (NULL == (host_h = zbx_hashset_search(&config->hosts_h, &host_h_local)))
+		return NULL;
+	else
+		return host_h->host_ptr;
 }
 
 static int	DCstrpool_replace(int found, const char **curr, const char *new)
@@ -1736,9 +1756,10 @@ static void	DCsync_hosts(DB_RESULT result)
 	ZBX_DC_PROXY		*proxy;
 
 	ZBX_DC_HOST_PH		*host_ph, host_ph_local;
+	ZBX_DC_HOST_H		*host_h, host_h_local;
 
 	int			found;
-	int			update_index;
+	int			update_index_ph, update_index_h;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1767,7 +1788,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* see whether we should and can update hosts_ph index at this point */
 
-		update_index = 0;
+		update_index_ph = 0;
+		update_index_h = 0;
 
 		if (0 == found || host->proxy_hostid != proxy_hostid || host->status != status ||
 				0 != strcmp(host->host, row[2]))
@@ -1794,7 +1816,33 @@ static void	DCsync_hosts(DB_RESULT result)
 			if (NULL != host_ph)
 				host_ph->host_ptr = host;
 			else
-				update_index = 1;
+				update_index_ph = 1;
+		}
+
+		if (0 == found || 0 != strcmp(host->host, row[2]))
+		{
+			if (1 == found)
+			{
+				host_h_local.host = host->host;
+				host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
+
+				if (NULL != host_h && host == host_h->host_ptr)	/* see ZBX-4045 for NULL check */
+				{
+					zbx_strpool_release(host_h->host);
+					zbx_hashset_remove(&config->hosts_h, &host_h_local);
+				}
+			}
+
+			if (HOST_STATUS_MONITORED == status)
+			{
+				host_h_local.host = row[2];
+				host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
+
+				if (NULL != host_h)
+					host_h->host_ptr = host;
+				else
+					update_index_h = 1;
+			}
 		}
 
 		/* store new information in host structure */
@@ -1827,13 +1875,22 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* update hosts_ph index using new data, if not done already */
 
-		if (1 == update_index)
+		if (1 == update_index_ph)
 		{
 			host_ph_local.proxy_hostid = host->proxy_hostid;
 			host_ph_local.status = host->status;
 			host_ph_local.host = zbx_strpool_acquire(host->host);
 			host_ph_local.host_ptr = host;
 			zbx_hashset_insert(&config->hosts_ph, &host_ph_local, sizeof(ZBX_DC_HOST_PH));
+		}
+
+		/* update hosts_h index using new data, if not done already */
+
+		if (1 == update_index_h)
+		{
+			host_h_local.host = zbx_strpool_acquire(host->host);
+			host_h_local.host_ptr = host;
+			zbx_hashset_insert(&config->hosts_h, &host_h_local, sizeof(ZBX_DC_HOST_H));
 		}
 
 		/* IPMI hosts */
@@ -1936,6 +1993,18 @@ static void	DCsync_hosts(DB_RESULT result)
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
+		}
+
+		if (HOST_STATUS_MONITORED == host->status)
+		{
+			host_h_local.host = host->host;
+			host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
+
+			if (NULL != host_h && host == host_h->host_ptr)	/* see ZBX-4045 for NULL check */
+			{
+				zbx_strpool_release(host_h->host);
+				zbx_hashset_remove(&config->hosts_h, &host_h_local);
+			}
 		}
 
 		zbx_strpool_release(host->host);
@@ -2942,6 +3011,21 @@ static int	__config_host_ph_compare(const void *d1, const void *d2)
 	return host_ph_1->host == host_ph_2->host ? 0 : strcmp(host_ph_1->host, host_ph_2->host);
 }
 
+static zbx_hash_t	__config_host_h_hash(const void *data)
+{
+	const ZBX_DC_HOST_H	*host_h = (const ZBX_DC_HOST_H *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(host_h->host, strlen(host_h->host), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	__config_host_h_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_HOST_H	*host_h_1 = (const ZBX_DC_HOST_H *)d1;
+	const ZBX_DC_HOST_H	*host_h_2 = (const ZBX_DC_HOST_H *)d2;
+
+	return host_h_1->host == host_h_2->host ? 0 : strcmp(host_h_1->host, host_h_2->host);
+}
+
 static zbx_hash_t	__config_gmacro_m_hash(const void *data)
 {
 	const ZBX_DC_GMACRO_M	*gmacro_m = (const ZBX_DC_GMACRO_M *)data;
@@ -3218,6 +3302,7 @@ void	init_configuration_cache()
 
 	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_ph, __config_host_ph_hash, __config_host_ph_compare);
+	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
 	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
@@ -3697,9 +3782,9 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items_by_keys                                       *
+ * Function: DCconfig_get_items_by_keys_ph                                    *
  *                                                                            *
- * Purpose: Locate item in configuration cache                                *
+ * Purpose: Locate item in configuration cache by proxi_hostid and host       *
  *                                                                            *
  * Parameters: item         - [OUT] pointer to DC_ITEM structure              *
  *             proxy_hostid - [IN] proxy host ID                              *
@@ -3710,7 +3795,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
+void	DCconfig_get_items_by_keys_ph(DC_ITEM *items, zbx_uint64_t proxy_hostid,
 		zbx_host_key_t *keys, int *errcodes, size_t num)
 {
 	size_t			i;
@@ -3721,7 +3806,47 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_host = DCfind_host(proxy_hostid, keys[i].host)) ||
+		if (NULL == (dc_host = DCfind_host_ph(proxy_hostid, keys[i].host)) ||
+				NULL == (dc_item = DCfind_item(dc_host->hostid, keys[i].key)))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		DCget_host(&items[i].host, dc_host);
+		DCget_item(&items[i], dc_item);
+		errcodes[i] = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_items_by_keys_h                                     *
+ *                                                                            *
+ * Purpose: Locate item in configuration cache by host                        *
+ *                                                                            *
+ * Parameters: item         - [OUT] pointer to DC_ITEM structure              *
+ *             keys         - [IN] list of item keys                          *
+ *                                                                            *
+ * Return value: SUCCEED if record located and FAIL otherwise                 *
+ *                                                                            *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_get_items_by_keys_h(DC_ITEM *items, zbx_host_key_t *keys,
+		int *errcodes, size_t num)
+{
+	size_t			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_host = DCfind_host_h(keys[i].host)) ||
 				NULL == (dc_item = DCfind_item(dc_host->hostid, keys[i].key)))
 		{
 			errcodes[i] = FAIL;
@@ -3769,6 +3894,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 
 		DCget_host(&items[i].host, dc_host);
 		DCget_item(&items[i], dc_item);
+
 		errcodes[i] = SUCCEED;
 	}
 

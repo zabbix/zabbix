@@ -154,7 +154,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters,
+static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function, const char *parameters,
 		time_t now)
 {
 	const char			*__function_name = "evaluate_LOGEVENTID";
@@ -174,7 +174,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
 	if ('@' == *arg1)
@@ -224,7 +224,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LOGSOURCE";
 	char				*arg1 = NULL;
@@ -241,7 +241,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
@@ -279,7 +279,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LOGSEVERITY";
 	int				ret = FAIL;
@@ -473,7 +473,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_COUNT";
 	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
@@ -490,17 +490,17 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (4 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
-	if (2 <= nparams && SUCCEED != get_function_parameter_str(item->hostid, parameters, 2, &arg2))
+	if (2 <= nparams && SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 2, &arg2))
 		goto out;
 
 	if (3 <= nparams)
 	{
 		int	fail = 2;
 
-		if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 3, &arg3))
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 3, &arg3))
 			goto out;
 
 		if ('\0' == *arg3)
@@ -553,7 +553,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 4, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 4, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -618,7 +618,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_SUM";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -634,14 +634,14 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -699,7 +699,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_AVG(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_AVG";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -715,14 +715,14 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -781,7 +781,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_LAST";
 	int				arg1, flag, ret = FAIL;
@@ -789,7 +789,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 1, &arg1, &flag,
+	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 1, &arg1, &flag,
 			1, ZBX_FLAG_VALUES))
 	{
 		goto out;
@@ -805,7 +805,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -846,7 +846,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_MIN(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_MIN";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -862,14 +862,14 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -933,7 +933,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_MAX(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_MAX";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -949,14 +949,14 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -1020,7 +1020,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_DELTA";
 	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -1036,14 +1036,14 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -1119,7 +1119,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
+static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, const char *parameters)
 {
 	const char			*__function_name = "evaluate_NODATA";
 	int				arg1, flag, now, ret = FAIL;
@@ -1132,7 +1132,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
 		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
@@ -1177,7 +1177,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_ABSCHANGE";
 	int				ret = FAIL;
@@ -1249,7 +1249,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_CHANGE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_CHANGE";
 	int				ret = FAIL;
@@ -1318,7 +1318,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_DIFF";
 	int				ret = FAIL;
@@ -1409,7 +1409,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 	return FAIL;
 }
 
-static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_STR";
 	char				*arg1 = NULL;
@@ -1440,12 +1440,12 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_str(item->hostid, parameters, 1, &arg1))
+	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
 	if (2 == nparams)
 	{
-		if (SUCCEED != get_function_parameter_uint31_default(item->hostid, parameters, 2, &arg2, &flag,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &arg2, &flag,
 				1, ZBX_FLAG_VALUES) || 0 == arg2)
 		{
 			goto out;
@@ -1531,7 +1531,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_STRLEN";
 	int		ret = FAIL;
@@ -1566,7 +1566,7 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_FUZZYTIME";
 	int				arg1, flag, ret = FAIL;
@@ -1584,7 +1584,7 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
 		goto out;
 
 	if (ZBX_FLAG_SEC != flag || now <= arg1)
@@ -1644,7 +1644,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_BAND(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_BAND";
 	char		*last_parameters = NULL;
@@ -1659,7 +1659,7 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 	if (3 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (SUCCEED != get_function_parameter_uint64(item->hostid, parameters, 2, &mask, &mask_flag) ||
+	if (SUCCEED != get_function_parameter_uint64(item->host.hostid, parameters, 2, &mask, &mask_flag) ||
 			ZBX_FLAG_SEC != mask_flag)
 	{
 		goto clean;
@@ -1697,15 +1697,15 @@ clean:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
+int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameter, time_t now)
 {
 	const char	*__function_name = "evaluate_function";
 
 	int		ret;
 	struct tm	*tm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s.%s(%s)'", __function_name,
-			zbx_host_key_string_by_item(item), function, parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name,
+			item->host.host, item->key_orig, function, parameter);
 
 	*value = '\0';
 
@@ -2193,52 +2193,39 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 {
 	const char	*__function_name = "evaluate_macro_function";
 
-	DB_ITEM		item;
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc, *key_esc;
-	int		ret;
+	zbx_host_key_t	keys;
+	DC_ITEM		items;
+	int		ret, errcodes;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
 
-	host_esc = DBdyn_escape_string(host);
-	key_esc = DBdyn_escape_string(key);
+	keys.host = zbx_strdup(NULL, host);
+	keys.key = zbx_strdup(NULL, key);
 
-	result = DBselect(
-			"select %s"
-			" where h.host='%s'"
-				" and h.hostid=i.hostid"
-				" and i.key_='%s'"
-				ZBX_SQL_NODE,
-			ZBX_SQL_ITEM_SELECT, host_esc, key_esc, DBand_node_local("h.hostid"));
+	DCconfig_get_items_by_keys_h(&items, &keys, &errcodes, 1);
 
-	zbx_free(host_esc);
-	zbx_free(key_esc);
-
-	if (NULL == (row = DBfetch(result)))
+	if (SUCCEED != errcodes)
 	{
-		DBfree_result(result);
-		zabbix_log(LOG_LEVEL_WARNING, "Function [%s:%s.%s(%s)] not found. Query returned empty result",
+		zabbix_log(LOG_LEVEL_DEBUG, "Function [%s:%s.%s(%s)] not found.",
 				host, key, function, parameter);
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
-	DBget_item_from_db(&item, row);
-
-	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
+	if (SUCCEED == (ret = evaluate_function(value, &items, function, parameter, time(NULL))))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
-			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
+			zbx_format_value(value, MAX_BUFFER_LEN, items.valuemapid, items.units, items.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,sum", function, ','))
 		{
-			switch (item.value_type)
+			switch (items.value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
+					add_value_suffix(value, MAX_BUFFER_LEN, items.units, items.value_type);
 					break;
 				default:
 					;
@@ -2246,10 +2233,11 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
-	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
 			zbx_result_string(ret), value);
+out:
+	zbx_free(keys.key);
+	zbx_free(keys.host);
 
 	return ret;
 }
