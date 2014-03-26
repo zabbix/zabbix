@@ -13,7 +13,7 @@ __usage() unless (GetOptions(\%OPTS, "type=n", "delay=n", "help!"));
 __usage() if ($OPTS{'help'});
 __usage() unless (__validate_input() == SUCCESS);
 
-my ($key_part, $macro);
+my ($key_part, $macro, $sql);
 if ($OPTS{'type'} == 1)
 {
     $key_part = 'rsm.dns.udp[%';
@@ -37,16 +37,12 @@ elsif ($OPTS{'type'} == 4)
 
 db_connect();
 
-my $sql = "update items set delay=? where type=3 and key_ like ?";
-
+$sql = "update items set delay=? where type=3 and key_ like ?";
 $sth = $dbh->prepare($sql) or die $dbh->errstr;
-
 $sth->execute($OPTS{'delay'}, $key_part) or die $dbh->errstr;
 
-my $sql = "update globalmacro set value=? where macro=?";
-
+$sql = "update globalmacro set value=? where macro=?";
 $sth = $dbh->prepare($sql) or die $dbh->errstr;
-
 $sth->execute($OPTS{'delay'}, $macro) or die $dbh->errstr;
 
 sub __validate_input
