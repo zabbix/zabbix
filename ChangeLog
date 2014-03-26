@@ -9,6 +9,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7896] fixed translated error messages not being rendered correctly in images (Pavels)
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
 A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
 A......... [ZBX-7409] fixed inherited web items being added to incorrect applications when updating a template web scenario (Pavels)
