@@ -143,10 +143,11 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	LPSTR		lp_name_strings;
 	LPCTSTR		wsource;
 
-	wsource = zbx_utf8_to_unicode(sys_key_1);
-	dw_buffer = 256;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	lp_name_strings = zbx_malloc(&lp_name_strings, dw_buffer);
+	wsource = zbx_utf8_to_unicode(sys_key_1);
+
+	lp_name_strings = zbx_malloc(&lp_name_strings, 256);
 
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
@@ -204,15 +205,16 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
 		goto out;
 
-	zbx_free(lp_name_strings);
+	if (0 != gethostname(os_version->ComputerName, sizeof(os_version->ComputerName)))
+		goto out;
+	else
+		zbx_strupper(os_version->ComputerName);
 
-	gethostname(os_version->ComputerName, sizeof(os_version->ComputerName));
-	zbx_strupper(os_version->ComputerName);
-
-	return SUCCEED;
+	ret = SUCCEED;
 out:
 	zbx_free(lp_name_strings);
-	return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, strerror_from_system(ret));
+	return ret;
 }
 #endif
 
