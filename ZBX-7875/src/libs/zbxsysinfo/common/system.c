@@ -243,7 +243,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 #ifdef _WINDOWS
 	OS_WIN_VERSION		os_version_info;
-	char			*os;
+	char			*os = NULL;
 	size_t			os_alloc, os_offset = 0;
 
 	os_alloc =  sizeof(os_version_info) + 14;
