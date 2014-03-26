@@ -123,7 +123,6 @@ else {
 		'filter' => array(
 			'showTriggers' => $filter['showTriggers'],
 			'ackStatus' => $filter['ackStatus'],
-			'showEvents' => $filter['showEvents'],
 			'showSeverity' => $filter['showSeverity'],
 			'statusChange' => $filter['statusChange'],
 			'statusChangeDays' => $filter['statusChangeDays'],
