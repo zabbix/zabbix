@@ -76,7 +76,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			/* 'ZBX_NOTSUPPORTED:<error message>' */
 			if (NULL !=  (tmp = strchr(buf, ':')))
 			{
-				zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent. %s",
+				zbx_snprintf(buffer, sizeof(buffer), "%s",
 					tmp + 1);
 			}
 			else
