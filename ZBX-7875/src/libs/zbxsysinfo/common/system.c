@@ -207,8 +207,7 @@ int		get_win_version(OS_WIN_VERSION *os_version)
 	zbx_free(lp_name_strings);
 
 	gethostname(os_version->ComputerName, sizeof(os_version->ComputerName));
-	for(i = 0; os_version->ComputerName[i]; i++)
-		os_version->ComputerName[i] = toupper(os_version->ComputerName[i]);
+	zbx_strupper(os_version->ComputerName);
 
 	return SUCCEED;
 out:
