@@ -358,10 +358,8 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 		{
 			/* merge with next chunk */
 
-			info->used_size -= chunk_size;
-			info->used_size += size;
-			info->free_size += chunk_size + 2 * MEM_SIZE_FIELD;
-			info->free_size -= size + 2 * MEM_SIZE_FIELD;
+			info->used_size -= chunk_size - size;
+			info->free_size += chunk_size - size;
 
 			new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
 			new_chunk_size = CHUNK_SIZE(next_chunk) + (chunk_size - size);
@@ -377,10 +375,8 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 		{
 			/* split the current one */
 
-			info->used_size -= chunk_size;
-			info->used_size += size;
-			info->free_size += chunk_size;
-			info->free_size -= size + 2 * MEM_SIZE_FIELD;
+			info->used_size -= chunk_size - size;
+			info->free_size += chunk_size - size - 2 * MEM_SIZE_FIELD;
 
 			new_chunk = (void *)((char *)chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD);
 			new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
@@ -397,7 +393,7 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	if (next_free && chunk_size + 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk) >= size)
 	{
 		info->used_size -= chunk_size;
-		info->free_size += chunk_size;
+		info->free_size += chunk_size + 2 * MEM_SIZE_FIELD;
 
 		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
 
