@@ -73,8 +73,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (0 == S_ISDIR(sb.st_mode))
 	{
-		__parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-		ret = SUCCEED;
+		ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 		goto out;
 	}
 
