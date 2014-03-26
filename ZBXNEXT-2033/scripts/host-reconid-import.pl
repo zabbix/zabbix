@@ -16,8 +16,8 @@ sub display_usage
 	printf "    --url=<url>             - Zabbix frontend URL\n";
 	printf "    --username=<username>   - Zabbix user name\n";
 	printf "    --password=<password>   - Zabbix user password\n";
-	printf "    --ci=<pos>              - CI field position (default: 1)\n";
-	printf "    --reconid=<pos>         - Recon ID field position (default: 3)\n";
+	printf "    --ci=<pos>              - CI field position (default: 2)\n";
+	printf "    --reconid=<pos>         - Recon ID field position (default: 4)\n";
 }
 
 my $URL;
