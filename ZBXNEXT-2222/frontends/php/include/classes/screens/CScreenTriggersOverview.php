@@ -29,7 +29,7 @@ class CScreenTriggersOverview extends CScreenBase {
 	public function get() {
 		// fetch hosts
 		$hosts = API::Host()->get(array(
-			'output' => array('name', 'hostid', 'status'),
+			'output' => array('name', 'hostid'),
 			'selectScreens' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 			'groupids' => $this->screenitem['resourceid'],
 			'preservekeys' => true

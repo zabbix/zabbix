@@ -232,7 +232,7 @@ if ($type == SHOW_TRIGGERS) {
 		$inventoryFilter[$field['field']][] = $field['value'];
 	}
 	$hosts = API::Host()->get(array(
-		'output' => array('name', 'hostid', 'status'),
+		'output' => array('name', 'hostid'),
 		'selectScreens' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 		'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
 		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
