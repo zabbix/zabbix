@@ -165,7 +165,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 			$ticket = CRemedyService::mediaAcknowledge(array(
 				'eventid' => getRequest('eventid'),
 				'message' => getRequest('message'),
-				'subject' => trigger_value2str($event['value']).': '.$eventTriggerName
+				'subject' => $eventTriggerName
 			));
 
 			$result = (bool) $ticket;
