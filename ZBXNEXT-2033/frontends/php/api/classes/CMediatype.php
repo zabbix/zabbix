@@ -74,6 +74,7 @@ class CMediatype extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectUsers'				=> null,
+			'selectMedia'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -542,6 +543,17 @@ class CMediatype extends CZBXAPI {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		// adding media
+		if ($options['selectMedia'] !== null && $options['selectMedia'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'mediaid', 'media');
+			$media = API::UserMedia()->get(array(
+				'output' => $options['selectMedia'],
+				'mediaids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $media, 'media');
 		}
 
 		return $result;

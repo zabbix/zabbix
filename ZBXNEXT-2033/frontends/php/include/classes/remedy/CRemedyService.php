@@ -58,54 +58,71 @@ class CRemedyService {
 
 		if (isset($event['triggerSeverity']) && $event['triggerSeverity'] >= self::minTriggerSeverity) {
 			$mediaType = API::MediaType()->get(array(
-				'userids' => CWebUser::$data['userid'],
+				'userids' => array(CWebUser::$data['userid']),
 				'filter' => array('type' => MEDIA_TYPE_REMEDY, 'status' => MEDIA_TYPE_STATUS_ACTIVE),
+				'selectMedia' => array('mediaid', 'userid', 'active'),
 				'output' => array('mediatypeid', 'smtp_server'),
 				'limit' => 1
 			));
+
+			if (!$mediaType) {
+				return false;
+			}
+
+			// since limit is 1, get only one media type
 			$mediaType = reset($mediaType);
 
-			self::$enabled = (bool) $mediaType;
+			// check if there are any medias at all
+			if (!$mediaType['media']) {
+				return false;
+			}
+
+			$mediaType['media'] = zbx_toHash($mediaType['media'], 'userid');
+
+			// check specific user for media and if it's enabled
+			if (!isset($mediaType['media'][CWebUser::$data['userid']])
+					|| $mediaType['media'][CWebUser::$data['userid']]['active'] != MEDIA_TYPE_STATUS_ACTIVE) {
+				return false;
+			}
 
 			// if trigger severity is valid, media type is set up as Remedy Service and is enabled,
 			// then next check if Remedy Service URL is valid.
-			if (self::$enabled) {
-				$server = parse_url($mediaType['smtp_server']);
+			$server = parse_url($mediaType['smtp_server']);
 
-				if (isset($server['scheme'])) {
-					self::$webFormUrl = $server['scheme'].'://';
+			// check if Remedy Servcie URL is valid
+			if (isset($server['scheme'])) {
+				self::$webFormUrl = $server['scheme'].'://';
 
-					if (isset($server['user']) && $server['user'] && isset($server['pass']) && $server['pass']) {
-						self::$webFormUrl .= $server['user'].':'.$server['pass'].'@';
-					}
-
-					self::$webFormUrl .= $server['host'];
-
-					if (isset($server['port']) && $server['port']) {
-						self::$webFormUrl .= ':'.$server['port'];
-					}
-
-					// link to web form in Remedy Service
-					self::$webFormUrl .= '/arsys/forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'.
-						'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'.
-						'&F303647600=SearchTicketWithQual&F304255610=\'1000000161\'%3D';
+				if (isset($server['user']) && $server['user'] && isset($server['pass']) && $server['pass']) {
+					self::$webFormUrl .= $server['user'].':'.$server['pass'].'@';
 				}
 
-				// check if server is online to do futher requests
-				$zabbixServer = new CZabbixServer(
-					$ZBX_SERVER,
-					$ZBX_SERVER_PORT,
-					ZBX_SOCKET_REMEDY_TIMEOUT,
-					ZBX_SOCKET_BYTES_LIMIT
-				);
+				self::$webFormUrl .= $server['host'];
 
-				self::$enabled = $zabbixServer->isRunning();
-
-				if (!self::$enabled) {
-					show_error_message(_('Cannot start Remedy Service'));
-
-					error($zabbixServer->getError());
+				if (isset($server['port']) && $server['port']) {
+					self::$webFormUrl .= ':'.$server['port'];
 				}
+
+				// link to web form in Remedy Service
+				self::$webFormUrl .= '/arsys/forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'.
+					'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'.
+					'&F303647600=SearchTicketWithQual&F304255610=\'1000000161\'%3D';
+			}
+
+			// check if server is online to do futher requests to it
+			$zabbixServer = new CZabbixServer(
+				$ZBX_SERVER,
+				$ZBX_SERVER_PORT,
+				ZBX_SOCKET_REMEDY_TIMEOUT,
+				ZBX_SOCKET_BYTES_LIMIT
+			);
+
+			self::$enabled = $zabbixServer->isRunning();
+
+			if (!self::$enabled) {
+				show_error_message(_('Cannot start Remedy Service'));
+
+				error($zabbixServer->getError());
 			}
 		}
 
