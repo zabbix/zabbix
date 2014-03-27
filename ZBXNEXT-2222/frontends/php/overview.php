@@ -92,6 +92,8 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::update('web.overview.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.txt_select', getRequest('txt_select'), PROFILE_TYPE_STR);
+	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// ack status
 	if (($config['event_ack_enable'] == EVENT_ACK_ENABLED) && hasRequest('ack_status')) {
@@ -101,22 +103,6 @@ if (hasRequest('filter_set')) {
 	// status change days
 	if (hasRequest('status_change_days')) {
 		CProfile::update('web.overview.filter.status_change_days', getRequest('status_change_days'), PROFILE_TYPE_INT);
-	}
-
-	// name
-	if (getRequest('txt_select') !== '') {
-		CProfile::update('web.overview.filter.txt_select', getRequest('txt_select'), PROFILE_TYPE_STR);
-	}
-	else {
-		CProfile::delete('web.overview.filter.txt_select');
-	}
-
-	// application
-	if (getRequest('application') !== '') {
-		CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
-	}
-	else {
-		CProfile::delete('web.overview.filter.application');
 	}
 
 	// update host inventory filter
