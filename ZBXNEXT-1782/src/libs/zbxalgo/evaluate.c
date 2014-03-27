@@ -55,12 +55,22 @@ static int		max_buffer_len;	/* error message buffer size */
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether the character delimits a numeric or symbolic token  *
+ * Purpose: check whether the character delimits a numeric token              *
  *                                                                            *
  ******************************************************************************/
-static int	is_token_delimiter(unsigned char c)
+static int	is_number_delimiter(unsigned char c)
 {
 	return 0 == isdigit(c) && '.' != c && 0 == isalpha(c) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether the character delimits a symbolic operator token    *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_operator_delimiter(unsigned char c)
+{
+	return NULL != strchr("()" ZBX_WHITESPACE, c) ? SUCCEED : FAIL;	/* includes '\0' */
 }
 
 /******************************************************************************
@@ -104,7 +114,7 @@ static double	evaluate_number()
 			iter++;
 		}
 
-		if (SUCCEED != is_token_delimiter(*iter))
+		if (SUCCEED != is_number_delimiter(*iter))
 			return ZBX_INFINITY;
 
 		result = atof(ptr) * factor;
@@ -206,7 +216,7 @@ static double	evaluate_term7()
 	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
 		ptr++;
 
-	if (0 == strncmp("not", ptr, 3) && SUCCEED == is_token_delimiter(*(ptr + 3)))
+	if (0 == strncmp("not", ptr, 3) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
 	{
 		ptr += 3;
 
@@ -388,7 +398,7 @@ static double	evaluate_term2()
 	if (ZBX_INFINITY == (result = evaluate_term3()))
 		return ZBX_INFINITY;
 
-	while (0 == strncmp("and", ptr, 3) && SUCCEED == is_token_delimiter(*(ptr + 3)))
+	while (0 == strncmp("and", ptr, 3) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
 	{
 		ptr += 3;
 
@@ -413,7 +423,7 @@ static double	evaluate_term1()
 	if (ZBX_INFINITY == (result = evaluate_term2()))
 		return ZBX_INFINITY;
 
-	while (0 == strncmp("or", ptr, 2) && SUCCEED == is_token_delimiter(*(ptr + 2)))
+	while (0 == strncmp("or", ptr, 2) && SUCCEED == is_operator_delimiter(*(ptr + 2)))
 	{
 		ptr += 2;
 
