@@ -59,36 +59,39 @@ class CRemedyService {
 		if (isset($event['triggerSeverity']) && $event['triggerSeverity'] >= self::minTriggerSeverity) {
 			$mediaType = API::MediaType()->get(array(
 				'userids' => CWebUser::$data['userid'],
-				'filter' => array('type' => MEDIA_TYPE_REMEDY),
+				'filter' => array('type' => MEDIA_TYPE_REMEDY, 'status' => MEDIA_TYPE_STATUS_ACTIVE),
 				'output' => array('mediatypeid', 'smtp_server'),
 				'limit' => 1
 			));
 			$mediaType = reset($mediaType);
 
-			$server = parse_url($mediaType['smtp_server']);
-
-			self::$webFormUrl = $server['scheme'].'://';
-
-			if (isset($server['user']) && $server['user'] && isset($server['pass']) && $server['pass']) {
-				self::$webFormUrl .= $server['user'].':'.$server['pass'].'@';
-			}
-
-			self::$webFormUrl .= $server['host'];
-
-			if (isset($server['port']) && $server['port']) {
-				self::$webFormUrl .= ':'.$server['port'];
-			}
-
-			// link to web form in Remedy Service
-			self::$webFormUrl .= '/arsys/forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'.
-				'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'.
-				'&F303647600=SearchTicketWithQual&F304255610=\'1000000161\'%3D';
-
 			self::$enabled = (bool) $mediaType;
 
-			// if trigger severity is valid, media type is set up as Remedy Service
-			// then next check if server is online to do futher requests.
+			// if trigger severity is valid, media type is set up as Remedy Service and is enabled,
+			// then next check if Remedy Service URL is valid.
 			if (self::$enabled) {
+				$server = parse_url($mediaType['smtp_server']);
+
+				if (isset($server['scheme'])) {
+					self::$webFormUrl = $server['scheme'].'://';
+
+					if (isset($server['user']) && $server['user'] && isset($server['pass']) && $server['pass']) {
+						self::$webFormUrl .= $server['user'].':'.$server['pass'].'@';
+					}
+
+					self::$webFormUrl .= $server['host'];
+
+					if (isset($server['port']) && $server['port']) {
+						self::$webFormUrl .= ':'.$server['port'];
+					}
+
+					// link to web form in Remedy Service
+					self::$webFormUrl .= '/arsys/forms/onbmc-s/SHR%3ALandingConsole/Default+Administrator+View/'.
+						'?mode=search&F304255500=HPD%3AHelp+Desk&F1000000076=FormOpenNoAppList'.
+						'&F303647600=SearchTicketWithQual&F304255610=\'1000000161\'%3D';
+				}
+
+				// check if server is online to do futher requests
 				$zabbixServer = new CZabbixServer(
 					$ZBX_SERVER,
 					$ZBX_SERVER_PORT,
