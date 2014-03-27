@@ -9,6 +9,7 @@
 
 int	rsm_ssl_init();
 int	get_random(void *data, int bytes);
+void	zbx_ssl_get_error(char *err, size_t err_size);
 int	encrypt(const EVP_CIPHER *cipher, unsigned char *plaintext, int plaintext_len, unsigned char *key,
 		unsigned char *iv, unsigned char *ciphertext, int *ciphertext_len, char *err, size_t err_size);
 int	encrypt_cleartext(const char *passphrase, int passphrase_len, const char *secretkey_enc_b64,

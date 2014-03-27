@@ -685,7 +685,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 #endif
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
-	char			buf[MAX_STRING_LEN], *esc;
+	char			buf[8192], *esc;
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;

@@ -87,6 +87,7 @@
 #define ZBX_MACRO_EPP_ENABLED		"{$RSM.EPP.ENABLED}"
 #define ZBX_MACRO_EPP_USER		"{$RSM.EPP.USER}"
 #define ZBX_MACRO_EPP_PASSWD		"{$RSM.EPP.PASSWD}"
+#define ZBX_MACRO_EPP_PRIVKEY		"{$RSM.EPP.PRIVKEY}"
 #define ZBX_MACRO_EPP_KEYSALT		"{$RSM.EPP.KEYSALT}"
 #define ZBX_MACRO_EPP_CERTS		"{$RSM.EPP.CERTS}"
 #define ZBX_MACRO_EPP_COMMANDS		"{$RSM.EPP.COMMANDS}"
@@ -100,7 +101,7 @@
 #define ZBX_RSM_TCP_TIMEOUT	20	/* seconds */
 #define ZBX_RSM_TCP_RETRY	1
 
-#define ZBX_RSM_DEFAULT_LOGDIR	"/var/log"	/* if Zabbix log dir is undefined */
+#define ZBX_RSM_DEFAULT_LOGDIR		"/var/log"	/* if Zabbix log dir is undefined */
 #define ZBX_DNS_LOG_PREFIX		"dns"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_DNS_LOG_PREFIX.log */
 #define ZBX_RDDS_LOG_PREFIX		"rdds"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_RDDS_LOG_PREFIX.log */
 #define ZBX_EPP_LOG_PREFIX		"epp"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_EPP_LOG_PREFIX.log */
