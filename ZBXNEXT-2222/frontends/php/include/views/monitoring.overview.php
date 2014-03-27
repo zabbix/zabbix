@@ -152,10 +152,7 @@ if ($config['dropdown_first_entry']) {
 	elseif ($this->data['type'] == SHOW_TRIGGERS) {
 		global $page;
 
-		$dataTable = getTriggersOverview(
-			array_keys($this->data['pageFilter']->hosts),
-			$filter['application'],
-			$page['file'],
+		$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
 			$this->data['view_style']
 		);
 	}

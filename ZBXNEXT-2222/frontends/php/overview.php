@@ -170,6 +170,12 @@ if (hasRequest('type')) {
 }
 $type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
 
+// overview style
+if (hasRequest('view_style')) {
+	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
+}
+$viewStyle = CProfile::get('web.overview.view_style', SHOW_TRIGGERS);
+
 /*
  * Display
  */
@@ -198,11 +204,9 @@ while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) 
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'type' => $type,
+	'view_style' => $viewStyle,
 	'filter' => $filter
 );
-
-$data['view_style'] = get_request('view_style', CProfile::get('web.overview.view.style', STYLE_TOP));
-CProfile::update('web.overview.view.style', $data['view_style'], PROFILE_TYPE_INT);
 
 $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
@@ -219,6 +223,48 @@ $data['pageFilter'] = new CPageFilter(array(
 
 $data['groupid'] = $data['pageFilter']->groupid;
 $data['hostid'] = $data['pageFilter']->hostid;
+
+// fetch trigger data
+if ($type == SHOW_TRIGGERS) {
+	// fetch hosts
+	$inventoryFilter = array();
+	foreach ($filter['inventory'] as $field) {
+		$inventoryFilter[$field['field']][] = $field['value'];
+	}
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid', 'status'),
+		'selectScreens' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
+		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
+		'preservekeys' => true
+	));
+
+	// application filter
+	$applications = array();
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'search' => array('name' => $filter['application'])
+		));
+		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
+	}
+
+	$triggers = API::Trigger()->get(array(
+		'output' => array(
+			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+		),
+		'selectHosts' => array('hostid', 'name'),
+		'hostids' => zbx_objectValues($hosts, 'hostid'),
+		'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
+		'monitored' => true,
+		'skipDependent' => true,
+		'sortfield' => 'description'
+	));
+
+	$data['hosts'] = $hosts;
+	$data['triggers'] = $triggers;
+}
 
 // render view
 $overviewView = new CView('monitoring.overview', $data);
