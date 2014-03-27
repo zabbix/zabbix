@@ -143,9 +143,7 @@ $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.stat
 // data table
 if ($config['dropdown_first_entry']) {
 	if ($this->data['type'] == SHOW_DATA) {
-		$dataTable = getItemsDataOverview(
-			array_keys($this->data['pageFilter']->hosts),
-			$filter['application'],
+		$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
 			$this->data['view_style']
 		);
 	}

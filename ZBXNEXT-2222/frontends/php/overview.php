@@ -247,7 +247,6 @@ if ($type == SHOW_TRIGGERS) {
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'search' => array('name' => $filter['application'])
 		));
-		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 	}
 
 	$triggers = API::Trigger()->get(array(
@@ -272,6 +271,22 @@ if ($type == SHOW_TRIGGERS) {
 	$data['hosts'] = $hosts;
 	$data['triggers'] = $triggers;
 }
+// fetch item data
+else {
+	// application filter
+	$applicationIds = null;
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
+			'search' => array('name' => $filter['application'])
+		));
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
+	}
+
+	$data['applicationIds'] = $applicationIds;
+}
+
 
 // render view
 $overviewView = new CView('monitoring.overview', $data);
