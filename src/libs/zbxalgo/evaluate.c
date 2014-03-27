@@ -71,23 +71,24 @@ static int	is_token_delimiter(unsigned char c)
 static double	evaluate_number()
 {
 	int		digits = 0, dots = 0;
-	const char	*start;
+	const char	*iter;
+	double		result;
 	zbx_uint64_t	factor = 1;
 
-	start = ptr;
+	iter = ptr;
 
 	while (1)
 	{
-		if (0 != isdigit((unsigned char)*ptr))
+		if (0 != isdigit((unsigned char)*iter))
 		{
-			ptr++;
+			iter++;
 			digits++;
 			continue;
 		}
 
-		if ('.' == *ptr)
+		if ('.' == *iter)
 		{
-			ptr++;
+			iter++;
 			dots++;
 			continue;
 		}
@@ -95,18 +96,22 @@ static double	evaluate_number()
 		if (1 > digits || 1 < dots)
 			return ZBX_INFINITY;
 
-		if (0 != isalpha((unsigned char)*ptr))
+		if (0 != isalpha((unsigned char)*iter))
 		{
-			if (0 == (factor = suffix2factor(*ptr)))
+			if (0 == (factor = suffix2factor(*iter)))
 				return ZBX_INFINITY;
 
-			ptr++;
+			iter++;
 		}
 
-		if (SUCCEED != is_token_delimiter(*ptr))
+		if (SUCCEED != is_token_delimiter(*iter))
 			return ZBX_INFINITY;
 
-		return atof(start) * factor;
+		result = atof(ptr) * factor;
+
+		ptr = iter;
+
+		return result;
 	}
 }
 
@@ -139,7 +144,8 @@ static double	evaluate_term9()
 
 		if (')' != *ptr)
 		{
-			zbx_strlcpy(buffer, "Cannot evaluate expression: missing closing parenthesis.", max_buffer_len);
+			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
+					" expected closing parenthesis at \"%s\".", ptr);
 			return ZBX_INFINITY;
 		}
 
@@ -149,7 +155,8 @@ static double	evaluate_term9()
 	{
 		if (ZBX_INFINITY == (result = evaluate_number()))
 		{
-			zbx_strlcpy(buffer, "Cannot evaluate expression: unrecognized number format.", max_buffer_len);
+			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
+					" expected numeric token at \"%s\".", ptr);
 			return ZBX_INFINITY;
 		}
 	}
@@ -307,7 +314,7 @@ static double	evaluate_term4()
 			op = 'g';
 			ptr += 2;
 		}
-		else if ('<' == *ptr || '>' == *ptr)
+		else if (('<' == *ptr && '>' != *(ptr + 1)) || '>' == *ptr)
 		{
 			op = *ptr++;
 		}
@@ -438,7 +445,7 @@ int	evaluate(double *value, const char *expression, char *error, int max_error_l
 
 	if (ZBX_INFINITY != *value && '\0' != *ptr)
 	{
-		zbx_snprintf(error, max_error_len, "Cannot evaluate expression starting from \"%s\".", ptr);
+		zbx_snprintf(error, max_error_len, "Cannot evaluate expression: unexpected token at \"%s\".", ptr);
 		*value = ZBX_INFINITY;
 	}
 
