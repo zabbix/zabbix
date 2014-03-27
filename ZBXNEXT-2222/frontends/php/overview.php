@@ -257,6 +257,13 @@ if ($type == SHOW_TRIGGERS) {
 		'selectHosts' => array('hostid', 'name'),
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
+		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
+		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_ONLYTRUE) ? true : null,
+		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
+		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
+		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
+		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
+		'maintenance' => !$filter['showMaintenance'] ? false : null,
 		'monitored' => true,
 		'skipDependent' => true,
 		'sortfield' => 'description'
