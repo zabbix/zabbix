@@ -23,9 +23,10 @@
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	MEMORYSTATUSEX	ms_ex;
-	MEMORYSTATUS	ms;
-	char		*swapdev, *mode;
+	MEMORYSTATUSEX			ms_ex;
+	MEMORYSTATUS			ms;
+	PERFORMANCE_INFORMATION		pi;
+	char				*swapdev, *mode;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -37,6 +38,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
+	pi.cb = sizeof(PERFORMANCE_INFORMATION);
+
 	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
@@ -47,6 +50,13 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
+		else if (0 == strcmp(mode, "pfree"))
+		{
+			if (TRUE != GetPerformanceInfo(&pi,pi.cb))
+				return SYSINFO_RET_FAIL;
+
+			SET_DBL_RESULT(result, (100.0 - ((pi.CommitTotal / pi.CommitLimit) * 100.0)));
+		}
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullAvailPageFile);
 		else
@@ -60,6 +70,13 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_UI64_RESULT(result, ms.dwTotalPageFile);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPageFile);
+		else if (0 == strcmp(mode, "pfree"))
+		{
+			if (TRUE != GetPerformanceInfo(&pi,pi.cb))
+				return SYSINFO_RET_FAIL;
+
+			SET_DBL_RESULT(result, (100.0 - ((pi.CommitTotal / pi.CommitLimit) * 100.0)));
+		}
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwAvailPageFile);
 		else
