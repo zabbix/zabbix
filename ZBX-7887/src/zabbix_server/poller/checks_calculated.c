@@ -21,10 +21,6 @@
 #include "zbxserver.h"
 #include "log.h"
 
-#define	ITEM_NOTFOUND 0
-#define	ITEM_FOUND 1
-#define	ITEM_NOTSUPPORTED 2
-
 typedef struct
 {
 	int		functionid;
@@ -84,7 +80,7 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 	f->func = func;
 	f->params = params;
 	f->value = NULL;
-	f->found = ITEM_NOTFOUND;
+	f->found = 0;
 
 	return f->functionid;
 }
