@@ -828,9 +828,12 @@ class CGraphPrototype extends CGraphGeneral {
 			'itemids' => $itemids,
 			'webitems' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('flags'),
+			'selectItemDiscovery' => array('parent_itemid'),
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_CREATED)
+			)
 		));
 
 		foreach ($itemids as $itemid) {
@@ -839,23 +842,9 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-
 		parent::checkInput($graphs, $update);
 
-		foreach ($graphs as $graph) {
-			// check if the graph has at least one prototype
-			$hasPrototype = false;
-			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used because it is possible to make API call without full item data
-				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
-				}
-			}
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-			}
-		}
+		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 	}
 
 	protected function createReal($graph) {
@@ -865,4 +854,41 @@ class CGraphPrototype extends CGraphGeneral {
 		return parent::createReal($graph);
 	}
 
+	/**
+	 * Check if graph prototype has at least one item prototype and belongs to one discovery rule.
+	 *
+	 * @throws APIException if graph prototype has no item prototype or items belong to multiple discovery rules.
+	 *
+	 * @param array  $graphs				array of graphs
+	 * @param array  $graphs['gitems']		array of graphs items
+	 * @param string $graphs['name']		graph name
+	 * @param array  $items					array of existing graph items and ones that user has permission to access
+	 */
+	protected function checkDiscoveryRuleCount(array $graphs, array $items) {
+		foreach ($graphs as $graph) {
+			// for update method we will skip this step, if no items are set
+			if (isset($graph['gitems'])) {
+				$itemDiscoveryIds = array();
+
+				foreach ($graph['gitems'] as $gitem) {
+					if ($items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$itemDiscoveryIds[$items[$gitem['itemid']]['itemDiscovery']['parent_itemid']] = true;
+					}
+				}
+
+				if (count($itemDiscoveryIds) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" contains item prototypes from multiple discovery rules.',
+						$graph['name']
+					));
+				}
+				elseif (!$itemDiscoveryIds) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph prototype "%1$s" must have at least one item prototype.',
+						$graph['name']
+					));
+				}
+			}
+		}
+	}
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:24+0200\n"
+"POT-Creation-Date: 2014-03-24 15:56+0200\n"
 "PO-Revision-Date: 2012-10-06 14:22+0200\n"
 "Last-Translator: Nader <jafari@sain.ir>\n"
 "Language-Team: none\n"
@@ -113,15 +113,15 @@ msgstr "----[بخش تصدیق]----"
 msgid "0 or 1"
 msgstr "0 یا 1"
 
-#: queue.php:162 queue.php:225
+#: queue.php:166 queue.php:229
 msgid "1 minute"
 msgstr "1 دقیقه"
 
-#: queue.php:160 queue.php:223
+#: queue.php:164 queue.php:227
 msgid "10 seconds"
 msgstr "10 ثانیه"
 
-#: queue.php:161 queue.php:224
+#: queue.php:165 queue.php:228
 msgid "30 seconds"
 msgstr "30 ثانیه"
 
@@ -129,11 +129,11 @@ msgstr "30 ثانیه"
 msgid "3D view"
 msgstr "نمایش سه بعدی"
 
-#: queue.php:163 queue.php:226
+#: queue.php:167 queue.php:230
 msgid "5 minutes"
 msgstr "5 دقیقه"
 
-#: queue.php:159 queue.php:222
+#: queue.php:163 queue.php:226
 msgid "5 seconds"
 msgstr "5 ثانیه"
 
@@ -1123,7 +1123,7 @@ msgstr "فعالیت نمی تواند اضافه شود"
 msgid "Cannot add application"
 msgstr "برنامه نمی تواند اضافه شود"
 
-#: api/classes/CTrigger.php:1713
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr "وابستگی از یک هاست به یک قالب نمی‌تواند اضافه شود"
 
@@ -1295,11 +1295,11 @@ msgstr "هشدار \"%1$s:%2$s\" نمی‌تواند کپی شود ، زیرا �
 msgid "Cannot create another database connection."
 msgstr "اتصال دیگری به پایگاه داده نمی‌توانند ایجاد شود."
 
-#: api/classes/CTrigger.php:1747
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1719
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1350,7 +1350,7 @@ msgstr "فعالیت نمی‌تواند حذف شود"
 msgid "Cannot delete application"
 msgstr "برنامه نمی‌تواند حذف شود"
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1460
 msgid "Cannot delete dependency"
 msgstr ""
 
@@ -1371,7 +1371,7 @@ msgstr "نمودار نمی‌تواند حذف شود"
 msgid "Cannot delete graph prototype"
 msgstr ""
 
-#: api/classes/CItem.php:985
+#: api/classes/CItem.php:986
 msgid "Cannot delete graph."
 msgstr "نمودار نمی‌تواند حذف شود"
 
@@ -1490,7 +1490,7 @@ msgstr "قالب نمی تواند حذف شود"
 msgid "Cannot delete templated graphs."
 msgstr ""
 
-#: api/classes/CItem.php:949
+#: api/classes/CItem.php:950
 msgid "Cannot delete templated item."
 msgstr ""
 
@@ -1502,7 +1502,7 @@ msgstr ""
 msgid "Cannot delete templated items."
 msgstr ""
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:903
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "هشدارهای قالب شده \"%1$s:%2$s\" نمی توانند حذف شوند."
@@ -1515,7 +1515,7 @@ msgstr "هشدار نمی‌تواند حذف شود"
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
-#: api/classes/CItem.php:1001
+#: api/classes/CItem.php:1002
 msgid "Cannot delete trigger."
 msgstr "هشدار نمی‌تواند حذف شود"
 
@@ -1523,7 +1523,7 @@ msgstr "هشدار نمی‌تواند حذف شود"
 msgid "Cannot delete triggers"
 msgstr "هشدارها نمی‌توانند حذف شوند"
 
-#: api/classes/CTriggerPrototype.php:965
+#: api/classes/CTriggerPrototype.php:941
 msgid "Cannot delete triggers created by low level discovery."
 msgstr ""
 
@@ -1661,9 +1661,9 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr "نام قابل مشاهده قالب نمی‌تواند خالی باشد"
 
-#: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
-#: api/classes/CTriggerPrototype.php:1008
-#: api/classes/CTriggerPrototype.php:1066
+#: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
+#: api/classes/CTriggerPrototype.php:984
+#: api/classes/CTriggerPrototype.php:1042
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "عبارت \"%s\" نمی‌تواند از داخل اجرا شود."
@@ -1849,7 +1849,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:833
+#: api/classes/CTriggerPrototype.php:820
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
@@ -2512,7 +2512,7 @@ msgstr ""
 msgid "Copy"
 msgstr "رونوشت"
 
-#: include/views/configuration.graph.list.php:138
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2661,7 +2661,7 @@ msgstr "ایجاد: برنامه \"%1$s\" در \"%2$s\"."
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "ایجاد:قانون کشف \"%1$s\" در \"%2$s\"."
 
-#: api/classes/CItem.php:850
+#: api/classes/CItem.php:851
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "ایجاد: آیتم \"%1$s\" در \"%2$s\"."
@@ -2671,12 +2671,12 @@ msgstr "ایجاد: آیتم \"%1$s\" در \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1482
+#: api/classes/CTrigger.php:1501
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1015
+#: api/classes/CTriggerPrototype.php:991
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3120,7 +3120,7 @@ msgstr "تاخیر"
 msgid "Delay (in sec)"
 msgstr "تأخیر(به ثانیه)"
 
-#: queue.php:247
+#: queue.php:251
 msgid "Delayed by"
 msgstr "تأخیر توسط"
 
@@ -3233,7 +3233,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:141
+#: include/views/configuration.graph.list.php:143
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3269,7 +3269,7 @@ msgstr ""
 msgid "Delete selected elements?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:144
 msgid "Delete selected graphs?"
 msgstr ""
 
@@ -3417,7 +3417,7 @@ msgstr ""
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3438,12 +3438,12 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr ""
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1246
+#: api/classes/CTrigger.php:1250
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:971
+#: api/classes/CTriggerPrototype.php:947
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3906,7 +3906,7 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1889
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -4030,12 +4030,12 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:929 api/classes/CItemPrototype.php:708
+#: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:885
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4697,7 +4697,7 @@ msgstr "اسکریپت های عمومی"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:145
+#: include/views/configuration.graph.list.php:147
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4798,6 +4798,16 @@ msgstr "آیتم گراف"
 msgid "Graph name"
 msgstr "نام گراف"
 
+#: api/classes/CGraphPrototype.php:881
+#, php-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:887
+#, php-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr ""
+
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -4806,10 +4816,6 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:793
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
-
-#: api/classes/CGraphPrototype.php:856
-msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
 #: include/html.inc.php:453 include/html.inc.php:457
@@ -5145,7 +5151,7 @@ msgstr "ردیف کردن افقی"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
-#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:249
+#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:253
 #: report2.php:235 report5.php:60 tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "هاست"
@@ -6196,15 +6202,15 @@ msgstr ""
 msgid "Incorrect screen provided for slide show."
 msgstr ""
 
-#: include/services.inc.php:490 include/services.inc.php:499
+#: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
 msgstr ""
 
-#: include/services.inc.php:487 include/services.inc.php:496
+#: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
 msgstr ""
 
-#: include/services.inc.php:481
+#: include/services.inc.php:482
 msgid "Incorrect service time type."
 msgstr ""
 
@@ -6526,7 +6532,7 @@ msgstr "آیتم"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: api/classes/CItem.php:1216
+#: api/classes/CItem.php:1217
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
@@ -6644,7 +6650,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:338
 #: include/views/configuration.item.list.php:34
 #: include/views/configuration.template.edit.php:240
-#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:158
+#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:162
 #: search.php:137 search.php:164 search.php:183 search.php:369 search.php:393
 #: search.php:416 templates.php:459 templates.php:523
 msgid "Items"
@@ -7776,7 +7782,7 @@ msgstr "ماه"
 msgid "Monthly"
 msgstr "ماهانه"
 
-#: queue.php:164 queue.php:227
+#: queue.php:168 queue.php:231
 msgid "More than 10 minutes"
 msgstr "بیشتر از 10 دقیقه"
 
@@ -7888,7 +7894,7 @@ msgstr "احراز هویت NTLM"
 #: popup.php:1321 popup.php:1350 popup.php:1448 popup.php:1451 popup.php:1521
 #: popup.php:1524 popup.php:1581 popup.php:1585 popup.php:1636 popup.php:1667
 #: popup.php:1698 popup.php:1738 popup.php:1754 popup.php:1777 popup.php:1806
-#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:250
+#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:254
 #: report2.php:236 screenconf.php:50 services.php:42 slideconf.php:38
 #: sysmaps.php:48 sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41
 #: tr_status.php:293 users.php:46
@@ -7987,7 +7993,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
-#: queue.php:246
+#: queue.php:250
 msgid "Next check"
 msgstr "بررسی بعدی"
 
@@ -8408,7 +8414,7 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:580 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:838
+#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:841
 #: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
@@ -8416,7 +8422,7 @@ msgstr ""
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:726
+#: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
@@ -8427,9 +8433,9 @@ msgstr ""
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
-#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
+#: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
 #: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
@@ -8577,7 +8583,7 @@ msgstr ""
 #: include/triggers.inc.php:1622 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
-#: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
+#: popup_right.php:66 queue.php:252 report2.php:234 report5.php:59
 #: search.php:128 search.php:257 search.php:366 tr_status.php:291
 msgid "Node"
 msgstr "گره"
@@ -8634,7 +8640,7 @@ msgstr "بدون تأیید"
 msgid "Not Templated items"
 msgstr "بدون آیتم های قالب شده"
 
-#: api/classes/CTrigger.php:1792
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -9650,7 +9656,7 @@ msgid "Proxies"
 msgstr "پروکسی ها"
 
 #: include/actions.inc.php:92 include/audit.inc.php:46
-#: include/views/administration.proxy.edit.php:86 queue.php:221
+#: include/views/administration.proxy.edit.php:86 queue.php:225
 msgid "Proxy"
 msgstr "پروکسی"
 
@@ -10812,7 +10818,7 @@ msgid "Serial number B"
 msgstr ""
 
 #: include/views/administration.script.list.php:67 popup.php:1859
-#: queue.php:186
+#: queue.php:190
 msgid "Server"
 msgstr "سرور"
 
@@ -10868,7 +10874,7 @@ msgstr ""
 msgid "Service port"
 msgstr "پرت سرویس"
 
-#: include/services.inc.php:504
+#: include/services.inc.php:505
 msgid "Service start time must be less than end time."
 msgstr ""
 
@@ -11657,7 +11663,7 @@ msgstr[0] ""
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: queue.php:121
+#: queue.php:125
 msgid "The queue is empty"
 msgstr ""
 
@@ -11820,7 +11826,7 @@ msgid "Top"
 msgstr "بالا"
 
 #: include/blocks.inc.php:377 include/classes/class.chostsinfo.php:128
-#: queue.php:289
+#: queue.php:293
 msgid "Total"
 msgstr "کل"
 
@@ -11874,18 +11880,13 @@ msgstr ""
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:885
-#, php-format
-msgid "Trigger \"%1$s\" does not have item prototype."
-msgstr ""
-
 #: include/classes/import/CXmlImport18.php:1434
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CTrigger.php:1931
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
@@ -11895,7 +11896,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr ""
 
-#: api/classes/CTrigger.php:1835
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr ""
 
@@ -11919,7 +11920,7 @@ msgstr "نمایش گزبنه های هشدار"
 msgid "Trigger expression condition"
 msgstr "عبارت شرط هشدار"
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1030
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -11953,9 +11954,14 @@ msgstr "نام هشدار"
 msgid "Trigger prototype"
 msgstr "نمونه اولیه هشدار"
 
-#: api/classes/CTriggerPrototype.php:791
+#: api/classes/CTriggerPrototype.php:1106
 #, php-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:1112
+#, php-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
@@ -12045,7 +12051,7 @@ msgstr "100 هشدار بالا"
 msgid "Triggers with severity"
 msgstr "هشدارها بهمراه جدیت"
 
-#: queue.php:289
+#: queue.php:293
 msgid "Truncated"
 msgstr "بریدن"
 
@@ -12071,7 +12077,7 @@ msgstr ""
 msgid "Two elements should be selected"
 msgstr "دو عنصر باید انتخاب شود"
 
-#: api/classes/CItem.php:1277
+#: api/classes/CItem.php:1278
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
@@ -12196,7 +12202,7 @@ msgstr "انگلیسی(160 کاراکتر)"
 msgid "USER PROFILE"
 msgstr "پروفایل کاربر "
 
-#: include/config.inc.php:760
+#: include/config.inc.php:761
 msgid "UTF-8"
 msgstr ""
 
@@ -12441,7 +12447,7 @@ msgstr ""
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:902
+#: api/classes/CItem.php:903
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12451,12 +12457,12 @@ msgstr ""
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1586
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1085
+#: api/classes/CTriggerPrototype.php:1061
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -13059,7 +13065,7 @@ msgstr ""
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:815
 msgid "Wrong fields for trigger."
 msgstr ""
 

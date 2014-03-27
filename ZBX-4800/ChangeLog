@@ -1,10 +1,25 @@
 Changes for 2.0.12rc1
 
 New features:
+....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Italian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
+..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
+..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
+..F.....S. [ZBX-5778] removed counting items in queue if host is in maintenance with no data collection (igors)
+A......... [ZBX-6151] fixed graph prototype and trigger prototype validation so item prototypes are no longer allowed from multiple discovery rules and fixed filter by flags not overriding in item.get method (Ivo)
+........S. [ZBX-5804] added overflow/wrapping detection to calculated items (Juris)
+........S. [ZBX-7659] fixed handling of hosts without any interfaces (Juris)
+....IJ.... [ZBX-5379] added stale PID file detection for Java gateway (asaveljevs)
+....IJ.... [ZBX-5558] fixed Java gateway error messages not being shown in the console on startup (asaveljevs)
+...G...PS. [ZBX-6731] faster processing of log files by agent on Unix (Andris)
+...G...PS. [ZBX-6729] faster processing of log files by agent on Microsoft Windows (Andris)
+...G...... [ZBX-6933] added substitution of eventlog parameter insertion strings (wiper)
+...G...... [ZBX-7853] changed log level from warning to information when listener, active checks and collector processes start (igors)
+A.F.....S. [ZBX-7674] implemented batch processing of IT services to resolve deadlocks and improve performance (Eduard, wiper)
 ........S. [ZBX-5789] improved performance of processing discovered graphs by the low-level discovery rule (Sasha)
 ........S. [ZBX-5789] fixed updating of low-level discovered graphs: the graph identifier never will change (Sasha)
 A.F....... [ZBX-7708] fixed trigger prototype error message and trigger form default description value (Oleg)
@@ -44,7 +59,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 .......PS. [ZBX-7587] set the correct server status (down) after ORA-01012, ORA-02396 errors (wiper)
 ...G...... [ZBX-7481] added checking for OpenBSD version to avoid compilation error on OpenBSD v5.4 and newer due to removed swapins/swapouts uvmexp fields (igors)
 ..F....... [ZBX-7634] removed sid from trigger URL in Monitoring->Triggers (Oleg)
-...GI..PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
+.......PS. [ZBX-5526] removed checking for PostgreSQL server version and disabled nonstandard use of escape strings in order to support versions newer than 8.1 (igors)
 ...G...... [ZBX-7414] added description to HostnameItem that UserParameters and aliases are not supported (igors)
 ..F....... [ZBX-7508] fixed import map with LLD triggers (Eduard)
 ..F....... [ZBX-7586] fixed trigger log expression saving in IE10 (Eduard)
@@ -1502,6 +1517,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20
 

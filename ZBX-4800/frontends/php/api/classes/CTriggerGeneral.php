@@ -86,7 +86,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 					info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
 						implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 				}
-				$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
+				$this->deleteByIds(zbx_objectValues($templatedTriggers, 'triggerid'));
 			}
 
 			// nothing to inherit, just exit
@@ -141,7 +141,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
 					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 			}
-			$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
+			$this->deleteByIds(zbx_objectValues($templatedTriggers, 'triggerid'));
 		}
 
 		return true;

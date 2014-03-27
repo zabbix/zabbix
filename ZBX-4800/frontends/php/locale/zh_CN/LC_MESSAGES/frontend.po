@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 01:24+0200\n"
+"POT-Creation-Date: 2014-03-24 15:56+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -117,15 +117,15 @@ msgstr "----[整批了解]----"
 msgid "0 or 1"
 msgstr "0 或 1"
 
-#: queue.php:162 queue.php:225
+#: queue.php:166 queue.php:229
 msgid "1 minute"
 msgstr "1分"
 
-#: queue.php:160 queue.php:223
+#: queue.php:164 queue.php:227
 msgid "10 seconds"
 msgstr "10秒"
 
-#: queue.php:161 queue.php:224
+#: queue.php:165 queue.php:228
 msgid "30 seconds"
 msgstr "30秒"
 
@@ -133,11 +133,11 @@ msgstr "30秒"
 msgid "3D view"
 msgstr "3D 视图"
 
-#: queue.php:163 queue.php:226
+#: queue.php:167 queue.php:230
 msgid "5 minutes"
 msgstr "5分"
 
-#: queue.php:159 queue.php:222
+#: queue.php:163 queue.php:226
 msgid "5 seconds"
 msgstr "5秒"
 
@@ -1127,7 +1127,7 @@ msgstr "无法添加操作"
 msgid "Cannot add application"
 msgstr "无法添加应用集"
 
-#: api/classes/CTrigger.php:1713
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr "无法添加自主机到模板的相依关系"
 
@@ -1299,11 +1299,11 @@ msgstr "无法复制触发器 \"%1$s:%2$s\", 因为在其表达式中有多个�
 msgid "Cannot create another database connection."
 msgstr "无法创建其他的数据库连接."
 
-#: api/classes/CTrigger.php:1747
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr "不能创建循环依赖."
 
-#: api/classes/CTrigger.php:1719
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr "无法创建触发器本身的依赖。"
 
@@ -1354,7 +1354,7 @@ msgstr "无法删除动作"
 msgid "Cannot delete application"
 msgstr "无法删除应用集"
 
-#: api/classes/CTrigger.php:1441
+#: api/classes/CTrigger.php:1460
 msgid "Cannot delete dependency"
 msgstr "无法删除相依关系"
 
@@ -1375,7 +1375,7 @@ msgstr "无法删除图形"
 msgid "Cannot delete graph prototype"
 msgstr "无法删除图原型"
 
-#: api/classes/CItem.php:985
+#: api/classes/CItem.php:986
 msgid "Cannot delete graph."
 msgstr "无法删除图形."
 
@@ -1494,7 +1494,7 @@ msgstr "无法删除模板"
 msgid "Cannot delete templated graphs."
 msgstr "无法删除模板图形."
 
-#: api/classes/CItem.php:949
+#: api/classes/CItem.php:950
 msgid "Cannot delete templated item."
 msgstr "无法删除样本项目."
 
@@ -1506,7 +1506,7 @@ msgstr "无法删除模板项目"
 msgid "Cannot delete templated items."
 msgstr "无法删除模板项目."
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:903
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "无法删除模板化触发器 \"%1$s:%2$s\"."
@@ -1519,7 +1519,7 @@ msgstr "无法删除触发器"
 msgid "Cannot delete trigger prototype"
 msgstr "无法删除触发器原型"
 
-#: api/classes/CItem.php:1001
+#: api/classes/CItem.php:1002
 msgid "Cannot delete trigger."
 msgstr "无法删除触发器."
 
@@ -1527,7 +1527,7 @@ msgstr "无法删除触发器."
 msgid "Cannot delete triggers"
 msgstr "无法删除触发器"
 
-#: api/classes/CTriggerPrototype.php:965
+#: api/classes/CTriggerPrototype.php:941
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "无法删除由低级发现创建的触发器。"
 
@@ -1665,9 +1665,9 @@ msgstr "无法形成树状格式"
 msgid "Cannot have empty visible template name"
 msgstr "不能有空白的可见模板名称"
 
-#: api/classes/CTrigger.php:1472 api/classes/CTrigger.php:1547
-#: api/classes/CTriggerPrototype.php:1008
-#: api/classes/CTriggerPrototype.php:1066
+#: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
+#: api/classes/CTriggerPrototype.php:984
+#: api/classes/CTriggerPrototype.php:1042
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "不能合并表达式 \"%s\"."
@@ -1853,7 +1853,7 @@ msgstr "无法为筛选器 \"%1$s\"更新\"模板号\"。"
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "无法为触发器 \"%1$s\"更新\"模板号\"。"
 
-#: api/classes/CTriggerPrototype.php:833
+#: api/classes/CTriggerPrototype.php:820
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "无法为触发器原型 \"%1$s\"更新\"模板号\"。"
@@ -2527,7 +2527,7 @@ msgstr "坐标"
 msgid "Copy"
 msgstr "复制"
 
-#: include/views/configuration.graph.list.php:138
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2676,7 +2676,7 @@ msgstr "已创建: 应用集 \"%1$s\" 于 \"%2$s\"."
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 发现规则 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CItem.php:850
+#: api/classes/CItem.php:851
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 项目 \"%1$s\" 于 \"%2$s\"."
@@ -2686,12 +2686,12 @@ msgstr "已创建: 项目 \"%1$s\" 于 \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 项目原型 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CTrigger.php:1482
+#: api/classes/CTrigger.php:1501
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 触发器 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1015
+#: api/classes/CTriggerPrototype.php:991
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已创建: 触发器原型 \"%1$s\" 于 \"%2$s\"."
@@ -3135,7 +3135,7 @@ msgstr "延迟"
 msgid "Delay (in sec)"
 msgstr "延迟(秒计)"
 
-#: queue.php:247
+#: queue.php:251
 msgid "Delayed by"
 msgstr "延迟因"
 
@@ -3248,7 +3248,7 @@ msgstr "删除脚本?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:141
+#: include/views/configuration.graph.list.php:143
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3284,7 +3284,7 @@ msgstr "删除所选的发现规则?"
 msgid "Delete selected elements?"
 msgstr "删除所选的组件?"
 
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:144
 msgid "Delete selected graphs?"
 msgstr "删除所选的图形?"
 
@@ -3432,7 +3432,7 @@ msgstr "已删除: 图形 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 项目 \"%1$s\" 于 \"%2$s\"."
@@ -3453,12 +3453,12 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr "已删除: 模板 \"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1246
+#: api/classes/CTrigger.php:1250
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 触发器 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:971
+#: api/classes/CTriggerPrototype.php:947
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 触发器原型 \"%1$s\" 于 \"%2$s\"."
@@ -3920,7 +3920,7 @@ msgstr "下拉的第一个输入项 \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "下拉记住所选的 \"%1$s\"."
 
-#: api/classes/CTrigger.php:1889
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "触发器 \"%1$s\" 中的重复相依关系."
@@ -4044,12 +4044,12 @@ msgstr "空的动作条件."
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:929 api/classes/CItemPrototype.php:708
+#: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1218 api/classes/CTrigger.php:1314
-#: api/classes/CTrigger.php:1406 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:885
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4711,7 +4711,7 @@ msgstr "全局脚本"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:145
+#: include/views/configuration.graph.list.php:147
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4812,6 +4812,16 @@ msgstr "图形项目"
 msgid "Graph name"
 msgstr "图形名称"
 
+#: api/classes/CGraphPrototype.php:881
+#, php-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:887
+#, php-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr ""
+
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -4821,10 +4831,6 @@ msgstr "含模板项目的图形原型\"%1$s\"不能包含其它主机的项目.
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "图形原型\"%s\"已删除."
-
-#: api/classes/CGraphPrototype.php:856
-msgid "Graph prototype must have at least one prototype."
-msgstr "图形原型必需至少有一个原型."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
@@ -5159,7 +5165,7 @@ msgstr "横向对齐"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
-#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:249
+#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:253
 #: report2.php:235 report5.php:60 tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "主机"
@@ -6210,15 +6216,15 @@ msgstr "提供了不正确的筛选ID\"%s\"给筛选项目."
 msgid "Incorrect screen provided for slide show."
 msgstr "用于简报片显示的不正确筛选."
 
-#: include/services.inc.php:490 include/services.inc.php:499
+#: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
 msgstr "不正确的服务终止时间."
 
-#: include/services.inc.php:487 include/services.inc.php:496
+#: include/services.inc.php:488 include/services.inc.php:497
 msgid "Incorrect service start time."
 msgstr "不正确的服务开始时间."
 
-#: include/services.inc.php:481
+#: include/services.inc.php:482
 msgid "Incorrect service time type."
 msgstr "不正确的服务时间类型."
 
@@ -6540,7 +6546,7 @@ msgstr "项目"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "键值为 \"%1$s\"的项目已存在于 \"%2$s\", 继承自其他模板."
 
-#: api/classes/CItem.php:1216
+#: api/classes/CItem.php:1217
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "项目\"%1$s\"不能填入一个不存在的主机资产纪录字段号码\"%2$d\". 选择为: 从0(不填入)到%3$d."
@@ -6658,7 +6664,7 @@ msgstr "键值为 \"%s\"的项目已存在"
 #: include/views/configuration.host.edit.php:338
 #: include/views/configuration.item.list.php:34
 #: include/views/configuration.template.edit.php:240
-#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:158
+#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:162
 #: search.php:137 search.php:164 search.php:183 search.php:369 search.php:393
 #: search.php:416 templates.php:459 templates.php:523
 msgid "Items"
@@ -7790,7 +7796,7 @@ msgstr "月"
 msgid "Monthly"
 msgstr "每月"
 
-#: queue.php:164 queue.php:227
+#: queue.php:168 queue.php:231
 msgid "More than 10 minutes"
 msgstr "10分钟以上"
 
@@ -7902,7 +7908,7 @@ msgstr "NTLM认证"
 #: popup.php:1321 popup.php:1350 popup.php:1448 popup.php:1451 popup.php:1521
 #: popup.php:1524 popup.php:1581 popup.php:1585 popup.php:1636 popup.php:1667
 #: popup.php:1698 popup.php:1738 popup.php:1754 popup.php:1777 popup.php:1806
-#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:250
+#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:254
 #: report2.php:236 screenconf.php:50 services.php:42 slideconf.php:38
 #: sysmaps.php:48 sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41
 #: tr_status.php:293 users.php:46
@@ -8001,7 +8007,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "次"
 
-#: queue.php:246
+#: queue.php:250
 msgid "Next check"
 msgstr "下个检查"
 
@@ -8422,7 +8428,7 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:580 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:838
+#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:841
 #: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
@@ -8430,7 +8436,7 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:726
+#: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
@@ -8441,9 +8447,9 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1357 api/classes/CTriggerPrototype.php:824
-#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
+#: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
 #: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
@@ -8591,7 +8597,7 @@ msgstr "没有定义的web方案"
 #: include/triggers.inc.php:1622 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
-#: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
+#: popup_right.php:66 queue.php:252 report2.php:234 report5.php:59
 #: search.php:128 search.php:257 search.php:366 tr_status.php:291
 msgid "Node"
 msgstr "节点"
@@ -8648,7 +8654,7 @@ msgstr "未确认"
 msgid "Not Templated items"
 msgstr "非模板项目"
 
-#: api/classes/CTrigger.php:1792
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "并非所有的模板都连结到\"%s\"."
@@ -9664,7 +9670,7 @@ msgid "Proxies"
 msgstr "代理节点"
 
 #: include/actions.inc.php:92 include/audit.inc.php:46
-#: include/views/administration.proxy.edit.php:86 queue.php:221
+#: include/views/administration.proxy.edit.php:86 queue.php:225
 msgid "Proxy"
 msgstr "代理节点"
 
@@ -10826,7 +10832,7 @@ msgid "Serial number B"
 msgstr "序列号B"
 
 #: include/views/administration.script.list.php:67 popup.php:1859
-#: queue.php:186
+#: queue.php:190
 msgid "Server"
 msgstr "服务器"
 
@@ -10882,7 +10888,7 @@ msgstr "服务已删除"
 msgid "Service port"
 msgstr "服务端口"
 
-#: include/services.inc.php:504
+#: include/services.inc.php:505
 msgid "Service start time must be less than end time."
 msgstr "服务的开始时间不能晚于截止时间."
 
@@ -11671,7 +11677,7 @@ msgstr[0] "此图片是用于对应%2$s."
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "已无法发现此项目了, 将删除于%1$s (在%2$s在%3$s)."
 
-#: queue.php:121
+#: queue.php:125
 msgid "The queue is empty"
 msgstr "储列是空的"
 
@@ -11834,7 +11840,7 @@ msgid "Top"
 msgstr "顶部"
 
 #: include/blocks.inc.php:377 include/classes/class.chostsinfo.php:128
-#: queue.php:289
+#: queue.php:293
 msgid "Total"
 msgstr "合计"
 
@@ -11888,18 +11894,13 @@ msgstr "触发器\"%1$s\"已存在于\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:885
-#, php-format
-msgid "Trigger \"%1$s\" does not have item prototype."
-msgstr "触发器\"%1$s\"并无项目原型."
-
 #: include/classes/import/CXmlImport18.php:1434
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略过触发器\"%1$s\"-用户规则."
 
-#: api/classes/CTrigger.php:1931
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "触发器\"%s\"属于有不同连结的模板."
@@ -11909,7 +11910,7 @@ msgstr "触发器\"%s\"属于有不同连结的模板."
 msgid "Trigger added"
 msgstr "触发器已添加"
 
-#: api/classes/CTrigger.php:1835
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "触发器不能相依于自己所继承的触发器."
 
@@ -11933,7 +11934,7 @@ msgstr "触发器显示选项"
 msgid "Trigger expression condition"
 msgstr "触发器表达式条件"
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1030
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "触发器表达式必需包含至少一个 主机:键值 参照."
 
@@ -11967,9 +11968,14 @@ msgstr "触发器名称"
 msgid "Trigger prototype"
 msgstr "触发器类型"
 
-#: api/classes/CTriggerPrototype.php:791
+#: api/classes/CTriggerPrototype.php:1106
 #, php-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:1112
+#, php-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
@@ -12059,7 +12065,7 @@ msgstr "前百大触发器"
 msgid "Triggers with severity"
 msgstr "具示警度的触发器"
 
-#: queue.php:289
+#: queue.php:293
 msgid "Truncated"
 msgstr "截断的"
 
@@ -12085,7 +12091,7 @@ msgstr "土耳其(tr_TR)"
 msgid "Two elements should be selected"
 msgstr "两个组件必需被选择"
 
-#: api/classes/CItem.php:1277
+#: api/classes/CItem.php:1278
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录字段\"%3$s\", 这会造成冲突."
@@ -12210,7 +12216,7 @@ msgstr "USA (160字符)"
 msgid "USER PROFILE"
 msgstr "用户基本资料"
 
-#: include/config.inc.php:760
+#: include/config.inc.php:761
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12455,7 +12461,7 @@ msgstr "已更新: 应用程序\"%1$s\"于\"%2$s\"."
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 发现规则\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CItem.php:902
+#: api/classes/CItem.php:903
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目\"%1$s\"于\"%2$s\"."
@@ -12465,12 +12471,12 @@ msgstr "已更新: 项目\"%1$s\"于\"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目原型\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CTrigger.php:1586
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 触发器\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1085
+#: api/classes/CTriggerPrototype.php:1061
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 触发器原型\"%1$s\"于\"%2$s\"."
@@ -13073,7 +13079,7 @@ msgstr "错误的服务字段\"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "错误的服务\"%1$s\"其时间字段."
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:815
 msgid "Wrong fields for trigger."
 msgstr "错误的触发器字段."
 
