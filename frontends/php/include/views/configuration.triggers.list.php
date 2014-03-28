@@ -172,17 +172,20 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$dependencies = $trigger['dependencies'];
 		if (count($dependencies) > 0) {
 			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
-			foreach ($dependencies as $dep_trigger) {
+			foreach ($dependencies as $depTrigger) {
 				$description[] = BR();
+				$hostNames = array();
 
-				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
-				while ($host = DBfetch($db_hosts)) {
-					$description[] = CHtml::encode($host['name']);
-					$description[] = ', ';
+				$dbHosts = get_hosts_by_triggerid($depTrigger['triggerid']);
+				while ($host = DBfetch($dbHosts)) {
+					$hostNames[] = CHtml::encode($host['name']);
 				}
-				array_pop($description);
-				$description[] = NAME_DELIMITER;
-				$description[] = CHtml::encode($dep_trigger['description']);
+
+				$description[] = new CLink(
+					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+					'triggers.php?form=update&hostid='.$depTrigger['hostid'].'&triggerid='.$depTrigger['triggerid'],
+					triggerIndicatorStyle($depTrigger['status'])
+				);
 			}
 		}
 	}
