@@ -312,7 +312,7 @@ $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
 $ackStatus = $_REQUEST['ack_status'];
 
-$triggerWidget = new CWidget(null, 'trigger-mon');
+$triggerWidget = new CWidget();
 
 $rightForm = new CForm('get');
 $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
@@ -326,105 +326,26 @@ $triggerWidget->addPageHeader(
 $triggerWidget->addHeader(_('Triggers'), $rightForm);
 $triggerWidget->addHeaderRowNumber();
 
-/*
- * Filter
- */
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
-$filterForm->addVar('groupid', $_REQUEST['groupid']);
-$filterForm->addVar('hostid', $_REQUEST['hostid']);
-
-$statusComboBox = new CComboBox('show_triggers', $showTriggers);
-$statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
-$filterForm->addRow(_('Triggers status'), $statusComboBox);
-
-if ($config['event_ack_enable']) {
-	$ackStatusComboBox = new CComboBox('ack_status', $ackStatus);
-	$ackStatusComboBox->addItem(ZBX_ACK_STS_ANY, _('Any'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_UNACK, _('With unacknowledged events'));
-	$ackStatusComboBox->additem(ZBX_ACK_STS_WITH_LAST_UNACK, _('With last event unacknowledged'));
-	$filterForm->addRow(_('Acknowledge status'), $ackStatusComboBox);
-}
-
-$eventsComboBox = new CComboBox('show_events', $_REQUEST['show_events']);
-$eventsComboBox->addItem(EVENTS_OPTION_NOEVENT, _('Hide all'));
-$eventsComboBox->addItem(EVENTS_OPTION_ALL, _('Show all').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-if ($config['event_ack_enable']) {
-	$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
-}
-$filterForm->addRow(_('Events'), $eventsComboBox);
-
-$severityComboBox = new CComboBox('show_severity', $showSeverity);
-$severityComboBox->addItems(array(
-	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
-));
-$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
-
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 3, false, false, false);
-if (!$_REQUEST['status_change']) {
-	$statusChangeDays->setAttribute('disabled', 'disabled');
-}
-$statusChangeDays->addStyle('vertical-align: middle;');
-
-$statusChangeCheckBox = new CCheckBox('status_change', $_REQUEST['status_change'], 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1);
-$statusChangeCheckBox->addStyle('vertical-align: middle;');
-
-$daysSpan = new CSpan(_('days'));
-$daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $filter['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-			'&dstfrm='.$filterForm->getName().'");',
-		'filter-button'
+// filter
+$filterFormView = new CView('common.filter.trigger', array(
+	'overview' => false,
+	'filter' => array(
+		'showTriggers' => getRequest('show_triggers'),
+		'ackStatus' => getRequest('ack_status'),
+		'showEvents' => getRequest('show_events'),
+		'showSeverity' => getRequest('show_severity'),
+		'statusChange' => getRequest('status_change'),
+		'statusChangeDays' => getRequest('status_change_days'),
+		'txtSelect' => getRequest('txt_select'),
+		'application' => $filter['application'],
+		'inventory' => $filter['inventory'],
+		'showMaintenance' => getRequest('show_maintenance'),
+		'hostId' => getRequest('hostid'),
+		'groupId' => getRequest('groupid'),
+		'fullScreen' => getRequest('fullScreen')
 	)
 ));
-
-// inventory filter
-$inventoryFilters = $filter['inventory'];
-if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
-	);
-}
-$inventoryFields = array();
-foreach (getHostInventories() as $inventory) {
-	$inventoryFields[$inventory['db_field']] = $inventory['title'];
-}
-
-$inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
-$i = 0;
-foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
-
-	$i++;
-}
-$inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
-);
-$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
-
-// maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
-
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm = $filterFormView->render();
 
 $triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 
@@ -994,7 +915,5 @@ $triggerWidget->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
-
-require_once dirname(__FILE__).'/include/views/js/monitoring.triggers.js.php';
 
 require_once dirname(__FILE__).'/include/page_footer.php';

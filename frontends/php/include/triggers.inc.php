@@ -1167,61 +1167,32 @@ function replace_template_dependencies($deps, $hostid) {
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * @param array  $hostIds
- * @param string $application	name of application to filter
- * @param string $pageFile		the page where the element is displayed
- * @param int    $viewMode		table display style: either hosts on top, or host on the left side
- * @param string $screenId		the ID of the screen, that contains the trigger overview table
+ * @param array  	$hosts							an array of hosts with host IDs as keys
+ * @param string 	$hosts[hostid][name]
+ * @param string 	$hosts[hostid][hostid]
+ * @param array		$triggers
+ * @param string	$triggers[][triggerid]
+ * @param string	$triggers[][description]
+ * @param string	$triggers[][expression]
+ * @param int		$triggers[][value]
+ * @param int		$triggers[][lastchange]
+ * @param int		$triggers[][flags]
+ * @param array		$triggers[][url]
+ * @param int		$triggers[][priority]
+ * @param array		$triggers[][hosts]
+ * @param string	$triggers[][hosts][][hostid]
+ * @param string	$triggers[][hosts][][name]
+ * @param string 	$pageFile						the page where the element is displayed
+ * @param int    	$viewMode						table display style: either hosts on top, or host on the left side
+ * @param string 	$screenId						the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
-function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null, $screenId = null) {
-	if (is_null($viewMode)) {
-		$viewMode = CProfile::get('web.overview.view.style', STYLE_TOP);
-	}
-
-	// get application ids
-	$applicationIds = null;
-	if ($application !== '') {
-		$dbApplications = API::Application()->get(array(
-			'hostids' => $hostIds,
-			'filter' => array('name' => $application),
-			'output' => array('applicationid')
-		));
-		$applicationIds = zbx_objectValues($dbApplications, 'applicationid');
-		$hostIds = null;
-	}
-
-	// get triggers
-	$dbTriggers = API::Trigger()->get(array(
-		'hostids' => $hostIds,
-		'applicationids' => $applicationIds,
-		'monitored' => true,
-		'skipDependent' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
-		'sortfield' => 'description'
-	));
-
-	// get hosts
-	$hostIds = array();
-	foreach ($dbTriggers as $trigger) {
-		$host = reset($trigger['hosts']);
-
-		$hostIds[$host['hostid']] = $host['hostid'];
-	}
-
-	$hosts = API::Host()->get(array(
-		'output' => array('name', 'hostid', 'status'),
-		'hostids' => $hostIds,
-		'preservekeys' => true,
-		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
-	));
-
-	$triggers = array();
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
+	$data = array();
 	$hostNames = array();
 
-	foreach ($dbTriggers as $trigger) {
+	foreach ($triggers as $trigger) {
 		$host = reset($trigger['hosts']);
 
 		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
@@ -1230,11 +1201,11 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($triggers[$trigger['description']][$host['name']])
-				|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-					|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-						&& $trigger['priority'] > $triggers[$trigger['description']][$host['name']]['priority']))) {
-			$triggers[$trigger['description']][$host['name']] = array(
+		if (!isset($data[$trigger['description']][$host['name']])
+				|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
+					|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
+						&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
+			$data[$trigger['description']][$host['name']] = array(
 				'hostid' => $host['hostid'],
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
@@ -1268,7 +1239,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
-		foreach ($triggers as $description => $triggerHosts) {
+		foreach ($data as $description => $triggerHosts) {
 			$columns = array(nbsp($description));
 
 			foreach ($hostNames as $hostName) {
@@ -1286,7 +1257,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 
-		foreach ($triggers as $description => $triggerHosts) {
+		foreach ($data as $description => $triggerHosts) {
 			$header[] = new CCol($description, 'vertical_rotation');
 		}
 
@@ -1300,7 +1271,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
-			foreach ($triggers as $triggerHosts) {
+			foreach ($data as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
 					$pageFile,

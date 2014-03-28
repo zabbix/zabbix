@@ -40,8 +40,22 @@ $fields = array(
 	'groupid'     => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null),
 	'view_style'  => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
 	'type'        => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
-	'application' => array(T_ZBX_STR, O_OPT, P_SYS, null,	   null),
-	'fullscreen'  => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null)
+	'fullscreen'  => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
+	// filter
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'ack_status' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
+	'show_severity' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
+	'show_maintenance' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null),
+	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	// ajax
+	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );
 check_fields($fields);
 
@@ -53,17 +67,132 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
 }
 
 /*
+ * Ajax
+ */
+if (hasRequest('favobj')) {
+	if (getRequest('favobj') === 'filter') {
+		CProfile::update('web.overview.filter.state', getRequest('favstate'), PROFILE_TYPE_INT);
+	}
+}
+
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit();
+}
+
+// show triggers
+// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
+// whole page inaccessible on large installations.
+$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
+
+$config = select_config();
+if (hasRequest('filter_set')) {
+	CProfile::update('web.overview.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		PROFILE_TYPE_INT
+	);
+	CProfile::update('web.overview.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.txt_select', getRequest('txt_select'), PROFILE_TYPE_STR);
+	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
+
+	// ack status
+	if (($config['event_ack_enable'] == EVENT_ACK_ENABLED) && hasRequest('ack_status')) {
+		CProfile::update('web.overview.filter.ack_status', getRequest('ack_status'), PROFILE_TYPE_INT);
+	}
+
+	// status change days
+	if (hasRequest('status_change_days')) {
+		CProfile::update('web.overview.filter.status_change_days', getRequest('status_change_days'), PROFILE_TYPE_INT);
+	}
+
+	// update host inventory filter
+	$i = 0;
+	foreach (getRequest('inventory', array()) as $field) {
+		if ($field['value'] === '') {
+			continue;
+		}
+
+		CProfile::update('web.overview.filter.inventory.field', $field['field'], PROFILE_TYPE_STR, $i);
+		CProfile::update('web.overview.filter.inventory.value', $field['value'], PROFILE_TYPE_STR, $i);
+
+		$i++;
+	}
+
+	// delete remaining old values
+	$idx2 = array();
+	while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
+		$idx2[] = $i;
+
+		$i++;
+	}
+
+	CProfile::delete('web.overview.filter.inventory.field', $idx2);
+	CProfile::delete('web.overview.filter.inventory.value', $idx2);
+}
+elseif (hasRequest('filter_rst')) {
+	$showTriggers = TRIGGERS_OPTION_ONLYTRUE;
+
+	CProfile::delete('web.overview.filter.show_maintenance');
+	CProfile::delete('web.overview.filter.ack_status');
+	CProfile::delete('web.overview.filter.show_severity');
+	CProfile::delete('web.overview.filter.txt_select');
+	CProfile::delete('web.overview.filter.status_change');
+	CProfile::delete('web.overview.filter.status_change_days');
+	CProfile::delete('web.overview.filter.application');
+
+	// reset inventory filters
+	$i = 0;
+	while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
+		CProfile::delete('web.overview.filter.inventory.field', $i);
+		CProfile::delete('web.overview.filter.inventory.value', $i);
+
+		$i++;
+	}
+}
+
+// overview type
+if (hasRequest('type')) {
+	CProfile::update('web.overview.type', getRequest('type'), PROFILE_TYPE_INT);
+}
+$type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
+
+// overview style
+if (hasRequest('view_style')) {
+	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
+}
+$viewStyle = CProfile::get('web.overview.view_style', SHOW_TRIGGERS);
+
+/*
  * Display
  */
-$data = array(
-	'fullscreen' => $_REQUEST['fullscreen']
+// filter data
+$filter = array(
+	'showTriggers' => $showTriggers,
+	'ackStatus' => CProfile::get('web.overview.filter.ack_status', 0),
+	'showSeverity' => CProfile::get('web.overview.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+	'statusChange' => CProfile::get('web.overview.filter.status_change', 0),
+	'statusChangeDays' => CProfile::get('web.overview.filter.status_change_days', 14),
+	'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
+	'application' => CProfile::get('web.overview.filter.application', ''),
+	'showMaintenance' => CProfile::get('web.overview.filter.show_maintenance', 1),
+	'inventory' => array()
 );
+$i = 0;
+while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
+	$filter['inventory'][] = array(
+		'field' => CProfile::get('web.overview.filter.inventory.field', null, $i),
+		'value' => CProfile::get('web.overview.filter.inventory.value', null, $i)
+	);
 
-$data['view_style'] = get_request('view_style', CProfile::get('web.overview.view.style', STYLE_TOP));
-CProfile::update('web.overview.view.style', $data['view_style'], PROFILE_TYPE_INT);
+	$i++;
+}
 
-$data['type'] = get_request('type', CProfile::get('web.overview.type', SHOW_TRIGGERS));
-CProfile::update('web.overview.type', $data['type'], PROFILE_TYPE_INT);
+$data = array(
+	'fullscreen' => $_REQUEST['fullscreen'],
+	'type' => $type,
+	'view_style' => $viewStyle,
+	'filter' => $filter
+);
 
 $data['pageFilter'] = new CPageFilter(array(
 	'groups' => array(
@@ -73,13 +202,76 @@ $data['pageFilter'] = new CPageFilter(array(
 		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
-	'applications' => array('templated' => false),
 	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null),
-	'application' => get_request('application', null)
+	'groupid' => get_request('groupid', null)
 ));
 
 $data['groupid'] = $data['pageFilter']->groupid;
+$data['hostid'] = $data['pageFilter']->hostid;
+
+// fetch trigger data
+if ($type == SHOW_TRIGGERS) {
+	// fetch hosts
+	$inventoryFilter = array();
+	foreach ($filter['inventory'] as $field) {
+		$inventoryFilter[$field['field']][] = $field['value'];
+	}
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid'),
+		'selectScreens' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
+		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
+		'preservekeys' => true
+	));
+
+	// application filter
+	$applications = array();
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'search' => array('name' => $filter['application'])
+		));
+	}
+
+	$triggers = API::Trigger()->get(array(
+		'output' => array(
+			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+		),
+		'selectHosts' => array('hostid', 'name'),
+		'hostids' => zbx_objectValues($hosts, 'hostid'),
+		'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
+		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
+		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_ONLYTRUE) ? true : null,
+		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
+		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
+		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
+		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
+		'maintenance' => !$filter['showMaintenance'] ? false : null,
+		'monitored' => true,
+		'skipDependent' => true,
+		'sortfield' => 'description'
+	));
+
+	$data['hosts'] = $hosts;
+	$data['triggers'] = $triggers;
+}
+// fetch item data
+else {
+	// application filter
+	$applicationIds = null;
+	if ($filter['application'] !== '') {
+		$applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
+			'search' => array('name' => $filter['application'])
+		));
+		$applicationIds = zbx_objectValues($applications, 'applicationid');
+	}
+
+	$data['applicationIds'] = $applicationIds;
+}
+
 
 // render view
 $overviewView = new CView('monitoring.overview', $data);
