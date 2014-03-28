@@ -3632,8 +3632,8 @@ typedef struct
 {
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
-	char		function[FUNCTION_FUNCTION_LEN_MAX];
-	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	char		*function;
+	char		*parameter;
 	zbx_timespec_t	timespec;
 	char		*value;
 	char		*error;
@@ -3691,8 +3691,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 		func = zbx_malloc(NULL, sizeof(zbx_func_t));
 		func->functionid = functions[i].functionid;
 		func->triggerid = functions[i].triggerid;
-		strscpy(func->function, functions[i].function);
-		strscpy(func->parameter, functions[i].parameter);
+		func->function = zbx_strdup(NULL, functions[i].function);
+		func->parameter = zbx_strdup(NULL, functions[i].parameter);
 		func->timespec.sec = 0;
 		func->timespec.ns = 0;
 		func->value = NULL;
@@ -3934,6 +3934,8 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 		{
 			func = (zbx_func_t *)ifunc->functions.values[j];
 
+			zbx_free(func->function);
+			zbx_free(func->parameter);
 			zbx_free(func->value);
 			zbx_free(func->error);
 			zbx_free(func);
