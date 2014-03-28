@@ -183,11 +183,16 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				}
 				array_pop($hostNames);
 
-				$description[] = new CLink(
-					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
-					'triggers.php?form=update&hostid='.$depTrigger['hostid'].'&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
-				);
+				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$description[] = new CLink(
+						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+						'triggers.php?form=update&hostid='.$depTrigger['hostid'].'&triggerid='.$depTrigger['triggerid'],
+						triggerIndicatorStyle($depTrigger['status'])
+					);
+				}
+				else {
+					$description[] = new CSpan(array($hostNames, NAME_DELIMITER, $depTrigger['description']));
+				}
 			}
 		}
 	}

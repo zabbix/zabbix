@@ -285,13 +285,18 @@ if (empty($this->data['parent_discoveryid'])) {
 		}
 		array_pop($hostNames);
 
-		$link = new CLink(
-			array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
-			'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
-		);
-		$link->setAttribute('target', '_blank');
+		if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			$description = new CLink(
+				array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
+				'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
+			);
+			$description->setAttribute('target', '_blank');
+		}
+		else {
+			$description = new CSpan(array($hostNames, NAME_DELIMITER, $dependency['description']));
+		}
 
-		$row = new CRow(array($link, new CButton('remove', _('Remove'),
+		$row = new CRow(array($description, new CButton('remove', _('Remove'),
 			'javascript: removeDependency("'.$dependency['triggerid'].'");',
 			'link_menu'
 		)));
