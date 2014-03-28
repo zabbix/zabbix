@@ -997,6 +997,9 @@ double	str2double(const char *str);
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
+typedef struct __stat64	zbx_stat_t;
+#else
+typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS && _UNICODE */
 
 

@@ -200,7 +200,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	static zbx_uint64_t	old_size = 0;
 	va_list			args;
 	struct tm		*tm;
-	struct stat		buf;
+	zbx_stat_t		buf;
 #ifdef _WINDOWS
 	struct _timeb		current_time;
 	WORD			wType;

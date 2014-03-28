@@ -21,13 +21,19 @@
 #include "log.h"
 
 #if defined(_WINDOWS) && defined(_UNICODE)
-int	__zbx_stat(const char *path, struct stat *buf)
+int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
-	int	ret;
+	int	ret = -1, fd;
 	wchar_t	*wpath;
 
 	wpath = zbx_utf8_to_unicode(path);
-	ret = _wstat64(wpath, buf);
+
+	/* _wstat64 does not support symlinks */
+	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
+	{
+		ret = _fstat64(fd, buf);
+		close(fd);
+	}
 	zbx_free(wpath);
 
 	return ret;
@@ -422,7 +428,7 @@ out:
 
 int	zbx_is_regular_file(const char *path)
 {
-	struct stat	st;
+	zbx_stat_t	st;
 
 	if (0 == zbx_stat(path, &st) && 0 != S_ISREG(st.st_mode))
 		return SUCCEED;
