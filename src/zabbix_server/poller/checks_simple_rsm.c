@@ -3040,23 +3040,62 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 	}
 }
 
-static int	zbx_ssl_attach_rsa(SSL *ssl, char *privkey, int privkey_len, char *err, size_t err_size)
+static int	zbx_ssl_attach_cert(SSL *ssl, char *cert, int cert_len, char *err, size_t err_size)
 {
-	BIO	*bpop = NULL;
+	BIO	*bio = NULL;
+	X509	*x509 = NULL;
+	char	*p;
+	int	ret = FAIL;
+
+	if (NULL == (bio = BIO_new_mem_buf(cert, cert_len)))
+	{
+		zbx_strlcpy(err, "cannot allocate memory for client certificate", err_size);
+		goto out;
+	}
+
+	while (NULL != (p = strchr(cert, ';')))
+		*p = '\n';
+
+	if (NULL == (x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)))
+	{
+		zbx_ssl_get_error(err, err_size);
+		goto out;
+	}
+
+	if (1 != SSL_use_certificate(ssl, x509))
+	{
+		zbx_ssl_get_error(err, err_size);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (NULL != x509)
+		X509_free(x509);
+
+	if (NULL != bio)
+		BIO_free(bio);
+
+	return ret;
+}
+
+static int	zbx_ssl_attach_privkey(SSL *ssl, char *privkey, int privkey_len, char *err, size_t err_size)
+{
+	BIO	*bio = NULL;
 	RSA	*rsa = NULL;
 	char	*p;
 	int	ret = FAIL;
 
-	if (NULL == (bpop = BIO_new_mem_buf(privkey, privkey_len)))
+	if (NULL == (bio = BIO_new_mem_buf(privkey, privkey_len)))
 	{
-		zbx_strlcpy(err, "cannot allocate memory for private key", err_size);
+		zbx_strlcpy(err, "cannot allocate memory for client private key", err_size);
 		goto out;
 	}
 
 	while (NULL != (p = strchr(privkey, ';')))
 		*p = '\n';
 
-	if (NULL == (rsa = PEM_read_bio_RSAPrivateKey(bpop, NULL, NULL, NULL)))
+	if (NULL == (rsa = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL)))
 	{
 		zbx_ssl_get_error(err, err_size);
 		goto out;
@@ -3073,24 +3112,22 @@ out:
 	if (NULL != rsa)
 		RSA_free(rsa);
 
-	if (NULL != bpop)
-		BIO_free(bpop);
+	if (NULL != bio)
+		BIO_free(bio);
 
 	return ret;
 }
 
 int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
-	static char		cert_file[512];
-
 	ldns_resolver		*res = NULL;
 	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL,
 				*secretkey_enc_b64 = NULL, *secretkey_salt_b64 = NULL, *epp_passwd_enc_b64 = NULL,
 				*epp_passwd_salt_b64 = NULL, *epp_privkey_enc_b64 = NULL, *epp_privkey_salt_b64 = NULL,
-				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_certs = NULL,
+				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_cert = NULL,
 				*epp_commands = NULL, *epp_serverid = NULL, *tmp;
 	short			epp_port = 700;
-	X509			*cert = NULL;
+	X509			*epp_server_x509 = NULL;
 	const SSL_METHOD	*method;
 	const char		*ip = NULL, *random_host;
 	SSL_CTX			*ctx = NULL;
@@ -3208,7 +3245,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_CERTS, &epp_certs, err, sizeof(err)))
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_CERT, &epp_cert, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -3378,13 +3415,10 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	zbx_snprintf(cert_file, sizeof(cert_file), "%s/client.crt", epp_certs);
-
-	if (1 != SSL_use_certificate_file(ssl, cert_file, SSL_FILETYPE_PEM))
+	if (SUCCEED != zbx_ssl_attach_cert(ssl, epp_cert, strlen(epp_cert), err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
-		zbx_ssl_get_error(err, sizeof(err));
-		zbx_rsm_errf(log_fd, "cannot load certificate from file %s: %s", cert_file, err);
+		zbx_rsm_errf(log_fd, "cannot attach client certificate to SSL session: %s", err);
 		goto out;
 	}
 
@@ -3398,7 +3432,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	rv = zbx_ssl_attach_rsa(ssl, epp_privkey, strlen(epp_privkey), err, sizeof(err));
+	rv = zbx_ssl_attach_privkey(ssl, epp_privkey, strlen(epp_privkey), err, sizeof(err));
 
 	memset(epp_privkey, 0, strlen(epp_privkey));
 	zbx_free(epp_privkey);
@@ -3420,7 +3454,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	}
 
 	/* get the remote certificate into the X509 structure */
-	if (NULL == (cert = SSL_get_peer_certificate(ssl)))
+	if (NULL == (epp_server_x509 = SSL_get_peer_certificate(ssl)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
 		zbx_rsm_errf(log_fd, "cannot get a certificate from %s:%d", ip, epp_port);
@@ -3515,8 +3549,8 @@ out:
 	}
 
 	zbx_free(epp_commands);
-	zbx_free(epp_certs);
 	zbx_free(epp_user);
+	zbx_free(epp_cert);
 	zbx_free(epp_privkey_salt_b64);
 	zbx_free(epp_privkey_enc_b64);
 	zbx_free(epp_passwd_salt_b64);
@@ -3524,8 +3558,8 @@ out:
 	zbx_free(secretkey_salt_b64);
 	zbx_free(secretkey_enc_b64);
 
-	if (NULL != cert)
-		X509_free(cert);
+	if (NULL != epp_server_x509)
+		X509_free(epp_server_x509);
 
 	if (NULL != ssl)
 	{
