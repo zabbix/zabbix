@@ -1485,7 +1485,7 @@ function getTriggerFormData() {
 	if (empty($data['parent_discoveryid'])) {
 		$data['db_dependencies'] = API::Trigger()->get(array(
 			'triggerids' => $data['dependencies'],
-			'output' => array('triggerid', 'description'),
+			'output' => array('triggerid', 'flags', 'description'),
 			'preservekeys' => true,
 			'selectHosts' => array('hostid', 'name')
 		));
