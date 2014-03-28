@@ -111,7 +111,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	}
 
 	/**
-	 * Create new graphs.
+	 * Create graphs.
 	 *
 	 * @param array $graphs
 	 *
@@ -119,17 +119,26 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 */
 	public function create($graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphids = array();
+
+		$graphIds = array();
 
 		// set default parameters
 		foreach ($graphs as &$graph) {
 			if (!isset($graph['graphtype'])) {
 				$graph['graphtype'] = GRAPH_TYPE_NORMAL;
 			}
-			if (!isset($graph['ymin_type'])) {
+
+			if (isset($graph['ymin_type']) && $graph['ymin_type'] != GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				unset($graph['ymin_itemid']);
+			}
+			else {
 				$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
-			if (!isset($graph['ymax_type'])) {
+
+			if (isset($graph['ymax_type']) && $graph['ymax_type'] != GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				unset($graph['ymax_itemid']);
+			}
+			else {
 				$graph['ymax_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
@@ -142,10 +151,10 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			$this->inherit($graph);
 
-			$graphids[] = $graph['graphid'];
+			$graphIds[] = $graph['graphid'];
 		}
 
-		return array('graphids' => $graphids);
+		return array('graphids' => $graphIds);
 	}
 
 	/**
