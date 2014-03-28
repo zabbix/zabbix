@@ -202,7 +202,6 @@ $data['pageFilter'] = new CPageFilter(array(
 		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	),
-	'applications' => array('templated' => false),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)
 ));
