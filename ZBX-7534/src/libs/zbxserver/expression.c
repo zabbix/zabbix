@@ -3657,7 +3657,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	DC_FUNCTION	*functions = NULL;
 	int		*errcodes = NULL;
 	zbx_ifunc_t	*ifunc = NULL;
-	zbx_func_t	*func = NULL;
+	zbx_func_t	*func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -3689,6 +3689,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 		}
 
 		func = zbx_malloc(NULL, sizeof(zbx_func_t));
+
 		func->functionid = functions[i].functionid;
 		func->triggerid = functions[i].triggerid;
 		func->function = zbx_strdup(NULL, functions[i].function);
