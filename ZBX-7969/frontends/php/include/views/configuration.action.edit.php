@@ -259,10 +259,12 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DSERVICE_TYPE:
+		$discoveryCheckTypes = discovery_check_type2str();
+		order_result($discoveryCheckTypes);
+
 		$condition = new CComboBox('new_condition[value]');
-		foreach (array(SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_ICMPPING, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP,
-				SVC_SMTP, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_SSH, SVC_TCP, SVC_TELNET, SVC_AGENT) as $svc) {
-			$condition->addItem($svc,discovery_check_type2str($svc));
+		foreach ($discoveryCheckTypes as $key => $discoveryCheckType) {
+			$condition->addItem($key, $discoveryCheckType);
 		}
 		break;
 
