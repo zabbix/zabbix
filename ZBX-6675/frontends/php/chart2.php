@@ -45,23 +45,17 @@ check_fields($fields);
  * Permissions
  */
 $dbGraph = API::Graph()->get(array(
-	'graphids' => $_REQUEST['graphid'],
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'selectGraphItems' => API_OUTPUT_EXTEND,
+	'graphids' => $_REQUEST['graphid']
 ));
+
 if (!$dbGraph) {
 	access_deny();
 }
 else {
 	$dbGraph = reset($dbGraph);
 }
-
-$host = API::Host()->get(array(
-	'nodeids' => get_current_nodeid(true),
-	'graphids' => $_REQUEST['graphid'],
-	'output' => API_OUTPUT_EXTEND,
-	'templated_hosts' => true
-));
-$host = reset($host);
 
 /*
  * Display
@@ -80,9 +74,54 @@ $chartHeader = '';
 if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
 	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
 }
-$chartHeader .= $host['name'].NAME_DELIMITER.$dbGraph['name'];
 
 $graph = new CLineGraphDraw($dbGraph['graphtype']);
+
+// array sorting
+CArrayHelper::sort($dbGraph['gitems'], array(
+	array('field' => 'sortorder', 'order' => ZBX_SORT_UP),
+	array('field' => 'itemid', 'order' => ZBX_SORT_DOWN)
+));
+
+// get graph items
+$gItems = array();
+foreach ($dbGraph['gitems'] as $gItem) {
+	$gItems[] = $gItem['itemid'];
+	$graph->addItem(
+		$gItem['itemid'],
+		$gItem['yaxisside'],
+		$gItem['calc_fnc'],
+		$gItem['color'],
+		$gItem['drawtype'],
+		$gItem['type']
+	);
+}
+
+$hostName = null;
+if ($gItems) {
+	// get graph items hosts
+	$gItemHosts = API::Host()->get(array(
+		'output' => array('name'),
+		'itemids' => $gItems
+	));
+
+	foreach ($gItemHosts as $gItemHost) {
+		if ($hostName === null) {
+			$hostName = $gItemHost['name'];
+		}
+		elseif ($hostName !== $gItemHost['name']) {
+			$hostName = null;
+			break;
+		}
+	}
+}
+
+if ($hostName) {
+	$chartHeader .= $hostName.NAME_DELIMITER.$dbGraph['name'];
+} else {
+	$chartHeader .= $dbGraph['name'];
+}
+
 $graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
@@ -114,23 +153,6 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
-
-$dbGraphItems = DBselect(
-	'SELECT gi.*'.
-	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.zbx_dbstr($dbGraph['graphid']).
-	' ORDER BY gi.sortorder,gi.itemid DESC'
-);
-while ($dbGraphItem = DBfetch($dbGraphItems)) {
-	$graph->addItem(
-		$dbGraphItem['itemid'],
-		$dbGraphItem['yaxisside'],
-		$dbGraphItem['calc_fnc'],
-		$dbGraphItem['color'],
-		$dbGraphItem['drawtype'],
-		$dbGraphItem['type']
-	);
-}
 
 $graph->draw();
 
