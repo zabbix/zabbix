@@ -405,7 +405,7 @@ else {
 
 	foreach ($data['triggers'] as &$trigger) {
 		if (count($trigger['dependencies']) > 1) {
-			order_result($trigger['dependencies'], 'hostname', ZBX_SORT_UP);
+			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 		}
 	}
 	unset($trigger);
