@@ -1487,9 +1487,10 @@ function getTriggerFormData() {
 			'triggerids' => $data['dependencies'],
 			'output' => array('triggerid', 'description'),
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('hostid', 'name')
 		));
 		foreach ($data['db_dependencies'] as &$dependency) {
+			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
 			$dependency['host'] = $dependency['hosts'][0]['name'];
 			unset($dependency['hosts']);
 		}
