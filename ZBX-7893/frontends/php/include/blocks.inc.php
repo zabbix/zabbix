@@ -820,7 +820,7 @@ function make_status_of_zbx() {
 	$status = get_status();
 
 	$table->addRow(array(
-		_('Zabbix server is running'),
+		_('Zabbix server is running (address)'),
 		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? 'off' : 'on')),
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
@@ -842,7 +842,7 @@ function make_status_of_zbx() {
 			new CSpan($status['items_count_not_supported'], 'unknown')
 		)
 	));
-	$title = new CSpan(_('Number of triggers (enabled/disabled) [problem/ok]'));
+	$title = new CSpan(_('Number of triggers (enabled/disabled [problem/ok])'));
 	$title->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow(array($title, $status['triggers_count'],
 		array(
