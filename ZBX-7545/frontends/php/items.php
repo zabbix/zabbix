@@ -826,8 +826,8 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
-	$data['is_multiple_hosts'] = count($data['hosts']) > 1;
-	if (!$data['is_multiple_hosts']) {
+	$data['singleHost'] = (count($data['hosts']) == 1);
+	if ($data['singleHost']) {
 		$data['hosts'] = reset($data['hosts']);
 
 		// set the initial chosen interface to one of the interfaces the items use
