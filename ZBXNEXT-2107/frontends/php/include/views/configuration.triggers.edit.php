@@ -278,15 +278,17 @@ if (empty($this->data['parent_discoveryid'])) {
 	foreach ($this->data['db_dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-		$row = new CRow(array(
-			new CLink(
-				array($dependency['host'], NAME_DELIMITER, $dependency['description']),
-				'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
-			),
-			new CButton('remove', _('Remove'),
-				'javascript: removeDependency("'.$dependency['triggerid'].'");', 'link_menu'
-			)
-		));
+		$link = new CLink(
+			array($dependency['host'], NAME_DELIMITER, $dependency['description']),
+			'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
+		);
+		$link->setAttribute('target', '_blank');
+
+		$row = new CRow(array($link, new CButton('remove', _('Remove'),
+			'javascript: removeDependency("'.$dependency['triggerid'].'");',
+			'link_menu'
+		)));
+
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}
