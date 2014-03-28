@@ -23,7 +23,6 @@
 #include "checks_simple_rsm.h"
 #include "zbxserver.h"
 #include "comms.h"
-#include "log.h"	/* TODO: tracking down crash when adding a value, remove later */
 #include "rsm.h"
 
 #define ZBX_HOST_BUF_SIZE	128
@@ -828,15 +827,10 @@ static void	zbx_add_value(const DC_ITEM *item, AGENT_RESULT *result, int ts)
 {
 	zbx_timespec_t	timespec;
 
-	zabbix_log(LOG_LEVEL_WARNING, "RSM: add value for itemid:" ZBX_FS_UI64 " type:%s",
-			item->itemid, zbx_item_value_type_string(item->value_type));
-
 	zbx_set_value_ts(&timespec, ts);
 
 	dc_add_history(item->itemid, item->value_type, item->flags, result, &timespec, ITEM_STATUS_ACTIVE,
 			NULL, 0, NULL, 0, 0, 0, 0);
-
-	zabbix_log(LOG_LEVEL_WARNING, "RSM: value added");
 }
 
 static void	zbx_add_value_uint(const DC_ITEM *item, int ts, int value)
@@ -2483,8 +2477,8 @@ static int	epp_recv_message(SSL *ssl, char **data, size_t *data_len, FILE *log_f
 
 	if (NULL == data || NULL != *data)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "internal error at %s:%d", __FILE__, __LINE__);
-		exit(-1);
+		zbx_rsm_errf(log_fd, "internal error at %s:%d", __FILE__, __LINE__);
+		exit(EXIT_FAILURE);
 	}
 
 	/* receive header */
@@ -2558,7 +2552,7 @@ out:
 	return ret;
 }
 
-static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t xml_value_size)
+static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t xml_value_size, FILE *log_fd)
 {
 	const char	*p_start, *p_end, *start_tag, *end_tag;
 	int		ret = FAIL;
@@ -2574,8 +2568,8 @@ static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t
 			end_tag = "\">";
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_CRIT, "invalid XML path type (%d)", xml_path);
-			exit(1);
+			zbx_rsm_errf(log_fd, "invalid XML path type (%d)", xml_path);
+			exit(EXIT_FAILURE);
 	}
 
 	if (NULL == (p_start = zbx_strcasestr(data, start_tag)))
@@ -2643,7 +2637,7 @@ static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, const char *epp_s
 		goto out;
 	}
 
-	if (SUCCEED != get_xml_value(data, XML_PATH_SERVER_ID, xml_value, sizeof(xml_value)))
+	if (SUCCEED != get_xml_value(data, XML_PATH_SERVER_ID, xml_value, sizeof(xml_value), log_fd))
 	{
 		zbx_snprintf(err, err_size, "no Server ID in first message from server");
 		*res = ZBX_EC_EPP_FIRSTINVAL;
@@ -2705,7 +2699,7 @@ static int	command_login(const char *epp_commands, const char *name, SSL *ssl, i
 		goto out;
 	}
 
-	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value), log_fd))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
 		*rtt = ZBX_EC_EPP_LOGININVAL;
@@ -2772,7 +2766,7 @@ static int	command_update(const char *epp_commands, const char *name, SSL *ssl, 
 		goto out;
 	}
 
-	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value), log_fd))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
 		*rtt = ZBX_EC_EPP_UPDATEINVAL;
@@ -2837,7 +2831,7 @@ static int	command_info(const char *epp_commands, const char *name, SSL *ssl, in
 		goto out;
 	}
 
-	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value), log_fd))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
 		*rtt = ZBX_EC_EPP_INFOINVAL;
@@ -2887,7 +2881,7 @@ static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, 
 		goto out;
 	}
 
-	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value)))
+	if (SUCCEED != get_xml_value(data, XML_PATH_RESULT_CODE, xml_value, sizeof(xml_value), log_fd))
 	{
 		zbx_snprintf(err, err_size, "no result code in reply");
 		goto out;
