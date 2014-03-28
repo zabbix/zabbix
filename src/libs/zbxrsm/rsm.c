@@ -326,19 +326,6 @@ int	zbx_read_stdin(const char *prompt, char *output, size_t output_size, char *e
 	tcgetattr(fileno(stdin), &oflags);
 	nflags = oflags;
 
-	printf("struct termios oflags has c_iflag:\n");
-	printf("%d\n", oflags.c_iflag & BRKINT);
-	printf("%d\n", oflags.c_iflag & ICRNL);
-	printf("%d\n", oflags.c_iflag & IGNBRK);
-	printf("%d\n", oflags.c_iflag & IGNCR);
-	printf("%d\n", oflags.c_iflag & IGNPAR);
-	printf("%d\n", oflags.c_iflag & INLCR);
-	printf("%d\n", oflags.c_iflag & INPCK);
-	printf("%d\n", oflags.c_iflag & ISTRIP);
-	printf("%d\n", oflags.c_iflag & IXOFF);
-	printf("%d\n", oflags.c_iflag & IXON);
-	printf("%d\n", oflags.c_iflag & PARMRK);
-
 	nflags.c_lflag &= ~ECHO;
 	nflags.c_lflag |= ECHONL;
 
