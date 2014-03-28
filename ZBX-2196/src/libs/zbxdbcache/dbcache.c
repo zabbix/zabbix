@@ -2270,7 +2270,7 @@ retry:
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for text cache");
-			exit(-1);
+			exit(EXIT_FAILURE);
 		}
 
 		free_len = CONFIG_TEXT_CACHE_SIZE - (cache->last_text - cache->text);
@@ -2828,13 +2828,13 @@ static void	init_trend_cache()
 	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
 		zbx_error("cannot create mutex for trend cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
@@ -2881,19 +2881,19 @@ void	init_database_cache()
 			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("cannot create mutex for history cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("cannot create mutex for IDs cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	itemids_alloc = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
@@ -3054,7 +3054,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	if (i == ZBX_IDS_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));

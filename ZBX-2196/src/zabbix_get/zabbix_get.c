@@ -183,15 +183,15 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			default:
 				usage();
-				exit(-1);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}

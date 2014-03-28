@@ -522,7 +522,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'n':
 				nodeid = (NULL == zbx_optarg ? 0 : atoi(zbx_optarg));
@@ -530,11 +530,11 @@ int	main(int argc, char **argv)
 				break;
 			case 'V':
 				version();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			default:
 				usage();
-				exit(-1);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -692,7 +692,7 @@ int	MAIN_ZABBIX_ENTRY()
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
 	{
 		zbx_error("Unable to create mutex for node syncs");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
@@ -709,7 +709,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -953,5 +953,5 @@ void	zbx_on_exit()
 	setproctitle_free_env();
 #endif
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }

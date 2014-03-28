@@ -157,54 +157,54 @@ int	daemon_start(int allow_root, const char *user)
 		{
 			zbx_error("user %s does not exist", user);
 			zbx_error("cannot run as root!");
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 		if (0 == pwd->pw_uid)
 		{
 			zbx_error("User=%s contradicts AllowRoot=0", user);
 			zbx_error("cannot run as root!");
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 		if (-1 == setgid(pwd->pw_gid))
 		{
 			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
 		if (-1 == initgroups(user, pwd->pw_gid))
 		{
 			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 #endif
 
 		if (-1 == setuid(pwd->pw_uid))
 		{
 			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 		{
 			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 #endif
 	}
 
 	if (0 != (pid = zbx_fork()))
-		exit(0);
+		exit(EXIT_SUCCESS);
 
 	setsid();
 
 	signal(SIGHUP, SIG_IGN);
 
 	if (0 != (pid = zbx_fork()))
-		exit(0);
+		exit(EXIT_SUCCESS);
 
 	if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 		assert(0);
@@ -214,7 +214,7 @@ int	daemon_start(int allow_root, const char *user)
 	redirect_std(CONFIG_LOG_FILE);
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 
 	atexit(daemon_stop);
 

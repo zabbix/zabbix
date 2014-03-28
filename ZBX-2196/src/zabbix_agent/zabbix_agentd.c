@@ -579,7 +579,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -734,7 +734,7 @@ void	zbx_on_exit(void)
 	setproctitle_free_env();
 #endif
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }
 
 #if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
@@ -832,7 +832,7 @@ int	main(int argc, char **argv)
 #endif
 			free_metrics();
 			alias_list_free();
-			exit(SUCCEED);
+			exit(EXIT_SUCCESS);
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
@@ -843,5 +843,5 @@ int	main(int argc, char **argv)
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }

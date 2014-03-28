@@ -201,7 +201,7 @@ zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap)
 	if (0 == heap->elems_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "asking for a minimum in an empty heap");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	return &heap->elems[0];
@@ -214,7 +214,7 @@ void	zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *ele
 	if (HAS_DIRECT_OPTION(heap) && FAIL != zbx_hashmap_get(heap->key_index, elem->key))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "inserting a duplicate key into a heap with direct option");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	__binary_heap_ensure_free_space(heap);
@@ -235,7 +235,7 @@ void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem
 	if (!HAS_DIRECT_OPTION(heap))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "direct update operation is not supported for this heap");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL != (index = zbx_hashmap_get(heap->key_index, elem->key)))
@@ -248,7 +248,7 @@ void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem
 	else
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "element with key " ZBX_FS_UI64 " not found in heap for update", elem->key);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -259,7 +259,7 @@ void	zbx_binary_heap_remove_min(zbx_binary_heap_t *heap)
 	if (0 == heap->elems_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "removing a minimum from an empty heap");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (HAS_DIRECT_OPTION(heap))
@@ -282,7 +282,7 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 	if (!HAS_DIRECT_OPTION(heap))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "direct remove operation is not supported for this heap");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL != (index = zbx_hashmap_get(heap->key_index, key)))
@@ -300,7 +300,7 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 	else
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "element with key " ZBX_FS_UI64 " not found in heap for remove", key);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 

@@ -3195,13 +3195,13 @@ void	init_configuration_cache()
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
 	{
 		zbx_error("Can't create IPC key for configuration cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&config_lock, ZBX_MUTEX_CONFIG))
 	{
 		zbx_error("Unable to create mutex for configuration cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
