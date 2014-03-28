@@ -1490,10 +1490,15 @@ function getTriggerFormData() {
 			'selectHosts' => array('hostid', 'name')
 		));
 		foreach ($data['db_dependencies'] as &$dependency) {
+			if (count($dependency['hosts']) > 1) {
+				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+			}
+
+			$dependency['hosts'] = array_values($dependency['hosts']);
 			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
-			$dependency['host'] = $dependency['hosts'][0]['name'];
-			unset($dependency['hosts']);
 		}
+		unset($dependency);
+
 		order_result($data['db_dependencies'], 'description');
 	}
 	return $data;

@@ -278,8 +278,15 @@ if (empty($this->data['parent_discoveryid'])) {
 	foreach ($this->data['db_dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
+		$hostNames = array();
+		foreach ($dependency['hosts'] as $host) {
+			$hostNames[] = CHtml::encode($host['name']);
+			$hostNames[] = ', ';
+		}
+		array_pop($hostNames);
+
 		$link = new CLink(
-			array($dependency['host'], NAME_DELIMITER, $dependency['description']),
+			array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
 			'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
 		);
 		$link->setAttribute('target', '_blank');

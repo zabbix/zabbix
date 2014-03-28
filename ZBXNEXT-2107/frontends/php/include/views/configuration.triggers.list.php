@@ -179,7 +179,9 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$dbHosts = get_hosts_by_triggerid($depTrigger['triggerid']);
 				while ($host = DBfetch($dbHosts)) {
 					$hostNames[] = CHtml::encode($host['name']);
+					$hostNames[] = ', ';
 				}
+				array_pop($hostNames);
 
 				$description[] = new CLink(
 					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
