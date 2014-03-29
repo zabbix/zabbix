@@ -83,20 +83,29 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
 	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
+	const char		*formula;
+	const char		*units;
+	const char		*error;
 	ZBX_DC_TRIGGER		**triggers;
 	int			delay;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
+	int			history;
+	int			trends;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
 	unsigned char		state;
 	unsigned char		location;
+	unsigned char		delta;
+	unsigned char		multiplier;
+	unsigned char		inventory_link;
 	unsigned char		flags;
 }
 ZBX_DC_ITEM;
@@ -929,15 +938,28 @@ static void	DCsync_items(DB_RESULT result)
 		item->hostid = hostid;
 		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
-		DCstrpool_replace(found, &item->key, row[6]);
-		DCstrpool_replace(found, &item->port, row[9]);
-		item->flags = (unsigned char)atoi(row[26]);
-		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
-
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
+		DCstrpool_replace(found, &item->key, row[6]);
+		DCstrpool_replace(found, &item->port, row[9]);
+		item->flags = (unsigned char)atoi(row[26]);
+		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
+		ZBX_STR2UCHAR(item->delta, row[33]);
+		ZBX_STR2UCHAR(item->multiplier, row[34]);
+		DCstrpool_replace(found, &item->formula, row[35]);
+		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
+			item->history = config->config->hk.history;
+		else
+			item->history = atoi(row[36]);
+		if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
+			item->trends = config->config->hk.trends;
+		else
+			item->trends = atoi(row[37]);
+		ZBX_STR2UCHAR(item->inventory_link, row[38]);
+		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
+		DCstrpool_replace(found, &item->units, row[40]);
 
 		if (0 == found)
 		{
@@ -945,6 +967,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->lastclock = 0;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
+			DCstrpool_replace(found, &item->error, row[41]);
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
@@ -2660,12 +2683,12 @@ void	DCsync_configuration(void)
 	sec = zbx_time();
 	item_result = DBselect(
 			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
-				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,"
-				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
-				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
-				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.flags,i.interfaceid,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
-				"i.snmpv3_contextname,i.lastlogsize,i.mtime"
+				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
+				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,i.delay_flex,"
+				"i.trapper_hosts,i.logtimefmt,i.params,i.state,i.authtype,i.username,i.password,"
+				"i.publickey,i.privatekey,i.flags,i.interfaceid,i.snmpv3_authprotocol,"
+				"i.snmpv3_privprotocol,i.snmpv3_contextname,i.lastlogsize,i.mtime,i.delta,i.multiplier,"
+				"i.formula,i.history,i.trends,i.inventory_link,i.valuemapid,i.units,i.error"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -4811,8 +4834,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, char **errors, int *lastclocks,
+		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -4828,6 +4851,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 			continue;
 
 		dc_item->state = states[i];
+		DCstrpool_replace(1, &dc_item->error, errors[i]);
 		dc_item->lastclock = lastclocks[i];
 		if (NULL != lastlogsizes)
 			dc_item->lastlogsize = lastlogsizes[i];
