@@ -206,8 +206,8 @@ static char	*xml_escape_dyn(const char *in)
 			case '"':
 				*ptr_out++ = '&';
 				*ptr_out++ = 'q';
-				*ptr_out++ = 'o';
 				*ptr_out++ = 'u';
+				*ptr_out++ = 'o';
 				*ptr_out++ = 't';
 				*ptr_out++ = ';';
 				break;
