@@ -407,8 +407,7 @@ if ($admin) {
 			'name' => $search
 		),
 		'countOutput' => 1,
-		'searchByAny' => true,
-		'editable' => 1
+		'searchByAny' => true
 	);
 
 	$overalCount = API::Template()->get($params);
