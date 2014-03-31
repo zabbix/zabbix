@@ -172,8 +172,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$dependencies = $trigger['dependencies'];
 		if (count($dependencies) > 0) {
 			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
+			$triggerDependencies = array();
+
 			foreach ($dependencies as $depTrigger) {
-				$description[] = BR();
+				$triggerDependencies[] = BR();
 				$hostNames = array();
 
 				$hosts = API::Host()->get(array(
@@ -190,16 +192,19 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				array_pop($hostNames);
 
 				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$description[] = new CLink(
+					$triggerDependencies[] = new CLink(
 						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
 						'triggers.php?form=update&hostid='.$hosts[0]['hostid'].'&triggerid='.$depTrigger['triggerid'],
 						triggerIndicatorStyle($depTrigger['status'])
 					);
 				}
 				else {
-					$description[] = new CSpan(array($hostNames, NAME_DELIMITER, $depTrigger['description']));
+					$triggerDependencies[] = new CSpan(array($hostNames, NAME_DELIMITER, $depTrigger['description']));
 				}
 			}
+			array_shift($triggerDependencies);
+
+			$description = array_merge($description, array(new CDiv($triggerDependencies, 'triggerDependencies')));
 		}
 	}
 	else {
