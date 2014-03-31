@@ -281,7 +281,7 @@ abstract class CHostBase extends CZBXAPI {
 	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
 	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
 	 * @param array $path - should be passed empty array for DFS
-	 * @param array $visited - there will be stored visited graph node ids
+	 * @param array $visited - there will be stored visited graph ids
 	 *
 	 * @return boolean
 	 */

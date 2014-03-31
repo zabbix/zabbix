@@ -239,8 +239,7 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'proxies.php',
-				'label' => _('DM'),
-				'sub_pages' => array('nodes.php')
+				'label' => _('DM')
 			),
 			array(
 				'url' => 'authentication.php',
@@ -367,10 +366,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 			}
 		}
 
-		if ($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') && (isset($menu['force_disable_all_nodes']) || isset($sub_page['force_disable_all_nodes']))) {
-			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-		}
-
 		if ($page_exists && $deny) {
 			$denied_page_requested = true;
 		}
@@ -394,20 +389,4 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	}
 
 	return $denied_page_requested;
-}
-
-function zbx_define_menu_restrictions($page, $ZBX_MENU) {
-	foreach ($ZBX_MENU as $section) {
-		foreach ($section['pages'] as $menu_page) {
-			if ($menu_page['url'] == $page['file'] || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
-				if (isset($section['force_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
-					define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-				}
-				if (isset($section['hide_node_selection']) && !defined('ZBX_HIDE_NODE_SELECTION')) {
-					define('ZBX_HIDE_NODE_SELECTION', 1);
-				}
-				return null;
-			}
-		}
-	}
 }

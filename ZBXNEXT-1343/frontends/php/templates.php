@@ -468,8 +468,6 @@ if (isset($_REQUEST['form'])) {
 	$templateWidget->addItem($templateForm->render());
 }
 else {
-	$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0);
-
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -481,7 +479,7 @@ else {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 	$templateWidget->addHeader(_('Templates'), $frmGroup);
 	$templateWidget->addHeaderRowNumber();
@@ -492,7 +490,6 @@ else {
 	$table = new CTableInfo(_('No templates found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-		$displayNodes ? _('Node') : null,
 		make_sorting_header(_('Templates'), 'name'),
 		_('Applications'),
 		_('Items'),
@@ -640,7 +637,6 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			$displayNodes ? get_node_name_by_elid($template['templateid'], true) : null,
 			$templatesOutput,
 			$applications,
 			$items,

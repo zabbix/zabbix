@@ -294,14 +294,6 @@ else {
 	// get paging
 	$data['paging'] = getPagingLine($data['drules'], array('druleid'));
 
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($data['drules'] as &$drule) {
-			$drule['nodename'] = get_node_name_by_elid($drule['druleid'], true);
-		}
-		unset($drule);
-	}
-
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);
 	$discoveryView->render();

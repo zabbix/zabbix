@@ -49,7 +49,6 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -63,7 +62,6 @@ class CTemplate extends CHostGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'parentTemplateids'			=> null,
@@ -127,9 +125,6 @@ class CTemplate extends CHostGeneral {
 					')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -141,11 +136,6 @@ class CTemplate extends CHostGeneral {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hg.groupid', $nodeids);
-			}
 		}
 
 		// templateids
@@ -153,11 +143,6 @@ class CTemplate extends CHostGeneral {
 			zbx_value2array($options['templateids']);
 
 			$sqlParts['where']['templateid'] = dbConditionInt('h.hostid', $options['templateids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.hostid', $nodeids);
-			}
 		}
 
 		// parentTemplateids
@@ -170,11 +155,6 @@ class CTemplate extends CHostGeneral {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ht.templateid', $nodeids);
 			}
 		}
 
@@ -189,11 +169,6 @@ class CTemplate extends CHostGeneral {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['ht'] = 'ht.hostid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ht.hostid', $nodeids);
-			}
 		}
 
 		// itemids
@@ -203,11 +178,6 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'i.itemid', $nodeids);
-			}
 		}
 
 		// triggerids
@@ -219,11 +189,6 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'f.triggerid', $nodeids);
-			}
 		}
 
 		// graphids
@@ -235,17 +200,6 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'gi.graphid', $nodeids);
-			}
-		}
-
-		// node check !!!!
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.hostid', $nodeids);
 		}
 
 		// with_items
@@ -304,7 +258,6 @@ class CTemplate extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -348,36 +301,19 @@ class CTemplate extends CHostGeneral {
 	 * @return string
 	 */
 	public function getObjects($templateData) {
-		$options = array(
+		return $this->get(array(
 			'filter' => $templateData,
 			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if (isset($templateData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
-		elseif (isset($templateData['nodeids']))
-			$options['nodeids'] = $templateData['nodeids'];
-
-		$result = $this->get($options);
-
-		return $result;
+		));
 	}
 
 	public function exists($object) {
-		$keyFields = array(array('templateid', 'host', 'name'));
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'output' => array('templateid'),
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'limit' => 1
-		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
-
-		$objs = $this->get($options);
+		));
 
 		return !empty($objs);
 	}
@@ -1135,7 +1071,6 @@ class CTemplate extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'countOutput' => true
 		));
@@ -1161,7 +1096,6 @@ class CTemplate extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'templateids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -1181,7 +1115,6 @@ class CTemplate extends CHostGeneral {
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
 				$templates = API::Template()->get(array(
 					'output' => $options['selectTemplates'],
-					'nodeids' => $options['nodeids'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1192,7 +1125,6 @@ class CTemplate extends CHostGeneral {
 			}
 			else {
 				$templates = API::Template()->get(array(
-					'nodeids' => $options['nodeids'],
 					'parentTemplateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1213,7 +1145,6 @@ class CTemplate extends CHostGeneral {
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
-					'nodeids' => $options['nodeids'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1224,7 +1155,6 @@ class CTemplate extends CHostGeneral {
 			}
 			else {
 				$hosts = API::Host()->get(array(
-					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1244,7 +1174,6 @@ class CTemplate extends CHostGeneral {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
 				$screens = API::TemplateScreen()->get(array(
 					'output' => $this->outputExtend($options['selectScreens'], array('templateid')),
-					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
 					'nopermissions' => true
 				));
@@ -1263,7 +1192,6 @@ class CTemplate extends CHostGeneral {
 			}
 			else {
 				$screens = API::TemplateScreen()->get(array(
-					'nodeids' => $options['nodeids'],
 					'templateids' => $templateids,
 					'nopermissions' => true,
 					'countOutput' => true,

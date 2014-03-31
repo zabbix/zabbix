@@ -23,11 +23,8 @@ require_once __DIR__.'/../../../include/gettextwrapper.inc.php';
 require_once __DIR__.'/../../../include/defines.inc.php';
 require_once __DIR__.'/../../../include/func.inc.php';
 require_once __DIR__.'/../../../include/db.inc.php';
-require_once __DIR__.'/../../../include/nodes.inc.php';
 require_once __DIR__.'/../../../conf/zabbix.conf.php';
-
 require_once 'ZbxDbOperationTruncate.php';
-
 
 spl_autoload_register(function($className) {
 	$foundFile = false;
@@ -80,11 +77,10 @@ spl_autoload_register(function($className) {
 	}
 });
 
-define('ZBX_DISTRIBUTED', false);
 CZBXAPI::$userData['userid'] = 1;
 CZBXAPI::$userData['type'] = USER_TYPE_SUPER_ADMIN;
-API::setReturnAPI();
 
+API::setReturnAPI();
 
 abstract class ZbxDbTestCase extends PHPUnit_Extensions_Database_TestCase {
 

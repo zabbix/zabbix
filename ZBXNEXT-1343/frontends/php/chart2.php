@@ -56,7 +56,6 @@ else {
 }
 
 $host = API::Host()->get(array(
-	'nodeids' => get_current_nodeid(true),
 	'graphids' => $_REQUEST['graphid'],
 	'output' => API_OUTPUT_EXTEND,
 	'templated_hosts' => true
@@ -76,14 +75,8 @@ $timeline = CScreenBase::calculateTime(array(
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
-$chartHeader = '';
-if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
-	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
-}
-$chartHeader .= $host['name'].NAME_DELIMITER.$dbGraph['name'];
-
 $graph = new CLineGraphDraw($dbGraph['graphtype']);
-$graph->setHeader($chartHeader);
+$graph->setHeader($host['name'].NAME_DELIMITER.$dbGraph['name']);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 

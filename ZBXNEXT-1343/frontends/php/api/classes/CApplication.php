@@ -63,7 +63,6 @@ class CApplication extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -206,7 +205,6 @@ class CApplication extends CZBXAPI {
 		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($application = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -240,21 +238,13 @@ class CApplication extends CZBXAPI {
 	}
 
 	public function exists($object) {
-		$keyFields = array(array('hostid', 'host'), 'name');
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
 			'output' => array('applicationid'),
 			'nopermissions' => 1,
 			'limit' => 1
-		);
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-		$objs = $this->get($options);
+		));
+
 		return !empty($objs);
 	}
 

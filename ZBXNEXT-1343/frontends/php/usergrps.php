@@ -222,8 +222,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$dbGroups = DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds).
-			andDbNode('ug.usrgrpid')
+		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
 	);
 	while ($group = DBfetch($dbGroups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -253,8 +252,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	$dbGroups = DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds).
-			andDbNode('ug.usrgrpid')
+		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
 	);
 	while ($group = DBfetch($dbGroups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -288,8 +286,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 	$dbGroup = DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds).
-			andDbNode('ug.usrgrpid')
+		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
 	);
 	while ($group = DBfetch($dbGroup)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -325,8 +322,7 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 	$dbGroups = DBselect(
 		'SELECT ug.usrgrpid,ug.name'.
 		' FROM usrgrp ug'.
-		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds).
-			andDbNode('ug.usrgrpid')
+		' WHERE '.dbConditionInt('ug.usrgrpid', $groupIds)
 	);
 	while ($group = DBfetch($dbGroups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -394,17 +390,13 @@ if (isset($_REQUEST['form'])) {
 		$data['group_rights'] = array();
 
 		$dbRights = DBselect(
-			'SELECT r.*,n.name AS nodename,g.name AS name'.
+			'SELECT r.*,g.name AS name'.
 			' FROM groups g'.
 				' LEFT JOIN rights r ON r.id=g.groupid'.
-				' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
 			' WHERE r.groupid='.zbx_dbstr($data['usrgrpid'])
 		);
-		while ($dbRight = DBfetch($dbRights)) {
-			if (!empty($dbRight['nodename'])) {
-				$dbRight['name'] = $dbRight['nodename'].NAME_DELIMITER.$dbRight['name'];
-			}
 
+		while ($dbRight = DBfetch($dbRights)) {
 			$data['group_rights'][$dbRight['id']] = array(
 				'permission' => $dbRight['permission'],
 				'name' => $dbRight['name'],
@@ -431,11 +423,11 @@ if (isset($_REQUEST['form'])) {
 		$sqlFrom = ',users_groups g';
 		$sqlWhere =
 			' WHERE '.dbConditionInt('u.userid', $data['group_users']).
-				' OR (u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($data['selected_usrgrp']).andDbNode('u.userid').')';
+				' OR (u.userid=g.userid AND g.usrgrpid='.zbx_dbstr($data['selected_usrgrp']).')';
 	}
 	else {
 		$sqlFrom = '';
-		$sqlWhere = whereDbNode('u.userid');
+		$sqlWhere = '';
 	}
 
 	$data['users'] = DBfetchArray(DBselect(
@@ -447,10 +439,9 @@ if (isset($_REQUEST['form'])) {
 
 	// get user groups
 	$data['usergroups'] = DBfetchArray(DBselect(
-		'SELECT ug.usrgrpid,ug.name'.
-		' FROM usrgrp ug'.
-			whereDbNode('usrgrpid')
+		'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'
 	));
+
 	order_result($data['usergroups'], 'name');
 
 	// render view
@@ -460,7 +451,6 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
 		'config' => $config
 	);
 
@@ -476,14 +466,6 @@ else {
 	// sorting & paging
 	order_result($data['usergroups'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['usergroups'], array('usrgrpid'));
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['usergroups'] as &$userGroup) {
-			$userGroup['nodename'] = get_node_name_by_elid($userGroup['usrgrpid'], true);
-		}
-		unset($userGroup);
-	}
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.list', $data);
