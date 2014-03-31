@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 19:22+0300\n"
-"PO-Revision-Date: 2014-03-14 03:45+0300\n"
+"POT-Creation-Date: 2014-03-31 23:41+0300\n"
+"PO-Revision-Date: 2014-03-31 05:13+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1394761527.0\n"
+"X-POOTLE-MTIME: 1396235619.0\n"
 
 #: api/classes/CMaintenance.php:354 api/classes/CMaintenance.php:359
 #: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:473
@@ -186,7 +186,7 @@ msgstr "<マニュアル>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "アクションログ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -206,7 +206,7 @@ msgstr "AND"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "監査ログ"
 
 #: report2.php:151
 msgid "AVAILABILITY REPORT"
@@ -361,7 +361,7 @@ msgstr[0] "アクションを有効にしました"
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 msgid "Action log"
-msgstr ""
+msgstr "アクションログ"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -660,7 +660,6 @@ msgid "Application added"
 msgstr "アプリケーションを追加しました"
 
 #: applications.php:151 applications.php:186
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "アプリケーションを削除しました"
@@ -805,7 +804,7 @@ msgstr "監査データ保存期間 (日) \"%1$s\"。"
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Audit log"
-msgstr ""
+msgstr "監査ログ"
 
 #: include/func.inc.php:256
 msgid "Aug"
@@ -1332,7 +1331,7 @@ msgstr "グループを追加できません"
 
 #: api/classes/CTemplate.php:429 api/classes/CTemplate.php:861
 msgid "Cannot add group."
-msgstr ""
+msgstr "グループを追加できません。"
 
 #: hosts.php:383
 msgid "Cannot add host"
@@ -1564,7 +1563,7 @@ msgstr "スクリーンを作成できません。"
 
 #: api/classes/CTemplate.php:443
 msgid "Cannot create template."
-msgstr ""
+msgstr "テンプレートを作成できません。"
 
 #: api/classes/CUser.php:1348
 #, c-format
@@ -1576,7 +1575,6 @@ msgid "Cannot delete action"
 msgstr "アクションを削除できません"
 
 #: applications.php:151 applications.php:187
-#, fuzzy
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "アプリケーションを削除できません"
@@ -2087,7 +2085,7 @@ msgstr "ツリーをフォーマットできません。"
 
 #: api/classes/CTemplate.php:826
 msgid "Cannot have empty visible template name."
-msgstr ""
+msgstr "テンプレート表示名に空白は設定できません。"
 
 #: api/classes/CTrigger.php:1093 api/classes/CTrigger.php:1232
 #: api/classes/CTriggerPrototype.php:683 api/classes/CTriggerPrototype.php:741
@@ -2114,7 +2112,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "トリガー条件式を追加できません"
 
 #: api/classes/CUser.php:688
 msgid "Cannot insert user media."
@@ -2126,7 +2124,7 @@ msgstr "テンプレートをリンクできません"
 
 #: api/classes/CTemplate.php:948 api/classes/CTemplate.php:963
 msgid "Cannot link template."
-msgstr ""
+msgstr "テンプレートをリンクできません。"
 
 #: api/classes/CUser.php:1049
 msgid "Cannot login."
@@ -2142,7 +2140,7 @@ msgstr "ホスト名を一括更新できません"
 
 #: api/classes/CTemplate.php:1049
 msgid "Cannot mass update template name."
-msgstr ""
+msgstr "テンプレート名を一括更新できません。"
 
 #: api/classes/CHost.php:998
 msgid "Cannot mass update visible host name."
@@ -2150,7 +2148,7 @@ msgstr "ホストの表示名は一括更新できません。"
 
 #: api/classes/CTemplate.php:1017
 msgid "Cannot mass update visible template name."
-msgstr ""
+msgstr "テンプレートの表示名を一括更新できません。"
 
 #: api/classes/CHostBase.php:57
 #, c-format
@@ -2187,7 +2185,7 @@ msgstr "すべてのアイテムを削除できません。少なくとの1つ�
 
 #: api/classes/CTemplate.php:874
 msgid "Cannot remove group."
-msgstr ""
+msgstr "グループを削除できません。"
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -2281,7 +2279,7 @@ msgstr "テンプレートのリンクを削除できません"
 
 #: api/classes/CTemplate.php:910 api/classes/CTemplate.php:933
 msgid "Cannot unlink template."
-msgstr ""
+msgstr "テンプレートのリンクを削除できません。"
 
 #: api/classes/CHostGeneral.php:234
 #, c-format
@@ -2813,11 +2811,11 @@ msgstr "色 (正常)"
 
 #: screenedit.php:264
 msgid "Column added"
-msgstr ""
+msgstr "列を追加しました"
 
 #: screenedit.php:339
 msgid "Column deleted"
-msgstr ""
+msgstr "列を削除しました"
 
 #: include/views/configuration.screen.constructor.edit.php:607
 #: screenedit.php:46
@@ -3420,7 +3418,7 @@ msgstr "現在の値"
 
 #: include/views/configuration.host.discovery.edit.php:280
 msgid "Custom expression"
-msgstr ""
+msgstr "カスタム条件式"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -4835,11 +4833,11 @@ msgstr "Zabbixサーバー\"%1$s\"から空のデータを受信しました。"
 
 #: api/classes/CScreen.php:479
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "スクリーンのスクリーンIDが空白です。"
 
 #: api/classes/CTemplateScreen.php:591
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "プンプレートスクリーンのスクリーンIDが空白です。"
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5217,7 +5215,7 @@ msgstr "失敗"
 
 #: api/classes/CTemplate.php:566
 msgid "Failed to update template."
-msgstr ""
+msgstr "テンプレートの更新の失敗。"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -5311,7 +5309,7 @@ msgstr "フィールド\"druleid\"を指定してください"
 
 #: api/classes/CTemplate.php:493
 msgid "Field \"host\" is mandatory."
-msgstr ""
+msgstr "フィールド\"host\"は必須です。"
 
 #: api/classes/CDRule.php:363
 msgid "Field \"name\" is required."
@@ -5353,7 +5351,7 @@ msgstr "フィルター"
 
 #: tr_status.php:370
 msgid "Filter by application"
-msgstr ""
+msgstr "アプリケーションによるフィルター"
 
 #: report2.php:321
 msgid "Filter by host group"
@@ -5361,7 +5359,7 @@ msgstr "ホストグループによるフィルター"
 
 #: tr_status.php:406
 msgid "Filter by host inventory"
-msgstr ""
+msgstr "ホストインベントリによるフィルター"
 
 #: tr_status.php:369
 msgid "Filter by name"
@@ -5370,7 +5368,7 @@ msgstr "名前によるフィルター"
 #: include/views/configuration.host.discovery.edit.php:346
 #: include/views/configuration.host.discovery.edit.php:355
 msgid "Filters"
-msgstr ""
+msgstr "フィルター"
 
 #: popup_trexpr.php:315
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
@@ -5489,7 +5487,7 @@ msgstr "関数"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "関数\"%1$s\"は選択されたアイテム\"%2$s\"と一緒に利用できません"
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -5702,12 +5700,12 @@ msgstr "グラフのプロトタイプ"
 #: api/classes/CGraphPrototype.php:778
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
 #: api/classes/CGraphPrototype.php:784
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7393,7 +7391,7 @@ msgstr "スクリーンの要素のグラフID\"%1$s\"が正しくありませ�
 
 #: api/classes/CScreen.php:480
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "スクリーンIDが正しくありません。"
 
 #: include/screens.inc.php:170 include/screens.inc.php:228
 msgid "Incorrect screen provided for slide show."
@@ -7441,7 +7439,7 @@ msgstr "ステータスが正しくありません。"
 
 #: api/classes/CTemplateScreen.php:592
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "テンプレートスクリーンIDが正しくありません。"
 
 #: api/classes/CUser.php:325
 #, c-format
@@ -7934,7 +7932,7 @@ msgstr "アイテムが\"取得不可\"の状態"
 
 #: popup_trexpr.php:781
 msgid "Item not selected"
-msgstr ""
+msgstr "アイテムが選択されていません"
 
 #: include/forms.inc.php:1109
 msgid "Item prototype"
@@ -9540,12 +9538,12 @@ msgstr "ホストのプロトタイプに\"%1$s\"が定義されていません�
 #: api/classes/CScreen.php:478
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "スクリーンに\"%1$s\"が定義されていません。"
 
 #: api/classes/CTemplateScreen.php:590
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "テンプレートスクリーンに\"%1$s\"が定義されていません。"
 
 #: api/classes/CDiscoveryRule.php:894
 #, c-format
@@ -9618,7 +9616,7 @@ msgstr "障害対応コメントはありません。"
 #: include/classes/screens/CScreenActions.php:127
 #: include/views/administration.auditacts.list.php:66
 msgid "No action log entries found."
-msgstr ""
+msgstr "アクションログ履歴はありません。"
 
 #: include/actions.inc.php:850 include/actions.inc.php:948
 #: include/actions.inc.php:1004 include/views/configuration.action.list.php:48
@@ -9642,7 +9640,7 @@ msgstr "アプリケーションがありません。"
 
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit log entries found."
-msgstr ""
+msgstr "監査ログ履歴はありません。"
 
 #: api/classes/CAction.php:1336
 #, c-format
@@ -9789,7 +9787,7 @@ msgstr "テンプレート\"%1$s\"にグループが設定されていません�
 
 #: api/classes/CTemplate.php:1011
 msgid "No groups for template."
-msgstr ""
+msgstr "テンプレートにグループが設定されていません。"
 
 #: api/classes/CDiscoveryRule.php:473
 msgid "No host IDs given."
@@ -10303,7 +10301,7 @@ msgstr "無効"
 #: include/classes/screens/CScreenActions.php:157
 #: include/views/administration.auditacts.list.php:94
 msgid "Not sent"
-msgstr ""
+msgstr "未送信"
 
 #: include/items.inc.php:181 include/items.inc.php:206
 msgid "Not supported"
@@ -11929,11 +11927,11 @@ msgstr "ルーマニア語 (ro_RO)"
 
 #: screenedit.php:241
 msgid "Row added"
-msgstr ""
+msgstr "行を追加しました"
 
 #: screenedit.php:299
 msgid "Row deleted"
-msgstr ""
+msgstr "行を削除しました"
 
 #: include/views/configuration.screen.constructor.edit.php:608
 #: screenedit.php:47
@@ -13909,7 +13907,7 @@ msgstr ""
 #: api/classes/CTriggerPrototype.php:886
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
 
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
@@ -15692,7 +15690,7 @@ msgstr "平均"
 #: include/classes/parsers/CConditionFormula.php:139
 #, c-format
 msgid "check expression starting from \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\"から始まる条件式を確認してください"
 
 #: include/func.inc.php:564 jsLoader.php:98
 msgctxt "day short"
@@ -15806,7 +15804,7 @@ msgstr "実行"
 
 #: include/classes/parsers/CConditionFormula.php:134
 msgid "expression is empty"
-msgstr ""
+msgstr "条件式が指定されていません"
 
 #: jsLoader.php:93
 msgid "fixed"
@@ -16039,7 +16037,7 @@ msgstr "更新"
 #: include/views/configuration.host.discovery.edit.php:327
 #: include/views/js/configuration.host.discovery.edit.js.php:27
 msgid "regular expression"
-msgstr ""
+msgstr "正規表現"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
