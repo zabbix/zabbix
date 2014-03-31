@@ -132,7 +132,7 @@ $viewCount = count($hosts);
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
 	ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
-	new CCol(_('Hosts')),
+	new CCol(_('Host')),
 	new CCol(_('IP')),
 	new CCol(_('DNS')),
 	new CCol(_('Latest data')),
@@ -416,7 +416,7 @@ if ($admin) {
 
 	$header = array(
 		ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
-		new CCol(_('Templates')),
+		new CCol(_('Template')),
 		new CCol(_('Applications')),
 		new CCol(_('Items')),
 		new CCol(_('Triggers')),
