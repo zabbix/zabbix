@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 13:00+0300\n"
-"PO-Revision-Date: 2014-03-05 23:16+0300\n"
+"POT-Creation-Date: 2014-03-31 13:03+0300\n"
+"PO-Revision-Date: 2014-03-24 18:16+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1394054209.0\n"
+"X-POOTLE-MTIME: 1395677788.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -4842,11 +4842,11 @@ msgstr "Prázdna odpoveď prijatá zo Zabbix servera \"%1$s\"."
 
 #: api/classes/CScreen.php:488
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "Prázdne ID obrazovky pre obrazovku."
 
 #: api/classes/CTemplateScreen.php:602
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "Prázdne ID obrazovky pre šablónu obrazovky."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5686,12 +5686,12 @@ msgstr "Prototyp grafu"
 #: api/classes/CGraphPrototype.php:807
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Prototyp grafu \"%1$s\" obsahuje prototypy položiek z rôznych pravidiel zisťovania."
 
 #: api/classes/CGraphPrototype.php:813
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Prototyp grafu \"%1$s\" musí obsahovať najmenej jeden prototyp položky."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7376,7 +7376,7 @@ msgstr "Neplatné ID obrazovky \"%1$s\" v prvku obrazovky."
 
 #: api/classes/CScreen.php:489
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "Neplatné ID obrazovky."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7419,7 +7419,7 @@ msgstr "Neplatný stav."
 
 #: api/classes/CTemplateScreen.php:603
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "Neplatné ID šablóny obrazovky."
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -9528,12 +9528,12 @@ msgstr "Žiadne \"%1$s\" dané pre prototyp hosta."
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Žiadne \"%1$s\" dané pre obrazovku."
 
 #: api/classes/CTemplateScreen.php:601
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Žiadne \"%1$s\" dané pre šablónu obrazovky."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -13885,12 +13885,12 @@ msgstr "Prototyp spúšťača"
 #: api/classes/CTriggerPrototype.php:927
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Prototyp spúšťača \"%1$s\" obsahuje prototypy položiek z rôznych pravidiel zisťovania."
 
 #: api/classes/CTriggerPrototype.php:933
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Prototyp spúšťača \"%1$s\" musí obsahovať najmenej jeden prototyp položky."
 
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 13:00+0300\n"
-"PO-Revision-Date: 2014-03-14 03:25+0300\n"
+"POT-Creation-Date: 2014-03-31 13:03+0300\n"
+"PO-Revision-Date: 2014-03-25 02:06+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1394760335.0\n"
+"X-POOTLE-MTIME: 1395705966.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -4760,11 +4760,11 @@ msgstr "Zabbixサーバー\"%1$s\"から空のデータを受信しました。"
 
 #: api/classes/CScreen.php:488
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "スクリーンのスクリーンIDが空白です。"
 
 #: api/classes/CTemplateScreen.php:602
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "テンプレートスクリーンのスクリーンIDが空白です。"
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5604,12 +5604,12 @@ msgstr "グラフのプロトタイプ"
 #: api/classes/CGraphPrototype.php:807
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
 #: api/classes/CGraphPrototype.php:813
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "グラフのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7286,7 +7286,7 @@ msgstr "スクリーンの要素のスクリーンID\"%1$s\"が正しくあり�
 
 #: api/classes/CScreen.php:489
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "スクリーンIDが正しくありません。"
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7329,7 +7329,7 @@ msgstr "ステータスが正しくありません。"
 
 #: api/classes/CTemplateScreen.php:603
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "テンプレートスクリーンIDが正しくありません。"
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -9412,12 +9412,12 @@ msgstr "ホストのプロトタイプに\"%1$s\"が定義されていません�
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "スクリーンに\"%1$s\"が定義されていません。"
 
 #: api/classes/CTemplateScreen.php:601
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "テンプレートスクリーンに\"%1$s\"が定義されていません。"
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -13757,12 +13757,12 @@ msgstr "トリガーのプロトタイプ"
 #: api/classes/CTriggerPrototype.php:927
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
 #: api/classes/CTriggerPrototype.php:933
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
 
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
