@@ -25,7 +25,6 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX			ms_ex;
 	MEMORYSTATUS			ms;
-	PERFORMANCE_INFORMATION		pi;
 	char				*swapdev, *mode;
 
 	if (2 < request->nparam)
@@ -42,43 +41,60 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
+		DWORDLONG	real_swap_total, real_swap_avail;
+
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
+
+		real_swap_total = ((ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys) >= 0) ?
+				ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys : 0;
+		real_swap_avail = ((ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys) < real_swap_total) ?
+				ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys : real_swap_total;
+
+		if (real_swap_avail < 0)
+			real_swap_avail = 0;
+
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
+			SET_UI64_RESULT(result, real_swap_total);
 		else if (0 == strcmp(mode, "free"))
-			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_avail);
 		else if (0 == strcmp(mode, "pfree"))
 		{
-			if (TRUE != GetPerformanceInfo(&pi,pi.cb))
-				return SYSINFO_RET_FAIL;
-
-			SET_DBL_RESULT(result, (100.0 - ((pi.CommitTotal / pi.CommitLimit) * 100.0)));
+			SET_DBL_RESULT(result, 100.0 - (((real_swap_total - real_swap_avail) /
+					real_swap_total) * 100.0));
 		}
 		else if (0 == strcmp(mode, "used"))
-			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 		else
 			return SYSINFO_RET_FAIL;
 	}
 	else
 	{
+		SIZE_T		real_swap_total, real_swap_avail;
+
 		GlobalMemoryStatus(&ms);
 
+		real_swap_total = ((ms.dwTotalPageFile - ms.dwTotalPhys) >= 0) ?
+				ms.dwTotalPageFile - ms.dwTotalPhys : 0;
+		real_swap_avail = ((ms.dwAvailPageFile - ms.dwAvailPhys) < real_swap_total) ?
+				ms.dwAvailPageFile - ms.dwAvailPhys : real_swap_total;
+
+		if (real_swap_avail < 0)
+			real_swap_avail = 0;
+
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-			SET_UI64_RESULT(result, ms.dwTotalPageFile);
+			SET_UI64_RESULT(result, real_swap_total);
 		else if (0 == strcmp(mode, "free"))
-			SET_UI64_RESULT(result, ms.dwAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_avail);
 		else if (0 == strcmp(mode, "pfree"))
 		{
-			if (TRUE != GetPerformanceInfo(&pi,pi.cb))
-				return SYSINFO_RET_FAIL;
-
-			SET_DBL_RESULT(result, (100.0 - ((pi.CommitTotal / pi.CommitLimit) * 100.0)));
+			SET_DBL_RESULT(result, 100.0 - (((real_swap_total - real_swap_avail) /
+					real_swap_total) * 100.0));
 		}
 		else if (0 == strcmp(mode, "used"))
-			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 		else
 			return SYSINFO_RET_FAIL;
 	}
