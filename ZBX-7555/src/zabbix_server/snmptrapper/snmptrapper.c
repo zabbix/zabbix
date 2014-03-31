@@ -76,7 +76,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 {
 	DC_ITEM			*items = NULL;
 	char			cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN],
-				error[ITEM_ERROR_LEN_MAX], **errors = NULL;
+				error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL;
 	zbx_uint64_t		*itemids = NULL;
@@ -90,7 +90,6 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
 	states = zbx_malloc(states, sizeof(unsigned char) * num);
-	errors = zbx_malloc(errors, sizeof(char *) * num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * num);
 	results = zbx_malloc(results, sizeof(AGENT_RESULT) * num);
@@ -166,7 +165,6 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
-				errors[i] = "";
 				lastclocks[i] = ts->sec;
 				break;
 			case NOTSUPPORTED:
@@ -176,22 +174,20 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
-				errors[i] = results[i].msg;
 				lastclocks[i] = ts->sec;
 				break;
 		}
 
 		zbx_free(items[i].key);
+		free_result(&results[i]);
 	}
 
-	DCrequeue_items(itemids, states, errors, lastclocks, NULL, NULL, errcodes, num);
-
-	for (i = 0; i < num; i++)
-		free_result(&results[i]);
 	zbx_free(results);
+
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
+
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
-	zbx_free(errors);
 	zbx_free(states);
 	zbx_free(itemids);
 

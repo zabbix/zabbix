@@ -109,7 +109,6 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	types[3], states[3];
-	char		*errors[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
@@ -179,13 +178,12 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
-		errors[i] = "";
 		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, states, errors, lastclocks, NULL, NULL, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -199,7 +197,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	types[3], states[3];
-	char		*errors[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
@@ -263,13 +260,12 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
-		errors[i] = "";
 		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, states, errors, lastclocks, NULL, NULL, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 

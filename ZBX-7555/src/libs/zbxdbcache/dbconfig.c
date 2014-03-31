@@ -79,28 +79,30 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	zbx_uint64_t		interfaceid;
-	zbx_uint64_t		lastlogsize;
-	zbx_uint64_t		valuemapid;
-	const char		*key;
-	const char		*port;
-	const char		*error;
-	ZBX_DC_TRIGGER		**triggers;
-	int			delay;
-	int			nextcheck;
-	int			lastclock;
-	int			mtime;
-	int			data_expected_from;
-	unsigned char		type;
-	unsigned char		data_type;
-	unsigned char		value_type;
-	unsigned char		poller_type;
-	unsigned char		state;
-	unsigned char		inventory_link;
-	unsigned char		location;
-	unsigned char		flags;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	interfaceid;
+	zbx_uint64_t	lastlogsize;
+	zbx_uint64_t	valuemapid;
+	const char	*key;
+	const char	*port;
+	const char	*db_error;
+	ZBX_DC_TRIGGER	**triggers;
+	int		delay;
+	int		nextcheck;
+	int		lastclock;
+	int		mtime;
+	int		data_expected_from;
+	int		history;
+	unsigned char	type;
+	unsigned char	data_type;
+	unsigned char	value_type;
+	unsigned char	poller_type;
+	unsigned char	state;
+	unsigned char	db_state;
+	unsigned char	inventory_link;
+	unsigned char	location;
+	unsigned char	flags;
 }
 ZBX_DC_ITEM;
 
@@ -117,7 +119,6 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*formula;
 	const char	*units;
-	int		history;
 	int		trends;
 	unsigned char	delta;
 	unsigned char	multiplier;
@@ -950,6 +951,10 @@ static void	DCsync_items(DB_RESULT result)
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
+		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
+			item->history = config->config->hk.history;
+		else
+			item->history = atoi(row[36]);
 		ZBX_STR2UCHAR(item->inventory_link, row[38]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
 
@@ -962,9 +967,11 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->triggers = NULL;
 			item->lastclock = 0;
+			item->state = (unsigned char)atoi(row[20]);
+			item->db_state = item->state;
 			ZBX_STR2UINT64(item->lastlogsize, row[31]);
 			item->mtime = atoi(row[32]);
-			DCstrpool_replace(found, &item->error, row[41]);
+			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
 
 			item->location = ZBX_LOC_NOWHERE;
@@ -1007,7 +1014,6 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (0 == found)
 		{
-			item->state = (unsigned char)atoi(row[20]);
 			old_nextcheck = 0;
 
 			if (ITEM_STATE_NOTSUPPORTED == item->state)
@@ -1043,10 +1049,6 @@ static void	DCsync_items(DB_RESULT result)
 			ZBX_STR2UCHAR(numitem->delta, row[33]);
 			ZBX_STR2UCHAR(numitem->multiplier, row[34]);
 			DCstrpool_replace(found, &numitem->formula, row[35]);
-			if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-				numitem->history = config->config->hk.history;
-			else
-				numitem->history = atoi(row[36]);
 			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
 				numitem->trends = config->config->hk.trends;
 			else
@@ -1241,7 +1243,7 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
-		/* Simple items */
+		/* simple items */
 
 		if (ITEM_TYPE_SIMPLE == item->type)
 		{
@@ -1432,7 +1434,7 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->telnetitems, &itemid);
 		}
 
-		/* Simple items */
+		/* simple items */
 
 		if (ITEM_TYPE_SIMPLE == item->type)
 		{
@@ -1487,7 +1489,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		zbx_strpool_release(item->key);
 		zbx_strpool_release(item->port);
-		zbx_strpool_release(item->error);
+		zbx_strpool_release(item->db_error);
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
@@ -3523,7 +3525,8 @@ void	DCload_config()
 
 static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 {
-	const ZBX_DC_IPMIHOST	*ipmihost;
+	const ZBX_DC_IPMIHOST		*ipmihost;
+	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
@@ -3559,6 +3562,11 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 		*dst_host->ipmi_username = '\0';
 		*dst_host->ipmi_password = '\0';
 	}
+
+	if (NULL != (host_inventory = zbx_hashset_search(&config->host_inventories, &src_host->hostid)))
+		dst_host->inventory_mode = (char)host_inventory->inventory_mode;
+	else
+		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
 }
 
 /******************************************************************************
@@ -3649,9 +3657,12 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->flags = src_item->flags;
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
+	dst_item->history = src_item->history;
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
-	dst_item->error = zbx_strdup(NULL, src_item->error);
+
+	dst_item->db_state = src_item->db_state;
+	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);
@@ -3667,7 +3678,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->delta = numitem->delta;
 			dst_item->multiplier = numitem->multiplier;
 			dst_item->formula = zbx_strdup(NULL, numitem->formula);
-			dst_item->history = numitem->history;
 			dst_item->trends = numitem->trends;
 			dst_item->units = zbx_strdup(NULL, numitem->units);
 			break;
@@ -3852,7 +3862,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				break;
 		}
 
-		zbx_free(items[i].error);
+		zbx_free(items[i].db_error);
 	}
 }
 
@@ -3973,6 +3983,28 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 		DCget_host(&items[i].host, dc_host);
 		DCget_item(&items[i], dc_item);
 		errcodes[i] = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_set_item_db_state                                       *
+ *                                                                            *
+ * Purpose: set item db_state and db_error                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error)
+{
+	ZBX_DC_ITEM	*dc_item;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
+	{
+		dc_item->db_state = state;
+		DCstrpool_replace(1, &dc_item->db_error, error);
 	}
 
 	UNLOCK_CACHE;
@@ -4901,8 +4933,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, char **errors, int *lastclocks,
-		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -4918,7 +4950,6 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, char **errors
 			continue;
 
 		dc_item->state = states[i];
-		DCstrpool_replace(1, &dc_item->error, errors[i]);
 		dc_item->lastclock = lastclocks[i];
 		if (NULL != lastlogsizes)
 			dc_item->lastlogsize = lastlogsizes[i];
@@ -5114,7 +5145,7 @@ int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_
 	ZBX_DC_HOST	*dc_host;
 
 	/* don't try deactivating host if the unreachable delay has not passed since the first error */
-	if (CONFIG_UNREACHABLE_DELAY > ts->sec - out->errors_from)
+	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
 		goto out;
 
 	LOCK_CACHE;

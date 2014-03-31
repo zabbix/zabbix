@@ -101,6 +101,7 @@ typedef struct
 	int		jmx_errors_from;
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
+	char		inventory_mode;
 }
 DC_HOST;
 
@@ -117,6 +118,7 @@ typedef struct
 	unsigned char	delta;
 	unsigned char	multiplier;
 	unsigned char	state;
+	unsigned char	db_state;
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	authtype;
 	unsigned char	flags;
@@ -147,7 +149,7 @@ typedef struct
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
-	char		*error;
+	char		*db_error;
 }
 DC_ITEM;
 
@@ -294,6 +296,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
 		zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
@@ -324,8 +327,8 @@ void	*DCconfig_get_config_data(void *data, int type);
 void	DCconfig_get_config_hk(zbx_config_hk_t *data);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, char **errors, int *lastclocks,
-		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num);
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 

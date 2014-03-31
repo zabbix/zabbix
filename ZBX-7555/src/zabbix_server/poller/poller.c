@@ -520,7 +520,7 @@ static int	get_values(unsigned char poller_type)
 	int		errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t	timespec;
 	int		i, num;
-	char		*port = NULL, error[ITEM_ERROR_LEN_MAX], *err;
+	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
 	int		last_available = HOST_AVAILABLE_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -705,17 +705,15 @@ static int	get_values(unsigned char poller_type)
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].state, NULL);
 			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
-			err = "";
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
 					items[i].state, results[i].msg);
-			err = results[i].msg;
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &err, &timespec.sec, &lastlogsizes[i], NULL,
+		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
 				&errcodes[i], 1);
 
 		zbx_free(items[i].key);
