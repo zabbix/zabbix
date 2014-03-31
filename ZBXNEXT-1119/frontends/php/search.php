@@ -171,7 +171,7 @@ foreach ($hosts as $hnum => $host) {
 	// highlight host name if it's different from the visible name
 	$hostName = null;
 	if ($host['host'] !== $host['name'] && zbx_stripos($host['host'], $search) !== false) {
-		$hostName = make_decoration($host['host'], $search);
+		$hostName = array('(', make_decoration($host['host'], $search), ')');
 	}
 
 	if ($admin && isset($rw_hosts[$hostid])) {
@@ -444,7 +444,7 @@ if ($admin) {
 		// highlight host name if it's different from the visible name
 		$templateHostName = null;
 		if ($template['host'] !== $template['name'] && zbx_stripos($template['host'], $search) !== false) {
-			$templateHostName = make_decoration($template['host'], $search);
+			$templateHostName = array('(', make_decoration($template['host'], $search), ')');
 		}
 
 		if (isset($rw_templates[$templateid])) {
