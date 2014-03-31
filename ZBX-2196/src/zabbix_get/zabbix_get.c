@@ -86,7 +86,7 @@ static void	get_signal_handler(int sig)
 	if (SIGALRM == sig)
 		zbx_error("Timeout while executing operation");
 
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 #endif /* not WINDOWS */

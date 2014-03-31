@@ -169,14 +169,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 			case 'h':
 				help();
-				exit(EXIT_FAILURE);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(EXIT_FAILURE);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'p':
 				if (ZBX_TASK_START == t->task)
@@ -544,7 +544,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 			assert(0);
 	}
 
-	return ret;
+	return (ret == SUCCEED ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 #endif	/* _WINDOWS */
 
