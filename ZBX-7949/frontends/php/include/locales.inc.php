@@ -33,7 +33,12 @@ function init_mbstrings() {
 }
 
 function mbstrings_available() {
-	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
+	return function_exists('mb_strlen')
+		&& function_exists('mb_strtoupper')
+		&& function_exists('mb_strtolower')
+		&& function_exists('mb_strpos')
+		&& function_exists('mb_substr')
+		&& function_exists('mb_convert_case');
 }
 
 /**
