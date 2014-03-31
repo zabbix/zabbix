@@ -544,7 +544,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 			assert(0);
 	}
 
-	return (ret == SUCCEED ? EXIT_SUCCESS : EXIT_FAILURE);
+	return ret;
 }
 #endif	/* _WINDOWS */
 
@@ -798,7 +798,7 @@ int	main(int argc, char **argv)
 
 			ret = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
-			exit(ret);
+			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
 		case ZBX_TASK_TEST_METRIC:
