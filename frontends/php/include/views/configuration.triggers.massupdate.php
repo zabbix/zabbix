@@ -92,15 +92,29 @@ if (empty($this->data['parent_discoveryid'])) {
 	foreach ($this->data['dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-		$row = new CRow(array(
-			$dependency['host'].NAME_DELIMITER.$dependency['description'],
-			new CButton(
-				'remove',
-				_('Remove'),
-				'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
-				'link_menu'
-			)
-		));
+		$hostNames = array();
+		foreach ($dependency['hosts'] as $host) {
+			$hostNames[] = CHtml::encode($host['name']);
+			$hostNames[] = ', ';
+		}
+		array_pop($hostNames);
+
+		if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			$description = new CLink(
+				array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
+				'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
+			);
+			$description->setAttribute('target', '_blank');
+		}
+		else {
+			$description = new CSpan(array($hostNames, NAME_DELIMITER, $dependency['description']));
+		}
+
+		$row = new CRow(array($description, new CButton('remove', _('Remove'),
+			'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
+			'link_menu'
+		)));
+
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}
