@@ -113,7 +113,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 {
 	zbx_sock_t	s;
 	int		ret;
-	char		*buf, request[1024];
+	char		request[1024];
 
 	assert(value);
 
@@ -125,10 +125,11 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
-			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
+			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
-				zbx_rtrim(buf, "\r\n");
-				*value = strdup(buf);
+/* TODO not sure if it is ok to trim here */
+				zbx_rtrim(s.buffer, "\r\n");
+				*value = strdup(s.buffer);
 			}
 		}
 

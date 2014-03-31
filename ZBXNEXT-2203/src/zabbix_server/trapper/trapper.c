@@ -595,7 +595,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	else if (0 == strncmp(s, "Data", 4))	/* node data exchange */
 	{
 		int	res, nodeid, sender_nodeid;
-		char	*data, *answer;
+		char	*data;
 
 		node_sync_lock(0);
 
@@ -621,8 +621,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				res = send_data_to_node(sender_nodeid, sock, data);
 				zbx_free(data);
 				if (SUCCEED == res)
-					res = recv_data_from_node(sender_nodeid, sock, &answer);
-				if (SUCCEED == res && 0 == strcmp(answer, "OK"))
+					res = recv_data_from_node(sender_nodeid, sock);
+				if (SUCCEED == res && 0 == strcmp(sock->buffer, "OK"))
 					res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
 				alarm(0);
 			}
@@ -704,12 +704,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 
 static void	process_trapper_child(zbx_sock_t *sock)
 {
-	char	*data;
-
-	if (SUCCEED != zbx_tcp_recv_to(sock, &data, CONFIG_TRAPPER_TIMEOUT))
+	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
 		return;
 
-	process_trap(sock, data);
+/* TODO or perhaps it's better to get rid of data? */
+	process_trap(sock, sock->buffer);
 }
 
 void	main_trapper_loop(zbx_sock_t *s)

@@ -73,9 +73,11 @@ typedef struct
 	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket_orig;
-	char		buf_stat[ZBX_STAT_BUF_LEN];
-	char		*buf_dyn;
 	zbx_buf_type_t	buf_type;
+	char		buf_stat[ZBX_STAT_BUF_LEN];
+/* TODO	char		*buf_dyn; */
+/* TODO rename to data */
+	char		*buffer;
 	unsigned char	accepted;
 	char		*error;
 	int		timeout;
@@ -114,10 +116,10 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, 0))
-#define	zbx_tcp_recv_to(s, data, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, timeout))
+#define	zbx_tcp_recv(s) 		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
+#define	zbx_tcp_recv_to(s, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, timeout))
 
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);

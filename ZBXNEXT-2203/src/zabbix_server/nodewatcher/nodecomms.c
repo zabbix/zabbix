@@ -71,18 +71,18 @@ int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data)
 	return res;
 }
 
-int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data)
+int	recv_data_from_node(int nodeid, zbx_sock_t *sock)
 {
 	int	res;
 
-	if (FAIL == (res = zbx_tcp_recv(sock, data)))
+	if (FAIL == (res = zbx_tcp_recv(sock)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "NODE %d: cannot receive answer from Node [%d]: %s",
 				CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: receiving [%s] from Node [%d]",
-				CONFIG_NODEID, *data, nodeid);
+				CONFIG_NODEID, sock->buffer, nodeid);
 
 	return res;
 }
@@ -112,7 +112,6 @@ int	send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
 {
 	int		ret = FAIL;
 	zbx_sock_t	sock;
-	char		*answer;
 
 	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending %s of node %d to node %d datalen " ZBX_FS_SIZE_T,
 			CONFIG_NODEID, name, nodeid, dest_nodeid, (zbx_fs_size_t)strlen(data));
@@ -123,10 +122,10 @@ int	send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
 	if (FAIL == send_data_to_node(dest_nodeid, &sock, data))
 		goto disconnect;
 
-	if (FAIL == recv_data_from_node(dest_nodeid, &sock, &answer))
+	if (FAIL == recv_data_from_node(dest_nodeid, &sock))
 		goto disconnect;
 
-	if (0 == strcmp(answer, "OK"))
+	if (0 == strcmp(sock.buffer, "OK"))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "OK");
 		ret = SUCCEED;

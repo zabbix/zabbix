@@ -101,17 +101,17 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_STRING_LEN], *recv_buf, *ssh_server, *ssh_proto;
+	char		send_buf[MAX_STRING_LEN], *ssh_server, *ssh_proto;
 
 	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
+		if (SUCCEED == (ret = zbx_tcp_recv(&s)))
 		{
-			if (0 == strncmp(recv_buf, "SSH", 3))
+			if (0 == strncmp(s.buffer, "SSH", 3))
 			{
-				ssh_server = ssh_proto = recv_buf + 4;
+				ssh_server = ssh_proto = s.buffer + 4;
 				ssh_server += strspn(ssh_proto, "0123456789-. ");
 				ssh_server[-1] = '\0';
 
