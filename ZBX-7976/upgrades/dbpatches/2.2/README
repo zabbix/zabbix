@@ -1,0 +1,18 @@
+Database upgrade
+----------------
+
+Zabbix server performs automatic database upgrade starting from version 2.2.0.
+No SQL scripts are provided anymore.
+
+----------------
+
+Starting with 2.2.0, manual database patching is not required anymore. Zabbix
+ server and proxy processes automatically check and upgrade the database schema
+ and relevant data.
+
+Patching status and progress is visible in the logfile.
+
+Note that upgrade will be always started unconditionally, care should be taken
+ when starting new binaries to prevent undesired database changes.
+
+Warning: make sure to have database backup before starting the new binaries.
