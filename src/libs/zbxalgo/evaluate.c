@@ -50,6 +50,8 @@
 #define ZBX_INFINITY	(1.0 / 0.0)	/* value used as an error code */
 
 static const char	*ptr;		/* character being looked at */
+static int		level;		/* expression nesting level  */
+
 static char		*buffer;	/* error message buffer      */
 static int		max_buffer_len;	/* error message buffer size */
 
@@ -420,6 +422,14 @@ static double	evaluate_term1()
 {
 	double	result, operand;
 
+	level++;
+
+	if (32 < level)
+	{
+		zbx_strlcpy(buffer, "Cannot evaluate expression: nesting level is too deep.", max_buffer_len);
+		return ZBX_INFINITY;
+	}
+
 	if (ZBX_INFINITY == (result = evaluate_term2()))
 		return ZBX_INFINITY;
 
@@ -432,6 +442,8 @@ static double	evaluate_term1()
 
 		result = (SUCCEED != zbx_double_compare(result, 0) || SUCCEED != zbx_double_compare(operand, 0));
 	}
+
+	level--;
 
 	return result;
 }
@@ -448,6 +460,8 @@ int	evaluate(double *value, const char *expression, char *error, int max_error_l
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
 
 	ptr = expression;
+	level = 0;
+
 	buffer = error;
 	max_buffer_len = max_error_len;
 
