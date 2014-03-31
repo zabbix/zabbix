@@ -3,7 +3,7 @@ Changes for 2.0.12rc1
 New features:
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
