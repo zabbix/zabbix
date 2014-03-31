@@ -39,41 +39,41 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		const char *expect, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
-	char		*buf;
 	int		net, val = SUCCEED;
 
 	*value_int = 0;
 
-	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (FAIL == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
-		if (NULL != request)
-			net = zbx_tcp_send_raw(&s, request);
-
-		if (NULL != expect && SUCCEED == net)
-		{
-			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
-			{
-				if (0 != strncmp(buf, expect, strlen(expect)))
-				{
-					val = FAIL;
-				}
-			}
-		}
-
-		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
-			zbx_tcp_send_raw(&s, sendtoclose);
-
-		if (SUCCEED == net && SUCCEED == val)
-			*value_int = 1;
-
-		zbx_tcp_close(&s);
+		goto clean;
 	}
 
+	if (NULL != request)
+		net = zbx_tcp_send_raw(&s, request);
+
+	if (NULL != expect && SUCCEED == net)
+	{
+		if (SUCCEED == (net = zbx_tcp_recv(&s)))
+		{
+			if (0 != strncmp(s.buffer, expect, strlen(expect)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, s.buffer);
+				val = FAIL;
+			}
+		}
+	}
+
+	if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
+		zbx_tcp_send_raw(&s, sendtoclose);
+
+	if (SUCCEED == net && SUCCEED == val)
+		*value_int = 1;
+
+	zbx_tcp_close(&s);
+
+clean:
 	if (FAIL == net)
 		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
-
-	if (FAIL == val)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, buf);
 
 	return SYSINFO_RET_OK;
 }

@@ -111,7 +111,6 @@ static int	send_script(int nodeid, const char *data, char **result)
 	DB_ROW			db_row;
 	int			ret = FAIL;
 	zbx_sock_t		sock;
-	char			*answer;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_script(nodeid:%d)", nodeid);
 
@@ -133,8 +132,8 @@ static int	send_script(int nodeid, const char *data, char **result)
 				goto exit_sock;
 			}
 
-			if (SUCCEED == (ret = zbx_tcp_recv(&sock, &answer)))
-				*result = zbx_dsprintf(*result, "%s", answer);
+			if (SUCCEED == (ret = zbx_tcp_recv(&sock)))
+				*result = zbx_dsprintf(*result, "%s", sock.buffer);
 			else
 				*result = zbx_dsprintf(*result,
 						"NODE %d: Error while receiving data from Node [%d]: %s.",

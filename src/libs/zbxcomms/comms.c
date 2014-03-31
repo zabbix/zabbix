@@ -182,6 +182,8 @@ static void	zbx_tcp_clean(zbx_sock_t *s)
 	assert(s);
 
 	memset(s, 0, sizeof(zbx_sock_t));
+
+	s->buf_type = ZBX_BUF_TYPE_STAT;
 }
 
 /******************************************************************************
@@ -898,7 +900,10 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  ******************************************************************************/
 void	zbx_tcp_free(zbx_sock_t *s)
 {
-	zbx_free(s->buf_dyn);
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		zbx_free(s->buffer);
+	}
 }
 
 /******************************************************************************
@@ -913,7 +918,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	(ZBX_STAT_BUF_LEN * 8)
 	ssize_t		nbytes, left, total_bytes;
@@ -925,13 +930,13 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	zbx_free(s->buf_dyn);
+	zbx_tcp_free(s);
 
 	total_bytes = 0;
 	read_bytes = 0;
-	s->buf_type = ZBX_BUF_TYPE_STAT;
 
-	*data = s->buf_stat;
+	s->buf_type = ZBX_BUF_TYPE_STAT;
+	s->buffer = s->buf_stat;
 
 	left = ZBX_TCP_HEADER_LEN;
 
@@ -1025,9 +1030,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	{
 		allocated = ZBX_BUF_LEN;
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
+		s->buffer = zbx_malloc(s->buffer, allocated);
 
-		memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
+		memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
 
 		offset = read_bytes;
 
@@ -1035,7 +1040,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		while (read_bytes < expected_len &&
 				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat))))
 		{
-			zbx_strncpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat, nbytes);
+			zbx_strncpy_alloc(&s->buffer, &allocated, &offset, s->buf_stat, nbytes);
 			read_bytes += nbytes;
 
 			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
@@ -1048,10 +1053,10 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 				{
 					/* XML protocol? */
-					if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
+					if (0 == strncmp(s->buffer, "<req>", sizeof("<req>") - 1))
 					{
 						/* closing tag received in the last 10 bytes? */
-						if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
+						if (NULL != strstr(s->buffer + read_bytes - 10, "</req>"))
 							break;
 					}
 					else
@@ -1059,9 +1064,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				}
 			}
 		}
-
-		*data = s->buf_dyn;
 	}
+
 out:
 	if (ZBX_TCP_ERROR == nbytes)
 	{

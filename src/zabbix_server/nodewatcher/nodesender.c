@@ -835,7 +835,7 @@ void process_nodes(void)
 	DB_ROW		row;
 	int		nodeid;
 	int		master_nodeid;
-	char		*data, *answer;
+	char		*data;
 	zbx_sock_t	sock;
 	int		res;
 	int		sender_nodeid;
@@ -863,11 +863,11 @@ void process_nodes(void)
 				if (SUCCEED == res)
 					res = send_data_to_node(master_nodeid, &sock, data);
 				if (SUCCEED == res)
-					res = recv_data_from_node(master_nodeid, &sock, &answer);
-				if (SUCCEED == res && 0 == strncmp(answer, "Data", 4)) {
+					res = recv_data_from_node(master_nodeid, &sock);
+				if (SUCCEED == res && 0 == strncmp(sock.buffer, "Data", 4)) {
 					res = update_checksums(nodeid, ZBX_NODE_MASTER, SUCCEED, NULL, 0, NULL);
 					if (SUCCEED == res)
-						res = node_sync(answer, &sender_nodeid, &nodeid);
+						res = node_sync(sock.buffer, &sender_nodeid, &nodeid);
 					send_data_to_node(master_nodeid, &sock, SUCCEED == res ? "OK" : "FAIL");
 				}
 				disconnect_node(&sock);

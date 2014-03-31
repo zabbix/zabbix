@@ -51,7 +51,6 @@ static void	process_configuration_sync(size_t *data_size)
 	const char	*__function_name = "process_configuration_sync";
 
 	zbx_sock_t	sock;
-	char		*data;
 	struct		zbx_json_parse jp;
 	char		value[16];
 
@@ -62,16 +61,16 @@ static void	process_configuration_sync(size_t *data_size)
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG))
 		goto out;
 
-	if ('\0' == *data)
+	if ('\0' == *sock.buffer)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_open(data, &jp))
+	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
 		goto out;

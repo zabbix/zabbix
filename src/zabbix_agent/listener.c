@@ -36,20 +36,20 @@
 static void	process_listener(zbx_sock_t *s)
 {
 	AGENT_RESULT	result;
-	char		*command;
 	char		*buffer = NULL;
 	char		**value = NULL;
 	int		ret;
 
-	if (SUCCEED == (ret = zbx_tcp_recv_to(s, &command, CONFIG_TIMEOUT)))
+	if (SUCCEED == (ret = zbx_tcp_recv_to(s, CONFIG_TIMEOUT)))
 	{
-		zbx_rtrim(command, "\r\n");
+/* Not sure if it's ok to trim here */
+		zbx_rtrim(s->buffer, "\r\n");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
+		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
 		init_result(&result);
 
-		if (SUCCEED == process(command, 0, &result))
+		if (SUCCEED == process(s->buffer, 0, &result))
 		{
 			if (NULL != (value =  GET_TEXT_RESULT(&result)))
 			{

@@ -49,7 +49,7 @@ static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 {
 	const char	*__function_name = "get_history_lastid";
 	zbx_sock_t	sock;
-	char		data[MAX_STRING_LEN], *answer;
+	char		data[MAX_STRING_LEN];
 	int		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -64,17 +64,17 @@ static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 		if (FAIL == send_data_to_node(master_nodeid, &sock, data))
 			goto disconnect;
 
-		if (FAIL == recv_data_from_node(master_nodeid, &sock, &answer))
+		if (FAIL == recv_data_from_node(master_nodeid, &sock))
 			goto disconnect;
 
-		if (0 == strncmp(answer, "FAIL", 4))
+		if (0 == strncmp(sock.buffer, "FAIL", 4))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "NODE %d: %s() FAIL from node %d for node %d",
 					CONFIG_NODEID, __function_name, master_nodeid, nodeid);
 			goto disconnect;
 		}
 
-		res = is_uint64(answer, lastid);
+		res = is_uint64(sock.buffer, lastid);
 disconnect:
 		disconnect_node(&sock);
 	}

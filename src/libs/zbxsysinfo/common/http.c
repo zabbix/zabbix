@@ -32,7 +32,6 @@
 static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
 {
 	int		ret;
-	char		*recv_buffer;
 	char		request[MAX_STRING_LEN];
 	zbx_sock_t	s;
 
@@ -47,10 +46,10 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
+			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				if (NULL != buffer)
-					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);
+					zbx_strlcpy(buffer, s.buffer, max_buffer_len);
 			}
 		}
 
