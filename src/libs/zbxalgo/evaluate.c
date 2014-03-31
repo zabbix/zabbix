@@ -218,7 +218,7 @@ static double	evaluate_term7()
 	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
 		ptr++;
 
-	if (0 == strncmp("not", ptr, 3) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
+	if ('n' == *ptr && 'o' == *(ptr + 1) && 't' == *(ptr + 2) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
 	{
 		ptr += 3;
 
@@ -316,12 +316,12 @@ static double	evaluate_term4()
 
 	while (1)
 	{
-		if (0 == strncmp("<=", ptr, 2))
+		if ('<' == *ptr && '=' == *(ptr + 1))
 		{
 			op = 'l';
 			ptr += 2;
 		}
-		else if (0 == strncmp(">=", ptr, 2))
+		else if ('>' == *ptr && '=' == *(ptr + 1))
 		{
 			op = 'g';
 			ptr += 2;
@@ -368,7 +368,7 @@ static double	evaluate_term3()
 		{
 			op = *ptr++;
 		}
-		else if (0 == strncmp("<>", ptr, 2))
+		else if ('<' == *ptr && '>' == *(ptr + 1))
 		{
 			op = '#';
 			ptr += 2;
@@ -400,7 +400,7 @@ static double	evaluate_term2()
 	if (ZBX_INFINITY == (result = evaluate_term3()))
 		return ZBX_INFINITY;
 
-	while (0 == strncmp("and", ptr, 3) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
+	while ('a' == *ptr && 'n' == *(ptr + 1) && 'd' == *(ptr + 2) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
 	{
 		ptr += 3;
 
@@ -433,7 +433,7 @@ static double	evaluate_term1()
 	if (ZBX_INFINITY == (result = evaluate_term2()))
 		return ZBX_INFINITY;
 
-	while (0 == strncmp("or", ptr, 2) && SUCCEED == is_operator_delimiter(*(ptr + 2)))
+	while ('o' == *ptr && 'r' == *(ptr + 1) && SUCCEED == is_operator_delimiter(*(ptr + 2)))
 	{
 		ptr += 2;
 
