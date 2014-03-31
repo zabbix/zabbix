@@ -121,7 +121,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	}
 	else {
 		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
-		$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
+		$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
 	}
 
 	foreach ($unlinkTemplates as $id) {
