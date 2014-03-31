@@ -184,6 +184,9 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 /* triggers expression condition */
 .trigger-expression #expr_type { width: 605px; max-width: 605px; }
 
+/* triggers configuration list */
+div.triggerDependencies { padding-left: 8px; }
+
 /* login */
 .login { position: absolute; height: 99%; width: 99%; }
 .login #glow {
