@@ -47,6 +47,7 @@ check_fields($fields);
 $dbGraph = API::Graph()->get(array(
 	'output' => API_OUTPUT_EXTEND,
 	'selectGraphItems' => API_OUTPUT_EXTEND,
+	'selectHosts' => array('name'),
 	'graphids' => $_REQUEST['graphid']
 ));
 
@@ -84,9 +85,7 @@ CArrayHelper::sort($dbGraph['gitems'], array(
 ));
 
 // get graph items
-$gItems = array();
 foreach ($dbGraph['gitems'] as $gItem) {
-	$gItems[] = $gItem['itemid'];
 	$graph->addItem(
 		$gItem['itemid'],
 		$gItem['yaxisside'],
@@ -97,22 +96,15 @@ foreach ($dbGraph['gitems'] as $gItem) {
 	);
 }
 
-$hostName = null;
-if ($gItems) {
-	// get graph items hosts
-	$gItemHosts = API::Host()->get(array(
-		'output' => array('name'),
-		'itemids' => $gItems
-	));
+$hostName = '';
 
-	foreach ($gItemHosts as $gItemHost) {
-		if ($hostName === null) {
-			$hostName = $gItemHost['name'];
-		}
-		elseif ($hostName !== $gItemHost['name']) {
-			$hostName = null;
-			break;
-		}
+foreach ($dbGraph['hosts'] as $gItemHost) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
+		$hostName = '';
+		break;
 	}
 }
 
