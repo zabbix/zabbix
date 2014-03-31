@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2013-11-05 16:28+0300\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"PO-Revision-Date: 2014-03-24 16:00+0300\n"
+"Last-Translator: Heilig <oleg.ivanivskyi@zabbix>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n%10==1 && n%100!=11 ? 1 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 2 : 3);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383661707.0\n"
+"X-POOTLE-MTIME: 1395669612.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -4848,7 +4848,7 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:887
 #, php-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Прототип графіку \"%1$s\" повинен містити як мінімум один прототип елемента даних."
 
 #: api/classes/CGraphPrototype.php:34
 #, php-format
@@ -7214,7 +7214,7 @@ msgstr "Помилка входу \"%s\"."
 #: api/classes/CUser.php:990
 #, php-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Ім'я користувача \"%1$s\" не співпадає з іменем \"%2$s\" використаним для проходження HTTP аутентифікації."
 
 #: authentication.php:115
 msgid "Login name or password is incorrect!"
