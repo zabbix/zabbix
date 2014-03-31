@@ -34,7 +34,6 @@ class CUserMedia extends CZBXAPI {
 	 * Get users data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']	filter by Node IDs
 	 * @param array  $options['usrgrpids']	filter by UserGroup IDs
 	 * @param array  $options['userids']	filter by User IDs
 	 * @param bool   $options['type']		filter by User type [USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3]
@@ -60,7 +59,6 @@ class CUserMedia extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'mediaids'					=> null,
@@ -102,21 +100,10 @@ class CUserMedia extends CZBXAPI {
 			}
 		}
 
-		// nodeids
-		$nodeids = ($options['nodeids'] === null) ? get_current_nodeid() : $options['nodeids'];
-
-		$nodeCheck = false;
-
 		// mediaids
 		if ($options['mediaids'] !== null) {
 			zbx_value2array($options['mediaids']);
 			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.mediaid', $nodeids);
-			}
 		}
 
 		// userids
@@ -129,12 +116,6 @@ class CUserMedia extends CZBXAPI {
 
 			if ($options['groupCount'] !== null) {
 				$sqlParts['group']['userid'] = 'm.userid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'u.userid', $nodeids);
 			}
 		}
 
@@ -149,12 +130,6 @@ class CUserMedia extends CZBXAPI {
 			if ($options['groupCount'] !== null) {
 				$sqlParts['group']['usrgrpid'] = 'ug.usrgrpid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ug.usrgrpid', $nodeids);
-			}
 		}
 
 		// mediatypeids
@@ -166,17 +141,6 @@ class CUserMedia extends CZBXAPI {
 			if ($options['groupCount'] !== null) {
 				$sqlParts['group']['mediatypeid'] = 'm.mediatypeid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.mediatypeid', $nodeids);
-			}
-		}
-
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.mediaid', $nodeids);
 		}
 
 		// filter
@@ -200,7 +164,6 @@ class CUserMedia extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($media = DBfetch($res)) {

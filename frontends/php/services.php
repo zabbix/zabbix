@@ -461,14 +461,6 @@ else {
 	}
 	unset($service);
 
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($services as &$service) {
-			$service['name'] = get_node_name_by_elid($service['serviceid'], true, NAME_DELIMITER).$service['name'];
-		}
-		unset($service);
-	}
-
 	$treeData = array();
 	createServiceConfigurationTree($services, $treeData);
 	$tree = new CServiceTree('service_conf_tree', $treeData, array(

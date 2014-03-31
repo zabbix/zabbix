@@ -71,7 +71,6 @@ class CEvent extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
@@ -85,7 +84,6 @@ class CEvent extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'objectids'					=> null,
@@ -196,18 +194,10 @@ class CEvent extends CZBXAPI {
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
 			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'e.objectid', $nodeids);
-			}
 		}
 
 		// objectids
@@ -219,11 +209,6 @@ class CEvent extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['objectid'] = 'e.objectid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'e.objectid', $nodeids);
 			}
 		}
 
@@ -269,11 +254,6 @@ class CEvent extends CZBXAPI {
 				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
 			}
-		}
-
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'e.eventid', $nodeids);
 		}
 
 		// object
@@ -334,7 +314,6 @@ class CEvent extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -500,7 +479,6 @@ class CEvent extends CZBXAPI {
 			}
 
 			$hosts = API::Host()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
@@ -537,7 +515,6 @@ class CEvent extends CZBXAPI {
 			}
 
 			$objects = $api->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectRelatedObject'],
 				$api->pkOption() => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
@@ -552,7 +529,6 @@ class CEvent extends CZBXAPI {
 			$alerts = API::Alert()->get(array(
 				'output' => $options['select_alerts'],
 				'selectMediatypes' => API_OUTPUT_EXTEND,
-				'nodeids' => $options['nodeids'],
 				'alertids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -570,8 +546,7 @@ class CEvent extends CZBXAPI {
 					'output' => $this->outputExtend($options['select_acknowledges'],
 						array('acknowledgeid', 'eventid', 'clock')
 					),
-					'filter' => array('eventid' => $eventIds),
-					'nodeids' => get_current_nodeid(true)
+					'filter' => array('eventid' => $eventIds)
 				));
 				$sqlParts['order'][] = 'a.clock DESC';
 

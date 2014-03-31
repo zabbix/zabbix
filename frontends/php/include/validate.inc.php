@@ -476,7 +476,6 @@ function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = array(
 		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
-		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
 		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
 		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),

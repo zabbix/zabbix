@@ -20,7 +20,6 @@
 
 require_once dirname(__FILE__).'/../../include/validate.inc.php';
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/nodes.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
@@ -71,14 +70,12 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	 */
 	protected $createdPks = array();
 
-
 	/**
 	 * A test host object.
 	 *
 	 * @var array
 	 */
 	protected $testHost;
-
 
 	/**
 	 * A method that provides valid objects for creating.
@@ -89,19 +86,12 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	 */
 	public abstract function providerCreateValid();
 
-
 	/**
 	 * Test case setup.
 	 *
 	 * @static
 	 */
 	public static function setUpBeforeClass() {
-
-		// some variable defines not to include config.inc.php
-		global $ZBX_CURRENT_NODEID;
-		$ZBX_CURRENT_NODEID = 0;
-		define('ZBX_DISTRIBUTED', false);
-
 		// add some user data
 		CZBXAPI::$userData = array(
 			'userid' => null,
@@ -112,14 +102,12 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		API::setReturnAPI();
 	}
 
-
 	/**
 	 * Test setup.
 	 */
 	public function setUp() {
 		DBconnect($error);
 	}
-
 
 	/**
 	 * A test for creating valid objects.
@@ -155,7 +143,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		$this->assertCount(1, $rs, 'One of the objects has not been retrieved.');
 	}
 
-
 	/**
 	 * A test for deleting object.
 	 *
@@ -169,7 +156,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertCount(1, $rs[$this->api->pkOption()], 'One of the objects has not been deleted.');
 	}
-
 
 	/**
 	 * Reverts the database to the initial test.
@@ -187,7 +173,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-
 	/**
 	 * Saves an object to the database and returns the result. The objects private key will be added to
 	 * $this->createdPks.
@@ -204,7 +189,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		return $rs;
 	}
 
-
 	/**
 	 * Deletes the objects, that have been created during the test.
 	 *
@@ -215,7 +199,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 			$this->api->pk() => $this->createdPks
 		));
 	}
-
 
 	/**
 	 * Sets up a test host group and a host. The created host is saved to $this->testHost.
@@ -260,7 +243,6 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		));
 		$this->testHost = reset($hosts);
 	}
-
 
 	/**
 	 * Deletes the created test host group and host.

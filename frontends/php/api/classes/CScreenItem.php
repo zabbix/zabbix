@@ -77,7 +77,6 @@ class CScreenItem extends CZBXAPI {
 	 * Get screem item data.
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids']			Node IDs
 	 * @param array $options['screenitemids']	Search by screen item IDs
 	 * @param array $options['screenids']		Search by screen IDs
 	 * @param array $options['filter']			Result filter
@@ -886,15 +885,6 @@ class CScreenItem extends CZBXAPI {
 				)
 			);
 		}
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific screen ids are given
-		if ($options['screenids'] === null) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {

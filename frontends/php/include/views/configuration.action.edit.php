@@ -200,20 +200,6 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = new CCol(_('maintenance'));
 		break;
 
-	case CONDITION_TYPE_NODE:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$condition = array(
-			new CTextBox('node', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=nodes&srcfld1=nodeid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=node'.
-					'&writeonly=1", 450, 450);',
-				'link_menu'
-			)
-		);
-		break;
-
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
@@ -569,11 +555,8 @@ if (!empty($this->data['new_operation'])) {
 			$mediaTypeComboBox = new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']);
 			$mediaTypeComboBox->addItem(0, '- '._('All').' -');
 
-			$dbMediaTypes = DBfetchArray(DBselect(
-				'SELECT mt.mediatypeid,mt.description'.
-				' FROM media_type mt'.
-				whereDbNode('mt.mediatypeid')
-			));
+			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+
 			order_result($dbMediaTypes, 'description');
 
 			foreach ($dbMediaTypes as $dbMediaType) {
