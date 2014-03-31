@@ -23,6 +23,7 @@
 #include "checks_simple_rsm.h"
 #include "zbxserver.h"
 #include "comms.h"
+#include "base64.h"
 #include "rsm.h"
 
 #define ZBX_HOST_BUF_SIZE	128
@@ -3038,7 +3039,6 @@ static int	zbx_ssl_attach_cert(SSL *ssl, char *cert, int cert_len, char *err, si
 {
 	BIO	*bio = NULL;
 	X509	*x509 = NULL;
-	char	*p;
 	int	ret = FAIL;
 
 	if (NULL == (bio = BIO_new_mem_buf(cert, cert_len)))
@@ -3046,9 +3046,6 @@ static int	zbx_ssl_attach_cert(SSL *ssl, char *cert, int cert_len, char *err, si
 		zbx_strlcpy(err, "cannot allocate memory for client certificate", err_size);
 		goto out;
 	}
-
-	while (NULL != (p = strchr(cert, ';')))
-		*p = '\n';
 
 	if (NULL == (x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)))
 	{
@@ -3077,7 +3074,6 @@ static int	zbx_ssl_attach_privkey(SSL *ssl, char *privkey, int privkey_len, char
 {
 	BIO	*bio = NULL;
 	RSA	*rsa = NULL;
-	char	*p;
 	int	ret = FAIL;
 
 	if (NULL == (bio = BIO_new_mem_buf(privkey, privkey_len)))
@@ -3085,9 +3081,6 @@ static int	zbx_ssl_attach_privkey(SSL *ssl, char *privkey, int privkey_len, char
 		zbx_strlcpy(err, "cannot allocate memory for client private key", err_size);
 		goto out;
 	}
-
-	while (NULL != (p = strchr(privkey, ';')))
-		*p = '\n';
 
 	if (NULL == (rsa = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL)))
 	{
@@ -3118,8 +3111,8 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	char			domain[ZBX_HOST_BUF_SIZE], err[ZBX_ERR_BUF_SIZE], *value_str = NULL, *res_ip = NULL,
 				*secretkey_enc_b64 = NULL, *secretkey_salt_b64 = NULL, *epp_passwd_enc_b64 = NULL,
 				*epp_passwd_salt_b64 = NULL, *epp_privkey_enc_b64 = NULL, *epp_privkey_salt_b64 = NULL,
-				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_cert = NULL,
-				*epp_commands = NULL, *epp_serverid = NULL, *tmp;
+				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_cert_b64 = NULL,
+				*epp_cert = NULL, *epp_commands = NULL, *epp_serverid = NULL, *tmp;
 	short			epp_port = 700;
 	X509			*epp_server_x509 = NULL;
 	const SSL_METHOD	*method;
@@ -3131,8 +3124,9 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM			*items = NULL;
 	size_t			items_num = 0;
 	zbx_vector_str_t	epp_hosts, epp_ips;
-	int			epp_enabled, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE, rtt3 = ZBX_NO_VALUE, rv, i,
-				rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled, ret = SYSINFO_RET_FAIL;
+	int			rv, i, epp_enabled, epp_cert_size, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE,
+				rtt3 = ZBX_NO_VALUE, rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled,
+				ret = SYSINFO_RET_FAIL;
 
 	memset(&sock, 0, sizeof(zbx_sock_t));
 	sock.socket = ZBX_SOCK_ERROR;
@@ -3239,7 +3233,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_CERT, &epp_cert, err, sizeof(err)))
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_CERT, &epp_cert_b64, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -3409,7 +3403,9 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	if (SUCCEED != zbx_ssl_attach_cert(ssl, epp_cert, strlen(epp_cert), err, sizeof(err)))
+	str_base64_decode_dyn(epp_cert_b64, strlen(epp_cert_b64), &epp_cert, &epp_cert_size);
+
+	if (SUCCEED != zbx_ssl_attach_cert(ssl, epp_cert, epp_cert_size, err, sizeof(err)))
 	{
 		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
 		zbx_rsm_errf(log_fd, "cannot attach client certificate to SSL session: %s", err);
@@ -3545,6 +3541,7 @@ out:
 	zbx_free(epp_commands);
 	zbx_free(epp_user);
 	zbx_free(epp_cert);
+	zbx_free(epp_cert_b64);
 	zbx_free(epp_privkey_salt_b64);
 	zbx_free(epp_privkey_enc_b64);
 	zbx_free(epp_passwd_salt_b64);

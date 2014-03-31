@@ -35,6 +35,7 @@ use strict;
 use warnings;
 use Zabbix;
 use Getopt::Long;
+use MIME::Base64;
 use Data::Dumper;
 use RSM;
 
@@ -88,7 +89,8 @@ my $rv = GetOptions(\%OPTS,
 		    "dnssec!",
 		    "epp-servers=s",
 		    "epp-user=s",
-		    "epp-certs=s",
+		    "epp-cert=s",
+		    "epp-privkey=s",
 		    "epp-commands=s",
 		    "epp-serverid=s",
 		    "ns-servers-v4=s",
@@ -1155,6 +1157,7 @@ sub trim
 
 sub encrypt_sensdata {
     my $prompt = shift;
+    my $file = shift;
 
     # ask the user to enter the passphrase
     my $passphrase;
@@ -1174,14 +1177,30 @@ sub encrypt_sensdata {
     $keysalt =~ s/\|/ /;
 
     print($prompt);
-    my $encrypted_sensdata = `$bin $keysalt noprompt`;
-    pfail("invalid output from $bin") unless ($encrypted_sensdata =~ m/\|/);
+    my $encrypted_sensdata;
+    if ($file) {
+	$encrypted_sensdata = `$bin $keysalt -n -f $file`;
+    } else {
+	$encrypted_sensdata = `$bin $keysalt -n`;
+    }
+    pfail("error encrypting sensible EPP data") unless ($encrypted_sensdata =~ m/\|/);
 
     trim($encrypted_sensdata);
 
     return $encrypted_sensdata;
 }
 
+sub read_file {
+    my $file = shift;
+
+    my $contents = do {
+	local $/ = undef;
+	open my $fh, "<", $file or pfail("could not open $file: $!");
+	<$fh>;
+    };
+
+    return $contents;
+}
 
 sub create_main_template {
     my $tld = shift;
@@ -1270,12 +1289,16 @@ sub create_main_template {
 
     if ($OPTS{'epp-servers'})
     {
-	create_macro('{$RSM.EPP.CERTS}', $OPTS{'epp-certs'} ? $OPTS{'epp-certs'} : '/opt/epp/'.$tld.'/certs', $templateid);
-	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'} ? $OPTS{'epp-commands'} : '/opt/epp/'.$tld.'/commands', $templateid);
-	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid);
-	create_macro('{$RSM.EPP.PASSWD}', encrypt_sensdata("Please enter EPP passphrase, then <ENTER> and then EPP password:\n"), $templateid);
-	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase, then <ENTER> and then EPP Client private key:\n"), $templateid);
-	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid);
+	if ($OPTS{'epp-commands'}) {
+	    create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, 1);
+	} else {
+	    create_macro('{$RSM.EPP.COMMANDS}', '/opt/epp/'.$tld.'/commands', $templateid);
+	}
+	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, 1);
+	create_macro('{$RSM.EPP.CERT}', encode_base64(read_file($OPTS{'epp-cert'}), ''),  $templateid, 1);
+	create_macro('{$RSM.EPP.PASSWD}', encrypt_sensdata("Please enter EPP passphrase, then press <ENTER> and then EPP password: "), $templateid, 1);
+	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase again: ", $OPTS{'epp-privkey'}), $templateid, 1);
+	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, 1);
     }
 
     return $templateid;
@@ -1743,10 +1766,12 @@ Other options
                 specify EPP username
 	--epp-serverid
                 specify expected EPP Server ID string in reply
-	--epp-certs
-                path to EPP certificates directory on the Probe node
+	--epp-cert
+                path to EPP Client certificates file
+	--epp-privkey
+                path to EPP Client private key file (unencrypted)
 	--epp-commands
-                path to EPP command templates directory on the Probe node
+                path to a directory on the Probe Node containing EPP command templates
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
@@ -1768,14 +1793,18 @@ sub validate_input {
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" unless ($OPTS{'ipv4'} or $OPTS{'ipv6'});
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" unless (defined($OPTS{'dns-test-prefix'}));
-    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
+    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
+									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
-    $msg .= "EPP user must be specified (--epp-user)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-user'});
-    $msg .= "EPP server ID must be specified (--epp-serverid)\n" if ($OPTS{'epp-servers'} and !$OPTS{'epp-serverid'});
+    if ($OPTS{'epp-servers'}) {
+	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
+	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
+	$msg .= "EPP Client certificate file must be specified (--epp-cert)\n" unless ($OPTS{'epp-cert'});
+	$msg .= "EPP Client private key file must be specified (--epp-privkey)\n" unless ($OPTS{'epp-privkey'});
+    }
 
-    if ($msg ne "")
-    {
+    unless ($msg eq "") {
 	print($msg);
 	usage();
     }
