@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 19:22+0300\n"
-"PO-Revision-Date: 2014-03-23 23:37+0300\n"
+"POT-Creation-Date: 2014-03-31 23:41+0300\n"
+"PO-Revision-Date: 2014-03-25 05:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395610652.0\n"
+"X-POOTLE-MTIME: 1395718225.0\n"
 
 #: api/classes/CMaintenance.php:354 api/classes/CMaintenance.php:359
 #: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:473
@@ -83,9 +83,9 @@ msgstr[2] "%1$s minút"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "ostáva %1$s pokus"
+msgstr[1] "ostávajú %1$s pokusy"
+msgstr[2] "ostáva %1$s pokusov"
 
 #: jsLoader.php:218 jsLoader.php:219
 #, c-format
@@ -204,7 +204,7 @@ msgstr "<manuálne>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "LOG AKCIÍ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -224,7 +224,7 @@ msgstr "A"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "AUDIT LOG"
 
 #: report2.php:151
 msgid "AVAILABILITY REPORT"
@@ -383,7 +383,7 @@ msgstr[2] "Akcie povolené"
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 msgid "Action log"
-msgstr ""
+msgstr "Log akcií"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -643,13 +643,13 @@ msgstr "Veľkosť pamäte v bytoch. Ak mode chýba, je použitý total."
 #: include/views/configuration.action.edit.php:940
 #: include/views/configuration.host.discovery.edit.php:278
 msgid "And"
-msgstr ""
+msgstr "A"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:939
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr ""
+msgstr "A/Alebo"
 
 #: tr_status.php:325 tr_status.php:331
 msgid "Any"
@@ -682,7 +682,6 @@ msgid "Application added"
 msgstr "Aplikácia bola pridaná"
 
 #: applications.php:151 applications.php:186
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Aplikácia bola zmazaná"
@@ -833,7 +832,7 @@ msgstr "Perióda uloženia audit údajov (v dňoch) \"%1$s\"."
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Audit log"
-msgstr ""
+msgstr "Audit log"
 
 #: include/func.inc.php:256
 msgid "Aug"
@@ -1360,7 +1359,7 @@ msgstr "Nie je možné pridať skupinu"
 
 #: api/classes/CTemplate.php:429 api/classes/CTemplate.php:861
 msgid "Cannot add group."
-msgstr ""
+msgstr "Nie je možné pridať skupinu."
 
 #: hosts.php:383
 msgid "Cannot add host"
@@ -1592,7 +1591,7 @@ msgstr "Nie možné vytvoriť obrazovku."
 
 #: api/classes/CTemplate.php:443
 msgid "Cannot create template."
-msgstr ""
+msgstr "Nie je možné vytvoriť šablónu."
 
 #: api/classes/CUser.php:1348
 #, c-format
@@ -1604,7 +1603,6 @@ msgid "Cannot delete action"
 msgstr "Nie je možné zmazať akciu"
 
 #: applications.php:151 applications.php:187
-#, fuzzy
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "Nie je možné zmazať aplikáciu"
@@ -2168,7 +2166,7 @@ msgstr "Nemôžem formátovať strom."
 
 #: api/classes/CTemplate.php:826
 msgid "Cannot have empty visible template name."
-msgstr ""
+msgstr "Nie je možné mať prázdne zobrazované meno šablóny."
 
 #: api/classes/CTrigger.php:1093 api/classes/CTrigger.php:1232
 #: api/classes/CTriggerPrototype.php:683 api/classes/CTriggerPrototype.php:741
@@ -2199,7 +2197,7 @@ msgstr "Nie je možné vložiť view súbor \"%s\"."
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Nie je možné vložiť výraz spúšťača"
 
 #: api/classes/CUser.php:688
 msgid "Cannot insert user media."
@@ -2211,7 +2209,7 @@ msgstr "Nie je možné nalinkovať šablónu"
 
 #: api/classes/CTemplate.php:948 api/classes/CTemplate.php:963
 msgid "Cannot link template."
-msgstr ""
+msgstr "Nie je možné nalinkovať šablónu."
 
 #: api/classes/CUser.php:1049
 msgid "Cannot login."
@@ -2227,7 +2225,7 @@ msgstr "Nie je možné hromadne aktualizovať meno hosta."
 
 #: api/classes/CTemplate.php:1049
 msgid "Cannot mass update template name."
-msgstr ""
+msgstr "Nie je možné hromadne aktualizovať meno šablóny."
 
 #: api/classes/CHost.php:998
 msgid "Cannot mass update visible host name."
@@ -2235,7 +2233,7 @@ msgstr "Nie je možné hromadne aktualizovať zobrazované meno hosta."
 
 #: api/classes/CTemplate.php:1017
 msgid "Cannot mass update visible template name."
-msgstr ""
+msgstr "Nie je možné hromadne aktualizovať zobrazované meno šablóny."
 
 #: api/classes/CHostBase.php:57
 #, c-format
@@ -2272,7 +2270,7 @@ msgstr "Nie je možné zmazať všetky položky, najmenej jedna musí ostať."
 
 #: api/classes/CTemplate.php:874
 msgid "Cannot remove group."
-msgstr ""
+msgstr "Nie je možné zmazať skupinu."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -2366,7 +2364,7 @@ msgstr "Nie je možné zrušiť prepojenie šablóny"
 
 #: api/classes/CTemplate.php:910 api/classes/CTemplate.php:933
 msgid "Cannot unlink template."
-msgstr ""
+msgstr "Nie je možné zrušiť prepojenie šablóny."
 
 #: api/classes/CHostGeneral.php:234
 #, c-format
@@ -2898,11 +2896,11 @@ msgstr "Farba (OK)"
 
 #: screenedit.php:264
 msgid "Column added"
-msgstr ""
+msgstr "Stĺpec pridaný"
 
 #: screenedit.php:339
 msgid "Column deleted"
-msgstr ""
+msgstr "Stĺpec zmazaný"
 
 #: include/views/configuration.screen.constructor.edit.php:607
 #: screenedit.php:46
@@ -2973,12 +2971,12 @@ msgstr "Podmienka"
 #: api/classes/CDiscoveryRule.php:858
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Podmienka \"%2$s\" nie je použitá vo formule \"%3$s\" pre zisťovacie pravidlo \"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:857
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr ""
+msgstr "Podmienka \"%2$s\" použitá vo formule \"%3$s\" pre zisťovacie pravidlo \"%1$s\" nie je definovaná."
 
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.action.edit.php:953
@@ -3505,7 +3503,7 @@ msgstr "Aktuálna hodnota"
 
 #: include/views/configuration.host.discovery.edit.php:280
 msgid "Custom expression"
-msgstr ""
+msgstr "Osobitný výraz"
 
 #: charts.php:26
 msgid "Custom graphs"
