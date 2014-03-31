@@ -156,9 +156,9 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	if (0 == exp->functions_num)
 		return ret;
 
-	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * (exp->functions_num));
-	items = zbx_malloc(items, sizeof(DC_ITEM) * (exp->functions_num));
-	errcodes = zbx_malloc(errcodes, sizeof(int) * (exp->functions_num));
+	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * exp->functions_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * exp->functions_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * exp->functions_num);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{

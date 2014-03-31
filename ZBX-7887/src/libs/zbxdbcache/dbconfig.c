@@ -2643,7 +2643,7 @@ void	DCsync_configuration(void)
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.flags,i.interfaceid,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
-				"i.snmpv3_contextname,i.lastlogsize,i.mtime, i.valuemapid, i.units"
+				"i.snmpv3_contextname,i.lastlogsize,i.mtime,i.valuemapid,i.units"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -3784,7 +3784,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
  *                                                                            *
  * Function: DCconfig_get_items_by_keys_ph                                    *
  *                                                                            *
- * Purpose: Locate item in configuration cache by proxi_hostid and host       *
+ * Purpose: Locate item in configuration cache by proxy_hostid and host       *
  *                                                                            *
  * Parameters: item         - [OUT] pointer to DC_ITEM structure              *
  *             proxy_hostid - [IN] proxy host ID                              *
@@ -3894,7 +3894,6 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 
 		DCget_host(&items[i].host, dc_host);
 		DCget_item(&items[i], dc_item);
-
 		errcodes[i] = SUCCEED;
 	}
 

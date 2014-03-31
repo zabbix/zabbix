@@ -3728,13 +3728,13 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DC_ITEM		*items;
+	DC_ITEM		*items = NULL;
 	char		value[MAX_BUFFER_LEN];
 	int		i, k;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	int		*errcodes;
+	int		*errcodes = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
@@ -3743,40 +3743,40 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	items = zbx_malloc(NULL, sizeof(DC_ITEM) * ifuncs->values_num);
-	errcodes = zbx_malloc(NULL, sizeof(int) * ifuncs->values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->values_num);
 
 	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->values_num);
 
 	zbx_free(itemids);
 
-	for (k = 0; k < ifuncs->values_num; k++)
+	for (i = 0; i < ifuncs->values_num; i++)
 	{
-		ifunc = (zbx_ifunc_t *)ifuncs->values[k];
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (i = 0; i < ifunc->functions.values_num; i++)
+		for (k = 0; k < ifunc->functions.values_num; k++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[i];
+			func = (zbx_func_t *)ifunc->functions.values[k];
 
-			if (SUCCEED != errcodes[k])
+			if (SUCCEED != errcodes[i])
 			{
 				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]"
 						": item [%s] not found",
-						func->function, func->parameter, items[k].key_orig);
+						func->function, func->parameter, items[i].key_orig);
 				continue;
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED == items[k].state)
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
 			{
 				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
-						items[k].host.host, items[k].key_orig, func->function, func->parameter);
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 				continue;
 			}
 
-			if (SUCCEED != evaluate_function(value, &items[k], func->function, func->parameter, func->timespec.sec))
+			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter, func->timespec.sec))
 			{
 				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
-						items[k].host.host, items[k].key_orig, func->function, func->parameter);
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
