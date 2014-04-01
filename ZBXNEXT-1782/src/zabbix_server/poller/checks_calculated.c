@@ -89,7 +89,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 {
 	const char	*__function_name = "calcitem_parse_expression";
 	char		*e, *f, *func = NULL, *params = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0;
+	size_t		exp_alloc = 128, exp_offset = 0, len;
 	int		functionid, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
@@ -101,15 +101,25 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	for (e = dc_item->params; '\0' != *e; e++)
 	{
-		if (NULL != strchr(" \t\r\n", *e))
+		if (SUCCEED != is_function_char(*e))
+		{
+			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *e);
 			continue;
+		}
+
+		if ((0 == strncmp("and", e, len = 3) || 0 == strncmp("not", e, 3) || 0 == strncmp("or", e, len = 2)) &&
+				NULL != strchr("()" ZBX_WHITESPACE, *(e + len)))
+		{
+			e += len - 1;
+			zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, len);
+			continue;
+		}
 
 		f = e;
-		if (FAIL == parse_function(&e, &func, &params))
+		if (SUCCEED != parse_function(&e, &func, &params))
 		{
 			e = f;
 			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *f);
-
 			continue;
 		}
 		else
