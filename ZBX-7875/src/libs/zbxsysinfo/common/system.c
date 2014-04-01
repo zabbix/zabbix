@@ -124,7 +124,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
  ******************************************************************************/
 int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
-	const char	*__function_name = "zbx_get_win_version";
+	const char	*__function_name = "get_win_version";
 	int		ret = FAIL;
 
 	/* Order of win_keys is vital.
@@ -140,8 +140,8 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 	int		i;
 	HKEY		h_key_registry;
 	DWORD		dw_buffer;
-	LPSTR		lp_name_strings;
-	LPCTSTR		wsource;
+	char		*lp_name_strings;
+	wchar_t		*wsource;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -149,8 +149,10 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 
 	lp_name_strings = zbx_malloc(&lp_name_strings, 256);
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
+	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
+
+	zbx_free(wsource);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -183,26 +185,32 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 					break;
 			}
 		}
+
+		zbx_free(wsource);
 	}
 
-	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
 		goto out;
 
 	wsource = zbx_utf8_to_unicode(sys_key_2);
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
+	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
 		goto out;
+
+	zbx_free(wsource);
 
 	wsource = zbx_utf8_to_unicode(win_keys[4]);
 
-	if (ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
+	if(ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
 			(LPBYTE)lp_name_strings, &dw_buffer))
 		goto out;
 	else
 		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
 				zbx_unicode_to_utf8( (LPCTSTR)lp_name_strings));
 
-	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	zbx_free(wsource);
+
+	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
 		goto out;
 
 	if (0 != gethostname(os_version->ComputerName, sizeof(os_version->ComputerName)))
