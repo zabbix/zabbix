@@ -2,12 +2,20 @@
 
 noinst_LIBRARIES = libzbxalgo.a
 
+if SERVER
+EVALUATE_C = evaluate.c
+else
+if PROXY
+EVALUATE_C = evaluate.c
+endif
+endif
+
 libzbxalgo_a_SOURCES = \
 	algodefs.c \
 	binaryheap.c \
-	evaluate.c \
+	$(EVALUATE_C) \
 	hashmap.c \
 	hashset.c \
-	vector.c \
 	int128.c \
+	vector.c \
 	vectorimpl.h
