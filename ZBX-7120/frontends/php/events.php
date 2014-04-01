@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
 if (isset($_REQUEST['csv_export'])) {
-	$CSV_EXPORT = true;
+	$csvExport = true;
 	$csvRows = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
@@ -36,7 +36,7 @@ if (isset($_REQUEST['csv_export'])) {
 	require_once dirname(__FILE__).'/include/func.inc.php';
 }
 else {
-	$CSV_EXPORT = false;
+	$csvExport = false;
 
 	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
@@ -215,8 +215,16 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
-// page filter
-if ($source == EVENT_SOURCE_TRIGGERS) {
+// page filter, NOTE: page filter must not be used in csv export
+if ($csvExport) {
+	if (!hasRequest('hostid')) {
+		$_REQUEST['hostid'] = 0;
+	}
+	if (!hasRequest('groupid')) {
+		$_REQUEST['groupid'] = 0;
+	}
+}
+elseif ($source == EVENT_SOURCE_TRIGGERS) {
 	$pageFilter = new CPageFilter(array(
 		'groups' => array(
 			'monitored_hosts' => true,
@@ -231,8 +239,10 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 		'groupid' => get_request('groupid', null),
 		'triggerid' => get_request('triggerid', null)
 	));
+
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
+
 	if ($pageFilter->triggerid > 0) {
 		$_REQUEST['triggerid'] = $pageFilter->triggerid;
 	}
@@ -279,7 +289,7 @@ $r_form->addVar('period', get_request('period'));
 $r_form->addVar('triggerid', 0);
 
 // add host and group filters to the form
-if ($source == EVENT_SOURCE_TRIGGERS) {
+if (!$csvExport && $source == EVENT_SOURCE_TRIGGERS) {
 	$r_form->addItem(array(
 		_('Group').SPACE,
 		$pageFilter->getGroupsCB(true)
@@ -506,7 +516,7 @@ else {
 			_('Status')
 		));
 
-		if ($CSV_EXPORT) {
+		if ($csvExport) {
 			$csvRows[] = array(
 				_('Time'),
 				_('IP'),
@@ -560,7 +570,7 @@ else {
 				new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 			));
 
-			if ($CSV_EXPORT) {
+			if ($csvExport) {
 				$csvRows[] = array(
 					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
 					$event_data['object_data']['ip'],
@@ -586,7 +596,7 @@ else {
 			_('Actions')
 		));
 
-		if ($CSV_EXPORT) {
+		if ($csvExport) {
 			$csvRows[] = array(
 				_('Time'),
 				is_show_all_nodes() ? _('Node') : null,
@@ -600,7 +610,7 @@ else {
 			);
 		}
 
-		if ($pageFilter->hostsSelected) {
+		if (!$csvExport || $pageFilter->hostsSelected) {
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'output' => array('triggerid'),
@@ -609,12 +619,15 @@ else {
 			if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
 				$options['triggerids'] = $_REQUEST['triggerid'];
 			}
-			else if ($pageFilter->hostid > 0) {
-				$options['hostids'] = $pageFilter->hostid;
+			elseif (!$csvExport) {
+				if ($pageFilter->hostid > 0) {
+					$options['hostids'] = $pageFilter->hostid;
+				}
+				elseif ($pageFilter->groupid > 0) {
+					$options['groupids'] = $pageFilter->groupid;
+				}
 			}
-			else if ($pageFilter->groupid > 0) {
-				$options['groupids'] = $pageFilter->groupid;
-			}
+
 			$triggers = API::Trigger()->get($options);
 
 			// query event with short data
@@ -754,7 +767,7 @@ else {
 					$action
 				));
 
-				if ($CSV_EXPORT) {
+				if ($csvExport) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
@@ -775,12 +788,12 @@ else {
 		}
 	}
 
-	if ($CSV_EXPORT) {
-		print(zbx_toCSV($csvRows));
-		exit;
-	}
-
 	$table = array($paging, $table, $paging);
+}
+
+if ($csvExport) {
+	print(zbx_toCSV($csvRows));
+	exit;
 }
 
 $eventsWidget->addItem($table);

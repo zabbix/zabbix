@@ -94,9 +94,6 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'jsrpc.php'
-			),
-			array(
-				'url' => 'zbx_events_export.csv'
 			)
 		)
 	),
