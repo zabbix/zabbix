@@ -62,11 +62,17 @@ static void	process_listener(zbx_sock_t *s)
 			if (NULL != value)
 			{
 				static char	*buffer = NULL;
-				static size_t	buffer_alloc = 0;
+				static size_t	buffer_alloc = 256;
 				size_t		buffer_offset = 0;
 
+				if (NULL == buffer)
+				{
+					buffer = zbx_malloc(buffer, buffer_alloc);
+				}
+
 				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-						ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED));
+						ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED) - 1);
+				buffer_offset++;
 				zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
 
 				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, CONFIG_TIMEOUT);
