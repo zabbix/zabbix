@@ -427,11 +427,13 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout)
 {
-	zbx_uint64_t	len64;
+	zbx_uint64_t	len64, len64_le;
 	ssize_t		i = 0, written = 0;
 	int		ret = SUCCEED;
 
 	ZBX_TCP_START();
+
+	len64 = (zbx_uint64_t)strlen(data);
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -446,11 +448,10 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 			goto cleanup;
 		}
 
-		len64 = (zbx_uint64_t)strlen(data);
-		len64 = zbx_htole_uint64(len64);
+		len64_le = zbx_htole_uint64(len64);
 
 		/* write data length */
-		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64, sizeof(len64)))
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64_le, sizeof(len64_le)))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -458,9 +459,9 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		}
 	}
 
-	while (written < (ssize_t)strlen(data))
+	while (written < (ssize_t)len64)
 	{
-		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(strlen(data) - written))))
+		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(len64 - written))))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
