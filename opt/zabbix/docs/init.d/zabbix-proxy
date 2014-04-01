@@ -28,10 +28,13 @@ prog=${exec##*/}
 conf=/opt/zabbix/etc/zabbix_proxy.conf
 lockfile=/var/lock/subsys/zabbix-proxy
 
+opts="-c $conf"
+[ "$2" = "--rsm" ] && opts="$opts --rsm"
+
 start()
 {
     echo -n $"Starting Zabbix proxy: "
-    daemon $exec -c $conf
+    daemon $exec $opts
     rv=$?
     echo
     [ $rv -eq 0 ] && touch $lockfile
