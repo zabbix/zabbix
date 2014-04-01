@@ -191,7 +191,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 				__function_name, f->host, f->key, f->func, f->params);
 	}
 
-	DCconfig_get_items_by_keys_h(items, keys, errcodes, exp->functions_num);
+	DCconfig_get_items_by_keys(items, keys, errcodes, exp->functions_num);
 
 	now = time(NULL);
 

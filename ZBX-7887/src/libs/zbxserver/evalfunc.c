@@ -2203,7 +2203,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	keys.host = zbx_strdup(NULL, host);
 	keys.key = zbx_strdup(NULL, key);
 
-	DCconfig_get_items_by_keys_h(&items, &keys, &errcodes, 1);
+	DCconfig_get_items_by_keys(&items, &keys, &errcodes, 1);
 
 	if (SUCCEED != errcodes)
 	{

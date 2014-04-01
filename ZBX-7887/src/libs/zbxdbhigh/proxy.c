@@ -2055,10 +2055,13 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		keys[i].key = values[i].key;
 	}
 
-	DCconfig_get_items_by_keys_ph(items, proxy_hostid, keys, errcodes, values_num);
+	DCconfig_get_items_by_keys(items, keys, errcodes, values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
+		if (proxy_hostid != items[i].host.proxy_hostid)
+			continue;
+
 		if (SUCCEED != errcodes[i])
 			continue;
 
