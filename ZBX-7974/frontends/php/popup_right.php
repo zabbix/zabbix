@@ -93,8 +93,8 @@ $hostGroups = API::HostGroup()->get(array(
 
 if ($availableNodeIds && $nodeId === null) {
 	foreach ($hostGroups as $key => $hostGroup) {
-		$hostGroups[$key]['name'] =
-			get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER).$hostGroup['name'];
+		$hostGroups[$key]['name'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER).
+			$hostGroup['name'];
 	}
 }
 
