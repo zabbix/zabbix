@@ -100,7 +100,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	memset(pst, 0, sizeof(pst));
 
-/* TODO is it possible to replace it with if() */
 	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx)))
 	{
 		for (i = 0; i < count; i++)

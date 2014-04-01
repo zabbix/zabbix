@@ -237,8 +237,6 @@ int	main(int argc, char **argv)
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s_in)))
 		{
-/* TODO not sure if it is ok to trim it
-			zbx_rtrim(command, "\r\n");*/
 			zbx_rtrim(s_in.buffer, "\r\n");
 
 			zabbix_log(LOG_LEVEL_DEBUG, "requested [%s]", s_in.buffer);

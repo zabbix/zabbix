@@ -24,13 +24,14 @@ static int			mib[] = {CTL_VM, VM_UVMEXP2};
 static size_t			len;
 static struct uvmexp_sysctl	uvm;
 
-#define ZBX_SYSCTL(value)								\
-											\
-	len = sizeof(value);								\
-	if (0 != sysctl(mib, 2, &value, &len, NULL, 0))					\
-	{										\
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));		\
-		return SYSINFO_RET_FAIL;						\
+#define ZBX_SYSCTL(value)									\
+												\
+	len = sizeof(value);									\
+	if (0 != sysctl(mib, 2, &value, &len, NULL, 0))						\
+	{											\
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",	\
+			zbx_strerror(errno)));							\
+		return SYSINFO_RET_FAIL;							\
 	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)

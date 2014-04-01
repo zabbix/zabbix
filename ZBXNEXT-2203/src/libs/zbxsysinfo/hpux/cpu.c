@@ -103,7 +103,6 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-/* TODO error reporting */
 	return get_cpustat(result, cpu_num, state, mode);
 }
 

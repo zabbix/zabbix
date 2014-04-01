@@ -36,13 +36,11 @@
 static void	process_listener(zbx_sock_t *s)
 {
 	AGENT_RESULT	result;
-	char		*buffer = NULL;
 	char		**value = NULL;
 	int		ret;
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, CONFIG_TIMEOUT)))
 	{
-/* Not sure if it's ok to trim here */
 		zbx_rtrim(s->buffer, "\r\n");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
@@ -63,9 +61,15 @@ static void	process_listener(zbx_sock_t *s)
 
 			if (NULL != value)
 			{
-				buffer = zbx_dsprintf(buffer, ZBX_NOTSUPPORTED ":%s", *value);
-				ret = zbx_tcp_send_to(s, buffer, CONFIG_TIMEOUT);
-				zbx_free(buffer);
+				static char	*buffer = NULL;
+				static size_t	buffer_alloc = 0;
+				size_t		buffer_offset = 0;
+
+				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+						ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED));
+				zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
+
+				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, CONFIG_TIMEOUT);
 			}
 			else
 			{

@@ -22,13 +22,14 @@
 
 static u_int	pagesize = 0;
 
-#define ZBX_SYSCTLBYNAME(name, value)							\
-											\
-	len = sizeof(value);								\
-	if (0 != sysctlbyname(name, &value, &len, NULL, 0))				\
-	{										\
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctlbyname."));	\
-		return SYSINFO_RET_FAIL;						\
+#define ZBX_SYSCTLBYNAME(name, value)								\
+												\
+	len = sizeof(value);									\
+	if (0 != sysctlbyname(name, &value, &len, NULL, 0))					\
+	{											\
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",	\
+			zbx_strerror(errno)));							\
+		return SYSINFO_RET_FAIL;							\
 	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)

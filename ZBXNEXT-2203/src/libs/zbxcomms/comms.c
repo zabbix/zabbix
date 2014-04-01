@@ -1076,7 +1076,10 @@ cleanup:
 		zbx_tcp_timeout_cleanup(s);
 
 	if (FAIL != total_bytes)
+	{
 		total_bytes += read_bytes;
+		s->read_bytes = read_bytes;
+	}
 
 	return total_bytes;
 }

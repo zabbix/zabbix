@@ -170,7 +170,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -178,7 +179,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -309,7 +311,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -317,7 +320,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
+			zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

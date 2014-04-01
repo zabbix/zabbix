@@ -196,9 +196,9 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
 	else
-/* TODO line too long */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: active, available, buffers, cached, free, inactive, pavailable, pused, shared, total, used, wired."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: active, available, buffers, cached, free,"
+			" inactive, pavailable, pused, shared, total, used, wired."));
 		ret = SYSINFO_RET_FAIL;
 	}
 

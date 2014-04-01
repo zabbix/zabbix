@@ -707,7 +707,6 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
 		return;
 
-/* TODO or perhaps it's better to get rid of data? */
 	process_trap(sock, sock->buffer);
 }
 
