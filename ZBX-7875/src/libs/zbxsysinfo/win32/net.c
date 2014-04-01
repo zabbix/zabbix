@@ -31,6 +31,7 @@ static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 	LPTSTR			wdescr;
 	LPSTR			utf8_descr;
 	zbx_win_version_t	os_version_info;
+
 	if (NULL == mb_to_unicode)
 	{
 		memset(&os_version_info, '\0', sizeof(os_version_info));
