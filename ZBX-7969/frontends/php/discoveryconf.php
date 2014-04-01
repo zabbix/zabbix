@@ -288,7 +288,7 @@ else {
 			// description
 			$data['drules'][$druleId]['description'] = array();
 
-			if (isset($drule['proxy_hostid']) && $drule['proxy_hostid']) {
+			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
 
 				array_push($data['drules'][$druleId]['description'], $proxy['host'].NAME_DELIMITER);
