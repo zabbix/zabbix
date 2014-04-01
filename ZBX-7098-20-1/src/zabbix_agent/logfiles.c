@@ -122,7 +122,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot split empty path");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot split empty path");
 		goto out;
 	}
 
@@ -139,7 +139,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, format))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot split '%s'", filename);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot split '%s'", filename);
 			goto out;
 		}
 
@@ -148,7 +148,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		/* Windows world verification */
 		if (sz + 1 > MAX_PATH)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot proceed: directory path is too long");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot proceed: directory path is too long");
 			zbx_free(*directory);
 			zbx_free(*format);
 			goto out;
@@ -181,12 +181,13 @@ static int	split_filename(const char *filename, char **directory, char **format)
 #else /* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "filename '%s' does not contain any path separator '%c'", filename, PATH_SEPARATOR);
+		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain any path separator '%c'", filename,
+				PATH_SEPARATOR);
 		goto out;
 	}
 	if (SUCCEED != split_string(filename, separator, directory, format))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot split filename '%s' by '%c'", filename, PATH_SEPARATOR);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot split filename '%s' by '%c'", filename, PATH_SEPARATOR);
 		goto out;
 	}
 
@@ -647,7 +648,8 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 			if (0 == cmp)
 			{
 				/* the file already exists, quite impossible branch */
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() file '%s' already added", __function_name, filename);
+				zabbix_log(LOG_LEVEL_WARNING, "%s() file '%s' already added", __function_name,
+						filename);
 				goto out;
 			}
 
@@ -896,7 +898,8 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 #else	/* not _WINDOWS */
 	if (NULL == (dir = opendir(directory)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
+				zbx_strerror(errno));
 		regfree(&re);
 		zbx_free(directory);
 		zbx_free(format);
