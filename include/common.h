@@ -819,9 +819,7 @@ void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
-#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
-void	compress_signs(char *str);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);

@@ -3935,8 +3935,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		/* when evaluating trigger expression                                                 */
 		event.trigger.expression = tr->expression_orig;
 
-		zbx_remove_whitespace(tr->expression);
-
 		if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL,
 				&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
