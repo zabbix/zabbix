@@ -36,6 +36,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8001] fixed host massupdate inventory tab being reset after choosing an inventory mode (Ivo)
 ..F....... [ZBX-7873] removed redundant error message in login page in event when frontend access for guest is not available (Eduard)
 ..F....... [ZBX-7969] fixed discovery checks sorting in action configuration page (Eduard)
 ..F....... [ZBX-7969] fixed sorting by name in discovery rule page (Eduard)
