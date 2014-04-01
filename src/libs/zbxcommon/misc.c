@@ -2032,11 +2032,13 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
  ******************************************************************************/
 double	str2double(const char *str)
 {
-	size_t		sz;
+	size_t	sz;
+	double	factor;
 
 	sz = strlen(str) - 1;
+	factor = suffix2factor(str[sz]);
 
-	return atof(str) * suffix2factor(str[sz]);
+	return atof(str) * (0 == factor ? 1 : factor);
 }
 
 /******************************************************************************
