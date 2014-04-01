@@ -46,11 +46,17 @@ if (ZBX_DISTRIBUTED) {
 	$nodeId = getRequest('nodeid', CProfile::get('web.popup_right.nodeid.last', get_current_nodeid(false)));
 	$availableNodeIds = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_IDS_ARRAY);
 
+	$profileNodeId = $nodeId;
+
 	if (!isset($availableNodeIds[$nodeId])) {
 		$nodeId = null;
+
+		if ($nodeId != 0) {
+			$profileNodeId = null;
+		}
 	}
 
-	CProfile::update('web.popup_right.nodeid.last', $nodeId, PROFILE_TYPE_ID);
+	CProfile::update('web.popup_right.nodeid.last', $profileNodeId, PROFILE_TYPE_ID);
 }
 
 /*
