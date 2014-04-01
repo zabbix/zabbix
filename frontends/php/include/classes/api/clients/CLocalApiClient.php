@@ -116,7 +116,7 @@ class CLocalApiClient extends CApiClient {
 		// authenticate
 		if ($this->requiresAuthentication($api, $method)) {
 			if (zbx_empty($auth)) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised'));
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized'));
 			}
 
 			$user = $this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
