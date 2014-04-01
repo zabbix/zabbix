@@ -62,7 +62,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
 
-	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, protocol, timeout)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
