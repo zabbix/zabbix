@@ -186,7 +186,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 		foreach (getSeverityCaption() as $key => $caption) {
 			$mediaActive = ($media['severity'] & (1 << $key));
 
-			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : null);
+			$mediaSeverity[$key] = new CSpan(mb_substr($caption, 0, 1), $mediaActive ? 'enabled' : null);
 			$mediaSeverity[$key]->setHint($caption.($mediaActive ? ' (on)' : ' (off)'));
 		}
 

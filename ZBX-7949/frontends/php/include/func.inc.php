@@ -286,14 +286,14 @@ function zbx_date2str($format, $value = null) {
 	);
 
 	$output = $part = '';
-	$length = zbx_strlen($format);
+	$length = strlen($format);
 
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
-		$char = zbx_substr($format, $i, 1);
+		$pchar = ($i > 0) ? substr($format, $i - 1, 1) : '';
+		$char = substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
-			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
+			$output .= (strlen($part) ? date($part, $value) : '').$rplcs[$char];
 			$part = '';
 		}
 		else {
@@ -301,7 +301,7 @@ function zbx_date2str($format, $value = null) {
 		}
 	}
 
-	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+	$output .= (strlen($part) > 0) ? date($part, $value) : '';
 
 	return $prefix.$output;
 }
@@ -990,67 +990,6 @@ function zbx_stristr($haystack, $needle) {
 	}
 }
 
-function zbx_substring($haystack, $start, $end = null) {
-	if (!is_null($end) && $end < $start) {
-		return '';
-	}
-
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		if (is_null($end)) {
-			$result = mb_substr($haystack, $start);
-		}
-		else {
-			$result = mb_substr($haystack, $start, ($end - $start));
-		}
-	}
-	else {
-		if (is_null($end)) {
-			$result = substr($haystack, $start);
-		}
-		else {
-			$result = substr($haystack, $start, ($end - $start));
-		}
-	}
-
-	return $result;
-}
-
-function zbx_substr($string, $start, $length = null) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		if (is_null($length)) {
-			$result = mb_substr($string, $start);
-		}
-		else {
-			$result = mb_substr($string, $start, $length);
-		}
-	}
-	else {
-		if (is_null($length)) {
-			$result = substr($string, $start);
-		}
-		else {
-			$result = substr($string, $start, $length);
-		}
-	}
-
-	return $result;
-}
-
-function zbx_str_revert($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$result = '';
-		$stop = mb_strlen($str);
-		for ($idx = 0; $idx < $stop; $idx++) {
-			$result = mb_substr($str, $idx, 1).$result;
-		}
-	}
-	else {
-		$result = strrev($str);
-	}
-
-	return $result;
-}
-
 function zbx_strtoupper($str) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strtoupper($str);
@@ -1075,17 +1014,6 @@ function zbx_strpos($haystack, $needle, $offset = 0) {
 	}
 	else {
 		return strpos($haystack, $needle, $offset);
-	}
-}
-
-function zbx_stripos($haystack, $needle, $offset = 0) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$haystack = mb_convert_case($haystack, MB_CASE_LOWER);
-		$needle = mb_convert_case($needle, MB_CASE_LOWER);
-		return mb_strpos($haystack, $needle, $offset);
-	}
-	else {
-		return stripos($haystack, $needle, $offset);
 	}
 }
 
@@ -1510,11 +1438,11 @@ function zbx_str2links($text) {
 
 	$start = 0;
 	foreach ($matches[0] as $match) {
-		$result[] = zbx_substr($text, $start, $match[1] - $start);
+		$result[] = mb_substr($text, $start, $match[1] - $start);
 		$result[] = new CLink($match[0], $match[0], null, null, true);
-		$start = $match[1] + zbx_strlen($match[0]);
+		$start = $match[1] + mb_strlen($match[0]);
 	}
-	$result[] = zbx_substr($text, $start, zbx_strlen($text));
+	$result[] = mb_substr($text, $start, mb_strlen($text));
 
 	return $result;
 }

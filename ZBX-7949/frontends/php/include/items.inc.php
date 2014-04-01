@@ -896,8 +896,8 @@ function formatHistoryValue($value, array $item, $trim = true) {
 		// break; is not missing here
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-			if ($trim && zbx_strlen($value) > 20) {
-				$value = zbx_substr($value, 0, 20).'...';
+			if ($trim && mb_strlen($value) > 20) {
+				$value = mb_substr($value, 0, 20).'...';
 			}
 
 			if ($mapping !== false) {
