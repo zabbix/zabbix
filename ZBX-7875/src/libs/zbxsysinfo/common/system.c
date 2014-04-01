@@ -124,7 +124,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
  ******************************************************************************/
 int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
-	const char	*__function_name = "get_win_version";
+	const char	*__function_name = "zbx_get_win_version";
 	int		ret = FAIL;
 
 	/* Order of win_keys is vital.
