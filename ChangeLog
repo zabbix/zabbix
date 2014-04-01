@@ -36,6 +36,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7826] fixed padding near textarea in acknowledges page (Eduard)
 ...G...PS. [ZBX-4998] fixed inconsistency of logging on Linux and Windows agents, and fixed information level logging at debug level 0 (igors)
 ....I..... [ZBX-6235] fixed unnecessary compilation of C code when only --enable-java is passed to ./configure (asaveljevs)
 ...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
@@ -936,6 +937,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
