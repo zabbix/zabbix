@@ -36,6 +36,8 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7969] fixed discovery checks sorting in action configuration page (Eduard)
+..F....... [ZBX-7969] fixed sorting by name in discovery rule page (Eduard)
 ..F....... [ZBX-7826] fixed padding near textarea in acknowledges page (Eduard)
 ...G...PS. [ZBX-4998] fixed inconsistency of logging on Linux and Windows agents, and fixed information level logging at debug level 0 (igors)
 ....I..... [ZBX-6235] fixed unnecessary compilation of C code when only --enable-java is passed to ./configure (asaveljevs)
