@@ -103,7 +103,6 @@ class CWebUser {
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				error(_('GUI access disabled.'));
 				throw new Exception();
 			}
 
