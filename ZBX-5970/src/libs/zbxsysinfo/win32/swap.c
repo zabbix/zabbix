@@ -25,6 +25,8 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
+	DWORDLONG	real_swap_total_ex, real_swap_avail_ex;
+	SIZE_T		real_swap_total, real_swap_avail;
 
 	char swapdev[10];
 	char mode[10];
@@ -64,14 +66,22 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
+		real_swap_total_ex = ((ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys) >= 0) ?
+				ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys : 0;
+		real_swap_avail_ex = ((ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys) < real_swap_total_ex) ?
+				ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys : real_swap_total_ex;
+
+		if (real_swap_avail_ex < 0)
+			real_swap_avail_ex = 0;
+
 		if (strcmp(mode, "total") == 0)
 		{
-			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys);
+			SET_UI64_RESULT(result, real_swap_total_ex);
 			return SYSINFO_RET_OK;
 		}
 		else if (strcmp(mode, "free") == 0)
 		{
-			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_avail_ex);
 			return SYSINFO_RET_OK;
 		}
 		else
@@ -83,14 +93,22 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		GlobalMemoryStatus(&ms);
 
+		real_swap_total = ((ms.dwTotalPageFile - ms.dwTotalPhys) >= 0) ?
+				ms.dwTotalPageFile - ms.dwTotalPhys : 0;
+		real_swap_avail = ((ms.dwAvailPageFile - ms.dwAvailPhys) < real_swap_total) ?
+				ms.dwAvailPageFile - ms.dwAvailPhys : real_swap_total;
+
+		if (real_swap_avail < 0)
+			real_swap_avail = 0;
+
 		if (strcmp(mode,"total") == 0)
 		{
-			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwTotalPhys);
+			SET_UI64_RESULT(result, real_swap_total);
 			return SYSINFO_RET_OK;
 		}
 		else if (strcmp(mode,"free") == 0)
 		{
-			SET_UI64_RESULT(result, ms.dwAvailPageFile);
+			SET_UI64_RESULT(result, real_swap_avail);
 			return SYSINFO_RET_OK;
 		}
 	}
