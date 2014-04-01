@@ -138,7 +138,7 @@ static double	evaluate_term9()
 {
 	double	result;
 
-	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
 		ptr++;
 
 	if ('\0' == *ptr)
@@ -188,7 +188,7 @@ static double	evaluate_term8()
 {
 	double	result;
 
-	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
 		ptr++;
 
 	if ('-' == *ptr)
@@ -215,7 +215,7 @@ static double	evaluate_term7()
 {
 	double	result;
 
-	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
 		ptr++;
 
 	if ('n' == *ptr && 'o' == *(ptr + 1) && 't' == *(ptr + 2) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
