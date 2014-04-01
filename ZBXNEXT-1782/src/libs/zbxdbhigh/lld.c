@@ -121,20 +121,9 @@ static void	lld_filter_clean(lld_filter_t *filter)
  *                                                                            *
  * Parameters: filter     - [IN] the lld filter                               *
  *             lld_ruleid - [IN] the lld rule id                              *
- *             evaltype   - [IN] the evaluation type, see                     *
- *                               CONDITION_EVAL_TYPE_* macros                 *
- *             formula    - [IN] the lld filter formula                       *
- *             error      - [OUT] the error description                       *
- *                                                                            *
- * Return value: SUCCEED - the filter was loaded successfully                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: In the case of failure the error description is allocated by     *
- *           this function and must be freed by the caller.                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int evaltype,
-		const char *formula, char **error)
+static void	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -162,18 +151,8 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 	}
 	DBfree_result(result);
 
-	if (CONDITION_EVAL_TYPE_AND_OR == evaltype)
+	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
-
-	if (CONDITION_EVAL_TYPE_EXPRESSION == evaltype &&
-			FAIL == translate_expression(formula, &filter->expression, error))
-	{
-		return FAIL;
-	}
-
-	filter->evaltype = evaltype;
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -330,8 +309,7 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
  *                                                                            *
  * Comments: 1) replace {item_condition} references with action condition     *
  *              evaluation results (1 or 0)                                   *
- *           2) pack the resulting expression by removing spaces              *
- *           3) call evaluate() to calculate the final result                 *
+ *           2) call evaluate() to calculate the final result                 *
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_parse *jp_row)
@@ -339,7 +317,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 	const char	*__function_name = "filter_evaluate_expression";
 
 	int		i, ret = FAIL, id_len;
-	char		*expression, id[32], *src, *dst, error[256];
+	char		*expression, id[32], *p, error[256];
 	double		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __function_name, filter->expression);
@@ -359,26 +337,17 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
-		src = expression;
+		p = expression;
 
-		while (NULL != (src = strstr(src, id)))
+		while (NULL != (p = strstr(p, id)))
 		{
 			id_len = strlen(id);
 
-			*src = (SUCCEED == ret ? '1' : '0');
-			memset(src + 1, ' ', id_len - 1);
-			src += id_len;
+			*p = (SUCCEED == ret ? '1' : '0');
+			memset(p + 1, ' ', id_len - 1);
+			p += id_len;
 		}
 	}
-
-	src = dst = expression;
-
-	do
-	{
-		if (' ' != *src)
-			*dst++ = *src;
-	}
-	while ('\0' != *src++);
 
 	if (SUCCEED == evaluate(&result, expression, error, sizeof(error)))
 		ret = (0 == result ? FAIL : SUCCEED);
@@ -502,14 +471,13 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid = 0;
-	char			*discovery_key = NULL, *formula = NULL, *error = NULL, *db_error = NULL, *error_esc;
+	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc;
 	unsigned char		state = 0;
 	unsigned short		lifetime;
 	zbx_vector_ptr_t	lld_rows;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
-	int			evaltype;
 	lld_filter_t		filter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
@@ -533,8 +501,8 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		state = (unsigned char)atoi(row[2]);
-		evaltype = atoi(row[3]);
-		formula = zbx_strdup(formula, row[4]);
+		filter.evaltype = atoi(row[3]);
+		filter.expression = zbx_strdup(NULL, row[4]);
 		db_error = zbx_strdup(db_error, row[5]);
 
 		lifetime_str = zbx_strdup(NULL, row[6]);
@@ -556,8 +524,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 	if (0 == hostid)
 		goto clean;
 
-	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, evaltype, formula, &error))
-		goto error;
+	lld_filter_load(&filter, lld_ruleid);
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &error))
 		goto error;
@@ -605,7 +572,6 @@ error:
 clean:
 	zbx_free(error);
 	zbx_free(db_error);
-	zbx_free(formula);
 	zbx_free(discovery_key);
 	zbx_free(sql);
 
