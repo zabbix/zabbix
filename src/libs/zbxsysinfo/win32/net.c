@@ -483,8 +483,6 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-/* TODO no MSG set below */
-
 	dwSize = sizeof(MIB_TCPTABLE);
 	pTcpTable = (MIB_TCPTABLE *)zbx_malloc(pTcpTable, dwSize);
 

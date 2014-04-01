@@ -97,7 +97,6 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = EXECUTE_STR(command, result);
 
-/* TODO we should distinguish between error and empty result */
 	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
 	{
 		/* only whitespace */

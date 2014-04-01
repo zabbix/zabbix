@@ -47,7 +47,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_sock_t	s;
-	char		*tmp, buffer[MAX_STRING_LEN];
+	char		buffer[MAX_STRING_LEN];
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -66,19 +66,18 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED == ret)
 	{
-/* TODO is it ok ? */
 		zbx_rtrim(s.buffer, " \r\n");
 		zbx_ltrim(s.buffer, " ");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s.buffer);
 
-		if (0 == strncmp(s.buffer, ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED)-1))
+		if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED))
 		{
-			/* 'ZBX_NOTSUPPORTED:<error message>' */
-			if (NULL !=  (tmp = strchr(s.buffer, ':')))
+			/* 'ZBX_NOTSUPPORTED\0<error message>' */
+			if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
 			{
 				zbx_snprintf(buffer, sizeof(buffer), "%s",
-					tmp + 1);
+					s.buffer + sizeof(ZBX_NOTSUPPORTED));
 			}
 			else
 			{
