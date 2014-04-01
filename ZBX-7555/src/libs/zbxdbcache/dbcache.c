@@ -1247,7 +1247,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		zbx_vector_uint64_append(&ids, items[i].itemid);
 	}
 
-	zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_ptr_sort(&inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	DCadd_update_inventory_sql(&sql_offset, &inventory_values);
 
