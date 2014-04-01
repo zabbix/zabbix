@@ -977,9 +977,9 @@ typedef struct
 	char ProcessorArchitecture[64];
 	char ComputerName[64];
 }
-OS_WIN_VERSION;
+zbx_win_version_t;
 
-int	get_win_version(OS_WIN_VERSION *os_version);
+int	zbx_get_win_version(zbx_win_version_t *os_version);
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);

@@ -122,7 +122,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_win_version(OS_WIN_VERSION *os_version)
+int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
 	const char	*__function_name = "get_win_version";
 	int		ret = FAIL;
@@ -221,7 +221,7 @@ out:
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
-	OS_WIN_VERSION		os_version_info;
+	zbx_win_version_t	os_version_info;
 	char			*os = NULL;
 	size_t			os_alloc, os_offset = 0;
 
@@ -231,7 +231,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	memset(&os_version_info, '\0', sizeof(os_version_info));
 
-	if (0 == get_win_version(&os_version_info))
+	if (0 == zbx_get_win_version(&os_version_info))
 	{
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "Windows %s %s.%s %s %s %s",
 				os_version_info.ComputerName,
