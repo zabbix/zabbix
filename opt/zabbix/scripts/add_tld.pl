@@ -93,6 +93,7 @@ my $rv = GetOptions(\%OPTS,
 		    "epp-privkey=s",
 		    "epp-commands=s",
 		    "epp-serverid=s",
+		    "epp-test-prefix=s",
 		    "ns-servers-v4=s",
 		    "ns-servers-v6=s",
 		    "rdds-ns-string=s",
@@ -1299,6 +1300,7 @@ sub create_main_template {
 	create_macro('{$RSM.EPP.PASSWD}', encrypt_sensdata("Please enter EPP passphrase, then press <ENTER> and then EPP password: "), $templateid, 1);
 	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase again: ", $OPTS{'epp-privkey'}), $templateid, 1);
 	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, 1);
+	create_macro('{$RSM.EPP.TESTPREFIX}', $OPTS{'epp-test-prefix'}, $templateid, 1);
     }
 
     return $templateid;
@@ -1764,12 +1766,14 @@ Other options
                 list of EPP servers separated by comma: "NAME1,NAME2,..."
         --epp-user
                 specify EPP username
-	--epp-serverid
-                specify expected EPP Server ID string in reply
 	--epp-cert
                 path to EPP Client certificates file
 	--epp-privkey
                 path to EPP Client private key file (unencrypted)
+	--epp-serverid
+                specify expected EPP Server ID string in reply
+	--epp-test-prefix=STRING
+                this string represents DOMAIN (in DOMAIN.TLD) to use in EPP commands
 	--epp-commands
                 path to a directory on the Probe Node containing EPP command templates
         --rdds-ns-string=STRING
@@ -1799,9 +1803,10 @@ sub validate_input {
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
     if ($OPTS{'epp-servers'}) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
-	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP Client certificate file must be specified (--epp-cert)\n" unless ($OPTS{'epp-cert'});
 	$msg .= "EPP Client private key file must be specified (--epp-privkey)\n" unless ($OPTS{'epp-privkey'});
+	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
+	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
     }
 
     unless ($msg eq "") {

@@ -44,8 +44,6 @@
 #define EXPECTED_RESULT_CODE		"1000"
 #define EXPECTED_RESULT_CODE_LOGOUT	"1500"
 
-#define REQUEST_DOMAIN			"icann-test.icanntest1"
-
 #define COMMAND_LOGIN			"login"
 #define COMMAND_INFO			"info"
 #define COMMAND_UPDATE			"update"
@@ -702,7 +700,7 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 		}
 
 		/* the AUTHORITY section should contain at least one NS RR for the last label in  */
-		/* PREFIX, e.g. "icann-test" when querying for "blahblah.icann-test.icanntest1.") */
+		/* PREFIX, e.g. "icann-test" when querying for "blahblah.icann-test.example.") */
 		if (SUCCEED != zbx_get_last_label(testname, &last_label, err, err_size))
 		{
 			*rtt = ZBX_EC_DNS_NS_EREPLY;
@@ -2588,41 +2586,34 @@ out:
 	return ret;
 }
 
-static int	get_tmpl(const char *epp_commands, const char *command, char *tmpl_buf, size_t tmpl_buf_size)
+static int	get_tmpl(const char *epp_commands, const char *command, char **tmpl)
 {
-	static char	path_buf[512];
+	char	buf[256];
+	size_t	tmpl_alloc = 512, tmpl_offset = 0;
+	int	f, nbytes, ret = FAIL;
 
-	FILE		*f;
-	size_t		read;
-	int		ret = FAIL;
+	zbx_snprintf(buf, sizeof(buf), "%s/%s.tmpl", epp_commands, command);
 
-	zbx_snprintf(path_buf, sizeof(path_buf), "%s/%s.tmpl", epp_commands, command);
-
-	if (NULL == (f = fopen(path_buf, "r")))
+	if (-1 == (f = zbx_open(buf, O_RDONLY)))
 		goto out;
 
-	if (0 >= (read = fread(tmpl_buf, sizeof(char), tmpl_buf_size - 1, f)))
-		goto out;
+	*tmpl = zbx_malloc(*tmpl, tmpl_alloc);
 
-	tmpl_buf[read] = '\0';
+	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), "")))
+		zbx_strncpy_alloc(tmpl, &tmpl_alloc, &tmpl_offset, buf, nbytes);
+
+	if (-1 == nbytes)
+	{
+		zbx_free(*tmpl);
+		goto out;
+	}
 
 	ret = SUCCEED;
 out:
-	if (NULL != f)
-		fclose(f);
+	if (-1 != f)
+		close(f);
 
 	return ret;
-}
-
-static int	set_command(char *command_buf, size_t command_buf_size, const char *fmt, ...)
-{
-	va_list	args;
-
-	va_start(args, fmt);
-	vsnprintf(command_buf, command_buf_size - 1, fmt, args);
-	va_end(args);
-
-	return SUCCEED;
 }
 
 static int	get_first_message(SSL *ssl, int *res, FILE *log_fd, const char *epp_serverid, char *err, size_t err_size)
@@ -2661,32 +2652,43 @@ out:
 	return ret;
 }
 
+static void	zbx_tmpl_replace(char **tmpl, const char *variable, const char *value)
+{
+	const char	*p;
+	size_t		variable_size, l_pos, r_pos;
+
+	variable_size = strlen(variable);
+
+	while (NULL != (p = strstr(*tmpl, variable)))
+	{
+		l_pos = p - *tmpl;
+		r_pos = l_pos + variable_size - 1;
+
+		zbx_replace_string(tmpl, p - *tmpl, &r_pos, value);
+	}
+}
+
 static int	command_login(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
 		const char *epp_user, const char *epp_passwd, char *err, size_t err_size)
 {
-	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
-			*data = NULL;
+	char		*tmpl = NULL, xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t		data_len;
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, &tmpl))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
 		goto out;
 	}
 
-	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, epp_user, epp_passwd))
-	{
-		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
-		*rtt = ZBX_EC_INTERNAL;
-		goto out;
-	}
+	zbx_tmpl_replace(&tmpl, "{TMPL_EPP_USER}", epp_user);
+	zbx_tmpl_replace(&tmpl, "{TMPL_EPP_PASSWD}", epp_passwd);
 
 	zbx_timespec(&start);
 
-	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
+	if (SUCCEED != epp_send_message(ssl, tmpl, strlen(tmpl), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*rtt = ZBX_EC_EPP_LOGINTO;
@@ -2721,21 +2723,24 @@ static int	command_login(const char *epp_commands, const char *name, SSL *ssl, i
 	ret = SUCCEED;
 out:
 	if (NULL != data)
-		free(data);
+		zbx_free(data);
+
+	if (NULL != tmpl)
+		zbx_free(tmpl);
 
 	return ret;
 }
 
 static int	command_update(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
-		char *err, size_t err_size)
+		const char *epp_testprefix, const char *domain, char *err, size_t err_size)
 {
-	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	char		*tmpl = NULL, xml_value[XML_VALUE_BUF_SIZE], *data = NULL, tsbuf[32], buf[ZBX_HOST_BUF_SIZE];
 	size_t		data_len;
 	time_t		now;
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, &tmpl))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
@@ -2743,17 +2748,16 @@ static int	command_update(const char *epp_commands, const char *name, SSL *ssl, 
 	}
 
 	time(&now);
+	zbx_snprintf(tsbuf, sizeof(tsbuf), "%llu", now);
 
-	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, REQUEST_DOMAIN, now, now))
-	{
-		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
-		*rtt = ZBX_EC_INTERNAL;
-		goto out;
-	}
+	zbx_snprintf(buf, sizeof(buf), "%s.%s", epp_testprefix, domain);
+
+	zbx_tmpl_replace(&tmpl, "{TMPL_DOMAIN}", buf);
+	zbx_tmpl_replace(&tmpl, "{TMPL_TIMESTAMP}", tsbuf);
 
 	zbx_timespec(&start);
 
-	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
+	if (SUCCEED != epp_send_message(ssl, tmpl, strlen(tmpl), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*rtt = ZBX_EC_EPP_UPDATETO;
@@ -2788,37 +2792,36 @@ static int	command_update(const char *epp_commands, const char *name, SSL *ssl, 
 	ret = SUCCEED;
 out:
 	if (NULL != data)
-		free(data);
+		zbx_free(data);
+
+	if (NULL != tmpl)
+		zbx_free(tmpl);
 
 	return ret;
 }
 
 static int	command_info(const char *epp_commands, const char *name, SSL *ssl, int *rtt, FILE *log_fd,
-		char *err, size_t err_size)
+		const char *epp_testprefix, const char *domain, char *err, size_t err_size)
 {
-	char		command_buf[COMMAND_BUF_SIZE], tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE],
-			*data = NULL;
+	char		*tmpl = NULL, xml_value[XML_VALUE_BUF_SIZE], *data = NULL, buf[ZBX_HOST_BUF_SIZE];
 	size_t		data_len;
 	zbx_timespec_t	start, end;
 	int		ret = FAIL;
 
-	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, &tmpl))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		*rtt = ZBX_EC_INTERNAL;
 		goto out;
 	}
 
-	if (SUCCEED != set_command(command_buf, sizeof(command_buf), tmpl_buf, REQUEST_DOMAIN))
-	{
-		zbx_snprintf(err, err_size, "cannot set \"%s\" template variables", name);
-		*rtt = ZBX_EC_INTERNAL;
-		goto out;
-	}
+	zbx_snprintf(buf, sizeof(buf), "%s.%s", epp_testprefix, domain);
+
+	zbx_tmpl_replace(&tmpl, "{TMPL_DOMAIN}", buf);
 
 	zbx_timespec(&start);
 
-	if (SUCCEED != epp_send_message(ssl, command_buf, strlen(command_buf), log_fd))
+	if (SUCCEED != epp_send_message(ssl, tmpl, strlen(tmpl), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		*rtt = ZBX_EC_EPP_INFOTO;
@@ -2853,24 +2856,27 @@ static int	command_info(const char *epp_commands, const char *name, SSL *ssl, in
 	ret = SUCCEED;
 out:
 	if (NULL != data)
-		free(data);
+		zbx_free(data);
+
+	if (NULL != tmpl)
+		zbx_free(tmpl);
 
 	return ret;
 }
 
 static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, FILE *log_fd, char *err, size_t err_size)
 {
-	char	tmpl_buf[COMMAND_BUF_SIZE], xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
+	char	*tmpl = NULL, xml_value[XML_VALUE_BUF_SIZE], *data = NULL;
 	size_t	data_len;
 	int	ret = FAIL;
 
-	if (SUCCEED != get_tmpl(epp_commands, name, tmpl_buf, sizeof(tmpl_buf)))
+	if (SUCCEED != get_tmpl(epp_commands, name, &tmpl))
 	{
 		zbx_snprintf(err, err_size, "cannot load template \"%s\"", name);
 		goto out;
 	}
 
-	if (SUCCEED != epp_send_message(ssl, tmpl_buf, strlen(tmpl_buf), log_fd))
+	if (SUCCEED != epp_send_message(ssl, tmpl, strlen(tmpl), log_fd))
 	{
 		zbx_snprintf(err, err_size, "cannot send command \"%s\"", name);
 		goto out;
@@ -2898,7 +2904,10 @@ static int	command_logout(const char *epp_commands, const char *name, SSL *ssl, 
 	ret = SUCCEED;
 out:
 	if (NULL != data)
-		free(data);
+		zbx_free(data);
+
+	if (NULL != tmpl)
+		zbx_free(tmpl);
 
 	return ret;
 }
@@ -3112,7 +3121,8 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 				*secretkey_enc_b64 = NULL, *secretkey_salt_b64 = NULL, *epp_passwd_enc_b64 = NULL,
 				*epp_passwd_salt_b64 = NULL, *epp_privkey_enc_b64 = NULL, *epp_privkey_salt_b64 = NULL,
 				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_cert_b64 = NULL,
-				*epp_cert = NULL, *epp_commands = NULL, *epp_serverid = NULL, *tmp;
+				*epp_cert = NULL, *epp_commands = NULL, *epp_serverid = NULL, *epp_testprefix = NULL,
+				*tmp;
 	short			epp_port = 700;
 	X509			*epp_server_x509 = NULL;
 	const SSL_METHOD	*method;
@@ -3246,6 +3256,12 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	}
 
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_SERVERID, &epp_serverid, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_TESTPREFIX, &epp_testprefix, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -3482,14 +3498,16 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	if (SUCCEED != command_update(epp_commands, COMMAND_UPDATE, ssl, &rtt2, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_update(epp_commands, COMMAND_UPDATE, ssl, &rtt2, log_fd, epp_testprefix, domain,
+			err, sizeof(err)))
 	{
 		rtt3 = rtt2;
 		zbx_rsm_err(log_fd, err);
 		goto out;
 	}
 
-	if (SUCCEED != command_info(epp_commands, COMMAND_INFO, ssl, &rtt3, log_fd, err, sizeof(err)))
+	if (SUCCEED != command_info(epp_commands, COMMAND_INFO, ssl, &rtt3, log_fd, epp_testprefix, domain, err,
+			sizeof(err)))
 	{
 		zbx_rsm_err(log_fd, err);
 		goto out;
@@ -3538,6 +3556,8 @@ out:
 		zbx_free(items);
 	}
 
+	zbx_free(epp_testprefix);
+	zbx_free(epp_serverid);
 	zbx_free(epp_commands);
 	zbx_free(epp_user);
 	zbx_free(epp_cert);
