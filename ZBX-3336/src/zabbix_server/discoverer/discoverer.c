@@ -37,6 +37,64 @@ extern unsigned char	daemon_type;
 extern unsigned char	process_type;
 extern int		process_num;
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: clean_dhost_list                                                 *
+ *                                                                            *
+ * Purpose: clean dhosts not presenting in drules                             *
+ *                                                                            *
+ * Parameters: drule                                                          *
+ *                                                                            *
+ * Author: Nikolajs Agafonovs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	clean_dhost_list(DB_DRULE *drule, DB_DHOST *dhost)
+{
+	static zbx_uint64_t	*d_hosts = NULL;
+	static int		d_hosts_count = 0;
+	static unsigned char	known_dhostid_list[10000];
+	unsigned char		known_dhostid_tmp[100];
+
+	if ((NULL != dhost) && (0 != dhost->dhostid))
+	{
+		if (NULL == d_hosts)
+		{
+			d_hosts_count = 0;
+			d_hosts = zbx_malloc(d_hosts, sizeof(zbx_uint64_t));
+		}
+		else
+		{
+			d_hosts_count++;
+			d_hosts = zbx_realloc(d_hosts, sizeof(zbx_uint64_t) * (d_hosts_count + 1));
+		}
+
+		d_hosts[d_hosts_count] = dhost->dhostid;
+	}
+	else if ((NULL == drule) && (NULL == dhost))
+	{
+		for (; 0<=d_hosts_count; d_hosts_count--)
+		{
+			zbx_snprintf(known_dhostid_tmp, sizeof(known_dhostid_tmp), "%u,", d_hosts[d_hosts_count]);
+			zbx_strlcat(known_dhostid_list, known_dhostid_tmp, sizeof(known_dhostid_tmp));
+		}
+		zbx_rtrim(known_dhostid_list, ",");
+
+		DBbegin();
+		DBexecute("delete from dhosts"
+			" where dhostid not in (%s)",
+			known_dhostid_list);
+		DBcommit();
+
+		d_hosts_count = 0;
+		zbx_free(d_hosts);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ERROR! Wrong usage of clean_dhost_list");
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: proxy_update_service                                             *
@@ -661,6 +719,8 @@ static void	process_rule(DB_DRULE *drule)
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
+
+			clean_dhost_list(NULL, &dhost);
 		}
 	}
 
@@ -708,6 +768,8 @@ static int	process_discovery(int now)
 		rule_count++;
 	}
 	DBfree_result(result);
+
+	clean_dhost_list(NULL, NULL);
 
 	return rule_count;	/* performance metric */
 }

@@ -233,6 +233,7 @@ else {
 }
 
 $messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
+$messageTable->addClass('acknowledge-edit');
 $messageTable->addVar('backurl', $_REQUEST['backurl']);
 
 if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
@@ -272,6 +273,6 @@ if (!$bulk) {
 }
 
 $messageTable->addItemToBottomRow(new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid'))));
-$messageTable->show(false);
+$messageTable->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
