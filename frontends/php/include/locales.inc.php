@@ -37,8 +37,7 @@ function mbstrings_available() {
 		&& function_exists('mb_strtoupper')
 		&& function_exists('mb_strtolower')
 		&& function_exists('mb_strpos')
-		&& function_exists('mb_substr')
-		&& function_exists('mb_convert_case');
+		&& function_exists('mb_substr');
 }
 
 /**

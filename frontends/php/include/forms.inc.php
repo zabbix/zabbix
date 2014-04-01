@@ -1610,8 +1610,8 @@ function get_timeperiod_form() {
 	$new_timeperiod['month_nov'] = $month[10];
 	$new_timeperiod['month_dec'] = $month[11];
 
-	$bit_dayofweek = zbx_str_revert($dayofweek);
-	$bit_month = zbx_str_revert($month);
+	$bit_dayofweek = strrev($dayofweek);
+	$bit_month = strrev($month);
 
 	$cmbType = new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'], 'submit()');
 	$cmbType->addItem(TIMEPERIOD_TYPE_ONETIME, _('One time only'));
