@@ -60,10 +60,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, real_swap_avail);
 		else if (0 == strcmp(mode, "pfree"))
-		{
-			SET_DBL_RESULT(result, 100.0 - (((real_swap_total - real_swap_avail) /
-					real_swap_total) * 100.0));
-		}
+			SET_DBL_RESULT(result, real_swap_avail / real_swap_total);
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 		else
@@ -88,10 +85,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, real_swap_avail);
 		else if (0 == strcmp(mode, "pfree"))
-		{
-			SET_DBL_RESULT(result, 100.0 - (((real_swap_total - real_swap_avail) /
-					real_swap_total) * 100.0));
-		}
+			SET_DBL_RESULT(result, real_swap_avail / real_swap_total);
 		else if (0 == strcmp(mode, "used"))
 			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 		else
