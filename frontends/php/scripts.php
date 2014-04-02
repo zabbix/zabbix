@@ -147,7 +147,7 @@ elseif (isset($_REQUEST['delete'])) {
 
 	DBstart();
 
-	$result = API::Script()->delete($scriptId);
+	$result = API::Script()->delete(array($scriptId));
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptId.']');

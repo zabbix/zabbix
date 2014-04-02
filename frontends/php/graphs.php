@@ -277,13 +277,13 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
 
 	if (hasRequest('parent_discoveryid')) {
-		$result = API::GraphPrototype()->delete($graphId);
+		$result = API::GraphPrototype()->delete(array($graphId));
 
 		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
 		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
-		$result = API::Graph()->delete($graphId);
+		$result = API::Graph()->delete(array($graphId));
 
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 		clearCookies($result, getRequest('hostid'));

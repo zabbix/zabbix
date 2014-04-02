@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CTemplateScreenItem extends CZBXAPI {
+class CTemplateScreenItem extends CApiService {
 
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';

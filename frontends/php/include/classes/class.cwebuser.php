@@ -84,7 +84,7 @@ class CWebUser {
 	public static function checkAuthentication($sessionid) {
 		try {
 			if ($sessionid !== null) {
-				self::$data = API::User()->checkAuthentication($sessionid);
+				self::$data = API::User()->checkAuthentication(array($sessionid));
 			}
 
 			if ($sessionid === null || empty(self::$data)) {
@@ -135,6 +135,15 @@ class CWebUser {
 	 */
 	public static function getType() {
 		return self::$data['type'];
+	}
+
+	/**
+	 * Returns true if debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function getDebugMode() {
+		return (self::$data['debug_mode']);
 	}
 
 	/**
