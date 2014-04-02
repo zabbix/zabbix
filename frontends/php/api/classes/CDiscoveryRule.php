@@ -874,16 +874,16 @@ class CDiscoveryRule extends CItemGeneral {
 			'validators' => array(
 				'macro' => new CStringValidator(array(
 					'regex' => '/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/',
-					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s"'),
-					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s"')
+					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s".')
 				)),
 				'value' => new CStringValidator(array(
 					'empty' => true
 				)),
 				'formulaid' => new CStringValidator(array(
 					'regex' => '/[A-Z]+/',
-					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s"'),
-					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s"')
+					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				)),
 				'operator' => new CSetValidator(array(
 					'values' => array(CONDITION_OPERATOR_REGEXP),
