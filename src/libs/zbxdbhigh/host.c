@@ -3087,7 +3087,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		char		*password;
 		char		*publickey;
 		char		*privatekey;
-		char		*filter;
 		char		*description;
 		char		*lifetime;
 		int		delay;
@@ -3149,7 +3148,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
-				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.filter,ti.description,"
+				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
 				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
@@ -3187,7 +3186,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		item[item_num].snmpv3_privprotocol = (unsigned char)atoi(row[26]);
 		item[item_num].authtype = (unsigned char)atoi(row[28]);
 		item[item_num].flags = (unsigned char)atoi(row[33]);
-		item[item_num].inventory_link = (unsigned char)atoi(row[36]);
+		item[item_num].inventory_link = (unsigned char)atoi(row[35]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -3206,10 +3205,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				item[item_num].interfaceid = interfaceids[interface_type - 1];
 		}
 
-		if (SUCCEED != DBis_null(row[39]))
+		if (SUCCEED != DBis_null(row[38]))
 		{
 			item[item_num].key = NULL;
-			ZBX_STR2UINT64(item[item_num].itemid, row[39]);
+			ZBX_STR2UINT64(item[item_num].itemid, row[38]);
 
 			item[item_num].name = DBdyn_escape_string(row[1]);
 			item[item_num].delay_flex = DBdyn_escape_string(row[7]);
@@ -3228,10 +3227,9 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			item[item_num].password = DBdyn_escape_string(row[30]);
 			item[item_num].publickey = DBdyn_escape_string(row[31]);
 			item[item_num].privatekey = DBdyn_escape_string(row[32]);
-			item[item_num].filter = DBdyn_escape_string(row[34]);
-			item[item_num].description = DBdyn_escape_string(row[35]);
-			item[item_num].lifetime = DBdyn_escape_string(row[37]);
-			item[item_num].snmpv3_contextname = DBdyn_escape_string(row[38]);
+			item[item_num].description = DBdyn_escape_string(row[34]);
+			item[item_num].lifetime = DBdyn_escape_string(row[36]);
+			item[item_num].snmpv3_contextname = DBdyn_escape_string(row[37]);
 		}
 		else
 		{
@@ -3255,10 +3253,9 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			item[item_num].password = zbx_strdup(NULL, row[30]);
 			item[item_num].publickey = zbx_strdup(NULL, row[31]);
 			item[item_num].privatekey = zbx_strdup(NULL, row[32]);
-			item[item_num].filter = zbx_strdup(NULL, row[34]);
-			item[item_num].description = zbx_strdup(NULL, row[35]);
-			item[item_num].lifetime = zbx_strdup(NULL, row[37]);
-			item[item_num].snmpv3_contextname = zbx_strdup(NULL, row[38]);
+			item[item_num].description = zbx_strdup(NULL, row[34]);
+			item[item_num].lifetime = zbx_strdup(NULL, row[36]);
+			item[item_num].snmpv3_contextname = zbx_strdup(NULL, row[37]);
 		}
 
 		item_num++;
@@ -3323,7 +3320,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 						"privatekey='%s',"
 						"templateid=" ZBX_FS_UI64 ","
 						"flags=%d,"
-						"filter='%s',"
 						"description='%s',"
 						"inventory_link=%d,"
 						"interfaceid=%s,"
@@ -3340,9 +3336,9 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					(int)item[i].snmpv3_privprotocol, item[i].snmpv3_privpassphrase,
 					item[i].snmpv3_contextname, (int)item[i].authtype, item[i].username,
 					item[i].password, item[i].publickey, item[i].privatekey,
-					item[i].templateid, (int)item[i].flags, item[i].filter,
-					item[i].description, (int)item[i].inventory_link,
-					DBsql_id_ins(item[i].interfaceid), item[i].lifetime, item[i].itemid);
+					item[i].templateid, (int)item[i].flags, item[i].description,
+					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
+					item[i].lifetime, item[i].itemid);
 
 			new_items--;
 		}
@@ -3365,7 +3361,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					"snmpv3_securityname", "snmpv3_securitylevel", "snmpv3_authprotocol",
 					"snmpv3_authpassphrase", "snmpv3_privprotocol", "snmpv3_privpassphrase",
 					"authtype", "username", "password", "publickey", "privatekey", "templateid",
-					"flags", "filter", "description", "inventory_link", "interfaceid", "lifetime",
+					"flags", "description", "inventory_link", "interfaceid", "lifetime",
 					"snmpv3_contextname", NULL);
 
 
@@ -3387,8 +3383,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 						item[i].snmpv3_privpassphrase, (int)item[i].authtype,
 						item[i].username, item[i].password, item[i].publickey,
 						item[i].privatekey, item[i].templateid, (int)item[i].flags,
-						item[i].filter, item[i].description,
-						(int)item[i].inventory_link, item[i].interfaceid,
+						item[i].description, (int)item[i].inventory_link, item[i].interfaceid,
 						item[i].lifetime, item[i].snmpv3_contextname);
 
 				if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item[i].flags))
@@ -3407,7 +3402,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			zbx_free(item[i].snmpv3_contextname);
 			zbx_free(item[i].lifetime);
 			zbx_free(item[i].description);
-			zbx_free(item[i].filter);
 			zbx_free(item[i].privatekey);
 			zbx_free(item[i].publickey);
 			zbx_free(item[i].password);
