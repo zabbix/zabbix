@@ -2193,19 +2193,16 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 {
 	const char	*__function_name = "evaluate_macro_function";
 
-	zbx_host_key_t	keys;
-	DC_ITEM		items;
-	int		ret, errcodes;
+	zbx_host_key_t	host_key = {host, key};
+	DC_ITEM		item;
+	int		ret, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
 
-	keys.host = zbx_strdup(NULL, host);
-	keys.key = zbx_strdup(NULL, key);
+	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 
-	DCconfig_get_items_by_keys(&items, &keys, &errcodes, 1);
-
-	if (SUCCEED != errcodes)
+	if (SUCCEED != errcode)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Function [%s:%s.%s(%s)] not found.",
 				host, key, function, parameter);
@@ -2213,19 +2210,19 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		goto out;
 	}
 
-	if (SUCCEED == (ret = evaluate_function(value, &items, function, parameter, time(NULL))))
+	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
-			zbx_format_value(value, MAX_BUFFER_LEN, items.valuemapid, items.units, items.value_type);
+			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,sum", function, ','))
 		{
-			switch (items.value_type)
+			switch (item.value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, MAX_BUFFER_LEN, items.units, items.value_type);
+					add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
 					break;
 				default:
 					;
@@ -2236,8 +2233,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
 			zbx_result_string(ret), value);
 out:
-	zbx_free(keys.key);
-	zbx_free(keys.host);
+	zbx_free(host_key.key);
+	zbx_free(host_key.host);
 
 	return ret;
 }

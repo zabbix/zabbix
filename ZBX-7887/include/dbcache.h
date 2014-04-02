@@ -181,8 +181,8 @@ DC_PROXY;
 
 typedef struct
 {
-	char	*host;
-	char	*key;
+	const char	*host;
+	const char	*key;
 }
 zbx_host_key_t;
 
