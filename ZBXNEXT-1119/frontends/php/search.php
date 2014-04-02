@@ -488,7 +488,7 @@ if ($admin) {
 			$templateCell = array(new CSpan($templateVisibleName));
 
 			// display the template host name only if it matches the search string
-			if ($hostName !== null) {
+			if ($templateHostName !== null) {
 				$templateCell[] = BR();
 				$templateCell[] = $templateHostName;
 			}
