@@ -49,11 +49,11 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			),
 			// no auth token
 			array('user', 'get', array(), null,
-				ZBX_API_ERROR_NO_AUTH, 'Not authorized'
+				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
 			),
 			// empty auth token
 			array('user', 'get', array(), '',
-				ZBX_API_ERROR_NO_AUTH, 'Not authorized'
+				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
 			),
 			// unnecessary auth token
 			array('apiinfo', 'version', array(), '',
