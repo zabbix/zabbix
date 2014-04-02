@@ -109,7 +109,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 }
 
 #ifdef _WINDOWS
-static char    *read_registry_value(HKEY hKey, LPCTSTR name)
+static char	*read_registry_value(HKEY hKey, LPCTSTR name)
 {
 	DWORD    szData;
 	LPTSTR    value;
@@ -127,40 +127,37 @@ static char    *read_registry_value(HKEY hKey, LPCTSTR name)
 	return value_utf8;
 }
 
-
 /******************************************************************************
- * *
+ *                                                                            *
  * Function: get_win_version                                                  *
- * *
+ *                                                                            *
  * Purpose: get Windows system UNAME form Windows registry                    *
- * *
- * Return value: *
+ *                                                                            *
+ * Return value:                                                              *
  *         SUCCESS = struct OS_WIN_VERSION                                    *
  *         FAIL if some of registry operations can not be done                *
- * *
+ *                                                                            *
  * Author: Nikolajs Agafonovs                                                 *
- * *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_get_win_version(OS_WIN_VERSION *os_version)
+int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
 	const char    *__function_name = "zbx_get_win_version";
 	int        ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
-	LPCTSTR    win_keys[5] = {
-			TEXT("ProductName"),
-			TEXT("CSDVersion"),
-			TEXT("CurrentBuild"),
-			TEXT("CurrentVersion"),
-			TEXT("PROCESSOR_ARCHITECTURE")};
-	LPCTSTR        sys_key_1 = TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
-	LPCTSTR        sys_key_2 = TEXT("System\\CurrentControlSet\\Control\\Session Manager\\Environment");
-	int        i;
-	HKEY        h_key_registry;
-	DWORD        dw_buffer = 256;
-	LPSTR        lp_name_strings = NULL;
-	LPCTSTR        wsource;
+	LPCTSTR		win_keys[5] = {
+				TEXT("ProductName"),
+				TEXT("CSDVersion"),
+				TEXT("CurrentBuild"),
+				TEXT("CurrentVersion"),
+				TEXT("PROCESSOR_ARCHITECTURE")};
+	LPCTSTR		sys_key_1 = TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
+	LPCTSTR		sys_key_2 = TEXT("System\\CurrentControlSet\\Control\\Session Manager\\Environment");
+	HKEY		h_key_registry;
+	DWORD		dw_buffer = 256;
+	LPSTR		lp_name_strings = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
