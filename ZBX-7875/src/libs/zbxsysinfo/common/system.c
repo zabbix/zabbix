@@ -141,9 +141,9 @@ static char    *read_registry_value(HKEY hKey, LPCTSTR name)
  * Author: Nikolajs Agafonovs                                                 *
  * *
  ******************************************************************************/
-int    get_win_version(OS_WIN_VERSION *os_version)
+int	zbx_get_win_version(OS_WIN_VERSION *os_version)
 {
-	const char    *__function_name = "get_win_version";
+	const char    *__function_name = "zbx_get_win_version";
 	int        ret = FAIL;
 
 	/* Order of win_keys is vital.
