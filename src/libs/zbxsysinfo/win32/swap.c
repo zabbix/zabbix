@@ -48,9 +48,12 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
 		real_swap_total = ms_ex.ullTotalPageFile > ms_ex.ullTotalPhys ?
-				ms_ex.ullTotalPageFile - ms.ullTotalPhys : 0;
-		real_swap_avail = ms_ex.ullAvailPageFile < real_swap_total + ms_ex.ullTotalPhys ?
-				ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys : real_swap_total;
+				ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys : 0;
+		real_swap_avail = ms_ex.ullAvailPageFile > ms_ex.ullAvailPhys ?
+				ms_ex.ullAvailPageFile - ms_ex.ullAvailPhys : 0;
+
+		if (real_swap_avail > real_swap_total)
+			real_swap_avail = real_swap_total;
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, real_swap_total);
@@ -73,9 +76,12 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		GlobalMemoryStatus(&ms);
 
 		real_swap_total = ms.dwTotalPageFile > ms.dwTotalPhys ?
-				ms.dwTotalPageFile - ms.ullTotalPhys: 0;
-		real_swap_avail = ms.dwAvailPageFile < real_swap_total + ms.dwTotalPhys ?
-				ms.dwAvailPageFile - ms.dwAvailPhys : real_swap_total;
+				ms.dwTotalPageFile - ms.dwTotalPhys : 0;
+		real_swap_avail = ms.dwAvailPageFile > ms.dwAvailPhys ?
+				ms.dwAvailPageFile - ms.dwAvailPhys : 0;
+
+		if (real_swap_avail > real_swap_total)
+			real_swap_avail = real_swap_total;
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, real_swap_total);
