@@ -916,7 +916,7 @@ class CUser extends CZBXAPI {
 		$cnf = array();
 
 		foreach ($config as $id => $value) {
-			if (zbx_strpos($id, 'ldap_') !== false) {
+			if (strpos($id, 'ldap_') !== false) {
 				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}

@@ -60,7 +60,7 @@ class CHTTP_request {
 
 		$this->headers = array();
 		foreach ($_SERVER as $i => $val) {
-			if (zbx_strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
+			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(array('HTTP_', '_'), array('', '-'), $i);
 				$this->headers[$name] = $val;
 			}

@@ -204,8 +204,13 @@ if ($items) {
 
 	// filter items by name
 	foreach ($items as $key => $item) {
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name_expanded'], $filterSelect)) {
-			unset($items[$key]);
+		if (!zbx_empty($filterSelect)) {
+			$haystack = mb_strtolower($item['name_expanded']);
+			$needle = mb_strtolower($filterSelect);
+
+			if (!mb_strpos($haystack, $needle)) {
+				unset($items[$key]);
+			}
 		}
 	}
 

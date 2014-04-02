@@ -589,15 +589,15 @@ function DBfetch($cursor, $convertNulls = true) {
 			if ($row = oci_fetch_assoc($cursor)) {
 				$result = array();
 				foreach ($row as $key => $value) {
-					$field_type = zbx_strtolower(oci_field_type($cursor, $key));
+					$field_type = strtolower(oci_field_type($cursor, $key));
 					// Oracle does not support NULL values for string fields, so if the string is empty, it will return NULL
 					// convert it to an empty string to be consistent with other databases
 					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? '' : $value;
 
-					if (is_object($value) && (zbx_stristr($field_type, 'lob') !== false)) {
+					if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
 						$value = $value->load();
 					}
-					$result[zbx_strtolower($key)] = $value;
+					$result[strtolower($key)] = $value;
 				}
 			}
 			break;
