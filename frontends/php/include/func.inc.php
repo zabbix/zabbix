@@ -1100,7 +1100,7 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
  *
  * @return array
  */
-function selectByPattern($table, $column, $pattern, $limit) {
+function selectByPattern(array $table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();
