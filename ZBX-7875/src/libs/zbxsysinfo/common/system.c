@@ -111,9 +111,9 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 #ifdef _WINDOWS
 static char	*read_registry_value(HKEY hKey, LPCTSTR name)
 {
-	DWORD    szData;
-	LPTSTR    value;
-	char    *value_utf8 = NULL;
+	DWORD	szData;
+	LPTSTR	value;
+	char	*value_utf8 = NULL;
 
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
 	{
@@ -142,8 +142,8 @@ static char	*read_registry_value(HKEY hKey, LPCTSTR name)
  ******************************************************************************/
 int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
-	const char    *__function_name = "zbx_get_win_version";
-	int        ret = FAIL;
+	const char	*__function_name = "zbx_get_win_version";
+	int		ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
