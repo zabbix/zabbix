@@ -40,59 +40,53 @@ extern int		process_num;
 
 /******************************************************************************
  *                                                                            *
- * Function: clean_dhost_list                                                 *
+ * Function: zbx_clean_dhost_list                                             *
  *                                                                            *
- * Purpose: clean dhosts not presenting in drules                             *
+ * Purpose: clean dhosts not presenting in drule                              *
  *                                                                            *
  * Parameters: drule                                                          *
  *                                                                            *
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	clean_dhost_list(DB_DRULE *drule, DB_DHOST *dhost)
+void	zbx_clean_dhost_list(DB_DRULE *drule)
 {
-	static zbx_uint64_t	*d_hosts = NULL;
-	static int		d_hosts_count = 0;
-	static unsigned char	known_dhostid_list[10000];
-	unsigned char		known_dhostid_tmp[100];
+	const char	*__function_name = "zbx_clean_dhost_list";
 
-	if ((NULL != dhost) && (0 != dhost->dhostid))
+	unsigned char		*known_dhostid_list;
+	DB_RESULT		result_dservices;
+	DB_ROW			row_dservices;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	known_dhostid_list = zbx_malloc(known_dhostid_list, 1);
+	memset(&known_dhostid_list, 0, sizeof(known_dhostid_list));
+
+	result_dservices = DBselect(
+			"select dhostid, ip "
+			"from dservices");
+
+	while (NULL != (row_dservices = DBfetch(result_dservices)))
 	{
-		if (NULL == d_hosts)
+		if (SUCCEED == ip_in_list(drule->iprange, row_dservices[1]))
 		{
-			d_hosts_count = 0;
-			d_hosts = zbx_malloc(d_hosts, sizeof(zbx_uint64_t));
+			known_dhostid_list = zbx_strdcat(known_dhostid_list, row_dservices[0]);
+			known_dhostid_list = zbx_strdcat(known_dhostid_list, ",");
 		}
-		else
-		{
-			d_hosts_count++;
-			d_hosts = zbx_realloc(d_hosts, sizeof(zbx_uint64_t) * (d_hosts_count + 1));
-		}
-
-		d_hosts[d_hosts_count] = dhost->dhostid;
 	}
-	else if ((NULL == drule) && (NULL == dhost))
-	{
-		for (; 0<=d_hosts_count; d_hosts_count--)
-		{
-			zbx_snprintf(known_dhostid_tmp, sizeof(known_dhostid_tmp), "%u,", d_hosts[d_hosts_count]);
-			zbx_strlcat(known_dhostid_list, known_dhostid_tmp, sizeof(known_dhostid_tmp));
-		}
-		zbx_rtrim(known_dhostid_list, ",");
+	zbx_rtrim(known_dhostid_list, ",");
 
-		DBbegin();
-		DBexecute("delete from dhosts"
-			" where dhostid not in (%s)",
-			known_dhostid_list);
-		DBcommit();
+	zabbix_log(LOG_LEVEL_DEBUG, "hosts in drule (hostid): %s\r\n", known_dhostid_list);
 
-		d_hosts_count = 0;
-		zbx_free(d_hosts);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ERROR! Wrong usage of clean_dhost_list");
-	}
+	DBexecute("delete from dhosts"
+			" where dhostid not in (%s) "
+			"and druleid =" ZBX_FS_UI64,
+			known_dhostid_list,
+			drule->druleid);
+
+	zbx_free(known_dhostid_list);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -719,10 +713,9 @@ static void	process_rule(DB_DRULE *drule)
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
-
-			clean_dhost_list(NULL, &dhost);
 		}
 	}
+	zbx_clean_dhost_list(drule);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -768,8 +761,6 @@ static int	process_discovery(int now)
 		rule_count++;
 	}
 	DBfree_result(result);
-
-	clean_dhost_list(NULL, NULL);
 
 	return rule_count;	/* performance metric */
 }
