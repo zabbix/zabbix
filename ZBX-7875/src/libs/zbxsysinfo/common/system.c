@@ -109,118 +109,113 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 }
 
 #ifdef _WINDOWS
+static char    *read_registry_value(HKEY hKey, LPCTSTR name)
+{
+	DWORD    szData;
+	LPTSTR    value;
+	char    *value_utf8 = NULL;
+
+	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
+	{
+		value = zbx_malloc(NULL, szData);
+		if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)value, &szData))
+			value_utf8 = zbx_unicode_to_utf8(value);
+
+		zbx_free(value);
+	}
+
+	return value_utf8;
+}
+
+
 /******************************************************************************
- *                                                                            *
+ * *
  * Function: get_win_version                                                  *
- *                                                                            *
+ * *
  * Purpose: get Windows system UNAME form Windows registry                    *
- *                                                                            *
- * Return value:                                                              *
+ * *
+ * Return value: *
  *         SUCCESS = struct OS_WIN_VERSION                                    *
  *         FAIL if some of registry operations can not be done                *
- *                                                                            *
+ * *
  * Author: Nikolajs Agafonovs                                                 *
- *                                                                            *
+ * *
  ******************************************************************************/
-int	zbx_get_win_version(zbx_win_version_t *os_version)
+int    get_win_version(OS_WIN_VERSION *os_version)
 {
-	const char	*__function_name = "zbx_get_win_version";
-	int		ret = FAIL;
+	const char    *__function_name = "get_win_version";
+	int        ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
-	const char	*win_keys[5] = {
-			"ProductName",
-			"CSDVersion",
-			"CurrentBuild",
-			"CurrentVersion",
-			"PROCESSOR_ARCHITECTURE"};
-	const char	sys_key_1[] = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-	const char	sys_key_2[] = "System\\CurrentControlSet\\Control\\Session Manager\\Environment";
-	int		i;
-	HKEY		h_key_registry;
-	DWORD		dw_buffer;
-	char		*lp_name_strings;
-	wchar_t		*wsource;
+	LPCTSTR    win_keys[5] = {
+			TEXT("ProductName"),
+			TEXT("CSDVersion"),
+			TEXT("CurrentBuild"),
+			TEXT("CurrentVersion"),
+			TEXT("PROCESSOR_ARCHITECTURE")};
+	LPCTSTR        sys_key_1 = TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
+	LPCTSTR        sys_key_2 = TEXT("System\\CurrentControlSet\\Control\\Session Manager\\Environment");
+	int        i;
+	HKEY        h_key_registry;
+	DWORD        dw_buffer = 256;
+	LPSTR        lp_name_strings = NULL;
+	LPCTSTR        wsource;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	wsource = zbx_utf8_to_unicode(sys_key_1);
+	lp_name_strings = zbx_malloc(lp_name_strings, 256);
 
-	lp_name_strings = zbx_malloc(&lp_name_strings, 256);
-
-	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
-		goto out;
-
-	zbx_free(wsource);
-
-	for (i = 0; i < 4; i++)
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, sys_key_1, 0, KEY_READ, &h_key_registry))
 	{
-		wsource = zbx_utf8_to_unicode(win_keys[i]);
-
-		if (ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
-				(LPBYTE)lp_name_strings, &dw_buffer))
-		{
-			goto out;
-		}
-		else
-		{
-			switch (i)
-			{
-				case 0:
-					zbx_snprintf(os_version->ProductName, sizeof(os_version->ProductName),
-							zbx_unicode_to_utf8((LPCTSTR)lp_name_strings));
-					break;
-				case 1:
-					zbx_snprintf(os_version->CSDVersion, sizeof(os_version->CSDVersion),
-							zbx_unicode_to_utf8((LPCTSTR)lp_name_strings));
-					break;
-				case 2:
-					zbx_snprintf(os_version->CurrentBuild, sizeof(os_version->CurrentBuild),
-							zbx_unicode_to_utf8((LPCTSTR)lp_name_strings));
-					break;
-				case 3:
-					zbx_snprintf(os_version->CurrentVersion, sizeof(os_version->CurrentVersion),
-							zbx_unicode_to_utf8((LPCTSTR)lp_name_strings));
-					break;
-			}
-		}
-
-		zbx_free(wsource);
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key");
+		goto out;
 	}
 
-	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
+/*
+	if (NULL == (os_version->ProductName = read_registry_value(h_key_registry, win_keys[0])))
 		goto out;
+*/
 
-	wsource = zbx_utf8_to_unicode(sys_key_2);
+	zbx_snprintf(os_version->ProductName, sizeof(os_version->ProductName), read_registry_value(h_key_registry, win_keys[0]));
+	zbx_snprintf(os_version->CSDVersion, sizeof(os_version->CSDVersion), read_registry_value(h_key_registry, win_keys[1]));
+	zbx_snprintf(os_version->CurrentBuild, sizeof(os_version->CurrentBuild), read_registry_value(h_key_registry, win_keys[2]));
+	zbx_snprintf(os_version->CurrentVersion, sizeof(os_version->CurrentVersion), read_registry_value(h_key_registry, win_keys[3]));
 
-	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, wsource, 0, KEY_READ, &h_key_registry))
+	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to close registry key");
 		goto out;
+	}
 
-	zbx_free(wsource);
-
-	wsource = zbx_utf8_to_unicode(win_keys[4]);
-
-	if(ERROR_SUCCESS != RegQueryValueEx(h_key_registry, wsource, NULL, NULL,
-			(LPBYTE)lp_name_strings, &dw_buffer))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, sys_key_2, 0, KEY_READ, &h_key_registry))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 2");
 		goto out;
-	else
-		zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture),
-				zbx_unicode_to_utf8( (LPCTSTR)lp_name_strings));
+	}
 
-	zbx_free(wsource);
+	zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture), read_registry_value(h_key_registry, win_keys[4]));
 
-	if(ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to close registry key 2");
 		goto out;
+	}
 
 	if (0 != gethostname(os_version->ComputerName, sizeof(os_version->ComputerName)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get host name");
 		goto out;
+	}
 	else
+	{
 		zbx_strupper(os_version->ComputerName);
+	}
 
 	ret = SUCCEED;
 out:
 	zbx_free(lp_name_strings);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, strerror_from_system(ret));
 	return ret;
 }
