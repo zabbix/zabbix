@@ -1072,15 +1072,6 @@ class CHttpTestManager {
 					$data[$httpItem['httptestid']]['error'] = $itemHistory['value'];
 				}
 			}
-			else {
-				if ($httpItem['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
-					$data[$httpItem['httptestid']]['lastcheck'] = null;
-					$data[$httpItem['httptestid']]['lastfailedstep'] = null;
-				}
-				else {
-					$data[$httpItem['httptestid']]['error'] = null;
-				}
-			}
 		}
 
 		return $data;
