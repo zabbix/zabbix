@@ -995,13 +995,12 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
-int	__zbx_stat(const char *path, struct stat *buf);
-int	__zbx_open(const char *pathname, int flags);
 typedef struct __stat64	zbx_stat_t;
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
+int	__zbx_open(const char *pathname, int flags);
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS && _UNICODE */
-
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
 		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
