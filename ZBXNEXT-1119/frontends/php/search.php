@@ -449,8 +449,7 @@ if ($admin) {
 		if (isset($rw_templates[$templateid])) {
 			// template
 			$templateCell = array(new CLink($templateVisibleName,
-				'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid),
-				$style
+				'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid)
 			));
 			// display the template host name only if it matches the search string
 			if ($templateHostName !== null) {
