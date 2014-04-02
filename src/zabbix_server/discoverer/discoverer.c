@@ -53,14 +53,11 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 {
 	const char	*__function_name = "zbx_clean_dhost_list";
 
-	unsigned char		*known_dhostid_list;
+	unsigned char		*known_dhostid_list = NULL;
 	DB_RESULT		result_dservices;
 	DB_ROW			row_dservices;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	known_dhostid_list = zbx_malloc(known_dhostid_list, 1);
-	memset(&known_dhostid_list, 0, sizeof(known_dhostid_list));
 
 	result_dservices = DBselect(
 			"select dhostid, ip "
@@ -83,7 +80,7 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 			"and druleid =" ZBX_FS_UI64,
 			known_dhostid_list,
 			drule->druleid);
-
+out:
 	zbx_free(known_dhostid_list);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
