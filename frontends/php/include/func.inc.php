@@ -959,37 +959,6 @@ function zbx_strlen($str) {
 	}
 }
 
-function zbx_strstr($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$pos = mb_strpos($haystack, $needle);
-		if ($pos !== false) {
-			return mb_substr($haystack, $pos);
-		}
-		else {
-			return false;
-		}
-	}
-	else {
-		return strstr($haystack, $needle);
-	}
-}
-
-function zbx_stristr($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$haystack_B = mb_strtoupper($haystack);
-		$needle = mb_strtoupper($needle);
-
-		$pos = mb_strpos($haystack_B, $needle);
-		if ($pos !== false) {
-			$pos = mb_substr($haystack, $pos);
-		}
-		return $pos;
-	}
-	else {
-		return stristr($haystack, $needle);
-	}
-}
-
 function zbx_strtoupper($str) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strtoupper($str);
@@ -1005,15 +974,6 @@ function zbx_strtolower($str) {
 	}
 	else {
 		return strtolower($str);
-	}
-}
-
-function zbx_strpos($haystack, $needle, $offset = 0) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strpos($haystack, $needle, $offset);
-	}
-	else {
-		return strpos($haystack, $needle, $offset);
 	}
 }
 
@@ -2349,12 +2309,6 @@ function imageOut(&$image, $format = null) {
 		default:
 			echo $imageId;
 	}
-}
-
-function encode_log($data) {
-	return (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
-			? mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT)
-			: $data;
 }
 
 /**
