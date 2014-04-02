@@ -163,10 +163,7 @@ foreach ($hosts as $hnum => $host) {
 	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
 	// highlight visible name
-	$visibleName = $host['name'];
-	if (zbx_stripos($host['name'], $search) !== false) {
-		$visibleName = make_decoration($host['name'], $search);
-	}
+	$visibleName = make_decoration($host['name'], $search);
 
 	// highlight host name if it's different from the visible name
 	$hostName = null;
@@ -177,6 +174,7 @@ foreach ($hosts as $hnum => $host) {
 	if ($admin && isset($rw_hosts[$hostid])) {
 		// host
 		$hostCell = array(new CLink($visibleName, 'hosts.php?form=update&'.$link, $style));
+
 		// display the host name only if it matches the search string
 		if ($hostName !== null) {
 			$hostCell[] = BR();
@@ -211,6 +209,7 @@ foreach ($hosts as $hnum => $host) {
 	else {
 		// host
 		$hostCell = array(new CSpan($visibleName, $style));
+
 		// display the host name only if it matches the search string
 		if ($hostName !== null) {
 			$hostCell[] = BR();
@@ -435,10 +434,7 @@ if ($admin) {
 		$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
 		// highlight visible name
-		$templateVisibleName = $template['name'];
-		if (zbx_stripos($template['name'], $search) !== false) {
-			$templateVisibleName = make_decoration($template['name'], $search);
-		}
+		$templateVisibleName = make_decoration($template['name'], $search);
 
 		// highlight host name if it's different from the visible name
 		$templateHostName = null;
@@ -451,6 +447,7 @@ if ($admin) {
 			$templateCell = array(new CLink($templateVisibleName,
 				'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid)
 			));
+
 			// display the template host name only if it matches the search string
 			if ($templateHostName !== null) {
 				$templateCell[] = BR();
@@ -489,6 +486,7 @@ if ($admin) {
 		else {
 			// host
 			$templateCell = array(new CSpan($templateVisibleName));
+
 			// display the template host name only if it matches the search string
 			if ($hostName !== null) {
 				$templateCell[] = BR();
