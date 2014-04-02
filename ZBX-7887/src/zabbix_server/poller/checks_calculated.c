@@ -203,9 +203,9 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 		{
 			zbx_snprintf(error, max_error_len,
 					"Cannot evaluate function [%s(%s)]"
-					": item [%s:%s] not found",
+					": item [%s:%s] does not exist, is disabled or belongs to a disabled host",
 					f->func, f->params, f->host, f->key);
-			ret = FAIL;
+			ret = NOTSUPPORTED;
 			break;
 		}
 
