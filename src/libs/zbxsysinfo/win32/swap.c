@@ -25,6 +25,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX			ms_ex;
 	MEMORYSTATUS			ms;
+	zbx_uint64_t			real_swap_total, real_swap_avail;
 	char				*swapdev, *mode;
 
 	if (2 < request->nparam)
@@ -37,12 +38,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
-	pi.cb = sizeof(PERFORMANCE_INFORMATION);
-
 	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
-		DWORDLONG	real_swap_total, real_swap_avail;
-
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
@@ -54,22 +51,9 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (real_swap_avail > real_swap_total)
 			real_swap_avail = real_swap_total;
-
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-			SET_UI64_RESULT(result, real_swap_total);
-		else if (0 == strcmp(mode, "free"))
-			SET_UI64_RESULT(result, real_swap_avail);
-		else if (0 == strcmp(mode, "pfree"))
-			SET_DBL_RESULT(result, real_swap_avail / real_swap_total);
-		else if (0 == strcmp(mode, "used"))
-			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
-		else
-			return SYSINFO_RET_FAIL;
 	}
 	else
 	{
-		SIZE_T		real_swap_total, real_swap_avail;
-
 		GlobalMemoryStatus(&ms);
 
 		real_swap_total = ms.dwTotalPageFile > ms.dwTotalPhys ?
@@ -79,18 +63,18 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (real_swap_avail > real_swap_total)
 			real_swap_avail = real_swap_total;
-
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-			SET_UI64_RESULT(result, real_swap_total);
-		else if (0 == strcmp(mode, "free"))
-			SET_UI64_RESULT(result, real_swap_avail);
-		else if (0 == strcmp(mode, "pfree"))
-			SET_DBL_RESULT(result, real_swap_avail / real_swap_total);
-		else if (0 == strcmp(mode, "used"))
-			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
-		else
-			return SYSINFO_RET_FAIL;
 	}
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, real_swap_total);
+	else if (0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, real_swap_avail);
+	else if (0 == strcmp(mode, "pfree"))
+		SET_DBL_RESULT(result, (real_swap_avail / real_swap_total) * 100.0);
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
