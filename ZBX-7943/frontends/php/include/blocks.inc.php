@@ -1110,7 +1110,7 @@ function make_webmon_overview($filter) {
 	$httpTestData = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 	foreach ($result as $row) {
-		if (isset($httpTestData[$row['httptestid']])) {
+		if (isset($httpTestData[$row['httptestid']]) && $httpTestData[$row['httptestid']]['lastfailedstep'] !== null) {
 			if ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
 				$data[$row['groupid']]['failed'] = isset($data[$row['groupid']]['failed'])
 					? ++$data[$row['groupid']]['failed']
