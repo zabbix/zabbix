@@ -155,7 +155,7 @@ $totalTime = array(
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
-	if (isset($httpTestData['lastfailedstep']) === null) {
+	if ($httpTestData['lastfailedstep'] === null) {
 		$status['msg'] = _('Never executed');
 		$status['style'] = 'unknown';
 		$status['afterError'] = false;
