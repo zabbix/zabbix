@@ -271,10 +271,10 @@
 				itemsTable.width(itemsTableWidth);
 			},
 			helper: function(e, ui) {
-				ui.children().each(function() {
+				ui.children().each(function(i) {
 					var td = jQuery(this);
 
-					td.width(td.width());
+					td.width(itemsTableColumnWidths[i]);
 				});
 
 				// when dragging element on safari, it jumps out of the table

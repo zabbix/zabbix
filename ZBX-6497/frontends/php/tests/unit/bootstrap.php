@@ -18,21 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once __DIR__.'/../../include/defines.inc.php';
+require_once __DIR__.'/../../include/func.inc.php';
+require_once __DIR__.'/../../include/gettextwrapper.inc.php';
 
-class ZbxDbOperationTruncate extends PHPUnit_Extensions_Database_Operation_Truncate {
+// register autoloader
+require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 
-	/**
-	 * Add disabling of foreign keys for truncate operations in db tests.
-	 *
-	 * @param PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection
-	 * @param PHPUnit_Extensions_Database_DataSet_IDataSet       $dataSet
-	 */
-	public function execute(
-			PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection,
-			PHPUnit_Extensions_Database_DataSet_IDataSet $dataSet) {
-		$connection->getConnection()->query("SET @FAKE_PREV_foreign_key_checks = @@foreign_key_checks");
-		$connection->getConnection()->query("SET foreign_key_checks = 0");
-		parent::execute($connection, $dataSet);
-		$connection->getConnection()->query("SET foreign_key_checks = @FAKE_PREV_foreign_key_checks");
-	}
-}
+$autoloader = new CAutoloader(array(
+	__DIR__.'/../../include/classes/core',
+	__DIR__.'/../../include/classes/db',
+	__DIR__.'/../../include/classes/api',
+	__DIR__.'/../../include/classes/api/clients',
+	__DIR__.'/../../include/classes/api/wrappers',
+	__DIR__.'/../../api/classes',
+));
+$autoloader->register();

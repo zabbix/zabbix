@@ -282,13 +282,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	DB_RESULT	result;
 	DB_ROW		row;
 	size_t		sql_offset;
-	int		num, i, clock;
+	int		num, i, clock, inserts_num = 0, ids_alloc, ids_num = 0, trends_to = *trends_num;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
-	int		ids_alloc, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, *trends_num);
 
@@ -316,6 +316,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 		if (clock != trend->clock || value_type != trend->value_type)
 			continue;
+
+		inserts_num++;
 
 		if (0 != trend->disable_from)
 			continue;
@@ -480,6 +482,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			trend->itemid = 0;
 
+			inserts_num--;
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 		DBfree_result(result);
@@ -516,10 +520,11 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		UNLOCK_TRENDS;
 	}
 
-	sql_offset = 0;
-
-	if (value_type == ITEM_VALUE_TYPE_FLOAT)
+	if (0 != inserts_num)
 	{
+		zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
+				"value_max", NULL);
+
 		for (i = 0; i < trends_to; i++)
 		{
 			trend = &trends[i];
@@ -530,100 +535,27 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
 
-			if (0 == sql_offset)
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
 			{
-				DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-#ifdef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into trends (itemid,clock,num,value_min,value_avg,value_max) values ");
-#endif
+				zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
+						trend->value_min.dbl, trend->value_avg.dbl, trend->value_max.dbl);
+			}
+			else
+			{
+				zbx_uint128_t	avg;
+
+				/* calculate the trend average value */
+				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+
+				zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
+						trend->value_min.ui64, avg.lo, trend->value_max.ui64);
 			}
 
-#ifdef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL "),",
-					trend->itemid,
-					trend->clock,
-					trend->num,
-					trend->value_min.dbl,
-					trend->value_avg.dbl,
-					trend->value_max.dbl);
-#else
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
-					" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ");\n",
-					trend->itemid,
-					trend->clock,
-					trend->num,
-					trend->value_min.dbl,
-					trend->value_avg.dbl,
-					trend->value_max.dbl);
-#endif
 			trend->itemid = 0;
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-	}
-	else
-	{
-		for (i = 0; i < trends_to; i++)
-		{
-			zbx_uint128_t	avg;
 
-			trend = &trends[i];
-
-			if (0 == trend->itemid)
-				continue;
-
-			if (clock != trend->clock || value_type != trend->value_type)
-				continue;
-
-			/* calculate the trend average value */
-			udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
-
-			if (0 == sql_offset)
-			{
-				DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-#ifdef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max) values ");
-#endif
-			}
-
-#ifdef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "),",
-					trend->itemid,
-					trend->clock,
-					trend->num,
-					trend->value_min.ui64,
-					avg.lo,
-					trend->value_max.ui64);
-#else
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
-					" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
-					trend->itemid,
-					trend->clock,
-					trend->num,
-					trend->value_min.ui64,
-					avg.lo,
-					trend->value_max.ui64);
-#endif
-			trend->itemid = 0;
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-	}
-
-	if (0 != sql_offset)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 
 	/* clean trends */
@@ -791,6 +723,8 @@ static void	DCsync_trends()
 		DCflush_trends(trends, &trends_num, 0);
 
 	DBcommit();
+
+	zbx_free(trends);
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data done");
 
@@ -1376,21 +1310,18 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_history_sql                                               *
+ * Function: dc_add_history_dbl                                               *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
  *          for writing float-type items into history/history_sync tables.    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_history_sql = "insert into history (itemid,clock,ns,value) values ";
-	const char	*ins_history_sync_sql = "insert into history_sync (nodeid,itemid,clock,ns,value) values ";
+	zbx_db_insert_t	db_insert;
 
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_sql);
-#endif
+	zbx_db_insert_prepare(&db_insert, "history", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1400,23 +1331,16 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_sql);
-#endif
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL ")" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, history[i].value.dbl);
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].value.dbl);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_sync_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "history_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -1426,39 +1350,27 @@ static void	dc_add_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t 
 			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_sync_sql);
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL ")" ZBX_ROW_DL,
-					get_nodeid_by_id(history[i].itemid), history[i].itemid,
+			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
 					history[i].ts.sec, history[i].ts.ns, history[i].value.dbl);
 		}
-
-#ifdef HAVE_MULTIROW_INSERT
-		(*sql_offset)--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_history_uint_sql                                          *
+ * Function: dc_add_history_uint                                              *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_history_uint_sql = "insert into history_uint (itemid,clock,ns,value) values ";
-	const char	*ins_history_uint_sync_sql =
-			"insert into history_uint_sync (nodeid,itemid,clock,ns,value) values ";
+	zbx_db_insert_t	db_insert;
 
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_uint_sql);
-#endif
+	zbx_db_insert_prepare(&db_insert, "history_uint", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1468,23 +1380,16 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_uint_sql);
-#endif
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, history[i].value.ui64);
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].value.ui64);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_uint_sync_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "history_uint_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -1494,40 +1399,28 @@ static void	dc_add_history_uint_sql(ZBX_DC_HISTORY *history, int history_num, si
 			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_uint_sync_sql);
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					get_nodeid_by_id(history[i].itemid), history[i].itemid,
+			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
 					history[i].ts.sec, history[i].ts.ns, history[i].value.ui64);
 		}
 
-#ifdef HAVE_MULTIROW_INSERT
-		(*sql_offset)--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_history_str_sql                                           *
+ * Function: dc_add_history_str                                               *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_history_str_sql = "insert into history_str (itemid,clock,ns,value) values ";
-	const char	*ins_history_str_sync_sql =
-			"insert into history_str_sync (nodeid,itemid,clock,ns,value) values ";
-	char		*value_esc;
+	zbx_db_insert_t	db_insert;
 
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_str_sql);
-#endif
+	zbx_db_insert_prepare(&db_insert, "history_str", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1537,25 +1430,16 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_str_sql);
-#endif
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, value_esc);
-		zbx_free(value_esc);
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].value_orig.str);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_str_sync_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "history_str_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -1565,42 +1449,31 @@ static void	dc_add_history_str_sql(ZBX_DC_HISTORY *history, int history_num, siz
 			if (0 == history[i].keep_history || 0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string(history[i].value_orig.str);
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_str_sync_sql);
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-					get_nodeid_by_id(history[i].itemid), history[i].itemid,
-					history[i].ts.sec, history[i].ts.ns, value_esc);
-			zbx_free(value_esc);
+			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
+					history[i].ts.sec, history[i].ts.ns, history[i].value_orig.str);
 		}
 
-#ifdef HAVE_MULTIROW_INSERT
-		(*sql_offset)--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_history_text_sql                                          *
+ * Function: dc_add_history_text                                              *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_ORACLE
-static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset, int htext_num)
+static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int htext_num)
 {
 	int		i;
-	const char	*ins_history_text_sql =
-			"insert into history_text (id,itemid,clock,ns,value) values (:1,:2,:3,:4,:5)";
 	zbx_uint64_t	id;
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "history_text", "id", "itemid", "clock", "ns", "value", NULL);
 
 	id = DBget_maxid_num("history_text", htext_num);
-
-	DBstatement_prepare(ins_history_text_sql);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1610,77 +1483,31 @@ static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, si
 		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
-		DBbind_parameter(1, &id, ZBX_TYPE_ID);
-		DBbind_parameter(2, &history[i].itemid, ZBX_TYPE_ID);
-		DBbind_parameter(3, &history[i].ts.sec, ZBX_TYPE_INT);
-		DBbind_parameter(4, &history[i].ts.ns, ZBX_TYPE_INT);
-		DBbind_parameter(5, history[i].value_orig.str, ZBX_TYPE_TEXT);
-
-		DBstatement_execute();
-		id++;
-	}
-}
-#else
-static void	dc_add_history_text_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset, int htext_num)
-{
-	int		i;
-	const char	*ins_history_text_sql = "insert into history_text (id,itemid,clock,ns,value) values ";
-	zbx_uint64_t	id;
-	char		*value_esc;
-
-	id = DBget_maxid_num("history_text", htext_num);
-
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_text_sql);
-#endif
-
-	for (i = 0; i < history_num; i++)
-	{
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
-			continue;
-
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
-			continue;
-
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_text_sql);
-#endif
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-				id, history[i].itemid, history[i].ts.sec, history[i].ts.ns, value_esc);
-		zbx_free(value_esc);
-		id++;
+		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].value_orig.str);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_history_log_sql                                           *
+ * Function: dc_add_history_log                                               *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_ORACLE
-static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset, int hlog_num)
+static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlog_num)
 {
 	int		i;
-	const char	*ins_history_log_sql =
-			"insert into history_log"
-			" (id,itemid,clock,ns,timestamp,source,severity,value,logeventid)"
-			" values"
-			" (:1,:2,:3,:4,:5,:6,:7,:8,:9)";
 	zbx_uint64_t	id;
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "history_log", "id", "itemid", "clock", "ns", "timestamp", "source",
+			"severity", "value", "logeventid", NULL);
 
 	id = DBget_maxid_num("history_log", hlog_num);
-
-	DBstatement_prepare(ins_history_log_sql);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1690,65 +1517,14 @@ static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, siz
 		if (0 == history[i].keep_history || 0 != history[i].value_null)
 			continue;
 
-		DBbind_parameter(1, &id, ZBX_TYPE_ID);
-		DBbind_parameter(2, &history[i].itemid, ZBX_TYPE_ID);
-		DBbind_parameter(3, &history[i].ts.sec, ZBX_TYPE_INT);
-		DBbind_parameter(4, &history[i].ts.ns, ZBX_TYPE_INT);
-		DBbind_parameter(5, &history[i].timestamp, ZBX_TYPE_INT);
-		DBbind_parameter(6, NULL == history[i].value.str ? "" : history[i].value.str, ZBX_TYPE_TEXT);
-		DBbind_parameter(7, &history[i].severity, ZBX_TYPE_INT);
-		DBbind_parameter(8, history[i].value_orig.str, ZBX_TYPE_TEXT);
-		DBbind_parameter(9, &history[i].logeventid, ZBX_TYPE_INT);
-
-		DBstatement_execute();
-		id++;
-	}
-}
-#else
-static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset, int hlog_num)
-{
-	int		i;
-	const char	*ins_history_log_sql =
-			"insert into history_log"
-			" (id,itemid,clock,ns,timestamp,source,severity,value,logeventid)"
-			" values ";
-	zbx_uint64_t	id;
-	char		*value_esc, *source_esc;
-
-	id = DBget_maxid_num("history_log", hlog_num);
-
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_log_sql);
-#endif
-
-	for (i = 0; i < history_num; i++)
-	{
-		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
-			continue;
-
-		if (0 == history[i].keep_history || 0 != history[i].value_null)
-			continue;
-
-		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_history_log_sql);
-#endif
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d)" ZBX_ROW_DL,
-				id, history[i].itemid, history[i].ts.sec, history[i].ts.ns, history[i].timestamp,
-				source_esc, history[i].severity, value_esc, history[i].logeventid);
-		zbx_free(value_esc);
-		zbx_free(source_esc);
-		id++;
+		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].timestamp, (NULL != history[i].value.str ? history[i].value.str : ""),
+				history[i].severity, history[i].value_orig.str, history[i].logeventid);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -1765,7 +1541,6 @@ static void	dc_add_history_log_sql(ZBX_DC_HISTORY *history, int history_num, siz
 static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_add_history";
-	size_t		sql_offset = 0;
 	int		i, h_num = 0, huint_num = 0, hstr_num = 0, htext_num = 0, hlog_num = 0, rc = ZBX_DB_OK;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1795,37 +1570,27 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		}
 	}
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* history */
 	if (0 != h_num)
-		dc_add_history_sql(history, history_num, &sql_offset);
+		dc_add_history_dbl(history, history_num);
 
 	/* history_uint */
 	if (0 != huint_num)
-		dc_add_history_uint_sql(history, history_num, &sql_offset);
+		dc_add_history_uint(history, history_num);
 
 	/* history_str */
 	if (0 != hstr_num)
-		dc_add_history_str_sql(history, history_num, &sql_offset);
+		dc_add_history_str(history, history_num);
 
 	/* history_text */
 	if (0 != htext_num)
-		dc_add_history_text_sql(history, history_num, &sql_offset, htext_num);
+		dc_add_history_text(history, history_num, htext_num);
 
 	/* history_log */
 	if (0 != hlog_num)
-		dc_add_history_log_sql(history, history_num, &sql_offset, hlog_num);
+		dc_add_history_log(history, history_num, hlog_num);
 
-#ifdef HAVE_MULTIROW_INSERT
-	sql[sql_offset] = '\0';
-#endif
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		rc = DBexecute("%s", sql);
-
+	/* update value cache */
 	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) &&
 			0 != h_num + huint_num + hstr_num + htext_num + hlog_num)
 	{
@@ -1875,150 +1640,61 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_proxy_history_sql                                         *
+ * Function: dc_add_proxy_history                                             *
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value) values ";
-	char		*value_esc;
+	char		buffer[64], *pvalue;
+	zbx_db_insert_t	db_insert;
 
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
+	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type && ITEM_VALUE_TYPE_UINT64 != history[i].value_type &&
-				ITEM_VALUE_TYPE_STR != history[i].value_type)
-		{
-			continue;
-		}
-
 		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
 		switch (history[i].value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "')" ZBX_ROW_DL,
-						history[i].itemid, history[i].ts.sec, history[i].ts.ns,
-						history[i].value_orig.dbl);
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL, history[i].value_orig.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "')" ZBX_ROW_DL,
-						history[i].itemid, history[i].ts.sec, history[i].ts.ns,
-						history[i].value_orig.ui64);
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, history[i].value_orig.ui64);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				value_esc = DBdyn_escape_string(history[i].value_orig.str);
-				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-						history[i].itemid, history[i].ts.sec, history[i].ts.ns, value_esc);
-				zbx_free(value_esc);
+			case ITEM_VALUE_TYPE_TEXT:
+				pvalue = history[i].value_orig.str;
 				break;
+			default:
+				continue;
 		}
+
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns, pvalue);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_proxy_history_text_sql                                    *
+ * Function: dc_add_proxy_history_log                                         *
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_ORACLE
-static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_proxy_history_sql =
-			"insert into proxy_history (itemid,clock,ns,value) values (:1,:2,:3,:4)";
+	zbx_db_insert_t	db_insert;
 
-	DBstatement_prepare(ins_proxy_history_sql);
-
-	for (i = 0; i < history_num; i++)
-	{
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
-		DBbind_parameter(2, &history[i].ts.sec, ZBX_TYPE_INT);
-		DBbind_parameter(3, &history[i].ts.ns, ZBX_TYPE_INT);
-		DBbind_parameter(4, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
-
-		DBstatement_execute();
-	}
-}
-#else
-static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
-{
-	int		i;
-	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value) values ";
-	char		*value_esc;
-
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
-
-	for (i = 0; i < history_num; i++)
-	{
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d,'%s')" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, value_esc);
-		zbx_free(value_esc);
-	}
-
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Function: dc_add_proxy_history_log_sql                                     *
- *                                                                            *
- * Purpose: helper function for DCmass_proxy_add_history()                    *
- *                                                                            *
- ******************************************************************************/
-#ifdef HAVE_ORACLE
-static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
-{
-	int		i;
-	const char	*ins_proxy_history_sql =
-			"insert into proxy_history"
-			" (itemid,clock,ns,timestamp,source,severity,value,logeventid)"
-			" values"
-			" (:1,:2,:3,:4,:5,:6,:7,:8)";
-
-	DBstatement_prepare(ins_proxy_history_sql);
+	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
+			"value", "logeventid", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2028,96 +1704,40 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
-		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
-		DBbind_parameter(2, &history[i].ts.sec, ZBX_TYPE_INT);
-		DBbind_parameter(3, &history[i].ts.ns, ZBX_TYPE_INT);
-		DBbind_parameter(4, &history[i].timestamp, ZBX_TYPE_INT);
-		DBbind_parameter(5, NULL == history[i].value.str ? "" : history[i].value.str, ZBX_TYPE_TEXT);
-		DBbind_parameter(6, &history[i].severity, ZBX_TYPE_INT);
-		DBbind_parameter(7, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
-		DBbind_parameter(8, &history[i].logeventid, ZBX_TYPE_INT);
-
-		DBstatement_execute();
-	}
-}
-#else
-static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
-{
-	int		i;
-	const char      *ins_proxy_history_sql =
-			"insert into proxy_history"
-			" (itemid,clock,ns,timestamp,source,severity,value,logeventid)"
-			" values ";
-	char		*source_esc, *value_esc;
-
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
-
-	for (i = 0; i < history_num; i++)
-	{
-		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
-		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-				"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d)" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, history[i].timestamp,
-				source_esc, history[i].severity, value_esc, history[i].logeventid);
-		zbx_free(value_esc);
-		zbx_free(source_esc);
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].timestamp, NULL !=  history[i].value.str ? history[i].value.str : "",
+				history[i].severity, history[i].value_orig.str, history[i].logeventid);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_add_proxy_history_notsupported_sql                            *
+ * Function: dc_add_proxy_history_notsupported                                *
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int history_num, size_t *sql_offset)
+static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
-	const char	*ins_proxy_history_sql = "insert into proxy_history (itemid,clock,ns,value,state) values ";
-	char		*value_esc;
+	zbx_db_insert_t	db_insert;
 
-#ifdef HAVE_MULTIROW_INSERT
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
+	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "state", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
 		if (ITEM_STATE_NOTSUPPORTED != history[i].state)
 			continue;
 
-#ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ins_proxy_history_sql);
-#endif
-		value_esc = DBdyn_escape_string(history[i].value_orig.err);
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "(" ZBX_FS_UI64 ",%d,%d,'%s',%d)" ZBX_ROW_DL,
-				history[i].itemid, history[i].ts.sec, history[i].ts.ns, value_esc,
-				(int)history[i].state);
-		zbx_free(value_esc);
+		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
+				history[i].value_orig.err, (int)history[i].state);
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
-	(*sql_offset)--;
-	zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ";\n");
-#endif
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 }
 
 /******************************************************************************
@@ -2135,8 +1755,7 @@ static void	dc_add_proxy_history_notsupported_sql(ZBX_DC_HISTORY *history, int h
 static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_proxy_add_history";
-	size_t		sql_offset = 0;
-	int		i, h_num = 0, htext_num = 0, hlog_num = 0, notsupported_num = 0;
+	int		i, h_num = 0, hlog_num = 0, notsupported_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2150,15 +1769,13 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		switch (history[i].value_type)
 		{
-			case ITEM_VALUE_TYPE_TEXT:
-				htext_num++;
-				break;
 			case ITEM_VALUE_TYPE_LOG:
 				hlog_num++;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
 				h_num++;
 				break;
 			default:
@@ -2166,28 +1783,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		}
 	}
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != h_num)
-		dc_add_proxy_history_sql(history, history_num, &sql_offset);
-
-	if (0 != htext_num)
-		dc_add_proxy_history_text_sql(history, history_num, &sql_offset);
+		dc_add_proxy_history(history, history_num);
 
 	if (0 != hlog_num)
-		dc_add_proxy_history_log_sql(history, history_num, &sql_offset);
+		dc_add_proxy_history_log(history, history_num);
 
 	if (0 != notsupported_num)
-		dc_add_proxy_history_notsupported_sql(history, history_num, &sql_offset);
-
-#ifdef HAVE_MULTIROW_INSERT
-	sql[sql_offset] = '\0';
-#endif
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		dc_add_proxy_history_notsupported(history, history_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

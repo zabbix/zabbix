@@ -142,7 +142,7 @@ if (isset($_REQUEST['save'])) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
-	$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
+	$result = API::Mediatype()->delete(array(getRequest('mediatypeid')));
 
 	if ($result) {
 		unset($_REQUEST['form']);
