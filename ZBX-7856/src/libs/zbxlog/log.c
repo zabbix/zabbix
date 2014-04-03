@@ -216,7 +216,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	{
 		zbx_mutex_lock(&log_file_access);
 
-		if (0 != CONFIG_LOG_FILE_SIZE && 0 == stat(log_filename, &buf))
+		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
 		{
 			if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < buf.st_size)
 			{
