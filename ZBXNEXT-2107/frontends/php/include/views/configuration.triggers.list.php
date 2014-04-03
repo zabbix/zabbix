@@ -19,7 +19,7 @@
 **/
 
 
-$triggersWidget = new CWidget();
+$triggersWidget = new CWidget(null, 'trigger-list');
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -204,7 +204,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			}
 			array_shift($triggerDependencies);
 
-			$description = array_merge($description, array(new CDiv($triggerDependencies, 'triggerDependencies')));
+			$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
 		}
 	}
 	else {
