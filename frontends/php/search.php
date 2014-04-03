@@ -165,21 +165,9 @@ foreach ($hosts as $hnum => $host) {
 	// highlight visible name
 	$visibleName = make_decoration($host['name'], $search);
 
-	// highlight host name if it's different from the visible name
-	$hostName = null;
-	if ($host['host'] !== $host['name'] && zbx_stripos($host['host'], $search) !== false) {
-		$hostName = array('(', make_decoration($host['host'], $search), ')');
-	}
-
 	if ($admin && isset($rw_hosts[$hostid])) {
 		// host
 		$hostCell = array(new CLink($visibleName, 'hosts.php?form=update&'.$link, $style));
-
-		// display the host name only if it matches the search string
-		if ($hostName !== null) {
-			$hostCell[] = BR();
-			$hostCell[] = $hostName;
-		}
 
 		$applications_link = array(
 			new CLink(_('Applications'), 'applications.php?'.$link),
@@ -210,18 +198,20 @@ foreach ($hosts as $hnum => $host) {
 		// host
 		$hostCell = array(new CSpan($visibleName, $style));
 
-		// display the host name only if it matches the search string
-		if ($hostName !== null) {
-			$hostCell[] = BR();
-			$hostCell[] = $hostName;
-		}
-
 		$applications_link = _('Applications').' ('.$host['applications'].')';
 		$items_link = _('Items').' ('.$host['items'].')';
 		$triggers_link = _('Triggers').' ('.$host['triggers'].')';
 		$graphs_link = _('Graphs').' ('.$host['graphs'].')';
 		$discoveryLink = _('Discovery').' ('.$host['discoveries'].')';
 		$httpTestsLink = _('Web').' ('.$host['httpTests'].')';
+	}
+
+	// display the host name only if it matches the search string and is different from the visible name
+	if ($host['host'] !== $host['name'] && zbx_stripos($host['host'], $search) !== false) {
+		$hostCell[] = BR();
+		$hostCell[] = '(';
+		$hostCell[] = make_decoration($host['host'], $search);
+		$hostCell[] = ')';
 	}
 
 	$hostip = make_decoration($host['ip'], $search);
@@ -448,12 +438,6 @@ if ($admin) {
 				'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid)
 			));
 
-			// display the template host name only if it matches the search string
-			if ($templateHostName !== null) {
-				$templateCell[] = BR();
-				$templateCell[] = $templateHostName;
-			}
-
 			$applications_link = array(
 				new CLink(_('Applications'), 'applications.php?'.$link),
 				' ('.$template['applications'].')'
@@ -487,12 +471,6 @@ if ($admin) {
 			// host
 			$templateCell = array(new CSpan($templateVisibleName));
 
-			// display the template host name only if it matches the search string
-			if ($templateHostName !== null) {
-				$templateCell[] = BR();
-				$templateCell[] = $templateHostName;
-			}
-
 			$applications_link = _('Applications').' ('.$template['applications'].')';
 			$items_link = _('Items').' ('.$template['items'].')';
 			$triggers_link = _('Triggers').' ('.$template['triggers'].')';
@@ -500,6 +478,14 @@ if ($admin) {
 			$screensLink = _('Screens').' ('.$template['screens'].')';
 			$discoveryLink = _('Discovery').' ('.$template['discoveries'].')';
 			$httpTestsLink = _('Web').' ('.$template['httpTests'].')';
+		}
+
+		// display the template host name only if it matches the search string and is different from the visible name
+		if ($template['host'] !== $template['name'] && zbx_stripos($template['host'], $search) !== false) {
+			$templateCell[] = BR();
+			$templateCell[] = '(';
+			$templateCell[] = make_decoration($template['host'], $search);
+			$templateCell[] = ')';
 		}
 
 		$table->addRow(array(
