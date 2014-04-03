@@ -2,6 +2,7 @@ Changes for 2.2.3rc2
 
 Bug fixes:
 .......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.3rc1
