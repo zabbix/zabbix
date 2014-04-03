@@ -71,6 +71,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.3rc2
 
 Bug fixes:
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
 .......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
