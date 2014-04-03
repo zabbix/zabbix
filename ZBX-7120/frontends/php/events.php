@@ -444,51 +444,39 @@ $config = select_config();
 
 // headers
 if ($source == EVENT_SOURCE_DISCOVERY) {
+	$header = array(
+		_('Time'),
+		_('IP'),
+		_('DNS'),
+		_('Description'),
+		_('Status')
+	);
+
 	if ($csvExport) {
-		$csvRows[] = array(
-			_('Time'),
-			_('IP'),
-			_('DNS'),
-			_('Description'),
-			_('Status')
-		);
+		$csvRows[] = $header;
 	}
 	else {
-		$table->setHeader(array(
-			_('Time'),
-			_('IP'),
-			_('DNS'),
-			_('Description'),
-			_('Status')
-		));
+		$table->setHeader($header);
 	}
 }
 else {
+	$header = array(
+		_('Time'),
+		is_show_all_nodes() ? _('Node') : null,
+		($_REQUEST['hostid'] == 0) ? _('Host') : null,
+		_('Description'),
+		_('Status'),
+		_('Severity'),
+		_('Duration'),
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Actions')
+	);
+
 	if ($csvExport) {
-		$csvRows[] = array(
-			_('Time'),
-			is_show_all_nodes() ? _('Node') : null,
-			($_REQUEST['hostid'] == 0) ? _('Host') : null,
-			_('Description'),
-			_('Status'),
-			_('Severity'),
-			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
-			_('Actions')
-		);
+		$csvRows[] = $header;
 	}
 	else {
-		$table->setHeader(array(
-			_('Time'),
-			is_show_all_nodes() ? _('Node') : null,
-			($_REQUEST['hostid'] == 0) ? _('Host') : null,
-			_('Description'),
-			_('Status'),
-			_('Severity'),
-			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
-			_('Actions')
-		));
+		$table->setHeader($header);
 	}
 }
 
