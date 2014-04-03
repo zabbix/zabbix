@@ -30,28 +30,15 @@
 
 #if defined(_WINDOWS)
 
-#ifdef _UNICODE
-#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#else
-#	define zbx_stat(path, buf)		_stat64(path, buf)
-#	define zbx_open(pathname, flags)	open(pathname, flags | O_BINARY)
-#endif
+#define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
 
-#ifdef UNICODE
-#	include <strsafe.h>
-#	define zbx_wsnprintf StringCchPrintf
-#	define zbx_strlen wcslen
-#	define zbx_strchr wcschr
-#	define zbx_strstr wcsstr
-#	define zbx_fullpath _wfullpath
-#else
-#	define zbx_wsnprintf zbx_snprintf
-#	define zbx_strlen strlen
-#	define zbx_strchr strchr
-#	define zbx_strstr strstr
-#	define zbx_fullpath _fullpath
-#endif
+#include <strsafe.h>
+#define zbx_wsnprintf StringCchPrintf
+#define zbx_strlen wcslen
+#define zbx_strchr wcschr
+#define zbx_strstr wcsstr
+#define zbx_fullpath _wfullpath
 
 #ifndef __UINT64_C
 #	define __UINT64_C(x)	x

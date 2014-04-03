@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 
-#if defined(_WINDOWS) && defined(_UNICODE)
+#if defined(_WINDOWS)
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
 	int	ret = -1, fd;
