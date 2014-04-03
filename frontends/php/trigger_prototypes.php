@@ -136,7 +136,7 @@ elseif (isset($_REQUEST['or_expression'])) {
 elseif (isset($_REQUEST['replace_expression'])) {
 	$_REQUEST['expr_action'] = 'r';
 }
-elseif (isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])) {
+elseif (hasRequest('remove_expression')) {
 	$_REQUEST['expr_action'] = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }

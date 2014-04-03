@@ -611,7 +611,7 @@ class CHostInterface extends CZBXAPI {
 	 * @param array $interface
 	 */
 	protected function checkDns(array $interface) {
-		if (zbx_strlen($interface['dns']) > 64) {
+		if (mb_strlen($interface['dns']) > 64) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_n(
@@ -619,7 +619,7 @@ class CHostInterface extends CZBXAPI {
 					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d characters.',
 					64,
 					$interface['dns'],
-					zbx_strlen($interface['dns'])
+					mb_strlen($interface['dns'])
 				)
 			);
 		}

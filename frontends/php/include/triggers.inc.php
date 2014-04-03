@@ -597,15 +597,15 @@ function construct_expression($itemid, $expressions) {
 				$complite_expr.=' | ';
 			}
 			if ($cexpor == 0) {
-				$startpos = zbx_strlen($complite_expr);
+				$startpos = mb_strlen($complite_expr);
 			}
 			$cexpor++;
 			$eq_global = '#0';
 		}
 		else {
 			if (($cexpor > 1) & ($startpos >= 0)) {
-				$head = substr($complite_expr, 0, $startpos);
-				$tail = substr($complite_expr, $startpos);
+				$head = mb_substr($complite_expr, 0, $startpos);
+				$tail = mb_substr($complite_expr, $startpos);
 				$complite_expr = $head.'('.$tail.')';
 			}
 			$cexpor = 0;
@@ -624,13 +624,12 @@ function construct_expression($itemid, $expressions) {
 		$multi = preg_match('/.+(&|\|).+/', $expr);
 
 		while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-			$arr[4] = zbx_strtolower($arr[4]);
 			if (!isset($functions[$arr[4]])) {
 				error(_('Incorrect function is used').'. ['.$expression['value'].']');
 				return false;
 			}
 			$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-			$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
+			$expr_array[$sub_expr_count]['regexp'] = $arr[4].$arr[5];
 
 			$sub_expr_count++;
 			$expr = $arr[1];
@@ -666,8 +665,8 @@ function construct_expression($itemid, $expressions) {
 	}
 
 	if (($cexpor > 1) & ($startpos >= 0)) {
-		$head = substr($complite_expr, 0, $startpos);
-		$tail = substr($complite_expr, $startpos);
+		$head = mb_substr($complite_expr, 0, $startpos);
+		$tail = mb_substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
 
@@ -685,7 +684,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 	$expressionExpanded = $html ? array() : '';
 	$trigger = array();
 
-	for ($i = 0, $state = '', $max = zbx_strlen($expressionCompressed); $i < $max; $i++) {
+	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
 		if ($expressionCompressed[$i] == '{') {
 			if ($expressionCompressed[$i + 1] == '$') {
 				$state = 'USERMACRO';

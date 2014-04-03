@@ -268,7 +268,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$this->sum += $item_value;
 
-			$convertedUnit = zbx_strlen(convert_units(array(
+			$convertedUnit = strlen(convert_units(array(
 				'value' => $item_value,
 				'units' => $this->items[$i]['units']
 			)));
@@ -287,11 +287,11 @@ class CPieGraphDraw extends CGraphDraw {
 		$max_name_len = 0;
 
 		for ($i = 0; $i < $this->num; $i++) {
-			if (zbx_strlen($this->items[$i]['hostname']) > $max_host_len) {
-				$max_host_len = zbx_strlen($this->items[$i]['hostname']);
+			if (mb_strlen($this->items[$i]['hostname']) > $max_host_len) {
+				$max_host_len = mb_strlen($this->items[$i]['hostname']);
 			}
-			if (zbx_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
-				$max_name_len = zbx_strlen($this->items[$i]['name_expanded']);
+			if (mb_strlen($this->items[$i]['name_expanded']) > $max_name_len) {
+				$max_name_len = mb_strlen($this->items[$i]['name_expanded']);
 			}
 		}
 

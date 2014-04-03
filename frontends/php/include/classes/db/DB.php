@@ -353,7 +353,7 @@ class DB {
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
 					case self::FIELD_TYPE_CHAR:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
 						if ($length > $tableSchema['fields'][$field]['length']) {
@@ -381,7 +381,7 @@ class DB {
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
 					case self::FIELD_TYPE_TEXT:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
 						if ($DB['TYPE'] == ZBX_DB_DB2) {

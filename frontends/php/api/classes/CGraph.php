@@ -394,7 +394,7 @@ class CGraph extends CGraphGeneral {
 			));
 
 			if ($chdGraph = reset($chdGraphs)) {
-				if (zbx_strtolower($tmpGraph['name']) != zbx_strtolower($chdGraph['name'])
+				if (mb_strtolower($tmpGraph['name']) !== mb_strtolower($chdGraph['name'])
 						&& $this->exists(array('name' => $tmpGraph['name'], 'hostids' => $chdHost['hostid']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" already exists on "%2$s".', $tmpGraph['name'], $chdHost['host']));
 				}

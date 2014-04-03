@@ -351,7 +351,7 @@ function rgb2hex($color) {
 		dechex($color[2])
 	);
 	foreach ($HEX as $id => $value) {
-		if (zbx_strlen($value) != 2) {
+		if (strlen($value) != 2) {
 			$HEX[$id] = '0'.$value;
 		}
 	}
@@ -364,10 +364,10 @@ function hex2rgb($color) {
 		$color = substr($color, 1);
 	}
 
-	if (zbx_strlen($color) == 6) {
+	if (strlen($color) == 6) {
 		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
 	}
-	elseif (zbx_strlen($color) == 3) {
+	elseif (strlen($color) == 3) {
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	}
 	else {
@@ -950,40 +950,13 @@ function zbx_formatDomId($value) {
 	return str_replace(array('[', ']'), array('_', ''), $value);
 }
 
-function zbx_strlen($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strlen($str);
-	}
-	else {
-		return strlen($str);
-	}
-}
-
-function zbx_strtoupper($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strtoupper($str);
-	}
-	else {
-		return strtoupper($str);
-	}
-}
-
-function zbx_strtolower($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strtolower($str);
-	}
-	else {
-		return strtolower($str);
-	}
-}
-
 /************* SELECT *************/
 function selectByPattern(&$table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();
 	foreach ($table as $num => $row) {
-		if (zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern)) {
+		if (mb_strtolower($row[$column]) === mb_strtolower($pattern)) {
 			$rsTable = array($num => $row) + $rsTable;
 		}
 		elseif ($limit > 0) {
@@ -1936,7 +1909,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$lst_error = new CList(null,'messages');
 			foreach ($ZBX_MESSAGES as $msg) {
 				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && 'error' != zbx_strtolower($msg['type']));
+				$bool = ($bool && 'error' !== strtolower($msg['type']));
 			}
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);

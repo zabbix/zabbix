@@ -435,7 +435,7 @@ elseif (hasRequest('save')) {
 				}
 				else {
 					// transform macros to uppercase {$aaa} => {$AAA}
-					$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
+					$macros[$key]['macro'] = mb_strtoupper($macro['macro']);
 				}
 			}
 

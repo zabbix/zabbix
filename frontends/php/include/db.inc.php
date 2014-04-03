@@ -48,7 +48,7 @@ function DBconnect(&$error) {
 		$result = false;
 	}
 	else {
-		$DB['TYPE'] = zbx_strtoupper($DB['TYPE']);
+		$DB['TYPE'] = strtoupper($DB['TYPE']);
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
@@ -899,7 +899,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$fieldSearch[] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+					zbx_dbstr($start.mb_strtoupper($pattern).'%').
 					" ESCAPE '!'";
 			}
 			else {
@@ -907,7 +907,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$fieldSearch[] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr(zbx_strtoupper($pattern)).
+					zbx_dbstr(mb_strtoupper($pattern)).
 					" ESCAPE '!'";
 			}
 		}
