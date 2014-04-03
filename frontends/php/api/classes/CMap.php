@@ -834,7 +834,7 @@ class CMap extends CMapElement {
 	 *
 	 * @return array
 	 */
-	public function delete($sysmapIds) {
+	public function delete(array $sysmapIds) {
 		$maps = zbx_toObject($sysmapIds, 'sysmapid');
 
 		$this->checkInput($maps, __FUNCTION__);
@@ -939,7 +939,7 @@ class CMap extends CMapElement {
 
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
-			$selements = API::getApi()->select('sysmaps_elements', array(
+			$selements = API::getApiService()->select('sysmaps_elements', array(
 				'output' => $this->outputExtend($options['selectSelements'], array('selementid', 'sysmapid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
@@ -1007,7 +1007,7 @@ class CMap extends CMapElement {
 
 		// adding links
 		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
-			$links = API::getApi()->select('sysmaps_links', array(
+			$links = API::getApiService()->select('sysmaps_links', array(
 				'output' => $this->outputExtend($options['selectLinks'], array('sysmapid', 'linkid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
@@ -1032,7 +1032,7 @@ class CMap extends CMapElement {
 
 		// adding urls
 		if ($options['selectUrls'] !== null && $options['selectUrls'] != API_OUTPUT_COUNT) {
-			$links = API::getApi()->select('sysmap_url', array(
+			$links = API::getApiService()->select('sysmap_url', array(
 				'output' => $this->outputExtend($options['selectUrls'], array('sysmapid', 'sysmapurlid')),
 				'filter' => array('sysmapid' => $sysmapIds),
 				'preservekeys' => true,
