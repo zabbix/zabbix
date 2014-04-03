@@ -111,16 +111,16 @@ foreach ($dbGraph['gitems'] as $gItem) {
 $hostName = '';
 
 foreach ($dbGraph['hosts'] as $gItemHost) {
-	if ($hostName !== $gItemHost['name']) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
 		$hostName = '';
 		break;
 	}
-	else {
-		$hostName = $gItemHost['name'];
-	}
 }
 
-$graph->setHeader($hostName ? $hostName.NAME_DELIMITER.$dbGraph['name'] : $dbGraph['name']);
+$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
 
 if ($dbGraph['show_3d']) {
 	$graph->switchPie3D();
