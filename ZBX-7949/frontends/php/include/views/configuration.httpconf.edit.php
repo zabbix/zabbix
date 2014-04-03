@@ -195,8 +195,10 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		'name_step' => $stepid
 	));
 
-	if (zbx_strlen($step['url']) > 70) {
-		$url = new CSpan(substr($step['url'], 0, 35).SPACE.'...'.SPACE.substr($step['url'], zbx_strlen($step['url']) - 25, 25));
+	if (mb_strlen($step['url']) > 70) {
+		$start = mb_substr($step['url'], 0, 35);
+		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
+		$url = new CSpan($start.SPACE.'...'.SPACE.$end);
 		$url->setHint($step['url']);
 	}
 	else {

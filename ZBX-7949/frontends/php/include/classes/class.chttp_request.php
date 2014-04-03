@@ -86,7 +86,7 @@ class CHTTP_request {
 	 * @param string Case-Insensitive HTTP Header Name (eg: "User-Agent")
 	 */
 	public function header($name) {
-		$name = zbx_strtoupper($name);
+		$name = strtoupper($name);
 		return isset($this->headers[$name]) ? $this->headers[$name] : false;
 	}
 
