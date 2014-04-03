@@ -2059,10 +2059,10 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 	for (i = 0; i < values_num; i++)
 	{
-		if (proxy_hostid != items[i].host.proxy_hostid)
+		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (SUCCEED != errcodes[i])
+		if (proxy_hostid != items[i].host.proxy_hostid)
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == items[i].flags)
