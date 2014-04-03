@@ -426,12 +426,6 @@ if ($admin) {
 		// highlight visible name
 		$templateVisibleName = make_decoration($template['name'], $search);
 
-		// highlight host name if it's different from the visible name
-		$templateHostName = null;
-		if ($template['host'] !== $template['name'] && zbx_stripos($template['host'], $search) !== false) {
-			$templateHostName = array('(', make_decoration($template['host'], $search), ')');
-		}
-
 		if (isset($rw_templates[$templateid])) {
 			// template
 			$templateCell = array(new CLink($templateVisibleName,
