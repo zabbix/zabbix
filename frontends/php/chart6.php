@@ -111,26 +111,21 @@ foreach ($dbGraph['gitems'] as $gItem) {
 $hostName = '';
 
 foreach ($dbGraph['hosts'] as $gItemHost) {
-	if ($hostName === '') {
-		$hostName = $gItemHost['name'];
-	}
-	elseif ($hostName !== $gItemHost['name']) {
+	if ($hostName !== $gItemHost['name']) {
 		$hostName = '';
 		break;
 	}
+	else {
+		$hostName = $gItemHost['name'];
+	}
 }
 
-if ($hostName) {
-	$graph->setHeader($hostName.NAME_DELIMITER.$dbGraph['name']);
-} else {
-	$graph->setHeader($dbGraph['name']);
-}
+$graph->setHeader($hostName ? $hostName.NAME_DELIMITER.$dbGraph['name'] : $dbGraph['name']);
 
 if ($dbGraph['show_3d']) {
 	$graph->switchPie3D();
 }
 $graph->showLegend($dbGraph['show_legend']);
-
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
