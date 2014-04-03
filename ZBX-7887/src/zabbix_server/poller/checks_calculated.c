@@ -29,7 +29,6 @@ typedef struct
 	char		*func;
 	char		*params;
 	char		*value;
-	unsigned char	found;
 }
 function_t;
 
@@ -80,7 +79,6 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 	f->func = func;
 	f->params = params;
 	f->value = NULL;
-	f->found = 0;
 
 	return f->functionid;
 }
