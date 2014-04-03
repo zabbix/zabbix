@@ -226,10 +226,11 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$dbHostGroup['permission'] = PERM_READ_WRITE;
 		}
+		elseif (isset($group_perm[$dbHostGroup['groupid']])) {
+			$dbHostGroup['permission'] = $group_perm[$dbHostGroup['groupid']];
+		}
 		else {
-			$dbHostGroup['permission'] = isset($group_perm[$dbHostGroup['groupid']])
-				? $group_perm[$dbHostGroup['groupid']]
-				: PERM_DENY;
+			$dbHostGroup['permission'] = PERM_DENY;
 		}
 
 		if ($dbHostGroup['permission'] < $perm) {
