@@ -1029,7 +1029,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	{
 		allocated = ZBX_BUF_LEN;
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buffer = zbx_malloc(s->buffer, allocated);
+		s->buffer = zbx_malloc(NULL, allocated);
 
 		memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
 
