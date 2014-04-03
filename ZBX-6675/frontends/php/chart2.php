@@ -71,11 +71,6 @@ $timeline = CScreenBase::calculateTime(array(
 
 CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
-$chartHeader = '';
-if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
-	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
-}
-
 $graph = new CLineGraphDraw($dbGraph['graphtype']);
 
 // array sorting
@@ -99,16 +94,21 @@ foreach ($dbGraph['gitems'] as $gItem) {
 $hostName = '';
 
 foreach ($dbGraph['hosts'] as $gItemHost) {
-	if ($hostName !== $gItemHost['name']) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
 		$hostName = '';
 		break;
 	}
-	else {
-		$hostName = $gItemHost['name'];
-	}
 }
 
-$chartHeader .= $hostName ? $hostName.NAME_DELIMITER.$dbGraph['name'] : $dbGraph['name'];
+$chartHeader = '';
+if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
+	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
+}
+
+$chartHeader .= ($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name'];
 
 $graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
