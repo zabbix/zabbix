@@ -508,9 +508,9 @@ void	zbx_remove_sqlite3_mutex()
 void	zbx_db_init(const char *dbname, const char *const db_schema)
 {
 #if defined(HAVE_SQLITE3)
-	struct stat	buf;
+	zbx_stat_t	buf;
 
-	if (0 != stat(dbname, &buf))
+	if (0 != zbx_stat(dbname, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open database file \"%s\": %s", dbname, zbx_strerror(errno));
 		zabbix_log(LOG_LEVEL_WARNING, "creating database ...");

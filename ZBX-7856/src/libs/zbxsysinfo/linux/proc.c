@@ -27,9 +27,9 @@
 
 static FILE	*open_proc_file(const char *filename)
 {
-	struct stat	s;
+	zbx_stat_t	s;
 
-	if (0 != stat(filename, &s))
+	if (0 != zbx_stat(filename, &s))
 		return NULL;
 
 	return fopen(filename, "r");
