@@ -36,6 +36,7 @@ use warnings;
 use Zabbix;
 use Getopt::Long;
 use MIME::Base64;
+use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 use RSM;
 
@@ -94,6 +95,7 @@ my $rv = GetOptions(\%OPTS,
 		    "epp-commands=s",
 		    "epp-serverid=s",
 		    "epp-test-prefix=s",
+		    "epp-servercert=s",
 		    "ns-servers-v4=s",
 		    "ns-servers-v6=s",
 		    "rdds-ns-string=s",
@@ -1203,6 +1205,21 @@ sub read_file {
     return $contents;
 }
 
+sub get_md5 {
+    my $file = shift;
+
+    my $contents = do {
+        local $/ = undef;
+        open(my $fh, "<", $file) or pfail("cannot open $file: $!");
+        <$fh>;
+    };
+
+    my $index = index($contents, "-----BEGIN CERTIFICATE-----");
+    pfail("specified file $file does not contain line \"-----BEGIN CERTIFICATE-----\"") if ($index == -1);
+
+    return md5_hex(substr($contents, $index));
+}
+
 sub create_main_template {
     my $tld = shift;
     my $ns_servers = shift;
@@ -1301,6 +1318,7 @@ sub create_main_template {
 	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase again: ", $OPTS{'epp-privkey'}), $templateid, 1);
 	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, 1);
 	create_macro('{$RSM.EPP.TESTPREFIX}', $OPTS{'epp-test-prefix'}, $templateid, 1);
+	create_macro('{$RSM.EPP.SERVERCERTMD5}', get_md5($OPTS{'epp-servercert'}), $templateid, 1);
     }
 
     return $templateid;
@@ -1768,6 +1786,8 @@ Other options
                 specify EPP username
 	--epp-cert
                 path to EPP Client certificates file
+	--epp-servercert
+                path to EPP Server certificates file
 	--epp-privkey
                 path to EPP Client private key file (unencrypted)
 	--epp-serverid
@@ -1807,6 +1827,7 @@ sub validate_input {
 	$msg .= "EPP Client private key file must be specified (--epp-privkey)\n" unless ($OPTS{'epp-privkey'});
 	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
+	$msg .= "EPP Server certificate file must be specified (--epp-servercert)\n" unless ($OPTS{'epp-servercert'});
     }
 
     unless ($msg eq "") {

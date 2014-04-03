@@ -24,6 +24,7 @@
 #include "zbxserver.h"
 #include "comms.h"
 #include "base64.h"
+#include "md5.h"
 #include "rsm.h"
 
 #define ZBX_HOST_BUF_SIZE	128
@@ -1234,7 +1235,7 @@ static int	zbx_conf_str(zbx_uint64_t *hostid, const char *macro, char **value, c
 
 	if (NULL != *value)
 	{
-		zbx_snprintf(err, err_size, "internal error getting macro %s, unfreed memory", macro);
+		zbx_strlcpy(err, "unfreed memory detected", err_size);
 		goto out;
 	}
 
@@ -2476,7 +2477,7 @@ static int	epp_recv_message(SSL *ssl, char **data, size_t *data_len, FILE *log_f
 
 	if (NULL == data || NULL != *data)
 	{
-		zbx_rsm_errf(log_fd, "internal error at %s:%d", __FILE__, __LINE__);
+		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
@@ -2567,7 +2568,7 @@ static int	get_xml_value(const char *data, int xml_path, char *xml_value, size_t
 			end_tag = "\">";
 			break;
 		default:
-			zbx_rsm_errf(log_fd, "invalid XML path type (%d)", xml_path);
+			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 	}
 
@@ -3044,15 +3045,18 @@ static void	zbx_set_epp_values(const char *ip, int rtt1, int rtt2, int rtt3, int
 	}
 }
 
-static int	zbx_ssl_attach_cert(SSL *ssl, char *cert, int cert_len, char *err, size_t err_size)
+static int	zbx_ssl_attach_cert(SSL *ssl, char *cert, int cert_len, int *rtt, char *err, size_t err_size)
 {
 	BIO	*bio = NULL;
 	X509	*x509 = NULL;
 	int	ret = FAIL;
 
+	*rtt = ZBX_EC_EPP_CRYPT;
+
 	if (NULL == (bio = BIO_new_mem_buf(cert, cert_len)))
 	{
-		zbx_strlcpy(err, "cannot allocate memory for client certificate", err_size);
+		*rtt = ZBX_EC_INTERNAL;
+		zbx_strlcpy(err, "out of memory", err_size);
 		goto out;
 	}
 
@@ -3079,15 +3083,18 @@ out:
 	return ret;
 }
 
-static int	zbx_ssl_attach_privkey(SSL *ssl, char *privkey, int privkey_len, char *err, size_t err_size)
+static int	zbx_ssl_attach_privkey(SSL *ssl, char *privkey, int privkey_len, int *rtt, char *err, size_t err_size)
 {
 	BIO	*bio = NULL;
 	RSA	*rsa = NULL;
 	int	ret = FAIL;
 
+	*rtt = ZBX_EC_EPP_CRYPT;
+
 	if (NULL == (bio = BIO_new_mem_buf(privkey, privkey_len)))
 	{
-		zbx_strlcpy(err, "cannot allocate memory for client private key", err_size);
+		*rtt = ZBX_EC_INTERNAL;
+		zbx_strlcpy(err, "out of memory", err_size);
 		goto out;
 	}
 
@@ -3114,6 +3121,209 @@ out:
 	return ret;
 }
 
+static char	*zbx_parse_time(char *str, size_t str_size, int *i)
+{
+	char	*p_end;
+	char	c;
+	size_t	block_size = 0;
+	int	rv;
+
+	p_end = str;
+
+	while ('\0' != *p_end && block_size++ < str_size)
+		p_end++;
+
+	if (str == p_end)
+		return NULL;
+
+	c = *p_end;
+	*p_end = '\0';
+
+	rv = sscanf(str, "%u", i);
+	*p_end = c;
+
+	if (1 != rv)
+		return NULL;
+
+
+	return p_end;
+}
+
+static int	zbx_parse_asn1time(ASN1_TIME *asn1time, time_t *time, char *err, size_t err_size)
+{
+	struct tm	tm;
+	char		buf[15], *p;
+	int		ret = FAIL;
+
+	if (V_ASN1_UTCTIME == asn1time->type && 13 == asn1time->length && 'Z' == asn1time->data[12])
+	{
+		memcpy(buf + 2, asn1time->data, asn1time->length - 1);
+
+		if ('5' <= asn1time->data[0])
+		{
+			buf[0] = '1';
+			buf[1] = '9';
+		}
+		else
+		{
+			buf[0] = '2';
+			buf[1] = '0';
+		}
+	}
+	else if (V_ASN1_GENERALIZEDTIME == asn1time->type && 15 == asn1time->length && 'Z' == asn1time->data[14])
+	{
+		memcpy(buf, asn1time->data, asn1time->length-1);
+	}
+	else
+	{
+		zbx_strlcpy(err, "unknown date format", err_size);
+		goto out;
+	}
+
+	buf[14] = '\0';
+
+	memset(&tm, 0, sizeof(tm));
+
+	/* year */
+	if (NULL == (p = zbx_parse_time(buf, 4, &tm.tm_year)) || '\0' == *p)
+	{
+		zbx_strlcpy(err, "invalid year", err_size);
+		goto out;
+	}
+
+	/* month */
+	if (NULL == (p = zbx_parse_time(p, 2, &tm.tm_mon)) || '\0' == *p)
+	{
+		zbx_strlcpy(err, "invalid month", err_size);
+		goto out;
+	}
+
+	/* day of month */
+	if (NULL == (p = zbx_parse_time(p, 2, &tm.tm_mday)) || '\0' == *p)
+	{
+		zbx_strlcpy(err, "invalid day of month", err_size);
+		goto out;
+	}
+
+	/* hours */
+	if (NULL == (p = zbx_parse_time(p, 2, &tm.tm_hour)) || '\0' == *p)
+	{
+		zbx_strlcpy(err, "invalid hours", err_size);
+		goto out;
+	}
+
+	/* minutes */
+	if (NULL == (p = zbx_parse_time(p, 2, &tm.tm_min)) || '\0' == *p)
+	{
+		zbx_strlcpy(err, "invalid minutes", err_size);
+		goto out;
+	}
+
+	/* seconds */
+	if (NULL == (p = zbx_parse_time(p, 2, &tm.tm_sec)) || '\0' != *p)
+	{
+		zbx_strlcpy(err, "invalid seconds", err_size);
+		goto out;
+	}
+
+	tm.tm_year -= 1900;
+	tm.tm_mon -= 1;
+
+	*time = timegm(&tm);
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+static int	zbx_get_cert_md5(X509 *cert, char **md5, char *err, size_t err_size)
+{
+	char		*data;
+	BIO		*bio;
+	size_t		len, sz;
+	md5_state_t	state;
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	int		i, ret = FAIL;
+
+	if (NULL == (bio = BIO_new(BIO_s_mem())))
+	{
+		zbx_strlcpy(err, "out of memory", err_size);
+		goto out;
+	}
+
+	if (1 != PEM_write_bio_X509(bio, cert))
+	{
+		zbx_strlcpy(err, "internal OpenSSL error while parsing server certificate", err_size);
+		goto out;
+	}
+
+	len = BIO_get_mem_data(bio, &data);	/* "data" points to the cert data (no need to free), len - its length */
+
+	md5_init(&state);
+	md5_append(&state, (const md5_byte_t *)data, len);
+	md5_finish(&state, hash);
+
+	sz = MD5_DIGEST_SIZE * 2 + 1;
+	*md5 = zbx_malloc(*md5, sz);
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+		zbx_snprintf(&(*md5)[i << 1], sz - (i << 1), "%02x", hash[i]);
+
+	ret = SUCCEED;
+out:
+	if (NULL != bio)
+		BIO_free(bio);
+
+	return ret;
+}
+
+static int	zbx_validate_cert(X509 *cert, const char *md5_macro, int *rtt, char *err, size_t err_size)
+{
+	time_t	now, not_before, not_after;
+	char	*md5 = NULL;
+	int	ret = FAIL;
+
+	*rtt = ZBX_EC_EPP_SERVERCERT;
+
+	/* get certificate validity dates */
+	if (SUCCEED != zbx_parse_asn1time(X509_get_notBefore(cert), &not_before, err, err_size))
+		goto out;
+
+	if (SUCCEED != zbx_parse_asn1time(X509_get_notAfter(cert), &not_after, err, err_size))
+		goto out;
+
+	now = time(NULL);
+	if (now > not_after)
+	{
+		zbx_strlcpy(err, "the certificate has expired", err_size);
+		goto out;
+	}
+
+	if (now < not_before)
+	{
+		zbx_strlcpy(err, "the validity date is in the future", err_size);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_get_cert_md5(cert, &md5, err, err_size))
+	{
+		*rtt = ZBX_EC_INTERNAL;
+		goto out;
+	}
+
+	if (0 != strcmp(md5_macro, md5))
+	{
+		zbx_snprintf(err, err_size, "MD5 sum set in a macro (%s) differs from what we got (%s)", md5_macro, md5);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(md5);
+
+	return ret;
+}
+
 int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	ldns_resolver		*res = NULL;
@@ -3122,7 +3332,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 				*epp_passwd_salt_b64 = NULL, *epp_privkey_enc_b64 = NULL, *epp_privkey_salt_b64 = NULL,
 				*epp_user = NULL, *epp_passwd = NULL, *epp_privkey = NULL, *epp_cert_b64 = NULL,
 				*epp_cert = NULL, *epp_commands = NULL, *epp_serverid = NULL, *epp_testprefix = NULL,
-				*tmp;
+				*epp_servercertmd5 = NULL, *tmp;
 	short			epp_port = 700;
 	X509			*epp_server_x509 = NULL;
 	const SSL_METHOD	*method;
@@ -3134,7 +3344,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM			*items = NULL;
 	size_t			items_num = 0;
 	zbx_vector_str_t	epp_hosts, epp_ips;
-	int			rv, i, epp_enabled, epp_cert_size, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE,
+	int			rv, i, epp_enabled, epp_cert_size, rtt, rtt1 = ZBX_NO_VALUE, rtt2 = ZBX_NO_VALUE,
 				rtt3 = ZBX_NO_VALUE, rtt1_limit, rtt2_limit, rtt3_limit, ipv4_enabled, ipv6_enabled,
 				ret = SYSINFO_RET_FAIL;
 
@@ -3262,6 +3472,13 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	}
 
 	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_TESTPREFIX, &epp_testprefix, err, sizeof(err)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_EPP_SERVERCERTMD5, &epp_servercertmd5, err,
+			sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -3421,9 +3638,9 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 
 	str_base64_decode_dyn(epp_cert_b64, strlen(epp_cert_b64), &epp_cert, &epp_cert_size);
 
-	if (SUCCEED != zbx_ssl_attach_cert(ssl, epp_cert, epp_cert_size, err, sizeof(err)))
+	if (SUCCEED != zbx_ssl_attach_cert(ssl, epp_cert, epp_cert_size, &rtt, err, sizeof(err)))
 	{
-		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
+		rtt1 = rtt2 = rtt3 = rtt;
 		zbx_rsm_errf(log_fd, "cannot attach client certificate to SSL session: %s", err);
 		goto out;
 	}
@@ -3438,14 +3655,14 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	rv = zbx_ssl_attach_privkey(ssl, epp_privkey, strlen(epp_privkey), err, sizeof(err));
+	rv = zbx_ssl_attach_privkey(ssl, epp_privkey, strlen(epp_privkey), &rtt, err, sizeof(err));
 
 	memset(epp_privkey, 0, strlen(epp_privkey));
 	zbx_free(epp_privkey);
 
 	if (SUCCEED != rv)
 	{
-		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_CRYPT;
+		rtt1 = rtt2 = rtt3 = rtt;
 		zbx_rsm_errf(log_fd, "cannot attach client private key to SSL session: %s", err);
 		goto out;
 	}
@@ -3462,10 +3679,19 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	/* get the remote certificate into the X509 structure */
 	if (NULL == (epp_server_x509 = SSL_get_peer_certificate(ssl)))
 	{
-		rtt1 = rtt2 = rtt3 = ZBX_EC_INTERNAL;
-		zbx_rsm_errf(log_fd, "cannot get a certificate from %s:%d", ip, epp_port);
+		rtt1 = rtt2 = rtt3 = ZBX_EC_EPP_SERVERCERT;
+		zbx_rsm_errf(log_fd, "cannot get Server certificate from %s:%d", ip, epp_port);
 		goto out;
 	}
+
+	if (SUCCEED != zbx_validate_cert(epp_server_x509, epp_servercertmd5, &rtt, err, sizeof(err)))
+	{
+		rtt1 = rtt2 = rtt3 = rtt;
+		zbx_rsm_errf(log_fd, "Server certificate validation failed: %s", err);
+		goto out;
+	}
+
+	zbx_rsm_info(log_fd, "Server certificate validation successful");
 
 	zbx_rsm_infof(log_fd, "start EPP test (ip %s)", ip);
 
@@ -3556,6 +3782,7 @@ out:
 		zbx_free(items);
 	}
 
+	zbx_free(epp_servercertmd5);
 	zbx_free(epp_testprefix);
 	zbx_free(epp_serverid);
 	zbx_free(epp_commands);

@@ -56,6 +56,7 @@
 #define ZBX_EC_EPP_UPDATEINVAL		-208	/* invalid reply to UPDATE command */
 #define ZBX_EC_EPP_INFOTO		-209	/* INFO command timeout */
 #define ZBX_EC_EPP_INFOINVAL		-210	/* invalid reply to INFO command */
+#define ZBX_EC_EPP_SERVERCERT		-211	/* Server certificate validation failed */
 #define ZBX_EC_PROBE_ONLINE		1	/* probe in automatic online mode */
 #define ZBX_EC_PROBE_OFFLINE		0	/* probe in automatic offline mode */
 #define ZBX_EC_PROBE_UNSUPPORTED	2	/* internal use only */
@@ -93,6 +94,7 @@
 #define ZBX_MACRO_EPP_COMMANDS		"{$RSM.EPP.COMMANDS}"
 #define ZBX_MACRO_EPP_SERVERID		"{$RSM.EPP.SERVERID}"
 #define ZBX_MACRO_EPP_TESTPREFIX	"{$RSM.EPP.TESTPREFIX}"
+#define ZBX_MACRO_EPP_SERVERCERTMD5	"{$RSM.EPP.SERVERCERTMD5}"
 #define ZBX_MACRO_TLD_DNSSEC_ENABLED	"{$RSM.TLD.DNSSEC.ENABLED}"
 #define ZBX_MACRO_TLD_RDDS_ENABLED	"{$RSM.TLD.RDDS.ENABLED}"
 #define ZBX_MACRO_TLD_EPP_ENABLED	"{$RSM.TLD.EPP.ENABLED}"

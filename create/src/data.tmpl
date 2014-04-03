@@ -680,6 +680,7 @@ ROW   |108      |19        |-208 |Invalid reply to UPDATE command      |
 ROW   |109      |19        |-209 |INFO command timeout                 |
 ROW   |110      |19        |-210 |Invalid reply to INFO command        |
 ROW   |111      |19        |-1   |Internal error                       |
+ROW   |112      |19        |-211 |Server certificate validation failed |
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|
@@ -693,7 +694,7 @@ ROW   |1           |2       |^lo$                                               
 ROW   |2           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                    |4              |,            |1             |
 ROW   |3           |2       |^Software Loopback Interface                                                                                                                      |4              |,            |1             |
 ROW   |4           |2       |^Software Loopback Interface                                                                                                                      |4              |,            |1             |
-ROW   |5           |1       |^(\/&pipe;\/boot&pipe;\/usr&pipe;\/var&pipe;\/tmp&pipe;\/home&pipe;\/root)$                                                                                              |3              |,            |0             |
+ROW   |5           |1       |^(\/&pipe;\/boot&pipe;\/usr&pipe;\/var&pipe;\/tmp&pipe;\/home&pipe;\/root)$                                                                       |3              |,            |0             |
 
 TABLE |item_discovery
 FIELDS|itemdiscoveryid|itemid|parent_itemid|
