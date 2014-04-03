@@ -440,6 +440,58 @@ $effectiveperiod = navigation_bar_calc();
 $from = zbxDateToTime($_REQUEST['stime']);
 $till = $from + $effectiveperiod;
 
+$config = select_config();
+
+// headers
+if ($source == EVENT_SOURCE_DISCOVERY) {
+	if ($csvExport) {
+		$csvRows[] = array(
+			_('Time'),
+			_('IP'),
+			_('DNS'),
+			_('Description'),
+			_('Status')
+		);
+	}
+	else {
+		$table->setHeader(array(
+			_('Time'),
+			_('IP'),
+			_('DNS'),
+			_('Description'),
+			_('Status')
+		));
+	}
+}
+else {
+	if ($csvExport) {
+		$csvRows[] = array(
+			_('Time'),
+			is_show_all_nodes() ? _('Node') : null,
+			($_REQUEST['hostid'] == 0) ? _('Host') : null,
+			_('Description'),
+			_('Status'),
+			_('Severity'),
+			_('Duration'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		);
+	}
+	else {
+		$table->setHeader(array(
+			_('Time'),
+			is_show_all_nodes() ? _('Node') : null,
+			($_REQUEST['hostid'] == 0) ? _('Host') : null,
+			_('Description'),
+			_('Status'),
+			_('Severity'),
+			_('Duration'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		));
+	}
+}
+
 if (!$firstEvent) {
 	$starttime = null;
 
@@ -449,7 +501,6 @@ if (!$firstEvent) {
 	}
 }
 else {
-	$config = select_config();
 	$starttime = $firstEvent['clock'];
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
@@ -514,25 +565,6 @@ else {
 			$dservices[$dservice['dserviceid']] = $dservice;
 		}
 
-		if ($csvExport) {
-			$csvRows[] = array(
-				_('Time'),
-				_('IP'),
-				_('DNS'),
-				_('Description'),
-				_('Status')
-			);
-		}
-		else {
-			$table->setHeader(array(
-				_('Time'),
-				_('IP'),
-				_('DNS'),
-				_('Description'),
-				_('Status')
-			));
-		}
-
 		foreach ($dsc_events as $event_data) {
 			switch ($event_data['object']) {
 				case EVENT_OBJECT_DHOST:
@@ -593,33 +625,6 @@ else {
 
 	// source not discovery i.e. trigger
 	else {
-		if ($csvExport) {
-			$csvRows[] = array(
-				_('Time'),
-				is_show_all_nodes() ? _('Node') : null,
-				($_REQUEST['hostid'] == 0) ? _('Host') : null,
-				_('Description'),
-				_('Status'),
-				_('Severity'),
-				_('Duration'),
-				$config['event_ack_enable'] ? _('Ack') : null,
-				_('Actions')
-			);
-		}
-		else {
-			$table->setHeader(array(
-				_('Time'),
-				is_show_all_nodes() ? _('Node') : null,
-				($_REQUEST['hostid'] == 0) ? _('Host') : null,
-				_('Description'),
-				_('Status'),
-				_('Severity'),
-				_('Duration'),
-				$config['event_ack_enable'] ? _('Ack') : null,
-				_('Actions')
-			));
-		}
-
 		if ($csvExport || $pageFilter->hostsSelected) {
 			$options = array(
 				'nodeids' => get_current_nodeid(),
@@ -756,7 +761,9 @@ else {
 				}
 				else {
 					$triggerDescription = new CSpan($description, 'pointer link_menu');
-					$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock']));
+					$triggerDescription->setMenuPopup(
+						CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock'])
+					);
 
 					// acknowledge
 					$ack = getEventAckState($event, true);
