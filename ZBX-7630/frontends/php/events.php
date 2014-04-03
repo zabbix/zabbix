@@ -122,11 +122,11 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['triggerid'] = 0;
 }
 
-$source = (get_request('triggerid') > 0)
-	? EVENT_SOURCE_TRIGGERS
-	: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
-$_REQUEST['triggerid'] = get_request('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+$_REQUEST['triggerid'] = ($source == EVENT_SOURCE_DISCOVERY)
+	? 0
+	: getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
 
 // change triggerId filter if change hostId
 if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
@@ -141,6 +141,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
+		$_REQUEST['triggerid'] = 0;
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
 		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
 		$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
@@ -277,6 +278,7 @@ $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 $r_form->addVar('stime', get_request('stime'));
 $r_form->addVar('period', get_request('period'));
+$r_form->addVar('triggerid', get_request('triggerid'));
 
 // add host and group filters to the form
 if ($source == EVENT_SOURCE_TRIGGERS) {

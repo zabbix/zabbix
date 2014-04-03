@@ -701,7 +701,7 @@ foreach ($triggers as $trigger) {
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
 			'events.php?triggerid='.$trigger['triggerid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
-				'&period='.ZBX_PERIOD_DEFAULT.'&filter_set=1'
+				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 	// acknowledge

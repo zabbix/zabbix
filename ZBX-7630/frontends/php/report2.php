@@ -412,7 +412,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			get_node_name_by_elid($trigger['hostid']),
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid'].'&filter_set=1'),
+			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
 			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
