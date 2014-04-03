@@ -49,6 +49,7 @@ extern int		process_num;
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
  ******************************************************************************/
+/*
 void	zbx_clean_dhost_list(DB_DRULE *drule)
 {
 	const char	*__function_name = "zbx_clean_dhost_list";
@@ -71,9 +72,11 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 			known_dhostid_list = zbx_strdcat(known_dhostid_list, ",");
 		}
 	}
-	zbx_rtrim(known_dhostid_list, ",");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "hosts in drule (hostid): %s\r\n", known_dhostid_list);
+	if(NULL == known_dhostid_list)
+		goto out;
+
+	zbx_rtrim(known_dhostid_list, ",");
 
 	DBexecute("delete from dhosts"
 			" where dhostid not in (%s) "
@@ -83,8 +86,89 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 out:
 	zbx_free(known_dhostid_list);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): hosts in drule (hostid): %s", __function_name, known_dhostid_list);
+}
+*/
+
+
+void	zbx_clean_dhost_list(DB_DRULE *drule, DB_DHOST *dhost, char execute_or_clean)
+{
+	const char	*__function_name = "zbx_clean_dhost_list";
+
+	static char	*known_dhostid_list = NULL;
+	char		known_dhostid_tmp[100];
+	DB_RESULT	result_dservices;
+	DB_ROW		row_dservices;
+	DB_RESULT	result_drule;
+	DB_ROW		row_drule;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == execute_or_clean)
+	{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: in collection dhostid = %u druleid = %u", dhost->dhostid, drule->druleid);
+		result_dservices = DBselect(
+				"select ip"
+				" from dservices"
+				" where dhostid=" ZBX_FS_UI64,
+				dhost->dhostid);
+
+		result_drule = DBselect(
+				"select iprange"
+				" from drules"
+				" where druleid=" ZBX_FS_UI64,
+				drule->druleid);
+
+		if (NULL == (row_dservices = DBfetch(result_dservices)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: wrong dservices");
+			goto out;
+		}
+
+		if (NULL == (row_drule = DBfetch(result_drule)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: wrong drule");
+			goto out;
+		}
+
+		if (SUCCEED == ip_in_list(row_drule[0], row_dservices[0]))
+		{
+			zbx_snprintf(known_dhostid_tmp, sizeof(known_dhostid_tmp), "%u,", dhost->dhostid);
+			known_dhostid_list = zbx_strdcat(known_dhostid_list, known_dhostid_tmp);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: ip not in range");
+			goto out;
+		}
+	}
+	else
+	{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: in execute");
+		if(NULL == known_dhostid_list)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: known_dhostid_list is null");
+			goto out;
+		}
+		else
+		{
+			zbx_rtrim(known_dhostid_list, ",");
+		}
+
+		DBbegin();
+		DBexecute("delete from dhosts"
+				" where dhostid not in (%s)"
+				" and druleid =" ZBX_FS_UI64,
+				known_dhostid_list,
+				drule->druleid);
+		DBcommit();
+
+		zbx_free(known_dhostid_list);
+	}
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -710,9 +794,11 @@ static void	process_rule(DB_DRULE *drule)
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
+
+			zbx_clean_dhost_list(drule, &dhost, 0);
 		}
 	}
-	zbx_clean_dhost_list(drule);
+	zbx_clean_dhost_list(drule, &dhost, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
