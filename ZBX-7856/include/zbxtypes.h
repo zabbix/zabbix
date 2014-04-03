@@ -49,7 +49,6 @@
 #	define ZBX_FS_UO64 "%I64o"
 #	define ZBX_FS_UX64 "%I64x"
 
-#	define stat		_stat64
 #	define snprintf		_snprintf
 
 #	define alloca		_alloca
