@@ -390,7 +390,7 @@ if (isset($_REQUEST['form'])) {
 		$data['group_rights'] = array();
 
 		$dbRights = DBselect(
-			'SELECT r.*,g.name AS name'.
+			'SELECT r.*,g.name'.
 			' FROM groups g'.
 				' LEFT JOIN rights r ON r.id=g.groupid'.
 			' WHERE r.groupid='.zbx_dbstr($data['usrgrpid'])
