@@ -1,6 +1,7 @@
 Changes for 2.2.3rc2
 
 Bug fixes:
+.......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.3rc1
