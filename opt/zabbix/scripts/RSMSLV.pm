@@ -1003,12 +1003,11 @@ sub check_lastclock
 
 sub get_down_count
 {
-    my $itemid_src = shift;
-    my $itemid_dst = shift;
+    my $itemid = shift;
     my $from = shift;
     my $till = shift;
 
-    my $eventtimes = __get_eventtimes($itemid_src, $from, $till);
+    my $eventtimes = __get_eventtimes($itemid, $from, $till);
 
     my $count = 0;
 
@@ -1019,7 +1018,7 @@ sub get_down_count
 	my $event_from = $eventtimes->[$i++];
 	my $event_till = $eventtimes->[$i++];
 
-	my $res = db_select("select count(*) from history_uint where itemid=$itemid_src and clock between $event_from and $event_till and value=" . DOWN);
+	my $res = db_select("select count(*) from history_uint where itemid=$itemid and clock between $event_from and $event_till and value=" . DOWN);
 
 	$count += ($res->fetchrow_array)[0];
     }
