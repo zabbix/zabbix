@@ -175,7 +175,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$triggerDependencies = array();
 
 			foreach ($dependencies as $depTrigger) {
-				$triggerDependencies[] = BR();
 				$hostNames = array();
 
 				$hosts = API::Host()->get(array(
@@ -201,8 +200,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				else {
 					$triggerDependencies[] = new CSpan(array($hostNames, NAME_DELIMITER, $depTrigger['description']));
 				}
+
+				$triggerDependencies[] = BR();
 			}
-			array_shift($triggerDependencies);
+			array_pop($triggerDependencies);
 
 			$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
 		}
