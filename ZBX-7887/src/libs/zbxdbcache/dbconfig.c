@@ -1764,7 +1764,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		update_index = 0;
 
-		if (0 == found || 0 != strcmp(host->host, row[2]))
+		if (HOST_STATUS_MONITORED == status && (0 == found || 0 != strcmp(host->host, row[2])))
 		{
 			if (1 == found)
 			{
@@ -1778,16 +1778,13 @@ static void	DCsync_hosts(DB_RESULT result)
 				}
 			}
 
-			if (HOST_STATUS_MONITORED == status)
-			{
-				host_h_local.host = row[2];
-				host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
+			host_h_local.host = row[2];
+			host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
 
-				if (NULL != host_h)
-					host_h->host_ptr = host;
-				else
-					update_index = 1;
-			}
+			if (NULL != host_h)
+				host_h->host_ptr = host;
+			else
+				update_index = 1;
 		}
 
 		/* store new information in host structure */
@@ -2799,7 +2796,7 @@ void	DCsync_configuration(void)
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
 			config->hosts.num_data, config->hosts.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h   : %d (%d slots)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
 			config->hosts_h.num_data, config->hosts_h.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
 			config->proxies.num_data, config->proxies.num_slots);
@@ -3675,18 +3672,17 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
  *                                                                            *
  * Function: DCconfig_get_items_by_keys                                       *
  *                                                                            *
- * Purpose: Locate item in configuration cache by host                        *
+ * Purpose: locate item in configuration cache by host and key                *
  *                                                                            *
- * Parameters: item         - [OUT] pointer to DC_ITEM structure              *
- *             keys         - [IN] list of item keys                          *
- *                                                                            *
- * Return value: SUCCEED if record located and FAIL otherwise                 *
+ * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ *             keys     - [IN] list of item keys with host names              *
+ *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
+ *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys,
-		int *errcodes, size_t num)
+void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num)
 {
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;

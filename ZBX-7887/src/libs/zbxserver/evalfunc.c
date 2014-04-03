@@ -2197,17 +2197,14 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DC_ITEM		item;
 	int		ret, errcode;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
-			__function_name, host, key, function, parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
 
 	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Function [%s:%s.%s(%s)] not found.",
-				host, key, function, parameter);
-		ret = FAIL;
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "Function [%s:%s.%s(%s)] not found.", host, key, function, parameter);
+		return FAIL;
 	}
 
 	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
@@ -2230,11 +2227,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
-			zbx_result_string(ret), value);
-out:
-	zbx_free(host_key.key);
-	zbx_free(host_key.host);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);
 
 	return ret;
 }

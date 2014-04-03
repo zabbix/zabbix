@@ -3760,8 +3760,8 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 
 			if (SUCCEED != errcodes[i])
 			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]"
-						": item does not exist, is disabled or belongs to a disabled host",
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]:"
+						" item does not exist, is disabled or belongs to a disabled host",
 						func->function, func->parameter);
 				continue;
 			}
