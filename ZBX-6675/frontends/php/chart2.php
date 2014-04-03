@@ -99,20 +99,16 @@ foreach ($dbGraph['gitems'] as $gItem) {
 $hostName = '';
 
 foreach ($dbGraph['hosts'] as $gItemHost) {
-	if ($hostName === '') {
-		$hostName = $gItemHost['name'];
-	}
-	elseif ($hostName !== $gItemHost['name']) {
+	if ($hostName !== $gItemHost['name']) {
 		$hostName = '';
 		break;
 	}
+	else {
+		$hostName = $gItemHost['name'];
+	}
 }
 
-if ($hostName) {
-	$chartHeader .= $hostName.NAME_DELIMITER.$dbGraph['name'];
-} else {
-	$chartHeader .= $dbGraph['name'];
-}
+$chartHeader .= $hostName ? $hostName.NAME_DELIMITER.$dbGraph['name'] : $dbGraph['name'];
 
 $graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
@@ -145,7 +141,6 @@ $graph->setYMinItemId($dbGraph['ymin_itemid']);
 $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
-
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
