@@ -23,12 +23,10 @@ function init_mbstrings() {
 	$res = true;
 	$res &= mbstrings_available();
 	ini_set('mbstring.internal_encoding', 'UTF-8');
-	$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
+	$res &= (ini_get('mbstring.internal_encoding') === 'UTF-8');
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
-	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
-	if ($res) {
-		define('ZBX_MBSTRINGS_ENABLED', true);
-	}
+	$res &= (ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS');
+
 	return $res;
 }
 

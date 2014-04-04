@@ -92,11 +92,13 @@ function get_request($name, $def = null) {
 function countRequest($str = null) {
 	if (!empty($str)) {
 		$count = 0;
+
 		foreach ($_REQUEST as $name => $value) {
-			if (strstr($name, $str)) {
+			if (strpos($name, $str) !== false) {
 				$count++;
 			}
 		}
+
 		return $count;
 	}
 	else {
