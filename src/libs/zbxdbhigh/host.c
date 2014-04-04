@@ -3104,6 +3104,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		unsigned char	authtype;
 		unsigned char	flags;
 		unsigned char	inventory_link;
+		unsigned char	evaltype;
 	}
 	zbx_item_t;
 
@@ -3120,6 +3121,33 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		zbx_uint64_t	parent_itemid;
 	}
 	zbx_proto_t;
+
+	/* discovery rule condition */
+	typedef struct
+	{
+		zbx_uint64_t	id;
+		char		*macro;
+		char		*value;
+		int		operator;
+	}
+	zbx_dcondition_t;
+
+	/* discovery rule */
+	typedef struct
+	{
+		/* discovery rule source id */
+		zbx_uint64_t		src_id;
+		/* discovery rule source conditions */
+		zbx_vector_ptr_t	src_conditions;
+
+		/* discovery rule destination id */
+		zbx_uint64_t		dst_id;
+		/* the starting id to be used for destination condition ids */
+		zbx_uint64_t		dst_conditionid;
+		/* discovery rule destination condition ids */
+		zbx_vector_uint64_t	dst_conditionids;
+	}
+	zbx_drule_t;
 
 	const char	*__function_name = "DBcopy_template_items";
 
@@ -3149,7 +3177,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
-				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid"
+				"ti.inventory_link,ti.lifetime,ti.snmpv3_contextname,hi.itemid,ti.evaltype"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -3187,6 +3215,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		item[item_num].authtype = (unsigned char)atoi(row[28]);
 		item[item_num].flags = (unsigned char)atoi(row[33]);
 		item[item_num].inventory_link = (unsigned char)atoi(row[35]);
+		item[item_num].evaltype = (unsigned char)atoi(row[39]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -3233,6 +3262,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		}
 		else
 		{
+			/* insert operation automatically performs escaping, so we need just strdup text fields */
 			item[item_num].key = zbx_strdup(NULL, row[2]);
 			item[item_num].itemid = 0;
 
@@ -3264,15 +3294,195 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 	if (0 != item_num)
 	{
-		zbx_uint64_t		itemid = 0;
-		int			new_items = item_num;
-		zbx_vector_uint64_t	itemids, protoids;
+		zbx_uint64_t		itemid = 0, templateid, conditionid;
+		int			new_items = item_num, conditions_num = 0, j, index;
+		zbx_vector_uint64_t	itemids, protoids, ids;
 		zbx_itemapp_t		*itemapp = NULL;
 		size_t			itemapp_alloc = 0, itemapp_num = 0;
+		zbx_vector_ptr_t	rules;
+		zbx_drule_t		*rule;
+		zbx_dcondition_t	*condition;
+		zbx_db_insert_t		db_insert_condition;
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, item_num);
 		zbx_vector_uint64_create(&protoids);
+		zbx_vector_uint64_create(&ids);
+
+		zbx_vector_ptr_create(&rules);
+
+		/* prepare discovery rules */
+		for (i = 0; i < item_num; i++)
+		{
+			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item[i].flags))
+				continue;
+
+			rule = zbx_malloc(NULL, sizeof(zbx_drule_t));
+
+			rule->dst_id = item[i].itemid;
+			rule->src_id = item[i].templateid;
+			rule->dst_conditionid = 0;
+			zbx_vector_uint64_create(&rule->dst_conditionids);
+			zbx_vector_ptr_create(&rule->src_conditions);
+
+			zbx_vector_ptr_append(&rules, rule);
+
+			zbx_vector_uint64_append(&ids, rule->src_id);
+		}
+
+		/* read template discovery rule conditions */
+		sql_offset = 0;
+
+		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid,operator,macro,value"
+				" from item_condition where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids.values, ids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(templateid, row[1]);
+
+			index = zbx_vector_ptr_search(&rules, &templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			rule = rules.values[index];
+
+			condition = zbx_malloc(NULL, sizeof(zbx_dcondition_t));
+
+			ZBX_STR2UINT64(condition->id, row[0]);
+			condition->operator = atoi(row[2]);
+			condition->macro = zbx_strdup(NULL, row[3]);
+			condition->value = zbx_strdup(NULL, row[4]);
+
+			zbx_vector_ptr_append(&rule->src_conditions, condition);
+		}
+
+		DBfree_result(result);
+
+		/* read host discovery rule conditions from database */
+		ids.values_num = 0;
+
+		for (i = 0; i < rules.values_num; i++)
+		{
+			rule = rules.values[i];
+
+			if (0 != rule->dst_id)
+				zbx_vector_uint64_append(&ids, rule->dst_id);
+		}
+
+		if (0 != ids.values_num)
+		{
+			zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			sql_offset = 0;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid from item_condition where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids.values, ids.values_num);
+
+			result = DBselect("%s", sql);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				ZBX_STR2UINT64(itemid, row[1]);
+
+				for (i = 0; i < rules.values_num; i++)
+				{
+					rule = rules.values[i];
+
+					if (itemid != rule->dst_id)
+						continue;
+
+					ZBX_STR2UINT64(itemid, row[0]);
+					zbx_vector_uint64_append(&rule->dst_conditionids, itemid);
+
+					break;
+				}
+			}
+
+			DBfree_result(result);
+		}
+
+		/* calculate the number of new conditions to be inserted */
+		for (i = 0; i < rules.values_num; i++)
+		{
+			rule = rules.values[i];
+
+			if (rule->src_conditions.values_num > rule->dst_conditionids.values_num)
+				conditions_num += rule->src_conditions.values_num - rule->dst_conditionids.values_num;
+		}
+
+		/* reserve ids for the new conditions to be inserted */
+		if (0 != conditions_num)
+		{
+			conditionid = DBget_maxid_num("item_condition", conditions_num);
+
+			for (i = 0; i < rules.values_num; i++)
+			{
+				rule = rules.values[i];
+
+				if (rule->src_conditions.values_num <= rule->dst_conditionids.values_num)
+					continue;
+
+				rule->dst_conditionid = conditionid;
+				conditionid += rule->src_conditions.values_num - rule->dst_conditionids.values_num;
+			}
+
+			zbx_db_insert_prepare(&db_insert_condition, "item_condition", "item_conditionid", "itemid",
+					"operator", "macro", "value", NULL);
+		}
+
+		/* translate item formulas with new condition ids */
+		for (i = 0; i < item_num; i++)
+		{
+			char	*formula;
+
+			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item[i].flags))
+				continue;
+
+			index = zbx_vector_ptr_search(&rules, &item[i].templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			rule = rules.values[index];
+
+			formula = zbx_strdup(NULL, item[i].formula);
+
+			conditionid = rule->dst_conditionid;
+
+			for (j = 0; j < rule->src_conditions.values_num; j++)
+			{
+				zbx_uint64_t	id;
+				char		srcid[64], dstid[64], *ptr;
+				size_t		pos;
+
+				if (j < rule->dst_conditionids.values_num)
+					id = rule->dst_conditionids.values[j];
+				else
+					id = conditionid++;
+
+				condition = rule->src_conditions.values[j];
+
+				zbx_snprintf(srcid, sizeof(srcid), "{" ZBX_FS_UI64 "}", condition->id);
+				zbx_snprintf(dstid, sizeof(dstid), "{" ZBX_FS_UI64 "}", id);
+
+				if (NULL == (ptr = strstr(formula, srcid)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				pos = ptr - formula + strlen(srcid) - 1;
+				zbx_replace_string(&formula, ptr - formula, &pos, dstid);
+			}
+
+			zbx_free(item[i].formula);
+
+			if (0 != item[i].itemid)
+			{
+				item[i].formula = DBdyn_escape_string(formula);
+				zbx_free(formula);
+			}
+			else
+				item[i].formula = formula;
+		}
 
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3323,7 +3533,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 						"description='%s',"
 						"inventory_link=%d,"
 						"interfaceid=%s,"
-						"lifetime='%s'"
+						"lifetime='%s',"
+						"evaltype=%d"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					item[i].name, (int)item[i].type, (int)item[i].value_type,
 					(int)item[i].data_type, item[i].delay, item[i].delay_flex,
@@ -3338,7 +3549,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					item[i].password, item[i].publickey, item[i].privatekey,
 					item[i].templateid, (int)item[i].flags, item[i].description,
 					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
-					item[i].lifetime, item[i].itemid);
+					item[i].lifetime, item[i].evaltype, item[i].itemid);
 
 			new_items--;
 		}
@@ -3362,7 +3573,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					"snmpv3_authpassphrase", "snmpv3_privprotocol", "snmpv3_privpassphrase",
 					"authtype", "username", "password", "publickey", "privatekey", "templateid",
 					"flags", "description", "inventory_link", "interfaceid", "lifetime",
-					"snmpv3_contextname", NULL);
+					"snmpv3_contextname", "evaltype", NULL);
 
 
 			for (i = 0; i < item_num; i++)
@@ -3384,10 +3595,27 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 						item[i].username, item[i].password, item[i].publickey,
 						item[i].privatekey, item[i].templateid, (int)item[i].flags,
 						item[i].description, (int)item[i].inventory_link, item[i].interfaceid,
-						item[i].lifetime, item[i].snmpv3_contextname);
+						item[i].lifetime, item[i].snmpv3_contextname, (int)item[i].evaltype);
 
 				if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item[i].flags))
 					zbx_vector_uint64_append(&protoids, itemid);
+
+				/* handle discovery rule condition insertion */
+				if (0 != (ZBX_FLAG_DISCOVERY_RULE & item[i].flags))
+				{
+					index = zbx_vector_ptr_search(&rules, &item[i].templateid,
+							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+					rule = rules.values[index];
+
+					for (j = 0; j < rule->src_conditions.values_num; j++)
+					{
+						condition = rule->src_conditions.values[j];
+
+						zbx_db_insert_add_values(&db_insert_condition, rule->dst_conditionid++,
+								itemid, condition->operator, condition->macro,
+								condition->value);
+					}
+				}
 
 				zbx_vector_uint64_append(&itemids, itemid++);
 			}
@@ -3422,8 +3650,101 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		}
 		zbx_free(item);
 
-		/* items_applications */
+		/* item_condition */
+		if (0 != rules.values_num)
+		{
+			char	*macro_esc, *value_esc;
 
+			ids.values_num = 0;
+
+			for (i = 0; i < rules.values_num; i++)
+			{
+				rule = rules.values[i];
+
+				if (0 == rule->dst_id)
+					continue;
+
+				index = MIN(rule->src_conditions.values_num, rule->dst_conditionids.values_num);
+
+				/* update intersecting rule conditions */
+				for (j = 0; j < index; j++)
+				{
+					condition = rule->src_conditions.values[j];
+
+					macro_esc = DBdyn_escape_string(condition->macro);
+					value_esc = DBdyn_escape_string(condition->value);
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition"
+							" set operator=%d,macro='%s',value='%s'"
+							" where item_conditionid=" ZBX_FS_UI64 ";\n",
+							condition->operator, macro_esc, value_esc,
+							rule->dst_conditionids.values[j]);
+
+					DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+					zbx_free(value_esc);
+					zbx_free(macro_esc);
+				}
+
+				/* delete removed rule conditions */
+				for (j = index; j < rule->dst_conditionids.values_num; j++)
+					zbx_vector_uint64_append(&ids, rule->dst_conditionids.values[j]);
+
+				/* insert new rule conditions */
+				for (j = index; j < rule->src_conditions.values_num; j++)
+				{
+					condition = rule->src_conditions.values[j];
+
+					zbx_db_insert_add_values(&db_insert_condition, rule->dst_conditionid++,
+							rule->dst_id, condition->operator, condition->macro,
+							condition->value);
+				}
+			}
+
+			/* delete removed item conditions */
+			if (0 != ids.values_num)
+			{
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_condition where");
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_conditionid", ids.values,
+						ids.values_num);
+			}
+
+			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+			if (16 < sql_offset)
+				DBexecute("%s", sql);
+
+			if (0 != conditions_num)
+			{
+				zbx_db_insert_execute(&db_insert_condition);
+				zbx_db_insert_clean(&db_insert_condition);
+			}
+		}
+
+		/* cleanup discovery rules */
+		for (i = 0; i < rules.values_num; i++)
+		{
+			rule = rules.values[i];
+
+			for (j = 0; j < rule->src_conditions.values_num; j++)
+			{
+				condition = rule->src_conditions.values[j];
+
+				zbx_free(condition->macro);
+				zbx_free(condition->value);
+				zbx_free(condition);
+			}
+			zbx_vector_ptr_destroy(&rule->src_conditions);
+
+			zbx_vector_uint64_destroy(&rule->dst_conditionids);
+
+			zbx_free(rule);
+		}
+
+		zbx_vector_ptr_destroy(&rules);
+		zbx_vector_uint64_destroy(&ids);
+
+		/* items_applications */
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.itemid,ha.applicationid"
@@ -3979,7 +4300,7 @@ httptestitem_t;
 
 typedef struct
 {
-	zbx_uint64_t		templateid;
+	zbx_uint64_t		src_id;
 	zbx_uint64_t		httptestid;
 	zbx_uint64_t		t_applicationid;
 	zbx_uint64_t		h_applicationid;
@@ -4048,7 +4369,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	{
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
-		ZBX_STR2UINT64(httptest->templateid, row[0]);
+		ZBX_STR2UINT64(httptest->src_id, row[0]);
 		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
@@ -4069,7 +4390,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httptest->http_proxy = zbx_strdup(NULL, row[10]);
 			httptest->retries = atoi(row[11]);
 
-			zbx_vector_uint64_append(&httptestids, httptest->templateid);
+			zbx_vector_uint64_append(&httptestids, httptest->src_id);
 
 			if (0 != httptest->t_applicationid)
 				zbx_vector_uint64_append(&applications, httptest->t_applicationid);
@@ -4097,7 +4418,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		{
 			ZBX_STR2UINT64(httptestid, row[1]);
 
-			if (NULL == httptest || httptest->templateid != httptestid)
+			if (NULL == httptest || httptest->src_id != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4186,7 +4507,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		{
 			ZBX_STR2UINT64(httptestid, row[0]);
 
-			if (NULL == httptest || httptest->templateid != httptestid)
+			if (NULL == httptest || httptest->src_id != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4235,7 +4556,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			ZBX_STR2UINT64(httptestid, row[0]);
 			ZBX_STR2UINT64(httpstepid, row[1]);
 
-			if (NULL == httptest || httptest->templateid != httptestid)
+			if (NULL == httptest || httptest->src_id != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4423,7 +4744,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					httptest->h_applicationid, httptest->delay, (int)httptest->status,
 					httptest->variables, httptest->agent, (int)httptest->authentication,
 					httptest->http_user, httptest->http_password, httptest->http_proxy,
-					httptest->retries, hostid, httptest->templateid);
+					httptest->retries, hostid, httptest->src_id);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -4463,7 +4784,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					"update httptest"
 					" set templateid=" ZBX_FS_UI64
 					" where httptestid=" ZBX_FS_UI64 ";\n",
-					httptest->templateid, httptest->httptestid);
+					httptest->src_id, httptest->httptestid);
 		}
 	}
 
