@@ -358,16 +358,16 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($ruleids, $nopermissions = false) {
+	public function delete(array $ruleids, $nopermissions = false) {
 		if (empty($ruleids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delRuleIds = zbx_toArray($ruleids);
-		$ruleids = zbx_toHash($ruleids);
+		$ruleids = array_keys(array_flip($ruleids));
 
 		$delRules = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
@@ -449,7 +449,7 @@ class CDiscoveryRule extends CItemGeneral {
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('ruleids' => $delRuleIds);
+		return array('ruleids' => $ruleids);
 	}
 
 	/**
@@ -874,16 +874,16 @@ class CDiscoveryRule extends CItemGeneral {
 			'validators' => array(
 				'macro' => new CStringValidator(array(
 					'regex' => '/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/',
-					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s"'),
-					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s"')
+					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s".')
 				)),
 				'value' => new CStringValidator(array(
 					'empty' => true
 				)),
 				'formulaid' => new CStringValidator(array(
 					'regex' => '/[A-Z]+/',
-					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s"'),
-					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s"')
+					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				)),
 				'operator' => new CSetValidator(array(
 					'values' => array(CONDITION_OPERATOR_REGEXP),
@@ -1427,7 +1427,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApi()->select('item_condition', array(
+				$conditions = API::getApiService()->select('item_condition', array(
 					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,

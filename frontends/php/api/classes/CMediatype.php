@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CMediatype extends CZBXAPI {
+class CMediatype extends CApiService {
 
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';
@@ -317,12 +317,10 @@ class CMediatype extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($mediatypeids) {
+	public function delete(array $mediatypeids) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types.'));
 		}
-
-		$mediatypeids = zbx_toArray($mediatypeids);
 
 		$actions = API::Action()->get(array(
 			'mediatypeids' => $mediatypeids,

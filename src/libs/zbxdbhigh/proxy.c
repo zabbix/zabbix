@@ -1952,6 +1952,7 @@ try_again:
 		records++;
 	}
 
+	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
@@ -2500,13 +2501,16 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
 		DBcommit();
 
-		zbx_clean_dhost_list(&drule, &dhost, 0);
+		if (0 != last_druleid)
+			zbx_clean_dhost_list(&drule, &dhost, 0);
 
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
-	zbx_clean_dhost_list(&drule, &dhost, 1);
+
+	if (0 != last_druleid)
+		zbx_clean_dhost_list(&drule, &dhost, 1);
 exit:
 
 

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHttpTest extends CZBXAPI {
+class CHttpTest extends CApiService {
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
@@ -342,15 +342,15 @@ class CHttpTest extends CZBXAPI {
 	/**
 	 * Delete web scenario.
 	 *
-	 * @param $httpTestIds
+	 * @param array $httpTestIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($httpTestIds, $nopermissions = false) {
+	public function delete(array $httpTestIds, $nopermissions = false) {
 		if (empty($httpTestIds)) {
 			return true;
 		}
-		$httpTestIds = zbx_toArray($httpTestIds);
 
 		$delHttpTests = $this->get(array(
 			'httptestids' => $httpTestIds,
@@ -715,7 +715,7 @@ class CHttpTest extends CZBXAPI {
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApi()->select('httpstep', array(
+				$httpSteps = API::getApiService()->select('httpstep', array(
 					'output' => $this->outputExtend($options['selectSteps'], array('httptestid', 'httpstepid')),
 					'filters' => array('httptestid' => $httpTestIds),
 					'preservekeys' => true,
