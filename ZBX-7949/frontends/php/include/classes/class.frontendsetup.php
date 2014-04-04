@@ -311,10 +311,9 @@ class FrontendSetup {
 	/**
 	 * Checks for PHP mbstring.func_overload value.
 	 *
-	 * Note: disabling mbstring functions completely, mbstring.func_overload returns false
-	 * instead of set numerical value in php.ini file.
-	 * checkPhpMbstringFuncOverload() will be called after successful checkPhpMbstring(),
-	 * to avoid duplicate error messages.
+	 * Note: disabling mbstring functions completely, mbstring.func_overload returns false.
+	 * checkPhpMbstringFuncOverload() will be called after successful checkPhpMbstring(), to avoid duplicate
+	 * error messages. mbstring.func_overload value in php.ini file represents a combination of bitmasks.
 	 *
 	 * @return array
 	 */
@@ -323,10 +322,10 @@ class FrontendSetup {
 
 		return array(
 			'name' => _('PHP mbstring.func_overload'),
-			'current' => $current,
-			'required' => '< 2',
-			'result' => ($current > 1) ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _('PHP mbstring.func_overload value is too high.')
+			'current' => ($current & 2) ? _('on') : _('off'),
+			'required' => _('off'),
+			'result' => ($current & 2) ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _('PHP string function overloading must be disabled.')
 		);
 	}
 
