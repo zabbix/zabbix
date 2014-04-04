@@ -230,18 +230,15 @@ if (!isset($httpTestData['lastfailedstep'])) {
 	$status['msg'] = _('Never executed');
 	$status['style'] = 'unknown';
 }
+elseif ($httpTestData['lastfailedstep'] != 0) {
+	$status['msg'] = ($httpTestData['error'] === null)
+		? _('Unknown error')
+		: _s('Error: %1$s', $httpTestData['error']);
+	$status['style'] = 'disabled';
+}
 else {
-	if ($httpTestData['lastfailedstep'] != 0) {
-		$status['msg'] = ($httpTestData['error'] === null)
-			? _('Unknown error')
-			: _s('Error: %1$s', $httpTestData['error']);
-
-		$status['style'] = 'disabled';
-	}
-	else {
-		$status['msg'] = _('OK');
-		$status['style'] = 'enabled';
-	}
+	$status['msg'] = _('OK');
+	$status['style'] = 'enabled';
 }
 
 $httpdetailsTable->addRow(array(
