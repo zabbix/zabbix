@@ -170,6 +170,11 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/api/CApiClientResponse.php -text
+frontends/php/include/classes/api/clients/CApiClient.php -text
+frontends/php/include/classes/api/clients/CLocalApiClient.php -text
+frontends/php/include/classes/api/wrappers/CApiWrapper.php -text
+frontends/php/include/classes/api/wrappers/CFrontendApiWrapper.php -text
 frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
 frontends/php/include/views/configuration.host.discovery.edit.php -text
@@ -268,6 +273,11 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/bootstrap.php -text
+frontends/php/tests/unit/include/classes/api/APITest.php -text
+frontends/php/tests/unit/include/classes/api/clients/CLocalApiClientTest.php -text
+frontends/php/tests/unit/include/classes/core/CRegistryFactoryTest.php -text
+frontends/php/tests/unit/phpunit.xml -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
