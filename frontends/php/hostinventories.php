@@ -73,7 +73,7 @@ if ($hostId > 0) {
 	$data = array();
 
 	// host scripts
-	$data['hostScripts'] = API::Script()->getScriptsByHosts($hostId);
+	$data['hostScripts'] = API::Script()->getScriptsByHosts(array($hostId));
 
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
