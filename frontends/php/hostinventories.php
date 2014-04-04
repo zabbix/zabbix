@@ -143,20 +143,22 @@ else {
 	 * Filter
 	 */
 	if (hasRequest('filter_set')) {
-		CProfile::update('web.hostinventories.filter_field', getRequest('filter_field'), PROFILE_TYPE_STR);
-		CProfile::update('web.hostinventories.filter_field_value', getRequest('filter_field_value'), PROFILE_TYPE_STR);
-		CProfile::update('web.hostinventories.filter_exact', getRequest('filter_exact'), PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter_field', getRequest('filter_field', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_field_value', getRequest('filter_field_value', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_exact', getRequest('filter_exact', 0), PROFILE_TYPE_INT);
 
 	}
 	elseif (hasRequest('filter_rst')) {
+		DBStart();
 		CProfile::delete('web.hostinventories.filter_field');
 		CProfile::delete('web.hostinventories.filter_field_value');
 		CProfile::delete('web.hostinventories.filter_exact');
+		DBend();
 	}
 
-	$data['filterField'] = CProfile::get('web.hostinventories.filter_field');
-	$data['filterFieldValue'] = CProfile::get('web.hostinventories.filter_field_value');
-	$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact');
+	$data['filterField'] = CProfile::get('web.hostinventories.filter_field', '');
+	$data['filterFieldValue'] = CProfile::get('web.hostinventories.filter_field_value', '');
+	$data['filterExact'] = CProfile::get('web.hostinventories.filter_exact', 0);
 
 	if ($data['pageFilter']->groupsSelected) {
 		// which inventory fields we will need for displaying

@@ -75,14 +75,16 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::update('web.auditlogs.filter.alias', getRequest('alias'), PROFILE_TYPE_STR);
-	CProfile::update('web.auditlogs.filter.action', getRequest('action'), PROFILE_TYPE_INT);
-	CProfile::update('web.auditlogs.filter.resourcetype', getRequest('resourcetype'), PROFILE_TYPE_INT);
+	CProfile::update('web.auditlogs.filter.alias', getRequest('alias', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.auditlogs.filter.action', getRequest('action', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.auditlogs.filter.resourcetype', getRequest('resourcetype', -1), PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
+	DBStart();
 	CProfile::delete('web.auditlogs.filter.alias');
 	CProfile::delete('web.auditlogs.filter.action');
 	CProfile::delete('web.auditlogs.filter.resourcetype');
+	DBend();
 }
 
 /*
@@ -94,7 +96,7 @@ $data = array(
 	'actions' => array(),
 	'action' => CProfile::get('web.auditlogs.filter.action', -1),
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
-	'alias' => CProfile::get('web.auditlogs.filter.alias')
+	'alias' => CProfile::get('web.auditlogs.filter.alias', '')
 );
 
 $from = zbxDateToTime($data['stime']);
