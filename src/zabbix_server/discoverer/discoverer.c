@@ -72,6 +72,7 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 			known_dhostid_list = zbx_strdcat(known_dhostid_list, ",");
 		}
 	}
+	DBfree_result(result_dservices);
 
 	if(NULL == known_dhostid_list)
 		goto out;
@@ -125,6 +126,7 @@ void	zbx_clean_dhost_list(DB_DRULE *drule, DB_DHOST *dhost, char execute_or_clea
 			goto out;
 		}
 
+
 		if (NULL == (row_drule = DBfetch(result_drule)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: wrong drule");
@@ -141,6 +143,8 @@ void	zbx_clean_dhost_list(DB_DRULE *drule, DB_DHOST *dhost, char execute_or_clea
 			zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: ip not in range");
 			goto out;
 		}
+		DBfree_result(result_drule);
+		DBfree_result(result_dservices);
 	}
 	else
 	{
