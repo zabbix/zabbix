@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CGraphGeneral extends CZBXAPI {
+abstract class CGraphGeneral extends CApiService {
 
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
 	const ERROR_MISSING_GRAPH_NAME = 'missingGraphName';

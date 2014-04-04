@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CImage extends CZBXAPI {
+class CImage extends CApiService {
 
 	protected $tableName = 'images';
 	protected $tableAlias = 'i';
@@ -451,9 +451,7 @@ class CImage extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($imageids) {
-		$imageids = zbx_toArray($imageids);
-
+	public function delete(array $imageids) {
 		if (empty($imageids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty parameters'));
 		}
