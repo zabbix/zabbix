@@ -198,7 +198,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 					);
 				}
 				else {
-					$triggerDependencies[] = new CSpan(array($hostNames, NAME_DELIMITER, $depTrigger['description']));
+					$triggerDependencies[] = array($hostNames, NAME_DELIMITER, $depTrigger['description']);
 				}
 
 				$triggerDependencies[] = BR();
