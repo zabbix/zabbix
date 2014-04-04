@@ -286,7 +286,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'name' => 'resourceid',
 			'objectName' => 'hostGroup',
 			'objectOptions' => array('editable' => true),
-			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => '')) : null,
+			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
@@ -308,7 +308,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'name' => 'resourceid',
 			'objectName' => 'hosts',
 			'objectOptions' => array('editable' => true),
-			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => '')) : null,
+			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'])) : null,
 			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
@@ -376,7 +376,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 		'name' => 'resourceid',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
-		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => '')) : null,
+		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 		'selectedLimit' => 1
 	)));
 	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
@@ -443,7 +443,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		'name' => 'resourceid',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
-		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => '')) : null,
+		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
 		'defaultValue' => 0,
 		'selectedLimit' => 1
 	)));

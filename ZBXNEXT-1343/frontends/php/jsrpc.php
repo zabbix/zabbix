@@ -256,8 +256,7 @@ switch ($data['method']) {
 					foreach ($hostGroups as $hostGroup) {
 						$result[] = array(
 							'id' => $hostGroup['groupid'],
-							'name' => $hostGroup['name'],
-							'prefix' => ''
+							'name' => $hostGroup['name']
 						);
 					}
 				}
@@ -284,8 +283,7 @@ switch ($data['method']) {
 					foreach ($hosts as $host) {
 						$result[] = array(
 							'id' => $host['hostid'],
-							'name' => $host['name'],
-							'prefix' => ''
+							'name' => $host['name']
 						);
 					}
 				}
@@ -311,8 +309,7 @@ switch ($data['method']) {
 					foreach ($templates as $template) {
 						$result[] = array(
 							'id' => $template['templateid'],
-							'name' => $template['name'],
-							'prefix' => ''
+							'name' => $template['name']
 						);
 					}
 				}
@@ -338,8 +335,7 @@ switch ($data['method']) {
 					foreach ($applications as $application) {
 						$result[] = array(
 							'id' => $application['applicationid'],
-							'name' => $application['name'],
-							'prefix' => ''
+							'name' => $application['name']
 						);
 					}
 				}

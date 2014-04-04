@@ -497,13 +497,15 @@ class CTrigger extends CTriggerGeneral {
 	 * @return array|int
 	 */
 	public function getObjects(array $triggerData) {
+		$options = array(
+			'filter' => $triggerData,
+			'output' => API_OUTPUT_EXTEND
+		);
+
 		// expression is checked later
 		unset($options['filter']['expression']);
 
-		$result = $this->get(array(
-			'filter' => $triggerData,
-			'output' => API_OUTPUT_EXTEND
-		));
+		$result = $this->get($options);
 
 		if (isset($triggerData['expression'])) {
 			foreach ($result as $tnum => $trigger) {
