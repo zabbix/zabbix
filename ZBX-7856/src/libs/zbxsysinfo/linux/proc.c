@@ -267,12 +267,12 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
 
-		if (NULL == (f_cmd = fopen(tmp)))
+		if (NULL == (f_cmd = fopen(tmp, "r")))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/status", entries->d_name);
 
-		if (NULL == (f_stat = fopen(tmp)))
+		if (NULL == (f_stat = fopen(tmp, "r")))
 			continue;
 
 		if (FAIL == check_procname(f_cmd, f_stat, procname))
@@ -406,12 +406,12 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
 
-		if (NULL == (f_cmd = fopen(tmp)))
+		if (NULL == (f_cmd = fopen(tmp, "r")))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/status", entries->d_name);
 
-		if (NULL == (f_stat = fopen(tmp)))
+		if (NULL == (f_stat = fopen(tmp, "r")))
 			continue;
 
 		if (FAIL == check_procname(f_cmd, f_stat, procname))
