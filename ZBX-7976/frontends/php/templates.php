@@ -113,17 +113,17 @@ if ($exportData) {
 if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
 	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
-if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
-	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
+if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
+	$_REQUEST['clear_templates'] = getRequest('clear_templates', array());
 
 	$unlinkTemplates = array();
 
-	if (isset($_REQUEST['unlink']) && is_array($_REQUEST['unlink'])) {
-		$unlinkTemplates = array_keys($_REQUEST['unlink']);
+	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
+		$unlinkTemplates = array_keys(getRequest('unlink'));
 	}
-	elseif (isset($_REQUEST['unlink_and_clear']) && is_array($_REQUEST['unlink_and_clear'])) {
-		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
-		$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
+	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
+		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
+		$_REQUEST['clear_templates'] = array_merge(getRequest('unlink_and_clear'), $unlinkTemplates);
 	}
 
 	foreach ($unlinkTemplates as $id) {
