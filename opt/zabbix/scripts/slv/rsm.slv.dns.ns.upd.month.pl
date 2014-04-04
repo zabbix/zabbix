@@ -26,7 +26,7 @@ my $interval = $till + 1 - $from;
 db_connect();
 
 my $cfg_update_time = get_macro_dns_update_time();
-my $cfg_delay = get_macro_dns_udp_delay();
+my $cfg_delay = get_macro_dns_udp_delay($from);
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my $tlds_ref = get_tlds();

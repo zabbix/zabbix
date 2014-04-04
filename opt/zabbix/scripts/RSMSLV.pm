@@ -45,8 +45,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
-		get_macro_rdds_delay
-		get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
+		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_lastclock get_tlds
 		db_connect db_select
@@ -119,17 +118,54 @@ sub get_macro_rdds_rtt_low
 
 sub get_macro_dns_udp_delay
 {
-    return __get_macro('{$RSM.DNS.UDP.DELAY}');
+    my $value_time = (shift or time() - $avail_shift_back);
+
+    my $item_param = 'RSM.DNS.UDP.DELAY';
+
+    my $value = __get_rsm_configvalue($item_param, $value_time);
+
+    return $value if ($value);
+
+    return __get_macro('{$' . $item_param . '}');
 }
 
 sub get_macro_dns_tcp_delay
 {
-    return __get_macro('{$RSM.DNS.TCP.DELAY}');
+    my $value_time = (shift or time() - $avail_shift_back);
+
+    my $item_param = 'RSM.DNS.TCP.DELAY';
+
+    my $value = __get_rsm_configvalue($item_param, $value_time);
+
+    return $value if ($value);
+
+    return __get_macro('{$' . $item_param . '}');
 }
 
 sub get_macro_rdds_delay
 {
-    return __get_macro('{$RSM.RDDS.DELAY}');
+    my $value_time = (shift or time() - $avail_shift_back);
+
+    my $item_param = 'RSM.RDDS.DELAY';
+
+    my $value = __get_rsm_configvalue($item_param, $value_time);
+
+    return $value if ($value);
+
+    return __get_macro('{$' . $item_param . '}');
+}
+
+sub get_macro_epp_delay
+{
+    my $value_time = (shift or time() - $avail_shift_back);
+
+    my $item_param = 'RSM.EPP.DELAY';
+
+    my $value = __get_rsm_configvalue($item_param, $value_time);
+
+    return $value if ($value);
+
+    return __get_macro('{$' . $item_param . '}');
 }
 
 sub get_macro_dns_update_time
@@ -145,11 +181,6 @@ sub get_macro_rdds_update_time
 sub get_macro_epp_probe_online
 {
     return __get_macro('{$RSM.EPP.PROBE.ONLINE}');
-}
-
-sub get_macro_epp_delay
-{
-    return __get_macro('{$RSM.EPP.DELAY}');
 }
 
 sub get_macro_epp_rollweek_sla
@@ -1498,6 +1529,51 @@ sub __get_probes
     }
 
     return \%result;
+}
+
+sub __get_configvalue
+{
+    my $item_prefix = shift;
+    my $item_param = shift;
+    my $value_time = shift;
+
+    my $hour = 3600;
+    my $day = $hour * 24;
+    my $month = $day * 30;
+
+    my $diff = $hour;
+    my $value = undef;
+
+    while (not $value and $diff < $month)
+    {
+	my $res = db_select(
+	    "select h.value".
+	    " from items i,history_uint h".
+	    " where i.itemid=h.itemid".
+	    	" and i.key_='$item_prefix.configvalue[$item_param]'".
+	    	" and h.clock between " . ($value_time - $diff) . " and $value_time".
+	    " order by h.clock DESC".
+	    " limit 1");
+
+	while (my @row = $res->fetchrow_array)
+	{
+	    $value = $row[0];
+	    last;
+	}
+
+	$diff = $day if ($diff == $hour);
+	$diff = $month if ($diff == $day);
+    }
+
+    return $value;
+}
+
+sub __get_rsm_configvalue
+{
+    my $item_param = shift;
+    my $value_time = shift;
+
+    return __get_configvalue('rsm', $item_param, $value_time);
 }
 
 1;
