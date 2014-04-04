@@ -90,13 +90,6 @@ $httpTestData = Manager::HttpTest()->getLastData(array($httpTest['httptestid']))
 if ($httpTestData) {
 	$httpTestData = reset($httpTestData);
 }
-else {
-	$httpTestData = array(
-		'lastcheck' => null,
-		'lastfailedstep' => null,
-		'error' => null
-	);
-}
 
 // fetch HTTP step items
 $query = DBselect(
@@ -125,7 +118,7 @@ $httpdetailsWidget->addPageHeader(
 		_('DETAILS OF SCENARIO'),
 		SPACE,
 		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
-		$httpTestData['lastcheck'] ? ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTestData['lastcheck']).']' : null
+		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTestData['lastcheck']).']' : null
 	),
 	array(
 		get_icon('reset', array('id' => get_request('httptestid'))),
@@ -155,31 +148,25 @@ $totalTime = array(
 while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
-	if ($httpTestData['lastfailedstep'] === null) {
+	$status['msg'] = _('OK');
+	$status['style'] = 'enabled';
+	$status['afterError'] = false;
+
+	if (!isset($httpTestData['lastfailedstep'])) {
 		$status['msg'] = _('Never executed');
 		$status['style'] = 'unknown';
-		$status['afterError'] = false;
 	}
-	else {
-		if ($httpTestData['lastfailedstep'] != 0) {
-			if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
-				$status['msg'] = ($httpTestData['error'] === null)
-					? _('Unknown error')
-					: _s('Error: %1$s', $httpTestData['error']);
-
-				$status['style'] = 'disabled';
-				$status['afterError'] = false;
-			}
-			else {
-				$status['msg'] = _('Unknown');
-				$status['style'] = 'unknown';
-				$status['afterError'] = true;
-			}
+	elseif ($httpTestData['lastfailedstep'] != 0) {
+		if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
+			$status['msg'] = ($httpTestData['error'] === null)
+				? _('Unknown error')
+				: _s('Error: %1$s', $httpTestData['error']);
+			$status['style'] = 'disabled';
 		}
-		else {
-			$status['msg'] = _('OK');
-			$status['style'] = 'enabled';
-			$status['afterError'] = false;
+		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
+			$status['msg'] = _('Unknown');
+			$status['style'] = 'unknown';
+			$status['afterError'] = true;
 		}
 	}
 
@@ -239,7 +226,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	));
 }
 
-if ($httpTestData['lastfailedstep'] === null) {
+if (!isset($httpTestData['lastfailedstep'])) {
 	$status['msg'] = _('Never executed');
 	$status['style'] = 'unknown';
 }
