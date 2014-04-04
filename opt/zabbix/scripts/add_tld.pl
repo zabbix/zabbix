@@ -37,6 +37,7 @@ use Zabbix;
 use Getopt::Long;
 use MIME::Base64;
 use Digest::MD5 qw(md5_hex);
+use Expect;
 use Data::Dumper;
 use RSM;
 
@@ -116,6 +117,11 @@ lc_options();
 
 my $main_templateid;
 my $ns_servers;
+
+# Expect stuff for EPP
+my $exp_timeout = 3;
+my $exp_command = '/opt/zabbix/bin/rsm_epp_enc';
+my $exp_output;
 
 use constant value_mappings => {'rsm_dns' => 13,
 				'rsm_probe' => 14,
@@ -1158,39 +1164,92 @@ sub trim
     $_[0] =~ s/\s*$//g;
 }
 
-sub encrypt_sensdata {
+sub get_sensdata
+{
     my $prompt = shift;
-    my $file = shift;
 
-    # ask the user to enter the passphrase
-    my $passphrase;
-
-    my $bin = "/opt/zabbix/bin/rsm_epp_enc";
-    pfail("$bin not found") unless (-x $bin);
-
-    my $m = '{$RSM.EPP.KEYSALT}';
-    unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
-	    and defined $result->{'value'}) {
-	pfail('cannot get macro ', $m);
-    }
-    my $keysalt = $result->{'value'};
-    trim($keysalt);
-    pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
-
-    $keysalt =~ s/\|/ /;
+    my $sensdata;
 
     print($prompt);
-    my $encrypted_sensdata;
-    if ($file) {
-	$encrypted_sensdata = `$bin $keysalt -n -f $file`;
-    } else {
-	$encrypted_sensdata = `$bin $keysalt -n`;
+    system('stty', '-echo');
+    chop($sensdata = <STDIN>);
+    system('stty', 'echo');
+    print("\n");
+
+    return $sensdata;
+}
+
+sub exp_get_keysalt
+{
+    my $self = shift;
+
+    if ($self->match() =~ m/^([^\s]+\|[^\s]+)/)
+    {
+	$exp_output = $1;
     }
-    pfail("error encrypting sensible EPP data") unless ($encrypted_sensdata =~ m/\|/);
+}
 
-    trim($encrypted_sensdata);
+sub get_encrypted_passwd
+{
+    my $keysalt = shift;
+    my $passphrase = shift;
+    my $passwd = shift;
 
-    return $encrypted_sensdata;
+    my @params = split('\|', $keysalt);
+
+    pfail("$keysalt: invalid keysalt") unless (scalar(@params) == 2);
+
+    push(@params, '-n');
+
+    my $exp = new Expect or pfail("cannot create Expect object");
+    $exp->raw_pty(1);
+    $exp->spawn($exp_command, @params) or pfail("cannot spawn $exp_command: $!");
+
+    $exp->send("$passphrase\n");
+    $exp->send("$passwd\n");
+
+    print("");
+    $exp->expect($exp_timeout, [qr/.*\n/, \&exp_get_keysalt]);
+
+    $exp->soft_close();
+
+    pfail("$exp_command returned error") unless ($exp_output and $exp_output =~ m/\|/);
+
+    my $ret = $exp_output;
+    $exp_output = undef;
+
+    return $ret;
+}
+
+sub get_encrypted_privkey
+{
+    my $keysalt = shift;
+    my $passphrase = shift;
+    my $file = shift;
+
+    my @params = split('\|', $keysalt);
+
+    pfail("$keysalt: invalid keysalt") unless (scalar(@params) == 2);
+
+    push(@params, '-n', '-f', $file);
+
+    my $exp = new Expect or pfail("cannot create Expect object");
+    $exp->raw_pty(1);
+    $exp->spawn($exp_command, @params) or pfail("cannot spawn $exp_command: $!");
+
+    $exp->send("$passphrase\n");
+
+    print("");
+    $exp->expect($exp_timeout, [qr/.*\n/, \&exp_get_keysalt]);
+
+    $exp->soft_close();
+
+    pfail("$exp_command returned error") unless ($exp_output and $exp_output =~ m/\|/);
+
+    my $ret = $exp_output;
+    $exp_output = undef;
+
+    return $ret;
 }
 
 sub read_file {
@@ -1307,6 +1366,15 @@ sub create_main_template {
 
     if ($OPTS{'epp-servers'})
     {
+	my $m = '{$RSM.EPP.KEYSALT}';
+	unless (($result = $zabbix->get('usermacro', {'globalmacro' => 1, output => 'extend', 'filter' => {'macro' => $m}}))
+		and defined $result->{'value'}) {
+	    pfail('cannot get macro ', $m);
+	}
+	my $keysalt = $result->{'value'};
+	trim($keysalt);
+	pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
+
 	if ($OPTS{'epp-commands'}) {
 	    create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, 1);
 	} else {
@@ -1314,11 +1382,18 @@ sub create_main_template {
 	}
 	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, 1);
 	create_macro('{$RSM.EPP.CERT}', encode_base64(read_file($OPTS{'epp-cert'}), ''),  $templateid, 1);
-	create_macro('{$RSM.EPP.PASSWD}', encrypt_sensdata("Please enter EPP passphrase, then press <ENTER> and then EPP password: "), $templateid, 1);
-	create_macro('{$RSM.EPP.PRIVKEY}', encrypt_sensdata("Please enter EPP passphrase again: ", $OPTS{'epp-privkey'}), $templateid, 1);
 	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, 1);
 	create_macro('{$RSM.EPP.TESTPREFIX}', $OPTS{'epp-test-prefix'}, $templateid, 1);
 	create_macro('{$RSM.EPP.SERVERCERTMD5}', get_md5($OPTS{'epp-servercert'}), $templateid, 1);
+
+	my $passphrase = get_sensdata("Enter EPP secret key passphrase: ");
+	my $passwd = get_sensdata("Enter EPP password: ");
+	create_macro('{$RSM.EPP.PASSWD}', get_encrypted_passwd($keysalt, $passphrase, $passwd), $templateid, 1);
+	$passwd = undef;
+	create_macro('{$RSM.EPP.PRIVKEY}', get_encrypted_privkey($keysalt, $passphrase, $OPTS{'epp-privkey'}), $templateid, 1);
+	$passphrase = undef;
+
+	print("EPP data saved successfully.\n");
     }
 
     return $templateid;
