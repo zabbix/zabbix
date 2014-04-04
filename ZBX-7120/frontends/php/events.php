@@ -215,6 +215,42 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
+// calculate stime and period
+if ($csvExport) {
+	$period = getRequest('period', ZBX_PERIOD_DEFAULT);
+
+	if (hasRequest('stime')) {
+		$stime = getRequest('stime');
+
+		if ($stime + $period > time()) {
+			$stime = date(TIMESTAMP_FORMAT, time() - $period);
+		}
+	}
+	else {
+		$stime = date(TIMESTAMP_FORMAT, time() - $period);
+	}
+}
+else {
+	$sourceName = ($source == EVENT_OBJECT_TRIGGER) ? 'trigger' : 'discovery';
+
+	if (hasRequest('period')) {
+		$_REQUEST['period'] = getRequest('period', ZBX_PERIOD_DEFAULT);
+		CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
+	}
+	else {
+		$_REQUEST['period'] = CProfile::get('web.events.'.$sourceName.'.period');
+	}
+
+	$period = navigation_bar_calc();
+	$stime = getRequest('stime');
+}
+
+$from = zbxDateToTime($stime);
+$till = $from + $period;
+
+/*
+ * Display
+ */
 if ($csvExport) {
 	if (!hasRequest('hostid')) {
 		$_REQUEST['hostid'] = 0;
@@ -248,9 +284,6 @@ else {
 		}
 	}
 
-	/*
-	 * Display
-	 */
 	$eventsWidget = new CWidget();
 
 	$csvDisabled = true;
@@ -260,13 +293,10 @@ else {
 	if (isset($_REQUEST['source'])) {
 		$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
 	}
-	if (isset($_REQUEST['stime'])) {
-		$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
-	}
-	if (isset($_REQUEST['period'])) {
-		$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
-	}
+	$frmForm->addVar('stime', $stime, 'stime_csv');
+	$frmForm->addVar('period', $period, 'period_csv');
 	$frmForm->addVar('page', getPageNumber(), 'page_csv');
+
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($_REQUEST['triggerid']) {
 			$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
@@ -289,8 +319,8 @@ else {
 
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-	$r_form->addVar('stime', get_request('stime'));
-	$r_form->addVar('period', get_request('period'));
+	$r_form->addVar('stime', $stime);
+	$r_form->addVar('period', $period);
 	$r_form->addVar('triggerid', 0);
 
 	// add host and group filters to the form
@@ -322,8 +352,8 @@ else {
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 		$filterForm->addVar('triggerid', get_request('triggerid'));
-		$filterForm->addVar('stime', get_request('stime'));
-		$filterForm->addVar('period', get_request('period'));
+		$filterForm->addVar('stime', $stime);
+		$filterForm->addVar('period', $period);
 
 		if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
 			$dbTrigger = API::Trigger()->get(array(
@@ -385,8 +415,6 @@ else {
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
-	$sourceName = 'trigger';
-
 	$firstEvent = API::Event()->get(array(
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -401,8 +429,6 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 
 // discovery events
 else {
-	$sourceName = 'discovery';
-
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -427,18 +453,6 @@ else {
 		$firstEvent = $firstDServiceEvent;
 	}
 }
-
-if (isset($_REQUEST['period'])) {
-	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
-	CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['period'] = CProfile::get('web.events.'.$sourceName.'.period');
-}
-
-$effectiveperiod = navigation_bar_calc();
-$from = zbxDateToTime($_REQUEST['stime']);
-$till = $from + $effectiveperiod;
 
 $config = select_config();
 
@@ -811,7 +825,7 @@ else {
 	$eventsWidget->addItem($table);
 
 	$timeline = array(
-		'period' => $effectiveperiod,
+		'period' => $period,
 		'starttime' => date(TIMESTAMP_FORMAT, $starttime),
 		'usertime' => date(TIMESTAMP_FORMAT, $till)
 	);
