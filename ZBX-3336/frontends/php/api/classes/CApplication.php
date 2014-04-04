@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CApplication extends CZBXAPI {
+class CApplication extends CApiService {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';
@@ -392,14 +392,14 @@ class CApplication extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Applications
+	 * Delete Applications.
 	 *
 	 * @param array $applicationids
+	 * @param bool  $nopermissions
+	 *
 	 * @return array
 	 */
-	public function delete($applicationids, $nopermissions = false) {
-		$applicationids = zbx_toArray($applicationids);
-		$delApplicationIds = $applicationids;
+	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'applicationids' => $applicationids,
@@ -454,7 +454,7 @@ class CApplication extends CZBXAPI {
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
 
-		return array('applicationids' => $delApplicationIds);
+		return array('applicationids' => $applicationids);
 	}
 
 	/**

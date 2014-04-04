@@ -355,7 +355,7 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = false;
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
-		$result = API::Item()->delete($_REQUEST['itemid']);
+		$result = API::Item()->delete(array(getRequest('itemid')));
 	}
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);

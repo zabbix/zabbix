@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHostGroup extends CZBXAPI {
+class CHostGroup extends CApiService {
 
 	protected $tableName = 'groups';
 	protected $tableAlias = 'g';
@@ -532,11 +532,10 @@ class CHostGroup extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($groupids, $nopermissions = false) {
+	public function delete(array $groupids, $nopermissions = false) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-		$groupids = zbx_toArray($groupids);
 		sort($groupids);
 
 		$delGroups = $this->get(array(
@@ -1119,7 +1118,7 @@ class CHostGroup extends CZBXAPI {
 
 		// adding group discovery
 		if ($options['selectGroupDiscovery'] !== null) {
-			$groupDiscoveries = API::getApi()->select('group_discovery', array(
+			$groupDiscoveries = API::getApiService()->select('group_discovery', array(
 				'output' => $this->outputExtend($options['selectGroupDiscovery'], array('groupid')),
 				'filter' => array('groupid' => $groupIds),
 				'preservekeys' => true,

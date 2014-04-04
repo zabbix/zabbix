@@ -105,7 +105,7 @@ if (!empty($_REQUEST['serviceid'])) {
 if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 	DBstart();
 
-	$result = API::Service()->delete($service['serviceid']);
+	$result = API::Service()->delete(array($service['serviceid']));
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');

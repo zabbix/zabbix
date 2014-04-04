@@ -123,7 +123,7 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 
 	$httptestData = get_httptest_by_httptestid($_REQUEST['httptestid']);
 	if ($httptestData) {
-		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
+		$result = API::HttpTest()->delete(array(getRequest('httptestid')));
 
 		if ($result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,

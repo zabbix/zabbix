@@ -509,12 +509,10 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($graphids, $nopermissions = false) {
+	public function delete(array $graphids, $nopermissions = false) {
 		if (empty($graphids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$graphids = zbx_toArray($graphids);
 
 		$delGraphs = $this->get(array(
 			'graphids' => $graphids,

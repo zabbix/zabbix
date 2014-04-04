@@ -19,53 +19,34 @@
 **/
 
 
-/**
- * A class for creating a storing instances of global objects.
- */
-class CFactoryRegistry {
+class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * An array of created object instances.
-	 *
-	 * @var
+	 * @var CRegistryFactory
 	 */
-	protected $objects;
+	protected $factory;
 
-	/**
-	 * An instance of the factory.
-	 *
-	 * @var CFactoryRegistry
-	 */
-	protected static $instance;
-
-	/**
-	 * Returns an instance of the factory object.
-	 *
-	 * @param string $class
-	 *
-	 * @return CFactoryRegistry
-	 */
-	public static function getInstance($class = __CLASS__) {
-		if (!self::$instance) {
-			self::$instance = new $class();
-		}
-
-		return self::$instance;
+	public function setUp() {
+		$this->factory = new CRegistryFactory(array(
+			'string' => 'DateTime',
+			'closure' => function() {
+				return new DateTime();
+			}
+		));
 	}
 
 	/**
-	 * Creates and returns an object from the given class.
-	 *
-	 * @param $class
-	 *
-	 * @return mixed
+	 * Test that the factory creates the right objects.
 	 */
-	protected function getObject($class) {
-		if (!isset($this->objects[$class])) {
-			$this->objects[$class] = new $class();
-		}
-
-		return $this->objects[$class];
+	public function testObjectCreate() {
+		$this->assertEquals(get_class($this->factory->getObject('string')), 'DateTime');
+		$this->assertEquals(get_class($this->factory->getObject('closure')), 'DateTime');
 	}
 
+	/**
+	 * Test that the factory creates the object only once and returns the same object after that.
+	 */
+	public function testObjectSame() {
+		$this->assertTrue($this->factory->getObject('string') === $this->factory->getObject('string'));
+	}
 }
