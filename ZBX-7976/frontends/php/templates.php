@@ -116,10 +116,12 @@ if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
-	if (isset($_REQUEST['unlink'])) {
+	$unlinkTemplates = array();
+
+	if (isset($_REQUEST['unlink']) && is_array($_REQUEST['unlink'])) {
 		$unlinkTemplates = array_keys($_REQUEST['unlink']);
 	}
-	else {
+	elseif (isset($_REQUEST['unlink_and_clear']) && is_array($_REQUEST['unlink_and_clear'])) {
 		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
 		$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
 	}
