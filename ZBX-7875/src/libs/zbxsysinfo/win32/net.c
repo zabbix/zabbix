@@ -42,6 +42,13 @@ static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 			mb_to_unicode = zbx_oemcp_to_unicode;
 		else
 			mb_to_unicode = zbx_acp_to_unicode;
+
+		zbx_free(os_version_info.ComputerName);
+		zbx_free(os_version_info.CurrentVersion);
+		zbx_free(os_version_info.CurrentBuild);
+		zbx_free(os_version_info.ProductName);
+		zbx_free(os_version_info.CSDVersion);
+		zbx_free(os_version_info.ProcessorArchitecture);
 	}
 	wdescr = mb_to_unicode(pIfRow->bDescr);
 	utf8_descr = zbx_unicode_to_utf8(wdescr);

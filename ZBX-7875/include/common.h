@@ -970,12 +970,12 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 #ifdef _WINDOWS
 typedef struct
 {
-	char ProductName[128];
-	char CSDVersion[64];
-	char CurrentBuild[32];
-	char CurrentVersion[32];
-	char ProcessorArchitecture[64];
-	char ComputerName[64];
+	char *ProductName;		/* "Windows ..." */
+	char *CSDVersion;		/* "Service pack ..." */
+	char *CurrentBuild;		/* "6xxx" */
+	char *CurrentVersion;		/* "6.x" */
+	char *ProcessorArchitecture;	/* "x86" | "x64" | "Intel Itanium-based" */
+	char *ComputerName;		/* DNS name of computer */
 }
 zbx_win_version_t;
 

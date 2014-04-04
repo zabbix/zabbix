@@ -134,7 +134,7 @@ static char	*read_registry_value(HKEY hKey, LPCTSTR name)
  * Purpose: get Windows system UNAME form Windows registry                    *
  *                                                                            *
  * Return value:                                                              *
- *         SUCCESS = struct OS_WIN_VERSION                                    *
+ *         SUCCESS = struct zbx_win_version_t                                 *
  *         FAIL if some of registry operations can not be done                *
  *                                                                            *
  * Author: Nikolajs Agafonovs                                                 *
@@ -169,15 +169,26 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 		goto out;
 	}
 
-/*
 	if (NULL == (os_version->ProductName = read_registry_value(h_key_registry, win_keys[0])))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 0");
 		goto out;
-*/
-
-	zbx_snprintf(os_version->ProductName, sizeof(os_version->ProductName), read_registry_value(h_key_registry, win_keys[0]));
-	zbx_snprintf(os_version->CSDVersion, sizeof(os_version->CSDVersion), read_registry_value(h_key_registry, win_keys[1]));
-	zbx_snprintf(os_version->CurrentBuild, sizeof(os_version->CurrentBuild), read_registry_value(h_key_registry, win_keys[2]));
-	zbx_snprintf(os_version->CurrentVersion, sizeof(os_version->CurrentVersion), read_registry_value(h_key_registry, win_keys[3]));
+	}
+	if (NULL == (os_version->CSDVersion = read_registry_value(h_key_registry, win_keys[1])))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 1");
+		goto out;
+	}
+	if (NULL == (os_version->CurrentBuild = read_registry_value(h_key_registry, win_keys[2])))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 2");
+		goto out;
+	}
+	if (NULL == (os_version->CurrentVersion = read_registry_value(h_key_registry, win_keys[3])))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 3");
+		goto out;
+	}
 
 	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
 	{
@@ -199,7 +210,8 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 		goto out;
 	}
 
-	if (0 != gethostname(os_version->ComputerName, sizeof(os_version->ComputerName)))
+	os_version->ComputerName = zbx_malloc(NULL, MAX_STRING_LEN);
+	if (0 != gethostname(os_version->ComputerName, MAX_STRING_LEN))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get host name");
 		goto out;
@@ -241,6 +253,13 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 				os_version_info.CSDVersion,
 				os_version_info.ProcessorArchitecture
 				);
+
+		zbx_free(os_version_info.ComputerName);
+		zbx_free(os_version_info.CurrentVersion);
+		zbx_free(os_version_info.CurrentBuild);
+		zbx_free(os_version_info.ProductName);
+		zbx_free(os_version_info.CSDVersion);
+		zbx_free(os_version_info.ProcessorArchitecture);
 	}
 	else
 	{
