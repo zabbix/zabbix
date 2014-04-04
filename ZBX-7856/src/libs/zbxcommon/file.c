@@ -36,12 +36,13 @@ int	__zbx_stat(const char *path, zbx_stat_t *buf)
 
 	/* In the case of symlinks _wstat64 returns zero file size.   */
 	/* Try to work around it by opening the file and using fstat. */
+
 	ret = -1;
 
 	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
 	{
 		ret = _fstat64(fd, buf);
-		close(fd);
+		_close(fd);
 	}
 out:
 	zbx_free(wpath);
