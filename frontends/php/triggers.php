@@ -118,7 +118,7 @@ elseif (isset($_REQUEST['or_expression'])) {
 elseif (isset($_REQUEST['replace_expression'])) {
 	$_REQUEST['expr_action'] = 'r';
 }
-elseif (hasRequest('remove_expression')) {
+elseif (getRequest('remove_expression')) {
 	$_REQUEST['expr_action'] = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
