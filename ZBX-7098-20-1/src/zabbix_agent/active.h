@@ -70,6 +70,7 @@ typedef struct
 						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */
 						/* 2 - use 128-bit FileID (currently only on ReFS) to identify files */
 						/* on a file system */
+	int			error_count;	/* number of file reading errors in consecutive checks */
 	int			logfiles_num;
 	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */
 }

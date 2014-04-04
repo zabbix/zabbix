@@ -696,9 +696,10 @@ out:
  *                                                                            *
  * Function: process_logrt                                                    *
  *                                                                            *
- * Purpose: Find new records in logfiles with rotation                        *
+ * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
+ *     is_logrt         - [IN] Item type: 0 - log[], 1 - logrt[]              *
  *     filename         - [IN] logfile name (regular expression with a path)  *
  *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
  *     mtime            - [IN/OUT] last modification time of the file         *
@@ -707,6 +708,7 @@ out:
  *     big_rec          - [IN/OUT] state variable to remember whether a long  *
  *                        record is being processed                           *
  *     use_ino          - [IN/OUT] how to use inode numbers                   *
+ *     error_count      - [IN/OUT] number of errors (for limiting retries)    *
  *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
  *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
  *     encoding         - [IN] text string describing encoding.               *
@@ -740,8 +742,8 @@ out:
  * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, int *use_ino, struct st_logfile **logfiles_old, int *logfiles_num_old,
+int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
+		int *big_rec, int *use_ino, int *error_count, struct st_logfile **logfiles_old, int *logfiles_num_old,
 		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
 		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key)
@@ -767,23 +769,26 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	regex_t			re;
 	time_t			now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, filename, *lastlogsize, *mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d "
+			"error_count:%d", __function_name, is_logrt, filename, *lastlogsize, *mtime, *error_count);
 
-	/* splitting filename */
-	if (SUCCEED != split_filename(filename, &directory, &format))
+	if (1 == is_logrt)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
-				filename);
-		goto out;
-	}
+		/* splitting filename into directory and file mask (reg exp) parts */
+		if (SUCCEED != split_filename(filename, &directory, &format))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
+					filename);
+			goto out;
+		}
 
-	if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
-	{
-		regerror(reg_error, &re, err_buf, sizeof(err_buf));
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for a logrt[] "
-				"item. Error: %s", format, err_buf);
-		goto out;
+		if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
+		{
+			regerror(reg_error, &re, err_buf, sizeof(err_buf));
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
+					"a logrt[] item. Error: %s", format, err_buf);
+			goto out;
+		}
 	}
 
 	/* Minimize data loss if the system clock has been set back in time. */
@@ -796,6 +801,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 			old_mtime = *mtime;
 			*mtime = (int)now;
+
 			zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
 					"seconds back.", (int)(old_mtime - now));
 		}
@@ -803,30 +809,41 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get system time");
-		regfree(&re);
+
+		if (1 == is_logrt)
+			regfree(&re);
+
+		(*error_count)++;
+		ret = SUCCEED;
 		goto out;
 	}
 
 #ifdef _WINDOWS
-	/* try to "open" Windows directory */
-	find_path = zbx_dsprintf(find_path, "%s*", directory);
-	find_handle = _findfirst((const char *)find_path, &find_data);
-	if (-1 == find_handle)
+	if (1 == is_logrt)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
-				zbx_strerror(errno));
-		win_err = 1;
+		/* try to "open" Windows directory */
+		find_path = zbx_dsprintf(find_path, "%s*", directory);
+		find_handle = _findfirst((const char *)find_path, &find_data);
+		if (-1 == find_handle)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
+					zbx_strerror(errno));
+			win_err = 1;
+		}
 	}
 
 	if (0 == win_err)
 	{
-		find_path_uni = zbx_utf8_to_unicode(find_path);
+		if (1 == is_logrt)
+			find_path_uni = zbx_utf8_to_unicode(find_path);
+		else
+			find_path_uni = zbx_utf8_to_unicode(filename);
 
 		if (0 == GetVolumePathName(find_path_uni, volume_mount_point,
 			sizeof(volume_mount_point) / sizeof(TCHAR)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": error code:%u",
-					find_path, GetLastError());
+					(1 == is_logrt) ? find_path : filename, GetLastError());
 			win_err = 1;
 		}
 
@@ -846,10 +863,16 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 
 	if (1 == win_err)
 	{
-		regfree(&re);
-		zbx_free(directory);
-		zbx_free(format);
-		zbx_free(find_path);
+		if (1 == is_logrt)
+		{
+			regfree(&re);
+			zbx_free(directory);
+			zbx_free(format);
+			zbx_free(find_path);
+		}
+
+		(*error_count)++;
+		ret = SUCCEED;
 		goto out;
 	}
 
@@ -865,76 +888,119 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	zabbix_log(LOG_LEVEL_DEBUG, "log files reside on '%s' file system", utf8);
 	zbx_free(utf8);
 
-	do
+	if (1 == is_logrt)
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
-
-		if (0 == zbx_stat(logfile_candidate, &file_buf))
+		do
 		{
-			if (S_ISREG(file_buf.st_mode) &&
-					*mtime <= file_buf.st_mtime &&
-					0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
+			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
+
+			if (0 == zbx_stat(logfile_candidate, &file_buf))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf,
-						*use_ino);
+				if (S_ISREG(file_buf.st_mode) &&
+						*mtime <= file_buf.st_mtime &&
+						0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+					add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate,
+							&file_buf, *use_ino);
+				}
 			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
+
+			zbx_free(logfile_candidate);
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
+		while (0 == _findnext(find_handle, &find_data));
 
-		zbx_free(logfile_candidate);
+		if (-1 == _findclose(find_handle))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
+					zbx_strerror(errno));
+		}
+
+		zbx_free(find_path);
 	}
-	while (0 == _findnext(find_handle, &find_data));
-
-	if (-1 == _findclose(find_handle))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
-				zbx_strerror(errno));
-	}
-
-	zbx_free(find_path);
-
 #else	/* not _WINDOWS */
-	if (NULL == (dir = opendir(directory)))
+	if (1 == is_logrt)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
-				zbx_strerror(errno));
-		regfree(&re);
-		zbx_free(directory);
-		zbx_free(format);
-		goto out;
-	}
-
-	/* on UNIX file systems we assume that inodes can be used to identify files */
-	/* i.e. use_ino = 1; */
-
-	while (NULL != (d_ent = readdir(dir)))
-	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
-
-		if (0 == zbx_stat(logfile_candidate, &file_buf))
+		if (NULL == (dir = opendir(directory)))
 		{
-			if (S_ISREG(file_buf.st_mode) &&
-					*mtime <= file_buf.st_mtime &&
-					0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate, &file_buf);
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
+					zbx_strerror(errno));
+			regfree(&re);
+			zbx_free(directory);
+			zbx_free(format);
+			(*error_count)++;
+			ret = SUCCEED;
+			goto out;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
-		zbx_free(logfile_candidate);
+		/* on UNIX file systems we always assume that inodes can be used to identify files */
+		/* i.e. use_ino = 1; */
+
+		while (NULL != (d_ent = readdir(dir)))
+		{
+			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
+
+			if (0 == zbx_stat(logfile_candidate, &file_buf))
+			{
+				if (S_ISREG(file_buf.st_mode) &&
+						*mtime <= file_buf.st_mtime &&
+						0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
+					add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate,
+							&file_buf);
+				}
+			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
+
+			zbx_free(logfile_candidate);
+		}
+
+		if (-1 == closedir(dir))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory,
+					zbx_strerror(errno));
+		}
 	}
-
-	if (-1 == closedir(dir))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
-
 #endif	/*_WINDOWS*/
 
-	regfree(&re);
+	if (1 == is_logrt)
+		regfree(&re);
+
+	if (0 == is_logrt)
+	{
+		if (0 == zbx_stat(filename, &file_buf))
+		{
+			if (S_ISREG(file_buf.st_mode))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", filename);
+#ifdef _WINDOWS
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, filename, &file_buf, *use_ino);
+#else
+				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, filename, &file_buf);
+#endif
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] "
+						"item", filename);
+				(*error_count)++;
+				ret = SUCCEED;
+				goto out;
+			}
+		}
+		else
+		{
+			/* for log[] item a non-existing file means an error causing NOTSUPPORTED state */
+			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+			(*error_count)++;
+			ret = SUCCEED;
+			goto out;
+		}
+	}
 
 	start_idx = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
 
@@ -1004,25 +1070,31 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
-	/* Do not make a logrt[] item NOTSUPPORTED if one of selected files is not accessible (can happen during */
-	/* a rotation) or there are no matching log files at all. Problems will be logged in agent log. */
-	ret = SUCCEED;
-
 	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
 	i = start_idx;
+
+	/* from now assume success - it could be that there is nothing to do */
+	ret = SUCCEED;
 
 	while (i < logfiles_num)
 	{
 		if (logfiles[i].size != logfiles[i].processed_size)
 		{
-			ret = process_log(logfiles[i].filename, lastlogsize, mtime, skip_old_data, big_rec, encoding,
-					regexps, regexps_num, pattern, p_count, s_count, process_value, server, port,
-					hostname, key);
+			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
+					skip_old_data, big_rec, encoding, regexps, regexps_num, pattern, p_count,
+					s_count, process_value, server, port, hostname, key);
 
 			logfiles[i].processed_size = *lastlogsize;
 			logfiles[i].seq = seq++;
 
-			if (SUCCEED != ret || 0 >= *p_count || 0 >= *s_count)
+			if (SUCCEED != ret)
+			{
+				(*error_count)++;
+				ret = SUCCEED;
+				break;
+			}
+
+			if (0 >= *p_count || 0 >= *s_count)
 			{
 				ret = SUCCEED;
 				break;
@@ -1042,8 +1114,10 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 		i++;
 	}
 
-	if (0 == logfiles_num)
+	if (0 == logfiles_num && 1 == is_logrt)
 	{
+		/* Do not make a logrt[] item NOTSUPPORTED if there are no matching log files or they are not */
+		/* accessible (can happen during a rotation), just log the problem. */
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
 		ret = SUCCEED;
 	}
@@ -1068,7 +1142,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	if (0 < logfiles_num)
 		*logfiles_old = logfiles;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error_count:%d", __function_name, zbx_result_string(ret), *error_count);
 
 	return ret;
 }
