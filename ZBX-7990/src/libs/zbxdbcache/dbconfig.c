@@ -4942,7 +4942,7 @@ int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_
 	ZBX_DC_HOST	*dc_host;
 
 	/* don't try deactivating host if the unreachable delay has not passed since the first error */
-	if (CONFIG_UNREACHABLE_DELAY > ts->sec - out->errors_from)
+	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
 		goto out;
 
 	LOCK_CACHE;
