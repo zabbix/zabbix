@@ -75,10 +75,12 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::update('web.auditacts.filter.alias', getRequest('alias'), PROFILE_TYPE_STR);
+	CProfile::update('web.auditacts.filter.alias', getRequest('alias', ''), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
+	DBStart();
 	CProfile::delete('web.auditacts.filter.alias');
+	DBend();
 }
 
 /*

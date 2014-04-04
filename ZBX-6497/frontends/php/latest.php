@@ -110,19 +110,21 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::update('web.latest.filter.select', getRequest('select'), PROFILE_TYPE_STR);
+	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', getRequest('show_details'), PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
+	DBStart();
 	CProfile::delete('web.latest.filter.select');
 	CProfile::delete('web.latest.filter.show_without_data');
 	CProfile::delete('web.latest.filter.show_details');
+	DBend();
 }
 
-$filterSelect = CProfile::get('web.latest.filter.select');
+$filterSelect = CProfile::get('web.latest.filter.select', '');
 $filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
-$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
+$filterShowDetails = CProfile::get('web.latest.filter.show_details');
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(

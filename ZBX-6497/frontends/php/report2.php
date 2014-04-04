@@ -123,14 +123,18 @@ if (!hasRequest('filter_rst')) {
 	);
 }
 
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid'), PROFILE_TYPE_ID);
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', getRequest('filter_timesince'),
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid', 0),
+	PROFILE_TYPE_ID
+);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', getRequest('filter_timesince', 0),
 	PROFILE_TYPE_STR
 );
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getRequest('filter_timetill'),
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getRequest('filter_timetill', 0),
 	PROFILE_TYPE_STR
 );
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid'), PROFILE_TYPE_ID);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid', 0),
+	PROFILE_TYPE_ID
+);
 
 $config = select_config();
 
@@ -427,7 +431,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			get_node_name_by_elid($trigger['hostid']),
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
+			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid']),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
 			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].

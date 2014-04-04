@@ -104,8 +104,8 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
-	CProfile::update('web.tr_status.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		PROFILE_TYPE_INT
+	CProfile::update('web.tr_status.filter.show_severity',
+		getRequest('show_severity', 0, TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
 	);
 	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
@@ -118,13 +118,6 @@ if (hasRequest('filter_set')) {
 			if (!str_in_array($showEvents, array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
 				$showEvents = EVENTS_OPTION_NOEVENT;
 			}
-		}
-
-		/*
-		 * Clean cookies
-		 */
-		if ($showEvents != CProfile::get('web.tr_status.filter.show_events')) {
-			clearCookies(true);
 		}
 
 		CProfile::update('web.tr_status.filter.show_events', $showEvents, PROFILE_TYPE_INT);
@@ -187,6 +180,7 @@ if (hasRequest('filter_set')) {
 elseif (hasRequest('filter_rst')) {
 	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 
+	DBStart();
 	CProfile::delete('web.tr_status.filter.show_details');
 	CProfile::delete('web.tr_status.filter.show_maintenance');
 	CProfile::delete('web.tr_status.filter.show_events');
@@ -198,6 +192,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.tr_status.filter.application');
 	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
 	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
+	DBend();
 }
 
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
@@ -764,7 +759,7 @@ foreach ($triggers as $trigger) {
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
-			'events.php?triggerid='.$trigger['triggerid'].
+			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
 				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
 		);
 
