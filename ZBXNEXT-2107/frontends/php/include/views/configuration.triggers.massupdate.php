@@ -107,7 +107,7 @@ if (empty($this->data['parent_discoveryid'])) {
 			$description->setAttribute('target', '_blank');
 		}
 		else {
-			$description = new CSpan(array($hostNames, NAME_DELIMITER, $dependency['description']));
+			$description = array($hostNames, NAME_DELIMITER, $dependency['description']);
 		}
 
 		$row = new CRow(array($description, new CButton('remove', _('Remove'),
