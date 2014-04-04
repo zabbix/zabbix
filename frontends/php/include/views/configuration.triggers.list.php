@@ -177,14 +177,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			foreach ($dependencies as $depTrigger) {
 				$hostNames = array();
 
-				$hosts = API::Host()->get(array(
-					'triggerids' => array($depTrigger['triggerid']),
-					'output' => array('hostid', 'name'),
-					'sortfield' => 'name',
-					'sortorder' => ZBX_SORT_UP
-				));
-
-				foreach ($hosts as $host) {
+				foreach ($depTrigger['hosts'] as $host) {
 					$hostNames[] = CHtml::encode($host['name']);
 					$hostNames[] = ', ';
 				}
@@ -193,7 +186,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 					$triggerDependencies[] = new CLink(
 						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
-						'triggers.php?form=update&hostid='.$hosts[0]['hostid'].'&triggerid='.$depTrigger['triggerid'],
+						'triggers.php?form=update&hostid='.$depTrigger['hostid'].'&triggerid='.$depTrigger['triggerid'],
 						triggerIndicatorStyle($depTrigger['status'])
 					);
 				}
