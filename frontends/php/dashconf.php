@@ -169,7 +169,6 @@ if ($data['grpswitch']) {
 
 	foreach ($data['groups'] as &$group) {
 		$group['id'] = $group['groupid'];
-		$group['prefix'] = '';
 
 		unset($group['groupid']);
 	}
@@ -187,7 +186,6 @@ if ($data['grpswitch']) {
 
 	foreach ($data['hideGroups'] as &$group) {
 		$group['id'] = $group['groupid'];
-		$group['prefix'] = '';
 
 		unset($group['groupid']);
 	}

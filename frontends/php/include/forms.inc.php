@@ -479,8 +479,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$groupFilter[] = array(
 				'id' => $getHostInfo['groupid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}
@@ -517,8 +516,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$hostFilterData[] = array(
 				'id' => $getHostInfo['hostid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}

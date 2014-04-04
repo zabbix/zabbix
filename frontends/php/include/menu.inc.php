@@ -143,7 +143,7 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'popup_right.php'
 			)
-		),
+		)
 	),
 	'config' => array(
 		'label'				=> _('Configuration'),
@@ -211,14 +211,14 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'services.php',
 				'label' => _('IT services')
-			),
+			)
 		)
 	),
 	'admin' => array(
 		'label'				=> _('Administration'),
 		'user_type'			=> USER_TYPE_SUPER_ADMIN,
 		'node_perm'			=> PERM_READ_WRITE,
-		'default_page_id'	=> 1,
+		'default_page_id'	=> 0,
 		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
@@ -239,7 +239,7 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'proxies.php',
-				'label' => _('DM')
+				'label' => _('Proxies')
 			),
 			array(
 				'url' => 'authentication.php',

@@ -249,19 +249,13 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$menu_table->setCellPadding(5);
 	$menu_table->addRow($main_menu);
 
-	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-		$table = new CTable();
-		$table->addStyle('width: 100%;');
-
-		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
-		$tableColumn->addStyle('padding-right: 20px; padding-bottom: 2px;');
-
-		$table->addRow($tableColumn);
-	}
+	$serverName = (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME))
+		? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles serverName')
+		: null;
 
 	// 1st level menu
 	$table = new CTable(null, 'maxwidth');
-	$table->addRow($menu_table);
+	$table->addRow(array($menu_table, $serverName));
 
 	$page_menu = new CDiv(null, 'textwhite');
 	$page_menu->setAttribute('id', 'mmenu');
