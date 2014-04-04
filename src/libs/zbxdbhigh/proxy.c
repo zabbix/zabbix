@@ -2494,6 +2494,9 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
+		if (0 != drule.druleid)
+			zbx_clean_dhost_list(&drule);
+
 		DBbegin();
 		if (-1 == dcheck.type)
 			discovery_update_host(&dhost, ip, status, itemtime);
@@ -2501,19 +2504,11 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
 		DBcommit();
 
-		if (0 != last_druleid)
-			zbx_clean_dhost_list(&drule, &dhost, 0);
-
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
-
-	if (0 != last_druleid)
-		zbx_clean_dhost_list(&drule, &dhost, 1);
 exit:
-
-
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 
