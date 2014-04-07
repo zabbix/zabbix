@@ -136,7 +136,7 @@ elseif (isset($_REQUEST['delete'])) {
 		if ($app = get_application_by_applicationid($_REQUEST['applicationid'])) {
 			$host = get_host_by_hostid($app['hostid']);
 
-			$result = API::Application()->delete($_REQUEST['applicationid']);
+			$result = API::Application()->delete(array(getRequest('applicationid')));
 		}
 
 		if ($result) {
@@ -170,7 +170,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 			continue;
 		}
 
-		$result &= (bool) API::Application()->delete($dbApplication['applicationid']);
+		$result &= (bool) API::Application()->delete(array($dbApplication['applicationid']));
 
 		if ($result) {
 			$host = get_host_by_hostid($dbApplication['hostid']);

@@ -1089,8 +1089,18 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
 	}
 }
 
-/************* SELECT *************/
-function selectByPattern(&$table, $column, $pattern, $limit) {
+/**
+ * Sort an array of objects so that the objects whose $column value matches $pattern are at the top.
+ * Return the first $limit objects.
+ *
+ * @param array 	$table		array of objects to sort
+ * @param string 	$column		name of the $column to search
+ * @param string 	$pattern	string to match the value of $column against
+ * @param int		$limit		number of objects to return
+ *
+ * @return array
+ */
+function selectByPattern(array $table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();

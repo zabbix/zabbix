@@ -1655,12 +1655,6 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type && ITEM_VALUE_TYPE_UINT64 != history[i].value_type &&
-				ITEM_VALUE_TYPE_STR != history[i].value_type)
-		{
-			continue;
-		}
-
 		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
 			continue;
 
@@ -1676,7 +1670,10 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 			case ITEM_VALUE_TYPE_TEXT:
 				pvalue = history[i].value_orig.str;
 				break;
+			default:
+				continue;
 		}
+
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns, pvalue);
 	}
 

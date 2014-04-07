@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CTriggerGeneral extends CZBXAPI {
+abstract class CTriggerGeneral extends CApiService {
 
 	/**
 	 * @abstract
@@ -342,7 +342,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 
 		// adding functions
 		if ($options['selectFunctions'] !== null && $options['selectFunctions'] != API_OUTPUT_COUNT) {
-			$functions = API::getApi()->select('functions', array(
+			$functions = API::getApiService()->select('functions', array(
 				'output' => $this->outputExtend($options['selectFunctions'], array('triggerid', 'functionid')),
 				'filter' => array('triggerid' => $triggerids),
 				'preservekeys' => true,

@@ -113,7 +113,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 	DBstart();
 
 	$image = get_image_by_imageid($_REQUEST['imageid']);
-	$result = API::Image()->delete($_REQUEST['imageid']);
+	$result = API::Image()->delete(array(getRequest('imageid')));
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$image['name'].'] deleted');
