@@ -174,7 +174,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
 			$triggerDependencies = array();
 
-			foreach ($dependencies as $depTrigger) {
+			foreach ($dependencies as $dependency) {
+				$depTrigger = $this->data['dependencyTriggers'][$dependency['triggerid']];
 				$hostNames = array();
 
 				foreach ($depTrigger['hosts'] as $host) {
@@ -184,9 +185,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				array_pop($hostNames);
 
 				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$host = reset($depTrigger['hosts']);
 					$triggerDependencies[] = new CLink(
 						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
-						'triggers.php?form=update&hostid='.$depTrigger['hostid'].'&triggerid='.$depTrigger['triggerid'],
+						'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
 						triggerIndicatorStyle($depTrigger['status'])
 					);
 				}
