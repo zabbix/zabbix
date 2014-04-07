@@ -3437,8 +3437,11 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			char	*formula;
 
-			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item[i].flags))
+			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item[i].flags) ||
+					CONDITION_EVAL_TYPE_EXPRESSION != item[i].evaltype)
+			{
 				continue;
+			}
 
 			index = zbx_vector_ptr_search(&rules, &item[i].templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			rule = rules.values[index];
@@ -3451,7 +3454,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			{
 				zbx_uint64_t	id;
 				char		srcid[64], dstid[64], *ptr;
-				size_t		pos;
+				size_t		pos = 0, len;
 
 				if (j < rule->dst_conditionids.values_num)
 					id = rule->dst_conditionids.values[j];
@@ -3463,14 +3466,13 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				zbx_snprintf(srcid, sizeof(srcid), "{" ZBX_FS_UI64 "}", condition->id);
 				zbx_snprintf(dstid, sizeof(dstid), "{" ZBX_FS_UI64 "}", id);
 
-				if (NULL == (ptr = strstr(formula, srcid)))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
+				len = strlen(srcid);
 
-				pos = ptr - formula + strlen(srcid) - 1;
-				zbx_replace_string(&formula, ptr - formula, &pos, dstid);
+				while (NULL != (ptr = strstr(formula + pos, srcid)))
+				{
+					pos = ptr - formula + len - 1;
+					zbx_replace_string(&formula, ptr - formula, &pos, dstid);
+				}
 			}
 
 			zbx_free(item[i].formula);
@@ -3484,6 +3486,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				item[i].formula = formula;
 		}
 
+		/* update items */
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
