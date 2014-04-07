@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
 ..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
 ...G...... [ZBXNEXT-2194] added configuration option to include all files in a directory on Windows (Nikolaj)
 ........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
