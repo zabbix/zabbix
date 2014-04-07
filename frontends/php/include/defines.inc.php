@@ -127,6 +127,7 @@ define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
+define('T_ZBX_DBL_BIG',		9);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
