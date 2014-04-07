@@ -117,14 +117,17 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-if (hasRequest('filter_rst')) {
-	$_REQUEST['triggerid'] = 0;
+if (hasRequest('filter_set')) {
+	CProfile::update('web.events.filter.triggerid', getRequest('triggerid'), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::delete('web.events.filter.triggerid');
 }
 
-$_REQUEST['triggerid'] = getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+$triggerId = CProfile::get('web.events.filter.triggerid', 0);
 
-// change triggerId filter if change hostId
-if (getRequest('triggerid', 0) > 0 && hasRequest('hostid')) {
+// change the triggerid when we change host id
+if ($triggerId != 0 && hasRequest('hostid')) {
 	$hostid = getRequest('hostid');
 
 	$oldTriggers = API::Trigger()->get(array(
@@ -132,8 +135,11 @@ if (getRequest('triggerid', 0) > 0 && hasRequest('hostid')) {
 		'selectHosts' => array('hostid', 'host'),
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'triggerids' => getRequest('triggerid')
+		'triggerids' => $triggerId
 	));
+
+	// unset the old trigger and look for a new one
+	$triggerId = 0;
 
 	foreach ($oldTriggers as $oldTrigger) {
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
@@ -197,22 +203,13 @@ if (getRequest('triggerid', 0) > 0 && hasRequest('hostid')) {
 			$newExpression = triggerExpression($newTrigger);
 
 			if (strcmp($oldExpression, $newExpression) == 0) {
-				$_REQUEST['triggerid'] = $newTrigger['triggerid'];
-				$_REQUEST['filter_set'] = 1;
+				CProfile::update('web.events.filter.triggerid', $newTrigger['triggerid'], PROFILE_TYPE_ID);
+				$triggerId = $newTrigger['triggerid'];
 				break;
 			}
 		}
 	}
 }
-
-if (hasRequest('filter_set')) {
-	CProfile::update('web.events.filter.triggerid', getRequest('triggerid'), PROFILE_TYPE_ID);
-}
-elseif (hasRequest('filter_rst')) {
-	CProfile::delete('web.events.filter.triggerid');
-}
-
-$triggerId = getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
 
 $source = ($triggerId > 0)
 	? EVENT_SOURCE_TRIGGERS
@@ -326,7 +323,6 @@ else {
 	$r_form->addVar('fullscreen', getRequest('fullscreen'));
 	$r_form->addVar('stime', $stime);
 	$r_form->addVar('period', $period);
-	$r_form->addVar('triggerid', 0);
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
