@@ -392,7 +392,7 @@ else {
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'selectDependencies' => array('triggerid'),
+		'selectDependencies' => array('triggerid', 'description'),
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 
@@ -405,37 +405,38 @@ else {
 
 	$dependencyIds = array();
 	foreach ($data['triggers'] as $trigger) {
-		if ($trigger['dependencies']) {
-			$dependencyIds = array_merge($dependencyIds, zbx_objectValues($trigger['dependencies'], 'triggerid'));
+		foreach ($trigger['dependencies'] as $depTrigger) {
+			$dependencyIds[$depTrigger['triggerid']] = $depTrigger['triggerid'];
 		}
 	}
 
-	$dependencies = API::Trigger()->get(array(
-		'triggerids' => $dependencyIds,
-		'output' => array('triggerid', 'flags', 'description', 'status'),
-		'selectHosts' => array('hostid', 'name'),
-		'preservekeys' => true
-	));
+	$dependencyTriggers = array();
+	if ($dependencyIds) {
+		$dependencyTriggers = API::Trigger()->get(array(
+			'triggerids' => $dependencyIds,
+			'output' => array('triggerid', 'flags', 'description', 'status'),
+			'selectHosts' => array('hostid', 'name'),
+			'preservekeys' => true
+		));
 
-	if ($dependencies) {
+		// sort dependencies
 		foreach ($data['triggers'] as &$trigger) {
-			foreach ($trigger['dependencies'] as &$dependency) {
-				if (count($dependencies[$dependency['triggerid']]['hosts']) > 1) {
-					order_result($dependencies[$dependency['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
-				}
-
-				$dependency = $dependencies[$dependency['triggerid']];
-				$host = reset($dependencies[$dependency['triggerid']]['hosts']);
-				$dependency['hostid'] = $host['hostid'];
-			}
-			unset($dependency);
-
 			if (count($trigger['dependencies']) > 1) {
 				order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 			}
 		}
 		unset($trigger);
+
+		// sort dependency trigger hosts
+		foreach ($dependencyTriggers as &$trigger) {
+			if (count($dependencyTriggers[$trigger['triggerid']]['hosts']) > 1) {
+				order_result($dependencyTriggers[$trigger['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
+			}
+		}
+		unset($trigger);
 	}
+
+	$data['dependencyTriggers'] = $dependencyTriggers;
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
