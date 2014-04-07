@@ -30,7 +30,7 @@ static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 	static LPTSTR		(*mb_to_unicode)(LPCSTR) = NULL;
 	LPTSTR			wdescr;
 	LPSTR			utf8_descr;
-	zbx_win_version_t	os_version_info;
+	zbx_win_version_t	os_version_info = {NULL};
 
 	if (NULL == mb_to_unicode)
 	{
@@ -38,17 +38,12 @@ static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 
 		/* starting with Windows Vista (Windows Server 2008) the interface description */
 		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
-		if (0 == zbx_get_win_version(&os_version_info) && 6 <= atoi(os_version_info.CurrentVersion))
+		if (SUCCEED == zbx_get_win_version(&os_version_info) && 6 <= atoi(os_version_info.CurrentVersion))
 			mb_to_unicode = zbx_oemcp_to_unicode;
 		else
 			mb_to_unicode = zbx_acp_to_unicode;
 
-		zbx_free(os_version_info.ComputerName);
-		zbx_free(os_version_info.CurrentVersion);
-		zbx_free(os_version_info.CurrentBuild);
-		zbx_free(os_version_info.ProductName);
-		zbx_free(os_version_info.CSDVersion);
-		zbx_free(os_version_info.ProcessorArchitecture);
+		zbx_clean_win_version(&os_version_info);
 	}
 	wdescr = mb_to_unicode(pIfRow->bDescr);
 	utf8_descr = zbx_unicode_to_utf8(wdescr);

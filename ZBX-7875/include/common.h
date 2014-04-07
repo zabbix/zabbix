@@ -980,6 +980,7 @@ typedef struct
 zbx_win_version_t;
 
 int	zbx_get_win_version(zbx_win_version_t *os_version);
+void	zbx_clean_win_version(zbx_win_version_t *os_version);
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);

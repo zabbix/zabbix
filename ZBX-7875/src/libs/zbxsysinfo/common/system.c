@@ -109,6 +109,24 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 }
 
 #ifdef _WINDOWS
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_clean_win_version                                            *
+ *                                                                            *
+ * Purpose: frees resources allocated to store Windows version data           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_clean_win_version(zbx_win_version_t *os_version)
+{
+	zbx_free(os_version->ComputerName);
+	zbx_free(os_version->CurrentVersion);
+	zbx_free(os_version->CurrentBuild);
+	zbx_free(os_version->ProductName);
+	zbx_free(os_version->CSDVersion);
+	zbx_free(os_version->ProcessorArchitecture);
+}
+
 static char	*read_registry_value(HKEY hKey, LPCTSTR name)
 {
 	DWORD	szData;
@@ -129,101 +147,103 @@ static char	*read_registry_value(HKEY hKey, LPCTSTR name)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_win_version                                                  *
+ * Function: zbx_get_win_version                                              *
  *                                                                            *
  * Purpose: get Windows system UNAME form Windows registry                    *
  *                                                                            *
  * Return value:                                                              *
- *         SUCCESS = struct zbx_win_version_t                                 *
- *         FAIL if some of registry operations can not be done                *
+ *         SUCCESS - the Windows version data was retrieved successfully      *
+ *         FAIL    - otherwise                                                *
  *                                                                            *
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_win_version(zbx_win_version_t *os_version)
 {
+
+#define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+#define ZBX_REGKEY_ENVIRONMENT		"System\\CurrentControlSet\\Control\\Session Manager\\Environment"
+
+#define ZBX_REGVALUE_PRODUCTNAME	"ProductName"
+#define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
+#define ZBX_REGVALUE_CURRENTBUILD	"CurrentBuild"
+#define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
+#define ZBX_REGVALUE_ARCHITECTURE	"PROCESSOR_ARCHITECTURE"
+
 	const char	*__function_name = "zbx_get_win_version";
 	int		ret = FAIL;
 
 	/* Order of win_keys is vital.
 	 * Version information in registry is stored in multiple keys */
-	LPCTSTR		win_keys[5] = {
-				TEXT("ProductName"),
-				TEXT("CSDVersion"),
-				TEXT("CurrentBuild"),
-				TEXT("CurrentVersion"),
-				TEXT("PROCESSOR_ARCHITECTURE")};
-	LPCTSTR		sys_key_1 = TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
-	LPCTSTR		sys_key_2 = TEXT("System\\CurrentControlSet\\Control\\Session Manager\\Environment");
 	HKEY		h_key_registry;
-	DWORD		dw_buffer = 256;
-	LPSTR		lp_name_strings = NULL;
+	TCHAR		computer_name[256];
+	DWORD		dwSize = 256;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	lp_name_strings = zbx_malloc(lp_name_strings, 256);
-
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, sys_key_1, 0, KEY_READ, &h_key_registry))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_VERSION), 0, KEY_READ, &h_key_registry))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_VERSION);
 		goto out;
 	}
 
-	if (NULL == (os_version->ProductName = read_registry_value(h_key_registry, win_keys[0])))
+	if (NULL == (os_version->ProductName = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_PRODUCTNAME))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 0");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_PRODUCTNAME);
 		goto out;
 	}
-	if (NULL == (os_version->CSDVersion = read_registry_value(h_key_registry, win_keys[1])))
+	if (NULL == (os_version->CSDVersion = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CSDVERSION))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 1");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CSDVERSION);
 		goto out;
 	}
-	if (NULL == (os_version->CurrentBuild = read_registry_value(h_key_registry, win_keys[2])))
+	if (NULL == (os_version->CurrentBuild = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILD))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 2");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTBUILD);
 		goto out;
 	}
-	if (NULL == (os_version->CurrentVersion = read_registry_value(h_key_registry, win_keys[3])))
+	if (NULL == (os_version->CurrentVersion = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTVERSION))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 3");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTVERSION);
 		goto out;
 	}
 
 	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to close registry key");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to close registry key '%s'", ZBX_REGKEY_VERSION);
 		goto out;
 	}
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, sys_key_2, 0, KEY_READ, &h_key_registry))
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_ENVIRONMENT), 0, KEY_READ, &h_key_registry))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to open registry key 2");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_ENVIRONMENT);
 		goto out;
 	}
 
-	zbx_snprintf(os_version->ProcessorArchitecture, sizeof(os_version->ProcessorArchitecture), read_registry_value(h_key_registry, win_keys[4]));
+	if (NULL == (os_version->ProcessorArchitecture = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_ARCHITECTURE))))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_ARCHITECTURE);
+		goto out;
+	}
 
 	if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to close registry key 2");
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to close registry key '%s'", ZBX_REGKEY_ENVIRONMENT);
 		goto out;
 	}
 
-	os_version->ComputerName = zbx_malloc(NULL, MAX_STRING_LEN);
-	if (0 != gethostname(os_version->ComputerName, MAX_STRING_LEN))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get host name");
-		goto out;
-	}
-	else
-	{
-		zbx_strupper(os_version->ComputerName);
-	}
+	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
+	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
+	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
+	if (0 == GetComputerName(computer_name, &dwSize))
+		*computer_name = TEXT('\0');
+
+	os_version->ComputerName = zbx_unicode_to_utf8(computer_name);
 
 	ret = SUCCEED;
 out:
-	zbx_free(lp_name_strings);
+	if (SUCCEED != ret)
+		zbx_clean_win_version(os_version);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, strerror_from_system(ret));
 	return ret;
@@ -233,17 +253,13 @@ out:
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
-	zbx_win_version_t	os_version_info;
+	zbx_win_version_t	os_version_info = {NULL};
 	char			*os = NULL;
-	size_t			os_alloc, os_offset = 0;
-
-	os_alloc =  sizeof(os_version_info) + 14;
+	size_t			os_alloc = 256, os_offset = 0;
 
 	os = zbx_malloc(os, os_alloc);
 
-	memset(&os_version_info, '\0', sizeof(os_version_info));
-
-	if (0 == zbx_get_win_version(&os_version_info))
+	if (SUCCEED == zbx_get_win_version(&os_version_info))
 	{
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "Windows %s %s.%s %s %s %s",
 				os_version_info.ComputerName,
@@ -254,12 +270,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 				os_version_info.ProcessorArchitecture
 				);
 
-		zbx_free(os_version_info.ComputerName);
-		zbx_free(os_version_info.CurrentVersion);
-		zbx_free(os_version_info.CurrentBuild);
-		zbx_free(os_version_info.ProductName);
-		zbx_free(os_version_info.CSDVersion);
-		zbx_free(os_version_info.ProcessorArchitecture);
+		zbx_clean_win_version(&os_version_info);
 	}
 	else
 	{
