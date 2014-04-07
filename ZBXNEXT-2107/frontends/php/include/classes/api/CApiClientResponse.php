@@ -18,19 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//require_once 'Framework/ClassTest.php';
-//require_once dirname(__FILE__).'/classes/class.cdrule.php';
-//require_once dirname(__FILE__).'/classes/class.triggerexpressionTest.php';
-//require_once dirname(__FILE__).'/classes/class.citemtest.php';
-// ...
-//class Package_GeneralTests
-class ApiTests {
-	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite();
-//		$suite->addTestSuite('class_triggerexpressionTest');
-//		$suite->addTestSuite('CItemTest');
-//		$suite->addTestSuite('CDRuleTest');
 
-		return $suite;
-	}
+/**
+ * This class is used by the API client to return the results of an API call.
+ */
+class CApiClientResponse {
+
+	/**
+	 * Data returned by the service method.
+	 *
+	 * @var mixed
+	 */
+	public $data;
+
+	/**
+	 * Error code.
+	 *
+	 * @var	int
+	 */
+	public $errorCode;
+
+	/**
+	 * Error message.
+	 *
+	 * @var	string
+	 */
+	public $errorMessage;
+
+	/**
+	 * Debug information.
+	 *
+	 * @var	array
+	 */
+	public $debug;
 }
