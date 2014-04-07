@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-04 00:15+0200\n"
-"PO-Revision-Date: 2014-02-20 14:19+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2014-03-31 13:03+0300\n"
+"PO-Revision-Date: 2014-03-25 02:06+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392898787.0\n"
+"X-POOTLE-MTIME: 1395705966.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -605,7 +605,7 @@ msgstr "すべて"
 msgid "Any character string included"
 msgstr "いずれかの文字列が含まれる"
 
-#: applications.php:117 httpconf.php:42 include/actions.inc.php:90
+#: applications.php:118 httpconf.php:42 include/actions.inc.php:90
 #: include/audit.inc.php:32 include/forms.inc.php:577
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
@@ -626,7 +626,7 @@ msgstr "アプリケーション\"%1$s\"はすでに存在します。"
 msgid "Application added"
 msgstr "アプリケーションを追加しました"
 
-#: applications.php:140 applications.php:179
+#: applications.php:142 applications.php:181
 msgid "Application deleted"
 msgstr "アプリケーションを削除しました"
 
@@ -1258,12 +1258,12 @@ msgstr "キャンセル"
 msgid "Cannot acknowledge event"
 msgstr "イベントの障害対応コメントを入力できません"
 
-#: api/classes/CGraph.php:721 api/classes/CGraph.php:735
+#: api/classes/CGraph.php:735 api/classes/CGraph.php:749
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "数値型ではないアイテム\"%1$s\"はグラフ\"%2$s\"に追加できません。"
 
-#: api/classes/CGraphPrototype.php:721 api/classes/CGraphPrototype.php:783
+#: api/classes/CGraphPrototype.php:709 api/classes/CGraphPrototype.php:774
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "数値型ではないアイテム\"%1$s\"はグラフのプロトタイプ\"%2$s\"に追加できません。"
@@ -1547,7 +1547,7 @@ msgstr "Zabbixユーザー\"%1$s\"を削除できません。ユーザーを無�
 msgid "Cannot delete action"
 msgstr "アクションを削除できません"
 
-#: applications.php:140 applications.php:179
+#: applications.php:142 applications.php:181
 msgid "Cannot delete application"
 msgstr "アプリケーションを削除できません"
 
@@ -1727,7 +1727,7 @@ msgstr "テンプレートのアイテムを削除できません"
 msgid "Cannot delete templated items."
 msgstr "テンプレートのアイテムを削除できません"
 
-#: api/classes/CTrigger.php:1899 api/classes/CTriggerPrototype.php:674
+#: api/classes/CTrigger.php:1899 api/classes/CTriggerPrototype.php:649
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
@@ -1757,7 +1757,7 @@ msgstr "トリガーを削除できません"
 msgid "Cannot delete triggers"
 msgstr "トリガーを削除できません"
 
-#: api/classes/CTriggerPrototype.php:712
+#: api/classes/CTriggerPrototype.php:687
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "ローレベルディスカバリによって作成されたトリガーは削除できません。"
 
@@ -1802,7 +1802,7 @@ msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
 msgstr[0] "ホストのプロトタイプを無効にできません"
 
-#: applications.php:211 items.php:682
+#: applications.php:213 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "アイテムを無効にできません"
@@ -1870,7 +1870,7 @@ msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
 msgstr[0] "ホストのプロトタイプを有効にできません"
 
-#: applications.php:210 items.php:681
+#: applications.php:212 items.php:681
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "アイテムを有効にできません"
@@ -2060,7 +2060,7 @@ msgid "Cannot have empty visible template name"
 msgstr "テンプレート名に空白は設定できません"
 
 #: api/classes/CTrigger.php:1120 api/classes/CTrigger.php:1259
-#: api/classes/CTriggerPrototype.php:755 api/classes/CTriggerPrototype.php:813
+#: api/classes/CTriggerPrototype.php:730 api/classes/CTriggerPrototype.php:788
 #, c-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "条件式\"%s\"を展開できません"
@@ -2084,7 +2084,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "トリガー条件式を追加できません"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -2291,17 +2291,17 @@ msgstr "グラフ\"%1$s\"の\"templateid\"を更新できません。"
 msgid "Cannot update \"templateid\" for graph prototype \"%1$s\"."
 msgstr "グラフのプロトタイプ\"%1$s\"の\"templateid\"を更新できません。"
 
-#: api/classes/CScreen.php:471
+#: api/classes/CScreen.php:457
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"の\"templateid\"を更新できません。"
 
-#: api/classes/CTemplateScreen.php:617
+#: api/classes/CTemplateScreen.php:635
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "テンプレートスクリーン\"%1$s\"の\"templateid\"を更新できません。"
 
-#: api/classes/CTriggerPrototype.php:576
+#: api/classes/CTriggerPrototype.php:563
 #, c-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "トリガーのプロトタイプ\"%1$s\"の\"templateid\"を更新できません。"
@@ -3109,7 +3109,7 @@ msgstr "座標"
 msgid "Copy"
 msgstr "コピー"
 
-#: include/views/configuration.graph.list.php:155
+#: include/views/configuration.graph.list.php:157
 #: include/views/configuration.item.list.php:284
 #: include/views/configuration.triggers.list.php:281
 msgid "Copy selected to ..."
@@ -3292,7 +3292,7 @@ msgstr "作成: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:763
+#: api/classes/CTriggerPrototype.php:738
 #, c-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -3836,7 +3836,7 @@ msgstr "スクリプトを削除しますか？"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
 #: include/views/configuration.discovery.list.php:77
-#: include/views/configuration.graph.list.php:158
+#: include/views/configuration.graph.list.php:160
 #: include/views/configuration.host.discovery.list.php:144
 #: include/views/configuration.hostgroups.list.php:167
 #: include/views/configuration.host.prototype.list.php:127
@@ -3872,11 +3872,11 @@ msgstr "選択したディスカバリルールを削除しますか？"
 msgid "Delete selected elements?"
 msgstr "選択した要素を削除しますか？"
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:163
 msgid "Delete selected graph prototypes?"
 msgstr "選択したグラフのプロトタイプを削除しますか？"
 
-#: include/views/configuration.graph.list.php:161
+#: include/views/configuration.graph.list.php:163
 msgid "Delete selected graphs?"
 msgstr "選択したグラフを削除しますか？"
 
@@ -4073,7 +4073,7 @@ msgstr "削除: テンプレート\"%1$s\"。"
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:718
+#: api/classes/CTriggerPrototype.php:693
 #, c-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
@@ -4137,7 +4137,7 @@ msgid "Description"
 msgstr "説明"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2208
+#: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4618,7 +4618,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2175
+#: include/func.inc.php:2173
 msgid "ERROR"
 msgstr "エラー"
 
@@ -4709,7 +4709,7 @@ msgstr "ホストが空白です。"
 #: api/classes/CService.php:377 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:624
 #: api/classes/CTrigger.php:882 api/classes/CTrigger.php:962
-#: api/classes/CTrigger.php:1052 api/classes/CTriggerPrototype.php:652
+#: api/classes/CTrigger.php:1052 api/classes/CTriggerPrototype.php:627
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
 #: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
@@ -4757,6 +4757,14 @@ msgstr "パラメータが空白です"
 #, c-format
 msgid "Empty response received from Zabbix server \"%1$s\"."
 msgstr "Zabbixサーバー\"%1$s\"から空のデータを受信しました。"
+
+#: api/classes/CScreen.php:488
+msgid "Empty screen ID for screen."
+msgstr "スクリーンのスクリーンIDが空白です。"
+
+#: api/classes/CTemplateScreen.php:602
+msgid "Empty screen ID for template screen."
+msgstr "テンプレートスクリーンのスクリーンIDが空白です。"
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5384,7 +5392,7 @@ msgstr "関数"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "関数\"%1$s\"は選択されたアイテム\"%2$s\"と一緒に利用できません"
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -5481,7 +5489,7 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.action.list.php:109
 #: include/views/configuration.application.list.php:124
 #: include/views/configuration.discovery.list.php:81
-#: include/views/configuration.graph.list.php:165
+#: include/views/configuration.graph.list.php:167
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.hostgroups.list.php:170
 #: include/views/configuration.host.prototype.list.php:131
@@ -5593,6 +5601,16 @@ msgstr "グラフ名"
 msgid "Graph prototype"
 msgstr "グラフのプロトタイプ"
 
+#: api/classes/CGraphPrototype.php:807
+#, c-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr "グラフのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
+
+#: api/classes/CGraphPrototype.php:813
+#, c-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr "グラフのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
+
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -5610,10 +5628,6 @@ msgstr "グラフのプロトタイプを追加しました"
 #: graphs.php:273
 msgid "Graph prototype deleted"
 msgstr "グラフのプロトタイプを削除しました"
-
-#: api/classes/CGraphPrototype.php:710 api/classes/CGraphPrototype.php:771
-msgid "Graph prototype must have at least one prototype."
-msgstr "グラフのプロトタイプは少なくとも1つ以上のプロトタイプを設定する必要があります。"
 
 #: graphs.php:224
 msgid "Graph prototype updated"
@@ -6724,7 +6738,7 @@ msgstr "インポートに成功しました"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "インベントリフィールド\"%s\"が存在しないためフィルターが行えません。"
 
-#: screenedit.php:240 screenedit.php:255
+#: screenedit.php:248 screenedit.php:271
 msgid "Impossible to remove last row and column."
 msgstr "最後の行と列は削除できません。"
 
@@ -7270,6 +7284,10 @@ msgstr "Zabbixサーバー\"%1$s\"から正しくない値を受信しました�
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
 msgstr "スクリーンの要素のスクリーンID\"%1$s\"が正しくありません。"
 
+#: api/classes/CScreen.php:489
+msgid "Incorrect screen ID."
+msgstr "スクリーンIDが正しくありません。"
+
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
 msgstr "スライドショーに設定されているスクリーンが正しくありません。"
@@ -7308,6 +7326,10 @@ msgstr "サービス\"%1$s\"のステータスが正しくありません。"
 #: api/classes/CDRule.php:265
 msgid "Incorrect status."
 msgstr "ステータスが正しくありません。"
+
+#: api/classes/CTemplateScreen.php:603
+msgid "Incorrect template screen ID."
+msgstr "テンプレートスクリーンIDが正しくありません。"
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -7608,13 +7630,12 @@ msgid "Invalid maintenance period"
 msgstr "メンテナンス期間が正しくありません。"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:241
-#: api/classes/CScreenItem.php:302 api/classes/CScreen.php:447
-#: api/classes/CScript.php:442 api/classes/CService.php:206
-#: api/classes/CService.php:382 api/classes/CService.php:1472
-#: api/classes/CUserMacro.php:339 api/classes/CUserMacro.php:472
-#: api/classes/CUser.php:673 api/classes/CUser.php:693
-#: api/classes/CUser.php:851 api/classes/CUser.php:896
-#: api/rpc/class.cjsonrpc.php:197
+#: api/classes/CScreenItem.php:302 api/classes/CScript.php:442
+#: api/classes/CService.php:206 api/classes/CService.php:382
+#: api/classes/CService.php:1472 api/classes/CUserMacro.php:339
+#: api/classes/CUserMacro.php:472 api/classes/CUser.php:673
+#: api/classes/CUser.php:693 api/classes/CUser.php:851
+#: api/classes/CUser.php:896 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "メソッドのパラメータが正しくありません。"
 
@@ -7763,12 +7784,12 @@ msgstr "アイテム数"
 msgid "Item deleted"
 msgstr "アイテムを削除しました"
 
-#: applications.php:208 items.php:679
+#: applications.php:210 items.php:679
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "アイテムを無効にしました"
 
-#: applications.php:207 items.php:678
+#: applications.php:209 items.php:678
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
@@ -7783,7 +7804,7 @@ msgstr "アイテムが\"取得不可\"の状態"
 
 #: popup_trexpr.php:781
 msgid "Item not selected"
-msgstr ""
+msgstr "アイテムが選択されていません"
 
 #: include/forms.inc.php:1134
 msgid "Item prototype"
@@ -7882,8 +7903,8 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
 
-#: api/classes/managers/CHttpTestManager.php:709
-#: api/classes/managers/CHttpTestManager.php:840
+#: api/classes/managers/CHttpTestManager.php:710
+#: api/classes/managers/CHttpTestManager.php:841
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "キー\"%1$s\"が設定されたアイテムがすでに存在します。"
@@ -8748,7 +8769,7 @@ msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Maximize"
 msgstr "最大化"
 
@@ -8938,7 +8959,7 @@ msgid "Middle"
 msgstr "中央"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Minimize"
 msgstr "最小化"
 
@@ -9366,7 +9387,7 @@ msgid "Next"
 msgstr "次へ"
 
 #: events.php:765 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2429 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9387,6 +9408,16 @@ msgstr "グラフに\"%1$s\"が定義されていません。"
 #, c-format
 msgid "No \"%1$s\" given for host prototype."
 msgstr "ホストのプロトタイプに\"%1$s\"が定義されていません。"
+
+#: api/classes/CScreen.php:487
+#, c-format
+msgid "No \"%1$s\" given for screen."
+msgstr "スクリーンに\"%1$s\"が定義されていません。"
+
+#: api/classes/CTemplateScreen.php:601
+#, c-format
+msgid "No \"%1$s\" given for template screen."
+msgstr "テンプレートスクリーンに\"%1$s\"が定義されていません。"
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -9838,8 +9869,8 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CDiscoveryRule.php:452 api/classes/CDiscoveryRule.php:457
 #: api/classes/CDRule.php:248 api/classes/CDRule.php:789
 #: api/classes/CEvent.php:735 api/classes/CGraphGeneral.php:65
-#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:707
-#: api/classes/CGraphPrototype.php:692 api/classes/CGraphPrototype.php:752
+#: api/classes/CGraphGeneral.php:86 api/classes/CGraph.php:721
+#: api/classes/CGraphPrototype.php:695 api/classes/CGraphPrototype.php:760
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
 #: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
 #: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
@@ -9862,14 +9893,14 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CMap.php:389 api/classes/CProxy.php:172
 #: api/classes/CProxy.php:213 api/classes/CProxy.php:285
 #: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
-#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:460
-#: api/classes/CScreen.php:573 api/classes/CService.php:1255
+#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:445
+#: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:573
-#: api/classes/CTemplateScreen.php:606 api/classes/CTemplateScreen.php:658
-#: api/classes/CTemplateScreen.php:664 api/classes/CTrigger.php:636
+#: api/classes/CTemplateScreen.php:624 api/classes/CTemplateScreen.php:676
+#: api/classes/CTemplateScreen.php:682 api/classes/CTrigger.php:636
 #: api/classes/CTrigger.php:981 api/classes/CTrigger.php:1002
-#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:566
-#: api/classes/CTriggerPrototype.php:669 api/classes/CUserMacro.php:589
+#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:553
+#: api/classes/CTriggerPrototype.php:644 api/classes/CUserMacro.php:589
 #: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
 #: api/classes/CUser.php:859 api/classes/CUser.php:879
 #: api/classes/CUser.php:938 api/classes/CUser.php:1363
@@ -10753,10 +10784,6 @@ msgstr "PHP gd"
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeTypeのサポート"
-
-#: include/graphs.inc.php:722 include/graphs.inc.php:746
-msgid "PHP gd FreeType support missing"
-msgstr "PHP gd FreeTypeがサポートされていません"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
@@ -12109,11 +12136,11 @@ msgstr "スクリーン"
 msgid "Screen \"%1$s\" added."
 msgstr "スクリーン\"%1$s\"を追加しました。"
 
-#: api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:700
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "スクリーン\"%1$s\"はテンプレート\"%2$2\"にすでに存在します。"
 
-#: api/classes/CScreen.php:396 api/classes/CScreen.php:483
+#: api/classes/CScreen.php:396 api/classes/CScreen.php:469
 #, c-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "スクリーン\"%1$s\"はすでに存在します。"
@@ -12168,7 +12195,7 @@ msgstr "スクリーンセルの設定"
 msgid "Screen deleted"
 msgstr "スクリーンを削除しました"
 
-#: screenedit.php:239 screenedit.php:254
+#: screenedit.php:247 screenedit.php:270
 msgid "Screen should contain at least one row and column."
 msgstr "スクリーンは少なくとも1つ以上の行か列を設定する必要があります。"
 
@@ -13219,7 +13246,7 @@ msgstr "テンプレートリスト"
 msgid "Template name"
 msgstr "テンプレート名"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:633
+#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "テンプレートスクリーン\"%1$s\"がすでに存在します。"
@@ -13685,7 +13712,7 @@ msgstr "トリガーイベントとアラートデータの保存期間 (日) \"
 msgid "Trigger expression condition"
 msgstr "トリガー条件式の作成"
 
-#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:801
+#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:776
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "トリガー条件式には少なくとも1つ以上のホストとアイテムのキーを設定する必要があります。"
 
@@ -13727,6 +13754,16 @@ msgstr "トリガー名"
 msgid "Trigger prototype"
 msgstr "トリガーのプロトタイプ"
 
+#: api/classes/CTriggerPrototype.php:927
+#, c-format
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
+
+#: api/classes/CTriggerPrototype.php:933
+#, c-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
+msgstr "トリガーのプロトタイプ\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプを設定する必要があります。"
+
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
 msgstr "トリガーのプロトタイプを追加しました"
@@ -13744,11 +13781,6 @@ msgstr[0] "トリガーのプロトタイプを無効にしました"
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] "トリガーのプロトタイプを有効にしました"
-
-#: api/classes/CTriggerPrototype.php:530 api/classes/CTriggerPrototype.php:605
-#, c-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
-msgstr "トリガーのプロトタイプの条件式\"%1$s\"は少なくとも1つ以上のアイテムのプロトタイプが利用されている必要があります。"
 
 #: trigger_prototypes.php:163
 msgid "Trigger prototype updated"
@@ -14004,7 +14036,7 @@ msgstr "USA (160文字)"
 msgid "USER PROFILE"
 msgstr "ユーザープロファイル"
 
-#: include/func.inc.php:2611
+#: include/func.inc.php:2619
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14296,12 +14328,12 @@ msgstr "更新: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガー\"%1$s\"。"
 
-#: api/classes/CTriggerPrototype.php:840
+#: api/classes/CTriggerPrototype.php:815
 #, c-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
-#: api/classes/managers/CHttpTestManager.php:263
+#: api/classes/managers/CHttpTestManager.php:264
 #, c-format
 msgid "Updated: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "更新: \"%2$s\"のWebシナリオ\"%1$s\"。"
@@ -14897,8 +14929,8 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Web監視"
 
-#: api/classes/managers/CHttpTestManager.php:382
-#: api/classes/managers/CHttpTestManager.php:390
+#: api/classes/managers/CHttpTestManager.php:383
+#: api/classes/managers/CHttpTestManager.php:391
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Webシナリオ\"%1$s\"はホスト\"%2$s\"にすでに存在します。"
@@ -15102,7 +15134,7 @@ msgstr "サービス\"%1$s\"の設定が正しくありません。"
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための時間の設定が正しくありません。"
 
-#: api/classes/CTriggerPrototype.php:501 api/classes/CTriggerPrototype.php:570
+#: api/classes/CTriggerPrototype.php:501 api/classes/CTriggerPrototype.php:557
 msgid "Wrong fields for trigger."
 msgstr "トリガーの設定が正しくありません。"
 
@@ -15216,7 +15248,7 @@ msgstr "毎年"
 
 #: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2429
+#: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
