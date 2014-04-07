@@ -1,6 +1,13 @@
 Changes for 2.2.3
 
-2.2.3rc1 was released as 2.2.3 without any changes
+2.2.3rc2 was released as 2.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3rc2
+
+Bug fixes:
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
+.......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.3rc1
