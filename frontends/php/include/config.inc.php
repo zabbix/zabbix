@@ -65,6 +65,13 @@ catch (Exception $e) {
 
 CProfiler::getInstance()->start();
 
-global $ZBX_PAGE_POST_JS, $page;
-global $ZBX_SERVER, $ZBX_SERVER_PORT;
-$page = array();
+global $ZBX_PAGE_POST_JS, $ZBX_SERVER, $ZBX_SERVER_PORT, $page;
+
+$page = array(
+	'title' => null,
+	'file' => null,
+	'hist_arg' => null,
+	'scripts' => null,
+	'type' => null,
+	'menu' => null
+);
