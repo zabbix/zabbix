@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAlert extends CZBXAPI {
+class CAlert extends CApiService {
 
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';
@@ -425,7 +425,7 @@ class CAlert extends CZBXAPI {
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'alertid', 'mediatypeid');
-			$mediatypes = API::getApi()->select('media_type', array(
+			$mediatypes = API::getApiService()->select('media_type', array(
 				'output' => $options['selectMediatypes'],
 				'filter' => array('mediatypeid' => $relationMap->getRelatedIds()),
 				'preservekeys' => true,

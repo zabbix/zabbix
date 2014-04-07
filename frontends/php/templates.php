@@ -351,7 +351,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 		'hosts' => array()
 	));
 	if ($result) {
-		$result = API::Template()->delete($_REQUEST['templateid']);
+		$result = API::Template()->delete(array(getRequest('templateid')));
 	}
 
 	$result = DBend($result);
@@ -368,7 +368,7 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	DBstart();
 
 	$goResult = true;
-	$result = API::Template()->delete($_REQUEST['templateid']);
+	$result = API::Template()->delete(array(getRequest('templateid')));
 
 	$result = DBend($result);
 
