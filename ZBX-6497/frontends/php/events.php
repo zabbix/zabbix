@@ -138,9 +138,6 @@ if ($triggerId != 0 && hasRequest('hostid')) {
 		'triggerids' => $triggerId
 	));
 
-	// unset the old trigger and look for a new one
-	$triggerId = 0;
-
 	foreach ($oldTriggers as $oldTrigger) {
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
 		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
@@ -149,6 +146,10 @@ if ($triggerId != 0 && hasRequest('hostid')) {
 
 		if (isset($oldTrigger['hosts'][$hostid])) {
 			break;
+		}
+		else {
+			// unset the old trigger and look for a new one
+			$triggerId = 0;
 		}
 
 		$newTriggers = API::Trigger()->get(array(
