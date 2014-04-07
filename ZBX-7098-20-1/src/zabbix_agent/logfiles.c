@@ -547,9 +547,6 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
  *          new     - [IN] new file list                                      *
  *          num_new - [IN] number of elements in the new file list            *
  *                                                                            *
- * Return value: index of the new file or                                     *
- *               -1 if no mapping was found                                   *
- *                                                                            *
  ******************************************************************************/
 static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num_old,
 		const struct st_logfile *new, int num_new)
@@ -557,7 +554,7 @@ static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num
 	int	i, j, ones;
 	char	*p;
 
-	/* Is there 1:1 mapping ? Every row and column should have not more than one element '1'. */
+	/* Is there 1:1 mapping (every row and column has not more than one element '1') ? */
 
 	p = old2new;
 
@@ -590,6 +587,8 @@ static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num
 			p += num_new;
 		}
 	}
+
+	return;
 non_unique:
 	zabbix_log(LOG_LEVEL_DEBUG, "resolve_old2new(): non-unique mapping");
 	return;
