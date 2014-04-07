@@ -80,6 +80,7 @@ Changes for 2.2.3
 Changes for 2.2.3rc2
 
 Bug fixes:
+..F....... [ZBX-7864] fixed filter by host group in "Availability reports" page (Oleg)
 .......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
 .......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
