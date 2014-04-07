@@ -1692,7 +1692,7 @@ function analyzeExpression($expression) {
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->source) - 1);
 
 	$next = array();
 	$letterNum = 0;
@@ -1874,7 +1874,7 @@ function expressionLevelDraw(array $next, $level) {
  */
 function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end) {
 	for ($i = $start, $level = 0, $expressionElementsNum = 1; $i <= $end; $i++) {
-		switch ($expressionData->expression[$i]) {
+		switch ($expressionData->source[$i]) {
 			case '(':
 				$level++;
 				break;
@@ -1947,7 +1947,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 		$operatorToken = '';
 
 		for ($i = $start, $level = 0; $i <= $end; $i++) {
-			switch ($expressionData->expression[$i]) {
+			switch ($expressionData->source[$i]) {
 				case ' ':
 				case "\r":
 				case "\n":
@@ -1978,9 +1978,9 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					break;
 				default:
 					// try to parse an operator
-					if ($operator[$operatorPos] === $expressionData->expression[$i]) {
+					if ($operator[$operatorPos] === $expressionData->source[$i]) {
 						$operatorPos++;
-						$operatorToken .= $expressionData->expression[$i];
+						$operatorToken .= $expressionData->source[$i];
 
 						// operator found
 						if ($operatorToken === $operator) {
@@ -1991,7 +1991,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 								$closeSymbolNum = $i - strlen($operator);
 
 								// trim blank symbols after the expression
-								while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
+								while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
 									$closeSymbolNum--;
 								}
 
@@ -2015,7 +2015,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 
 		// trim blank symbols in the end of the trigger expression
 		$closeSymbolNum = $end;
-		while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
+		while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
 			$closeSymbolNum--;
 		}
 
@@ -2033,19 +2033,19 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 
 			// trim blank symbols in the beginning of the trigger expression
 			$openSymbolNum = $start;
-			while (in_array($expressionData->expression[$openSymbolNum], $blankSymbols)) {
+			while (in_array($expressionData->source[$openSymbolNum], $blankSymbols)) {
 				$openSymbolNum++;
 			}
 
 			// trim blank symbols in the end of the trigger expression
 			$closeSymbolNum = $end;
-			while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
+			while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
 				$closeSymbolNum--;
 			}
 
 			$expressionTree = array(
 				'id' => $openSymbolNum.'_'.$closeSymbolNum,
-				'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+				'expression' => substr($expressionData->source, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 				'type' => 'operator',
 				'operator' => $operator,
 				'elements' => $expressions
@@ -2066,7 +2066,7 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 			else {
 				$expressionTree = array(
 					'id' => $openSymbolNum.'_'.$closeSymbolNum,
-					'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+					'expression' => substr($expressionData->source, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 					'type' => 'expression'
 				);
 			}
@@ -2108,7 +2108,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->source) - 1);
 
 	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
 		$expression = makeExpression($expressionTree);
