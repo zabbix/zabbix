@@ -77,11 +77,17 @@ class CRemedyService {
 				return false;
 			}
 
-			$mediaType['media'] = zbx_toHash($mediaType['media'], 'userid');
+			// get first enabled media for this user.
+			$mediaActive = false;
+			foreach ($mediaType['media'] as $media) {
+				if ($media['userid'] == CWebUser::$data['userid'] && $media['active'] == MEDIA_TYPE_STATUS_ACTIVE) {
+					$mediaActive = true;
+					break;
+				}
+			}
 
-			// check specific user for media and if it's enabled
-			if (!isset($mediaType['media'][CWebUser::$data['userid']])
-					|| $mediaType['media'][CWebUser::$data['userid']]['active'] != MEDIA_TYPE_STATUS_ACTIVE) {
+			// at least one media should be active
+			if (!$mediaActive) {
 				return false;
 			}
 
