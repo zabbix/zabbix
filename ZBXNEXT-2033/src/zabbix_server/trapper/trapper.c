@@ -45,7 +45,6 @@
 #define ZBX_MEDIA_RESPONSE_QUERY	0
 #define ZBX_MEDIA_RESPONSE_ACKNOWLEDGE	1
 
-
 extern unsigned char	daemon_type;
 extern unsigned char	process_type;
 extern int		process_num;
@@ -306,7 +305,7 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
  *                                                                            *
  * Return value:  SUCCEED - the session is active and user has the required   *
  *                          access rights.                                    *
- *                FAIL    - the session is not active or usr has not enough   *
+ *                FAIL    - the session is not active or user has not enough  *
  *                          access rights.                                    *
  *                                                                            *
  ******************************************************************************/
@@ -533,7 +532,7 @@ static void	format_media_response(struct zbx_json *json, zbx_vector_ptr_t *ticke
 		zbx_snprintf(buf, sizeof(buf), "%d", ticket->clock);
 		zbx_json_addstring(json, "clock", buf, ZBX_JSON_TYPE_INT);
 
-		if (response_type != ZBX_MEDIA_RESPONSE_QUERY)
+		if (ZBX_MEDIA_RESPONSE_QUERY != response_type)
 			zbx_json_adduint64(json, "new", ticket->is_new);
 
 		zbx_json_close(json);
@@ -566,7 +565,6 @@ static int	recv_media_query(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_vector_ptr_t	tickets;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 		FAIL == zbx_session_validate(sessionid, USER_TYPE_ZABBIX_USER, NULL))
@@ -604,12 +602,10 @@ static int	recv_media_query(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_tcp_send_raw(sock, json.buffer);
 
 	zbx_json_free(&json);
-
 clean:
 	zbx_vector_ptr_clean(&tickets, (zbx_mem_free_func_t)zbx_free_ticket);
 	zbx_vector_ptr_destroy(&tickets);
 	zbx_vector_uint64_destroy(&eventids);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -704,14 +700,12 @@ static int	recv_media_acknowledge(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_tcp_send_raw(sock, json.buffer);
 
 	zbx_json_free(&json);
-
 clean:
 	zbx_vector_ptr_clean(&tickets, (zbx_mem_free_func_t)zbx_free_ticket);
 	zbx_vector_ptr_destroy(&tickets);
 
 	zbx_vector_ptr_clean(&acknowledges, (zbx_mem_free_func_t)zbx_free_acknowledge);
 	zbx_vector_ptr_destroy(&acknowledges);
-
 out:
 	return ret;
 }

@@ -38,9 +38,6 @@ int	send_jabber(const char *username, const char *password, const char *sendto,
 #endif
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
-
-#define ZBX_REMEDY_NEW_UNSET
-
 typedef struct
 {
 	/* the source event id */
@@ -78,8 +75,5 @@ int	zbx_remedy_process_alert(const struct DB_ALERT *alert, const struct DB_MEDIA
 int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tickets, char **error);
 int	zbx_remedy_acknowledge_events(zbx_uint64_t userid, zbx_vector_ptr_t *acknowledges, zbx_vector_ptr_t *tickets,
 		char **error);
-
-
-
 
 #endif

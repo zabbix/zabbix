@@ -122,7 +122,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_REMEDY == mediatype->type)
 	{
-		char	*error_dyn  = NULL;
+		char	*error_dyn = NULL;
 
 		res = zbx_remedy_process_alert(alert, mediatype, &error_dyn);
 

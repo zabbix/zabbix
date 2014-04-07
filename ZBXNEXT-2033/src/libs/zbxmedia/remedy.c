@@ -143,7 +143,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  *                                                                            *
  * Parameters: in     - [IN] the input string                                 *
  *                                                                            *
- * Return Value: An allocated string containing escaped input string          *
+ * Return value: An allocated string containing escaped input string          *
  *                                                                            *
  * Comments: The caller must free the returned string after it has been used. *
  *                                                                            *
@@ -237,11 +237,10 @@ static char	*xml_escape_dyn(const char *in)
  *          response                                                          *
  *                                                                            *
  * Parameters: data       - [IN] the response data                            *
- *             headers    - [OUT] the CURL headers                            *
  *             fields     - [IN/OUT] the array of fields to read              *
  *             fields_num - [IN] the number of items in fields array          *
  *                                                                            *
- * Return Value: The number of fields read                                    *
+ * Return value: The number of fields read                                    *
  *                                                                            *
  * Comments: This function allocates the values in fields array which must    *
  *           be freed afterwards with remedy_fields_clean_values() function.  *
@@ -290,14 +289,12 @@ static int	xml_read_remedy_fields(const char *data, zbx_remedy_field_t *fields, 
 		xmlXPathFreeObject(xpathObj);
 	}
 
-
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 out:
 	return fields_read;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -389,7 +386,7 @@ static const char	*remedy_fields_get_value(zbx_remedy_field_t *fields, int field
  *                               disable proxy                                *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the connection was initialized successfully        *
+ * Return value: SUCCEED - the connection was initialized successfully        *
  *               FAIL - connection initialization failed, error contains      *
  *                      allocated string with error description               *
  *                                                                            *
@@ -413,7 +410,7 @@ static int	remedy_init_connection(CURL **easyhandle, const struct curl_slist *he
 		goto out;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, CURLOPT_PROXY, proxy)) ||
+	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_PROXY, proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
@@ -442,18 +439,18 @@ out:
  *                                                                            *
  * Parameters: url        - [IN] the Remedy service URL                       *
  *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
+ *                               disable proxy                                *
  *             user       - [IN] the Remedy user name                         *
  *             password   - [IN] the Remedy user password                     *
- *                               disable proxy                                *
  *             ...        - [IN] various ticket parameters                    *
  *             externalid - [OUT] the number of created incident in Remedy    *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the ticket was created successfully                *
- *               FAIL - ticekt creation failed, error contains                *
+ * Return value: SUCCEED - the ticket was created successfully                *
+ *               FAIL - ticket creation failed, error contains                *
  *                      allocated string with error description               *
  *                                                                            *
- * Comments: The caller must free the error description if it was set.        *
+ * Comments: The caller must free the incident number and error description.  *
  *                                                                            *
  ******************************************************************************/
 static int	remedy_create_ticket(const char *url, const char *proxy, const char *user, const char *password,
@@ -543,18 +540,17 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 		goto out;
 	}
 
-
 	ret = SUCCEED;
 out:
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
-	zbx_free(impact_esc);
-	zbx_free(urgency_esc);
+	zbx_free(company_esc);
 	zbx_free(service_id_esc);
 	zbx_free(service_name_esc);
-	zbx_free(company_esc);
+	zbx_free(urgency_esc);
+	zbx_free(impact_esc);
 	zbx_free(ci_id_esc);
 	zbx_free(ci_esc);
 	zbx_free(notes_esc);
@@ -563,7 +559,7 @@ out:
 	zbx_free(user_esc);
 	zbx_free(service_url);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name, zbx_result_string(ret),
 			SUCCEED == ret ? *externalid : *error);
 
 	return ret;
@@ -580,14 +576,14 @@ out:
  *                               disable proxy                                *
  *             user       - [IN] the Remedy user name                         *
  *             password   - [IN] the Remedy user password                     *
- *             ticketid   - [NI] the Remedy ticket id                         *
+ *             externalid - [NI] the Remedy ticket id                         *
  *             fields     - [IN/OUT] the array of fields to read.             *
  *                          To ensure that old data is not carried over the   *
  *                          fields[*].value members must be set to NULL.      *
  *             fields_num - [IN] the number of items in fields array          *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the request was made successfully                  *
+ * Return value: SUCCEED - the request was made successfully                  *
  *               FAIL - the operation failed, error contains                  *
  *                      allocated string with error description               *
  *                                                                            *
@@ -597,7 +593,7 @@ out:
  *           The caller must free the error description if it was set.        *
  *                                                                            *
  *           If the requested incident number was not found the function      *
- *           sill returns SUCCESS, but the Incident_Number field in the       *
+ *           sill returns SUCCEED, but the Incident_Number field in the       *
  *           fields array will be left NULL. If the incident was found the    *
  *           requested fields will be set from the response except            *
  *           the Incident_Number field, which will be copied from request.    *
@@ -676,8 +672,8 @@ out:
 	zbx_free(user_esc);
 	zbx_free(service_url);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ret == SUCCEED ? "" : *error);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name, zbx_result_string(ret),
+			SUCCEED == ret ? "" : *error);
 
 	return ret;
 }
@@ -689,17 +685,17 @@ out:
  * Purpose: modify Remedy service ticket                                      *
  *                                                                            *
  * Parameters: url        - [IN] the Remedy service URL                       *
- *             user       - [IN] the Remedy user name                         *
- *             password   - [IN] the Remedy user password                     *
  *             proxy      - [IN] the http(s) proxy URL, pass empty string to  *
  *                               disable proxy                                *
+ *             user       - [IN] the Remedy user name                         *
+ *             password   - [IN] the Remedy user password                     *
  *             fields     - [IN/OUT] the array of fields to read.             *
  *                          To ensure that old data is not carried over the   *
  *                          fields[*].value members must be set to NULL.      *
  *             fields_num - [IN] the number of items in fields array          *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the ticket was created successfully                *
+ * Return value: SUCCEED - the ticket was created successfully                *
  *               FAIL - ticekt creation failed, error contains                *
  *                      allocated string with error description               *
  *                                                                            *
@@ -733,9 +729,9 @@ static int	remedy_modify_ticket(const char *url, const char *proxy, const char *
 	remedy_fields_set_value(fields, fields_num, ZBX_REMEDY_FIELD_ACTION, ZBX_REMEDY_ACTION_MODIFY);
 
 	zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset,
-			ZBX_SOAP_ENVELOPE_OPEN							\
-			ZBX_SOAP_HEADER 							\
-			ZBX_SOAP_BODY_OPEN							\
+			ZBX_SOAP_ENVELOPE_OPEN
+			ZBX_SOAP_HEADER
+			ZBX_SOAP_BODY_OPEN
 			ZBX_HELPDESK_MODIFY_SERVICE_OPEN,
 			user_esc, password_esc);
 
@@ -743,23 +739,22 @@ static int	remedy_modify_ticket(const char *url, const char *proxy, const char *
 	{
 		if (NULL != fields[i].value)
 		{
-			char	*value = NULL;
+			char	*value;
 
 			value = xml_escape_dyn(fields[i].value);
+
 			zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset, "<urn:%s>%s</urn:%s>", fields[i].name, value,
 				fields[i].name);
 
 			zbx_free(value);
 		}
 		else
-		{
 			zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset, "<urn:%s/>", fields[i].name);
-		}
 	}
 
 	zbx_snprintf_alloc(&xml, &xml_alloc, &xml_offset,
-			ZBX_HELPDESK_MODIFY_SERVICE_CLOSE					\
-			ZBX_SOAP_BODY_CLOSE							\
+			ZBX_HELPDESK_MODIFY_SERVICE_CLOSE
+			ZBX_SOAP_BODY_CLOSE
 			ZBX_SOAP_ENVELOPE_CLOSE);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
@@ -789,8 +784,8 @@ out:
 	zbx_free(user_esc);
 	zbx_free(service_url);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ret == SUCCEED ? "" : *error);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name, zbx_result_string(ret),
+			SUCCEED == ret ? "" : *error);
 
 	return ret;
 }
@@ -857,9 +852,9 @@ static char	*remedy_get_ticketid_by_triggerid(zbx_uint64_t triggerid)
 
 	/* find the latest ticket id which was created for the specified trigger */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select tk.externalid,tk.clock from ticket tk"
-				" where tk.triggerid=" ZBX_FS_UI64
-				" order by tk.clock desc",
+			"select externalid,clock from ticket"
+				" where triggerid=" ZBX_FS_UI64
+				" order by clock desc",
 				triggerid);
 
 	result = DBselectN(sql, 1);
@@ -883,11 +878,11 @@ static char	*remedy_get_ticketid_by_triggerid(zbx_uint64_t triggerid)
  * Purpose: gets remedy service associated to the specified host              *
  *                                                                            *
  * Parameters: hostid       - [IN] the host id                                *
- *             valuemap     - [IN] the name of value mapping containing       *
+ *             group_name   - [IN] the name of value mapping containing       *
  *                               mapping of host group names to Remedy        *
  *                               names                                        *
  *             service_name - [OUT] the corresponding service name            *
- *             service_id   - [OUT] the corresponding service  reconciliation *
+ *             service_id   - [OUT] the corresponding service reconciliation  *
  *                                  id                                        *
  *                                                                            *
  * Comments: The Zabbix host association with corresponding Remedy service is *
@@ -945,11 +940,11 @@ static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_na
  *                                                                            *
  * Parameters: eventid       - [IN] the event to acknowledge                  *
  *             userid        - [IN] the user the alert is assigned to         *
- *             ticketnumber  - [IN] the number of corresponding incident in   *
+ *             ticketnumber  - [IN] the number of corresponding incident      *
  *             status        - [IN] the incident status, see                  *
- *                                  ZBX_REMEDY_ACK_* defines             *
+ *                                  ZBX_REMEDY_ACK_* defines                  *
  *                                                                            *
- * Return Value: SUCCEED - the event was acknowledged                         *
+ * Return value: SUCCEED - the event was acknowledged                         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -986,7 +981,7 @@ static int	remedy_acknowledge_event(zbx_uint64_t eventid, zbx_uint64_t userid, c
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into acknowledges"
 			" (acknowledgeid,userid,eventid,clock,message) values"
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
-			ackid, userid, eventid, time(NULL), message);
+			ackid, userid, eventid, time(NULL), message_esc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set acknowledged=1"
 			" where eventid=" ZBX_FS_UI64, eventid);
@@ -1058,7 +1053,7 @@ static void	remedy_clean_mediatype(DB_MEDIATYPE *media)
  *                                                                            *
  * Parameters: media   - [IN] the mediatype data                              *
  *                                                                            *
- * Return Value: SUCCEED - the media type was read successfully               *
+ * Return value: SUCCEED - the media type was read successfully               *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: This function allocates memory to store mediatype properties     *
@@ -1109,13 +1104,13 @@ static int	remedy_get_mediatype(DB_MEDIATYPE *media)
  *                                                                            *
  * Parameters: externalid    - [IN] the ticket external id                    *
  *                                                                            *
- * Return Value: the ticket creation time in seconds or 0 if the ticket was   *
+ * Return value: the ticket creation time in seconds or 0 if the ticket was   *
  *               not found                                                    *
  *                                                                            *
  ******************************************************************************/
 static int	remedy_get_ticket_creation_time(const char *externalid)
 {
-	int		clock;
+	int		clock = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*incident_number;
@@ -1138,7 +1133,7 @@ static int	remedy_get_ticket_creation_time(const char *externalid)
 
 /******************************************************************************
  *                                                                            *
- * Function: remedy_get_last_ticket                                           *
+ * Function: remedy_get_last_ticketid                                         *
  *                                                                            *
  * Purpose: retrieves either the ticket directly linked to the specified      *
  *          event or the last ticket created in response to the event         *
@@ -1147,7 +1142,7 @@ static int	remedy_get_ticket_creation_time(const char *externalid)
  * Parameters: eventid         - [IN] the event                               *
  *             incident_number - [OUT] the linked incident number             *
  *                                                                            *
- * Return Value: SUCCEED - the incident was retrieved successfully            *
+ * Return value: SUCCEED - the incident was retrieved successfully            *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: This function allocates memory to store incident number          *
@@ -1164,10 +1159,10 @@ static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid)
 		zbx_uint64_t	triggerid;
 
 		/* get the event source trigger id */
-		result = DBselect("select e.objectid from events e,triggers t"
-				" where e.source=%d"
-					" and e.object=%d"
-					" and e.eventid=" ZBX_FS_UI64,
+		result = DBselect("select objectid from events"
+				" where source=%d"
+					" and object=%d"
+					" and eventid=" ZBX_FS_UI64,
 					EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, eventid);
 
 		if (NULL != (row = DBfetch(result)))
@@ -1205,7 +1200,7 @@ static int	remedy_get_last_ticketid(zbx_uint64_t eventid, char **externalid)
  *             ticket     - [OUT] the updated/created ticket data (optional)  *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the alert was processed successfully               *
+ * Return value: SUCCEED - the alert was processed successfully               *
  *               FAIL - alert processing failed, error contains               *
  *                      allocated string with error description               *
  *                                                                            *
@@ -1382,12 +1377,12 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		/* map trigger severity */
 		switch (trigger_severity)
 		{
-			case  TRIGGER_SEVERITY_WARNING:
+			case TRIGGER_SEVERITY_WARNING:
 				remedy_event = ZBX_EVENT_REMEDY_WARNING;
 				break;
-			case  TRIGGER_SEVERITY_AVERAGE:
-			case  TRIGGER_SEVERITY_HIGH:
-			case  TRIGGER_SEVERITY_DISASTER:
+			case TRIGGER_SEVERITY_AVERAGE:
+			case TRIGGER_SEVERITY_HIGH:
+			case TRIGGER_SEVERITY_DISASTER:
 				remedy_event = ZBX_EVENT_REMEDY_CRITICAL;
 				break;
 			default:
@@ -1440,7 +1435,6 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		ret = remedy_modify_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd, fields,
 				ARRSIZE(fields) - ZBX_REMEDY_QUERY_FIELDS, error);
 	}
-
 out:
 	DBfree_result(result);
 
@@ -1448,17 +1442,19 @@ out:
 	{
 		int	is_new;
 
-		DBbegin();
-
 		is_new = ZBX_REMEDY_ACK_CREATE == acknowledge_status ? 1 : 0;
 
 		if (ZBX_REMEDY_ACK_UNKNOWN != acknowledge_status)
 		{
+			DBbegin();
+
 			if (state == ZBX_REMEDY_PROCESS_AUTOMATED && ZBX_REMEDY_ACK_NONE != acknowledge_status)
 				remedy_acknowledge_event(eventid, userid, incident_number, acknowledge_status);
 
 			if (0 == is_registered || 1 == is_new)
 				remedy_register_ticket(incident_number, eventid, triggerid, is_new);
+
+			DBcommit();
 		}
 
 		if (NULL != ticket)
@@ -1476,8 +1472,6 @@ out:
 			if (NULL != assignee)
 				ticket->assignee = zbx_strdup(NULL, assignee);
 		}
-
-		DBcommit();
 	}
 
 	zbx_free(incident_number);
@@ -1507,7 +1501,7 @@ out:
  *                               and ticket information                       *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the alert was processed successfully               *
+ * Return value: SUCCEED - the alert was processed successfully               *
  *               FAIL - alert processing failed, error contains               *
  *                      allocated string with error description               *
  *                                                                            *
@@ -1516,7 +1510,7 @@ out:
  ******************************************************************************/
 int	zbx_remedy_process_alert(const DB_ALERT *alert, const DB_MEDIATYPE *mediatype, char **error)
 {
-	const char		*__function_name = "zbx_remedy_process_alert";
+	const char	*__function_name = "zbx_remedy_process_alert";
 
 	int	ret;
 
@@ -1541,7 +1535,7 @@ int	zbx_remedy_process_alert(const DB_ALERT *alert, const DB_MEDIATYPE *mediatyp
  *             tickets    - [OUT] the incident data                           *
  *             error      - [OUT] the error description                       *
  *                                                                            *
- * Return Value: SUCCEED - the operation was completed successfully.          *
+ * Return value: SUCCEED - the operation was completed successfully.          *
  *                         Per event query status can be determined by        *
  *                         inspecting ticketids contents.                     *
  *               FAIL - otherwise                                             *
@@ -1623,7 +1617,7 @@ out:
  *             tickets       - [OUT] the incident data                        *
  *             error         - [OUT] the error description                    *
  *                                                                            *
- * Return Value: SUCCEED - the events were acknowledged successfully          *
+ * Return value: SUCCEED - the events were acknowledged successfully          *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: The caller must free the error description if it was set and     *
@@ -1731,7 +1725,6 @@ int	zbx_remedy_process_alert(const DB_ALERT *alert, const DB_MEDIATYPE *mediatyp
 	*error = zbx_dsprintf(*error, "Zabbix server is built without Remedy ticket support");
 	return FAIL;
 }
-
 
 int	zbx_remedy_query_events(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *tickets, char **error)
 {
