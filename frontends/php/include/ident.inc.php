@@ -45,19 +45,6 @@ function getImageByIdent($ident) {
 	}
 
 	$ident['name'] = trim($ident['name'], ' ');
-	if (!isset($images[$ident['name']])) {
-		return 0;
-	}
 
-	$searchedImages = $images[$ident['name']];
-
-	if (!isset($ident['node'])) {
-		return reset($searchedImages);
-	}
-	elseif (isset($searchedImages[$ident['node']])) {
-		return $searchedImages[$ident['node']];
-	}
-	else {
-		return 0;
-	}
+	return isset($images[$ident['name']]) ? reset($images[$ident['name']]) : 0;
 }
