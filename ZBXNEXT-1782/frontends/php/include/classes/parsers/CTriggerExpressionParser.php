@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CTriggerExpression extends CParser {
+class CTriggerExpressionParser extends CParser {
 	// for parsing of trigger expression
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;

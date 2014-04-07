@@ -54,7 +54,7 @@ $fields = array();
 $rplcts = array();
 $allowedTesting = true;
 
-$expressionData = new CTriggerExpression();
+$expressionData = new CTriggerExpressionParser();
 if ($expressionData->parse($expression)) {
 	$macrosData = array();
 

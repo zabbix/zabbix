@@ -18,10 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/parsers/CTriggerExpression.php';
-
 class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
@@ -3215,7 +3211,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provider
 	 */
 	public function test_parse($expression, $result, $rc) {
-		$expressionData = new CTriggerExpression();
+		$expressionData = new CTriggerExpressionParser();
 
 		if ($expressionData->parse($expression)) {
 			$this->assertEquals($rc, true);
