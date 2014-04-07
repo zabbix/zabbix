@@ -695,6 +695,19 @@ class CLineGraphDraw extends CGraphDraw {
 		return $maxY;
 	}
 
+	/**
+	 * Check if Y axis min value is larger than Y axis max value. Show error instead of graph if true.
+	 *
+	 * @param float $min		Y axis min value
+	 * @param float $max		Y axis max value
+	 */
+	protected function validateMinMax($min, $max) {
+		if (bccomp($min, $max) == 0 || bccomp($min, $max) == 1) {
+			show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
+			exit;
+		}
+	}
+
 	protected function calcZero() {
 		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
 			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
@@ -780,8 +793,11 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
-			if ($this->type == GRAPH_TYPE_STACKED) {
+			if (($this->ymin_type != GRAPH_YAXIS_TYPE_FIXED || $this->ymax_type != GRAPH_YAXIS_TYPE_CALCULATED)
+					&& $this->type == GRAPH_TYPE_STACKED) {
 				$this->m_minY[$side] = min($this->m_minY[$side], 0);
+				$this->validateMinMax($this->m_minY[$side], $this->m_maxY[$side]);
+
 				continue;
 			}
 
@@ -790,7 +806,10 @@ class CLineGraphDraw extends CGraphDraw {
 				if ($this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED
 						&& ($this->m_minY[$side] == null || bccomp($this->m_maxY[$side], $this->m_minY[$side]) == 0
 								|| bccomp($this->m_maxY[$side], $this->m_minY[$side]) == -1)) {
-					if ($this->m_maxY[$side] > 0) {
+					if ($this->m_maxY[$side] == 0) {
+						$this->m_minY[$side] = -1;
+					}
+					elseif ($this->m_maxY[$side] > 0) {
 						$this->m_minY[$side] = bcmul($this->m_maxY[$side], 0.8);
 					}
 					else {
@@ -812,6 +831,8 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 				}
 			}
+
+			$this->validateMinMax($this->m_minY[$side], $this->m_maxY[$side]);
 		}
 
 		$side = GRAPH_YAXIS_SIDE_LEFT;
@@ -947,8 +968,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$interval = 1;
 
 			foreach ($intervals as $int) {
-			if (bccomp($dist, bcmul($this->gridLinesCount[$side], $int)) == -1) {
-				$interval = $int;
+				if (bccomp($dist, bcmul($this->gridLinesCount[$side], $int)) == -1) {
+					$interval = $int;
 					break;
 				}
 			}
@@ -1008,6 +1029,8 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				$this->m_minY[$graphSide] = $tmp_minY[$graphSide];
 			}
+
+			$this->validateMinMax($this->m_minY[$graphSide], $this->m_maxY[$graphSide]);
 		}
 
 		// division by zero
