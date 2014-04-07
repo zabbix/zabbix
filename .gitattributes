@@ -177,6 +177,7 @@ frontends/php/include/classes/api/wrappers/CApiWrapper.php -text
 frontends/php/include/classes/api/wrappers/CFrontendApiWrapper.php -text
 frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
+frontends/php/include/classes/parsers/tokens/CParserTokens.php -text
 frontends/php/include/views/configuration.host.discovery.edit.php -text
 frontends/php/include/views/js/common.init.js.php -text
 frontends/php/include/views/js/monitoring.slides.js.php -text
@@ -277,6 +278,7 @@ frontends/php/tests/unit/bootstrap.php -text
 frontends/php/tests/unit/include/classes/api/APITest.php -text
 frontends/php/tests/unit/include/classes/api/clients/CLocalApiClientTest.php -text
 frontends/php/tests/unit/include/classes/core/CRegistryFactoryTest.php -text
+frontends/php/tests/unit/include/classes/parsers/tokens/CParserTokensTest.php -text
 frontends/php/tests/unit/phpunit.xml -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
