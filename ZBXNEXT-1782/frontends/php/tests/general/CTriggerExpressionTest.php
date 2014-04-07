@@ -3081,6 +3081,133 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{ho', null, false),
 			array('{h', null, false),
 			array('{', null, false),
+
+			// new lines and tabs
+			array("\r{host:key.last(1)}+1", null, true),
+			array("\n{host:key.last(1)}+1", null, true),
+			array("\r\n{host:key.last(1)}+1", null, true),
+			array("\t{host:key.last(1)}+1", null, true),
+
+			array("{\rhost:key.last(1)}+1", null, false),
+			array("{\nhost:key.last(1)}+1", null, false),
+			array("{\r\nhost:key.last(1)}+1", null, false),
+			array("{\thost:key.last(1)}+1", null, false),
+
+			array("{host\r:key.last(1)}+1", null, false),
+			array("{host\n:key.last(1)}+1", null, false),
+			array("{host\r\n:key.last(1)}+1", null, false),
+			array("{host\t:key.last(1)}+1", null, false),
+
+			array("{host:\rkey.last(1)}+1", null, false),
+			array("{host:\nkey.last(1)}+1", null, false),
+			array("{host:\r\nkey.last(1)}+1", null, false),
+			array("{host:\tkey.last(1)}+1", null, false),
+
+			array("{host:key\r.last(1)}+1", null, false),
+			array("{host:key\n.last(1)}+1", null, false),
+			array("{host:key\r\n.last(1)}+1", null, false),
+			array("{host:key\t.last(1)}+1", null, false),
+
+			array("{host:key.\rlast(1)}+1", null, false),
+			array("{host:key.\nlast(1)}+1", null, false),
+			array("{host:key.\r\nlast(1)}+1", null, false),
+			array("{host:key.\tlast(1)}+1", null, false),
+
+			array("{host:key.last\r(1)}+1", null, false),
+			array("{host:key.last\n(1)}+1", null, false),
+			array("{host:key.last\r\n(1)}+1", null, false),
+			array("{host:key.last\t(1)}+1", null, false),
+
+			array("{host:key.last(1)\r}+1", null, false),
+			array("{host:key.last(1)\n}+1", null, false),
+			array("{host:key.last(1)\r\n}+1", null, false),
+			array("{host:key.last(1)\t}+1", null, false),
+
+			array("{host:key.last(1)}\r+1", null, true),
+			array("{host:key.last(1)}\n+1", null, true),
+			array("{host:key.last(1)}\r\n+1", null, true),
+			array("{host:key.last(1)}\t+1", null, true),
+
+			array("{host:key.last(1)}+\r1", null, true),
+			array("{host:key.last(1)}+\n1", null, true),
+			array("{host:key.last(1)}+\r\n1", null, true),
+			array("{host:key.last(1)}+\t1", null, true),
+
+			array("{host:key.last(1)}+1\r", null, true),
+			array("{host:key.last(1)}+1\n", null, true),
+			array("{host:key.last(1)}+1\r\n", null, true),
+			array("{host:key.last(1)}+1\t", null, true),
+
+			array("{host:key.last(1)}\r\r+\r\r1", null, true),
+			array("{host:key.last(1)}\n\n+\n\n1", null, true),
+			array("{host:key.last(1)}\r\n\r\n+\r\n\r\n1", null, true),
+			array("{host:key.last(1)}\t\t+\t\t1", null, true),
+
+			array("{host:key.last(1)}\r\t+\r\t1", null, true),
+			array("{host:key.last(1)}\n\t+\n\t1", null, true),
+			array("{host:key.last(1)}\r\n\t+\r\n\t1", null, true),
+			array("{host:key.last(1)}\t\t+\t\t1", null, true),
+
+			array("(\r{host:key.last(1)}+1) or 1", null, true),
+			array("(\n{host:key.last(1)}+1) or 1", null, true),
+			array("(\r\n{host:key.last(1)}+1) or 1", null, true),
+			array("(\t{host:key.last(1)}+1) or 1", null, true),
+
+			array("({host:key.last(1)}+1\r) or 1", null, true),
+			array("({host:key.last(1)}+1\n) or 1", null, true),
+			array("({host:key.last(1)}+1\r\n) or 1", null, true),
+			array("({host:key.last(1)}+1\t) or 1", null, true),
+			array("({host:key.last(1)}+1\t) or 1", null, true),
+
+			array("{host:key.last(1)}\ror not 1", null, true),
+			array("{host:key.last(1)}\nor not 1", null, true),
+			array("{host:key.last(1)}\r\nor not 1", null, true),
+			array("{host:key.last(1)}\tor not 1", null, true),
+
+			array("{host:key.last(1)} or\rnot 1", null, true),
+			array("{host:key.last(1)} or\nnot 1", null, true),
+			array("{host:key.last(1)} or\r\nnot 1", null, true),
+			array("{host:key.last(1)} or\tnot 1", null, true),
+
+			array("{host:key.last(1)}\rand not 1", null, true),
+			array("{host:key.last(1)}\nand not 1", null, true),
+			array("{host:key.last(1)}\r\nand not 1", null, true),
+			array("{host:key.last(1)}\tand not 1", null, true),
+
+			array("{host:key.last(1)} and\rnot 1", null, true),
+			array("{host:key.last(1)} and\nnot 1", null, true),
+			array("{host:key.last(1)} and\r\nnot 1", null, true),
+			array("{host:key.last(1)} and\tnot 1", null, true),
+
+			array("{host:key.last(1)} and not\r1", null, true),
+			array("{host:key.last(1)} and not\n1", null, true),
+			array("{host:key.last(1)} and not\r\n1", null, true),
+			array("{host:key.last(1)} and not\t1", null, true),
+
+			array("{host:key.count(1,\"\"\r)}=0", null, true),
+			array("{host:key.count(1,\"\"\n)}=0", null, true),
+			array("{host:key.count(1,\"\"\r\n)}=0", null, true),
+			array("{host:key.count(1,\"\"\t)}=0", null, true),
+
+			array("{host:key.count(1,\"\r\")}=0", null, true),
+			array("{host:key.count(1,\"\n\")}=0", null, true),
+			array("{host:key.count(1,\"\r\n\")}=0", null, true),
+			array("{host:key.count(1,\"\t\")}=0", null, true),
+
+			array("{host:key.count(1,\r\"\")}=0", null, true),
+			array("{host:key.count(1,\n\"\")}=0", null, true),
+			array("{host:key.count(1,\r\n\"\")}=0", null, true),
+			array("{host:key.count(1,\t\"\")}=0", null, true),
+
+			array("{host:key.count(1\r,\"\")}=0", null, true),
+			array("{host:key.count(1\n,\"\")}=0", null, true),
+			array("{host:key.count(1\r\n,\"\")}=0", null, true),
+			array("{host:key.count(1\t,\"\")}=0", null, true),
+
+			array("{host:key.count(\r1,\"\")}=0", null, true),
+			array("{host:key.count(\n1,\"\")}=0", null, true),
+			array("{host:key.count(\r\n1,\"\")}=0", null, true),
+			array("{host:key.count(\t1,\"\")}=0", null, true),
 		);
 	}
 
