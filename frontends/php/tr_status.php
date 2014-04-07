@@ -100,7 +100,12 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-// reset filter
+// show triggers
+// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
+// whole page inaccessible on large installations.
+$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
+
+// filter set
 if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
@@ -109,6 +114,9 @@ if (hasRequest('filter_set')) {
 	);
 	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.status_change_days', getRequest('status_change_days', 14),
+		PROFILE_TYPE_INT
+	);
 
 	// show events
 	$showEvents = getRequest('show_events');
@@ -132,18 +140,6 @@ if (hasRequest('filter_set')) {
 		}
 
 		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
-	}
-
-	// status change days
-	if (hasRequest('status_change_days')) {
-		$maxDays = DAY_IN_YEAR * 2;
-
-		$statusChangeBydays = getRequest('status_change_days');
-		if ($statusChangeBydays > $maxDays) {
-			$statusChangeBydays = $maxDays;
-		}
-
-		CProfile::update('web.tr_status.filter.status_change_days', $statusChangeBydays, PROFILE_TYPE_INT);
 	}
 
 	if (getRequest('application') !== '') {
@@ -178,8 +174,6 @@ if (hasRequest('filter_set')) {
 	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
 }
 elseif (hasRequest('filter_rst')) {
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
-
 	DBStart();
 	CProfile::delete('web.tr_status.filter.show_details');
 	CProfile::delete('web.tr_status.filter.show_maintenance');
@@ -193,6 +187,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
 	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
 	DBend();
+
+	$showTriggers = TRIGGERS_OPTION_ONLYTRUE;
 }
 
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
@@ -201,10 +197,14 @@ $showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVE
 $txtSelect = CProfile::get('web.tr_status.filter.txt_select', '');
 $showChange = CProfile::get('web.tr_status.filter.status_change', 0);
 $statusChangeBydays = CProfile::get('web.tr_status.filter.status_change_days', 14);
-$showEvents = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
-	? EVENTS_OPTION_NOEVENT : CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
 $ackStatus = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
 	? ZBX_ACK_STS_ANY : CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
+$showEvents = CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
+
+// check event acknowledges
+if ($config['event_ack_enable'] == EVENT_ACK_DISABLED && $showEvents == EVENTS_OPTION_NOT_ACK) {
+	$showEvents = EVENTS_OPTION_NOEVENT;
+}
 
 // fetch filter from profiles
 $filter = array(
@@ -220,12 +220,6 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 
 	$i++;
 }
-
-// show triggers
-// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
-// whole page inaccessible on large installations.
-$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
-
 
 /*
  * Page sorting
