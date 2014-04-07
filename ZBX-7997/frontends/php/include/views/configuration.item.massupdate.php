@@ -462,85 +462,79 @@ $itemFormList->addRow(
 );
 
 // append applications to form list
-if ($this->data['singleHost']) {
-	// replace applications
-	$appToReplace = null;
-	if (isset($_REQUEST['applications'])) {
+// replace applications
+$appToReplace = null;
+if (hasRequest('applications')) {
+	$getApps = API::Application()->get(array(
+		'applicationids' => getRequest('applications'),
+		'output' => array('applicationid', 'name')
+	));
+	foreach ($getApps as $getApp) {
+		$appToReplace[] = array(
+			'id' => $getApp['applicationid'],
+			'name' => $getApp['name']
+		);
+	}
+}
+
+$replaceApp = new CMultiSelect(array(
+	'name' => 'applications[]',
+	'objectName' => 'applications',
+	'objectOptions' => array('hostid' => $this->data['hostid']),
+	'data' => $appToReplace
+));
+
+$itemFormList->addRow(
+	array(_('Replace applications'), SPACE, new CVisibilityBox('visible[applications]',
+		isset($this->data['visible']['applications']), 'applications_', _('Original')
+	)),
+	$replaceApp
+);
+
+// add new or existing applications
+$appToAdd = null;
+if (hasRequest('new_applications')) {
+	foreach (getRequest('new_applications') as $newApplication) {
+		if (is_array($newApplication) && isset($newApplication['new'])) {
+			$appToAdd[] = array(
+				'id' => $newApplication['new'],
+				'name' => $newApplication['new'].' ('._x('new', 'new element in multiselect').')',
+				'isNew' => true
+			);
+		}
+		else {
+			$appToAddId[] = $newApplication;
+		}
+	}
+
+	if (isset($appToAddId)) {
 		$getApps = API::Application()->get(array(
-			'applicationids' => $_REQUEST['applications'],
+			'applicationids' => $appToAddId,
 			'output' => array('applicationid', 'name')
 		));
 		foreach ($getApps as $getApp) {
-			$appToReplace[] = array(
+			$appToAdd[] = array(
 				'id' => $getApp['applicationid'],
 				'name' => $getApp['name']
 			);
 		}
 	}
-
-	$replaceApp = new CMultiSelect(array(
-			'name' => 'applications[]',
-			'objectName' => 'applications',
-			'objectOptions' => array('hostid' => $this->data['hostid']),
-			'data' => $appToReplace
-		));
-
-	$itemFormList->addRow(
-		array(
-			_('Replace applications'),
-			SPACE,
-			new CVisibilityBox('visible[applications]', isset($this->data['visible']['applications']), 'applications_', _('Original'))
-		),
-		$replaceApp
-	);
-
-	// add new or existing applications
-	$appToAdd = null;
-	if (isset($_REQUEST['new_applications'])) {
-		foreach ($_REQUEST['new_applications'] as $newApplication) {
-			if (is_array($newApplication) && isset($newApplication['new'])) {
-				$appToAdd[] = array(
-					'id' => $newApplication['new'],
-					'name' => $newApplication['new'] . ' (new)',
-					'isNew' => true
-				);
-			}
-			else {
-				$appToAddId[] = $newApplication;
-			}
-		}
-
-		if (isset($appToAddId)) {
-			$getApps = API::Application()->get(array(
-				'applicationids' => $appToAddId,
-				'output' => array('applicationid', 'name')
-			));
-			foreach ($getApps as $getApp) {
-				$appToAdd[] = array(
-					'id' => $getApp['applicationid'],
-					'name' => $getApp['name']
-				);
-			}
-		}
-	}
-
-	$newApp = new CMultiSelect(array(
-			'name' => 'new_applications[]',
-			'objectName' => 'applications',
-			'objectOptions' => array('hostid' => $this->data['hostid']),
-			'data' => $appToAdd,
-			'addNew' => true
-		));
-
-	$itemFormList->addRow(
-		array(
-			_('Add new or existing applications'),
-			SPACE,
-			new CVisibilityBox('visible[new_applications]', isset($this->data['visible']['new_applications']), 'new_applications_', _('Original'))
-		),
-		$newApp
-	);
 }
+
+$newApp = new CMultiSelect(array(
+	'name' => 'new_applications[]',
+	'objectName' => 'applications',
+	'objectOptions' => array('hostid' => $this->data['hostid']),
+	'data' => $appToAdd,
+	'addNew' => true
+));
+
+$itemFormList->addRow(
+	array(_('Add new or existing applications'), SPACE, new CVisibilityBox('visible[new_applications]',
+		isset($this->data['visible']['new_applications']), 'new_applications_', _('Original')
+	)),
+	$newApp
+);
 
 // append description to form list
 $descriptionTextArea = new CTextArea('description', $this->data['description']);
