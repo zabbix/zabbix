@@ -674,7 +674,7 @@ function get_dbid($table, $field) {
 	$found = false;
 
 	$min = 0;
-	$max = ZBX_STANDALONE_MAX_IDS;
+	$max = ZBX_MAX_IDS;
 
 	do {
 		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));

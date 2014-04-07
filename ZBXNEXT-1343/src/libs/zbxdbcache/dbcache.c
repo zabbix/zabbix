@@ -3321,7 +3321,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	ZBX_DC_ID	*id;
-	zbx_uint64_t	min = 0, max = ZBX_STANDALONE_MAX_IDS, nextid, lastid;
+	zbx_uint64_t	min = 0, max = ZBX_MAX_IDS, nextid, lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d",
 			__function_name, table_name, num);
