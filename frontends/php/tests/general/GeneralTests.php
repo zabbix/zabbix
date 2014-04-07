@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/class_cItemKey.php';
-require_once dirname(__FILE__).'/CTriggerExpressionTest.php';
 require_once dirname(__FILE__).'/class_cxmlexportwriter.php';
 require_once dirname(__FILE__).'/class_cxmlimportreader.php';
 require_once dirname(__FILE__).'/function_DBcommit.php';
@@ -47,7 +46,6 @@ class GeneralTests {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('class_cItemKey');
-		$suite->addTestSuite('CTriggerExpressionTest');
 		$suite->addTestSuite('class_cxmlexportwriter');
 		$suite->addTestSuite('class_cxmlimportreader');
 		$suite->addTestSuite('function_DBcommit');

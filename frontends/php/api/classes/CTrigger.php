@@ -546,7 +546,7 @@ class CTrigger extends CTriggerGeneral {
 		$result = false;
 
 		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expressionData = new CTriggerExpression();
+			$expressionData = new CTriggerExpressionParser();
 			if (!$expressionData->parse($object['expression'])) {
 				return false;
 			}
@@ -655,7 +655,7 @@ class CTrigger extends CTriggerGeneral {
 			// validating trigger expression
 			if (isset($trigger['expression']) && $expressionChanged) {
 				// expression permissions
-				$expressionData = new CTriggerExpression(array('lldmacros' => false));
+				$expressionData = new CTriggerExpressionParser(array('lldmacros' => false));
 				if (!$expressionData->parse($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
@@ -1166,13 +1166,13 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($expressionChanged) {
 				// check the expression
-				$expressionData = new CTriggerExpression();
+				$expressionData = new CTriggerExpressionParser();
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
-				$oldExpressionData = new CTriggerExpression();
+				$oldExpressionData = new CTriggerExpressionParser();
 				$oldExpressionData->parse($oldExpression);
 				// chech if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
@@ -1586,7 +1586,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @return bool
 	 */
 	protected function validateItems(array $trigger) {
-		$expressionData = new CTriggerExpression();
+		$expressionData = new CTriggerExpressionParser();
 		$expressionData->parse($trigger['expression']);
 
 		$templatesData = API::Template()->get(array(
@@ -1670,11 +1670,11 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Returns true if the given expression contains templates.
 	 *
-	 * @param CTriggerExpression $exp
+	 * @param CTriggerExpressionParser $exp
 	 *
 	 * @return bool
 	 */
-	protected function expressionHasTemplates(CTriggerExpression $expressionData) {
+	protected function expressionHasTemplates(CTriggerExpressionParser $expressionData) {
 		$hosts = API::Host()->get(array(
 			'output' => array('status'),
 			'filter' => array('name' => $expressionData->getHosts()),

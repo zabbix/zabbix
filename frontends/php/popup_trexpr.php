@@ -540,7 +540,7 @@ check_fields($fields);
 if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
-	$expressionData = new CTriggerExpression();
+	$expressionData = new CTriggerExpressionParser();
 
 	if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
 		$exprPart = reset($expressionData->expressions);
@@ -736,7 +736,7 @@ if (isset($data['insert'])) {
 			);
 
 			// validate trigger expression
-			$triggerExpression = new CTriggerExpression();
+			$triggerExpression = new CTriggerExpressionParser();
 
 			if ($triggerExpression->parse($data['expression'])) {
 				$expressionData = reset($triggerExpression->expressions);
