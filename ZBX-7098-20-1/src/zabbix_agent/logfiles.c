@@ -536,9 +536,70 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
 
 /******************************************************************************
  *                                                                            *
- * Function: find_old2new_uni                                                 *
+ * Function: resolve_old2new                                                  *
  *                                                                            *
- * Purpose: find a mapping from old to new file if the mapping is unique.     *
+ * Purpose: resolve non-unique mappings                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          old2new - [IN] two dimensional array of possible mappings         *
+ *          old     - [IN] old file list                                      *
+ *          num_old - [IN] number of elements in the old file list            *
+ *          new     - [IN] new file list                                      *
+ *          num_new - [IN] number of elements in the new file list            *
+ *                                                                            *
+ * Return value: index of the new file or                                     *
+ *               -1 if no mapping was found                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num_old,
+		const struct st_logfile *new, int num_new)
+{
+	int	i, j, ones;
+	char	*p;
+
+	/* Is there 1:1 mapping ? Every row and column should have not more than one element '1'. */
+
+	p = old2new;
+
+	for (i = 0; i < num_old; i++)		/* loop over rows (old files) */
+	{
+		ones = 0;
+
+		for (j = 0; j < num_new; j++)	/* loop over columns (new files) */
+		{
+			if ('1' == *p++)
+			{
+				if (2 == ++ones)
+					goto non_unique;
+			}
+		}
+	}
+
+	for (i = 0; i < num_new; i++)		/* loop over columns */
+	{
+		p = old2new + i;
+		ones = 0;
+
+		for (j = 0; j < num_old; j++)	/* loop over rows */
+		{
+			if ('1' == *p)
+			{
+				if (2 == ++ones)
+					goto non_unique;
+			}
+			p += num_new;
+		}
+	}
+non_unique:
+	zabbix_log(LOG_LEVEL_DEBUG, "resolve_old2new(): non-unique mapping");
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: find_old2new                                                     *
+ *                                                                            *
+ * Purpose: find a mapping from old to new file                               *
  *                                                                            *
  * Parameters:                                                                *
  *          old2new - [IN] two dimensional array of possible mappings         *
@@ -546,33 +607,23 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
  *          i_old   - [IN] index of the old file                              *
  *                                                                            *
  * Return value: index of the new file or                                     *
- *               -1 if the mapping is not unique.                             *
+ *               -1 if no mapping was found                                   *
  *                                                                            *
  ******************************************************************************/
-static int	find_old2new_uni(char *old2new, int num_new, int i_old)
+static int	find_old2new(char *old2new, int num_new, int i_old)
 {
-	int	i, m = -1, ones = 0;
+	int	i;
 	char	*p;
-
-	/* Is there 1:1 mapping ? */
 
 	p = old2new + (size_t)i_old * (size_t)num_new * sizeof(char);
 
 	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
 	{
-		if ('1' == *(p + i))
-		{
-			if (2 == ++ones)
-				break;
-
-			m = i;
-		}
+		if ('1' == *p++)
+			return i;
 	}
 
-	if (1 == ones)			/* 1:1 mapping */
-		return m;
-	else				/* 1:M mapping */
-		return -1;
+	return -1;
 }
 
 /******************************************************************************
@@ -1020,41 +1071,43 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 #else
 		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
 #endif
-	}
+		if (1 < *logfiles_num_old || 1 < logfiles_num)
+			resolve_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
 
-	/* Find and mark for skipping files processed during the previous check. Such files can get into the new file */
-	/* list if several files had the same mtime but their processing was not finished because of error or */
-	/* maxlines limit. */
-	for (i = 0; i < *logfiles_num_old; i++)
-	{
-		if ((*logfiles_old)[i].processed_size == (*logfiles_old)[i].size
-				&& -1 != (j = find_old2new_uni(old2new, logfiles_num, i))
-				&& logfiles[j].size == (*logfiles_old)[i].size)
+		/* Find and mark for skipping files processed during the previous check. Such files can get into the */
+		/* new file list if several files had the same mtime but their processing was not finished because of */
+		/* error or maxlines limit. */
+		for (i = 0; i < *logfiles_num_old; i++)
 		{
-			logfiles[j].processed_size = logfiles[j].size;
-			logfiles[j].seq = seq++;
+			if ((*logfiles_old)[i].processed_size == (*logfiles_old)[i].size
+					&& -1 != (j = find_old2new(old2new, logfiles_num, i))
+					&& logfiles[j].size == (*logfiles_old)[i].size)
+			{
+				logfiles[j].processed_size = logfiles[j].size;
+				logfiles[j].seq = seq++;
+			}
+
+			/* find the last file processed in the previous check */
+			if (max_old_seq < (*logfiles_old)[i].seq)
+			{
+				max_old_seq = (*logfiles_old)[i].seq;
+				old_last = i;
+			}
 		}
 
-		/* find the last file processed in the previous check */
-		if (max_old_seq < (*logfiles_old)[i].seq)
+		/* find the first file to continue with in the new file list */
+		if (0 < max_old_seq)
 		{
-			max_old_seq = (*logfiles_old)[i].seq;
-			old_last = i;
+			if (-1 == (start_idx = find_old2new(old2new, logfiles_num, old_last)))
+			{
+				/* Cannot find the successor of the last processed file from the previous check. */
+				/* 'lastlogsize' does not apply in this case. */
+				*lastlogsize = 0;
+				start_idx = 0;
+			}
+			else
+				first_file = 1;
 		}
-	}
-
-	/* find the first file to continue with in the new file list */
-	if (0 < max_old_seq)
-	{
-		if (-1 == (start_idx = find_old2new_uni(old2new, logfiles_num, old_last)))
-		{
-			/* Cannot find the successor of the last processed file from the previous check. */
-			/* 'lastlogsize' does not apply in this case. */
-			*lastlogsize = 0;
-			start_idx = 0;
-		}
-		else
-			first_file = 1;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
