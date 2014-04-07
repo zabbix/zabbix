@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CGraphItem extends CZBXAPI {
+class CGraphItem extends CApiService {
 
 	protected $tableName = 'graphs_items';
 	protected $tableAlias = 'gi';

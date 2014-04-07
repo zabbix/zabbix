@@ -177,7 +177,7 @@ elseif (hasRequest('save')) {
 	unset($_REQUEST['save']);
 }
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
-	$result = API::TriggerPrototype()->delete(getRequest('triggerid'));
+	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));
 
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 	clearCookies($result, getRequest('parent_discoveryid'));

@@ -108,6 +108,7 @@ class CHost extends CHostGeneral {
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchInventory'			=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
@@ -396,6 +397,23 @@ class CHost extends CHostGeneral {
 				$sqlParts['from']['interface'] = 'interface hi';
 				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 			}
+		}
+
+		// search inventory
+		if ($options['searchInventory'] !== null) {
+			$sqlParts['from']['host_inventory'] = 'host_inventory hii';
+			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
+
+			zbx_db_search('host_inventory hii',
+				array(
+					'search' => $options['searchInventory'],
+					'startSearch' => $options['startSearch'],
+					'excludeSearch' => $options['excludeSearch'],
+					'searchWildcardsEnabled' => $options['searchWildcardsEnabled'],
+					'searchByAny' => $options['searchByAny']
+				),
+				$sqlParts
+			);
 		}
 
 		// filter
@@ -1558,7 +1576,7 @@ class CHost extends CHostGeneral {
 		// adding inventories
 		if ($options['selectInventory'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = API::getApi()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $options['selectInventory'],
 				'filter' => array('hostid' => $hostids),
 				'nodeids' => get_current_nodeid(true)
@@ -1661,7 +1679,7 @@ class CHost extends CHostGeneral {
 
 		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
-			$hostDiscoveries = API::getApi()->select('host_discovery', array(
+			$hostDiscoveries = API::getApiService()->select('host_discovery', array(
 				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
 				'filter' => array('hostid' => $hostids),
 				'preservekeys' => true,
