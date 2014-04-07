@@ -46,7 +46,12 @@ $data = $http_request->body();
 try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
-	$jsonRpc = new CJSONrpc($data);
+	$apiClient = API::getWrapper()->getClient();
+
+	// unset wrappers so that calls between methods would be made directly to the services
+	API::setWrapper();
+
+	$jsonRpc = new CJSONrpc($apiClient, $data);
 	echo $jsonRpc->execute();
 }
 catch (Exception $e) {

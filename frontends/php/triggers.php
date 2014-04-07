@@ -191,7 +191,7 @@ elseif (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	DBstart();
 
-	$result = API::Trigger()->delete($_REQUEST['triggerid']);
+	$result = API::Trigger()->delete(array(getRequest('triggerid')));
 	$result = DBend($result);
 
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
