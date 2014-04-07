@@ -1,6 +1,7 @@
 Changes for 2.2.4rc1
 
 Bug fixes:
+..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
 ..F....... [ZBX-7809] improved validation on decimal values (Eduard)
 ..F....... [ZBX-7809] fixed unused graph Y axis min/max fields unseting from db (Eduard)
 ..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
