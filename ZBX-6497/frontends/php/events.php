@@ -118,10 +118,12 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::update('web.events.filter.triggerid', getRequest('triggerid'), PROFILE_TYPE_ID);
+	CProfile::update('web.events.filter.triggerid', getRequest('triggerid', 0), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
+	DBStart();
 	CProfile::delete('web.events.filter.triggerid');
+	DBend();
 }
 
 $triggerId = CProfile::get('web.events.filter.triggerid', 0);
