@@ -1,6 +1,7 @@
 Changes for 2.2.4rc1
 
 Bug fixes:
+..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
 ..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
