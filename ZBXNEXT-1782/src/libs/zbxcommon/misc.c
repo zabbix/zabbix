@@ -1436,7 +1436,6 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	return SUCCEED;
 }
 
-
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
 {
@@ -2141,21 +2140,30 @@ int	is_macro_char(char c)
  *                                                                            *
  * Function: is_time_function                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - given function is time-based                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_time_function(const char *func)
 {
 	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_snmp_type                                                     *
+ *                                                                            *
+ * Return value:  SUCCEED  - the given type is one of regular SNMP types      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	is_snmp_type(unsigned char type)
+{
+	return ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2325,4 +2333,3 @@ fail:
 
 	return res;
 }
-

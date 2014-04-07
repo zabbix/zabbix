@@ -195,7 +195,7 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 }
 elseif (hasRequest('delete') && hasRequest('itemid')) {
 	DBstart();
-	$result = API::Itemprototype()->delete(getRequest('itemid'));
+	$result = API::Itemprototype()->delete(array(getRequest('itemid')));
 	$result = DBend($result);
 
 	show_messages($result, _('Item prototype deleted'), _('Cannot delete item prototype'));
