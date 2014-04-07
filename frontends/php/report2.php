@@ -304,7 +304,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('groupid', 'name'),
 			'hostids' => $triggerOptions['hostids'],
-			'monitored_hosts' => true
+			'monitored_hosts' => true,
+			'preservekeys' => true
 		));
 		order_result($hostGroups, 'name');
 
@@ -314,6 +315,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 				get_node_name_by_elid($hostGroup['groupid'], null, NAME_DELIMITER).$hostGroup['name']
 			);
 		}
+
 		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
 			unset($triggerOptions['groupids']);
 		}
