@@ -122,14 +122,7 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['triggerid'] = 0;
 }
 
-if (hasRequest('source')) {
-	$source = getRequest('source');
-}
-else {
-	$source = (getRequest('triggerid') > 0)
-		? EVENT_SOURCE_TRIGGERS
-		: CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS);
-}
+$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
 $_REQUEST['triggerid'] = ($source == EVENT_SOURCE_DISCOVERY)
 	? 0
