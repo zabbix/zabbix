@@ -1270,7 +1270,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($hostsByNr as $i => $host) {
 				$replace = array(
 					'{HOST.NAME'.$i.'}' => $host['name'],
-					'{HOSTNAME'.$i.'}' => $host['name'],
+					'{HOSTNAME'.$i.'}' => $host['host'],
 					'{HOST.HOST'.$i.'}' => $host['host'],
 					'{HOST.DESCRIPTION'.$i.'}' => $host['description'],
 					'{HOST.DNS'.$i.'}' => $host['dns'],

@@ -76,6 +76,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc1
 
 Bug fixes:
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
 ..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
 ..F....... [ZBX-7809] improved validation on decimal values (Eduard)
@@ -971,6 +972,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
