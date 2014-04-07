@@ -245,7 +245,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now, errstr, sizeof(errstr)))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)] %s",
-						f->func, f->params, ('\0' != *errstr) ? errstr: "");
+						f->func, f->params, ('\0' != *errstr) ? errstr : "");
 
 				ret = NOTSUPPORTED;
 				break;

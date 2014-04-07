@@ -1163,14 +1163,11 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 				zbx_strlcpy(error, "Could not retrieve data for item", errsiz);
 			goto out;
 		}
-		else
+		else if (seconds + arg1 > now)
 		{
-			if (seconds + arg1 > now)
-			{
-				if (NULL != error && 0 < errsiz)
-					zbx_strlcpy(error, "Not enough data for computation", errsiz);
-				goto out;
-			}
+			if (NULL != error && 0 < errsiz)
+				zbx_strlcpy(error, "Item does not have enough data after server (re)start", errsiz);
+			goto out;
 		}
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
