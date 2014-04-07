@@ -1166,7 +1166,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 		else if (seconds + arg1 > now)
 		{
 			if (NULL != error && 0 < errsiz)
-				zbx_strlcpy(error, "Item does not have enough data after server (re)start", errsiz);
+				zbx_strlcpy(error, "Item does not have enough data after server (re)start/item creation", errsiz);
 			goto out;
 		}
 
