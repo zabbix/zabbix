@@ -62,9 +62,9 @@
 
 #elif defined(HAVE_MYSQL)
 
-#	include <mysql/mysql.h>
-#	include <mysql/errmsg.h>
-#	include <mysql/mysqld_error.h>
+#	include "mysql.h"
+#	include "errmsg.h"
+#	include "mysqld_error.h"
 
 #	define DB_ROW		MYSQL_ROW
 #	define DB_RESULT	MYSQL_RES *
