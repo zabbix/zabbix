@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:15+0200\n"
+"POT-Creation-Date: 2014-03-31 13:00+0300\n"
 "PO-Revision-Date: 2014-02-13 07:24+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -4175,7 +4175,7 @@ msgid "Description"
 msgstr "Descrizione"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2208
+#: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4658,7 +4658,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2175
+#: include/func.inc.php:2173
 msgid "ERROR"
 msgstr "ERRORE"
 
@@ -8818,7 +8818,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Numero massimo di eventi per trigger da visualizzare"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Maximize"
 msgstr "Massimizza"
 
@@ -9015,7 +9015,7 @@ msgid "Middle"
 msgstr "Centro"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Minimize"
 msgstr "Minimizza"
 
@@ -9444,7 +9444,7 @@ msgid "Next"
 msgstr "Successivo"
 
 #: events.php:765 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2429 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -10841,10 +10841,6 @@ msgstr "PHP gd"
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
 msgstr "Supporto PHP gd FreeType"
-
-#: include/graphs.inc.php:722 include/graphs.inc.php:746
-msgid "PHP gd FreeType support missing"
-msgstr "Supporto PHP gd FreeType mancante"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
@@ -14105,7 +14101,7 @@ msgstr "USA (160 caratteri)"
 msgid "USER PROFILE"
 msgstr "PROFILO UTENTE"
 
-#: include/func.inc.php:2612
+#: include/func.inc.php:2619
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15321,7 +15317,7 @@ msgstr "Per anni"
 
 #: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2429
+#: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
