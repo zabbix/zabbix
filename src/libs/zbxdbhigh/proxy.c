@@ -96,12 +96,11 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 {
 	const char	*__function_name = "zbx_clean_dhost_list";
 
-	unsigned char		*known_dhostid_list = NULL;
+	char			*known_dhostid_list = NULL;
 	DB_RESULT		result_dservices;
 	DB_ROW			row_dservices;
 	DB_RESULT		result_drule;
 	DB_ROW			row_drule;
-	size_t 			alloc_len = 0, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
