@@ -250,7 +250,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$menu_table->addRow($main_menu);
 
 	$serverName = (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME))
-		? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles serverName')
+		? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles server-name')
 		: null;
 
 	// 1st level menu

@@ -576,4 +576,4 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .tabs { visibility: hidden; }
 
 /* server name */
-.serverName { padding-right: 5px; }
+.server-name { padding-right: 5px; }
