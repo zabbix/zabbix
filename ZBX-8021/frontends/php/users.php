@@ -143,7 +143,17 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (isset($_REQUEST['save'])) {
 	$config = select_config();
 
-	$authType = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+	$usrgrps = get_request('user_groups', array());
+
+	// authentication type
+	if ($usrgrps) {
+		$authType = getGroupAuthenticationType($usrgrps);
+	}
+	else {
+		$authType = isset($_REQUEST['userid'])
+			? getUserAuthenticationType($_REQUEST['userid'])
+			: $config['authentication_type'];
+	}
 
 	if (isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
 		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
@@ -189,7 +199,6 @@ elseif (isset($_REQUEST['save'])) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		$usrgrps = get_request('user_groups', array());
 		$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
 		$user['usrgrps'] = $usrgrps;
 
