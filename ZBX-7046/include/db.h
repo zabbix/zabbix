@@ -538,9 +538,6 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
-double	multiply_item_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
-
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,

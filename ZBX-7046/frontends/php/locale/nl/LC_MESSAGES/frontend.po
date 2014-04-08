@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:15+0200\n"
+"POT-Creation-Date: 2014-03-31 13:00+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -4180,7 +4180,7 @@ msgid "Description"
 msgstr "Omschrijving"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2208
+#: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4663,7 +4663,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2175
+#: include/func.inc.php:2173
 msgid "ERROR"
 msgstr "FOUT"
 
@@ -8828,7 +8828,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Maximum aantal getoonde gebeurtenissen per trigger"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Maximize"
 msgstr "Maximalizeer"
 
@@ -9025,7 +9025,7 @@ msgid "Middle"
 msgstr "Midden"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Minimize"
 msgstr ""
 
@@ -9454,7 +9454,7 @@ msgid "Next"
 msgstr ""
 
 #: events.php:765 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2429 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -10850,10 +10850,6 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
-msgstr ""
-
-#: include/graphs.inc.php:722 include/graphs.inc.php:746
-msgid "PHP gd FreeType support missing"
 msgstr ""
 
 #: include/classes/class.frontendsetup.php:417
@@ -14115,7 +14111,7 @@ msgstr "USA (160 karakters)"
 msgid "USER PROFILE"
 msgstr "GEBRUIKERS PROFIEL"
 
-#: include/func.inc.php:2612
+#: include/func.inc.php:2619
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15331,7 +15327,7 @@ msgstr "Jaarlijks"
 
 #: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2429
+#: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139

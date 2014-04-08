@@ -352,7 +352,7 @@ function resolveMapLabelMacrosAll(array $selement) {
 		foreach ($hostsByNr as $i => $host) {
 			$replace = array(
 				'{HOST.NAME'.$i.'}' => $host['name'],
-				'{HOSTNAME'.$i.'}' => $host['name'],
+				'{HOSTNAME'.$i.'}' => $host['host'],
 				'{HOST.HOST'.$i.'}' => $host['host'],
 				'{HOST.DNS'.$i.'}' => $host['dns'],
 				'{HOST.IP'.$i.'}' => $host['ip'],
