@@ -1,5 +1,8 @@
 Changes for 2.2.4rc1
 
+New features:
+........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
+
 Bug fixes:
 .......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
 ....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
