@@ -1,3 +1,31 @@
+Changes for 2.2.4rc1
+
+Bug fixes:
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
+....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
+..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
+..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
+..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
+..F....... [ZBX-7809] improved validation on decimal values (Eduard)
+..F....... [ZBX-7809] fixed unused graph Y axis min/max fields unseting from db (Eduard)
+..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
+..F....... [ZBX-7545] fixed item mass update form being rendered with a delay when updating template items (Pavels)
+..F....... [ZBX-7864] fixed filter by host group in "Availability reports" page (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3
+
+2.2.3rc2 was released as 2.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3rc2
+
+Bug fixes:
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
+.......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.3rc1
 
 New features:
@@ -872,6 +900,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)

@@ -5139,7 +5139,7 @@ out:
  *               FAIL    - failed to activate host, host not found            *
  *                                                                            *
  ******************************************************************************/
-int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out)
+int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out)
 {
 	int		ret = FAIL;
 	ZBX_DC_HOST	*dc_host;
