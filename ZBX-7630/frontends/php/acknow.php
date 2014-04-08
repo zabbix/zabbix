@@ -62,7 +62,8 @@ if (isset($_REQUEST['cancel'])) {
 
 	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
-			'&source='.EVENT_SOURCE_TRIGGERS);
+			'&source='.EVENT_SOURCE_TRIGGERS
+		);
 	}
 	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 		redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
@@ -167,7 +168,8 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 
 		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
-				'&source='.EVENT_SOURCE_TRIGGERS);
+				'&source='.EVENT_SOURCE_TRIGGERS
+			);
 		}
 		elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 			redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
