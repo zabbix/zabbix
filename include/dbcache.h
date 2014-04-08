@@ -341,7 +341,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
 
-int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
+int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
 
 void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
 
