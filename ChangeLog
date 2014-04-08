@@ -76,6 +76,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc1
 
 Bug fixes:
+....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
 ..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
