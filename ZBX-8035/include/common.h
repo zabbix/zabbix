@@ -85,6 +85,13 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
 
+typedef enum
+{
+	ZBX_FALSE,
+	ZBX_TRUE
+}
+zbx_bool_t;
+
 #define MAX_ID_LEN		21
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
