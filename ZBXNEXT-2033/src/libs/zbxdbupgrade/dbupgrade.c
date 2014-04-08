@@ -2402,7 +2402,7 @@ static int	DBpatch_2020002(void)
 		{
 			{"ticketid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 			{"externalid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+			{"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 			{"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 			{"clock", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 			{"new", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -2429,6 +2429,28 @@ static int	DBpatch_2020005(void)
 	return DBcreate_index("ticket", "ticket_3", "externalid,new", 0);
 }
 
+static int	DBpatch_2020006(void)
+{
+	const ZBX_FIELD field = {"externalid", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("ticket", &field);
+}
+
+static int	DBpatch_2020007(void)
+{
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("ticket", 1, &field);
+}
+
+static int	DBpatch_2020008(void)
+{
+	const ZBX_FIELD field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("ticket", 2, &field);
+}
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
@@ -2682,6 +2704,9 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2020003, 0, 1)
 	DBPATCH_ADD(2020004, 0, 1)
 	DBPATCH_ADD(2020005, 0, 1)
+	DBPATCH_ADD(2020006, 0, 1)
+	DBPATCH_ADD(2020007, 0, 1)
+	DBPATCH_ADD(2020008, 0, 1)
 
 	DBPATCH_END()
 
