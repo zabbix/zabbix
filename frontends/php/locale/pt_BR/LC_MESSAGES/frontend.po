@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-08 17:23+0300\n"
-"PO-Revision-Date: 2014-03-27 10:46+0300\n"
+"POT-Creation-Date: 2014-04-08 17:25+0300\n"
+"PO-Revision-Date: 2014-04-06 12:24+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395909969.0\n"
+"X-POOTLE-MTIME: 1396779875.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -41,8 +41,8 @@ msgstr[1] "%1$d dias"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "%1$d de %2$d problema exibido"
-msgstr[1] "%1$d de %2$d problemas exibidos"
+msgstr[0] "%1$d de %2$d incidente exibido"
+msgstr[1] "%1$d de %2$d incidentes exibidos"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -5085,7 +5085,7 @@ msgstr "Expandir macros"
 
 #: include/views/configuration.sysmap.edit.php:66
 msgid "Expand single problem"
-msgstr "Expandir problemas singulares"
+msgstr "Expandir incidentes singulares"
 
 #: api/rpc/class.cjsonrpc.php:90
 #, c-format
@@ -6595,7 +6595,7 @@ msgstr "Ícone (manutenção)"
 
 #: include/views/js/configuration.sysmaps.js.php:273
 msgid "Icon (problem)"
-msgstr "Ícone (problema)"
+msgstr "Ícone (incidente)"
 
 #: include/views/configuration.sysmap.edit.php:64
 msgid "Icon highlight"
@@ -9240,7 +9240,7 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1644
 msgid "Multiple PROBLEM events"
-msgstr "Multiplos eventos de PROBLEMA"
+msgstr "Multiplos eventos de INCIDENTES"
 
 #: include/views/configuration.triggers.edit.php:244
 msgid "Multiple PROBLEM events generation"
@@ -10988,7 +10988,7 @@ msgstr "POP"
 #: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:167
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
-msgstr "PROBLEMA"
+msgstr "INCIDENTE"
 
 #: include/validate.inc.php:555
 msgid "Page received incorrect data"
@@ -11033,7 +11033,7 @@ msgstr "Serviço pai"
 
 #: include/views/configuration.triggers.edit.php:59
 msgid "Parent triggers"
-msgstr "Triggers herdadas"
+msgstr "Trigger herdada de"
 
 #: include/views/configuration.httpconf.edit.php:51
 msgid "Parent web scenarios"
@@ -11323,33 +11323,33 @@ msgstr "Provavelmente o módulo php-ldap está ausente."
 #: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:141 tr_status.php:282
 msgid "Problem"
-msgstr "Problema"
+msgstr "Incidente"
 
 #: include/views/configuration.sysmap.edit.php:129
 #: include/views/monitoring.dashconf.php:100
 msgid "Problem display"
-msgstr "Exibição de problemas"
+msgstr "Exibição de incidentes"
 
 #: jsrpc.php:118
 msgid "Problem on"
-msgstr "Problema em"
+msgstr "Incidente em"
 
 #: srv_status.php:141
 msgid "Problem time"
-msgstr "Problema de hora"
+msgstr "Incidente de hora"
 
 #: include/services.inc.php:60
 msgid "Problem, if all children have problems"
-msgstr "Problema, se todos os filhos tem problemas"
+msgstr "Incidente, se todos os filhos possuem incidentes"
 
 #: include/services.inc.php:59
 msgid "Problem, if at least one child has a problem"
-msgstr "Problema, se pelo menos um filho tem problema"
+msgstr "Incidente, se pelo menos um filho tem incidente"
 
 #: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
-msgstr "Problemas"
+msgstr "Incidentes"
 
 #: include/page_header.php:213
 msgid "Profile"
@@ -14540,7 +14540,7 @@ msgstr "O grupo de usuários \"%1$s\" é o único grupo que o usuário \"%2$s\" 
 #: api/classes/CUserGroup.php:668
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
-msgstr "O grupo \"%1$s\" é utilizado para notificações sobre problemas no banco de dados."
+msgstr "O grupo \"%1$s\" é utilizado para notificações sobre incidentes no banco de dados."
 
 #: api/classes/CUserGroup.php:657
 #, c-format
@@ -14571,7 +14571,7 @@ msgstr "Grupo de usuários que receberá a mensagem de banco de dados indisponí
 #: adm.other.php:94
 #, c-format
 msgid "User group for database down message \"%1$s\"."
-msgstr "Grupo para mensagens de problemas com o banco de dados \"%1$s\"."
+msgstr "Grupo para mensagens de incidentes com o banco de dados \"%1$s\"."
 
 #: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
@@ -15150,7 +15150,7 @@ msgstr "Com últimos eventos não reconhecidos"
 
 #: include/blocks.inc.php:388
 msgid "With problems"
-msgstr "Com problemas"
+msgstr "Com incidentes"
 
 #: include/forms.inc.php:596 include/forms.inc.php:823
 #: include/forms.inc.php:932
@@ -15163,7 +15163,7 @@ msgstr "Com eventos não reconhecidos"
 
 #: include/blocks.inc.php:387
 msgid "Without problems"
-msgstr "Sem problemas"
+msgstr "Sem incidentes"
 
 #: include/forms.inc.php:597 include/forms.inc.php:820
 msgid "Without triggers"
@@ -15306,7 +15306,7 @@ msgstr "O arquivo XML contêm o alerta %1$s:"
 
 #: include/views/js/configuration.sysmaps.js.php:169 report3.php:96
 msgid "Y"
-msgstr "A"
+msgstr "Y"
 
 #: include/func.inc.php:683
 msgctxt "Yotta short"
