@@ -83,7 +83,7 @@ class DB {
 
 	/**
 	 * Reserve ids for primary key of passed table.
-	 * If record for table does not exist or value is out of range, ids record is recreated
+	 * If record for table does not exist or value is out of range, ids record is created
 	 * using maximum id from table or minimum allowed value.
 	 *
 	 * @throw APIException
@@ -116,8 +116,14 @@ class DB {
 		if ($res) {
 			$maxNextId = bcadd($res['nextid'], $count, 0);
 
+			if (bccomp($maxNextId, ZBX_MAX_IDS) == 1) {
+				self::exception(
+					self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"'
+				);
+			}
+
 			$sql = 'UPDATE ids'.
-					' SET nextid=nextid+'.$count.
+					' SET nextid='.$maxNextId.
 					' WHERE table_name='.zbx_dbstr($table).
 						' AND field_name='.zbx_dbstr($id_name);
 
@@ -136,9 +142,10 @@ class DB {
 
 	/**
 	 * Refresh id record for given table.
-	 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
+	 * Record created with value of maximum id from table or minimum allowed.
 	 *
 	 * @throw APIException
+	 *
 	 * @static
 	 *
 	 * @param string $table table name
@@ -150,19 +157,17 @@ class DB {
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
-		$sql = 'DELETE FROM ids'.
-				' WHERE table_name='.zbx_dbstr($table).
-				' AND field_name='.zbx_dbstr($id_name);
-
-		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-		}
-
-		$row = DBfetch(DBselect('SELECT MAX('.$id_name.') AS id FROM '.$table.' WHERE '.$id_name));
+		$row = DBfetch(DBselect('SELECT MAX('.$id_name.') AS id FROM '.$table));
 
 		$nextid = ($row && $row['id']) ? $row['id'] : 0;
 
 		$maxNextId = bcadd($nextid, $count, 0);
+
+		if (bccomp($maxNextId, ZBX_MAX_IDS) == 1) {
+			self::exception(
+				self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"'
+			);
+		}
 
 		$sql = 'INSERT INTO ids (table_name,field_name,nextid)'.
 				' VALUES ('.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
