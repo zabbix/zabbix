@@ -1,6 +1,7 @@
 Changes for 2.2.4rc1
 
 Bug fixes:
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
 ....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
 ..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
