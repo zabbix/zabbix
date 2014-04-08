@@ -490,7 +490,8 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	int			ret = FAIL, err, opt;
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
 				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_name_esc,
-				*service_id_esc, *user_esc = NULL, *password_esc = NULL, *ci_id_esc = NULL;
+				*service_id_esc, *user_esc = NULL, *password_esc = NULL, *ci_id_esc = NULL,
+				*loginid_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -513,10 +514,11 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	service_name_esc = xml_escape_dyn(service_name);
 	service_id_esc = xml_escape_dyn(service_id);
 	company_esc = xml_escape_dyn(company);
+	loginid_esc = xml_escape_dyn(loginid);
 
 	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, impact_esc,
 			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_name_esc,
-			service_id_esc, ci_esc, ci_id_esc, loginid, company_esc);
+			service_id_esc, ci_esc, ci_id_esc, loginid_esc, company_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -546,6 +548,7 @@ out:
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
+	zbx_free(loginid_esc);
 	zbx_free(company_esc);
 	zbx_free(service_id_esc);
 	zbx_free(service_name_esc);
