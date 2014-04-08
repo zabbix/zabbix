@@ -76,8 +76,6 @@ typedef struct
 	zbx_buf_type_t	buf_type;
 	size_t		read_bytes;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
-/* TODO	char		*buf_dyn; */
-/* TODO rename to data */
 	char		*buffer;
 	unsigned char	accepted;
 	char		*error;
