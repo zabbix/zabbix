@@ -116,7 +116,7 @@ class DB {
 		if ($res) {
 			$maxNextId = bcadd($res['nextid'], $count, 0);
 
-			if (bccomp($maxNextId, ZBX_MAX_IDS) == 1) {
+			if (bccomp($maxNextId, ZBX_DB_MAX_ID) == 1) {
 				self::exception(
 					self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"'
 				);
@@ -163,7 +163,7 @@ class DB {
 
 		$maxNextId = bcadd($nextid, $count, 0);
 
-		if (bccomp($maxNextId, ZBX_MAX_IDS) == 1) {
+		if (bccomp($maxNextId, ZBX_DB_MAX_ID) == 1) {
 			self::exception(
 				self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"'
 			);
