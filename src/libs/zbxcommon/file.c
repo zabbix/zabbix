@@ -20,14 +20,31 @@
 #include "common.h"
 #include "log.h"
 
-#if defined(_WINDOWS) && defined(_UNICODE)
-int	__zbx_stat(const char *path, struct stat *buf)
+#if defined(_WINDOWS)
+int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
-	int	ret;
+	int	ret, fd;
 	wchar_t	*wpath;
 
 	wpath = zbx_utf8_to_unicode(path);
-	ret = _wstat64(wpath, buf);
+
+	if (-1 == (ret = _wstat64(wpath, buf)))
+		goto out;
+
+	if (0 != buf->st_size)
+		goto out;
+
+	/* In the case of symlinks _wstat64 returns zero file size.   */
+	/* Try to work around it by opening the file and using fstat. */
+
+	ret = -1;
+
+	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
+	{
+		ret = _fstat64(fd, buf);
+		_close(fd);
+	}
+out:
 	zbx_free(wpath);
 
 	return ret;
@@ -422,7 +439,7 @@ out:
 
 int	zbx_is_regular_file(const char *path)
 {
-	struct stat	st;
+	zbx_stat_t	st;
 
 	if (0 == zbx_stat(path, &st) && 0 != S_ISREG(st.st_mode))
 		return SUCCEED;
