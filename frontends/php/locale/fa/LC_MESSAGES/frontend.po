@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2012-10-06 14:22+0200\n"
-"Last-Translator: Nader <jafari@sain.ir>\n"
+"PO-Revision-Date: 2014-04-07 06:17+0300\n"
+"Last-Translator: Starless boi <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
+"X-POOTLE-MTIME: 1396844241.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -77,15 +78,15 @@ msgstr "(0 تا بینهایت)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(تنها مديران ارشد مجوز ايجاد گروه ها را دارند)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
-msgstr ""
+msgstr "(به روز)"
 
 #: include/forms.inc.php:436
 msgid "(in sec)"
-msgstr ""
+msgstr "(به ثانيه)"
 
 #: include/views/configuration.action.edit.php:440
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -175,19 +176,19 @@ msgstr "گزارش دسترسی"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "قدر اختلاف مطلق بين اخرين مقدار و مقدار ما قبل آن کمتر از N است."
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "قدر مطلق اختلاف بين اخرين مقدار و مقدار ما قبل آن برابر با N است."
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "قدر مطلق اختلاف بين اخرين مقدار و مقدار ما قبل آن بزرگتر از N است."
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "قدر مطلق اختلاف بين اخرين مقدار و مقدار ما قبل آن مخالف N است."
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
