@@ -90,6 +90,9 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
+		if (0 != strcmp(".conf", strrchr(file_name, '.')))
+			continue;
+
 		path = zbx_dsprintf(path, "%s\\%s", cfg_file, file_name);
 
 		zbx_free(file_name);
