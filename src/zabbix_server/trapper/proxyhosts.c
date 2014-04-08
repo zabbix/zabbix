@@ -30,21 +30,16 @@
  *                                                                            *
  * Purpose: update hosts availability, monitored by proxies                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	recv_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "recv_host_availability";
-	zbx_uint64_t		proxy_hostid;
-	char			host[HOST_HOST_LEN_MAX], error[256];
-	int			ret;
+	const char	*__function_name = "recv_host_availability";
+
+	zbx_uint64_t	proxy_hostid;
+	char		host[HOST_HOST_LEN_MAX], error[256];
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -70,13 +65,7 @@ out:
  *                                                                            *
  * Purpose: send hosts availability data from proxy                           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	send_host_availability(zbx_sock_t *sock)
