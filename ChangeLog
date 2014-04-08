@@ -4,6 +4,7 @@ New features:
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
@@ -907,6 +908,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
