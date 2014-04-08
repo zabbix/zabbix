@@ -83,75 +83,6 @@ static zbx_history_table_t areg = {
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_clean_dhost_list                                             *
- *                                                                            *
- * Purpose: clean dhosts not presenting in drule                              *
- *                                                                            *
- * Parameters: drule                                                          *
- *                                                                            *
- * Author: Nikolajs Agafonovs                                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_clean_dhost_list(DB_DRULE *drule)
-{
-	const char	*__function_name = "zbx_clean_dhost_list";
-
-	char			*known_dhostid_list = NULL;
-	DB_RESULT		result_dservices;
-	DB_ROW			row_dservices;
-	DB_RESULT		result_drule;
-	DB_ROW			row_drule;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result_drule =  DBselect(
-			"select iprange"
-			" from drules"
-			" where druleid=" ZBX_FS_UI64,
-			drule->druleid);
-
-	if (NULL == (row_drule = DBfetch(result_drule)))
-		goto out;
-
-	result_dservices = DBselect(
-			"select dhostid, ip"
-			" from dservices");
-
-	while (NULL != (row_dservices = DBfetch(result_dservices)))
-	{
-		if (SUCCEED == ip_in_list(row_drule[0], row_dservices[1]))
-		{
-			known_dhostid_list = zbx_strdcat(known_dhostid_list, row_dservices[0]);
-			known_dhostid_list = zbx_strdcat(known_dhostid_list, ",");
-		}
-	}
-	DBfree_result(result_dservices);
-
-	if (NULL == known_dhostid_list)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "known_dhostid_list = NULL");
-		goto out;
-	}
-
-	zbx_rtrim(known_dhostid_list, ",");
-
-	DBbegin();
-	DBexecute("delete from dhosts"
-			" where dhostid not in (%s) "
-			"and druleid =" ZBX_FS_UI64,
-			known_dhostid_list,
-			drule->druleid);
-	DBcommit();
-out:
-	DBfree_result(result_drule);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): hosts in drule (hostid): %s", __function_name, known_dhostid_list);
-
-	zbx_free(known_dhostid_list);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_active_proxy_id                                              *
  *                                                                            *
  * Purpose: extract a proxy name from JSON and find the proxy ID in database. *
@@ -2447,6 +2378,75 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_clean_dhost_list                                             *
+ *                                                                            *
+ * Purpose: clean dhosts not presenting in drule                              *
+ *                                                                            *
+ * Parameters: drule                                                          *
+ *                                                                            *
+ * Author: Nikolajs Agafonovs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_clean_dhost_list(DB_DRULE *drule)
+{
+	const char	*__function_name = "zbx_clean_dhost_list";
+
+	char			*known_dhostid_list = NULL;
+	DB_RESULT		result_dservices;
+	DB_ROW			row_dservices;
+	DB_RESULT		result_drule;
+	DB_ROW			row_drule;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result_drule =  DBselect(
+			"select iprange"
+			" from drules"
+			" where druleid=" ZBX_FS_UI64,
+			drule->druleid);
+
+	if (NULL == (row_drule = DBfetch(result_drule)))
+		goto out;
+
+	result_dservices = DBselect(
+			"select dhostid, ip"
+			" from dservices");
+
+	while (NULL != (row_dservices = DBfetch(result_dservices)))
+	{
+		if (SUCCEED == ip_in_list(row_drule[0], row_dservices[1]))
+		{
+			known_dhostid_list = zbx_strdcat(known_dhostid_list, row_dservices[0]);
+			known_dhostid_list = zbx_strdcat(known_dhostid_list, ",");
+		}
+	}
+	DBfree_result(result_dservices);
+
+	if (NULL == known_dhostid_list)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "known_dhostid_list = NULL");
+		goto out;
+	}
+
+	zbx_rtrim(known_dhostid_list, ",");
+
+	DBbegin();
+	DBexecute("delete from dhosts"
+			" where dhostid not in (%s) "
+			"and druleid =" ZBX_FS_UI64,
+			known_dhostid_list,
+			drule->druleid);
+	DBcommit();
+out:
+	DBfree_result(result_drule);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): hosts in drule (hostid): %s", __function_name, known_dhostid_list);
+
+	zbx_free(known_dhostid_list);
 }
 
 /******************************************************************************
