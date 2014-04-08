@@ -325,6 +325,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 		$menu_class = 'horizontal_menu_n';
 		$sub_menus[$label] = array();
+
 		foreach ($menu['pages'] as $sub_page) {
 			$show_sub_menu = true;
 

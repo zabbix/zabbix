@@ -2,6 +2,8 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
+...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
 ..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
 ...G...... [ZBXNEXT-2194] added configuration option to include all files in a directory on Windows (Nikolaj)
 ........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
@@ -37,6 +39,8 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
+..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
 ..F....... [ZBX-6675] fixed graph header, if items belong to multiple hosts (Oleg)
 A.F....... [ZBX-7781] fixed no error being triggered when trying to pass the "auth" parameter to a method that does not require authentication (Pavels)
 ..F....... [ZBX-8001] fixed host massupdate inventory tab being reset after choosing an inventory mode (Ivo)
@@ -70,6 +74,33 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.4rc1
+
+New features:
+........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
+
+Bug fixes:
+........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
+...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
+....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
+..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
+..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
+..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
+..F....... [ZBX-7809] improved validation on decimal values (Eduard)
+..F....... [ZBX-7809] fixed unused graph Y axis min/max fields unseting from db (Eduard)
+..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
+..F....... [ZBX-7545] fixed item mass update form being rendered with a delay when updating template items (Pavels)
+..F....... [ZBX-7864] fixed filter by host group in "Availability reports" page (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3
+
+2.2.3rc2 was released as 2.2.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.3rc2
 
 Bug fixes:
@@ -88,6 +119,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7896] fixed translated error messages not being rendered correctly in images (Pavels)
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
 A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
@@ -951,6 +983,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
