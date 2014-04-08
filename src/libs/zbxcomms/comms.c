@@ -1082,7 +1082,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	sa;
 	ZBX_SOCKLEN_T	sz = sizeof(sa);
-	static char	buffer[64];
+	static char	host[64];
 	char		*error_message = NULL;
 
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
@@ -1093,23 +1093,23 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	}
 
 #if defined(HAVE_IPV6)
-	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), buffer, sizeof(buffer), NULL, 0, NI_NUMERICHOST))
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
 	}
 #else
-	zbx_snprintf(buffer, sizeof(buffer), "%s", inet_ntoa(sa.sin_addr));
+	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
 #endif
 
 out:
 	if (NULL != error_message)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
-		strscpy(buffer, "unknown IP");
+		strscpy(host, "unknown IP");
 	}
 
-	return buffer;
+	return host;
 }
 
 #if defined(HAVE_IPV6)
@@ -1271,12 +1271,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
+	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
 		zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, ip_list);
 	else
 		zbx_set_tcp_strerror("connection rejected, allowed hosts: \"%s\"", ip_list);
 #else
 	zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", inet_ntoa(name.sin_addr), ip_list);
 #endif
-	return	FAIL;
+	return FAIL;
 }
