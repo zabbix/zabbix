@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:38+0200\n"
-"PO-Revision-Date: 2014-03-24 14:43+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2014-03-31 13:03+0300\n"
+"PO-Revision-Date: 2014-03-24 15:26+0300\n"
+"Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395665016.0\n"
+"X-POOTLE-MTIME: 1395667599.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -4176,7 +4176,7 @@ msgid "Description"
 msgstr "Açıklama"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2208
+#: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4659,7 +4659,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2175
+#: include/func.inc.php:2173
 msgid "ERROR"
 msgstr "HATA"
 
@@ -8819,7 +8819,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Her bir tetik için gösterilecek maksimum olay sayısı"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Maximize"
 msgstr "Ekranı kapla"
 
@@ -9016,7 +9016,7 @@ msgid "Middle"
 msgstr "Orta"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Minimize"
 msgstr "Küçült"
 
@@ -9445,7 +9445,7 @@ msgid "Next"
 msgstr "Sonraki"
 
 #: events.php:765 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2429 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9470,17 +9470,17 @@ msgstr "Konak prototipi için hiçbir \"%1$s\" verilmemiş."
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Ekran için hiç \"%1$s\" verilmemiş."
 
 #: api/classes/CTemplateScreen.php:601
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Şablon ekran için hiç \"%1$s\" verilmemiş."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr "\"%1$s\" konak prototipi için hiçbir \"%2$s\" verilmemiş."
+msgstr "\"%1$s\" ana makine prototipi için hiçbir \"%2$s\" verilmemiş."
 
 #: include/classes/import/CXmlImport18.php:1568
 #, c-format
@@ -10842,10 +10842,6 @@ msgstr "PHP gd"
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeType desteği"
-
-#: include/graphs.inc.php:722 include/graphs.inc.php:746
-msgid "PHP gd FreeType support missing"
-msgstr "PHP gd FreeType desteği eksik"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
@@ -14106,7 +14102,7 @@ msgstr "USA(160 karakter)"
 msgid "USER PROFILE"
 msgstr "KULLANICI PROFİLİ"
 
-#: include/func.inc.php:2612
+#: include/func.inc.php:2619
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15322,7 +15318,7 @@ msgstr "Yıllık"
 
 #: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2429
+#: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139

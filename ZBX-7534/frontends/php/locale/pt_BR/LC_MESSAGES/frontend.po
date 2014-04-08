@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 16:38+0200\n"
-"PO-Revision-Date: 2014-03-11 13:42+0300\n"
+"POT-Creation-Date: 2014-03-31 13:03+0300\n"
+"PO-Revision-Date: 2014-03-27 10:46+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1394538179.0\n"
+"X-POOTLE-MTIME: 1395909969.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -4181,7 +4181,7 @@ msgid "Description"
 msgstr "Descrição"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:729
-#: include/func.inc.php:2208
+#: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:337
@@ -4664,7 +4664,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "E"
 
-#: include/func.inc.php:2175
+#: include/func.inc.php:2173
 msgid "ERROR"
 msgstr "ERRO"
 
@@ -4806,11 +4806,11 @@ msgstr "Recebido resposta nula do servidor Zabbix \"%1$s\"."
 
 #: api/classes/CScreen.php:488
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "Não foi fornecido um ID de tela para a tela."
 
 #: api/classes/CTemplateScreen.php:602
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "Não foi fornecido um ID de tela para o template de tela."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5650,12 +5650,12 @@ msgstr "Protótipo de gráfico"
 #: api/classes/CGraphPrototype.php:807
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "O protótipo de gráfico \"%1$s\" contêm protótipos de itens de múltiplas regras de descoberta."
 
 #: api/classes/CGraphPrototype.php:813
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "O protótipo de gráfico \"%1$s\" precisa ter no mínimo um protótipo de item."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7337,7 +7337,7 @@ msgstr "O ID de tela informado \"%1$s\" é inválido para o elemento da tela."
 
 #: api/classes/CScreen.php:489
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "ID de tela inválido."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7380,7 +7380,7 @@ msgstr "Status inválido."
 
 #: api/classes/CTemplateScreen.php:603
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "ID de template de tela inválido."
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -8835,7 +8835,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Máximo de eventos por trigger a exibir"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Maximize"
 msgstr "Maximizar"
 
@@ -9032,7 +9032,7 @@ msgid "Middle"
 msgstr "Centro"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2210
+#: include/func.inc.php:2206
 msgid "Minimize"
 msgstr "Minimizar"
 
@@ -9461,7 +9461,7 @@ msgid "Next"
 msgstr "Próximo"
 
 #: events.php:765 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2429 include/triggers.inc.php:1646
+#: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9486,12 +9486,12 @@ msgstr "Não foi encontrado \"%1$s\" para o protótipo de host."
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Não foi encontrado \"%1$s\" para a tela."
 
 #: api/classes/CTemplateScreen.php:601
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Não foi encontrado \"%1$s\" para o template de tela."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -10867,10 +10867,6 @@ msgstr "PGP gd"
 #: include/classes/class.frontendsetup.php:413
 msgid "PHP gd FreeType support"
 msgstr "Suporte ao FreeType do PHP gd"
-
-#: include/graphs.inc.php:722 include/graphs.inc.php:746
-msgid "PHP gd FreeType support missing"
-msgstr "Suporte ao PHP gd FreeType faltando"
 
 #: include/classes/class.frontendsetup.php:417
 msgid "PHP gd FreeType support missing."
@@ -13855,12 +13851,12 @@ msgstr "Protótipo de trigger"
 #: api/classes/CTriggerPrototype.php:927
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de itens de múltiplas regras de descoberta."
 
 #: api/classes/CTriggerPrototype.php:933
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" precisa conter no mínimo um protótipo de item."
 
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
@@ -14137,7 +14133,7 @@ msgstr "EUA (160 caracteres)"
 msgid "USER PROFILE"
 msgstr "PERFIL DO USUÁRIO"
 
-#: include/func.inc.php:2612
+#: include/func.inc.php:2619
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15353,7 +15349,7 @@ msgstr "Anual"
 
 #: events.php:765 include/blocks.inc.php:737
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2429
+#: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
