@@ -875,7 +875,7 @@ static char	*remedy_get_ticketid_by_triggerid(zbx_uint64_t triggerid)
  *                                                                            *
  * Function: remedy_get_service_by_host                                       *
  *                                                                            *
- * Purpose: gets remedy service associated to the specified host              *
+ * Purpose: gets remedy service linked to the specified host                  *
  *                                                                            *
  * Parameters: hostid       - [IN] the host id                                *
  *             group_name   - [IN] the name of value mapping containing       *
@@ -885,11 +885,11 @@ static char	*remedy_get_ticketid_by_triggerid(zbx_uint64_t triggerid)
  *             service_id   - [OUT] the corresponding service reconciliation  *
  *                                  id                                        *
  *                                                                            *
- * Comments: The Zabbix host association with corresponding Remedy service is *
- *           done through a specific value mapping that maps Zabbix host      *
- *           group names to respective Remedy services in format:             *
- *               <group name> => <service name>:<service reconciliation id>   *
- *           The name of this mapping must be stored in Remedy media type.    *
+ * Comments: The Service CI is linked to the hosts with a help of host groups.*
+ *           All hosts in the group defined in Remedy media configuration     *
+ *           (service mapping) are linked to Network & Telecoms Service CI,   *
+ *           while the rest of hosts are linked to Server & Storage Service   *
+ *           CI.                                                              *
  *                                                                            *
  ******************************************************************************/
 static void	remedy_get_service_by_host(zbx_uint64_t hostid, const char *group_name, char **service_name,
