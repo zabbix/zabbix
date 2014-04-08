@@ -80,6 +80,7 @@ New features:
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
 .......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
