@@ -844,7 +844,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
-	zbx_uint64_t	min = 0, max = ZBX_MAX_IDS;
+	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID;
 	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 

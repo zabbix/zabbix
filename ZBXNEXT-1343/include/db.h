@@ -214,7 +214,7 @@ zbx_graph_item_type;
 
 #define ZBX_MAX_SQL_LEN		65535
 
-#define ZBX_MAX_IDS	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
+#define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
 typedef struct
 {
