@@ -36,12 +36,12 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 #else
 	DIR		*dir;
-	struct stat	sb;
+	zbx_stat_t	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
 	int		result = SUCCEED;
 
-	if (-1 == stat(cfg_file, &sb))
+	if (-1 == zbx_stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
@@ -60,7 +60,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	{
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
 
-		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
+		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
