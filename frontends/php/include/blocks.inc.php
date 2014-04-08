@@ -1106,8 +1106,9 @@ function make_latest_issues(array $filter = array()) {
 
 		// clock
 		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&hostid='.$trigger['hostid'].
-				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+			'events.php?triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.'&show_unknown=1'.
+				'&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 		// actions
