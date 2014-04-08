@@ -151,6 +151,13 @@ class CTriggerExpressionParser extends CParser {
 	protected $unaryOperatorTokens;
 
 	/**
+	 * Tokens that should be treated as spaces.
+	 *
+	 * @var array
+	 */
+	protected $spaceTokens = array();
+
+	/**
 	 * @param array $options
 	 * @param bool $options['lldmacros']
 	 */
@@ -162,10 +169,8 @@ class CTriggerExpressionParser extends CParser {
 		$this->binaryOperatorTokens = new CParserTokens(array(
 			'<', '>', '<=', '>=', '+', '-', '/', '*', 'and', 'or', '=', '<>'
 		));
-
-		$this->unaryOperatorTokens = new CParserTokens(array(
-			'-', 'not'
-		));
+		$this->unaryOperatorTokens = new CParserTokens(array('-', 'not'));
+		$this->spaceTokens = new CParserTokens(array(' ', "\r", "\n", "\t"));
 	}
 
 	/**
@@ -328,7 +333,25 @@ class CTriggerExpressionParser extends CParser {
 	 * @return null|string
 	 */
 	protected function parseBinaryOperator() {
-		return $this->parseToken($this->binaryOperatorTokens);
+		$start = $this->pos;
+
+		$operator = $this->parseToken($this->binaryOperatorTokens);
+
+		$prevChar = isset($this->source[$start - 1]) ? $this->source[$start - 1] : null;
+		$nextChar = isset($this->source[$this->pos + 1]) ? $this->source[$this->pos + 1] : null;
+
+		// make sure that the "and" and "or" operators are preceded by either a closing parentheses or space,
+		// and followed by either an opening parentheses or space
+		if (($operator === 'and' || $operator === 'or')
+			&& (($prevChar !== null && $prevChar !== ')' &&  !$this->spaceTokens->hasToken($prevChar))
+				|| ($nextChar !== null && $nextChar !== '(' &&  !$this->spaceTokens->hasToken($nextChar)))) {
+
+			$this->pos = $start;
+
+			return null;
+		}
+
+		return $operator;
 	}
 
 	/**
@@ -337,7 +360,25 @@ class CTriggerExpressionParser extends CParser {
 	 * @return null|string
 	 */
 	protected function parseUnaryOperator() {
-		return $this->parseToken($this->unaryOperatorTokens);
+		$start = $this->pos;
+
+		$operator = $this->parseToken($this->unaryOperatorTokens);
+
+		$prevChar = isset($this->source[$start - 1]) ? $this->source[$start - 1] : null;
+		$nextChar = isset($this->source[$this->pos + 1]) ? $this->source[$this->pos + 1] : null;
+
+		// make sure that the "not" operator is preceded by either an opening parentheses or space,
+		// and followed by either an opening parentheses or space
+		if (($operator === 'not')
+			&& (($prevChar !== null && $prevChar !== '(' &&  !$this->spaceTokens->hasToken($prevChar))
+				|| ($nextChar !== null && $nextChar !== '(' &&  !$this->spaceTokens->hasToken($nextChar)))) {
+
+			$this->pos = $start;
+
+			return null;
+		}
+
+		return $operator;
 	}
 
 	/**
