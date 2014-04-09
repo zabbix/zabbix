@@ -2403,18 +2403,12 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result_drule =  DBselect(
-			"select iprange"
-			" from drules"
-			" where druleid=" ZBX_FS_UI64,
-			drule->druleid);
+	result_drule = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, drule->druleid);
 
 	if (NULL == (row_drule = DBfetch(result_drule)))
 		goto out;
 
-	result_dservices = DBselect(
-			"select dhostid, ip"
-			" from dservices");
+	result_dservices = DBselect("select dhostid, ip from dservices");
 
 	while (NULL != (row_dservices = DBfetch(result_dservices)))
 	{
@@ -2436,17 +2430,16 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 
 	DBbegin();
 	DBexecute("delete from dhosts"
-			" where dhostid not in (%s) "
-			"and druleid =" ZBX_FS_UI64,
+			" where dhostid not in (%s)"
+				" and druleid =" ZBX_FS_UI64,
 			known_dhostid_list,
 			drule->druleid);
 	DBcommit();
 out:
+	zbx_free(known_dhostid_list);
 	DBfree_result(result_drule);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): hosts in drule (hostid): %s", __function_name, known_dhostid_list);
-
-	zbx_free(known_dhostid_list);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
