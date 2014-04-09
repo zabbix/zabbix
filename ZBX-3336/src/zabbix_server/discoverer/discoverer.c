@@ -663,7 +663,7 @@ static void	process_rule(DB_DRULE *drule)
 			DBcommit();
 		}
 	}
-	zbx_clean_dhost_list(drule);
+	zbx_clean_dhost_list(drule->druleid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

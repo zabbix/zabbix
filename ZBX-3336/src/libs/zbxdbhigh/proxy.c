@@ -2391,7 +2391,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  * Author: Nikolajs Agafonovs                                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_clean_dhost_list(DB_DRULE *drule)
+void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 {
 	const char	*__function_name = "zbx_clean_dhost_list";
 
@@ -2403,7 +2403,7 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result_drule = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, drule->druleid);
+	result_drule = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
 	if (NULL == (row_drule = DBfetch(result_drule)))
 		goto out;
@@ -2433,7 +2433,7 @@ void	zbx_clean_dhost_list(DB_DRULE *drule)
 			" where dhostid not in (%s)"
 				" and druleid =" ZBX_FS_UI64,
 			known_dhostid_list,
-			drule->druleid);
+			druleid);
 	DBcommit();
 out:
 	zbx_free(known_dhostid_list);
@@ -2557,7 +2557,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
 		if (0 != drule.druleid)
-			zbx_clean_dhost_list(&drule);
+			zbx_clean_dhost_list(drule.druleid);
 
 		DBbegin();
 		if (-1 == dcheck.type)
