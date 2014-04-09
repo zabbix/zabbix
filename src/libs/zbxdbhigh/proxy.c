@@ -2402,6 +2402,8 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	zbx_uint64_t		tmp;
 	size_t			sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
 	if (NULL == (row = DBfetch(result)))
