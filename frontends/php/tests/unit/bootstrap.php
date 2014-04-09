@@ -32,7 +32,7 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/clients',
 	__DIR__.'/../../include/classes/api/wrappers',
 	__DIR__.'/../../include/classes/parsers',
-	__DIR__.'/../../include/classes/parsers/tokens',
+	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../api/classes',
 ));
 $autoloader->register();

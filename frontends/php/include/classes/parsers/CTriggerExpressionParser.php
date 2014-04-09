@@ -18,14 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CTriggerExpressionParser extends CParser {
+class CTriggerExpressionParser {
 	// for parsing of trigger expression
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
 	const STATE_AFTER_BINARY_OPERATOR = 2;
-	const STATE_AFTER_UNARY_OPERATOR = 3;
-	const STATE_AFTER_CLOSE_BRACE = 4;
-	const STATE_AFTER_CONSTANT = 5;
+	const STATE_AFTER_LOGICAL_OPERATOR = 3;
+	const STATE_AFTER_NOT_OPERATOR = 4;
+	const STATE_AFTER_MINUS_OPERATOR = 5;
+	const STATE_AFTER_CLOSE_BRACE = 6;
+	const STATE_AFTER_CONSTANT = 7;
 
 	// for parsing of item key parameters
 	const STATE_NEW = 0;
@@ -137,25 +139,46 @@ class CTriggerExpressionParser extends CParser {
 	public $options = array('lldmacros' => true);
 
 	/**
-	 * Supported binary operators.
+	 * Source string.
 	 *
-	 * @var CParserTokens
+	 * @var
 	 */
-	protected $binaryOperatorTokens;
+	public $source;
 
 	/**
-	 * Supported unary operators.
+	 * Current cursor position.
 	 *
-	 * @var CParserTokens
+	 * @var
 	 */
-	protected $unaryOperatorTokens;
+	protected $pos;
 
 	/**
-	 * Tokens that should be treated as spaces.
+	 * Parser for binary operators.
+	 *
+	 * @var CSetParser
+	 */
+	protected $binaryOperatorParser;
+
+	/**
+	 * Parser for logical operators.
+	 *
+	 * @var CSetParser
+	 */
+	protected $logicalOperatorParser;
+
+	/**
+	 * Parser for the "not" operator.
+	 *
+	 * @var CSetParser
+	 */
+	protected $notOperatorParser;
+
+	/**
+	 * Chars that should be treated as spaces.
 	 *
 	 * @var array
 	 */
-	protected $spaceTokens = array();
+	protected $spaceChars = array(' ' => true, "\r" => true, "\n" => true, "\t" => true);
 
 	/**
 	 * @param array $options
@@ -166,11 +189,9 @@ class CTriggerExpressionParser extends CParser {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 
-		$this->binaryOperatorTokens = new CParserTokens(array(
-			'<', '>', '<=', '>=', '+', '-', '/', '*', 'and', 'or', '=', '<>'
-		));
-		$this->unaryOperatorTokens = new CParserTokens(array('-', 'not'));
-		$this->spaceTokens = new CParserTokens(array(' ', "\r", "\n", "\t"));
+		$this->binaryOperatorParser = new CSetParser(array('<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>'));
+		$this->logicalOperatorParser = new CSetParser(array('and', 'or'));
+		$this->notOperatorParser = new CSetParser(array('not'));
 	}
 
 	/**
@@ -223,80 +244,110 @@ class CTriggerExpressionParser extends CParser {
 		$this->source = $expression;
 
 		$state = self::STATE_INIT;
+		$afterSpace = true;
 		$level = 0;
 
 		while (isset($this->source[$this->pos])) {
-			switch ($state) {
-				case self::STATE_INIT:
-				case self::STATE_AFTER_OPEN_BRACE:
-				case self::STATE_AFTER_BINARY_OPERATOR:
-					switch ($this->source[$this->pos]) {
-						case ' ':
-						case "\r":
-						case "\n":
-						case "\t":
-							break;
-						case '(':
-							$state = self::STATE_AFTER_OPEN_BRACE;
-							$level++;
-							break;
-						default:
-							// try to parse the next token as a unary operator
-							$pos = $this->pos;
-							if ($this->parseUnaryOperator()) {
-								$state = self::STATE_AFTER_UNARY_OPERATOR;
+			// check if this is a space
+			$isSpace = isset($this->spaceChars[$this->source[$this->pos]]);
+
+			// skip space characters
+			if (!$isSpace) {
+				switch ($state) {
+					case self::STATE_INIT:
+					case self::STATE_AFTER_OPEN_BRACE:
+					case self::STATE_AFTER_BINARY_OPERATOR:
+					case self::STATE_AFTER_LOGICAL_OPERATOR:
+						if ($afterSpace || $state == self::STATE_INIT || $state == self::STATE_AFTER_OPEN_BRACE) {
+							if ($this->parseUsing($this->notOperatorParser)) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
 								break;
 							}
-							// if this is not an operator - return to the start position and try to parse it as a
-							// constant
-							$this->pos = $pos;
-							if (!$this->parseConstant()) {
-								break 3;
+						}
+
+						switch ($this->source[$this->pos]) {
+							case '-':
+								$state = self::STATE_AFTER_MINUS_OPERATOR;
+								break;
+							case '(':
+								$state = self::STATE_AFTER_OPEN_BRACE;
+								$level++;
+								break;
+							default:
+								if (!$this->parseConstant()) {
+									break 3;
+								}
+								$state = self::STATE_AFTER_CONSTANT;
+						}
+
+						break;
+					case self::STATE_AFTER_CLOSE_BRACE:
+					case self::STATE_AFTER_CONSTANT:
+						if ($afterSpace || $state == self::STATE_AFTER_CLOSE_BRACE) {
+							if ($this->parseUsing($this->logicalOperatorParser)) {
+								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
+								break;
 							}
-							$state = self::STATE_AFTER_CONSTANT;
-					}
-					break;
-				case self::STATE_AFTER_UNARY_OPERATOR:
-					switch ($this->source[$this->pos]) {
-						case ' ':
-						case "\r":
-						case "\n":
-						case "\t":
-							break;
-						case '(':
-							$state = self::STATE_AFTER_OPEN_BRACE;
-							$level++;
-							break;
-						default:
-							if (!$this->parseConstant()) {
-								break 3;
+						}
+
+						switch ($this->source[$this->pos]) {
+							case ')':
+								$state = self::STATE_AFTER_CLOSE_BRACE;
+								if ($level == 0) {
+									break 3;
+								}
+								$level--;
+								break;
+							default:
+								if (!$this->parseUsing($this->binaryOperatorParser)) {
+									break 3;
+								}
+								$state = self::STATE_AFTER_BINARY_OPERATOR;
+						}
+
+						break;
+					case self::STATE_AFTER_NOT_OPERATOR:
+						if ($afterSpace) {
+							switch ($this->source[$this->pos]) {
+								case '-':
+									$state = self::STATE_AFTER_MINUS_OPERATOR;
+									break 2;
+								default:
+									if ($this->parseConstant()) {
+										$state = self::STATE_AFTER_CONSTANT;
+										break 2;
+									}
 							}
-							$state = self::STATE_AFTER_CONSTANT;
-					}
-					break;
-				case self::STATE_AFTER_CLOSE_BRACE:
-				case self::STATE_AFTER_CONSTANT:
-					switch ($this->source[$this->pos]) {
-						case ' ':
-						case "\r":
-						case "\n":
-						case "\t":
-							break;
-						case ')':
-							$state = self::STATE_AFTER_CLOSE_BRACE;
-							if ($level == 0) {
+						}
+
+						switch ($this->source[$this->pos]) {
+							case '(':
+								$state = self::STATE_AFTER_OPEN_BRACE;
+								$level++;
+								break;
+							default:
 								break 3;
-							}
-							$level--;
-							break;
-						default:
-							if (!$this->parseBinaryOperator()) {
-								break 3;
-							}
-							$state = self::STATE_AFTER_BINARY_OPERATOR;
-					}
-					break;
+						}
+
+						break;
+					case self::STATE_AFTER_MINUS_OPERATOR:
+						switch ($this->source[$this->pos]) {
+							case '(':
+								$state = self::STATE_AFTER_OPEN_BRACE;
+								$level++;
+								break;
+							default:
+								if (!$this->parseConstant()) {
+									break 3;
+								}
+								$state = self::STATE_AFTER_CONSTANT;
+						}
+
+						break;
+				}
 			}
+
+			$afterSpace = $isSpace;
 			$this->pos++;
 		}
 
@@ -305,7 +356,9 @@ class CTriggerExpressionParser extends CParser {
 			$this->isValid = false;
 		}
 
-		if ($level != 0 || isset($this->source[$this->pos]) || $state == self::STATE_AFTER_BINARY_OPERATOR || $state == self::STATE_AFTER_UNARY_OPERATOR) {
+		if ($level != 0 || isset($this->source[$this->pos])
+				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
+
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
 					substr($this->source, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
@@ -328,57 +381,25 @@ class CTriggerExpressionParser extends CParser {
 	}
 
 	/**
-	 * Parses a binary operator and moves the current position to the last symbol of the operator.
+	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
+	 * matched string.
 	 *
-	 * @return null|string
+	 * @param CParser $parser
+	 *
+	 * @return bool		true if a match has been found, false otherwise
 	 */
-	protected function parseBinaryOperator() {
-		$start = $this->pos;
+	protected function parseUsing(CParser $parser) {
+		$j = $this->pos;
 
-		$operator = $this->parseToken($this->binaryOperatorTokens);
+		$result = $parser->parse($this->source, $j);
 
-		$prevChar = isset($this->source[$start - 1]) ? $this->source[$start - 1] : null;
-		$nextChar = isset($this->source[$this->pos + 1]) ? $this->source[$this->pos + 1] : null;
-
-		// make sure that the "and" and "or" operators are preceded by either a closing parentheses or space,
-		// and followed by either an opening parentheses or space
-		if (($operator === 'and' || $operator === 'or')
-			&& (($prevChar !== null && $prevChar !== ')' &&  !$this->spaceTokens->hasToken($prevChar))
-				|| ($nextChar !== null && $nextChar !== '(' &&  !$this->spaceTokens->hasToken($nextChar)))) {
-
-			$this->pos = $start;
-
-			return null;
+		if ($result->match === null) {
+			return false;
 		}
 
-		return $operator;
-	}
+		$this->pos = $result->endPos - 1;
 
-	/**
-	 * Parses a unary operator and moves the current position to the last symbol of the operator.
-	 *
-	 * @return null|string
-	 */
-	protected function parseUnaryOperator() {
-		$start = $this->pos;
-
-		$operator = $this->parseToken($this->unaryOperatorTokens);
-
-		$prevChar = isset($this->source[$start - 1]) ? $this->source[$start - 1] : null;
-		$nextChar = isset($this->source[$this->pos + 1]) ? $this->source[$this->pos + 1] : null;
-
-		// make sure that the "not" operator is preceded by either an opening parentheses or space,
-		// and followed by either an opening parentheses or space
-		if (($operator === 'not')
-			&& (($prevChar !== null && $prevChar !== '(' &&  !$this->spaceTokens->hasToken($prevChar))
-				|| ($nextChar !== null && $nextChar !== '(' &&  !$this->spaceTokens->hasToken($nextChar)))) {
-
-			$this->pos = $start;
-
-			return null;
-		}
-
-		return $operator;
+		return true;
 	}
 
 	/**
