@@ -2395,11 +2395,11 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 {
 	const char	*__function_name = "zbx_clean_dhost_list";
 
-	char			*known_dhostid_list = NULL;
-	DB_RESULT		result_dservices;
-	DB_ROW			row_dservices;
-	DB_RESULT		result_drule;
-	DB_ROW			row_drule;
+	char		*known_dhostid_list = NULL;
+	DB_RESULT	result_dservices;
+	DB_ROW		row_dservices;
+	DB_RESULT	result_drule;
+	DB_ROW		row_drule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
