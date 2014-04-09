@@ -165,6 +165,7 @@ input[type="submit"].input[disabled].formlist { cursor: default; }
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
+input[type="file"],
 textarea.textarea_standard,
 textarea.textarea_big,
 input.jqueryinput,
