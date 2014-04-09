@@ -2433,7 +2433,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "dhosts which is not in drule range count: %u", vector_dhosts.values_num);
 
-	if (0 < vector_dhosts.values_num)
+	if (0 != vector_dhosts.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
