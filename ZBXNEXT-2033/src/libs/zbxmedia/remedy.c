@@ -1319,9 +1319,10 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		char		*urgency_map[] = {"3-Medium", "2-High"};
 		zbx_uint64_t	functionid;
 
-		if (NULL != incident_number && NULL != (status = remedy_fields_get_value(fields, ARRSIZE(fields),
-				ZBX_REMEDY_FIELD_STATUS)))
+		if (NULL != incident_number)
 		{
+			status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+
 			/* check if the ticket should be reopened */
 			if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED))
 			{
