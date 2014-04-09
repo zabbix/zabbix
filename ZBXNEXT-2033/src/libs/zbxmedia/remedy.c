@@ -1313,7 +1313,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 
 	if (TRIGGER_VALUE_OK != event_value)
 	{
-		char		*service_name = NULL, *service_id = NULL;
+		char		*service_name = NULL, *service_id = NULL, *severity_name = NULL;
 		int		remedy_event;
 		char		*impact_map[] = {"3-Moderate/Limited", "2-Significant/Large"};
 		char		*urgency_map[] = {"3-Medium", "2-High"};
@@ -1361,21 +1361,33 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		/* create a new ticket */
 
 		if (SUCCEED != get_N_functionid(trigger_expression, 1, &functionid, NULL))
+		{
+			*error = zbx_strdup(*error, "Failed to extract function id from the trigger expression");
 			goto out;
+		}
 
 		DBfree_result(result);
 
 		/* find the host */
 		result = DBselect("select h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
-				" from hosts h,items i,functions f,host_inventory hi"
+				" from items i,functions f,hosts h left join host_inventory hi"
+					" on hi.hostid=h.hostid"
 				" where f.functionid=" ZBX_FS_UI64
 					" and f.itemid=i.itemid"
-					" and i.hostid=h.hostid"
-					" and hi.hostid=h.hostid",
+					" and i.hostid=h.hostid",
 				functionid);
 
 		if (NULL == (row = DBfetch(result)))
+		{
+			*error = zbx_strdup(*error, "Failed find host of the trigger expression");
 			goto out;
+		}
+
+		if (SUCCEED == DBis_null(row[2]))
+		{
+			*error = zbx_dsprintf(NULL, "Host inventory is not enabled for the host '%s'", row[0]);
+			goto out;
+		}
 
 		/* map trigger severity */
 		switch (trigger_severity)
@@ -1389,6 +1401,12 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 				remedy_event = ZBX_EVENT_REMEDY_CRITICAL;
 				break;
 			default:
+				if (SUCCEED != DCget_trigger_severity_name(trigger_severity, &severity_name))
+					severity_name = zbx_dsprintf(severity_name, "[%d]", trigger_severity);
+
+				*error = zbx_dsprintf(*error, "Unsupported trigger severity: %s", severity_name);
+				zbx_free(severity_name);
+
 				goto out;
 		}
 
