@@ -18,15 +18,49 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-abstract class CParser {
+/**
+ * Class for storing the result returned by a parser.
+ */
+class CParserResult {
 
 	/**
-	 * Try to parse the string starting from the given position.
+	 * Source string.
 	 *
-	 * @param string	$source		string to parse
-	 * @param int 		$startPos	position to start from
-	 *
-	 * @return CParserResult
+	 * @var	string
 	 */
-	abstract public function parse($source, $startPos = 0);
+	public $source;
+
+	/**
+	 * Parsed string.
+	 *
+	 * @var string
+	 */
+	public $match;
+
+	/**
+	 * Starting position of the matched string in the source string.
+	 *
+	 * @var
+	 */
+	public $startPos;
+
+	/**
+	 * Position of the next character after the matched string in the source string.
+	 *
+	 * @var string
+	 */
+	public $endPos;
+
+	/**
+	 * @param string 	$source
+	 * @param string 	$match
+	 * @param int	 	$startPos
+	 * @param int 		$endPos
+	 */
+	public function __construct($source, $match, $startPos, $endPos) {
+		$this->source = $source;
+		$this->match = $match;
+		$this->startPos = $startPos;
+		$this->endPos = $endPos;
+	}
 }
