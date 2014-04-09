@@ -1120,7 +1120,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// try to create valid expression
-			$expressionData = new CTriggerExpressionParser();
+			$expressionData = new CTriggerExpression();
 
 			if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 				continue;

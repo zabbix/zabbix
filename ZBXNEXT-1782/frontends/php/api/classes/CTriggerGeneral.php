@@ -131,7 +131,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
-		$expressionData = new CTriggerExpressionParser();
+		$expressionData = new CTriggerExpression();
 		$expressionData->parse($trigger['expression']);
 
 		$newTrigger['expression'] = $trigger['expression'];
@@ -245,7 +245,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$filter['hostid'] = $hostId;
 		}
 		else {
-			$expressionData = new CTriggerExpressionParser($trigger['expression']);
+			$expressionData = new CTriggerExpression($trigger['expression']);
 			$expressionData->parse($trigger['expression']);
 			$expressionHosts = $expressionData->getHosts();
 			$filter['host'] = reset($expressionHosts);
