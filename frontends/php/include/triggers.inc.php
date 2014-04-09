@@ -1004,7 +1004,7 @@ function triggerExpression($trigger, $html = false) {
  * @return string Imploded expression (names and keys replaced by IDs)
  */
 function implode_exp($expression, $triggerId, &$hostnames = array()) {
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		throw new Exception($expressionData->error);
 	}
@@ -1083,11 +1083,11 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 /**
  * Get items from expression.
  *
- * @param CTriggerExpressionParser $triggerExpression
+ * @param CTriggerExpression $triggerExpression
  *
  * @return array
  */
-function getExpressionItems(CTriggerExpressionParser $triggerExpression) {
+function getExpressionItems(CTriggerExpression $triggerExpression) {
 	$items = array();
 	$processedFunctions = array();
 	$processedItems = array();
@@ -1122,7 +1122,7 @@ function getExpressionItems(CTriggerExpressionParser $triggerExpression) {
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
 		return false;
@@ -1686,13 +1686,13 @@ function analyzeExpression($expression) {
 		return array('', null);
 	}
 
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->source) - 1);
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
 
 	$next = array();
 	$letterNum = 0;
@@ -1807,7 +1807,7 @@ function expressionHighLevelErrors($expression) {
 
 	if (!isset($errors[$expression])) {
 		$errors[$expression] = array();
-		$expressionData = new CTriggerExpressionParser();
+		$expressionData = new CTriggerExpression();
 		if ($expressionData->parse($expression)) {
 			foreach ($expressionData->expressions as $exprPart) {
 				$info = get_item_function_info($exprPart['expression']);
@@ -1826,7 +1826,7 @@ function expressionHighLevelErrors($expression) {
 		return $ret;
 	}
 
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 	if ($expressionData->parse($expression)) {
 		foreach ($expressionData->expressions as $exprPart) {
 			if (isset($errors[$expression][$exprPart['expression']])) {
@@ -1866,15 +1866,15 @@ function expressionLevelDraw(array $next, $level) {
  * expression "{host.key.last(0)}=0 & ({host2:key.last(0)}=0 & {host3.key.last(0)}=0)" has two elements:
  * "{host.key.last(0)}=0" and "({host2:key.last(0)}=0 & {host3.key.last(0)}=0)"
  *
- * @param CTriggerExpressionParser $expressionData
+ * @param CTriggerExpression $expressionData
  * @param int $start
  * @param int $end
  *
  * @return integer
  */
-function getExpressionElementsNum(CTriggerExpressionParser $expressionData, $start, $end) {
+function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end) {
 	for ($i = $start, $level = 0, $expressionElementsNum = 1; $i <= $end; $i++) {
-		switch ($expressionData->source[$i]) {
+		switch ($expressionData->expression[$i]) {
 			case '(':
 				$level++;
 				break;
@@ -1927,13 +1927,13 @@ function getExpressionElementsNum(CTriggerExpressionParser $expressionData, $sta
  *     )
  *   )
  *
- * @param CTriggerExpressionParser $expressionData
+ * @param CTriggerExpression $expressionData
  * @param int $start
  * @param int $end
  *
  * @return array
  */
-function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $end) {
+function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 	$blankSymbols = array(' ', "\r", "\n", "\t");
 
 	$expressionTree = array();
@@ -1947,7 +1947,7 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 		$operatorToken = '';
 
 		for ($i = $start, $level = 0; $i <= $end; $i++) {
-			switch ($expressionData->source[$i]) {
+			switch ($expressionData->expression[$i]) {
 				case ' ':
 				case "\r":
 				case "\n":
@@ -1978,9 +1978,9 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 					break;
 				default:
 					// try to parse an operator
-					if ($operator[$operatorPos] === $expressionData->source[$i]) {
+					if ($operator[$operatorPos] === $expressionData->expression[$i]) {
 						$operatorPos++;
-						$operatorToken .= $expressionData->source[$i];
+						$operatorToken .= $expressionData->expression[$i];
 
 						// operator found
 						if ($operatorToken === $operator) {
@@ -1991,7 +1991,7 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 								$closeSymbolNum = $i - strlen($operator);
 
 								// trim blank symbols after the expression
-								while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
+								while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
 									$closeSymbolNum--;
 								}
 
@@ -2015,7 +2015,7 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 
 		// trim blank symbols in the end of the trigger expression
 		$closeSymbolNum = $end;
-		while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
+		while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
 			$closeSymbolNum--;
 		}
 
@@ -2033,19 +2033,19 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 
 			// trim blank symbols in the beginning of the trigger expression
 			$openSymbolNum = $start;
-			while (in_array($expressionData->source[$openSymbolNum], $blankSymbols)) {
+			while (in_array($expressionData->expression[$openSymbolNum], $blankSymbols)) {
 				$openSymbolNum++;
 			}
 
 			// trim blank symbols in the end of the trigger expression
 			$closeSymbolNum = $end;
-			while (in_array($expressionData->source[$closeSymbolNum], $blankSymbols)) {
+			while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
 				$closeSymbolNum--;
 			}
 
 			$expressionTree = array(
 				'id' => $openSymbolNum.'_'.$closeSymbolNum,
-				'expression' => substr($expressionData->source, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+				'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 				'type' => 'operator',
 				'operator' => $operator,
 				'elements' => $expressions
@@ -2066,7 +2066,7 @@ function getExpressionTree(CTriggerExpressionParser $expressionData, $start, $en
 			else {
 				$expressionTree = array(
 					'id' => $openSymbolNum.'_'.$closeSymbolNum,
-					'expression' => substr($expressionData->source, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+					'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 					'type' => 'expression'
 				);
 			}
@@ -2097,7 +2097,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
 		return false;
 	}
 
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 	if ($action != 'R' && !$expressionData->parse($newExpression)) {
 		error($expressionData->error);
 		return false;
@@ -2108,7 +2108,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->source) - 1);
+	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
 
 	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
 		$expression = makeExpression($expressionTree);
@@ -2347,7 +2347,7 @@ function get_item_function_info($expr) {
 		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
 	);
 
-	$expressionData = new CTriggerExpressionParser();
+	$expressionData = new CTriggerExpression();
 
 	if ($expressionData->parse($expr)) {
 		if (isset($expressionData->macros[0])) {

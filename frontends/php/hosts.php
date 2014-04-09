@@ -107,7 +107,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-$parser = new CTriggerExpressionParser();
+$parser = new CTriggerExpression();
 var_dumP($parser->parse('{host:key.diff()}=1Kand 1'));
 
 /*

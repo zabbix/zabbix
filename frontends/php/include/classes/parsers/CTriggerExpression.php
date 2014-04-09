@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CTriggerExpressionParser {
+class CTriggerExpression {
 	// for parsing of trigger expression
 	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
@@ -143,7 +143,7 @@ class CTriggerExpressionParser {
 	 *
 	 * @var
 	 */
-	public $source;
+	public $expression;
 
 	/**
 	 * Current cursor position.
@@ -241,15 +241,15 @@ class CTriggerExpressionParser {
 		$this->lldmacros = array();
 
 		$this->pos = 0;
-		$this->source = $expression;
+		$this->expression = $expression;
 
 		$state = self::STATE_INIT;
 		$afterSpace = true;
 		$level = 0;
 
-		while (isset($this->source[$this->pos])) {
+		while (isset($this->expression[$this->pos])) {
 			// check if this is a space
-			$isSpace = isset($this->spaceChars[$this->source[$this->pos]]);
+			$isSpace = isset($this->spaceChars[$this->expression[$this->pos]]);
 
 			// skip space characters
 			if (!$isSpace) {
@@ -265,7 +265,7 @@ class CTriggerExpressionParser {
 							}
 						}
 
-						switch ($this->source[$this->pos]) {
+						switch ($this->expression[$this->pos]) {
 							case '-':
 								$state = self::STATE_AFTER_MINUS_OPERATOR;
 								break;
@@ -290,7 +290,7 @@ class CTriggerExpressionParser {
 							}
 						}
 
-						switch ($this->source[$this->pos]) {
+						switch ($this->expression[$this->pos]) {
 							case ')':
 								$state = self::STATE_AFTER_CLOSE_BRACE;
 								if ($level == 0) {
@@ -308,7 +308,7 @@ class CTriggerExpressionParser {
 						break;
 					case self::STATE_AFTER_NOT_OPERATOR:
 						if ($afterSpace) {
-							switch ($this->source[$this->pos]) {
+							switch ($this->expression[$this->pos]) {
 								case '-':
 									$state = self::STATE_AFTER_MINUS_OPERATOR;
 									break 2;
@@ -320,7 +320,7 @@ class CTriggerExpressionParser {
 							}
 						}
 
-						switch ($this->source[$this->pos]) {
+						switch ($this->expression[$this->pos]) {
 							case '(':
 								$state = self::STATE_AFTER_OPEN_BRACE;
 								$level++;
@@ -331,7 +331,7 @@ class CTriggerExpressionParser {
 
 						break;
 					case self::STATE_AFTER_MINUS_OPERATOR:
-						switch ($this->source[$this->pos]) {
+						switch ($this->expression[$this->pos]) {
 							case '(':
 								$state = self::STATE_AFTER_OPEN_BRACE;
 								$level++;
@@ -356,11 +356,11 @@ class CTriggerExpressionParser {
 			$this->isValid = false;
 		}
 
-		if ($level != 0 || isset($this->source[$this->pos])
+		if ($level != 0 || isset($this->expression[$this->pos])
 				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
 
 			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
-					substr($this->source, $this->pos == 0 ? 0 : $this->pos - 1));
+					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
 			$this->isValid = false;
 		}
 
@@ -391,7 +391,7 @@ class CTriggerExpressionParser {
 	protected function parseUsing(CParser $parser) {
 		$j = $this->pos;
 
-		$result = $parser->parse($this->source, $j);
+		$result = $parser->parse($this->expression, $j);
 
 		if ($result->match === null) {
 			return false;
@@ -431,25 +431,25 @@ class CTriggerExpressionParser {
 	private function parseFunctionMacro() {
 		$j = $this->pos;
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != '{' || ($host = $this->parseHost($j)) === null) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || ($host = $this->parseHost($j)) === null) {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != ':' || ($item = $this->parseItem($j)) === null) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || ($item = $this->parseItem($j)) === null) {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != '.'
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '.'
 				|| !(list($function, $functionParamList) = $this->parseFunction($j))) {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j] != '}') {
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
 			return false;
 		}
 
 		$this->expressions[] = array(
-			'expression' => substr($this->source, $this->pos, $j - $this->pos + 1),
+			'expression' => substr($this->expression, $this->pos, $j - $this->pos + 1),
 			'pos' => $this->pos,
 			'host' => $host,
 			'item' => $item,
@@ -471,7 +471,7 @@ class CTriggerExpressionParser {
 	{
 		$j = $pos;
 
-		while (isset($this->source[$j]) && $this->isHostChar($this->source[$j])) {
+		while (isset($this->expression[$j]) && $this->isHostChar($this->expression[$j])) {
 			$j++;
 		}
 
@@ -480,7 +480,7 @@ class CTriggerExpressionParser {
 			return null;
 		}
 
-		$host = substr($this->source, $pos, $j - $pos);
+		$host = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
 		return $host;
 	}
@@ -494,25 +494,25 @@ class CTriggerExpressionParser {
 	{
 		$j = $pos;
 
-		while (isset($this->source[$j]) && $this->isKeyChar($this->source[$j])) {
+		while (isset($this->expression[$j]) && $this->isKeyChar($this->expression[$j])) {
 			$j++;
 		}
 
 		// for instance, agent.ping.last(0)
-		if (isset($this->source[$j]) && $this->source[$j] == '(') {
-			while ($j > $pos && $this->source[$j] != '.') {
+		if (isset($this->expression[$j]) && $this->expression[$j] == '(') {
+			while ($j > $pos && $this->expression[$j] != '.') {
 				$j--;
 			}
 		}
 		// for instance, net.tcp.port[,80]
-		elseif (isset($this->source[$j]) && $this->source[$j] == '[') {
+		elseif (isset($this->expression[$j]) && $this->expression[$j] == '[') {
 			$level = 0;
 			$state = self::STATE_END;
 
-			while (isset($this->source[$j])) {
+			while (isset($this->expression[$j])) {
 				if ($level == 0) {
 					// first square bracket + Zapcat compatibility
-					if ($state == self::STATE_END && $this->source[$j] == '[') {
+					if ($state == self::STATE_END && $this->expression[$j] == '[') {
 						$state = self::STATE_NEW;
 					}
 					else {
@@ -523,7 +523,7 @@ class CTriggerExpressionParser {
 				switch ($state) {
 					// a new parameter started
 					case self::STATE_NEW:
-						switch ($this->source[$j]) {
+						switch ($this->expression[$j]) {
 							case ' ':
 							case ',':
 								break;
@@ -543,7 +543,7 @@ class CTriggerExpressionParser {
 						break;
 					// end of parameter
 					case self::STATE_END:
-						switch ($this->source[$j]) {
+						switch ($this->expression[$j]) {
 							case ' ':
 								break;
 							case ',':
@@ -558,7 +558,7 @@ class CTriggerExpressionParser {
 						break;
 					// an unquoted parameter
 					case self::STATE_UNQUOTED:
-						switch ($this->source[$j]) {
+						switch ($this->expression[$j]) {
 							case ']':
 								$level--;
 								$state = self::STATE_END;
@@ -570,9 +570,9 @@ class CTriggerExpressionParser {
 						break;
 					// a quoted parameter
 					case self::STATE_QUOTED:
-						switch ($this->source[$j]) {
+						switch ($this->expression[$j]) {
 							case '"':
-								if ($this->source[$j - 1] != '\\') {
+								if ($this->expression[$j - 1] != '\\') {
 									$state = self::STATE_END;
 								}
 								break;
@@ -592,7 +592,7 @@ class CTriggerExpressionParser {
 			return null;
 		}
 
-		$item = substr($this->source, $pos, $j - $pos);
+		$item = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
 		return $item;
 	}
@@ -611,7 +611,7 @@ class CTriggerExpressionParser {
 	{
 		$j = $pos;
 
-		while (isset($this->source[$j]) && $this->isFunctionChar($this->source[$j])) {
+		while (isset($this->expression[$j]) && $this->isFunctionChar($this->expression[$j])) {
 			$j++;
 		}
 
@@ -620,7 +620,7 @@ class CTriggerExpressionParser {
 			return null;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != '(') {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '(') {
 			return null;
 		}
 
@@ -629,11 +629,11 @@ class CTriggerExpressionParser {
 		$functionParamList = array();
 		$functionParamList[$num] = '';
 
-		while (isset($this->source[$j])) {
+		while (isset($this->expression[$j])) {
 			switch ($state) {
 				// a new parameter started
 				case self::STATE_NEW:
-					switch ($this->source[$j]) {
+					switch ($this->expression[$j]) {
 						case ' ':
 							break;
 						case ',':
@@ -646,13 +646,13 @@ class CTriggerExpressionParser {
 							$state = self::STATE_QUOTED;
 							break;
 						default:
-							$functionParamList[$num] .= $this->source[$j];
+							$functionParamList[$num] .= $this->expression[$j];
 							$state = self::STATE_UNQUOTED;
 					}
 					break;
 				// end of parameter
 				case self::STATE_END:
-					switch ($this->source[$j]) {
+					switch ($this->expression[$j]) {
 						case ' ':
 							break;
 						case ',':
@@ -668,7 +668,7 @@ class CTriggerExpressionParser {
 					break;
 				// an unquoted parameter
 				case self::STATE_UNQUOTED:
-					switch ($this->source[$j]) {
+					switch ($this->expression[$j]) {
 						case ')':
 							// end of parameters
 							break 3;
@@ -677,22 +677,22 @@ class CTriggerExpressionParser {
 							$state = self::STATE_NEW;
 							break;
 						default:
-							$functionParamList[$num] .= $this->source[$j];
+							$functionParamList[$num] .= $this->expression[$j];
 					}
 					break;
 				// a quoted parameter
 				case self::STATE_QUOTED:
-					switch ($this->source[$j]) {
+					switch ($this->expression[$j]) {
 						case '"':
 							$state = self::STATE_END;
 							break;
 						case '\\':
-							if (isset($this->source[$j + 1]) && $this->source[$j + 1] == '"') {
+							if (isset($this->expression[$j + 1]) && $this->expression[$j + 1] == '"') {
 								$j++;
 							}
 							// break; is not missing here
 						default:
-							$functionParamList[$num] .= $this->source[$j];
+							$functionParamList[$num] .= $this->expression[$j];
 							break;
 					}
 					break;
@@ -700,11 +700,11 @@ class CTriggerExpressionParser {
 			$j++;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != ')') {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ')') {
 			return null;
 		}
 
-		$function = substr($this->source, $pos, $j - $pos);
+		$function = substr($this->expression, $pos, $j - $pos);
 		$pos = $j;
 		return array($function, $functionParamList);
 	}
@@ -718,29 +718,29 @@ class CTriggerExpressionParser {
 	private function parseNumber() {
 		$j = $this->pos;
 
-		if ($this->source[$j] < '0' || $this->source[$j] > '9') {
+		if ($this->expression[$j] < '0' || $this->expression[$j] > '9') {
 			return false;
 		}
 
 		$j++;
-		while (isset($this->source[$j]) && $this->source[$j] >= '0' && $this->source[$j] <= '9') {
+		while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
 			$j++;
 		}
 
-		if (isset($this->source[$j]) && $this->source[$j] == '.') {
+		if (isset($this->expression[$j]) && $this->expression[$j] == '.') {
 			$j++;
-			if (!isset($this->source[$j]) || $this->source[$j] < '0' || $this->source[$j] > '9') {
+			if (!isset($this->expression[$j]) || $this->expression[$j] < '0' || $this->expression[$j] > '9') {
 				return false;
 			}
 
 			$j++;
-			while (isset($this->source[$j]) && $this->source[$j] >= '0' && $this->source[$j] <= '9') {
+			while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
 				$j++;
 			}
 		}
 
 		// check for an optional suffix
-		if (isset($this->source[$j]) && strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->source[$j]) !== false) {
+		if (isset($this->expression[$j]) && strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
 			$j++;
 		}
 
@@ -760,7 +760,7 @@ class CTriggerExpressionParser {
 		foreach ($macros as $macro) {
 			$len = strlen($macro);
 
-			if (substr($this->source, $this->pos, $len) != $macro) {
+			if (substr($this->expression, $this->pos, $len) != $macro) {
 				continue;
 			}
 
@@ -780,27 +780,27 @@ class CTriggerExpressionParser {
 	private function parseUserMacro() {
 		$j = $this->pos;
 
-		if ($this->source[$j++] != '{') {
+		if ($this->expression[$j++] != '{') {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != '$') {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '$') {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || !$this->isMacroChar($this->source[$j++])) {
+		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
 			return false;
 		}
 
-		while (isset($this->source[$j]) && $this->isMacroChar($this->source[$j])) {
+		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
 			$j++;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j] != '}') {
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
 			return false;
 		}
 
-		$usermacro = substr($this->source, $this->pos, $j - $this->pos + 1);
+		$usermacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
 		$this->usermacros[] = array('expression' => $usermacro);
 		$this->pos = $j;
 		return true;
@@ -819,27 +819,27 @@ class CTriggerExpressionParser {
 
 		$j = $this->pos;
 
-		if ($this->source[$j++] != '{') {
+		if ($this->expression[$j++] != '{') {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j++] != '#') {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '#') {
 			return false;
 		}
 
-		if (!isset($this->source[$j]) || !$this->isMacroChar($this->source[$j++])) {
+		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
 			return false;
 		}
 
-		while (isset($this->source[$j]) && $this->isMacroChar($this->source[$j])) {
+		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
 			$j++;
 		}
 
-		if (!isset($this->source[$j]) || $this->source[$j] != '}') {
+		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
 			return false;
 		}
 
-		$lldmacro = substr($this->source, $this->pos, $j - $this->pos + 1);
+		$lldmacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
 		$this->lldmacros[] = array('expression' => $lldmacro);
 		$this->pos = $j;
 		return true;
