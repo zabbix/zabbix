@@ -76,6 +76,8 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 		if ($data['type'] == 0) {
 			$data['availProbes'] = 0;
+			$data['noResultProbes'] = 0;
+			$data['totalAvailProbes'] = 0;
 			$data['totalProbes'] = 0;
 		}
 		else {
@@ -349,8 +351,15 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		}
 		elseif ($data['type'] == RSM_DNS && $item['key_'] == PROBE_DNS_UDP_ITEM) {
 			// avail probes
-			if ($itemValue['value'] == 1 || $itemValue['value'] === null) {
+			if ($itemValue['value'] == 1) {
 				$data['availProbes']++;
+				$data['totalAvailProbes']++;
+			}
+			elseif ($itemValue['value'] === null) {
+				$data['noResultProbes']++;
+			}
+			else {
+				$data['totalAvailProbes']++;
 			}
 		}
 		elseif ($data['type'] == RSM_DNSSEC && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {

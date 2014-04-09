@@ -62,19 +62,24 @@ $particularTestsInfoTable = new CTable(null, 'filter info-block');
 $particularTestsTable = new CTableInfo($noData);
 $particularTestsTable->setHeader($headers);
 
+$down = new CSpan(_('Down'), 'red');
+$offline = new CSpan(_('Offline'), 'red');
+$noResult = _('No result');
+$up = new CSpan(_('Up'), 'green');
+
 foreach ($this->data['probes'] as $probe) {
 	$status = null;
 	if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
 		if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
-			$link = new CSpan(_('Offline'), 'red');
+			$link = $offline;
 		}
 		elseif ($this->data['type'] == RSM_RDDS) {
-			$rdds = new CSpan(_('Offline'), 'red');
-			$rdds43 = new CSpan(_('Offline'), 'red');
-			$rdds80 = new CSpan(_('Offline'), 'red');
+			$rdds = $offline;
+			$rdds43 = $offline;
+			$rdds80 = $offline;
 		}
 		else {
-			$epp = new CSpan(_('Offline'), 'red');
+			$epp = $offline;
 		}
 	}
 	else {
@@ -82,10 +87,10 @@ foreach ($this->data['probes'] as $probe) {
 			// DNS
 			if (isset($probe['value'])) {
 				if ($probe['value']) {
-					$status = new CSpan(_('Up'), 'green');
+					$status = $up;
 				}
 				else {
-					$status = new CSpan(_('Down'), 'red');
+					$status = $down;
 				}
 				$link = new CLink(
 					$status,
@@ -123,41 +128,41 @@ foreach ($this->data['probes'] as $probe) {
 		elseif ($this->data['type'] == RSM_RDDS) {
 			// RDDS
 			if (!isset($probe['value']) || $probe['value'] === null) {
-				$rdds43 = _('No result');
-				$rdds80 = _('No result');
-				$rdds = _('No result');
+				$rdds43 = $noResult;
+				$rdds80 = $noResult;
+				$rdds = $noResult;
 			}
 			elseif ($probe['value'] == 0) {
-				$rdds43 = new CSpan(_('Down'), 'red');
-				$rdds80 = new CSpan(_('Down'), 'red');
-				$rdds = new CSpan(_('Down'), 'red');
+				$rdds43 = $down;
+				$rdds80 = $down;
+				$rdds = $down;
 			}
 			elseif ($probe['value'] == 1) {
-				$rdds43 = new CSpan(_('Up'), 'green');
-				$rdds80 = new CSpan(_('Up'), 'green');
-				$rdds = new CSpan(_('Up'), 'green');
+				$rdds43 = $up;
+				$rdds80 = $up;
+				$rdds = $up;
 			}
 			elseif ($probe['value'] == 2) {
-				$rdds43 = new CSpan(_('Up'), 'green');
-				$rdds80 = new CSpan(_('Down'), 'red');
-				$rdds = new CSpan(_('Down'), 'red');
+				$rdds43 = $up;
+				$rdds80 = $down;
+				$rdds = $down;
 			}
 			elseif ($probe['value'] == 3) {
 				$rdds43 = new CSpan(_('Down'), 'green');
 				$rdds80 = new CSpan(_('Up'), 'red');
-				$rdds = new CSpan(_('Down'), 'red');
+				$rdds = $down;
 			}
 		}
 		else {
 			// EPP
 			if (!isset($probe['value']) || $probe['value'] === null) {
-				$epp = _('No result');
+				$epp = $noResult;
 			}
 			elseif ($probe['value'] == 0) {
-				$epp = new CSpan(_('Down'), 'red');
+				$epp = $down;
 			}
 			elseif ($probe['value'] == 1) {
-				$epp = new CSpan(_('Up'), 'green');
+				$epp = $up;
 			}
 		}
 	}
@@ -195,12 +200,19 @@ foreach ($this->data['probes'] as $probe) {
 	$particularTestsTable->addRow($row);
 }
 if ($this->data['type'] == RSM_DNS) {
+	if ($this->data['totalAvailProbes'] != 0) {
+		$availProbes = round($this->data['availProbes'] / $this->data['totalAvailProbes'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	}
+	else {
+		$availProbes = 0;
+	}
+
 	$additionInfo = array(
 		BR(),
 		new CSpan(bold(_s(
 			'%1$s out of %2$s probes reported availability of service',
-			round($this->data['availProbes'] / $this->data['totalProbes'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%',
-			$this->data['totalProbes']
+			$availProbes.'%',
+			$this->data['totalAvailProbes']
 		)))
 	);
 }
