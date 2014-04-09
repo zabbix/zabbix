@@ -2397,10 +2397,9 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	char			*ip_range, *sql = NULL;
+	char			*ip_range;
 	zbx_vector_uint64_t	vector_dhosts;
 	zbx_uint64_t		tmp;
-	size_t			sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2416,7 +2415,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 			" from dhosts dh,dservices ds"
 			" where dh.dhostid=ds.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64,
-				druleid);
+			druleid);
 
 	zbx_vector_uint64_create(&vector_dhosts);
 
@@ -2432,17 +2431,22 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	zbx_free(ip_range);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "dhosts not in drule range count: %u", vector_dhosts.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "dhosts which is not in drule range count: %u", vector_dhosts.values_num);
+
 	if (0 < vector_dhosts.values_num)
 	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+
 		zbx_vector_uint64_sort(&vector_dhosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&vector_dhosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where ");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid", vector_dhosts.values, vector_dhosts.values_num);
 
 		DBexecute("%s", sql);
+
+		zbx_free(sql);
 	}
 	zbx_vector_uint64_destroy(&vector_dhosts);
 
