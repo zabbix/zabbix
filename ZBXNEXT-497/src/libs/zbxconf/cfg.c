@@ -53,7 +53,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *file_name, *dot_pos;
+	char 			*path = NULL, *file_name;
+	const char		*extension;
 	wchar_t			*wpath;
 	struct _stat		sb;
 
@@ -90,8 +91,11 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
-		if ((NULL ==(dot_pos = strrchr(file_name, '.'))) || (0 != strcmp(".conf", dot_pos)))
+		if (NULL == (extension = strrchr(file_name, '.')) || 0 != strcmp(".conf", extension))
+		{
+			zbx_free(file_name);
 			continue;
+		}
 
 		path = zbx_dsprintf(path, "%s\\%s", cfg_file, file_name);
 
@@ -114,7 +118,8 @@ out:
 	DIR		*dir;
 	zbx_stat_t	sb;
 	struct dirent	*d;
-	char		*incl_file = NULL, *dot_pos;
+	char		*incl_file = NULL;
+	const char	*extension;
 	int		result = SUCCEED;
 
 	if (-1 == zbx_stat(cfg_file, &sb))
@@ -139,7 +144,7 @@ out:
 		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
-		if ((NULL ==(dot_pos = strrchr(incl_file, '.'))) || (0 != strcmp(".conf", dot_pos)))
+		if (NULL == (extension = strrchr(incl_file, '.')) || 0 != strcmp(".conf", extension))
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
@@ -148,6 +153,7 @@ out:
 			break;
 		}
 	}
+
 	zbx_free(incl_file);
 
 	if (-1 == closedir(dir))
