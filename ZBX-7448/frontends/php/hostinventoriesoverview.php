@@ -127,7 +127,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	foreach($report as $rep){
 		$row = array(
-			new CSpan($rep['inventory_field'], 'pre'),
+			new CSpan(zbx_str2links($rep['inventory_field']), 'pre'),
 			new CLink($rep['host_count'],'hostinventories.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['inventory_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
 		);
 		$table->addRow($row);
