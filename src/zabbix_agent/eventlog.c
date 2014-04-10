@@ -126,7 +126,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 	{
 		*pEventMessageFile = zbx_malloc(*pEventMessageFile, szData);
 		if (ERROR_SUCCESS != RegQueryValueEx(hKey, TEXT("EventMessageFile"), NULL, NULL,
-				(LPBYTE)*pEventMessageFile, &szData))
+				(unsigned char *)*pEventMessageFile, &szData))
 		{
 			zbx_free(*pEventMessageFile);
 		}
@@ -136,7 +136,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 	{
 		*pParamMessageFile = zbx_malloc(*pParamMessageFile, szData);
 		if (ERROR_SUCCESS != RegQueryValueEx(hKey, TEXT("ParameterMessageFile"), NULL, NULL,
-				(LPBYTE)*pParamMessageFile, &szData))
+				(unsigned char *)*pParamMessageFile, &szData))
 		{
 			zbx_free(*pParamMessageFile);
 		}
@@ -295,7 +295,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	{
 		pInsertStrings = zbx_malloc(NULL, sizeof(wchar_t *) * pELR->NumStrings);
 
-		pCh = (wchar_t *)((LPBYTE)pELR + pELR->StringOffset);
+		pCh = (wchar_t *)((unsigned char *)pELR + pELR->StringOffset);
 
 		for (i = 0; i < pELR->NumStrings; i++)
 		{
@@ -349,7 +349,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 
 			*out_message = zbx_strdcat(*out_message, " The following information is part of the event: ");
 
-			for (i = 0, pCh = (wchar_t *)((LPBYTE)pELR + pELR->StringOffset);
+			for (i = 0, pCh = (wchar_t *)((unsigned char *)pELR + pELR->StringOffset);
 					i < pELR->NumStrings;
 					i++, pCh += zbx_strlen(pCh) + 1)
 			{
