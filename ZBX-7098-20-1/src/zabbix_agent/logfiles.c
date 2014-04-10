@@ -232,8 +232,8 @@ out:
  *                MD5 sum is placed                                           *
  *     use_ino  - [IN] how to use file IDs (on Microsoft Windows)             *
  *     dev      - [OUT] device ID                                             *
- *     use_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
- *     use_hi   - [OUT] higher 64-bits of FileId                              *
+ *     ino_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
+ *     ino_hi   - [OUT] higher 64-bits of FileId                              *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -242,16 +242,12 @@ out:
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-#ifdef _WINDOWS
 static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf,
 		int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, zbx_uint64_t *ino_hi)
-#else
-static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int length, md5_byte_t *md5buf)
-#endif
 {
-	int		ret = FAIL, f;
-	md5_state_t	state;
-	char		buf[MAX_LEN_MD5];
+	int				ret = FAIL, f;
+	md5_state_t			state;
+	char				buf[MAX_LEN_MD5];
 #ifdef _WINDOWS
 	intptr_t			h;	/* file HANDLE */
 	BY_HANDLE_FILE_INFORMATION	hfi;
@@ -274,43 +270,46 @@ static int	file_part_md5sum_id(const char *filename, zbx_uint64_t offset, int le
 		return ret;
 	}
 
-	if (1 == use_ino || 0 == use_ino)
+	if (NULL != dev && NULL != ino_lo && NULL != ino_hi)
 	{
-		/* Although nFileIndexHigh and nFileIndexLow cannot be reliably used to identify files when */
-		/* use_ino = 0 (e.g. on FAT32, exFAT), we copy indexes to have at least correct debug logs. */
-		if (0 != GetFileInformationByHandle((HANDLE)h, &hfi))
+		if (1 == use_ino || 0 == use_ino)
 		{
-			*dev = hfi.dwVolumeSerialNumber;
-			*ino_lo = (zbx_uint64_t)hfi.nFileIndexHigh << 32 | (zbx_uint64_t)hfi.nFileIndexLow;
-			*ino_hi = 0;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
-					filename, GetLastError());
-			return ret;
-		}
-	}
-	else if (2 == use_ino)
-	{
-		if (NULL != zbx_GetFileInformationByHandleEx)
-		{
-			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
+			/* Although nFileIndexHigh and nFileIndexLow cannot be reliably used to identify files when */
+			/* use_ino = 0 (e.g. on FAT32, exFAT), we copy indexes to have at least correct debug logs. */
+			if (0 != GetFileInformationByHandle((HANDLE)h, &hfi))
 			{
-				*dev = fid.VolumeSerialNumber;
-				*ino_lo = fid.FileId.LowPart;
-				*ino_hi = fid.FileId.HighPart;
+				*dev = hfi.dwVolumeSerialNumber;
+				*ino_lo = (zbx_uint64_t)hfi.nFileIndexHigh << 32 | (zbx_uint64_t)hfi.nFileIndexLow;
+				*ino_hi = 0;
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
-						"\"%s\", error code:%u", filename, GetLastError());
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
+						filename, GetLastError());
 				return ret;
 			}
 		}
+		else if (2 == use_ino)
+		{
+			if (NULL != zbx_GetFileInformationByHandleEx)
+			{
+				if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, FileIdInfo, &fid, sizeof(fid)))
+				{
+					*dev = fid.VolumeSerialNumber;
+					*ino_lo = fid.FileId.LowPart;
+					*ino_hi = fid.FileId.HighPart;
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
+							"\"%s\", error code:%u", filename, GetLastError());
+					return ret;
+				}
+			}
+		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
-	else
-		THIS_SHOULD_NEVER_HAPPEN;
 #endif
 	if (0 < offset && (zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
 	{
@@ -344,7 +343,6 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
 
 	for (i = 0; i < logfiles_num; i++)
 	{
-#ifdef _WINDOWS
 		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
 				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:" ZBX_FS_UI64
 				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
@@ -356,19 +354,6 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
 				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
 				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
 				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
-#else /* not _WINDOWS */
-		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
-				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino:" ZBX_FS_UI64 " md5size:%d "
-				"md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino_lo,
-				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
-				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
-				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
-				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
-				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
-				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
-#endif /* _WINDOWS */
 	}
 }
 
@@ -394,30 +379,22 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
-#ifdef _WINDOWS
 static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
-#else
-static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new)
-#endif
 {
-#ifdef _WINDOWS
 	if (1 == use_ino || 2 == use_ino)
 	{
-#endif
 		if (old->ino_lo != new->ino_lo || old->dev != new->dev)
 		{
 			/* File's inode and device id cannot differ. */
 			goto not_same;
 		}
-#ifdef _WINDOWS
 	}
 
-	if (2 == use_ino && (old->ino_hi != new->ino_hi))
+	if (2 == use_ino && old->ino_hi != new->ino_hi)
 	{
 		/* File's inode (older 64-bits) cannot differ. */
 		goto not_same;
 	}
-#endif
 
 	if (old->mtime > new->mtime)
 	{
@@ -465,13 +442,8 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			md5_byte_t	md5tmp;
 
 			/* MD5 for the old file has been calculated from a smaller initial block */
-#ifdef _WINDOWS
 			if (FAIL == file_part_md5sum_id(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp, 0, NULL,
 					NULL, NULL) || 0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
-#else
-			if (FAIL == file_part_md5sum_id(new->filename, (zbx_uint64_t)0, old->md5size, &md5tmp)
-					|| 0 != memcmp(old->md5buf, &md5tmp, sizeof(md5tmp)))
-#endif
 			{
 				goto not_same;
 			}
@@ -499,17 +471,13 @@ not_same:
  *          use_ino - [IN] how to use inodes in is_same_file()                *
  *                                                                            *
  * Comments:                                                                  *
- *          old2new[i][j] = "0" - i-th old file cannot be the j-th new file   *
- *          old2new[i][j] = "1" - i-th old file could be the j-th new file    *
+ *    The array is filled with '0' and '1' which mean:                        *
+ *       old2new[i][j] = '0' - the i-th old file IS NOT the j-th new file     *
+ *       old2new[i][j] = '1' - the i-th old file COULD BE the j-th new file   *
  *                                                                            *
  ******************************************************************************/
-#ifdef _WINDOWS
 static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
 		const struct st_logfile *new, int num_new, int use_ino)
-#else
-static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
-		const struct st_logfile *new, int num_new)
-#endif
 {
 	int	i, j;
 	char	*p = old2new;
@@ -518,11 +486,7 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
 	{
 		for (j = 0; j < num_new; j++)
 		{
-#ifdef _WINDOWS
 			if (1 == is_same_file(old + i, new + j, use_ino))
-#else
-			if (1 == is_same_file(old + i, new + j))
-#endif
 				*(p + j) = '1';
 			else
 				*(p + j) = '0';
@@ -536,25 +500,153 @@ static void	setup_old2new(char *old2new, const struct st_logfile *old, int num_o
 
 /******************************************************************************
  *                                                                            *
+ * Function: cross_out                                                        *
+ *                                                                            *
+ * Purpose: fill the given row and column with '0' except the element at the  *
+ *          cross point and protected columns and protected rows              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          arr    - [IN] two dimensional array                               *
+ *          n_rows - [IN] number of rows in the array                         *
+ *          n_cols - [IN] number of columns in the array                      *
+ *          row    - [IN] number of cross point row                           *
+ *          col    - [IN] number of cross point column                        *
+ *          p_rows - [IN] vector with 'n_rows' elements.                      *
+ *                        Value '1' means protected row.                      *
+ *          p_cols - [IN] vector with 'n_cols' elements.                      *
+ *                        Value '1' means protected column.                   *
+ *                                                                            *
+ * Example:                                                                   *
+ *     Given array                                                            *
+ *                                                                            *
+ *         1 1 1 1                                                            *
+ *         1 1 1 1                                                            *
+ *         1 1 1 1                                                            *
+ *                                                                            *
+ *     and row = 1, col = 2 and no protected rows and columns                 *
+ *     the array is modified as                                               *
+ *                                                                            *
+ *         1 1 0 1                                                            *
+ *         0 0 1 0                                                            *
+ *         1 1 0 1                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, char *p_rows, char *p_cols)
+{
+	int	i;
+	char	*p;
+
+	p = arr + row * n_cols;		/* point to the first element of the 'row' */
+
+	for (i = 0; i < n_cols; i++)	/* process row */
+	{
+		if ('1' != p_cols[i] && col != i)
+			p[i] = '0';
+	}
+
+	p = arr + col;			/* point to the top element of the 'col' */
+
+	for (i = 0; i < n_rows; i++)	/* process column */
+	{
+		if ('1' != p_rows[i] && row != i)
+			p[i * n_cols] = '0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_uniq_row                                                      *
+ *                                                                            *
+ * Purpose: check if there is only one element '1' in the given row           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          arr    - [IN] two dimensional array                               *
+ *          n_cols - [IN] number of columns in the array                      *
+ *          row    - [IN] number of row to search                             *
+ *                                                                            *
+ * Return value: number of column where the '1' element was found or          *
+ *               -1 if there are zero or multiple '1' elements in the row     *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uniq_row(const char *arr, int n_cols, int row)
+{
+	int		i, ones = 0, ret = -1;
+	const char	*p;
+
+	p = arr + row * n_cols;			/* point to the first element of the 'row' */
+
+	for (i = 0; i < n_cols; i++)
+	{
+		if ('1' == *p++)
+		{
+			if (2 == ++ones)
+				break;		/* non-unique mapping in the row */
+
+			ret = i;
+		}
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_uniq_col                                                      *
+ *                                                                            *
+ * Purpose: check if there is only one element '1' in the given column        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          arr    - [IN] two dimensional array                               *
+ *          n_rows - [IN] number of rows in the array                         *
+ *          n_cols - [IN] number of columns in the array                      *
+ *          col    - [IN] number of column to search                          *
+ *                                                                            *
+ * Return value: number of row where the '1' element was found or             *
+ *               -1 if there are zero or multiple '1' elements in the column  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
+{
+	int		i, ones = 0, ret = -1;
+	const char	*p;
+
+	p = arr + col;				/* point to the top element of the 'col' */
+
+	for (i = 0; i < n_rows; i++)
+	{
+		if ('1' == *p)
+		{
+			if (2 == ++ones)
+				break;		/* non-unique mapping in the column */
+
+			ret = i;
+		}
+		p += n_cols;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: resolve_old2new                                                  *
  *                                                                            *
  * Purpose: resolve non-unique mappings                                       *
  *                                                                            *
  * Parameters:                                                                *
  *          old2new - [IN] two dimensional array of possible mappings         *
- *          old     - [IN] old file list                                      *
  *          num_old - [IN] number of elements in the old file list            *
- *          new     - [IN] new file list                                      *
  *          num_new - [IN] number of elements in the new file list            *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num_old,
-		const struct st_logfile *new, int num_new)
+static void	resolve_old2new(char *old2new, int num_old, int num_new)
 {
 	int	i, j, ones;
-	char	*p;
+	char	*p, *protected_rows = NULL, *protected_cols = NULL;
 
-	/* Is there 1:1 mapping (every row and column has not more than one element '1') ? */
+	/* Is there 1:1 mapping in both directions between files in the old and the new list ? */
+	/* In this case every row and column has not more than one element '1'. */
+	/* This is expected on UNIX (using inode numbers) and MS Windows (using FileID on NTFS, ReFS) */
 
 	p = old2new;
 
@@ -590,7 +682,131 @@ static void	resolve_old2new(char *old2new, const struct st_logfile *old, int num
 
 	return;
 non_unique:
+	/* This is expected on MS Windows using FAT32 and other file systems where inodes or file indexes */
+	/* are either not preserved if a file is renamed or are not applicable. */
+
 	zabbix_log(LOG_LEVEL_DEBUG, "resolve_old2new(): non-unique mapping");
+
+	/* protect unique mappings from further modifications */
+
+	protected_rows = zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
+	protected_cols = zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
+
+	for (i = 0; i < num_old; i++)
+	{
+		int	c;
+
+		if (-1 != (c = is_uniq_row(old2new, num_new, i)) && -1 != is_uniq_col(old2new, num_old, num_new, c))
+		{
+			protected_rows[i] = '1';
+			protected_cols[c] = '1';
+		}
+	}
+
+	/* resolve the remaining non-unique mappings - turn them into unique ones */
+
+	if (num_old <= num_new)				/* square or wide array */
+	{
+		/****************************************************************************************************
+		 *                                                                                                  *
+		 * Example for a wide array:                                                                        *
+		 *                                                                                                  *
+		 *            D.log C.log B.log A.log                                                               *
+		 *           ------------------------                                                               *
+		 *    3.log | <1>    1     1     1                                                                  *
+		 *    2.log |  1    <1>    1     1                                                                  *
+		 *    1.log |  1     1    <1>    1                                                                  *
+		 *                                                                                                  *
+		 * There are 3 files in the old log file list and 4 files in the new log file list.                 *
+		 * The mapping is totally non-unique: the old log file '3.log' could have become the new 'D.log' or *
+		 * 'C.log', or 'B.log', or 'A.log' - we don't know for sure.                                        *
+		 * We make an assumption that a reasonable solution will be to proceed as if '3.log' was renamed to *
+		 * 'D.log', '2.log' - to 'C.log' and '1.log' - to 'B.log'.                                          *
+		 * We modify the array according to this assumption:                                                *
+		 *                                                                                                  *
+		 *            D.log C.log B.log A.log                                                               *
+		 *           ------------------------                                                               *
+		 *    3.log | <1>    0     0     0                                                                  *
+		 *    2.log |  0    <1>    0     0                                                                  *
+		 *    1.log |  0     0    <1>    0                                                                  *
+		 *                                                                                                  *
+		 * Now the mapping is unique. The file 'A.log' is counted as a new file to be analyzed from the     *
+		 * start.                                                                                           *
+		 *                                                                                                  *
+		 ****************************************************************************************************/
+
+		for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
+		{
+			if ('1' == protected_rows[i])
+				continue;
+
+			p = old2new + i * num_new;	/* the first element of the current row */
+
+			for (j = 0; j < num_new; j++)
+			{
+				if ('1' == p[j] && '1' != protected_cols[j])
+				{
+					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+					break;
+				}
+			}
+		}
+	}
+	else	/* tall array */
+	{
+		/****************************************************************************************************
+		 *                                                                                                  *
+		 * Example for a tall array:                                                                        *
+		 *                                                                                                  *
+		 *            D.log C.log B.log A.log                                                               *
+		 *           ------------------------                                                               *
+		 *    6.log |  1     1     1     1                                                                  *
+		 *    5.log |  1     1     1     1                                                                  *
+		 *    4.log | <1>    1     1     1                                                                  *
+		 *    3.log |  1    <1>    1     1                                                                  *
+		 *    2.log |  1     1    <1>    1                                                                  *
+		 *    1.log |  1     1     1    <1>                                                                 *
+		 *                                                                                                  *
+		 * There are 6 files in the old log file list and 4 files in the new log file list.                 *
+		 * The mapping is totally non-unique: the old log file '6.log' could have become the new 'D.log' or *
+		 * 'C.log', or 'B.log', or 'A.log' - we don't know for sure.                                        *
+		 * We make an assumption that a reasonable solution will be to proceed as if '1.log' was renamed to *
+		 * 'A.log', '2.log' - to 'B.log', '3.log' - to 'C.log', '4.log' - to 'D.log'.                       *
+		 * We modify the array according to this assumption:                                                *
+		 *                                                                                                  *
+		 *            D.log C.log B.log A.log                                                               *
+		 *           ------------------------                                                               *
+		 *    6.log |  0     0     0     0                                                                  *
+		 *    5.log |  0     0     0     0                                                                  *
+		 *    4.log | <1>    0     0     0                                                                  *
+		 *    3.log |  0    <1>    0     0                                                                  *
+		 *    2.log |  0     0    <1>    0                                                                  *
+		 *    1.log |  0     0     0    <1>                                                                 *
+		 *                                                                                                  *
+		 * Now the mapping is unique. Files '6.log' and '5.log' are counted as not present in the new file. *
+		 *                                                                                                  *
+		 ****************************************************************************************************/
+
+		for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
+		{
+			if ('1' == protected_rows[i])
+				continue;
+
+			p = old2new + (i + 1) * num_new - 1;	/* the last element of the current row */
+
+			for (j = num_new - 1; j >= 0; j--)
+			{
+				if ('1' == p[j] && '1' != protected_cols[j])
+				{
+					cross_out(old2new, num_old, num_new, i, j, protected_rows, protected_cols);
+					break;
+				}
+			}
+		}
+	}
+
+	zbx_free(protected_cols);
+	zbx_free(protected_rows);
 	return;
 }
 
@@ -614,7 +830,7 @@ static int	find_old2new(char *old2new, int num_new, int i_old)
 	int	i;
 	char	*p;
 
-	p = old2new + (size_t)i_old * (size_t)num_new * sizeof(char);
+	p = old2new + i_old * num_new;
 
 	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
 	{
@@ -645,13 +861,8 @@ static int	find_old2new(char *old2new, int num_new, int i_old)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#ifdef _WINDOWS
 static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		struct stat *st, int use_ino)
-#else
-static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
-		struct stat *st)
-#endif
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
@@ -724,15 +935,12 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].seq = 0;
 	(*logfiles)[i].md5size = (zbx_uint64_t)MAX_LEN_MD5 > (zbx_uint64_t)st->st_size ? (int)st->st_size : MAX_LEN_MD5;
 
-#ifdef _WINDOWS
-	if (SUCCEED != file_part_md5sum_id(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf,
-			use_ino, &(*logfiles)[i].dev, &(*logfiles)[i].ino_lo, &(*logfiles)[i].ino_hi))
-#else
+#ifndef _WINDOWS
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
-
-	if (SUCCEED != file_part_md5sum_id(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf))
 #endif
+	if (SUCCEED != file_part_md5sum_id(filename, (zbx_uint64_t)0, (*logfiles)[i].md5size, (*logfiles)[i].md5buf,
+			use_ino, &(*logfiles)[i].dev, &(*logfiles)[i].ino_lo, &(*logfiles)[i].ino_hi))
 	{
 		(*logfiles)[i].md5size = -1;
 	}
@@ -800,7 +1008,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, reg_error, seq = 1,
-				max_old_seq = 0, old_last, first_file = 0;
+				max_old_seq = 0, old_last, from_first_file = 0;
 	char			err_buf[MAX_STRING_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL,
 				*old2new = NULL;
 	struct stat		file_buf;
@@ -986,7 +1194,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 		}
 
 		/* on UNIX file systems we always assume that inodes can be used to identify files */
-		/* i.e. use_ino = 1; */
+		*use_ino = 1;
 
 		while (NULL != (d_ent = readdir(dir)))
 		{
@@ -1000,7 +1208,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 					add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, logfile_candidate,
-							&file_buf);
+							&file_buf, *use_ino);
 				}
 			}
 			else
@@ -1020,18 +1228,14 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 	if (1 == is_logrt)
 		regfree(&re);
 
-	if (0 == is_logrt)
+	if (0 == is_logrt)	/* log[] item */
 	{
 		if (0 == zbx_stat(filename, &file_buf))
 		{
 			if (S_ISREG(file_buf.st_mode))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", filename);
-#ifdef _WINDOWS
 				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, filename, &file_buf, *use_ino);
-#else
-				add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, filename, &file_buf);
-#endif
 			}
 			else
 			{
@@ -1054,7 +1258,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	start_idx = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
 
-	/* mark files to be skipped as processed */
+	/* mark files to be skipped as processed (case if 'skip_old_data' was set) */
 	for (i = 0; i < start_idx; i++)
 	{
 		logfiles[i].processed_size = logfiles[i].size;
@@ -1063,19 +1267,16 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	if (0 < *logfiles_num_old && 0 < logfiles_num)
 	{
-		/* set up a mapping matrix from old files to new files */
+		/* set up a mapping array from old files to new files */
 		old2new = zbx_malloc(old2new, (size_t)logfiles_num * (size_t)(*logfiles_num_old) * sizeof(char));
-#ifdef _WINDOWS
 		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num, *use_ino);
-#else
-		setup_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
-#endif
+
 		if (1 < *logfiles_num_old || 1 < logfiles_num)
-			resolve_old2new(old2new, *logfiles_old, *logfiles_num_old, logfiles, logfiles_num);
+			resolve_old2new(old2new, *logfiles_num_old, logfiles_num);
 
 		/* Find and mark for skipping files processed during the previous check. Such files can get into the */
-		/* new file list if several files had the same mtime but their processing was not finished because of */
-		/* error or maxlines limit. */
+		/* new file list if several files had the same 'mtime' but their processing was not finished because */
+		/* of an error or 'maxlines' limit. */
 		for (i = 0; i < *logfiles_num_old; i++)
 		{
 			if ((*logfiles_old)[i].processed_size == (*logfiles_old)[i].size
@@ -1086,7 +1287,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				logfiles[j].seq = seq++;
 			}
 
-			/* find the last file processed in the previous check */
+			/* find the last file processed (wholly or partially) in the previous check */
 			if (max_old_seq < (*logfiles_old)[i].seq)
 			{
 				max_old_seq = (*logfiles_old)[i].seq;
@@ -1094,7 +1295,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 			}
 		}
 
-		/* find the first file to continue with in the new file list */
+		/* find the first file to continue from in the new file list */
 		if (0 < max_old_seq)
 		{
 			if (-1 == (start_idx = find_old2new(old2new, logfiles_num, old_last)))
@@ -1105,7 +1306,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				start_idx = 0;
 			}
 			else
-				first_file = 1;
+				from_first_file = 1;
 		}
 	}
 
@@ -1156,9 +1357,11 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 				*lastlogsize = 0;
 		}
 
-		if (0 != first_file)
+		if (0 != from_first_file)
 		{
-			first_file = 0;
+			/* We have processed the file where we left off in the previous check. */
+			/* Now proceed from the beginning of the new file list to process the remaining files. */
+			from_first_file = 0;
 			i = 0;
 			continue;
 		}

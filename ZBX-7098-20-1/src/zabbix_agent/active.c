@@ -800,7 +800,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	AGENT_RESULT	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s('%s',%hu)", __function_name, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu)", __function_name, server, port);
 
 	init_result(&result);
 

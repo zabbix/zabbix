@@ -30,9 +30,7 @@ struct st_logfile
 	int		seq;		/* number in processing order */
 	zbx_uint64_t	dev;		/* ID of device containing file */
 	zbx_uint64_t	ino_lo;		/* UNIX: inode number. Microsoft Windows: nFileIndexLow or FileId.LowPart */
-#ifdef _WINDOWS
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
-#endif
 	zbx_uint64_t	size;		/* st_size from stat() */
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
 	md5_byte_t	md5buf[16];	/* md5 sum of the initial part of the file */
