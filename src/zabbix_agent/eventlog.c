@@ -253,8 +253,8 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 	int		buffer_size = 512;
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
-	wchar_t 	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL, *pCh,
-			*pInsertStrings = NULL;
+	wchar_t 	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL,
+			*pCh = NULL, **pInsertStrings = NULL;
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
@@ -642,7 +642,7 @@ finish:
 }
 
 /* expand the string message from a specific event handler */
-static char *expand_message6(const char *pname, EVT_HANDLE event)
+static char *expand_message6(const wchar_t *pname, EVT_HANDLE event)
 {
 	const char	*__function_name = "expand_message6";
 	wchar_t		*pmessage = NULL;
