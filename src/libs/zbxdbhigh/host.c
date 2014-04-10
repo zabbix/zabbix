@@ -3335,8 +3335,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid,operator,macro,value"
-				" from item_condition where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select item_conditionid,itemid,operator,macro,value from item_condition where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids.values, ids.values_num);
 
 		result = DBselect("%s", sql);
@@ -3345,7 +3345,13 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			ZBX_STR2UINT64(templateid, row[1]);
 
-			index = zbx_vector_ptr_search(&rules, &templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			if (FAIL == (index = zbx_vector_ptr_search(&rules, &templateid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
 			rule = rules.values[index];
 
 			condition = zbx_malloc(NULL, sizeof(zbx_dcondition_t));
@@ -3357,7 +3363,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_ptr_append(&rule->src_conditions, condition);
 		}
-
 		DBfree_result(result);
 
 		/* read host discovery rule conditions from database */
@@ -3377,7 +3382,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			sql_offset = 0;
 
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select item_conditionid,itemid from item_condition where");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select item_conditionid,itemid from item_condition where");
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids.values, ids.values_num);
 
 			result = DBselect("%s", sql);
@@ -3552,7 +3558,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					item[i].password, item[i].publickey, item[i].privatekey,
 					item[i].templateid, (int)item[i].flags, item[i].description,
 					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
-					item[i].lifetime, item[i].evaltype, item[i].itemid);
+					item[i].lifetime, (int)item[i].evaltype, item[i].itemid);
 
 			new_items--;
 		}
@@ -3577,7 +3583,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 					"authtype", "username", "password", "publickey", "privatekey", "templateid",
 					"flags", "description", "inventory_link", "interfaceid", "lifetime",
 					"snmpv3_contextname", "evaltype", NULL);
-
 
 			for (i = 0; i < item_num; i++)
 			{
