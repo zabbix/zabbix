@@ -30,22 +30,16 @@
  *                                                                            *
  * Purpose: receive auto-registration data from proxy                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "recv_areg_data";
+	const char	*__function_name = "recv_areg_data";
 
-	int			ret;
-	zbx_uint64_t		proxy_hostid;
-	char			host[HOST_HOST_LEN_MAX], error[256];
+	int		ret;
+	zbx_uint64_t	proxy_hostid;
+	char		host[HOST_HOST_LEN_MAX], error[256];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -71,13 +65,7 @@ out:
  *                                                                            *
  * Purpose: send auto-registration data from proxy to a server                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	send_areg_data(zbx_sock_t *sock)

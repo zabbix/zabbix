@@ -304,7 +304,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('groupid', 'name'),
 			'hostids' => $triggerOptions['hostids'],
-			'monitored_hosts' => true
+			'monitored_hosts' => true,
+			'preservekeys' => true
 		));
 		order_result($hostGroups, 'name');
 
@@ -314,6 +315,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 				get_node_name_by_elid($hostGroup['groupid'], null, NAME_DELIMITER).$hostGroup['name']
 			);
 		}
+
 		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
 			unset($triggerOptions['groupids']);
 		}
@@ -419,7 +421,9 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			get_node_name_by_elid($trigger['hostid']),
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
+			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid'].
+				'&source='.EVENT_SOURCE_TRIGGERS
+			),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
 			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
