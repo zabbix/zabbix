@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserMedia extends CZBXAPI {
+class CUserMedia extends CApiService {
 
 	protected $tableName = 'media';
 	protected $tableAlias = 'm';

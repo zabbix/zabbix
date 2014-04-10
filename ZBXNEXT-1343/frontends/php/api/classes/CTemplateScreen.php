@@ -228,7 +228,7 @@ class CTemplateScreen extends CScreen {
 
 		// adding screenitems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', array(
 				'output' => $this->outputExtend($options['selectScreenItems'],
 					array('screenid', 'screenitemid', 'resourcetype', 'resourceid')
 				),

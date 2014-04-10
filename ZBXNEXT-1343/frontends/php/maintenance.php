@@ -514,13 +514,21 @@ else {
 		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);
 	}
 
+	// get only maintenance IDs for paging
 	$data['maintenances'] = API::Maintenance()->get(array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('maintenanceid'),
 		'groupids' => $groupIds,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'editable' => true,
 		'limit' => $config['search_limit'] + 1
+	));
+	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
+
+	// get list of maintenances
+	$data['maintenances'] = API::Maintenance()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'maintenanceids' => zbx_objectValues($data['maintenances'], 'maintenanceid')
 	));
 
 	foreach ($data['maintenances'] as $key => $maintenance) {
@@ -537,7 +545,6 @@ else {
 
 	order_result($data['maintenances'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 	$data['pageFilter'] = $pageFilter;
 
 	// render view

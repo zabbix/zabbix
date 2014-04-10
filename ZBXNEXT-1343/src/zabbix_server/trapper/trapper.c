@@ -103,13 +103,7 @@ out:
  *                                                                            *
  * Purpose: send history data to a Zabbix server                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	send_proxyhistory(zbx_sock_t *sock)
@@ -162,14 +156,10 @@ out:
  *                                                                            *
  * Purpose: process heartbeat sent by proxy servers                           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)

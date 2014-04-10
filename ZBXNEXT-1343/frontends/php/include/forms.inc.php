@@ -1285,16 +1285,20 @@ function getTriggerMassupdateFormData() {
 	// get dependencies
 	$data['dependencies'] = API::Trigger()->get(array(
 		'triggerids' => $data['dependencies'],
-		'output' => array('triggerid', 'description'),
+		'output' => array('triggerid', 'flags', 'description'),
 		'preservekeys' => true,
-		'selectHosts' => array('name')
+		'selectHosts' => array('hostid', 'name')
 	));
 	foreach ($data['dependencies'] as &$dependency) {
-		if (!empty($dependency['hosts'][0]['name'])) {
-			$dependency['host'] = $dependency['hosts'][0]['name'];
+		if (count($dependency['hosts']) > 1) {
+			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
 		}
-		unset($dependency['hosts']);
+
+		$dependency['hosts'] = array_values($dependency['hosts']);
+		$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
 	}
+	unset($dependency);
+
 	order_result($data['dependencies'], 'description');
 
 	return $data;
@@ -1449,14 +1453,20 @@ function getTriggerFormData() {
 	if (empty($data['parent_discoveryid'])) {
 		$data['db_dependencies'] = API::Trigger()->get(array(
 			'triggerids' => $data['dependencies'],
-			'output' => array('triggerid', 'description'),
+			'output' => array('triggerid', 'flags', 'description'),
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('hostid', 'name')
 		));
 		foreach ($data['db_dependencies'] as &$dependency) {
-			$dependency['host'] = $dependency['hosts'][0]['name'];
-			unset($dependency['hosts']);
+			if (count($dependency['hosts']) > 1) {
+				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+			}
+
+			$dependency['hosts'] = array_values($dependency['hosts']);
+			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
 		}
+		unset($dependency);
+
 		order_result($data['db_dependencies'], 'description');
 	}
 	return $data;

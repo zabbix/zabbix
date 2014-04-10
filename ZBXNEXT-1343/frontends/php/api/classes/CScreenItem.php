@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScreenItem extends CZBXAPI {
+class CScreenItem extends CApiService {
 
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';
@@ -347,9 +347,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($screenItemIds) {
-		$screenItemIds = zbx_toArray($screenItemIds);
-
+	public function delete(array $screenItemIds) {
 		// check permissions
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid'),

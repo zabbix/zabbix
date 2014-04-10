@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDCheck extends CZBXAPI {
+class CDCheck extends CApiService {
 
 	protected $tableName = 'dchecks';
 	protected $tableAlias = 'dc';

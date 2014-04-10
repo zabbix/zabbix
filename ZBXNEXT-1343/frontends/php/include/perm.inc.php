@@ -19,15 +19,21 @@
 **/
 
 
-function permission2str($group_permission) {
-	$str_perm[PERM_READ_WRITE] = _('Read-write');
-	$str_perm[PERM_READ] = _('Read only');
-	$str_perm[PERM_DENY] = _('Deny');
+/**
+ * Get permission label.
+ *
+ * @param int $permission
+ *
+ * @return string
+ */
+function permission2str($permission) {
+	$permissions = array(
+		PERM_READ_WRITE => _('Read-write'),
+		PERM_READ => _('Read only'),
+		PERM_DENY => _('Deny')
+	);
 
-	if (isset($str_perm[$group_permission])) {
-		return $str_perm[$group_permission];
-	}
-	return _('Unknown');
+	return isset($permissions[$permission]) ? $permissions[$permission] : _('Unknown');
 }
 
 /***********************************************

@@ -457,11 +457,9 @@ class DB {
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
-		$fields = array_keys(reset($values));
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
-			$fields[] = $tableSchema['key'];
 		}
 
 		$newValues = array();
@@ -475,6 +473,8 @@ class DB {
 			self::checkValueTypes($table, $row);
 			$newValues[] = $row;
 		}
+
+		$fields = array_keys(reset($newValues));
 
 		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
 

@@ -24,7 +24,7 @@
  *
  * * @package API
  */
-class CMaintenance extends CZBXAPI {
+class CMaintenance extends CApiService {
 
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';
@@ -598,64 +598,64 @@ class CMaintenance extends CZBXAPI {
 	}
 
 	/**
-	 * Delete maintenances by maintenanceids.
+	 * Delete Maintenances.
 	 *
 	 * @param array $maintenanceids
 	 *
 	 * @return array
 	 */
 	public function delete(array $maintenanceids) {
-		$maintenanceids = zbx_toArray($maintenanceids);
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
+		$options = array(
+			'maintenanceids' => $maintenanceids,
+			'editable' => true,
+			'output' => array('maintenanceid'),
+			'preservekeys' => true
+		);
+		$maintenances = $this->get($options);
+		foreach ($maintenanceids as $maintenanceid) {
+			if (!isset($maintenances[$maintenanceid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
+		}
 
-			$options = array(
-				'maintenanceids' => $maintenanceids,
-				'editable' => true,
-				'output' => array('maintenanceid'),
-				'preservekeys' => true
-			);
-			$maintenances = $this->get($options);
-			foreach ($maintenanceids as $maintenanceid) {
-				if (!isset($maintenances[$maintenanceid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-				}
-			}
+		$timeperiodids = array();
+		$dbTimeperiods = DBselect(
+			'SELECT DISTINCT tp.timeperiodid'.
+			' FROM timeperiods tp,maintenances_windows mw'.
+			' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
+				' AND tp.timeperiodid=mw.timeperiodid'
+		);
+		while ($timeperiod = DBfetch($dbTimeperiods)) {
+			$timeperiodids[] = $timeperiod['timeperiodid'];
+		}
 
-			$timeperiodids = array();
-			$dbTimeperiods = DBselect(
-				'SELECT DISTINCT tp.timeperiodid'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
-					' AND tp.timeperiodid=mw.timeperiodid'
-			);
-			while ($timeperiod = DBfetch($dbTimeperiods)) {
-				$timeperiodids[] = $timeperiod['timeperiodid'];
-			}
+		$midCond = array('maintenanceid' => $maintenanceids);
 
-			$midCond = array('maintenanceid' => $maintenanceids);
+		// remove maintenanceid from hosts table
+		$options = array(
+			'real_hosts' => true,
+			'output' => array('hostid'),
+			'filter' => array('maintenanceid' => $maintenanceids)
+		);
+		$hosts = API::Host()->get($options);
+		if (!empty($hosts)) {
+			DB::update('hosts', array(
+				'values' => array('maintenanceid' => 0),
+				'where' => array('hostid' => zbx_objectValues($hosts, 'hostid'))
+			));
+		}
 
-			// remove maintenanceid from hosts table
-			$options = array(
-				'real_hosts' => true,
-				'output' => array('hostid'),
-				'filter' => array('maintenanceid' => $maintenanceids)
-			);
-			$hosts = API::Host()->get($options);
-			if (!empty($hosts)) {
-				DB::update('hosts', array(
-					'values' => array('maintenanceid' => 0),
-					'where' => array('hostid' => zbx_objectValues($hosts, 'hostid'))
-				));
-			}
+		DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
+		DB::delete('maintenances_windows', $midCond);
+		DB::delete('maintenances_hosts', $midCond);
+		DB::delete('maintenances_groups', $midCond);
+		DB::delete('maintenances', $midCond);
 
-			DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
-			DB::delete('maintenances_windows', $midCond);
-			DB::delete('maintenances_hosts', $midCond);
-			DB::delete('maintenances_groups', $midCond);
-			DB::delete('maintenances', $midCond);
-			return array('maintenanceids' => $maintenanceids);
+		return array('maintenanceids' => $maintenanceids);
 	}
 
 	/**
@@ -738,7 +738,7 @@ class CMaintenance extends CZBXAPI {
 		// selectTimeperiods
 		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
-			$timeperiods = API::getApi()->select('timeperiods', array(
+			$timeperiods = API::getApiService()->select('timeperiods', array(
 				'output' => $options['selectTimeperiods'],
 				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
 				'preservekeys' => true

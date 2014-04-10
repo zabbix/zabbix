@@ -143,7 +143,7 @@ class CHostPrototype extends CHostBase {
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check if the host is discovered
-		$discoveryRules = API::getApi()->select('items', array(
+		$discoveryRules = API::getApiService()->select('items', array(
 			'output' => array('hostid'),
 			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
 		));
@@ -915,13 +915,12 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Delete host prototypes.
 	 *
-	 * @param string|array 	$hostPrototypeIds
-	 * @param bool 			$nopermissions		if set to true, permission and template checks will be skipped
+	 * @param array 	$hostPrototypeIds
+	 * @param bool 		$nopermissions		if set to true, permission and template checks will be skipped
 	 *
 	 * @return array
 	 */
-	public function delete($hostPrototypeIds, $nopermissions = false) {
-		$hostPrototypeIds = zbx_toArray($hostPrototypeIds);
+	public function delete(array $hostPrototypeIds, $nopermissions = false) {
 		$this->validateDelete($hostPrototypeIds, $nopermissions);
 
 		// include child IDs
@@ -1225,7 +1224,7 @@ class CHostPrototype extends CHostBase {
 					' AND hg.groupid!=0'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApi()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupLinks'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
@@ -1246,7 +1245,7 @@ class CHostPrototype extends CHostBase {
 					' AND hg.name NOT LIKE '.zbx_dbstr('')
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApi()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupPrototypes'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
@@ -1317,7 +1316,7 @@ class CHostPrototype extends CHostBase {
 			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
 				$output[] = 'inventory_mode';
 			}
-			$inventory = API::getApi()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $output,
 				'filter' => array('hostid' => $hostPrototypeIds)
 			));

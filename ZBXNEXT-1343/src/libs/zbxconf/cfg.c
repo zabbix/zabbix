@@ -30,18 +30,91 @@ int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_cfg_object                                                 *
+ *                                                                            *
+ * Purpose: parse "Include=..." line in configuration file                    *
+ *                                                                            *
+ * Parameters: cfg_file - full name of config file                            *
+ *             cfg      - pointer to configuration parameter structure        *
+ *             level    - a level of included file                            *
+ *             strict   - treat unknown parameters as error                   *
+ *                                                                            *
+ * Return value: SUCCEED - parsed successfully                                *
+ *               FAIL - error processing object                               *
+ *                                                                            *
+ ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+	const char		*__function_name = "parse_cfg_object";
+
+	int			ret = FAIL;
+	WIN32_FIND_DATAW	find_file_data;
+	HANDLE			h_find;
+	char 			*path = NULL, *file_name;
+	wchar_t			*wpath;
+	struct _stat		sb;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	path = zbx_strdup(path, cfg_file);
+	zbx_rtrim(path, "\\");
+
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (0 != _wstat(wpath, &sb))
+	{
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		goto out;
+	}
+	zbx_free(wpath);
+
+	if (0 == S_ISDIR(sb.st_mode))
+	{
+		ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		goto out;
+	}
+
+	path = zbx_dsprintf(path, "%s\\*", cfg_file);
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (INVALID_HANDLE_VALUE == (h_find = FindFirstFileW(wpath, &find_file_data)))
+		goto out;
+
+	while (0 != FindNextFileW(h_find, &find_file_data))
+	{
+		if (0 != (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			continue;
+
+		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
+
+		path = zbx_dsprintf(path, "%s\\%s", cfg_file, file_name);
+
+		zbx_free(file_name);
+
+		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	FindClose(h_find);
+	zbx_free(wpath);
+	zbx_free(path);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 #else
 	DIR		*dir;
-	struct stat	sb;
+	zbx_stat_t	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
 	int		result = SUCCEED;
 
-	if (-1 == stat(cfg_file, &sb))
+	if (-1 == zbx_stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
@@ -60,7 +133,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	{
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
 
-		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
+		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
@@ -112,7 +185,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	int		i, lineno, param_valid;
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
-
+#ifdef _WINDOWS
+	wchar_t		*wcfg_file;
+#endif
 	if (++level > ZBX_MAX_INCLUDE_LEVEL)
 	{
 		zbx_error("Recursion detected! Skipped processing of '%s'.", cfg_file);
@@ -121,9 +196,17 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (NULL != cfg_file)
 	{
+#ifdef _WINDOWS
+		wcfg_file = zbx_utf8_to_unicode(cfg_file);
+		file = _wfopen(wcfg_file, L"r");
+		zbx_free(wcfg_file);
+
+		if (NULL == file)
+			goto cannot_open;
+#else
 		if (NULL == (file = fopen(cfg_file, "r")))
 			goto cannot_open;
-
+#endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);

@@ -293,7 +293,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hostGroups = API::HostGroup()->get(array(
 			'output' => array('groupid', 'name'),
 			'hostids' => $triggerOptions['hostids'],
-			'monitored_hosts' => true
+			'monitored_hosts' => true,
+			'preservekeys' => true
 		));
 		order_result($hostGroups, 'name');
 
@@ -398,7 +399,9 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$triggerTable->addRow(array(
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
+			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid'].
+				'&source='.EVENT_SOURCE_TRIGGERS
+			),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
 			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].

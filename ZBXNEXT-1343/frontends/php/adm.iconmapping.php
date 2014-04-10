@@ -88,7 +88,7 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
-	$result = API::IconMap()->delete($_REQUEST['iconmapid']);
+	$result = API::IconMap()->delete(array(getRequest('iconmapid')));
 
 	if ($result) {
 		unset($_REQUEST['form']);

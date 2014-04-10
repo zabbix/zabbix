@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAction extends CZBXAPI {
+class CAction extends CApiService {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
@@ -1239,8 +1239,14 @@ class CAction extends CZBXAPI {
 		DB::delete('operations', array('operationid' => $operationids));
 	}
 
-	public function delete($actionids) {
-		$actionids = zbx_toArray($actionids);
+	/**
+	 * Delete actions.
+	 *
+	 * @param array $actionids
+	 *
+	 * @return array
+	 */
+	public function delete(array $actionids) {
 		if (empty($actionids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1718,7 +1724,7 @@ class CAction extends CZBXAPI {
 
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
-			$conditions = API::getApi()->select('conditions', array(
+			$conditions = API::getApiService()->select('conditions', array(
 				'output' => $this->outputExtend($options['selectConditions'], array('actionid', 'conditionid')),
 				'filter' => array('actionid' => $actionIds),
 				'preservekeys' => true
@@ -1731,7 +1737,7 @@ class CAction extends CZBXAPI {
 
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
-			$operations = API::getApi()->select('operations', array(
+			$operations = API::getApiService()->select('operations', array(
 				'output' => $this->outputExtend($options['selectOperations'],
 					array('operationid', 'actionid', 'operationtype')
 				),

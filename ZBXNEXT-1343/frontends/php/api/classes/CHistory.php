@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHistory extends CZBXAPI {
+class CHistory extends CApiService {
 
 	protected $tableName = 'history';
 	protected $tableAlias = 'h';
