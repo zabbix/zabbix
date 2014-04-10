@@ -23,10 +23,10 @@
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	MEMORYSTATUSEX			ms_ex;
-	MEMORYSTATUS			ms;
-	zbx_uint64_t			real_swap_total, real_swap_avail;
-	char				*swapdev, *mode;
+	MEMORYSTATUSEX	ms_ex;
+	MEMORYSTATUS	ms;
+	zbx_uint64_t	real_swap_total, real_swap_avail;
+	char		*swapdev, *mode;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -50,9 +50,11 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	 *                                                                         *
 	 * While developing this solution, it was found that in virtualized        *
 	 * environments Windows reports incorrect values for various memory        *
-	 * types. For example, the free memory size may be larger than the         *
-	 * total memory size of the system, or, under certain circumstances,       *
-	 * these functions may return negative values.                             *
+	 * types. For example, the available memory size may be larger than the    *
+	 * total memory size of the system, or, under certain circumstances        *
+	 * (such as virtual system guests, zero sized virtual memory, dynamically  *
+	 * changing virtual memory size) these functions may return negative       *
+	 * values.                                                                 *
 	 *                                                                         *
 	 * Taking these fallacious conditions into account, these calculations     *
 	 * guarantee that the available swap size is never larger than the total   *
@@ -67,6 +69,11 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	 * arithmetic calculation, but the problem lies within the way Windows     *
 	 * itself operates. Although this guestimate should work most of the time, *
 	 * there are no guarantees that it will.                                   *
+	 *                                                                         *
+	 * NB: The reason why GlobalMemoryStatus[Ex] are used is their             *
+	 * availability on Windows 2000 and later, as opposed to other functions   *
+	 * of a similar nature (like GetPerformanceInfo) that are not supported    *
+	 * on some versions of Windows.                                            *
 	 *                                                                         *
 	 ***************************************************************************/
 
@@ -99,7 +106,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, real_swap_avail);
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, (real_swap_avail / real_swap_total) * 100.0);
+		SET_DBL_RESULT(result, ((double)real_swap_avail / (double)real_swap_total) * 100.0);
 	else if (0 == strcmp(mode, "used"))
 		SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 	else
