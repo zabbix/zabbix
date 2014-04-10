@@ -1321,7 +1321,12 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 
 		if (NULL != incident_number)
 		{
-			status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS);
+			if (NULL == (status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS)))
+			{
+				*error = zbx_dsprintf(*error, "Incident %s query did no return status field",
+						incident_number);
+				goto out;
+			}
 
 			/* check if the ticket should be reopened */
 			if (0 == strcmp(status, ZBX_REMEDY_STATUS_RESOLVED))
