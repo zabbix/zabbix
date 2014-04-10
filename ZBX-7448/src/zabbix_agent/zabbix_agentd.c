@@ -596,12 +596,14 @@ int	MAIN_ZABBIX_ENTRY()
 	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
+#ifdef _WINDOWS
 	if (MAXIMUM_WAIT_OBJECTS < threads_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start agent: specified number of agents (%d) is over limit (%d)",
 				threads_num, MAXIMUM_WAIT_OBJECTS);
 		exit(EXIT_FAILURE);
 	}
+#endif
 
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
