@@ -64,7 +64,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	wchar_t		fsName[MAX_PATH + 1];
-	wchar_t 	*buffer = NULL, p;
+	wchar_t 	*buffer = NULL, *p;
 	char		*utf8;
 	DWORD		dwSize;
 	size_t		sz;

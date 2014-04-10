@@ -170,7 +170,7 @@ static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_ful
 	wchar_t	*wpath;
 
 	wpath = zbx_acp_to_unicode(path);
-	wcschr(fullpath, wpath, max_fullpath);
+	_wfullpath(fullpath, wpath, max_fullpath);
 	zbx_free(wpath);
 }
 
