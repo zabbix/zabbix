@@ -30,7 +30,7 @@ PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENT
 	LPTSTR		wcounterPath = NULL;
 	PDH_STATUS	pdh_status;
 
-	wcounterPath = zbx_realloc(wcounterPath, dwSize * sizeof(TCHAR));
+	wcounterPath = zbx_calloc(wcounterPath, PDH_MAX_COUNTER_PATH, sizeof(wchar_t));
 
 	if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, wcounterPath, &dwSize, 0)))
 	{
