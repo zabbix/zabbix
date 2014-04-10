@@ -73,8 +73,9 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
-define('TRIGGERS_OPTION_ONLYTRUE',	1);
-define('TRIGGERS_OPTION_ALL',		2);
+define('TRIGGERS_OPTION_PROBLEM_AND_OK',	1);
+define('TRIGGERS_OPTION_ALL',				2);
+define('TRIGGERS_OPTION_ONLY_PROBLEM',		3);
 
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);

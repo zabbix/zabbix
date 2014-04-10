@@ -104,7 +104,7 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_details'] = 0;
 	$_REQUEST['show_maintenance'] = 1;
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
+	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_PROBLEM_AND_OK;
 	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
 	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
@@ -167,7 +167,7 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 // show triggers
 // the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
 // whole page inaccessible on large installations.
-$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
+$_REQUEST['show_triggers'] = hasRequest('show_triggers') ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_PROBLEM_AND_OK;
 
 // show events
 if (isset($_REQUEST['show_events'])) {
@@ -323,7 +323,8 @@ $filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 $statusComboBox = new CComboBox('show_triggers', $showTriggers);
 $statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
+$statusComboBox->additem(TRIGGERS_OPTION_PROBLEM_AND_OK, _('Problem / OK'));
+$statusComboBox->additem(TRIGGERS_OPTION_ONLY_PROBLEM, _('Problem'));
 $filterForm->addRow(_('Triggers status'), $statusComboBox);
 
 if ($config['event_ack_enable']) {
@@ -516,8 +517,11 @@ if ($filter['application'] !== '') {
 if (!zbx_empty($_REQUEST['txt_select'])) {
 	$options['search'] = array('description' => $_REQUEST['txt_select']);
 }
-if ($showTriggers == TRIGGERS_OPTION_ONLYTRUE) {
+if ($showTriggers == TRIGGERS_OPTION_PROBLEM_AND_OK) {
 	$options['only_true'] = 1;
+}
+if ($showTriggers == TRIGGERS_OPTION_ONLY_PROBLEM) {
+	$options['filter'] = array('value' => TRIGGER_VALUE_TRUE);
 }
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 	$options['withUnacknowledgedEvents'] = 1;
