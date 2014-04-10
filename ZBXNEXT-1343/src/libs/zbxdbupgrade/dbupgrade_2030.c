@@ -249,7 +249,9 @@ static int	DBpatch_2030024(void)
 	char		*value, *macro_esc, *value_esc;
 	int		ret = FAIL, rc;
 
-	result = DBselect("select itemid,filter from items where filter<>'' and flags=%d", ZBX_FLAG_DISCOVERY_RULE);
+	/* 1 - ZBX_FLAG_DISCOVERY_RULE*/
+	if (NULL == (result = DBselect("select itemid,filter from items where filter<>'' and flags=1")))
+		return FAIL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -450,11 +452,6 @@ static int	DBpatch_2030042(void)
 
 static int	DBpatch_2030043(void)
 {
-	return DBdrop_table("nodes");
-}
-
-static int	DBpatch_2030044(void)
-{
 	const char	*sql =
 			"delete from profiles"
 			" where idx in ("
@@ -468,7 +465,7 @@ static int	DBpatch_2030044(void)
 	return FAIL;
 }
 
-static int	DBpatch_2030045(void)
+static int	DBpatch_2030044(void)
 {
 	/* 21 - AUDIT_RESOURCE_NODE */
 	const char	*sql = "delete from auditlog where resourcetype=21";
@@ -479,7 +476,7 @@ static int	DBpatch_2030045(void)
 	return FAIL;
 }
 
-static int	DBpatch_2030046(void)
+static int	DBpatch_2030045(void)
 {
 	/* 17 - CONDITION_TYPE_NODE */
 	const char	*sql = "delete from conditions where conditiontype=17";
@@ -488,6 +485,403 @@ static int	DBpatch_2030046(void)
 		return SUCCEED;
 
 	return FAIL;
+}
+
+static int	dm_rename_slave_data(const char *table_name, const char *key_name, const char *field_name,
+		int field_length)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		local_nodeid = 0, nodeid, globalmacro;
+	zbx_uint64_t	id, min, max;
+	char		*name = NULL, *name_esc;
+	size_t		name_alloc = 0, name_offset;
+
+	/* 1 - ZBX_NODE_LOCAL */
+	if (NULL == (result = DBselect("select nodeid from nodes where nodetype=1")))
+		return FAIL;
+
+	if (NULL != (row = DBfetch(result)))
+		local_nodeid = atoi(row[0]);
+	DBfree_result(result);
+
+	if (0 == local_nodeid)
+		return SUCCEED;
+
+	globalmacro = (0 == strcmp(table_name, "globalmacro"));
+
+	min = local_nodeid * __UINT64_C(100000000000000);
+	max = min + __UINT64_C(100000000000000) - 1;
+
+	if (NULL == (result = DBselect(
+			"select %s,%s"
+			" from %s"
+			" where not %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64
+			" order by %s",
+			key_name, field_name, table_name, key_name, min, max, key_name)))
+	{
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+		nodeid = (int)(id / __UINT64_C(100000000000000));
+
+		name_offset = 0;
+
+		if (0 == globalmacro)
+			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "N%d_%s", nodeid, row[1]);
+		else
+			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "{$N%d_%s", nodeid, row[1] + 2);
+
+		name_esc = DBdyn_escape_string_len(name, field_length);
+
+		if (ZBX_DB_OK > DBexecute("update %s set %s='%s' where %s=" ZBX_FS_UI64,
+				table_name, field_name, name_esc, key_name, id))
+		{
+			zbx_free(name_esc);
+			break;
+		}
+
+		zbx_free(name_esc);
+	}
+	DBfree_result(result);
+
+	zbx_free(name);
+
+	return SUCCEED;
+}
+
+static int	check_data_uniqueness(const char *table_name, const char *field_name)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = DBselect("select %s from %s group by %s having count(*)>1",
+			field_name, table_name, field_name)))
+	{
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Duplicate data \"%s\" for field \"%s\" is found in table \"%s\"."
+				" Remove it manually and restart the process.", row[0], field_name, table_name);
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2030046(void)
+{
+	return dm_rename_slave_data("actions", "actionid", "name", 255);
+}
+
+static int	DBpatch_2030047(void)
+{
+	return dm_rename_slave_data("drules", "druleid", "name", 255);
+}
+
+static int	DBpatch_2030048(void)
+{
+	return dm_rename_slave_data("globalmacro", "globalmacroid", "macro", 64);
+}
+
+static int	DBpatch_2030049(void)
+{
+	return dm_rename_slave_data("graph_theme", "graphthemeid", "description", 64);
+}
+
+static int	DBpatch_2030050(void)
+{
+	return dm_rename_slave_data("groups", "groupid", "name", 64);
+}
+
+static int	DBpatch_2030051(void)
+{
+	return dm_rename_slave_data("hosts", "hostid", "host", 64);
+}
+
+static int	DBpatch_2030052(void)
+{
+	return dm_rename_slave_data("hosts", "hostid", "name", 64);
+}
+
+static int	DBpatch_2030053(void)
+{
+	return dm_rename_slave_data("icon_map", "iconmapid", "name", 64);
+}
+
+static int	DBpatch_2030054(void)
+{
+	return dm_rename_slave_data("images", "imageid", "name", 64);
+}
+
+static int	DBpatch_2030055(void)
+{
+	return dm_rename_slave_data("maintenances", "maintenanceid", "name", 128);
+}
+
+static int	DBpatch_2030056(void)
+{
+	return dm_rename_slave_data("media_type", "mediatypeid", "description", 100);
+}
+
+static int	DBpatch_2030057(void)
+{
+	return dm_rename_slave_data("regexps", "regexpid", "name", 128);
+}
+
+static int	DBpatch_2030058(void)
+{
+	return dm_rename_slave_data("screens", "screenid", "name", 255);
+}
+
+static int	DBpatch_2030059(void)
+{
+	return dm_rename_slave_data("scripts", "scriptid", "name", 255);
+}
+
+static int	DBpatch_2030060(void)
+{
+	return dm_rename_slave_data("services", "serviceid", "name", 128);
+}
+
+static int	DBpatch_2030061(void)
+{
+	return dm_rename_slave_data("slideshows", "slideshowid", "name", 255);
+}
+
+static int	DBpatch_2030062(void)
+{
+	return dm_rename_slave_data("sysmaps", "sysmapid", "name", 128);
+}
+
+static int	DBpatch_2030063(void)
+{
+	return dm_rename_slave_data("usrgrp", "usrgrpid", "name", 64);
+}
+
+static int	DBpatch_2030064(void)
+{
+	return dm_rename_slave_data("users", "userid", "alias", 100);
+}
+
+static int	DBpatch_2030065(void)
+{
+	return dm_rename_slave_data("valuemaps", "valuemapid", "name", 64);
+}
+
+static int	DBpatch_2030066(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		local_nodeid = 0;
+	zbx_uint64_t	min, max;
+
+	/* 1 - ZBX_NODE_LOCAL */
+	if (NULL == (result = DBselect("select nodeid from nodes where nodetype=1")))
+		return FAIL;
+
+	if (NULL != (row = DBfetch(result)))
+		local_nodeid = atoi(row[0]);
+	DBfree_result(result);
+
+	if (0 == local_nodeid)
+		return SUCCEED;
+
+	min = local_nodeid * __UINT64_C(100000000000000);
+	max = min + __UINT64_C(100000000000000) - 1;
+
+	if (ZBX_DB_OK <= DBexecute(
+			"delete from config where not configid between " ZBX_FS_UI64 " and " ZBX_FS_UI64, min, max))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2030067(void)
+{
+	return DBdrop_table("nodes");
+}
+
+static int	DBpatch_2030068(void)
+{
+	if (SUCCEED != check_data_uniqueness("actions", "name"))
+		return FAIL;
+
+	return DBcreate_index("actions", "actions_2", "name", 1);
+}
+
+static int	DBpatch_2030069(void)
+{
+	if (SUCCEED != check_data_uniqueness("drules", "name"))
+		return FAIL;
+
+	return DBcreate_index("drules", "drules_2", "name", 1);
+}
+
+static int	DBpatch_2030070(void)
+{
+	return DBdrop_index("globalmacro", "globalmacro_1");
+}
+
+static int	DBpatch_2030071(void)
+{
+	if (SUCCEED != check_data_uniqueness("globalmacro", "macro"))
+		return FAIL;
+
+	return DBcreate_index("globalmacro", "globalmacro_1", "macro", 1);
+}
+
+static int	DBpatch_2030072(void)
+{
+	return DBdrop_index("graph_theme", "graph_theme_1");
+}
+
+static int	DBpatch_2030073(void)
+{
+	if (SUCCEED != check_data_uniqueness("graph_theme", "description"))
+		return FAIL;
+
+	return DBcreate_index("graph_theme", "graph_theme_1", "description", 1);
+}
+
+static int	DBpatch_2030074(void)
+{
+	return DBdrop_index("icon_map", "icon_map_1");
+}
+
+static int	DBpatch_2030075(void)
+{
+	if (SUCCEED != check_data_uniqueness("icon_map", "name"))
+		return FAIL;
+
+	return DBcreate_index("icon_map", "icon_map_1", "name", 1);
+}
+
+static int	DBpatch_2030076(void)
+{
+	return DBdrop_index("images", "images_1");
+}
+
+static int	DBpatch_2030077(void)
+{
+	if (SUCCEED != check_data_uniqueness("images", "name"))
+		return FAIL;
+
+	return DBcreate_index("images", "images_1", "name", 1);
+}
+
+static int	DBpatch_2030078(void)
+{
+	if (SUCCEED != check_data_uniqueness("maintenances", "name"))
+		return FAIL;
+
+	return DBcreate_index("maintenances", "maintenances_2", "name", 1);
+}
+
+static int	DBpatch_2030079(void)
+{
+	if (SUCCEED != check_data_uniqueness("media_type", "description"))
+		return FAIL;
+
+	return DBcreate_index("media_type", "media_type_1", "description", 1);
+}
+
+static int	DBpatch_2030080(void)
+{
+	return DBdrop_index("regexps", "regexps_1");
+}
+
+static int	DBpatch_2030081(void)
+{
+	if (SUCCEED != check_data_uniqueness("regexps", "name"))
+		return FAIL;
+
+	return DBcreate_index("regexps", "regexps_1", "name", 1);
+}
+
+static int	DBpatch_2030082(void)
+{
+	if (SUCCEED != check_data_uniqueness("scripts", "name"))
+		return FAIL;
+
+	return DBcreate_index("scripts", "scripts_3", "name", 1);
+}
+
+static int	DBpatch_2030083(void)
+{
+	if (SUCCEED != check_data_uniqueness("services", "name"))
+		return FAIL;
+
+	return DBcreate_index("services", "services_2", "name", 1);
+}
+
+static int	DBpatch_2030084(void)
+{
+	if (SUCCEED != check_data_uniqueness("slideshows", "name"))
+		return FAIL;
+
+	return DBcreate_index("slideshows", "slideshows_1", "name", 1);
+}
+
+static int	DBpatch_2030085(void)
+{
+	return DBdrop_index("sysmaps", "sysmaps_1");
+}
+
+static int	DBpatch_2030086(void)
+{
+	if (SUCCEED != check_data_uniqueness("sysmaps", "name"))
+		return FAIL;
+
+	return DBcreate_index("sysmaps", "sysmaps_1", "name", 1);
+}
+
+static int	DBpatch_2030087(void)
+{
+	return DBdrop_index("usrgrp", "usrgrp_1");
+}
+
+static int	DBpatch_2030088(void)
+{
+	if (SUCCEED != check_data_uniqueness("usrgrp", "name"))
+		return FAIL;
+
+	return DBcreate_index("usrgrp", "usrgrp_1", "name", 1);
+}
+
+static int	DBpatch_2030089(void)
+{
+	return DBdrop_index("users", "users_1");
+}
+
+static int	DBpatch_2030090(void)
+{
+	if (SUCCEED != check_data_uniqueness("users", "alias"))
+		return FAIL;
+
+	return DBcreate_index("users", "users_1", "alias", 1);
+}
+
+static int	DBpatch_2030091(void)
+{
+	return DBdrop_index("valuemaps", "valuemaps_1");
+}
+
+static int	DBpatch_2030092(void)
+{
+	if (SUCCEED != check_data_uniqueness("valuemaps", "name"))
+		return FAIL;
+
+	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
 #endif
 
@@ -539,8 +933,54 @@ DBPATCH_ADD(2030040, 0, 1)
 DBPATCH_ADD(2030041, 0, 1)
 DBPATCH_ADD(2030042, 0, 1)
 DBPATCH_ADD(2030043, 0, 1)
-DBPATCH_ADD(2030044, 0, 0)
+DBPATCH_ADD(2030044, 0, 1)
 DBPATCH_ADD(2030045, 0, 1)
 DBPATCH_ADD(2030046, 0, 1)
+DBPATCH_ADD(2030047, 0, 1)
+DBPATCH_ADD(2030048, 0, 1)
+DBPATCH_ADD(2030049, 0, 1)
+DBPATCH_ADD(2030050, 0, 1)
+DBPATCH_ADD(2030051, 0, 1)
+DBPATCH_ADD(2030052, 0, 1)
+DBPATCH_ADD(2030053, 0, 1)
+DBPATCH_ADD(2030054, 0, 1)
+DBPATCH_ADD(2030055, 0, 1)
+DBPATCH_ADD(2030056, 0, 1)
+DBPATCH_ADD(2030057, 0, 1)
+DBPATCH_ADD(2030058, 0, 1)
+DBPATCH_ADD(2030059, 0, 1)
+DBPATCH_ADD(2030060, 0, 1)
+DBPATCH_ADD(2030061, 0, 1)
+DBPATCH_ADD(2030062, 0, 1)
+DBPATCH_ADD(2030063, 0, 1)
+DBPATCH_ADD(2030064, 0, 1)
+DBPATCH_ADD(2030065, 0, 1)
+DBPATCH_ADD(2030066, 0, 1)
+DBPATCH_ADD(2030067, 0, 1)
+DBPATCH_ADD(2030068, 0, 1)
+DBPATCH_ADD(2030069, 0, 1)
+DBPATCH_ADD(2030070, 0, 1)
+DBPATCH_ADD(2030071, 0, 1)
+DBPATCH_ADD(2030072, 0, 1)
+DBPATCH_ADD(2030073, 0, 1)
+DBPATCH_ADD(2030074, 0, 1)
+DBPATCH_ADD(2030075, 0, 1)
+DBPATCH_ADD(2030076, 0, 1)
+DBPATCH_ADD(2030077, 0, 1)
+DBPATCH_ADD(2030078, 0, 1)
+DBPATCH_ADD(2030079, 0, 1)
+DBPATCH_ADD(2030080, 0, 1)
+DBPATCH_ADD(2030081, 0, 1)
+DBPATCH_ADD(2030082, 0, 1)
+DBPATCH_ADD(2030083, 0, 1)
+DBPATCH_ADD(2030084, 0, 1)
+DBPATCH_ADD(2030085, 0, 1)
+DBPATCH_ADD(2030086, 0, 1)
+DBPATCH_ADD(2030087, 0, 1)
+DBPATCH_ADD(2030088, 0, 1)
+DBPATCH_ADD(2030089, 0, 1)
+DBPATCH_ADD(2030090, 0, 1)
+DBPATCH_ADD(2030091, 0, 1)
+DBPATCH_ADD(2030092, 0, 1)
 
 DBPATCH_END()
