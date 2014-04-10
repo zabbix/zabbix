@@ -24,7 +24,7 @@
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*path, *mode;
-	LPTSTR		wpath;
+	wchar_t 	*wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
 	if (2 < request->nparam)
@@ -64,7 +64,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	wchar_t		fsName[MAX_PATH + 1];
-	LPTSTR		buffer = NULL, p;
+	wchar_t 	*buffer = NULL, p;
 	char		*utf8;
 	DWORD		dwSize;
 	size_t		sz;
@@ -75,7 +75,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
 		return SYSINFO_RET_FAIL;
 
-	buffer = (LPTSTR)zbx_malloc(buffer, dwSize + 1);
+	buffer = (wchar_t *)zbx_malloc(buffer, dwSize + 1);
 
 	/* Make a second call to GetLogicalDriveStrings to get
 	   the actual data we require */

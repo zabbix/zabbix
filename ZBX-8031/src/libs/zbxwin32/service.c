@@ -84,9 +84,9 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
-static VOID WINAPI	ServiceEntry(DWORD argc, LPTSTR *argv)
+static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 {
-	LPTSTR	wservice_name;
+	wchar_t	*wservice_name;
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 	serviceHandle = RegisterServiceCtrlHandler(wservice_name, ServiceCtrlHandler);
@@ -148,7 +148,7 @@ static int	svc_OpenSCManager(SC_HANDLE *mgr)
 
 static int	svc_OpenService(SC_HANDLE mgr, SC_HANDLE *service, DWORD desired_access)
 {
-	LPTSTR	wservice_name;
+	wchar_t	*wservice_name;
 	int	ret = SUCCEED;
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
@@ -165,16 +165,16 @@ static int	svc_OpenService(SC_HANDLE mgr, SC_HANDLE *service, DWORD desired_acce
 	return ret;
 }
 
-static void	svc_get_fullpath(const char *path, LPTSTR fullpath, size_t max_fullpath)
+static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_fullpath)
 {
-	LPTSTR	wpath;
+	wchar_t	*wpath;
 
 	wpath = zbx_acp_to_unicode(path);
 	zbx_fullpath(fullpath, wpath, max_fullpath);
 	zbx_free(wpath);
 }
 
-static void	svc_get_command_line(const char *path, int multiple_agents, LPTSTR cmdLine, size_t max_cmdLine)
+static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine)
 {
 	wchar_t	path1[MAX_PATH], path2[MAX_PATH];
 
@@ -232,7 +232,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;
 	wchar_t			cmdLine[MAX_PATH];
-	LPTSTR			wservice_name;
+	wchar_t			*wservice_name;
 	DWORD			code;
 	int			ret = FAIL;
 
@@ -280,7 +280,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 static int	svc_RemoveEventSource()
 {
 	wchar_t	regkey[256];
-	LPTSTR	wevent_source;
+	wchar_t *wevent_source;
 	int	ret = FAIL;
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
