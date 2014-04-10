@@ -26,7 +26,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SC_HANDLE	mgr, service;
 	char		*name;
 	LPTSTR		wname;
-	TCHAR		service_name[MAX_STRING_LEN];
+	wchar_t		service_name[MAX_STRING_LEN];
 	DWORD		max_len_name = MAX_STRING_LEN;
 	int		i, ret = SYSINFO_RET_FAIL;
 	SERVICE_STATUS	status;

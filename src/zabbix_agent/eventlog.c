@@ -51,7 +51,7 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint6
 		zbx_uint64_t *pLatestRecord)
 {
 	const char	*__function_name = "zbx_open_eventlog";
-	TCHAR		reg_path[MAX_PATH];
+	wchar_t		reg_path[MAX_PATH];
 	HKEY		hk = NULL;
 	int		ret = FAIL;
 
@@ -112,7 +112,7 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
 static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTSTR *pEventMessageFile,
 		LPTSTR *pParamMessageFile)
 {
-	TCHAR	buf[MAX_PATH];
+	wchar_t	buf[MAX_PATH];
 	HKEY	hKey = NULL;
 	DWORD	szData;
 
@@ -159,7 +159,7 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
  ******************************************************************************/
 static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 {
-	TCHAR	MsgDll[MAX_PATH];
+	wchar_t	MsgDll[MAX_PATH];
 
 	if (NULL == szFileName || 0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
 		return NULL;
@@ -308,7 +308,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 
 	for (pFile = pEventMessageFile; NULL != pFile && err != SUCCEED; pFile = pNextFile)
 	{
-		if (NULL != (pNextFile = zbx_strchr(pFile, ';')))
+		if (NULL != (pNextFile = zbx_strchr(pFile, TEXT(';'))))
 		{
 			*pNextFile = '\0';
 			pNextFile++;

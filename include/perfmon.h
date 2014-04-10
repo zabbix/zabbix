@@ -44,7 +44,7 @@ typedef struct perf_counter_id
 {
 	struct perf_counter_id	*next;
 	unsigned long		pdhIndex;
-	TCHAR			name[PDH_MAX_COUNTER_NAME];
+	wchar_t			name[PDH_MAX_COUNTER_NAME];
 }
 PERF_COUNTER_ID;
 
