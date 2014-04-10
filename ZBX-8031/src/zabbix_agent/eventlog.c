@@ -62,7 +62,7 @@ static int	zbx_open_eventlog(const wchar_t *wsource, HANDLE *eventlog_handle, zb
 	*pLatestRecord = 0;
 
 	/* Get path to eventlog */
-	zbx_wsnprintf(reg_path, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s"), wsource);
+	StringCchPrintf(reg_path, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s"), wsource);
 
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, reg_path, 0, KEY_READ, &hk))
 		goto out;
@@ -117,7 +117,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 	DWORD	szData;
 
 	/* Get path to message dll */
-	zbx_wsnprintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
+	StringCchPrintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
 
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, buf, 0, KEY_READ, &hKey))
 		return;
@@ -300,7 +300,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 		for (i = 0; i < pELR->NumStrings; i++)
 		{
 			pInsertStrings[i] = pCh;
-			pCh += zbx_strlen(pCh) + 1;
+			pCh += wcslen(pCh) + 1;
 		}
 	}
 
@@ -308,7 +308,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 
 	for (pFile = pEventMessageFile; NULL != pFile && err != SUCCEED; pFile = pNextFile)
 	{
-		if (NULL != (pNextFile = zbx_strchr(pFile, TEXT(';'))))
+		if (NULL != (pNextFile = wcschr(pFile, TEXT(';'))))
 		{
 			*pNextFile = '\0';
 			pNextFile++;
@@ -351,7 +351,7 @@ static int	zbx_get_eventlog_message(const wchar_t *wsource, HANDLE eventlog_hand
 
 			for (i = 0, pCh = (wchar_t *)((unsigned char *)pELR + pELR->StringOffset);
 					i < pELR->NumStrings;
-					i++, pCh += zbx_strlen(pCh) + 1)
+					i++, pCh += wcslen(pCh) + 1)
 			{
 				if (0 < i)
 					*out_message = zbx_strdcat(*out_message, "; ");
