@@ -231,6 +231,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 			'nopermissions' => true,
 			'limit' => 1
 		);
+
 		if (isset($object['name'])) {
 			$options['filter']['name'] = $object['name'];
 		}
@@ -239,13 +240,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 		}
 		if (isset($object['hostids'])) {
 			$options['hostids'] = zbx_toArray($object['hostids']);
-		}
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
 		}
 
 		$objs = $this->get($options);
@@ -340,7 +334,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 		// adding GraphItems
 		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] !== API_OUTPUT_COUNT) {
 			$gitems = API::GraphItem()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $this->outputExtend($options['selectGraphItems'], array('graphid', 'gitemid')),
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -368,7 +361,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			$groups = API::HostGroup()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
 				'groupids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
@@ -392,7 +384,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			$hosts = API::Host()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
@@ -417,7 +408,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			}
 
 			$templates = API::Template()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectTemplates'],
 				'templateids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
