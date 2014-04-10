@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScreen extends CZBXAPI {
+class CScreen extends CApiService {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
@@ -360,7 +360,7 @@ class CScreen extends CZBXAPI {
 		}
 		unset($screen);
 
-		$dbScreens = API::getApi()->select('screens', array(
+		$dbScreens = API::getApiService()->select('screens', array(
 			'filter' => array('name' => zbx_objectValues($screens, 'name')),
 			'output' => array('name')
 		));
@@ -432,7 +432,7 @@ class CScreen extends CZBXAPI {
 			}
 
 			if (isset($screen['name'])) {
-				$dbScreenExist = API::getApi()->select('screens', array(
+				$dbScreenExist = API::getApiService()->select('screens', array(
 					'filter' => array('name' => $screen['name']),
 					'output' => array('screenid')
 				));
@@ -602,9 +602,7 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($screenIds) {
-		$screenIds = zbx_toArray($screenIds);
-
+	public function delete(array $screenIds) {
 		$this->validateDelete($screenIds);
 
 		DB::delete('screens_items', array('screenid' => $screenIds));
@@ -674,7 +672,7 @@ class CScreen extends CZBXAPI {
 
 		// adding ScreenItems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', array(
 				'output' => $this->outputExtend($options['selectScreenItems'], array('screenid', 'screenitemid')),
 				'filter' => array('screenid' => $screenIds),
 				'preservekeys' => true

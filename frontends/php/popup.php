@@ -1312,15 +1312,19 @@ elseif ($srctbl == 'screens2') {
 /*
  * Discovery rules
  */
-elseif ($srctbl == 'drules') {
+elseif ($srctbl === 'drules') {
 	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect('SELECT d.* FROM drules d');
+	$dRules = API::DRule()->get(array(
+		'output' => array('druleid', 'name')
+	));
 
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['name'], 'link');
+	order_result($dRules, 'name');
+
+	foreach ($dRules as $dRule) {
+		$action = get_window_opener($dstfrm, $dstfld1, $dRule[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
+		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
@@ -1329,14 +1333,16 @@ elseif ($srctbl == 'drules') {
 /*
  * Discovery checks
  */
-elseif ($srctbl == 'dchecks') {
+elseif ($srctbl === 'dchecks') {
 	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get(array(
 		'selectDChecks' => array('dcheckid', 'type', 'key_', 'ports'),
-		'output' => array('name')
+		'output' => array('druleid', 'name')
 	));
+
+	order_result($dRules, 'name');
 
 	foreach ($dRules as $dRule) {
 		foreach ($dRule['dchecks'] as $dCheck) {

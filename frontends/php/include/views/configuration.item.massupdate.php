@@ -50,7 +50,7 @@ $itemFormList->addRow(
 );
 
 // append hosts to form list
-if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) && !$this->data['is_multiple_hosts']) {
+if ($this->data['singleHost']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	$interfacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
 
@@ -462,7 +462,7 @@ $itemFormList->addRow(
 );
 
 // append applications to form list
-if (!$this->data['is_multiple_hosts']) {
+if ($this->data['singleHost']) {
 	// replace applications
 	$appToReplace = null;
 	if (isset($_REQUEST['applications'])) {

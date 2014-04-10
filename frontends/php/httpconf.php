@@ -123,7 +123,7 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 
 	$httptestData = get_httptest_by_httptestid($_REQUEST['httptestid']);
 	if ($httptestData) {
-		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
+		$result = API::HttpTest()->delete(array(getRequest('httptestid')));
 
 		if ($result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
@@ -316,6 +316,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$result = true;
 	$group_httptestid = $_REQUEST['group_httptestid'];
+
+	DBStart();
+
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
 			continue;

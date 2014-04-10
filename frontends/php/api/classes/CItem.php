@@ -602,14 +602,15 @@ class CItem extends CItemGeneral {
 	 * Delete items.
 	 *
 	 * @param array $itemids
+	 *
+	 * @return array
 	 */
-	public function delete($itemids, $nopermissions = false) {
+	public function delete(array $itemids, $nopermissions = false) {
 		if (empty($itemids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delItemIds = zbx_toArray($itemids);
-		$itemids = zbx_toHash($itemids);
+		$itemids = array_keys(array_flip($itemids));
 
 		$delItems = $this->get(array(
 			'itemids' => $itemids,
@@ -720,7 +721,7 @@ class CItem extends CItemGeneral {
 			info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('itemids' => $delItemIds);
+		return array('itemids' => $itemids);
 	}
 
 	public function syncTemplates($data) {
@@ -1102,7 +1103,7 @@ class CItem extends CItemGeneral {
 
 		// adding item discovery
 		if ($options['selectItemDiscovery'] !== null) {
-			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+			$itemDiscoveries = API::getApiService()->select('item_discovery', array(
 				'output' => $this->outputExtend($options['selectItemDiscovery'], array('itemdiscoveryid', 'itemid')),
 				'filter' => array('itemid' => array_keys($result)),
 				'preservekeys' => true

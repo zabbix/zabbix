@@ -566,20 +566,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Delete triggers.
+	 * Delete trigger prototypes.
 	 *
-	 * @param int|string|array $triggerIds array with trigger ids
-	 * @param bool             $nopermissions
+	 * @param array 	$triggerIds array with trigger ids
+	 * @param bool      $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($triggerIds, $nopermissions = false) {
+	public function delete(array $triggerIds, $nopermissions = false) {
 		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$triggerIds = zbx_toArray($triggerIds);
-		$triggerPrototypeIds = $triggerIds;
 
 		$delTriggers = $this->get(array(
 			'triggerids' => $triggerIds,
@@ -650,7 +647,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		DB::delete('triggers', array('triggerid' => $triggerIds));
 
-		return array('triggerids' => $triggerPrototypeIds);
+		return array('triggerids' => $triggerIds);
 	}
 
 	protected function createReal(array &$triggers) {
@@ -863,7 +860,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
 		if ($items) {
-			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+			$itemDiscoveries = API::getApiService()->select('item_discovery', array(
 				'output' => array('parent_itemid'),
 				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
 			));

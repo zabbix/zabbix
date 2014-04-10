@@ -19,7 +19,7 @@
 **/
 
 
-$triggersWidget = new CWidget();
+$triggersWidget = new CWidget(null, 'trigger-list');
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -171,18 +171,35 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$dependencies = $trigger['dependencies'];
 		if (count($dependencies) > 0) {
 			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
-			foreach ($dependencies as $dep_trigger) {
-				$description[] = BR();
+			$triggerDependencies = array();
 
-				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
-				while ($host = DBfetch($db_hosts)) {
-					$description[] = CHtml::encode($host['name']);
-					$description[] = ', ';
+			foreach ($dependencies as $dependency) {
+				$depTrigger = $this->data['dependencyTriggers'][$dependency['triggerid']];
+				$hostNames = array();
+
+				foreach ($depTrigger['hosts'] as $host) {
+					$hostNames[] = CHtml::encode($host['name']);
+					$hostNames[] = ', ';
 				}
-				array_pop($description);
-				$description[] = NAME_DELIMITER;
-				$description[] = CHtml::encode($dep_trigger['description']);
+				array_pop($hostNames);
+
+				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$host = reset($depTrigger['hosts']);
+					$triggerDependencies[] = new CLink(
+						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+						'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
+						triggerIndicatorStyle($depTrigger['status'])
+					);
+				}
+				else {
+					$triggerDependencies[] = array($hostNames, NAME_DELIMITER, $depTrigger['description']);
+				}
+
+				$triggerDependencies[] = BR();
 			}
+			array_pop($triggerDependencies);
+
+			$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
 		}
 	}
 	else {

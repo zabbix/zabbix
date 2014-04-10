@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScript extends CZBXAPI {
+class CScript extends CApiService {
 
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
@@ -254,9 +254,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($scriptIds) {
-		$scriptIds = zbx_toArray($scriptIds);
-
+	public function delete(array $scriptIds) {
 		$this->validateDelete($scriptIds);
 
 		DB::delete('scripts', array('scriptid' => $scriptIds));

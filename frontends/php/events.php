@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
 if (isset($_REQUEST['csv_export'])) {
-	$CSV_EXPORT = true;
+	$csvExport = true;
 	$csvRows = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
@@ -36,7 +36,7 @@ if (isset($_REQUEST['csv_export'])) {
 	require_once dirname(__FILE__).'/include/func.inc.php';
 }
 else {
-	$CSV_EXPORT = false;
+	$csvExport = false;
 
 	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
@@ -121,11 +121,11 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['triggerid'] = 0;
 }
 
-$source = (get_request('triggerid') > 0)
-	? EVENT_SOURCE_TRIGGERS
-	: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
-$_REQUEST['triggerid'] = get_request('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+$_REQUEST['triggerid'] = ($source == EVENT_SOURCE_DISCOVERY)
+	? 0
+	: getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
 
 // change triggerId filter if change hostId
 if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
@@ -140,6 +140,7 @@ if ($_REQUEST['triggerid'] > 0 && isset($_REQUEST['hostid'])) {
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
+		$_REQUEST['triggerid'] = 0;
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
 		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
 		$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
@@ -215,165 +216,209 @@ if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
-// page filter
-if ($source == EVENT_SOURCE_TRIGGERS) {
-	$pageFilter = new CPageFilter(array(
-		'groups' => array(
-			'monitored_hosts' => true,
-			'with_monitored_triggers' => true
-		),
-		'hosts' => array(
-			'monitored_hosts' => true,
-			'with_monitored_triggers' => true
-		),
-		'triggers' => array(),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-		'triggerid' => get_request('triggerid', null)
-	));
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	if ($pageFilter->triggerid > 0) {
-		$_REQUEST['triggerid'] = $pageFilter->triggerid;
-	}
-}
+// calculate stime and period
+if ($csvExport) {
+	$period = getRequest('period', ZBX_PERIOD_DEFAULT);
 
-$eventsWidget = new CWidget();
+	if (hasRequest('stime')) {
+		$stime = getRequest('stime');
 
-// header
-$frmForm = new CForm();
-if (isset($_REQUEST['source'])) {
-	$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
-}
-if (isset($_REQUEST['stime'])) {
-	$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
-}
-if (isset($_REQUEST['period'])) {
-	$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
-}
-$frmForm->addVar('page', getPageNumber(), 'page_csv');
-if ($source == EVENT_SOURCE_TRIGGERS) {
-	if ($_REQUEST['triggerid']) {
-		$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+		if ($stime + $period > time()) {
+			$stime = date(TIMESTAMP_FORMAT, time() - $period);
+		}
 	}
 	else {
-		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
-		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+		$stime = date(TIMESTAMP_FORMAT, time() - $period);
 	}
 }
-$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
+else {
+	$sourceName = ($source == EVENT_OBJECT_TRIGGER) ? 'trigger' : 'discovery';
 
-$eventsWidget->addPageHeader(
-	_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
-	array(
-		$frmForm,
-		SPACE,
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-	)
-);
-
-$r_form = new CForm('get');
-$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-$r_form->addVar('stime', get_request('stime'));
-$r_form->addVar('period', get_request('period'));
-$r_form->addVar('triggerid', 0);
-
-// add host and group filters to the form
-if ($source == EVENT_SOURCE_TRIGGERS) {
-	$r_form->addItem(array(
-		_('Group').SPACE,
-		$pageFilter->getGroupsCB()
-	));
-	$r_form->addItem(array(
-		SPACE._('Host').SPACE,
-		$pageFilter->getHostsCB()
-	));
-}
-
-if ($allow_discovery) {
-	$cmbSource = new CComboBox('source', $source, 'submit()');
-	$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
-	$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-	$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
-}
-
-$eventsWidget->addHeader(_('Events'), $r_form);
-$eventsWidget->addHeaderRowNumber();
-
-$filterForm = null;
-
-if ($source == EVENT_SOURCE_TRIGGERS) {
-	$filterForm = new CFormTable(null, null, 'get');
-	$filterForm->setAttribute('name', 'zbx_filter');
-	$filterForm->setAttribute('id', 'zbx_filter');
-	$filterForm->addVar('triggerid', get_request('triggerid'));
-	$filterForm->addVar('stime', get_request('stime'));
-	$filterForm->addVar('period', get_request('period'));
-
-	if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
-		$dbTrigger = API::Trigger()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
-			'output' => array('description', 'expression'),
-			'selectHosts' => array('name'),
-			'preservekeys' => true,
-			'expandDescription' => true
-		));
-		if ($dbTrigger) {
-			$dbTrigger = reset($dbTrigger);
-			$host = reset($dbTrigger['hosts']);
-
-			$trigger = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
-		}
-		else {
-			$_REQUEST['triggerid'] = 0;
-		}
+	if (hasRequest('period')) {
+		$_REQUEST['period'] = getRequest('period', ZBX_PERIOD_DEFAULT);
+		CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
 	}
-	if (!isset($trigger)) {
-		$trigger = '';
+	else {
+		$_REQUEST['period'] = CProfile::get('web.events.'.$sourceName.'.period');
 	}
 
-	$filterForm->addRow(new CRow(array(
-		new CCol(_('Trigger'), 'form_row_l'),
-		new CCol(array(
-			new CTextBox('trigger', $trigger, 96, 'yes'),
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?'.
-					'dstfrm='.$filterForm->getName().
-					'&dstfld1=triggerid'.
-					'&dstfld2=trigger'.
-					'&srctbl=triggers'.
-					'&srcfld1=triggerid'.
-					'&srcfld2=description'.
-					'&real_hosts=1'.
-					'&monitored_hosts=1'.
-					'&with_monitored_triggers=1'.
-					($_REQUEST['hostid'] ? '&only_hostid='.$_REQUEST['hostid'] : '').
-					'");',
-				'T'
-			)
-		), 'form_row_r')
-	)));
-
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-	$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-		'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'));
+	$period = navigation_bar_calc();
+	$stime = getRequest('stime');
 }
 
-$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
-
-$scroll = new CDiv();
-$scroll->setAttribute('id', 'scrollbar_cntr');
-$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
+$from = zbxDateToTime($stime);
+$till = $from + $period;
 
 /*
  * Display
  */
-$table = new CTableInfo(_('No events found.'));
+if ($csvExport) {
+	if (!hasRequest('hostid')) {
+		$_REQUEST['hostid'] = 0;
+	}
+	if (!hasRequest('groupid')) {
+		$_REQUEST['groupid'] = 0;
+	}
+}
+else {
+	if ($source == EVENT_SOURCE_TRIGGERS) {
+		$pageFilter = new CPageFilter(array(
+			'groups' => array(
+				'monitored_hosts' => true,
+				'with_monitored_triggers' => true
+			),
+			'hosts' => array(
+				'monitored_hosts' => true,
+				'with_monitored_triggers' => true
+			),
+			'triggers' => array(),
+			'hostid' => get_request('hostid', null),
+			'groupid' => get_request('groupid', null),
+			'triggerid' => get_request('triggerid', null)
+		));
+
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+		$_REQUEST['hostid'] = $pageFilter->hostid;
+
+		if ($pageFilter->triggerid > 0) {
+			$_REQUEST['triggerid'] = $pageFilter->triggerid;
+		}
+	}
+
+	$eventsWidget = new CWidget();
+
+	$csvDisabled = true;
+
+	// header
+	$frmForm = new CForm();
+	if (isset($_REQUEST['source'])) {
+		$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
+	}
+	$frmForm->addVar('stime', $stime, 'stime_csv');
+	$frmForm->addVar('period', $period, 'period_csv');
+	$frmForm->addVar('page', getPageNumber(), 'page_csv');
+
+	if ($source == EVENT_SOURCE_TRIGGERS) {
+		if (getRequest('triggerid') != 0) {
+			$frmForm->addVar('triggerid', $_REQUEST['triggerid'], 'triggerid_csv');
+		}
+		else {
+			$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+			$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+		}
+	}
+	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
+
+	$eventsWidget->addPageHeader(
+		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
+		array(
+			$frmForm,
+			SPACE,
+			get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
+		)
+	);
+
+	$r_form = new CForm('get');
+	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
+	$r_form->addVar('stime', $stime);
+	$r_form->addVar('period', $period);
+
+	// add host and group filters to the form
+	if ($source == EVENT_SOURCE_TRIGGERS) {
+		if (getRequest('triggerid') != 0) {
+			$r_form->addVar('triggerid', get_request('triggerid'));
+		}
+
+		$r_form->addItem(array(
+			_('Group').SPACE,
+			$pageFilter->getGroupsCB()
+		));
+		$r_form->addItem(array(
+			SPACE._('Host').SPACE,
+			$pageFilter->getHostsCB()
+		));
+	}
+
+	if ($allow_discovery) {
+		$cmbSource = new CComboBox('source', $source, 'submit()');
+		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
+		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
+		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
+	}
+
+	$eventsWidget->addHeader(_('Events'), $r_form);
+	$eventsWidget->addHeaderRowNumber();
+
+	$filterForm = null;
+
+	if ($source == EVENT_SOURCE_TRIGGERS) {
+		$filterForm = new CFormTable(null, null, 'get');
+		$filterForm->setAttribute('name', 'zbx_filter');
+		$filterForm->setAttribute('id', 'zbx_filter');
+		$filterForm->addVar('triggerid', get_request('triggerid'));
+		$filterForm->addVar('stime', $stime);
+		$filterForm->addVar('period', $period);
+
+		if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
+			$dbTrigger = API::Trigger()->get(array(
+				'triggerids' => $_REQUEST['triggerid'],
+				'output' => array('description', 'expression'),
+				'selectHosts' => array('name'),
+				'preservekeys' => true,
+				'expandDescription' => true
+			));
+			if ($dbTrigger) {
+				$dbTrigger = reset($dbTrigger);
+				$host = reset($dbTrigger['hosts']);
+
+				$trigger = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
+			}
+			else {
+				$_REQUEST['triggerid'] = 0;
+			}
+		}
+		if (!isset($trigger)) {
+			$trigger = '';
+		}
+
+		$filterForm->addRow(new CRow(array(
+			new CCol(_('Trigger'), 'form_row_l'),
+			new CCol(array(
+				new CTextBox('trigger', $trigger, 96, 'yes'),
+				new CButton('btn1', _('Select'),
+					'return PopUp("popup.php?'.
+						'dstfrm='.$filterForm->getName().
+						'&dstfld1=triggerid'.
+						'&dstfld2=trigger'.
+						'&srctbl=triggers'.
+						'&srcfld1=triggerid'.
+						'&srcfld2=description'.
+						'&real_hosts=1'.
+						'&monitored_hosts=1'.
+						'&with_monitored_triggers=1'.
+						($_REQUEST['hostid'] ? '&only_hostid='.$_REQUEST['hostid'] : '').
+						'");',
+					'T'
+				)
+			), 'form_row_r')
+		)));
+
+		$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
+		$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
+			'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'));
+	}
+
+	$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
+
+	$scroll = new CDiv();
+	$scroll->setAttribute('id', 'scrollbar_cntr');
+	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
+
+	$table = new CTableInfo(_('No events found.'));
+}
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
-	$sourceName = 'trigger';
-
 	$firstEvent = API::Event()->get(array(
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -388,8 +433,6 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 
 // discovery events
 else {
-	$sourceName = 'discovery';
-
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -415,27 +458,54 @@ else {
 	}
 }
 
-if (isset($_REQUEST['period'])) {
-	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
-	CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
+$config = select_config();
+
+// headers
+if ($source == EVENT_SOURCE_DISCOVERY) {
+	$header = array(
+		_('Time'),
+		_('IP'),
+		_('DNS'),
+		_('Description'),
+		_('Status')
+	);
+
+	if ($csvExport) {
+		$csvRows[] = $header;
+	}
+	else {
+		$table->setHeader($header);
+	}
 }
 else {
-	$_REQUEST['period'] = CProfile::get('web.events.'.$sourceName.'.period');
+	$header = array(
+		_('Time'),
+		($_REQUEST['hostid'] == 0) ? _('Host') : null,
+		_('Description'),
+		_('Status'),
+		_('Severity'),
+		_('Duration'),
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Actions')
+	);
+
+	if ($csvExport) {
+		$csvRows[] = $header;
+	}
+	else {
+		$table->setHeader($header);
+	}
 }
-
-$effectiveperiod = navigation_bar_calc();
-$from = zbxDateToTime($_REQUEST['stime']);
-$till = $from + $effectiveperiod;
-
-$csv_disabled = true;
 
 if (!$firstEvent) {
 	$starttime = null;
-	$events = array();
-	$paging = getPagingLine($events);
+
+	if (!$csvExport) {
+		$events = array();
+		$paging = getPagingLine($events);
+	}
 }
 else {
-	$config = select_config();
 	$starttime = $firstEvent['clock'];
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
@@ -466,10 +536,12 @@ else {
 			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 		));
 		$dsc_events = array_slice($dsc_events, 0, $config['search_limit'] + 1);
+
 		$paging = getPagingLine($dsc_events);
 
-		// do we need to make CVS export button enabled?
-		$csv_disabled = zbx_empty($dsc_events);
+		if (!$csvExport) {
+			$csvDisabled = zbx_empty($dsc_events);
+		}
 
 		$objectids = array();
 		foreach ($dsc_events as $event_data) {
@@ -496,24 +568,6 @@ else {
 		);
 		while ($dservice = DBfetch($res)) {
 			$dservices[$dservice['dserviceid']] = $dservice;
-		}
-
-		$table->setHeader(array(
-			_('Time'),
-			_('IP'),
-			_('DNS'),
-			_('Description'),
-			_('Status')
-		));
-
-		if ($CSV_EXPORT) {
-			$csvRows[] = array(
-				_('Time'),
-				_('IP'),
-				_('DNS'),
-				_('Description'),
-				_('Status')
-			);
 		}
 
 		foreach ($dsc_events as $event_data) {
@@ -552,15 +606,8 @@ else {
 			if (!isset($event_data['object_data'])) {
 				continue;
 			}
-			$table->addRow(array(
-				zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
-				$event_data['object_data']['ip'],
-				zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
-				$event_data['description'],
-				new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
-			));
 
-			if ($CSV_EXPORT) {
+			if ($csvExport) {
 				$csvRows[] = array(
 					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
 					$event_data['object_data']['ip'],
@@ -569,49 +616,38 @@ else {
 					discovery_value($event_data['value'])
 				);
 			}
+			else {
+				$table->addRow(array(
+					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
+					$event_data['object_data']['ip'],
+					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
+					$event_data['description'],
+					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
+				));
+			}
 		}
 	}
 
 	// source not discovery i.e. trigger
 	else {
-		$table->setHeader(array(
-			_('Time'),
-			($_REQUEST['hostid'] == 0) ? _('Host') : null,
-			_('Description'),
-			_('Status'),
-			_('Severity'),
-			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
-			_('Actions')
-		));
-
-		if ($CSV_EXPORT) {
-			$csvRows[] = array(
-				_('Time'),
-				($_REQUEST['hostid'] == 0) ? _('Host') : null,
-				_('Description'),
-				_('Status'),
-				_('Severity'),
-				_('Duration'),
-				$config['event_ack_enable'] ? _('Ack') : null,
-				_('Actions')
-			);
-		}
-
-		if ($pageFilter->hostsSelected) {
+		if ($csvExport || $pageFilter->hostsSelected) {
 			$options = array(
 				'output' => array('triggerid'),
 				'monitored' => true
 			);
+
 			if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
 				$options['triggerids'] = $_REQUEST['triggerid'];
 			}
-			else if ($pageFilter->hostid > 0) {
-				$options['hostids'] = $pageFilter->hostid;
+			else {
+				if ($_REQUEST['hostid'] > 0) {
+					$options['hostids'] = $_REQUEST['hostid'];
+				}
+				elseif ($_REQUEST['groupid'] > 0) {
+					$options['groupids'] = $_REQUEST['groupid'];
+				}
 			}
-			else if ($pageFilter->groupid > 0) {
-				$options['groupids'] = $pageFilter->groupid;
-			}
+
 			$triggers = API::Trigger()->get($options);
 
 			// query event with short data
@@ -642,7 +678,9 @@ else {
 				'nopermissions' => true
 			));
 
-			$csv_disabled = zbx_empty($events);
+			if (!$csvExport) {
+				$csvDisabled = zbx_empty($events);
+			}
 
 			$triggers = API::Trigger()->get(array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
@@ -668,7 +706,7 @@ else {
 			));
 
 			// fetch scripts for the host JS menu
-			if ($_REQUEST['hostid'] == 0) {
+			if (!$csvExport && $_REQUEST['hostid'] == 0) {
 				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
@@ -702,53 +740,15 @@ else {
 					'ns' => $event['ns']
 				)));
 
-				$triggerDescription = new CSpan($description, 'pointer link_menu');
-				$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock']));
-
-				// acknowledge
-				$ack = getEventAckState($event, true);
-
 				// duration
 				$event['duration'] = ($nextEvent = get_next_event($event, $events))
 					? zbx_date2age($event['clock'], $nextEvent['clock'])
 					: zbx_date2age($event['clock']);
 
-				$statusSpan = new CSpan(trigger_value2str($event['value']));
-
-				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle(
-					$statusSpan,
-					$event['value'],
-					$event['clock'],
-					$event['acknowledged']
-				);
-
-				// host JS menu link
-				$hostName = null;
-
-				if ($_REQUEST['hostid'] == 0) {
-					$hostName = new CSpan($host['name'], 'link_menu');
-					$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
-				}
-
 				// action
 				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
 
-				$table->addRow(array(
-					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-						'action'
-					),
-					$hostName,
-					$triggerDescription,
-					$statusSpan,
-					getSeverityCell($trigger['priority'], null, !$event['value']),
-					$event['duration'],
-					$config['event_ack_enable'] ? $ack : null,
-					$action
-				));
-
-				if ($CSV_EXPORT) {
+				if ($csvExport) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 						($_REQUEST['hostid'] == 0) ? $host['name'] : null,
@@ -760,49 +760,94 @@ else {
 						strip_tags((string) $action)
 					);
 				}
+				else {
+					$triggerDescription = new CSpan($description, 'pointer link_menu');
+					$triggerDescription->setMenuPopup(
+						CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock'])
+					);
+
+					// acknowledge
+					$ack = getEventAckState($event, true);
+
+					// add colors and blinking to span depending on configuration and trigger parameters
+					$statusSpan = new CSpan(trigger_value2str($event['value']));
+
+					addTriggerValueStyle(
+						$statusSpan,
+						$event['value'],
+						$event['clock'],
+						$event['acknowledged']
+					);
+
+					// host JS menu link
+					$hostName = null;
+
+					if ($_REQUEST['hostid'] == 0) {
+						$hostName = new CSpan($host['name'], 'link_menu');
+						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+					}
+
+					$table->addRow(array(
+						new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
+							'action'
+						),
+						$hostName,
+						$triggerDescription,
+						$statusSpan,
+						getSeverityCell($trigger['priority'], null, !$event['value']),
+						$event['duration'],
+						$config['event_ack_enable'] ? $ack : null,
+						$action
+					));
+				}
 			}
 		}
 		else {
-			$events = array();
-			$paging = getPagingLine($events);
+			if (!$csvExport) {
+				$events = array();
+				$paging = getPagingLine($events);
+			}
 		}
 	}
 
-	if ($CSV_EXPORT) {
-		print(zbx_toCSV($csvRows));
-		exit;
+	if (!$csvExport) {
+		$table = array($paging, $table, $paging);
+	}
+}
+
+if ($csvExport) {
+	echo zbx_toCSV($csvRows);
+}
+else {
+	$eventsWidget->addItem($table);
+
+	$timeline = array(
+		'period' => $period,
+		'starttime' => date(TIMESTAMP_FORMAT, $starttime),
+		'usertime' => date(TIMESTAMP_FORMAT, $till)
+	);
+
+	$objData = array(
+		'id' => 'timeline_1',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.events.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+	);
+
+	zbx_add_post_js('jqBlink.blink();');
+	zbx_add_post_js('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
+
+	$eventsWidget->show();
+
+	if ($csvDisabled) {
+		zbx_add_post_js('document.getElementById("csv_export").disabled = true;');
 	}
 
-	$table = array($paging, $table, $paging);
+	require_once dirname(__FILE__).'/include/page_footer.php';
 }
-
-$eventsWidget->addItem($table);
-
-$timeline = array(
-	'period' => $effectiveperiod,
-	'starttime' => date(TIMESTAMP_FORMAT, $starttime),
-	'usertime' => date(TIMESTAMP_FORMAT, $till)
-);
-
-$objData = array(
-	'id' => 'timeline_1',
-	'loadSBox' => 0,
-	'loadImage' => 0,
-	'loadScroll' => 1,
-	'dynamic' => 0,
-	'mainObject' => 1,
-	'periodFixed' => CProfile::get('web.events.timelinefixed', 1),
-	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-);
-
-zbx_add_post_js('jqBlink.blink();');
-zbx_add_post_js('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-zbx_add_post_js('timeControl.processObjects();');
-
-$eventsWidget->show();
-
-if ($csv_disabled) {
-	zbx_add_post_js('document.getElementById("csv_export").disabled = true;');
-}
-
-require_once dirname(__FILE__).'/include/page_footer.php';

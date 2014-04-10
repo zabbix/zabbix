@@ -844,7 +844,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
@@ -975,10 +975,13 @@ void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
-#if defined(_WINDOWS) && defined(_UNICODE)
-int	__zbx_stat(const char *path, struct stat *buf);
+#if defined(_WINDOWS)
+typedef struct __stat64	zbx_stat_t;
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#endif	/* _WINDOWS && _UNICODE */
+#else
+typedef struct stat	zbx_stat_t;
+#endif	/* _WINDOWS */
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
 		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
@@ -1000,6 +1003,7 @@ int	is_function_char(char c);
 int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
+int	is_snmp_type(unsigned char type);
 
 int	get_item_key(char **exp, char **key);
 
