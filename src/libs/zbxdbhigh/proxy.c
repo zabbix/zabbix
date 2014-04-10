@@ -2386,30 +2386,29 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  *                                                                            *
  * Purpose: clean dhosts not presenting in drule                              *
  *                                                                            *
- * Parameters: drule                                                          *
- *                                                                            *
- * Author: Nikolajs Agafonovs                                                 *
- *                                                                            *
  ******************************************************************************/
 void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 {
-	const char	*__function_name = "zbx_clean_dhost_list";
+	const char		*__function_name = "zbx_clean_dhost_list";
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	char			*ip_range;
-	zbx_vector_uint64_t	vector_dhosts;
-	zbx_uint64_t		tmp;
+	char			*iprange = NULL;
+	zbx_vector_uint64_t	dhostids;
+	zbx_uint64_t		dhostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL != (row = DBfetch(result)))
+		iprange = zbx_strdup(iprange, row[0]);
+	DBfree_result(result);
+
+	if (NULL == iprange)
 		goto out;
 
-	ip_range = zbx_strdcat(ip_range, row[0]);
-	DBfree_result(result);
+	zbx_vector_uint64_create(&dhostids);
 
 	result = DBselect("select dh.dhostid,ds.ip"
 			" from dhosts dh,dservices ds"
@@ -2417,39 +2416,35 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 				" and dh.druleid=" ZBX_FS_UI64,
 			druleid);
 
-	zbx_vector_uint64_create(&vector_dhosts);
-
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED != ip_in_list(ip_range, row[1]))
+		if (SUCCEED != ip_in_list(iprange, row[1]))
 		{
-			ZBX_STR2UINT64(tmp, row[0]);
-			zbx_vector_uint64_append(&vector_dhosts, tmp);
+			ZBX_STR2UINT64(dhostid, row[0]);
+			zbx_vector_uint64_append(&dhostids, dhostid);
 		}
 	}
-
-	zbx_free(ip_range);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "dhosts which is not in drule range count: %u", vector_dhosts.values_num);
+	zbx_free(iprange);
 
-	if (0 != vector_dhosts.values_num)
+	if (0 != dhostids.values_num)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_vector_uint64_sort(&vector_dhosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&vector_dhosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where ");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid", vector_dhosts.values, vector_dhosts.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid", dhostids.values, dhostids.values_num);
 
 		DBexecute("%s", sql);
 
 		zbx_free(sql);
 	}
-	zbx_vector_uint64_destroy(&vector_dhosts);
 
+	zbx_vector_uint64_destroy(&dhostids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
