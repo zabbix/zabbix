@@ -170,7 +170,7 @@ static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_ful
 	wchar_t	*wpath;
 
 	wpath = zbx_acp_to_unicode(path);
-	zbx_fullpath(fullpath, wpath, max_fullpath);
+	wcschr(fullpath, wpath, max_fullpath);
 	zbx_free(wpath);
 }
 
@@ -180,21 +180,21 @@ static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t 
 
 	svc_get_fullpath(path, path2, MAX_PATH);
 
-	if (NULL == zbx_strstr(path2, TEXT(".exe")))
-		zbx_wsnprintf(path1, MAX_PATH, TEXT("%s.exe"), path2);
+	if (NULL == wcsstr(path2, TEXT(".exe")))
+		StringCchPrintf(path1, MAX_PATH, TEXT("%s.exe"), path2);
 	else
-		zbx_wsnprintf(path1, MAX_PATH, path2);
+		StringCchPrintf(path1, MAX_PATH, path2);
 
 	if (NULL != CONFIG_FILE)
 	{
 		svc_get_fullpath(CONFIG_FILE, path2, MAX_PATH);
-		zbx_wsnprintf(cmdLine, max_cmdLine, TEXT("\"%s\" %s--config \"%s\""),
+		StringCchPrintf(cmdLine, max_cmdLine, TEXT("\"%s\" %s--config \"%s\""),
 				path1,
 				(0 == multiple_agents) ? TEXT("") : TEXT("--multiple-agents "),
 				path2);
 	}
 	else
-		zbx_wsnprintf(cmdLine, max_cmdLine, TEXT("\"%s\""), path1);
+		StringCchPrintf(cmdLine, max_cmdLine, TEXT("\"%s\""), path1);
 }
 
 static int	svc_install_event_source(const char *path)
@@ -207,7 +207,7 @@ static int	svc_install_event_source(const char *path)
 	svc_get_fullpath(path, execName, MAX_PATH);
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE, regkey, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -284,7 +284,7 @@ static int	svc_RemoveEventSource()
 	int	ret = FAIL;
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE, regkey))

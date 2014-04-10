@@ -131,7 +131,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
 		if (0 == cpu_num)
-			zbx_wsnprintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+			StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
 		else
 			_itow_s(cpu_num - 1, cpu, ARRSIZE(cpu), 10);
 
