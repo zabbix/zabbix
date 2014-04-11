@@ -130,6 +130,7 @@ $fields = array(
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
+	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -168,6 +169,9 @@ else {
 }
 
 // ajax
+if (hasRequest('filterState')) {
+	CProfile::update('web.host_discovery.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
+}
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
