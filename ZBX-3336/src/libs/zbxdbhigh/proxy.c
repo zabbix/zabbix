@@ -2395,7 +2395,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	DB_ROW			row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	dhostids;
-	zbx_uint64_t		dhostid;
+	zbx_uint64_t		dserviceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2410,7 +2410,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 
 	zbx_vector_uint64_create(&dhostids);
 
-	result = DBselect("select dh.dhostid,ds.ip"
+	result = DBselect("select ds.dserviceid,ds.ip"
 			" from dhosts dh,dservices ds"
 			" where dh.dhostid=ds.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64,
@@ -2420,8 +2420,8 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	{
 		if (SUCCEED != ip_in_list(iprange, row[1]))
 		{
-			ZBX_STR2UINT64(dhostid, row[0]);
-			zbx_vector_uint64_append(&dhostids, dhostid);
+			ZBX_STR2UINT64(dserviceid, row[0]);
+			zbx_vector_uint64_append(&dhostids, dserviceid);
 		}
 	}
 	DBfree_result(result);
@@ -2436,8 +2436,9 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 		zbx_vector_uint64_sort(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where ");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid", dhostids.values, dhostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dservices where ");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+				dhostids.values, dhostids.values_num);
 
 		DBexecute("%s", sql);
 
