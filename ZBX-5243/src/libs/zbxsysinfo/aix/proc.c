@@ -21,72 +21,62 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#if !defined(HAVE_SYS_PROCFS_H)
-#	include "../common/common.h"
-#endif
+#define DO_SUM	0
+#define DO_MAX	1
+#define DO_MIN	2
+#define DO_AVG	3
 
-#define DO_SUM 0
-#define DO_MAX 1
-#define DO_MIN 2
-#define DO_AVG 3
-
-#ifdef HAVE_SYS_PROCFS_H
-static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
-{
-	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
-		return SUCCEED;
-
-	switch (zbx_proc_stat)
-	{
-		case ZBX_PROC_STAT_RUN:
-			return (psinfo->pr_lwp.pr_sname == PR_SNAME_TSRUN) ? SUCCEED : FAIL;
-		case ZBX_PROC_STAT_SLEEP:
-			return (psinfo->pr_lwp.pr_sname == PR_SNAME_TSSLEEP) ? SUCCEED : FAIL;
-		case ZBX_PROC_STAT_ZOMB:
-			return (psinfo->pr_lwp.pr_sname == PR_SNAME_TSZOMB) ? SUCCEED : FAIL;
-	}
-
-	return FAIL;
-}
-#else
 static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
 {
-	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
+	if (ZBX_PROC_STAT_ALL == zbx_proc_stat)
 		return SUCCEED;
 
 	switch (zbx_proc_stat)
 	{
 		case ZBX_PROC_STAT_RUN:
-			return (procsinfo->pi_state == SRUN) ? SUCCEED : FAIL;
+			return SRUN == procsinfo->pi_state ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
-			return (procsinfo->pi_state == SSLEEP) ? SUCCEED : FAIL;
+			return SSLEEP == procsinfo->pi_state ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_ZOMB:
-			return (procsinfo->pi_state == SZOMB) ? SUCCEED : FAIL;
+			return SZOMB == procsinfo->pi_state ? SUCCEED : FAIL;
 	}
 
 	return FAIL;
 }
-#endif /* HAVE_SYS_PROCFS_H */
+
+static int	check_procargs(struct procsinfo *procsinfo, const char *proccomm)
+{
+	int	i;
+	char	procargs[MAX_STRING_LEN];
+
+	if (0 != getargs(&procsinfo, sizeof(procsinfo), procargs, sizeof(procargs)))
+		return FAIL;
+
+	for (i = 0; i < sizeof(procargs) - 1; i++)
+	{
+		if ('\0' == procargs[i])
+		{
+			if ('\0' == procargs[i + 1])
+				break;
+
+			procargs[i] = ' ';
+		}
+	}
+
+	if (i == sizeof(procargs))
+		procargs[i] = '\0';
+
+	return NULL != zbx_regexp_match(procags, proccomm, NULL) ? SUCCEED : FAIL;
+}
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
-#ifdef HAVE_SYS_PROCFS_H
-	DIR			*dir;
-	struct dirent		*entries;
-	zbx_stat_t		buf;
-	struct psinfo		psinfo;
-	int			fd = -1;
-#else
+	char			*param, *procname, *proccomm;
+	struct passwd		*usrinfo;
 	struct procsinfo	procsinfo;
 	pid_t			pid = 0;
-	AGENT_RESULT		proc_args;
-#endif /* HAVE_SYS_PROCFS_H */
-	struct passwd		*usrinfo;
-	zbx_uint64_t		value = 0;
 	int			do_task;
-	double			memsize = 0;
-	zbx_uint64_t		proccount = 0;
+	zbx_uint64_t		memsize = 0, proccount = 0, value;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -117,58 +107,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
-#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
-	if (NULL == (dir = opendir("/proc")))
-		return SYSINFO_RET_FAIL;
-
-	while (NULL != (entries = readdir(dir)))
-	{
-		if (-1 != fd)
-		{
-			close(fd);
-			fd = -1;
-		}
-
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
-
-		if (0 != zbx_stat(tmp, &buf))
-			continue;
-
-		if (-1 == (fd = open(tmp, O_RDONLY)))
-			continue;
-
-		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
-			continue;
-
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
-			continue;
-
-		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
-			continue;
-
-		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-			continue;
-
-		value = psinfo.pr_size;
-		value <<= 10;	/* kB to Byte */
-
-		if (0 == proccount++)
-			memsize = value;
-		else
-		{
-			if (do_task == DO_MAX)
-				memsize = MAX(memsize, value);
-			else if (do_task == DO_MIN)
-				memsize = MIN(memsize, value);
-			else
-				memsize += value;
-		}
-	}
-
-	closedir(dir);
-	if (-1 != fd)
-		close(fd);
-#else
 	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
 	{
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
@@ -177,31 +115,16 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm)
-		{
-			init_result(&proc_args);
-
-			zbx_snprintf(tmp, sizeof(tmp), "ps -p %i -oargs=", procsinfo.pi_pid);
-
-			if (SYSINFO_RET_OK != EXECUTE_STR(tmp, &proc_args))
-			{
-				free_result(&proc_args);
-				continue;
-			}
-			if (NULL == zbx_regexp_match(proc_args.str, proccomm, NULL))
-			{
-				free_result(&proc_args);
-				continue;
-			}
-
-			free_result(&proc_args);
-		}
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_progargs(&procsinfo, proccomm))
+			continue;
 
 		value = procsinfo.pi_size;
 		value <<= 12;	/* number of pages to bytes */
 
 		if (0 == proccount++)
+		{
 			memsize = value;
+		}
 		else
 		{
 			if (DO_MAX == do_task)
@@ -212,12 +135,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				memsize += value;
 		}
         }
-#endif /* HAVE_SYS_PROCFS_H */
 
-	if (do_task == DO_AVG)
-	{
-		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize/proccount);
-	}
+	if (DO_AVG == do_task)
+		SET_DBL_RESULT(result, 0 == proccount ? 0 : memsize / (double)proccount);
 	else
 		SET_UI64_RESULT(result, memsize);
 
@@ -226,19 +146,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
-#ifdef HAVE_SYS_PROCFS_H
-	DIR			*dir;
-	struct dirent		*entries;
-	zbx_stat_t		buf;
-	struct psinfo		psinfo;
-	int			fd = -1;
-#else
+	char			*param, *procname, *proccomm;
+	struct passwd		*usrinfo;
 	struct procsinfo	procsinfo;
 	pid_t			pid = 0;
-	AGENT_RESULT		proc_args;
-#endif /* HAVE_SYS_PROCFS_H */
-	struct passwd		*usrinfo;
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
 
@@ -271,48 +182,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
-#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
-	if (NULL == (dir = opendir("/proc")))
-		return SYSINFO_RET_FAIL;
-
-	while (NULL != (entries = readdir(dir)))
-	{
-		if (-1 != fd)
-		{
-			close(fd);
-			fd = -1;
-		}
-
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
-
-		if (0 != zbx_stat(tmp, &buf))
-			continue;
-
-		if (-1 == (fd = open(tmp, O_RDONLY)))
-			continue;
-
-		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
-			continue;
-
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
-			continue;
-
-		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
-			continue;
-
-		if (FAIL == check_procstate(&psinfo, zbx_proc_stat))
-			continue;
-
-		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-			continue;
-
-		proccount++;
-	}
-
-	closedir(dir);
-	if (-1 != fd)
-		close(fd);
-#else
 	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
 	{
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
@@ -321,32 +190,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
 			continue;
 
-		if (FAIL == check_procstate(&procsinfo, zbx_proc_stat))
+		if (SUCCEED != check_procstate(&procsinfo, zbx_proc_stat))
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm)
-		{
-			init_result(&proc_args);
-
-			zbx_snprintf(tmp, sizeof(tmp), "ps -p %i -oargs=", procsinfo.pi_pid);
-
-			if (SYSINFO_RET_OK != EXECUTE_STR(tmp, &proc_args))
-			{
-				free_result(&proc_args);
-				continue;
-			}
-			if (NULL == zbx_regexp_match(proc_args.str, proccomm, NULL))
-			{
-				free_result(&proc_args);
-				continue;
-			}
-
-			free_result(&proc_args);
-		}
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_progargs(&procsinfo, proccomm))
+			continue;
 
 		proccount++;
         }
-#endif /* HAVE_SYS_PROCFS_H */
 
 	SET_UI64_RESULT(result, proccount);
 
