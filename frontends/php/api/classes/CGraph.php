@@ -509,12 +509,10 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($graphids, $nopermissions = false) {
+	public function delete(array $graphids, $nopermissions = false) {
 		if (empty($graphids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$graphids = zbx_toArray($graphids);
 
 		$delGraphs = $this->get(array(
 			'graphids' => $graphids,
@@ -632,8 +630,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validate graph specific data on Create method.
-	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
+	 * Validate create.
 	 *
 	 * @param array $graphs
 	 */
@@ -645,8 +642,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validate graph specific data on Update method.
-	 * Get allowed item ID's, check permissions, do all general validation and check for numeric item types.
+	 * Validate update.
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
@@ -673,7 +669,7 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Validates graph item permissions.
+	 * Validates items.
 	 *
 	 * @param array $itemIds
 	 * @param array $graphs
@@ -712,18 +708,31 @@ class CGraph extends CGraphGeneral {
 				}
 			}
 
-			// Y axis min/max
-			foreach (array('ymin_itemid', 'ymax_itemid') as $field) {
-				if (isset($graph[$field]) && $graph[$field]) {
-					$item = $dbItems[$graph[$field]];
+			// Y axis min
+			if (isset($graph['ymin_itemid']) && $graph['ymin_itemid']
+					&& isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$item = $dbItems[$graph['ymin_itemid']];
 
-					if (!in_array($item['value_type'], $allowedValueTypes)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-							$item['name'],
-							$graph['name']
-						));
-					}
+				if (!in_array($item['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+						$item['name'],
+						$graph['name']
+					));
+				}
+			}
+
+			// Y axis max
+			if (isset($graph['ymax_itemid']) && $graph['ymax_itemid']
+					&& isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$item = $dbItems[$graph['ymax_itemid']];
+
+				if (!in_array($item['value_type'], $allowedValueTypes)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+						$item['name'],
+						$graph['name']
+					));
 				}
 			}
 		}

@@ -476,7 +476,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $data
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
@@ -519,18 +519,15 @@ class CGraphPrototype extends CGraphGeneral {
 	/**
 	 * Delete GraphPrototype.
 	 *
-	 * @param int|string|array $graphids
-	 * @param bool             $nopermissions
+	 * @param array $graphids
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($graphids, $nopermissions = false) {
+	public function delete(array $graphids, $nopermissions = false) {
 		if (empty($graphids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$graphids = zbx_toArray($graphids);
-		$delGraphPrototypeIds = $graphids;
 
 		$delGraphs = $this->get(array(
 			'graphids' => $graphids,
@@ -580,7 +577,7 @@ class CGraphPrototype extends CGraphGeneral {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));
 		}
 
-		return array('graphids' => $delGraphPrototypeIds);
+		return array('graphids' => $graphids);
 	}
 
 	protected function createReal($graph) {
@@ -642,8 +639,6 @@ class CGraphPrototype extends CGraphGeneral {
 	 * and check for numeric item types.
 	 *
 	 * @param array $graphs
-	 *
-	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
@@ -693,8 +688,6 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 *
-	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		// check for "itemid" when updating graph prototype with only "gitemid" passed
@@ -738,15 +731,11 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		foreach ($graphs as $graph) {
-			foreach ($graph['gitems'] as $gitem) {
-				if (!in_array($allowedItems[$gitem['itemid']]['value_type'], $allowedValueTypes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".',
-						$allowedItems[$gitem['itemid']]['name'],
-						$graph['name']
-					));
-				}
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".', $item['name'], $graph['name'])
+				);
 			}
 		}
 	}

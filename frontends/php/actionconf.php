@@ -172,7 +172,7 @@ elseif (hasRequest('save')) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	$result = API::Action()->delete($_REQUEST['actionid']);
+	$result = API::Action()->delete(array(getRequest('actionid')));
 
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 

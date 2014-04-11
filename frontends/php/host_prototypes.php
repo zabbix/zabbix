@@ -114,7 +114,7 @@ elseif (get_request('unlink')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 
 	DBstart();
-	$result = API::HostPrototype()->delete(get_request('hostid'));
+	$result = API::HostPrototype()->delete(array(getRequest('hostid')));
 
 	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
 
