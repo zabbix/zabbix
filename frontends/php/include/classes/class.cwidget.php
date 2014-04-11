@@ -124,23 +124,11 @@ class CWidget {
 			$icon_r->setAttribute('title', _('Maximize').'/'._('Minimize'));
 
 			$icons_row = new CTable(null, 'textwhite');
-
-			$flicker_title_when_visible = _('Hide filter');
-			$flicker_title_when_hidden = _('Show filter');
-
-			$flicker_title = $this->flicker_state
-				? $flicker_title_when_visible
-				: $flicker_title_when_hidden;
-
-			$icons_row->addRow(array($icon_l, new CSpan(SPACE.$flicker_title.SPACE, null, 'flicker_title'), $icon_r));
+			$icons_row->addRow(array($icon_l, new CSpan(SPACE._('Filter').SPACE), $icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->attr('id', 'filter_icon');
-			$thin_tab->addAction('onclick', "javascript: changeFlickerState(".
-				"'".$flicker_domid."', ".
-				CJs::encodeJson($flicker_title_when_visible).", ".
-				CJs::encodeJson($flicker_title_when_hidden).
-			");");
+			$thin_tab->addAction('onclick', "javascript: changeFlickerState('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
 			$flicker_tab->addRow($div);
