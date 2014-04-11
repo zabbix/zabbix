@@ -821,7 +821,7 @@ else {
 	$filterForm->setAttribute('id', 'zbx_filter');
 	$filterForm->addItem($filterTable);
 
-	$hostsWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
+	$hostsWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 1));
 
 	// table hosts
 	$form = new CForm();

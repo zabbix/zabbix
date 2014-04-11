@@ -881,11 +881,17 @@ function rm4favorites(favobj, favid) {
 	});
 }
 
-function changeFlickerState(id) {
+function changeFlickerState(id, title_when_visible, title_when_hidden) {
 	var state = showHide(id);
 
 	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
 	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
+
+	var title = state
+		? (title_when_visible || "Hide filter")
+		: (title_when_hidden || "Show filter");
+
+	jQuery('#flicker_title').html(title);
 
 	sendAjaxData({
 		data: {
