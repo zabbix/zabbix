@@ -408,11 +408,11 @@ else {
 			'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'));
 	}
 
-	$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 1));
+	$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
 
 	$scroll = new CDiv();
 	$scroll->setAttribute('id', 'scrollbar_cntr');
-	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 1));
+	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
 
 	$table = new CTableInfo(_('No events found.'));
 }

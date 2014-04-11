@@ -254,7 +254,7 @@ echo SBR;
 
 // create graphs widget
 $graphsWidget = new CWidget();
-$graphsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.httpdetails.filter.state', 1));
+$graphsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.httpdetails.filter.state', 0));
 $graphsWidget->addItem(SPACE);
 
 $graphTable = new CTableInfo();
