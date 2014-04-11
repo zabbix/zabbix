@@ -411,7 +411,7 @@ $filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintena
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
 $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
 
-$triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
+$triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 1));
 
 /*
  * Form
