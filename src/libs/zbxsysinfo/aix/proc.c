@@ -49,7 +49,7 @@ static int	check_procargs(struct procsinfo *procsinfo, const char *proccomm)
 	int	i;
 	char	procargs[MAX_STRING_LEN];
 
-	if (0 != getargs(&procsinfo, sizeof(procsinfo), procargs, sizeof(procargs)))
+	if (0 != getargs(procsinfo, sizeof(*procsinfo), procargs, sizeof(procargs)))
 		return FAIL;
 
 	for (i = 0; i < sizeof(procargs) - 1; i++)
