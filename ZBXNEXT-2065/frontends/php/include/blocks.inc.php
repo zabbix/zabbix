@@ -412,7 +412,7 @@ function make_system_status($filter) {
 		}
 
 		$name = new CLink($group['name'],
-			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_PROBLEM_AND_OK
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 		);
 		$groupRow->addItem($name);
 
@@ -678,7 +678,7 @@ function make_hoststat_summary($filter) {
 		}
 
 		$name = new CLink($group['name'],
-			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_PROBLEM_AND_OK
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 		);
 		$group_row->addItem($name);
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
@@ -713,7 +713,7 @@ function make_hoststat_summary($filter) {
 
 					$r = new CRow();
 					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.
-						$hostid.'&show_triggers='.TRIGGERS_OPTION_PROBLEM_AND_OK
+						$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 					));
 
 					foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
@@ -761,7 +761,7 @@ function make_hoststat_summary($filter) {
 
 				$r = new CRow();
 				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.
-					'&show_triggers='.TRIGGERS_OPTION_PROBLEM_AND_OK
+					'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 				));
 
 				foreach ($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
