@@ -1101,8 +1101,7 @@ COpt::memoryPick();
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => 1,
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		if(isset($object['node']))

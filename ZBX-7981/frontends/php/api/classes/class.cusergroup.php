@@ -315,7 +315,6 @@ class CUserGroup extends CZBXAPI{
 		$options = array(
 			'filter' => array('name' => $object['name']),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1,
 		);
 		if(isset($object['node']))

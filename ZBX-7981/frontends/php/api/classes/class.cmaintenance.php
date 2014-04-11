@@ -457,7 +457,6 @@ Copt::memoryPick();
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 
@@ -537,9 +536,17 @@ Copt::memoryPick();
 				if (!check_db_fields($db_fields, $maintenance)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
 				}
-				//checkig wheter a maintence with this name already exists
-				if (self::exists(array('name' => $maintenance['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+
+				// check wheter a maintence with this name already exists
+				$maintenanceExists = CMaintenance::get(array(
+					'output' => array('maintenanceid'),
+					'filter' => array('name' => $maintenance['name']),
+					'nopermissions' => true
+				));
+				if ($maintenanceExists) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_MAINTENANCE.' ['.$maintenance['name'].'] '.S_ALREADY_EXISTS_SMALL
+					);
 				}
 
 				$insert[$mnum] = $maintenance;

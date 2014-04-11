@@ -1030,7 +1030,6 @@ Copt::memoryPick();
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 
@@ -1811,9 +1810,16 @@ Copt::memoryPick();
 			if (zbx_strlen($host['host']) > 64) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
 			}
-			if (CTemplate::exists(array('host' => $host['host']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+
+			$templateExists = CTemplate::get(array(
+				'output' => array('hostid'),
+				'filter' => array('host' => $host['host']),
+				'nopermissions' => true
+			));
+			if ($templateExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' ['.$host['host'].'] '.S_ALREADY_EXISTS_SMALL);
 			}
+
 			// check if a different host with the same name exists
 			$options = array(
 				'filter' => array(

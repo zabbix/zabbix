@@ -834,7 +834,20 @@ class zbxXML{
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
+
+					// check if template or host exists
+					$options = array(
+						'output' => array('hostid'),
+						'filter' => array('host' => $host_db['host']),
+						'nopermissions' => true
+					);
+					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
+						$current_host = CTemplate::get($options);
+					}
+					else {
+						$current_host = CHost::get($options);
+					}
+
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
@@ -868,7 +881,14 @@ class zbxXML{
 							$current_host = reset($current_host);
 						}
 					}
-
+					else {
+						if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
+							throw new APIException(1, 'Template ['.$host_db['host'].'] does not exist');
+						}
+						else {
+							throw new APIException(1, 'Host ['.$host_db['host'].'] does not exist');
+						}
+					}
 // HOST GROUPS {{{
 					$groups = $xpath->query('groups/group', $host);
 

@@ -654,7 +654,6 @@ COpt::memoryPick();
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => 1,
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 

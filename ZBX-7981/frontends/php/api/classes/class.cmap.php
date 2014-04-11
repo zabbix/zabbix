@@ -486,7 +486,6 @@ COpt::memoryPick();
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 		if(isset($object['node']))
@@ -561,10 +560,6 @@ COpt::memoryPick();
 
 				if(!check_db_fields($map_db_fields, $map)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for map');
-				}
-
-				if(self::exists(array('name' => $map['name']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
 
 				$data_map[] = $map;

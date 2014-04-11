@@ -552,7 +552,6 @@ COpt::memoryPick();
 		$options = array(
 			'filter' => array(),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 		if(isset($object['name'])) $options['filter']['name'] = $object['name'];

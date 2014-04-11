@@ -902,7 +902,6 @@ COpt::memoryPick();
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 		if(isset($object['node']))
@@ -982,11 +981,28 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				if(self::exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				// check if template with same name exists
+				$templateExists = CTemplate::get(array(
+					'output' => array('hostid'),
+					'filter' => array('host' => $template['host']),
+					'nopermissions' => true
+				));
+				if ($templateExists) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_TEMPLATE.' ['.$template['host'].'] '.S_ALREADY_EXISTS_SMALL
+					);
 				}
-				if(CHost::exists(array('host' => $template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+
+				// check if host with same name exists
+				$hostExists = CHost::get(array(
+					'output' => array('hostid'),
+					'filter' => array('host' => $template['host']),
+					'nopermissions' => true
+				));
+				if ($hostExists) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_HOST.' ['.$template['host'].'] '.S_ALREADY_EXISTS_SMALL
+					);
 				}
 
 				$templateid = get_dbid('hosts', 'hostid');
@@ -1264,9 +1280,16 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
 				}
 
-//can't set the same name as existing host
-				if(CHost::exists(array('host' => $cur_template['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				// can't set the same name as existing host
+				$hostExists = CHost::get(array(
+					'output' => array('hostid'),
+					'filter' => array('host' => $cur_template['host']),
+					'nopermissions' => true
+				));
+				if ($hostExists) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_HOST.' ['.$cur_template['host'].'] '.S_ALREADY_EXISTS_SMALL
+					);
 				}
 			}
 
