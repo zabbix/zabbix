@@ -205,7 +205,7 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -223,7 +223,7 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_SERIAL);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: full, model, serial, type, vendor."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -298,7 +298,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional cpu and mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -308,7 +308,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
 	else if (FAIL == is_uint31(param, (uint32_t*)&cpu))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid CPU num. Must be one of: all."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -326,7 +326,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 		filter = HW_CPU_SHOW_CURFREQ;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: curfreq, full, maxfreq, model, vendor."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -407,7 +407,7 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -419,7 +419,7 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return EXECUTE_STR("lsusb", result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: lspci, lsusb, usb."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 }
@@ -435,7 +435,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional regex and format are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -448,7 +448,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		show_names = 0;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid format. Must be one of: full, short."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
