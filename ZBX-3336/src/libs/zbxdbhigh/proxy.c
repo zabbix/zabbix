@@ -2384,7 +2384,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  *                                                                            *
  * Function: zbx_clean_dhost_list                                             *
  *                                                                            *
- * Purpose: clean dhosts not presenting in drule                              *
+ * Purpose: clean dservices not presenting in drule                           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_clean_dhost_list(zbx_uint64_t druleid)
