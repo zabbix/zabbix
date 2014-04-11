@@ -220,6 +220,13 @@ static void	zbx_set_defaults()
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
 
+	if(NULL == CONFIG_DBSCHEMA)
+#ifdef HAVE_POSTGRESQL
+		CONFIG_DBSCHEMA = zbx_strdup(CONFIG_DBSCHEMA, "public");
+#else
+		;
+#endif
+
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
 

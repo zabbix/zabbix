@@ -1689,10 +1689,16 @@ int	DBtxn_ongoing()
 int	DBtable_exists(const char *table_name)
 {
 	char		*table_name_esc;
+#ifdef HAVE_POSTGRESQL
+	char		*table_schema_esc;
+#endif
 	DB_RESULT	result;
 	int		ret;
 
 	table_name_esc = DBdyn_escape_string(table_name);
+#ifdef HAVE_POSTGRESQL
+	table_schema_esc = DBdyn_escape_string(CONFIG_DBSCHEMA);
+#endif
 
 #if defined(HAVE_IBM_DB2)
 	/* publib.boulder.ibm.com/infocenter/db2luw/v9r7/topic/com.ibm.db2.luw.admin.cmd.doc/doc/r0001967.html */
@@ -1716,8 +1722,8 @@ int	DBtable_exists(const char *table_name)
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
-				" and table_schema='public'",
-			table_name_esc);
+				" and table_schema='%s'",
+			table_name_esc, table_schema_esc);
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
@@ -1728,6 +1734,9 @@ int	DBtable_exists(const char *table_name)
 #endif
 
 	zbx_free(table_name_esc);
+#ifdef HAVE_POSTGRESQL
+	zbx_free(table_schema_esc);
+#endif
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 

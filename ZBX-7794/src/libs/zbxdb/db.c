@@ -400,6 +400,21 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		goto out;
 	}
 
+	if (NULL != dbschema && '\0' != *dbschema)
+	{
+		char	*dbschema_esc;
+
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("SET SCHEMA '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
+			ret = rc;
+		zbx_free(dbschema_esc);
+	}
+
+	if (ZBX_DB_FAIL == rc || ZBX_DB_DOWN == rc) {
+		ret = rc;
+		goto out;
+	}
+
 	result = zbx_db_select("%s", "select oid from pg_type where typname='bytea'");
 
 	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
