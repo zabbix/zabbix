@@ -3130,24 +3130,24 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		char		*value;
 		int		operator;
 	}
-	zbx_dcondition_t;
+	zbx_lld_rule_condition_t;
 
 	/* discovery rule */
 	typedef struct
 	{
 		/* discovery rule source id */
-		zbx_uint64_t		src_id;
+		zbx_uint64_t		templateid;
 		/* discovery rule source conditions */
-		zbx_vector_ptr_t	src_conditions;
+		zbx_vector_ptr_t	conditions;
 
 		/* discovery rule destination id */
-		zbx_uint64_t		dst_id;
+		zbx_uint64_t		itemid;
 		/* the starting id to be used for destination condition ids */
-		zbx_uint64_t		dst_conditionid;
+		zbx_uint64_t		conditionid;
 		/* discovery rule destination condition ids */
-		zbx_vector_uint64_t	dst_conditionids;
+		zbx_vector_uint64_t	conditionids;
 	}
-	zbx_drule_t;
+	zbx_lld_rule_copy_t;
 
 	const char	*__function_name = "DBcopy_template_items";
 
@@ -3300,8 +3300,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		zbx_itemapp_t		*itemapp = NULL;
 		size_t			itemapp_alloc = 0, itemapp_num = 0;
 		zbx_vector_ptr_t	rules;
-		zbx_drule_t		*rule;
-		zbx_dcondition_t	*condition;
+		zbx_lld_rule_copy_t		*rule;
+		zbx_lld_rule_condition_t	*condition;
 		zbx_db_insert_t		db_insert_condition;
 
 		zbx_vector_uint64_create(&itemids);
@@ -3317,17 +3317,17 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item[i].flags))
 				continue;
 
-			rule = zbx_malloc(NULL, sizeof(zbx_drule_t));
+			rule = zbx_malloc(NULL, sizeof(zbx_lld_rule_copy_t));
 
-			rule->dst_id = item[i].itemid;
-			rule->src_id = item[i].templateid;
-			rule->dst_conditionid = 0;
-			zbx_vector_uint64_create(&rule->dst_conditionids);
-			zbx_vector_ptr_create(&rule->src_conditions);
+			rule->itemid = item[i].itemid;
+			rule->templateid = item[i].templateid;
+			rule->conditionid = 0;
+			zbx_vector_uint64_create(&rule->conditionids);
+			zbx_vector_ptr_create(&rule->conditions);
 
 			zbx_vector_ptr_append(&rules, rule);
 
-			zbx_vector_uint64_append(&ids, rule->src_id);
+			zbx_vector_uint64_append(&ids, rule->templateid);
 		}
 
 		/* read template discovery rule conditions */
@@ -3354,14 +3354,14 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			rule = rules.values[index];
 
-			condition = zbx_malloc(NULL, sizeof(zbx_dcondition_t));
+			condition = zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
 
 			ZBX_STR2UINT64(condition->id, row[0]);
 			condition->operator = atoi(row[2]);
 			condition->macro = zbx_strdup(NULL, row[3]);
 			condition->value = zbx_strdup(NULL, row[4]);
 
-			zbx_vector_ptr_append(&rule->src_conditions, condition);
+			zbx_vector_ptr_append(&rule->conditions, condition);
 		}
 		DBfree_result(result);
 
@@ -3372,8 +3372,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			rule = rules.values[i];
 
-			if (0 != rule->dst_id)
-				zbx_vector_uint64_append(&ids, rule->dst_id);
+			if (0 != rule->itemid)
+				zbx_vector_uint64_append(&ids, rule->itemid);
 		}
 
 		if (0 != ids.values_num)
@@ -3396,11 +3396,11 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				{
 					rule = rules.values[i];
 
-					if (itemid != rule->dst_id)
+					if (itemid != rule->itemid)
 						continue;
 
 					ZBX_STR2UINT64(itemid, row[0]);
-					zbx_vector_uint64_append(&rule->dst_conditionids, itemid);
+					zbx_vector_uint64_append(&rule->conditionids, itemid);
 
 					break;
 				}
@@ -3414,8 +3414,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			rule = rules.values[i];
 
-			if (rule->src_conditions.values_num > rule->dst_conditionids.values_num)
-				conditions_num += rule->src_conditions.values_num - rule->dst_conditionids.values_num;
+			if (rule->conditions.values_num > rule->conditionids.values_num)
+				conditions_num += rule->conditions.values_num - rule->conditionids.values_num;
 		}
 
 		/* reserve ids for the new conditions to be inserted */
@@ -3427,11 +3427,11 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			{
 				rule = rules.values[i];
 
-				if (rule->src_conditions.values_num <= rule->dst_conditionids.values_num)
+				if (rule->conditions.values_num <= rule->conditionids.values_num)
 					continue;
 
-				rule->dst_conditionid = conditionid;
-				conditionid += rule->src_conditions.values_num - rule->dst_conditionids.values_num;
+				rule->conditionid = conditionid;
+				conditionid += rule->conditions.values_num - rule->conditionids.values_num;
 			}
 
 			zbx_db_insert_prepare(&db_insert_condition, "item_condition", "item_conditionid", "itemid",
@@ -3454,20 +3454,20 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			formula = zbx_strdup(NULL, item[i].formula);
 
-			conditionid = rule->dst_conditionid;
+			conditionid = rule->conditionid;
 
-			for (j = 0; j < rule->src_conditions.values_num; j++)
+			for (j = 0; j < rule->conditions.values_num; j++)
 			{
 				zbx_uint64_t	id;
 				char		srcid[64], dstid[64], *ptr;
 				size_t		pos = 0, len;
 
-				if (j < rule->dst_conditionids.values_num)
-					id = rule->dst_conditionids.values[j];
+				if (j < rule->conditionids.values_num)
+					id = rule->conditionids.values[j];
 				else
 					id = conditionid++;
 
-				condition = rule->src_conditions.values[j];
+				condition = rule->conditions.values[j];
 
 				zbx_snprintf(srcid, sizeof(srcid), "{" ZBX_FS_UI64 "}", condition->id);
 				zbx_snprintf(dstid, sizeof(dstid), "{" ZBX_FS_UI64 "}", id);
@@ -3615,11 +3615,11 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 					rule = rules.values[index];
 
-					for (j = 0; j < rule->src_conditions.values_num; j++)
+					for (j = 0; j < rule->conditions.values_num; j++)
 					{
-						condition = rule->src_conditions.values[j];
+						condition = rule->conditions.values[j];
 
-						zbx_db_insert_add_values(&db_insert_condition, rule->dst_conditionid++,
+						zbx_db_insert_add_values(&db_insert_condition, rule->conditionid++,
 								itemid, condition->operator, condition->macro,
 								condition->value);
 					}
@@ -3669,15 +3669,15 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 			{
 				rule = rules.values[i];
 
-				if (0 == rule->dst_id)
+				if (0 == rule->itemid)
 					continue;
 
-				index = MIN(rule->src_conditions.values_num, rule->dst_conditionids.values_num);
+				index = MIN(rule->conditions.values_num, rule->conditionids.values_num);
 
 				/* update intersecting rule conditions */
 				for (j = 0; j < index; j++)
 				{
-					condition = rule->src_conditions.values[j];
+					condition = rule->conditions.values[j];
 
 					macro_esc = DBdyn_escape_string(condition->macro);
 					value_esc = DBdyn_escape_string(condition->value);
@@ -3686,7 +3686,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 							" set operator=%d,macro='%s',value='%s'"
 							" where item_conditionid=" ZBX_FS_UI64 ";\n",
 							condition->operator, macro_esc, value_esc,
-							rule->dst_conditionids.values[j]);
+							rule->conditionids.values[j]);
 
 					DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
@@ -3695,16 +3695,16 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 				}
 
 				/* delete removed rule conditions */
-				for (j = index; j < rule->dst_conditionids.values_num; j++)
-					zbx_vector_uint64_append(&ids, rule->dst_conditionids.values[j]);
+				for (j = index; j < rule->conditionids.values_num; j++)
+					zbx_vector_uint64_append(&ids, rule->conditionids.values[j]);
 
 				/* insert new rule conditions */
-				for (j = index; j < rule->src_conditions.values_num; j++)
+				for (j = index; j < rule->conditions.values_num; j++)
 				{
-					condition = rule->src_conditions.values[j];
+					condition = rule->conditions.values[j];
 
-					zbx_db_insert_add_values(&db_insert_condition, rule->dst_conditionid++,
-							rule->dst_id, condition->operator, condition->macro,
+					zbx_db_insert_add_values(&db_insert_condition, rule->conditionid++,
+							rule->itemid, condition->operator, condition->macro,
 							condition->value);
 				}
 			}
@@ -3734,17 +3734,17 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			rule = rules.values[i];
 
-			for (j = 0; j < rule->src_conditions.values_num; j++)
+			for (j = 0; j < rule->conditions.values_num; j++)
 			{
-				condition = rule->src_conditions.values[j];
+				condition = rule->conditions.values[j];
 
 				zbx_free(condition->macro);
 				zbx_free(condition->value);
 				zbx_free(condition);
 			}
-			zbx_vector_ptr_destroy(&rule->src_conditions);
+			zbx_vector_ptr_destroy(&rule->conditions);
 
-			zbx_vector_uint64_destroy(&rule->dst_conditionids);
+			zbx_vector_uint64_destroy(&rule->conditionids);
 
 			zbx_free(rule);
 		}
@@ -4308,7 +4308,7 @@ httptestitem_t;
 
 typedef struct
 {
-	zbx_uint64_t		src_id;
+	zbx_uint64_t		templateid;
 	zbx_uint64_t		httptestid;
 	zbx_uint64_t		t_applicationid;
 	zbx_uint64_t		h_applicationid;
@@ -4377,7 +4377,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	{
 		httptest = zbx_calloc(NULL, 1, sizeof(httptest_t));
 
-		ZBX_STR2UINT64(httptest->src_id, row[0]);
+		ZBX_STR2UINT64(httptest->templateid, row[0]);
 		ZBX_DBROW2UINT64(httptest->httptestid, row[12]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
@@ -4398,7 +4398,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httptest->http_proxy = zbx_strdup(NULL, row[10]);
 			httptest->retries = atoi(row[11]);
 
-			zbx_vector_uint64_append(&httptestids, httptest->src_id);
+			zbx_vector_uint64_append(&httptestids, httptest->templateid);
 
 			if (0 != httptest->t_applicationid)
 				zbx_vector_uint64_append(&applications, httptest->t_applicationid);
@@ -4426,7 +4426,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		{
 			ZBX_STR2UINT64(httptestid, row[1]);
 
-			if (NULL == httptest || httptest->src_id != httptestid)
+			if (NULL == httptest || httptest->templateid != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4515,7 +4515,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		{
 			ZBX_STR2UINT64(httptestid, row[0]);
 
-			if (NULL == httptest || httptest->src_id != httptestid)
+			if (NULL == httptest || httptest->templateid != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4564,7 +4564,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			ZBX_STR2UINT64(httptestid, row[0]);
 			ZBX_STR2UINT64(httpstepid, row[1]);
 
-			if (NULL == httptest || httptest->src_id != httptestid)
+			if (NULL == httptest || httptest->templateid != httptestid)
 			{
 				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -4752,7 +4752,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					httptest->h_applicationid, httptest->delay, (int)httptest->status,
 					httptest->variables, httptest->agent, (int)httptest->authentication,
 					httptest->http_user, httptest->http_password, httptest->http_proxy,
-					httptest->retries, hostid, httptest->src_id);
+					httptest->retries, hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -4792,7 +4792,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					"update httptest"
 					" set templateid=" ZBX_FS_UI64
 					" where httptestid=" ZBX_FS_UI64 ";\n",
-					httptest->src_id, httptest->httptestid);
+					httptest->templateid, httptest->httptestid);
 		}
 	}
 
