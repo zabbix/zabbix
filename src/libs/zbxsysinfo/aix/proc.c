@@ -66,7 +66,7 @@ static int	check_procargs(struct procsinfo *procsinfo, const char *proccomm)
 	if (i == sizeof(procargs))
 		procargs[i] = '\0';
 
-	return NULL != zbx_regexp_match(procags, proccomm, NULL) ? SUCCEED : FAIL;
+	return NULL != zbx_regexp_match(procargs, proccomm, NULL) ? SUCCEED : FAIL;
 }
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -115,7 +115,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_progargs(&procsinfo, proccomm))
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procsinfo, proccomm))
 			continue;
 
 		value = procsinfo.pi_size;
@@ -193,7 +193,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != check_procstate(&procsinfo, zbx_proc_stat))
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_progargs(&procsinfo, proccomm))
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procsinfo, proccomm))
 			continue;
 
 		proccount++;
