@@ -68,7 +68,7 @@ $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addItem($filterTable);
-$hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
+$hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 1));
 $hostInventoryWidget->addHeaderRowNumber();
 
 $table = new CTableInfo(_('No hosts found.'));

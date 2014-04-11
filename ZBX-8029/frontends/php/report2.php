@@ -391,7 +391,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
 		'javascript: var url = new Curl(location.href); url.setArgument("filter_rst", 1); location.href = url.getUrl();'));
 
-	$reportWidget->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
+	$reportWidget->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 1));
 
 	/*
 	 * Triggers
