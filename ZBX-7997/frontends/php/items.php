@@ -821,6 +821,9 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'visible' => get_request('visible', array())
 	);
 
+	$data['singleHost'] = null;
+	$data['singleTemplate'] = null;
+
 	// hosts
 	$data['hosts'] = API::Host()->get(array(
 		'itemids' => $data['itemids'],
@@ -844,6 +847,13 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		$data['initial_item_type'] = $initialItemType;
 		$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
 	}
+
+	// get template count to display applications multiselect only for single template
+	$templates = API::Template()->get(array(
+		'itemids' => $data['itemids'],
+		'countOutput' => true
+	));
+	$data['singleTemplate'] = ($templates == 1);
 
 	// application
 	if (count($data['applications']) == 0) {
