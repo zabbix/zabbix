@@ -5777,7 +5777,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host;
 
-		host = zbx_hashset_search(&config->hosts, &item->hostid);
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == host->maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == host->maintenance_type)
@@ -5804,21 +5805,21 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (NULL == host || 0 != host->errors_from)
+				if (0 != host->errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (NULL == host || 0 != host->snmp_errors_from)
+				if (0 != host->snmp_errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_IPMI:
-				if (NULL == host || 0 != host->ipmi_errors_from)
+				if (0 != host->ipmi_errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_JMX:
-				if (NULL == host || 0 != host->jmx_errors_from)
+				if (0 != host->jmx_errors_from)
 					continue;
 				break;
 			default:
@@ -5834,11 +5835,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			queue_item->itemid = item->itemid;
 			queue_item->type = item->type;
 			queue_item->nextcheck = item->nextcheck;
-
-			if (NULL != host || (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid))))
-				queue_item->proxy_hostid = host->proxy_hostid;
-			else
-				queue_item->proxy_hostid = 0;
+			queue_item->proxy_hostid = host->proxy_hostid;
 
 			zbx_vector_ptr_append(queue, queue_item);
 		}
