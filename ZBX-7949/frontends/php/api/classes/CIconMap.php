@@ -28,7 +28,7 @@
  *
  * @package API
  */
-class CIconMap extends CZBXAPI {
+class CIconMap extends CApiService {
 
 	protected $tableName = 'icon_map';
 	protected $tableAlias = 'im';
@@ -294,12 +294,12 @@ class CIconMap extends CZBXAPI {
 
 	/**
 	 * Delete IconMap.
+	 *
 	 * @param array $iconmapids
+	 *
 	 * @return array
 	 */
-	public function delete($iconmapids) {
-		$iconmapids = zbx_toArray($iconmapids);
-
+	public function delete(array $iconmapids) {
 		if (empty($iconmapids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -458,7 +458,7 @@ class CIconMap extends CZBXAPI {
 		$iconMapIds = array_keys($result);
 
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$mappings = API::getApi()->select('icon_mapping', array(
+			$mappings = API::getApiService()->select('icon_mapping', array(
 				'output' => $this->outputExtend($options['selectMappings'], array('iconmapid', 'iconmappingid')),
 				'filter' => array('iconmapid' => $iconMapIds),
 				'preservekeys' => true,

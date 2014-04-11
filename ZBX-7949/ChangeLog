@@ -2,20 +2,23 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
+...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
+..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
 ...G...... [ZBXNEXT-2194] added configuration option to include all files in a directory on Windows (Nikolaj)
 ........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
 A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
-A.F.I...S. [ZBXNEXT-2117] added support of the new "Description" field for templates, hosts and proxies (Eduard, Sasha)
-..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added patch to changed screen item sort order (Oleg, Pavels)
+A.F.I...S. [ZBXNEXT-2117] added "Description" field for templates, hosts and proxies (Eduard, Sasha)
+..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added a patch to change screen item sort order (Oleg, Pavels)
 ..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
-..F....... [ZBXNEXT-1533] added "Action name" in Audit->Action log (Oleg)
+..F....... [ZBXNEXT-1533] added "Action name" in Audit -> Action log (Oleg)
 ...G...... [ZBX-7742] added error message upon encountering trailing data for zabbix_sender when reading from file (Juris)
 A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macros (Pavels, wiper)
 ..F....... [ZBX-7361] implemented alphabetic host ordering when trigger has many hosts (Ivo)
-..F....... [ZBXNEXT-1632] added goto graphs link in host menu popup (Eduard)
+..F....... [ZBXNEXT-1632] added graph link in host menu popup "Go to" section (Eduard)
 ..F....... [ZBXNEXT-1735] removed graph and history link from items in latest data page, if history and trends are disabled (Oleg)
 ..F....... [ZBXNEXT-1910] added active since and active till columns in maintenance page (Eduard)
 ..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
@@ -36,19 +39,29 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
+..F....... [ZBX-7625] changed the execution order of API checks (Oleg)
+..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
+..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
+..F....... [ZBX-6675] fixed graph header, if items belong to multiple hosts (Oleg)
+A.F....... [ZBX-7781] fixed no error being triggered when trying to pass the "auth" parameter to a method that does not require authentication (Pavels)
+..F....... [ZBX-8001] fixed host massupdate inventory tab being reset after choosing an inventory mode (Ivo)
+..F....... [ZBX-7873] removed redundant error message in login page in event when frontend access for guest is not available (Eduard)
+..F....... [ZBX-7969] fixed discovery checks sorting in action configuration page (Eduard)
+..F....... [ZBX-7969] fixed sorting by name in discovery rule page (Eduard)
 ..F....... [ZBX-7826] fixed padding near textarea in acknowledges page (Eduard)
 ...G...PS. [ZBX-4998] fixed inconsistency of logging on Linux and Windows agents, and fixed information level logging at debug level 0 (igors)
 ....I..... [ZBX-6235] fixed unnecessary compilation of C code when only --enable-java is passed to ./configure (asaveljevs)
-...G...PS. [ZBX-5546] removed formatting of json objects and escaping of solidus (igors)
+...G...PS. [ZBX-5546] removed formatting of JSON objects and escaping of forward slash/solidus (igors)
 ..F....... [ZBX-7749] fixed possibility to set up database with default setting "Autocommit OFF" (Ivo)
 ........S. [ZBX-7140] fixed SQL query to retrieve data for host updates sorted from the database (Juris)
 ...G...... [ZBX-7673] removed strict necessity for a configuration for options that don't require it (Juris)
 ..F....... [ZBX-7786] fixed cell limit formatting with ellipsis (Eduard)
-..F....... [ZBX-7727] added SQL connection errors displaying for Oracle and DB2 (Oleg)
+..F....... [ZBX-7727] added SQL connection error displaying for Oracle and DB2 (Oleg)
 ....I..... [ZBX-5789] removed unused fields in graph_discovery table (Sasha)
 ..F....... [ZBX-6350] fixed incorrectly displayed table cell width in Event source details and Event details blocks (Ivo)
 ..F....... [ZBX-7095] fixed dashboard filter name to show pointer cursor (Ivo)
-..F....... [ZBX-7773] fixed jquery buttonset initializing (Eduard)
+..F....... [ZBX-7773] fixed jQuery buttonset initializing (Eduard)
 ..F....... [ZBX-7707] fixed "Auto-logout" field to show submitted incorrect value (Ivo)
 A.F.I..... [ZBXNEXT-2124] implemented an application filter for host and host group map elements (Pavels)
 ....I..... [ZBX-7109] removed unused fields in trigger_discovery table (Sasha)
@@ -61,6 +74,44 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4rc1
+
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
+
+Bug fixes:
+..F....... [ZBX-7867] fixed graph item drag and drop when selecting multiple items (Ivo)
+..F....... [ZBX-8046] fixed application toggling in Latest data page if same item belongs to several applications (Ivo)
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
+........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
+...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
+....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
+..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
+..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
+..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
+..F....... [ZBX-7809] improved validation on decimal values (Eduard)
+..F....... [ZBX-7809] fixed unused graph Y axis min/max fields unseting from db (Eduard)
+..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
+..F....... [ZBX-7545] fixed item mass update form being rendered with a delay when updating template items (Pavels)
+..F....... [ZBX-7864] fixed filter by host group in "Availability reports" page (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3
+
+2.2.3rc2 was released as 2.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3rc2
+
+Bug fixes:
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
+.......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.3rc1
@@ -934,9 +985,11 @@ Changes for 2.0.12rc1
 New features:
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)

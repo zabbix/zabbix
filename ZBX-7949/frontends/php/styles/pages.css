@@ -110,6 +110,9 @@
 .trigger-mon #inventory-filter td { padding-left: 0; padding-right: 3px; }
 .trigger-mon .filter-button { height: 16px; }
 
+/* trigger list */
+.trigger-list .dependencies { padding-left: 8px; }
+
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
 #testResultTable tr td { padding: 1px 3px; }

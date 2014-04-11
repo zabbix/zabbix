@@ -602,12 +602,10 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($templateids) {
+	public function delete(array $templateids) {
 		if (empty($templateids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$templateids = zbx_toArray($templateids);
 
 		$options = array(
 			'templateids' => $templateids,

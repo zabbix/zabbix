@@ -47,18 +47,18 @@ check_fields($fields);
  * Permissions
  */
 $dbGraph = API::Graph()->get(array(
-	'graphids' => $_REQUEST['graphid'],
-	'selectHosts' => API_OUTPUT_EXTEND,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'selectGraphItems' => array('itemid', 'calc_fnc', 'color', 'type'),
+	'selectHosts' => array('name'),
+	'graphids' => $_REQUEST['graphid']
 ));
+
 if (!$dbGraph) {
 	access_deny();
 }
 else {
 	$dbGraph = reset($dbGraph);
 }
-
-$host = reset($dbGraph['hosts']);
 
 /*
  * Display
@@ -91,27 +91,41 @@ if ($height <= 0) {
 
 $graph->setWidth($width);
 $graph->setHeight($height);
-$graph->setHeader($host['name'].NAME_DELIMITER.$dbGraph['name']);
+
+// array sorting
+CArrayHelper::sort($dbGraph['gitems'], array(
+	array('field' => 'sortorder', 'order' => ZBX_SORT_UP),
+	array('field' => 'itemid', 'order' => ZBX_SORT_DOWN)
+));
+
+// get graph items
+foreach ($dbGraph['gitems'] as $gItem) {
+	$graph->addItem(
+		$gItem['itemid'],
+		$gItem['calc_fnc'],
+		$gItem['color'],
+		$gItem['type']
+	);
+}
+
+$hostName = '';
+
+foreach ($dbGraph['hosts'] as $gItemHost) {
+	if ($hostName === '') {
+		$hostName = $gItemHost['name'];
+	}
+	elseif ($hostName !== $gItemHost['name']) {
+		$hostName = '';
+		break;
+	}
+}
+
+$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
 
 if ($dbGraph['show_3d']) {
 	$graph->switchPie3D();
 }
 $graph->showLegend($dbGraph['show_legend']);
-
-$result = DBselect(
-	'SELECT gi.*'.
-	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.zbx_dbstr($dbGraph['graphid']).
-	' ORDER BY gi.sortorder,gi.itemid DESC'
-);
-while ($dbGraph = DBfetch($result)) {
-	$graph->addItem(
-		$dbGraph['itemid'],
-		$dbGraph['calc_fnc'],
-		$dbGraph['color'],
-		$dbGraph['type']
-	);
-}
 $graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
