@@ -2382,9 +2382,53 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_clean_dhost_list_absent                                      *
+ *                                                                            *
+ * Purpose: clean dhosts not presenting in dservices                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_clean_dhost_list_absent(zbx_uint64_t druleid)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	dhostids;
+	zbx_uint64_t		dhostid;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_uint64_create(&dhostids);
+
+	result = DBselect("select dh.dhostid from dhosts dh where dh.druleid="ZBX_FS_UI64
+			" and dh.dhostid not in"
+				" (select ds.dhostid from dservices ds"
+				" where ds.dhostid is not null)", druleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(dhostid, row[0]);
+		zbx_vector_uint64_append(&dhostids, dhostid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where ");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+			dhostids.values, dhostids.values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&dhostids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_clean_dhost_list                                             *
  *                                                                            *
- * Purpose: clean dservices not presenting in drule                           *
+ * Purpose: clean dservices and dhosts not presenting in drule                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_clean_dhost_list(zbx_uint64_t druleid)
@@ -2394,7 +2438,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*iprange = NULL;
-	zbx_vector_uint64_t	dhostids;
+	zbx_vector_uint64_t	dserviceids;
 	zbx_uint64_t		dserviceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2408,7 +2452,7 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 	if (NULL == iprange)
 		goto out;
 
-	zbx_vector_uint64_create(&dhostids);
+	zbx_vector_uint64_create(&dserviceids);
 
 	result = DBselect("select ds.dserviceid,ds.ip"
 			" from dhosts dh,dservices ds"
@@ -2421,31 +2465,33 @@ void	zbx_clean_dhost_list(zbx_uint64_t druleid)
 		if (SUCCEED != ip_in_list(iprange, row[1]))
 		{
 			ZBX_STR2UINT64(dserviceid, row[0]);
-			zbx_vector_uint64_append(&dhostids, dserviceid);
+			zbx_vector_uint64_append(&dserviceids, dserviceid);
 		}
 	}
 	DBfree_result(result);
 
 	zbx_free(iprange);
 
-	if (0 != dhostids.values_num)
+	if (0 != dserviceids.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_vector_uint64_sort(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dservices where ");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
-				dhostids.values, dhostids.values_num);
+				dserviceids.values, dserviceids.values_num);
 
 		DBexecute("%s", sql);
 
 		zbx_free(sql);
+
+		zbx_clean_dhost_list_absent(druleid);
 	}
 
-	zbx_vector_uint64_destroy(&dhostids);
+	zbx_vector_uint64_destroy(&dserviceids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
