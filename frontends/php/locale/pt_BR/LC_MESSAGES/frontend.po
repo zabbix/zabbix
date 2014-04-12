@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2014-02-19 17:24+0300\n"
+"PO-Revision-Date: 2014-04-12 03:02+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392823448.0\n"
+"X-POOTLE-MTIME: 1397264554.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -4832,12 +4832,12 @@ msgstr "Nome do gráfico"
 #: api/classes/CGraphPrototype.php:881
 #, php-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "O protótipo de gráfico \"%1$s\" contêm protótipos de itens de múltiplas autobuscas."
 
 #: api/classes/CGraphPrototype.php:887
 #, php-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "O protótipo de gráfico \"%1$s\" precisa possuir ao menos um protótipo de item."
 
 #: api/classes/CGraphPrototype.php:34
 #, php-format
@@ -11999,12 +11999,12 @@ msgstr "Protótipo de trigger"
 #: api/classes/CTriggerPrototype.php:1106
 #, php-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de itens de múltiplas autobuscas."
 
 #: api/classes/CTriggerPrototype.php:1112
 #, php-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" precisa possuir ao menos um protótipo de item."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
