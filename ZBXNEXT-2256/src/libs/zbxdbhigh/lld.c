@@ -47,12 +47,12 @@ static int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, 
 	return res;
 }
 
-static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, char **error)
+static int	lld_rows_get(zbx_uint64_t lld_ruleid, char *value, char *filter, zbx_vector_ptr_t *lld_rows, char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
 	struct zbx_json_parse	jp, jp_data, jp_row;
-	char			*f_macro = NULL, *f_regexp = NULL;
+	char			*f_macro = NULL, *f_regexp, *regexp = NULL;
 	const char		*p;
 	zbx_vector_ptr_t	regexps;
 	zbx_lld_row_t		*lld_row;
@@ -83,7 +83,33 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 		*f_regexp++ = '\0';
 
 		if ('@' == *f_regexp)
+		{
 			DCget_expressions_by_name(&regexps, f_regexp + 1);
+		}
+		else if (STR_CONTAINS_MACROS(f_regexp))
+		{
+			DC_ITEM	item;
+			int	errcode;
+
+			DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+
+			if (SUCCEED == errcode)
+			{
+				regexp = zbx_strdup(regexp, f_regexp);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item,
+						&regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
+				f_regexp = regexp;
+			}
+
+			DCconfig_clean_items(&item, &errcode, 1);
+
+			if (SUCCEED != errcode)
+			{
+				*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].",
+						lld_ruleid);
+				goto out;
+			}
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'", __function_name, f_macro, f_regexp);
 	}
@@ -107,6 +133,8 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 
 		zbx_vector_ptr_append(lld_rows, lld_row);
 	}
+
+	zbx_free(regexp);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
@@ -189,13 +217,13 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 		zbx_free(lifetime_str);
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery rule ID [" ZBX_FS_UI64 "].", lld_ruleid);
 	DBfree_result(result);
 
 	if (0 == hostid)
 		goto clean;
 
-	if (SUCCEED != lld_rows_get(value, filter, &lld_rows, &error))
+	if (SUCCEED != lld_rows_get(lld_ruleid, value, filter, &lld_rows, &error))
 		goto error;
 
 	error = zbx_strdup(error, "");
