@@ -217,7 +217,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 		zbx_free(lifetime_str);
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery rule ID [" ZBX_FS_UI64 "].", lld_ruleid);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
 	DBfree_result(result);
 
 	if (0 == hostid)
