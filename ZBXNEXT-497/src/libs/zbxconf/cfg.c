@@ -118,33 +118,101 @@ out:
 	DIR		*dir;
 	zbx_stat_t	sb;
 	struct dirent	*d;
-	char		*incl_file = NULL;
-	const char	*extension;
-	int		result = SUCCEED;
+	char		*incl_file = NULL, **tokens_tmp = NULL;
+	char		*extension, *extension_full = NULL, *ex_carret, *ex_carret2, *path_tmp;
+	size_t		alloc_len = MAX_STRING_LEN, offset = 0;
+	int		result = SUCCEED, i = 0;
 
-	if (-1 == zbx_stat(cfg_file, &sb))
+	path_tmp = zbx_strdup(path_tmp, cfg_file);
+
+	if ((NULL != (extension = strrchr(path_tmp, '*'))) && (NULL != (extension_full = strrchr(path_tmp, '/'))))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		if (extension_full > extension)
+		{
+			zbx_error("%s: Wrong usage of '*' wildcard", path_tmp);
+			result = FAIL;
+			goto out;
+		}
+
+		zbx_error("Splitting filename with wildcards '%s' into tokens", extension_full + 1);
+
+		tokens_tmp = (char **)zbx_malloc(NULL, sizeof(char*));
+
+		if (NULL != (tokens_tmp[i] = strtok(extension_full + 1, "*")))
+		{
+			while (NULL != tokens_tmp[i])
+			{
+				zbx_error("tokens: '%s'", tokens_tmp[i]);
+				i++;
+				tokens_tmp = (char **)zbx_realloc(tokens_tmp, sizeof(char*) * (i + 1));
+
+				tokens_tmp[i] = strtok (NULL, "*");
+			}
+			memset(extension_full, '\0', 1);
+		}
+		else
+		{
+			zbx_rtrim(path_tmp, "*");
+
+			zbx_error("Use all conf files in path: '%s'", path_tmp);
+		}
+	}
+
+	zbx_error("Opening path: %s", path_tmp);
+
+	if (-1 == zbx_stat(path_tmp, &sb))
+	{
+		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
+		result = FAIL;
+		goto out;
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-		return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+		return __parse_cfg_file(path_tmp, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 
-	if (NULL == (dir = opendir(cfg_file)))
+	if (NULL == (dir = opendir(path_tmp)))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
+		result = FAIL;
+		goto out;
 	}
 
 	while (NULL != (d = readdir(dir)))
 	{
-		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
+		if (NULL != tokens_tmp[0])
+		{
+			int j = 0;
+
+			if ((NULL == (ex_carret = strstr(d->d_name, tokens_tmp[j]))) ||
+				((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != d->d_name)))
+				continue;
+
+			ex_carret += strlen(tokens_tmp[j]);
+
+			while (i > j++)
+			{
+				if (NULL == tokens_tmp[j])
+				{
+					if ((strlen(ex_carret) > strlen(tokens_tmp[j - 1])) &&
+							(0 != strcmp(strrchr(cfg_file, '*'), "*")))
+					{
+						j--;
+					}
+
+					break;
+				}
+
+				if (NULL == (ex_carret = strstr(ex_carret, tokens_tmp[j])))
+					break;
+			}
+
+			if (i > j)
+				continue;
+		}
+
+		incl_file = zbx_dsprintf(incl_file, "%s/%s", path_tmp, d->d_name);
 
 		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
-			continue;
-
-		if (NULL == (extension = strrchr(incl_file, '.')) || 0 != strcmp(".conf", extension))
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
@@ -152,15 +220,19 @@ out:
 			result = FAIL;
 			break;
 		}
+		zbx_error("File is parsed: %s", incl_file);
 	}
 
 	zbx_free(incl_file);
 
 	if (-1 == closedir(dir))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		zbx_error("%s: %s\n", path_tmp, zbx_strerror(errno));
 		return FAIL;
 	}
+
+out:
+	zbx_free(tokens_tmp);
 
 	return result;
 #endif
