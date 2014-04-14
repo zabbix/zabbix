@@ -310,7 +310,7 @@ $filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
 	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
 ));
 
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table
@@ -523,7 +523,8 @@ foreach ($items as $key => $item){
 		$applicationId = $itemApplication['applicationid'];
 
 		$applications[$applicationId]['item_cnt']++;
-		$tab_rows[$applicationId][] = $row;
+		// objects may have different properties, so it's better to use a copy of it
+		$tab_rows[$applicationId][] = clone $row;
 	}
 
 	// remove items with applications from the collection

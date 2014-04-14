@@ -497,11 +497,7 @@ out:
  ******************************************************************************/
 static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
 {
-	if ((*update1)->sourceid < (*update2)->sourceid)
-		return -1;
-
-	if ((*update1)->sourceid > (*update2)->sourceid)
-		return 1;
+	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
 
 	return 0;
 }
@@ -524,8 +520,6 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 {
 	int			i, ret = FAIL;
 	zbx_vector_ptr_t	updates;
-	const char		*ins_service_alarms =
-				"insert into service_alarms (servicealarmid,serviceid,value,clock) values ";
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		alarmid;
@@ -565,45 +559,38 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 		}
 	}
 
-	if (0 != alarms->values_num)
-	{
-		/* write generated service alarms into database */
-		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
-
-		for (i = 0; i < alarms->values_num; i++)
-		{
-			zbx_status_update_t	*update = alarms->values[i];
-
-#ifdef HAVE_MULTIROW_INSERT
-			if (16 > sql_offset || 0 == i)
-#endif
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_service_alarms);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)" ZBX_ROW_DL,
-					alarmid++, update->sourceid, update->status, update->clock);
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				goto out;
-		}
-	}
-
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		if (0 < alarms->values_num)
-		{
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
-#endif
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto out;
 	}
 
 	ret = SUCCEED;
+
+	/* write generated service alarms into database */
+	if (0 != alarms->values_num)
+	{
+		zbx_db_insert_t	db_insert;
+
+		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
+
+		zbx_db_insert_prepare(&db_insert, "service_alarms", "servicealarmid", "serviceid", "value", "clock",
+				NULL);
+
+		for (i = 0; i < alarms->values_num; i++)
+		{
+			zbx_status_update_t	*update = alarms->values[i];
+
+			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
+					update->clock);
+		}
+
+		ret = zbx_db_insert_execute(&db_insert);
+
+		zbx_db_insert_clean(&db_insert);
+	}
 out:
 	zbx_free(sql);
 

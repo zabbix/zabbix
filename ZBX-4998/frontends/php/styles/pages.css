@@ -106,6 +106,13 @@
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 
+/* trigger monitoring */
+.trigger-mon #inventory-filter td { padding-left: 0; padding-right: 3px; }
+.trigger-mon .filter-button { height: 16px; }
+
+/* trigger list */
+.trigger-list .dependencies { padding-left: 8px; }
+
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
 #testResultTable tr td { padding: 1px 3px; }
@@ -179,6 +186,9 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 
 /* triggers expression condition */
 .trigger-expression #expr_type { width: 605px; max-width: 605px; }
+
+/* acknowledge */
+.acknowledge-edit textarea { margin: 5px 0; vertical-align: inherit; }
 
 /* login */
 .login { position: absolute; height: 99%; width: 99%; }

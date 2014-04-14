@@ -226,7 +226,8 @@ static int	process_proxy(void)
 
 			get_proxyconfig_data(proxy.hostid, &j);
 
-			zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
+			zabbix_log(LOG_LEVEL_WARNING,
+					"sending configuration data to proxy \"%s\", datalen " ZBX_FS_SIZE_T,
 					proxy.host, (zbx_fs_size_t)j.buffer_size);
 
 			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))

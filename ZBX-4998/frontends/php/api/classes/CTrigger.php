@@ -799,9 +799,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @return array
 	 */
-	public function delete($triggerIds, $nopermissions = false) {
-		$triggerIds = zbx_toArray($triggerIds);
-
+	public function delete(array $triggerIds, $nopermissions = false) {
 		$this->validateDelete($triggerIds, $nopermissions);
 
 		// get child triggers
@@ -988,7 +986,7 @@ class CTrigger extends CTriggerGeneral {
 			)));
 
 			// propagate the dependencies to the child triggers
-			$childTriggers = API::getApi()->select($this->tableName(), array(
+			$childTriggers = API::getApiService()->select($this->tableName(), array(
 				'output' => array('triggerid'),
 				'filter' => array(
 					'templateid' => $triggerId
@@ -1042,7 +1040,7 @@ class CTrigger extends CTriggerGeneral {
 
 		try {
 			// delete the dependencies from the child triggers
-			$childTriggers = API::getApi()->select($this->tableName(), array(
+			$childTriggers = API::getApiService()->select($this->tableName(), array(
 				'output' => array('triggerid'),
 				'filter' => array(
 					'templateid' => $triggerids
@@ -1805,12 +1803,11 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!zbx_empty($options['sortfield'])) {
-			// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
-			// since column "t.hostname" doesn't exist
-			if (isset($sqlParts['select']['hostname'])) {
-				$sqlParts['select']['hostname'] = 'h.name as hostname';
-			}
+		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
+		// since column "t.hostname" doesn't exist
+		if (!zbx_empty($options['sortfield'])
+				&& ($options['sortfield'] === 'hostname' || isset($sqlParts['select']['hostname']))) {
+			$sqlParts['select']['hostname'] = 'h.name as hostname';
 		}
 
 		return $sqlParts;

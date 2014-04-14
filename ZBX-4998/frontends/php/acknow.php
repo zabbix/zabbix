@@ -61,7 +61,9 @@ if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 
 	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
-		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
+		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
+			'&source='.EVENT_SOURCE_TRIGGERS
+		);
 	}
 	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 		redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
@@ -169,7 +171,9 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		ob_end_clean();
 
 		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
-			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
+			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
+				'&source='.EVENT_SOURCE_TRIGGERS
+			);
 		}
 		elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 			redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
@@ -233,11 +237,13 @@ else {
 }
 
 $messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
+$messageTable->addClass('acknowledge-edit');
 $messageTable->addVar('backurl', $_REQUEST['backurl']);
 
 if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 	$messageTable->addVar('eventid', $_REQUEST['eventid']);
 	$messageTable->addVar('triggerid', $_REQUEST['triggerid']);
+	$messageTable->addVar('source', EVENT_SOURCE_TRIGGERS);
 }
 elseif (in_array($_REQUEST['backurl'], array('screenedit.php', 'screens.php'))) {
 	$messageTable->addVar('screenid', $_REQUEST['screenid']);
@@ -272,6 +278,6 @@ if (!$bulk) {
 }
 
 $messageTable->addItemToBottomRow(new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid'))));
-$messageTable->show(false);
+$messageTable->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

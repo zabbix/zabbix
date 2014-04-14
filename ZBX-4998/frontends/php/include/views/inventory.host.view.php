@@ -185,7 +185,11 @@ if ($this->data['host']['inventory']) {
 }
 
 // description
-$overviewFormList->addRow(_('Description'), new CDiv(zbx_str2links($this->data['host']['description']), 'description'));
+if ($this->data['host']['description'] !== '') {
+	$overviewFormList->addRow(_('Description'),
+		new CDiv(zbx_str2links($this->data['host']['description']), 'description')
+	);
+}
 
 // latest data
 $overviewFormList->addRow(_('Latest data'), array(
@@ -195,7 +199,10 @@ $overviewFormList->addRow(_('Latest data'), array(
 	new CLink(_('Triggers'),
 		'tr_status.php?show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
 		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
-	new CLink(_('Events'), 'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
+	new CLink(_('Events'),
+		'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS,
+		'overview-link'
+	),
 	new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid'), 'overview-link'),
 	new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid'),
 		'overview-link')

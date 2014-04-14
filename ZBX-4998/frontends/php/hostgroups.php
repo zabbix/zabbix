@@ -159,7 +159,7 @@ elseif (isset($_REQUEST['save'])) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
-	$result = API::HostGroup()->delete($_REQUEST['groupid']);
+	$result = API::HostGroup()->delete(array(getRequest('groupid')));
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 
