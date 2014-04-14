@@ -593,90 +593,85 @@ static int	DBpatch_2030048(void)
 
 static int	DBpatch_2030049(void)
 {
-	return dm_rename_slave_data("graph_theme", "graphthemeid", "description", 64);
+	return dm_rename_slave_data("groups", "groupid", "name", 64);
 }
 
 static int	DBpatch_2030050(void)
 {
-	return dm_rename_slave_data("groups", "groupid", "name", 64);
+	return dm_rename_slave_data("hosts", "hostid", "host", 64);
 }
 
 static int	DBpatch_2030051(void)
 {
-	return dm_rename_slave_data("hosts", "hostid", "host", 64);
+	return dm_rename_slave_data("hosts", "hostid", "name", 64);
 }
 
 static int	DBpatch_2030052(void)
 {
-	return dm_rename_slave_data("hosts", "hostid", "name", 64);
+	return dm_rename_slave_data("icon_map", "iconmapid", "name", 64);
 }
 
 static int	DBpatch_2030053(void)
 {
-	return dm_rename_slave_data("icon_map", "iconmapid", "name", 64);
+	return dm_rename_slave_data("images", "imageid", "name", 64);
 }
 
 static int	DBpatch_2030054(void)
 {
-	return dm_rename_slave_data("images", "imageid", "name", 64);
+	return dm_rename_slave_data("maintenances", "maintenanceid", "name", 128);
 }
 
 static int	DBpatch_2030055(void)
 {
-	return dm_rename_slave_data("maintenances", "maintenanceid", "name", 128);
+	return dm_rename_slave_data("media_type", "mediatypeid", "description", 100);
 }
 
 static int	DBpatch_2030056(void)
 {
-	return dm_rename_slave_data("media_type", "mediatypeid", "description", 100);
+	return dm_rename_slave_data("regexps", "regexpid", "name", 128);
 }
 
 static int	DBpatch_2030057(void)
 {
-	return dm_rename_slave_data("regexps", "regexpid", "name", 128);
+	return dm_rename_slave_data("screens", "screenid", "name", 255);
 }
 
 static int	DBpatch_2030058(void)
 {
-	return dm_rename_slave_data("screens", "screenid", "name", 255);
+	return dm_rename_slave_data("scripts", "scriptid", "name", 255);
 }
 
 static int	DBpatch_2030059(void)
 {
-	return dm_rename_slave_data("scripts", "scriptid", "name", 255);
+	return dm_rename_slave_data("services", "serviceid", "name", 128);
 }
 
 static int	DBpatch_2030060(void)
 {
-	return dm_rename_slave_data("services", "serviceid", "name", 128);
+	return dm_rename_slave_data("slideshows", "slideshowid", "name", 255);
 }
 
 static int	DBpatch_2030061(void)
 {
-	return dm_rename_slave_data("slideshows", "slideshowid", "name", 255);
+	return dm_rename_slave_data("sysmaps", "sysmapid", "name", 128);
 }
 
 static int	DBpatch_2030062(void)
 {
-	return dm_rename_slave_data("sysmaps", "sysmapid", "name", 128);
+	return dm_rename_slave_data("usrgrp", "usrgrpid", "name", 64);
 }
 
 static int	DBpatch_2030063(void)
 {
-	return dm_rename_slave_data("usrgrp", "usrgrpid", "name", 64);
+	return dm_rename_slave_data("users", "userid", "alias", 100);
 }
 
 static int	DBpatch_2030064(void)
 {
-	return dm_rename_slave_data("users", "userid", "alias", 100);
-}
-
-static int	DBpatch_2030065(void)
-{
 	return dm_rename_slave_data("valuemaps", "valuemapid", "name", 64);
 }
 
-static int	DBpatch_2030066(void)
+static int	DBpatch_2030065(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -706,12 +701,12 @@ static int	DBpatch_2030066(void)
 	return FAIL;
 }
 
-static int	DBpatch_2030067(void)
+static int	DBpatch_2030066(void)
 {
 	return DBdrop_table("nodes");
 }
 
-static int	DBpatch_2030068(void)
+static int	DBpatch_2030067(void)
 {
 	if (SUCCEED != check_data_uniqueness("actions", "name"))
 		return FAIL;
@@ -719,7 +714,7 @@ static int	DBpatch_2030068(void)
 	return DBcreate_index("actions", "actions_2", "name", 1);
 }
 
-static int	DBpatch_2030069(void)
+static int	DBpatch_2030068(void)
 {
 	if (SUCCEED != check_data_uniqueness("drules", "name"))
 		return FAIL;
@@ -727,12 +722,12 @@ static int	DBpatch_2030069(void)
 	return DBcreate_index("drules", "drules_2", "name", 1);
 }
 
-static int	DBpatch_2030070(void)
+static int	DBpatch_2030069(void)
 {
 	return DBdrop_index("globalmacro", "globalmacro_1");
 }
 
-static int	DBpatch_2030071(void)
+static int	DBpatch_2030070(void)
 {
 	if (SUCCEED != check_data_uniqueness("globalmacro", "macro"))
 		return FAIL;
@@ -740,12 +735,12 @@ static int	DBpatch_2030071(void)
 	return DBcreate_index("globalmacro", "globalmacro_1", "macro", 1);
 }
 
-static int	DBpatch_2030072(void)
+static int	DBpatch_2030071(void)
 {
 	return DBdrop_index("graph_theme", "graph_theme_1");
 }
 
-static int	DBpatch_2030073(void)
+static int	DBpatch_2030072(void)
 {
 	if (SUCCEED != check_data_uniqueness("graph_theme", "description"))
 		return FAIL;
@@ -753,12 +748,12 @@ static int	DBpatch_2030073(void)
 	return DBcreate_index("graph_theme", "graph_theme_1", "description", 1);
 }
 
-static int	DBpatch_2030074(void)
+static int	DBpatch_2030073(void)
 {
 	return DBdrop_index("icon_map", "icon_map_1");
 }
 
-static int	DBpatch_2030075(void)
+static int	DBpatch_2030074(void)
 {
 	if (SUCCEED != check_data_uniqueness("icon_map", "name"))
 		return FAIL;
@@ -766,12 +761,12 @@ static int	DBpatch_2030075(void)
 	return DBcreate_index("icon_map", "icon_map_1", "name", 1);
 }
 
-static int	DBpatch_2030076(void)
+static int	DBpatch_2030075(void)
 {
 	return DBdrop_index("images", "images_1");
 }
 
-static int	DBpatch_2030077(void)
+static int	DBpatch_2030076(void)
 {
 	if (SUCCEED != check_data_uniqueness("images", "name"))
 		return FAIL;
@@ -779,7 +774,7 @@ static int	DBpatch_2030077(void)
 	return DBcreate_index("images", "images_1", "name", 1);
 }
 
-static int	DBpatch_2030078(void)
+static int	DBpatch_2030077(void)
 {
 	if (SUCCEED != check_data_uniqueness("maintenances", "name"))
 		return FAIL;
@@ -787,7 +782,7 @@ static int	DBpatch_2030078(void)
 	return DBcreate_index("maintenances", "maintenances_2", "name", 1);
 }
 
-static int	DBpatch_2030079(void)
+static int	DBpatch_2030078(void)
 {
 	if (SUCCEED != check_data_uniqueness("media_type", "description"))
 		return FAIL;
@@ -795,12 +790,12 @@ static int	DBpatch_2030079(void)
 	return DBcreate_index("media_type", "media_type_1", "description", 1);
 }
 
-static int	DBpatch_2030080(void)
+static int	DBpatch_2030079(void)
 {
 	return DBdrop_index("regexps", "regexps_1");
 }
 
-static int	DBpatch_2030081(void)
+static int	DBpatch_2030080(void)
 {
 	if (SUCCEED != check_data_uniqueness("regexps", "name"))
 		return FAIL;
@@ -808,7 +803,7 @@ static int	DBpatch_2030081(void)
 	return DBcreate_index("regexps", "regexps_1", "name", 1);
 }
 
-static int	DBpatch_2030082(void)
+static int	DBpatch_2030081(void)
 {
 	if (SUCCEED != check_data_uniqueness("scripts", "name"))
 		return FAIL;
@@ -816,7 +811,7 @@ static int	DBpatch_2030082(void)
 	return DBcreate_index("scripts", "scripts_3", "name", 1);
 }
 
-static int	DBpatch_2030083(void)
+static int	DBpatch_2030082(void)
 {
 	if (SUCCEED != check_data_uniqueness("services", "name"))
 		return FAIL;
@@ -824,7 +819,7 @@ static int	DBpatch_2030083(void)
 	return DBcreate_index("services", "services_2", "name", 1);
 }
 
-static int	DBpatch_2030084(void)
+static int	DBpatch_2030083(void)
 {
 	if (SUCCEED != check_data_uniqueness("slideshows", "name"))
 		return FAIL;
@@ -832,12 +827,12 @@ static int	DBpatch_2030084(void)
 	return DBcreate_index("slideshows", "slideshows_1", "name", 1);
 }
 
-static int	DBpatch_2030085(void)
+static int	DBpatch_2030084(void)
 {
 	return DBdrop_index("sysmaps", "sysmaps_1");
 }
 
-static int	DBpatch_2030086(void)
+static int	DBpatch_2030085(void)
 {
 	if (SUCCEED != check_data_uniqueness("sysmaps", "name"))
 		return FAIL;
@@ -845,12 +840,12 @@ static int	DBpatch_2030086(void)
 	return DBcreate_index("sysmaps", "sysmaps_1", "name", 1);
 }
 
-static int	DBpatch_2030087(void)
+static int	DBpatch_2030086(void)
 {
 	return DBdrop_index("usrgrp", "usrgrp_1");
 }
 
-static int	DBpatch_2030088(void)
+static int	DBpatch_2030087(void)
 {
 	if (SUCCEED != check_data_uniqueness("usrgrp", "name"))
 		return FAIL;
@@ -858,12 +853,12 @@ static int	DBpatch_2030088(void)
 	return DBcreate_index("usrgrp", "usrgrp_1", "name", 1);
 }
 
-static int	DBpatch_2030089(void)
+static int	DBpatch_2030088(void)
 {
 	return DBdrop_index("users", "users_1");
 }
 
-static int	DBpatch_2030090(void)
+static int	DBpatch_2030089(void)
 {
 	if (SUCCEED != check_data_uniqueness("users", "alias"))
 		return FAIL;
@@ -871,12 +866,12 @@ static int	DBpatch_2030090(void)
 	return DBcreate_index("users", "users_1", "alias", 1);
 }
 
-static int	DBpatch_2030091(void)
+static int	DBpatch_2030090(void)
 {
 	return DBdrop_index("valuemaps", "valuemaps_1");
 }
 
-static int	DBpatch_2030092(void)
+static int	DBpatch_2030091(void)
 {
 	if (SUCCEED != check_data_uniqueness("valuemaps", "name"))
 		return FAIL;
@@ -981,6 +976,5 @@ DBPATCH_ADD(2030088, 0, 1)
 DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
-DBPATCH_ADD(2030092, 0, 1)
 
 DBPATCH_END()
