@@ -147,11 +147,11 @@ elseif (isset($_REQUEST['save'])) {
 
 	// authentication type
 	if ($usrgrps) {
-		$authType = getGroupAuthenticationType($usrgrps);
+		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
 		$authType = hasRequest('userid')
-			? getUserAuthenticationType(getRequest('userid'))
+			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
 			: $config['authentication_type'];
 	}
 

@@ -106,12 +106,12 @@
 
 		// authentication type
 		if ($data['user_groups']) {
-			$data['auth_type'] = getGroupAuthenticationType($data['user_groups']);
+			$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
 		}
 		else {
 			$data['auth_type'] = ($userid === null)
 				? $config['authentication_type']
-				: getUserAuthenticationType($userid);
+				: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
 		}
 
 		// set autologout

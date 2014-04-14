@@ -93,10 +93,11 @@ function check_perm2login($userId) {
  * Get user gui access.
  *
  * @param string $userId
+ * @param int    $maxGuiAccess
  *
  * @return int
  */
-function getUserGuiAccess($userId) {
+function getUserGuiAccess($userId, $maxGuiAccess = null) {
 	if (bccomp($userId, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
 		return CWebUser::$data['gui_access'];
 	}
@@ -105,7 +106,8 @@ function getUserGuiAccess($userId) {
 		'SELECT MAX(g.gui_access) AS gui_access'.
 		' FROM usrgrp g,users_groups ug'.
 		' WHERE ug.userid='.zbx_dbstr($userId).
-			' AND g.usrgrpid=ug.usrgrpid'
+			' AND g.usrgrpid=ug.usrgrpid'.
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
 	));
 
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
@@ -115,13 +117,14 @@ function getUserGuiAccess($userId) {
  * Get user authentication type.
  *
  * @param string $userId
+ * @param int    $maxGuiAccess
  *
  * @return int
  */
-function getUserAuthenticationType($userId) {
+function getUserAuthenticationType($userId, $maxGuiAccess = null) {
 	$config = select_config();
 
-	switch (getUserGuiAccess($userId)) {
+	switch (getUserGuiAccess($userId, $maxGuiAccess)) {
 		case GROUP_GUI_ACCESS_SYSTEM:
 			return $config['authentication_type'];
 
@@ -137,14 +140,16 @@ function getUserAuthenticationType($userId) {
  * Get groups gui access.
  *
  * @param array $groupIds
+ * @param int   $maxGuiAccess
  *
  * @return int
  */
-function getGroupsGuiAccess($groupIds) {
+function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
 	$guiAccess = DBfetch(DBselect(
 		'SELECT MAX(g.gui_access) AS gui_access'.
 		' FROM usrgrp g'.
-		' WHERE '.dbConditionInt('g.usrgrpid', $groupIds)
+		' WHERE '.dbConditionInt('g.usrgrpid', $groupIds).
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
 	));
 
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
@@ -154,13 +159,14 @@ function getGroupsGuiAccess($groupIds) {
  * Get group authentication type.
  *
  * @param array $groupIds
+ * @param int   $maxGuiAccess
  *
  * @return int
  */
-function getGroupAuthenticationType($groupIds) {
+function getGroupAuthenticationType($groupIds, $maxGuiAccess = null) {
 	$config = select_config();
 
-	switch (getGroupsGuiAccess($groupIds)) {
+	switch (getGroupsGuiAccess($groupIds, $maxGuiAccess)) {
 		case GROUP_GUI_ACCESS_SYSTEM:
 			return $config['authentication_type'];
 
