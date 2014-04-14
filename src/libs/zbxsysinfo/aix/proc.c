@@ -26,7 +26,7 @@
 #define DO_MIN	2
 #define DO_AVG	3
 
-static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
+static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 {
 	if (ZBX_PROC_STAT_ALL == zbx_proc_stat)
 		return SUCCEED;
@@ -34,22 +34,22 @@ static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
 	switch (zbx_proc_stat)
 	{
 		case ZBX_PROC_STAT_RUN:
-			return SRUN == procsinfo->pi_state ? SUCCEED : FAIL;
+			return SRUN == procentry->pi_state ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
-			return SSLEEP == procsinfo->pi_state ? SUCCEED : FAIL;
+			return SSLEEP == procentry->pi_state ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_ZOMB:
-			return SZOMB == procsinfo->pi_state ? SUCCEED : FAIL;
+			return SZOMB == procentry->pi_state ? SUCCEED : FAIL;
 	}
 
 	return FAIL;
 }
 
-static int	check_procargs(struct procsinfo *procsinfo, const char *proccomm)
+static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 {
 	int	i;
 	char	procargs[MAX_STRING_LEN];
 
-	if (0 != getargs(procsinfo, sizeof(*procsinfo), procargs, sizeof(procargs)))
+	if (0 != getargs(procentry, sizeof(*procentry), procargs, sizeof(procargs)))
 		return FAIL;
 
 	for (i = 0; i < sizeof(procargs) - 1; i++)
@@ -73,7 +73,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*param, *procname, *proccomm;
 	struct passwd		*usrinfo;
-	struct procsinfo	procsinfo;
+	struct procentry64	procentry;
 	pid_t			pid = 0;
 	int			do_task;
 	zbx_uint64_t		memsize = 0, proccount = 0, value;
@@ -107,18 +107,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
-	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
+	while (0 < getprocs64(&procentry, (int)sizeof(struct procentry64), NULL, 0, &pid, 1))
 	{
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procentry.pi_comm))
 			continue;
 
-		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
+		if (NULL != usrinfo && usrinfo->pw_uid != procentry.pi_uid)
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procsinfo, proccomm))
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procentry, proccomm))
 			continue;
 
-		value = procsinfo.pi_size;
+		value = procentry.pi_size;
 		value <<= 12;	/* number of pages to bytes */
 
 		if (0 == proccount++)
@@ -148,7 +148,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*param, *procname, *proccomm;
 	struct passwd		*usrinfo;
-	struct procsinfo	procsinfo;
+	struct procentry64	procentry;
 	pid_t			pid = 0;
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
@@ -182,18 +182,18 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
-	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
+	while (0 < getprocs64(&procentry, (int)sizeof(struct procentry64), NULL, 0, &pid, 1))
 	{
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procentry.pi_comm))
 			continue;
 
-		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
+		if (NULL != usrinfo && usrinfo->pw_uid != procentry.pi_uid)
 			continue;
 
-		if (SUCCEED != check_procstate(&procsinfo, zbx_proc_stat))
+		if (SUCCEED != check_procstate(&procentry, zbx_proc_stat))
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procsinfo, proccomm))
+		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procentry, proccomm))
 			continue;
 
 		proccount++;
