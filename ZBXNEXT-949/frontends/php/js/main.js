@@ -885,9 +885,9 @@ function rm4favorites(favobj, favid) {
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {int} id					Id of filter in DOM
- * @param {string} titleWhenVisible	Title to set when filter is visible
- * @param {string} titleWhenHidden	Title to set when filter is collapsed
+ * @param {int} 	id					Id of filter in DOM
+ * @param {string} 	titleWhenVisible	Title to set when filter is visible
+ * @param {string} 	titleWhenHidden		Title to set when filter is collapsed
  */
 function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 	var state = showHide(id);
