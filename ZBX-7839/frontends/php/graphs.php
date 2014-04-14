@@ -170,7 +170,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 		: API::GraphPrototype()->get($options);
 	$graph = reset($graph);
 
-	$_REQUEST = array_merge($_REQUEST, $graph);
+	$_REQUEST = array_merge($graph, $_REQUEST);
 
 	// graph items
 	$_REQUEST['items'] = API::GraphItem()->get(array(
