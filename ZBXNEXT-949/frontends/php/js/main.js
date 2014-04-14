@@ -881,15 +881,21 @@ function rm4favorites(favobj, favid) {
 	});
 }
 
-function changeFlickerState(id, title_when_visible, title_when_hidden) {
+
+/**
+ * Toggles filter state and updates title and icons accordingly.
+ *
+ * @param {int} id					Id of filter in DOM
+ * @param {string} titleWhenVisible	Title to set when filter is visible
+ * @param {string} titleWhenHidden	Title to set when filter is collapsed
+ */
+function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 	var state = showHide(id);
 
 	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
 	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
 
-	var title = state
-		? (title_when_visible || "Hide filter")
-		: (title_when_hidden || "Show filter");
+	var title = state ? titleWhenVisible : titleWhenHidden;
 
 	jQuery('#flicker_title').html(title);
 
