@@ -992,6 +992,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
