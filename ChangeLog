@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
 ..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
 ..F....... [ZBX-7625] changed the execution order of API checks (Oleg)
 ..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
