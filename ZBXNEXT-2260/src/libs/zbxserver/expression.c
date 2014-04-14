@@ -1891,10 +1891,8 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_HOST_HOST			"{HOST.HOST}"
 #define MVAR_HOST_IP			"{HOST.IP}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
 #define MVAR_HOST_METADATA		"{HOST.METADATA}"
 #define MVAR_HOST_NAME			"{HOST.NAME}"
-#define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_DESCRIPTION		"{HOST.DESCRIPTION}"
 #define MVAR_HOST_PORT			"{HOST.PORT}"
 #define MVAR_TIME			"{TIME}"
@@ -1906,7 +1904,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_KEY			"{ITEM.KEY}"
 #define MVAR_ITEM_KEY_ORIG		"{ITEM.KEY.ORIG}"
 #define MVAR_ITEM_STATE			"{ITEM.STATE}"
-#define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
 #define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
 #define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
@@ -1916,7 +1913,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
 #define MVAR_TRIGGER_DESCRIPTION	"{TRIGGER.DESCRIPTION}"
-#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_NAME_ORIG		"{TRIGGER.NAME.ORIG}"
@@ -1927,7 +1923,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TRIGGER_STATE		"{TRIGGER.STATE}"
 #define MVAR_TRIGGER_TEMPLATE_NAME	"{TRIGGER.TEMPLATE.NAME}"
 #define MVAR_TRIGGER_HOSTGROUP_NAME	"{TRIGGER.HOSTGROUP.NAME}"
-#define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
@@ -2016,20 +2011,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_INVENTORY_POC_SECONDARY_SCREEN	MVAR_INVENTORY "POC.SECONDARY.SCREEN}"
 #define MVAR_INVENTORY_POC_SECONDARY_NOTES	MVAR_INVENTORY "POC.SECONDARY.NOTES}"
 
-/* PROFILE.* is deprecated, use INVENTORY.* instead */
-#define MVAR_PROFILE			"{PROFILE."			/* prefix for profile macros */
-#define MVAR_PROFILE_DEVICETYPE		MVAR_PROFILE "DEVICETYPE}"
-#define MVAR_PROFILE_NAME		MVAR_PROFILE "NAME}"
-#define MVAR_PROFILE_OS			MVAR_PROFILE "OS}"
-#define MVAR_PROFILE_SERIALNO		MVAR_PROFILE "SERIALNO}"
-#define MVAR_PROFILE_TAG		MVAR_PROFILE "TAG}"
-#define MVAR_PROFILE_MACADDRESS		MVAR_PROFILE "MACADDRESS}"
-#define MVAR_PROFILE_HARDWARE		MVAR_PROFILE "HARDWARE}"
-#define MVAR_PROFILE_SOFTWARE		MVAR_PROFILE "SOFTWARE}"
-#define MVAR_PROFILE_CONTACT		MVAR_PROFILE "CONTACT}"
-#define MVAR_PROFILE_LOCATION		MVAR_PROFILE "LOCATION}"
-#define MVAR_PROFILE_NOTES		MVAR_PROFILE "NOTES}"
-
 #define MVAR_NODE_ID			"{NODE.ID}"
 #define MVAR_NODE_NAME			"{NODE.NAME}"
 
@@ -2068,14 +2049,10 @@ static const char	*ex_macros[] =
 	MVAR_INVENTORY_POC_SECONDARY_NAME, MVAR_INVENTORY_POC_SECONDARY_EMAIL, MVAR_INVENTORY_POC_SECONDARY_PHONE_A,
 	MVAR_INVENTORY_POC_SECONDARY_PHONE_B, MVAR_INVENTORY_POC_SECONDARY_CELL, MVAR_INVENTORY_POC_SECONDARY_SCREEN,
 	MVAR_INVENTORY_POC_SECONDARY_NOTES,
-	/* PROFILE.* is deprecated, use INVENTORY.* instead */
-	MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
-	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
-	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS,
+	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
-	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
+	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_STATE,
 	MVAR_ITEM_VALUE,
@@ -2094,29 +2071,21 @@ typedef struct
 static inventory_field_t	inventory_fields[] =
 {
 	{MVAR_INVENTORY_TYPE, "type"},
-	{MVAR_PROFILE_DEVICETYPE, "type"},	/* deprecated */
 	{MVAR_INVENTORY_TYPE_FULL, "type_full"},
 	{MVAR_INVENTORY_NAME, "name"},
-	{MVAR_PROFILE_NAME, "name"},	/* deprecated */
 	{MVAR_INVENTORY_ALIAS, "alias"},
 	{MVAR_INVENTORY_OS, "os"},
-	{MVAR_PROFILE_OS, "os"},	/* deprecated */
 	{MVAR_INVENTORY_OS_FULL, "os_full"},
 	{MVAR_INVENTORY_OS_SHORT, "os_short"},
 	{MVAR_INVENTORY_SERIALNO_A, "serialno_a"},
-	{MVAR_PROFILE_SERIALNO, "serialno_a"},	/* deprecated */
 	{MVAR_INVENTORY_SERIALNO_B, "serialno_b"},
 	{MVAR_INVENTORY_TAG, "tag"},
-	{MVAR_PROFILE_TAG, "tag"},	/* deprecated */
 	{MVAR_INVENTORY_ASSET_TAG, "asset_tag"},
 	{MVAR_INVENTORY_MACADDRESS_A, "macaddress_a"},
-	{MVAR_PROFILE_MACADDRESS, "macaddress_a"},	/* deprecated */
 	{MVAR_INVENTORY_MACADDRESS_B, "macaddress_b"},
 	{MVAR_INVENTORY_HARDWARE, "hardware"},
-	{MVAR_PROFILE_HARDWARE, "hardware"},	/* deprecated */
 	{MVAR_INVENTORY_HARDWARE_FULL, "hardware_full"},
 	{MVAR_INVENTORY_SOFTWARE, "software"},
-	{MVAR_PROFILE_SOFTWARE, "software"},	/* deprecated */
 	{MVAR_INVENTORY_SOFTWARE_FULL, "software_full"},
 	{MVAR_INVENTORY_SOFTWARE_APP_A, "software_app_a"},
 	{MVAR_INVENTORY_SOFTWARE_APP_B, "software_app_b"},
@@ -2124,13 +2093,10 @@ static inventory_field_t	inventory_fields[] =
 	{MVAR_INVENTORY_SOFTWARE_APP_D, "software_app_d"},
 	{MVAR_INVENTORY_SOFTWARE_APP_E, "software_app_e"},
 	{MVAR_INVENTORY_CONTACT, "contact"},
-	{MVAR_PROFILE_CONTACT, "contact"},	/* deprecated */
 	{MVAR_INVENTORY_LOCATION, "location"},
-	{MVAR_PROFILE_LOCATION, "location"},	/* deprecated */
 	{MVAR_INVENTORY_LOCATION_LAT, "location_lat"},
 	{MVAR_INVENTORY_LOCATION_LON, "location_lon"},
 	{MVAR_INVENTORY_NOTES, "notes"},
-	{MVAR_PROFILE_NOTES, "notes"},	/* deprecated */
 	{MVAR_INVENTORY_CHASSIS, "chassis"},
 	{MVAR_INVENTORY_MODEL, "model"},
 	{MVAR_INVENTORY_HW_ARCH, "hw_arch"},
@@ -2421,7 +2387,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 
 	p = bl + 1;
 
-	if (0 == strncmp(p, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2) ||
+	if (0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
 			0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2))
 	{
 		ret = SUCCEED;
@@ -2439,8 +2405,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || ':' != *p++)
 		goto fail;
 
-	if ((0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2) ||
-				0 == strncmp(p, MVAR_TRIGGER_KEY, sz = sizeof(MVAR_TRIGGER_KEY) - 2)) &&
+	if ((0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2)) &&
 			('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
@@ -2623,7 +2588,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_event_value(m, event, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_HOST);
@@ -2638,7 +2603,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
@@ -2658,8 +2623,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1))
 				{
 					ret = get_host_inventory(m, c_event->trigger.expression, &replace_to,
 							N_functionid);
@@ -2674,7 +2638,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_ID);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
+				else if (0 == strcmp(m, MVAR_ITEM_KEY))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_KEY);
@@ -2769,8 +2733,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
-						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
+				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
@@ -2819,7 +2782,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", (int)c_event->trigger.priority);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
+				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_trigger_value_string(c_event->value));
 				}
@@ -2877,7 +2840,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_event_value(m, event, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_HOST);
@@ -2892,7 +2855,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_IP);
@@ -2912,8 +2875,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1))
 				{
 					ret = get_host_inventory(m, c_event->trigger.expression, &replace_to,
 							N_functionid);
@@ -2928,7 +2890,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_ID);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
+				else if (0 == strcmp(m, MVAR_ITEM_KEY))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_KEY);
@@ -2972,8 +2934,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
-						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
+				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION))
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.comments);
 					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL,
@@ -3182,7 +3143,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = get_autoreg_value_by_event(c_event, &replace_to, "host");
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = get_autoreg_value_by_event(c_event, &replace_to, "listen_ip");
 				}
@@ -3266,7 +3227,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_event_value(m, event, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_HOST);
 				}
@@ -3279,7 +3240,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_HOST_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
 				}
@@ -3295,8 +3256,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1))
 				{
 					ret = get_host_inventory_by_itemid(m, c_event->objectid, &replace_to);
 				}
@@ -3309,7 +3269,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, c_event->objectid);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
+				else if (0 == strcmp(m, MVAR_ITEM_KEY))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_ITEM_KEY);
 				}
@@ -3381,7 +3341,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					get_event_value(m, event, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_HOST);
 				}
@@ -3394,7 +3354,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_HOST_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_IP);
 				}
@@ -3410,8 +3370,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
-						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1))
 				{
 					ret = get_host_inventory_by_itemid(m, c_event->objectid, &replace_to);
 				}
@@ -3473,7 +3432,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+				if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
@@ -3483,7 +3442,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
 				}
-				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+				else if (0 == strcmp(m, MVAR_HOST_IP))
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IP);
@@ -3550,11 +3509,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_item->host.host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_item->host.name);
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			else if (0 == strcmp(m, MVAR_HOST_IP))
 			{
 				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
 					replace_to = zbx_strdup(replace_to, dc_item->interface.ip_orig);
@@ -3580,11 +3539,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			else if (0 == strcmp(m, MVAR_HOST_IP))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface_by_type(&interface,
 						dc_host->hostid, INTERFACE_TYPE_AGENT)))
@@ -3613,11 +3572,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			else if (0 == strcmp(m, MVAR_HOST_IP))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IP, 1);
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS, 1);
@@ -3647,11 +3606,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			else if (0 == strcmp(m, MVAR_HOST_IP))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IP, 0);
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS, 0);
@@ -3662,11 +3621,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
+			else if (0 == strcmp(m, MVAR_HOST_HOST))
 				replace_to = zbx_strdup(replace_to, dc_host->host);
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 				replace_to = zbx_strdup(replace_to, dc_host->name);
-			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
+			else if (0 == strcmp(m, MVAR_HOST_IP))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_IP, 0);
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_DNS, 0);
@@ -4246,8 +4205,7 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 		return FAIL;
 
 	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
-	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
-			0 == strncmp(pr, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2)) &&
+	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2)) &&
 			('}' == pr[sz] || ('}' == pr[sz + 1] && '1' <= pr[sz] && pr[sz] <= '9')))
 	{
 		pr += sz + ('}' == pr[sz] ? 1 : 2);
