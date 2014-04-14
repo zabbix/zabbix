@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8035] fixed proxy queue for ICMP, JMX and SNMP items being calculated incorrectly by the server (asaveljevs)
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 .......PS. [ZBX-8077] fixed log messages about sending/receiving of the configuration data (Sasha)
 ........S. [ZBX-8060] fixed server crash when calculating queue (asaveljevs)
