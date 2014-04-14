@@ -250,10 +250,8 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 
 function get_png_by_selement($info) {
 	$image = get_image_by_imageid($info['iconid']);
-	if (!$image) {
-		return get_default_image();
-	}
-	return imagecreatefromstring($image['image']);
+
+	return $image['image'] ? imagecreatefromstring($image['image']) : get_default_image();
 }
 
 function convertColor($im, $color) {
@@ -379,7 +377,9 @@ function add_elementNames(&$selements) {
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
-				$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
+				if (isset($images[$selement['iconid_off']]['name'])) {
+					$selements[$snum]['elementName'] = $images[$selement['iconid_off']]['name'];
+				}
 				break;
 		}
 	}
