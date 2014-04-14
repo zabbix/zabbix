@@ -267,7 +267,8 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 		dservice->status = atoi(row[2]);
 		dservice->lastup = atoi(row[3]);
 		dservice->lastdown = atoi(row[4]);
-		strscpy(dservice->value, row[5]);
+
+		dservice->value = zbx_strdup(NULL, row[5]);
 
 		if (dhostid != dhost->dhostid)
 		{
@@ -295,6 +296,7 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 	}
 	DBfree_result(result);
 
+	zbx_free(dservice->value);
 	zbx_free(ip_esc);
 	zbx_free(key_esc);
 
@@ -314,7 +316,7 @@ static void	discovery_update_dservice(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_string_len(service->value, strlen(service->value));
 
 	DBexecute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
 			service->status, service->lastup, service->lastdown, value_esc, service->dserviceid);
@@ -334,7 +336,7 @@ static void	discovery_update_dservice_value(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_string_len(service->value, strlen(service->value));
 
 	DBexecute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64,
 			value_esc, service->dserviceid);
@@ -366,14 +368,14 @@ static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, c
 			dservice->lastdown = 0;
 			dservice->lastup = now;
 
-			zbx_strlcpy(dservice->value, value, sizeof(dservice->value));
+			dservice->value = zbx_strdup(dservice->value, value);
 			discovery_update_dservice(dservice);
 			add_event(0, EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
 					DOBJECT_STATUS_DISCOVER, NULL, NULL, 0, 0);
 		}
 		else if (0 != strcmp(dservice->value, value))
 		{
-			zbx_strlcpy(dservice->value, value, sizeof(dservice->value));
+			dservice->value = zbx_strdup(dservice->value, value);
 			discovery_update_dservice_value(dservice);
 		}
 	}
@@ -516,6 +518,8 @@ void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhos
 	/* service was not registered because we do not add down service */
 	if (0 != dservice.dserviceid)
 		discovery_update_service_status(&dservice, status, value, now);
+
+	zbx_free(dservice.value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
