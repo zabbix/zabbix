@@ -61,7 +61,10 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != get_proxyconfig_data(proxy_hostid, &j))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot collect proxy configuration: database error");
 		goto out;
+	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
 			host, (zbx_fs_size_t)j.buffer_size);
