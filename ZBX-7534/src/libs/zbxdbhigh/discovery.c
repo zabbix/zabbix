@@ -27,7 +27,7 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 	DB_RESULT	result;
 	char		*value_esc;
 
-	value_esc = DBdyn_escape_string_len(value, DSERVICE_VALUE_LEN);
+	value_esc = DBdyn_escape_string_len(value, strlen(value));
 
 	result = DBselect(
 			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
