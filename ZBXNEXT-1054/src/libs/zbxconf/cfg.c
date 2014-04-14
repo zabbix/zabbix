@@ -209,6 +209,13 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
+#ifdef _WINDOWS
+			if ((1 == lineno) && (NULL != strchr(line, 0xef)) && (NULL != strchr(line + 1, 0xbb)) &&
+					(NULL != strchr(line + 1, 0xbf)))
+			{
+				memcpy(line, "\t\t\t", 3);
+			}
+#endif
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
 			zbx_rtrim(line, ZBX_CFG_RTRIM_CHARS);
 
