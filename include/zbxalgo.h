@@ -71,6 +71,13 @@ void	zbx_default_mem_free_func(void *ptr);
 #define ZBX_DEFAULT_MEM_REALLOC_FUNC	zbx_default_mem_realloc_func
 #define ZBX_DEFAULT_MEM_FREE_FUNC	zbx_default_mem_free_func
 
+#define ZBX_RETURN_IF_NOT_EQUAL(a, b)	\
+					\
+	if ((a) < (b))			\
+		return -1;		\
+	if ((a) > (b))			\
+		return +1
+
 int	is_prime(int n);
 int	next_prime(int n);
 
@@ -288,6 +295,10 @@ ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t);
 
 void	zbx_vector_str_clean(zbx_vector_str_t *vector);
 void	zbx_vector_ptr_clean(zbx_vector_ptr_t *vector, zbx_mem_free_func_t free_func);
+
+/* this function is only for use with zbx_vector_ptr_clean()  */
+/* and only if the vector does not contain nested allocations */
+void	zbx_ptr_free(void *ptr);
 
 /* 128 bit unsigned integer handling */
 #define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64

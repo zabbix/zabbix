@@ -19,7 +19,7 @@
 **/
 
 
-class CZBXAPI {
+class CApiService {
 
 	public static $userData;
 
@@ -313,7 +313,7 @@ class CZBXAPI {
 
 		// create the map from a database table
 		if ($table) {
-			$res = DBselect(API::getApi()->createSelectQuery($table, array(
+			$res = DBselect(API::getApiService()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
 				'filter' => array($baseField => array_keys($objects)),
 				'nodeids' => get_current_nodeid(true)
@@ -540,7 +540,7 @@ class CZBXAPI {
 
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
-	 * Soring is currently only supported for CZBXAPI::get() methods.
+	 * Sorting is currently only supported for CApiService::get() methods.
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
@@ -691,7 +691,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = API::getApi()->select($tableName, array(
+		$dbObjects = API::getApiService()->select($tableName, array(
 			'output' => $fields,
 			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 			'preservekeys' => true
@@ -764,7 +764,7 @@ class CZBXAPI {
 		));
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $messageRequired);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, array($idField)));
 			}
 
 			$this->checkValidator($object[$idField], $idValidator);

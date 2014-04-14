@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAPIInfo extends CZBXAPI {
+class CAPIInfo extends CApiService {
 
 	/**
 	 * Get API version.

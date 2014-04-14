@@ -2473,7 +2473,7 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: cache_expression_hostids                                         *
+ * Function: cache_trigger_hostids                                            *
  *                                                                            *
  * Purpose: cache host identifiers referenced by trigger expression           *
  *                                                                            *
@@ -2491,6 +2491,32 @@ static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expr
 		get_functionids(&functionids, expression);
 		DCget_functions_hostids(hostids, &functionids);
 		zbx_vector_uint64_destroy(&functionids);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_item_hostid                                                *
+ *                                                                            *
+ * Purpose: cache host identifier referenced by an item or a lld-rule         *
+ *                                                                            *
+ * Parameters: hostids - [OUT] the host identifier cache                      *
+ *             itemid  - [IN]  the item identifier                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		DC_ITEM	item;
+		int	errcode;
+
+		DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+		if (SUCCEED == errcode)
+			zbx_vector_uint64_append(hostids, item.host.hostid);
+
+		DCconfig_clean_items(&item, &errcode, 1);
 	}
 }
 
@@ -2571,7 +2597,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2820,7 +2851,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -2991,7 +3027,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3118,7 +3158,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					DCget_user_macro(NULL, 0, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3196,7 +3240,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_ITEM == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_item_hostid(&hostids, c_event->objectid);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3306,7 +3355,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_LLDRULE == c_event->object)
 			{
-				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_item_hostid(&hostids, c_event->objectid);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3725,8 +3779,8 @@ typedef struct
 {
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
-	char		function[FUNCTION_FUNCTION_LEN_MAX];
-	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	char		*function;
+	char		*parameter;
 	zbx_timespec_t	timespec;
 	char		*value;
 	char		*error;
@@ -3750,7 +3804,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	DC_FUNCTION	*functions = NULL;
 	int		*errcodes = NULL;
 	zbx_ifunc_t	*ifunc = NULL;
-	zbx_func_t	*func = NULL;
+	zbx_func_t	*func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -3782,10 +3836,11 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 		}
 
 		func = zbx_malloc(NULL, sizeof(zbx_func_t));
+
 		func->functionid = functions[i].functionid;
 		func->triggerid = functions[i].triggerid;
-		strscpy(func->function, functions[i].function);
-		strscpy(func->parameter, functions[i].parameter);
+		func->function = zbx_strdup(NULL, functions[i].function);
+		func->parameter = zbx_strdup(NULL, functions[i].parameter);
 		func->timespec.sec = 0;
 		func->timespec.ns = 0;
 		func->value = NULL;
@@ -4013,7 +4068,6 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	int		i, j;
@@ -4028,6 +4082,8 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 		{
 			func = (zbx_func_t *)ifunc->functions.values[j];
 
+			zbx_free(func->function);
+			zbx_free(func->parameter);
 			zbx_free(func->value);
 			zbx_free(func->error);
 			zbx_free(func);
