@@ -510,23 +510,20 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  ******************************************************************************/
 static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	switch (item->poller_type)
+	if (ITEM_TYPE_JMX == item->type || SUCCEED == is_snmp_type(item->type))
+		return item->interfaceid;
+
+	if (ITEM_TYPE_SIMPLE == item->type)
 	{
-		case ZBX_POLLER_TYPE_JAVA:
-		case ZBX_POLLER_TYPE_PINGER:
-			/* Java and pinger pollers can process multiple items at the same time. To   */
-			/* take advantage of that we must schedule items with the same interface to  */
-			/* be processed at the same time.                                            */
+		if (SUCCEED == cmp_key_id(item->key, SERVER_ICMPPING_KEY) ||
+				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGSEC_KEY) ||
+				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGLOSS_KEY))
+		{
 			return item->interfaceid;
-		case ZBX_POLLER_TYPE_NORMAL:
-			/* SNMP items, processed by normal pollers, also support multiple processing */
-			if (SUCCEED == is_snmp_type(item->type))
-				return item->interfaceid;
-			/* break; is not missing here */
-		default:
-			/* by default just try to spread all item processing over the delay period   */
-			return item->itemid;
+		}
 	}
+
+	return item->itemid;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
