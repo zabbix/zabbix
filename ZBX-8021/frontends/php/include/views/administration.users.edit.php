@@ -79,9 +79,15 @@ if (!$this->data['is_profile']) {
 
 // append password to form list
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
-	if (empty($this->data['userid']) || isset($this->data['change_password'])) {
-		$userFormList->addRow(_('Password'), new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE));
-		$userFormList->addRow(_('Password (once again)'), new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE));
+	if (!$this->data['userid'] || isset($this->data['change_password'])) {
+		$userFormList->addRow(
+			_('Password'),
+			new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE)
+		);
+		$userFormList->addRow(
+			_('Password (once again)'),
+			new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE)
+		);
 
 		if (isset($this->data['change_password'])) {
 			$userForm->addVar('change_password', $this->data['change_password']);

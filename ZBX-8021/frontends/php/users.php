@@ -143,15 +143,15 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (isset($_REQUEST['save'])) {
 	$config = select_config();
 
-	$usrgrps = get_request('user_groups', array());
+	$usrgrps = getRequest('user_groups', array());
 
 	// authentication type
 	if ($usrgrps) {
 		$authType = getGroupAuthenticationType($usrgrps);
 	}
 	else {
-		$authType = isset($_REQUEST['userid'])
-			? getUserAuthenticationType($_REQUEST['userid'])
+		$authType = hasRequest('userid')
+			? getUserAuthenticationType(getRequest('userid'))
 			: $config['authentication_type'];
 	}
 

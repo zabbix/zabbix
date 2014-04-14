@@ -78,18 +78,15 @@ function check_perm2system($userid) {
 	return true;
 }
 
-/* Function: check_perm2login()
+/**
+ * Checking user permissions to login in frontend.
  *
- * Description:
- * 		Checking user permissions to Login in frontend
+ * @param string $userId
  *
- * Comments:
- *		return true if permission is positive
- *
- * Author: Aly
+ * @return bool
  */
 function check_perm2login($userId) {
-	return !(getUserGuiAccess($userId) == GROUP_GUI_ACCESS_DISABLED);
+	return (getUserGuiAccess($userId) != GROUP_GUI_ACCESS_DISABLED);
 }
 
 /**
