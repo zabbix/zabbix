@@ -125,21 +125,19 @@ class CWidget {
 
 			$icons_row = new CTable(null, 'textwhite');
 
-			$flicker_title_when_visible = _('Hide filter');
-			$flicker_title_when_hidden = _('Show filter');
+			$flickerTitleWhenVisible = _('Hide filter');
+			$flickerTitleWhenHidden = _('Show filter');
 
-			$flicker_title = $this->flicker_state
-				? $flicker_title_when_visible
-				: $flicker_title_when_hidden;
+			$flickerTitle = $this->flicker_state ? $flickerTitleWhenVisible : $flickerTitleWhenHidden;
 
-			$icons_row->addRow(array($icon_l, new CSpan(SPACE.$flicker_title.SPACE, null, 'flicker_title'), $icon_r));
+			$icons_row->addRow(array($icon_l, new CSpan(SPACE.$flickerTitle.SPACE, null, 'flicker_title'), $icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->attr('id', 'filter_icon');
 			$thin_tab->addAction('onclick', "javascript: changeFlickerState(".
 				"'".$flicker_domid."', ".
-				CJs::encodeJson($flicker_title_when_visible).", ".
-				CJs::encodeJson($flicker_title_when_hidden).
+				CJs::encodeJson($flickerTitleWhenVisible).", ".
+				CJs::encodeJson($flickerTitleWhenHidden).
 			");");
 
 			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
