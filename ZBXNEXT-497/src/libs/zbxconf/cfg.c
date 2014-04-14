@@ -30,6 +30,99 @@ int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
+int	parse_file_name_to_tokens(char **path_tmp, char **extension_full, char ***tokens, int *i)
+{
+	char	*extension;
+
+	if ((NULL != (extension = strrchr(*path_tmp, '*'))) &&
+#ifdef _WINDOWS
+		(NULL != (*extension_full = strrchr(*path_tmp, '\\'))))
+#else
+		(NULL != (*extension_full = strrchr(*path_tmp, '/'))))
+#endif
+	{
+		if (*extension_full > extension)
+		{
+			zbx_error("%s: Wrong usage of '*' wildcard", *path_tmp);
+			return 10;
+		}
+
+		zbx_error("Splitting filename with wildcards '%s' into tokens", *extension_full + 1);
+
+		*tokens = zbx_malloc(NULL, sizeof(char*));
+
+		if (NULL != (*(*tokens + *i) = strtok(*extension_full + 1, "*")))
+		{
+			while (NULL != *(*tokens + *i))
+			{
+				zbx_error("token %i: '%s'", *i, *(*tokens + *i));
+				*i = *i + 1;
+				*tokens = zbx_realloc(*tokens, sizeof(char*) * (*i + 1));
+				*(*tokens + *i) = strtok (NULL, "*");
+			}
+			memset(*extension_full, '\0', 1);
+		}
+		else
+		{
+			zbx_rtrim(*path_tmp, "*");
+
+			zbx_error("Use all conf files in path: '%s'", *path_tmp);
+		}
+	}
+	else
+	{
+#ifdef _WINDOWS
+		zbx_rtrim(*path_tmp, "\\");
+#else
+		zbx_rtrim(*path_tmp, "/");
+#endif
+	}
+
+	return SUCCEED;
+}
+
+
+int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_name,
+		char **extension_full, char ***tokens_tmp, int *i)
+{
+	char	*ex_carret;
+	int	j = 0;
+
+	if (NULL != *tokens_tmp)
+	{
+		int j = 0;
+
+		if (NULL == (ex_carret = strstr(file_name, *(*tokens_tmp + j))) ||
+			((NULL == (strchr(*extension_full + 1, '*'))) && (ex_carret != file_name)))
+		{
+			return 10;
+		}
+
+		ex_carret += strlen(*(*tokens_tmp + j));
+
+		while (*i > j++)
+		{
+			if (NULL == *(*tokens_tmp + j))
+			{
+				if ((strlen(ex_carret) > strlen(*(*tokens_tmp + j - 1))) &&
+						(0 != strcmp(strrchr(cfg_file, '*'), "*")))
+				{
+					j--;
+				}
+
+				break;
+			}
+
+			if (NULL == (ex_carret = strstr(ex_carret, *(*tokens_tmp + j))))
+				break;
+		}
+
+		if (*i > j)
+			return 10;
+	}
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: parse_cfg_object                                                 *
@@ -47,59 +140,25 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
-#ifdef _WINDOWS
 	const char		*__function_name = "parse_cfg_object";
+	char 			*path = NULL, *path_tmp = NULL, *file_name;
+	char			*extension_full = NULL, **tokens_tmp = NULL;
+	int			i = 0, ret;
 
-	int			ret = FAIL;
+#ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *path_tmp = NULL, *file_name;
 	wchar_t			*wpath;
 	struct _stat	sb;
-	char			*extension, *extension_full = NULL, **tokens_tmp = NULL, *ex_carret;
-	int			i = 0;
+
+	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	path = zbx_strdup(path, cfg_file);
 
-
-	if ((NULL != (extension = strrchr(path, '*'))) && (NULL != (extension_full = strrchr(path, '\\'))))
-	{
-		if (extension_full > extension)
-		{
-			zbx_error("%s: Wrong usage of '*' wildcard", path);
-			ret = FAIL;
-			goto out;
-		}
-
-		zbx_error("Splitting filename with wildcards '%s' into tokens", extension_full + 1);
-
-		tokens_tmp = (char **)zbx_malloc(NULL, sizeof(char*));
-
-		if (NULL != (tokens_tmp[i] = strtok(extension_full + 1, "*")))
-		{
-			while (NULL != tokens_tmp[i])
-			{
-				zbx_error("tokens: '%s'", tokens_tmp[i]);
-				i++;
-				tokens_tmp = (char **)zbx_realloc(tokens_tmp, sizeof(char*) * (i + 1));
-
-				tokens_tmp[i] = strtok (NULL, "*");
-			}
-			memset(extension_full, '\0', 1);
-		}
-		else
-		{
-			zbx_rtrim(path, "*");
-
-			zbx_error("Use all conf files in path: '%s'", path);
-		}
-	}
-	else
-	{
-		zbx_rtrim(path, "\\");
-	}
+	if (10 == parse_file_name_to_tokens(&path, &extension_full, &tokens_tmp, &i))
+		goto out;
 
 	wpath = zbx_utf8_to_unicode(path);
 
@@ -130,36 +189,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
-		if (NULL != tokens_tmp[0])
-		{
-			int j = 0;
-
-			if ((NULL == (ex_carret = strstr(file_name, tokens_tmp[j]))) ||
-				((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != file_name)))
-				continue;
-
-			ex_carret += strlen(tokens_tmp[j]);
-
-			while (i > j++)
-			{
-				if (NULL == tokens_tmp[j])
-				{
-					if ((strlen(ex_carret) > strlen(tokens_tmp[j - 1])) &&
-							(0 != strcmp(strrchr(cfg_file, '*'), "*")))
-					{
-						j--;
-					}
-
-					break;
-				}
-
-				if (NULL == (ex_carret = strstr(ex_carret, tokens_tmp[j])))
-					break;
-			}
-
-			if (i > j)
-				continue;
-		}
+		if (10 == check_tokens_in_file_name(cfg_file, path_tmp, file_name, &extension_full, &tokens_tmp, &i))
+			continue;
 
 		path_tmp = zbx_dsprintf(path_tmp, "%s\\%s", path, file_name);
 
@@ -174,62 +205,28 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 out:
 	FindClose(h_find);
 	zbx_free(wpath);
-	zbx_free(path);
-	zbx_free(path_tmp);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
 #else
 	DIR		*dir;
 	zbx_stat_t	sb;
 	struct dirent	*d;
-	char		*incl_file = NULL, **tokens_tmp = NULL;
-	char		*extension, *extension_full = NULL, *ex_carret, *ex_carret2, *path_tmp;
+	char		*incl_file = NULL;
+	char		*extension, *ex_carret;
 	size_t		alloc_len = MAX_STRING_LEN, offset = 0;
-	int		result = SUCCEED, i = 0;
+
+	ret = SUCCEED;
 
 	path_tmp = zbx_strdup(path_tmp, cfg_file);
 
-	if ((NULL != (extension = strrchr(path_tmp, '*'))) && (NULL != (extension_full = strrchr(path_tmp, '/'))))
-	{
-		if (extension_full > extension)
-		{
-			zbx_error("%s: Wrong usage of '*' wildcard", path_tmp);
-			result = FAIL;
-			goto out;
-		}
-
-		zbx_error("Splitting filename with wildcards '%s' into tokens", extension_full + 1);
-
-		tokens_tmp = (char **)zbx_malloc(NULL, sizeof(char*));
-
-		if (NULL != (tokens_tmp[i] = strtok(extension_full + 1, "*")))
-		{
-			while (NULL != tokens_tmp[i])
-			{
-				zbx_error("tokens: '%s'", tokens_tmp[i]);
-				i++;
-				tokens_tmp = (char **)zbx_realloc(tokens_tmp, sizeof(char*) * (i + 1));
-
-				tokens_tmp[i] = strtok (NULL, "*");
-			}
-			memset(extension_full, '\0', 1);
-		}
-		else
-		{
-			zbx_rtrim(path_tmp, "*");
-
-			zbx_error("Use all conf files in path: '%s'", path_tmp);
-		}
-	}
+	if (10 == parse_file_name_to_tokens(&path_tmp, &extension_full, &tokens_tmp, &i))
+		goto out;
 
 	zbx_error("Opening path: %s", path_tmp);
 
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
 		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
-		result = FAIL;
+		ret = FAIL;
 		goto out;
 	}
 
@@ -239,42 +236,16 @@ out:
 	if (NULL == (dir = opendir(path_tmp)))
 	{
 		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
-		result = FAIL;
+		ret = FAIL;
 		goto out;
 	}
 
+
+
 	while (NULL != (d = readdir(dir)))
 	{
-		if (NULL != tokens_tmp[0])
-		{
-			int j = 0;
-
-			if ((NULL == (ex_carret = strstr(d->d_name, tokens_tmp[j]))) ||
-				((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != d->d_name)))
-				continue;
-
-			ex_carret += strlen(tokens_tmp[j]);
-
-			while (i > j++)
-			{
-				if (NULL == tokens_tmp[j])
-				{
-					if ((strlen(ex_carret) > strlen(tokens_tmp[j - 1])) &&
-							(0 != strcmp(strrchr(cfg_file, '*'), "*")))
-					{
-						j--;
-					}
-
-					break;
-				}
-
-				if (NULL == (ex_carret = strstr(ex_carret, tokens_tmp[j])))
-					break;
-			}
-
-			if (i > j)
-				continue;
-		}
+		if (10 == check_tokens_in_file_name(cfg_file, path_tmp, d->d_name, &extension_full, &tokens_tmp, &i))
+			continue;
 
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", path_tmp, d->d_name);
 
@@ -283,7 +254,7 @@ out:
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 		{
-			result = FAIL;
+			ret = FAIL;
 			break;
 		}
 		zbx_error("File is parsed: %s", incl_file);
@@ -298,10 +269,15 @@ out:
 	}
 
 out:
+
+#endif
+	zbx_free(path);
+	zbx_free(path_tmp);
 	zbx_free(tokens_tmp);
 
-	return result;
-#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
