@@ -169,7 +169,7 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 // whole page inaccessible on large installations.
 if (hasRequest('show_triggers')) {
 	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-			CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
 	}
 }
 else {
@@ -534,12 +534,14 @@ if ($filter['application'] !== '') {
 if (!zbx_empty($_REQUEST['txt_select'])) {
 	$options['search'] = array('description' => $_REQUEST['txt_select']);
 }
+
 if ($showTriggers == TRIGGERS_OPTION_RECENT_PROBLEM) {
 	$options['only_true'] = 1;
 }
 elseif ($showTriggers == TRIGGERS_OPTION_IN_PROBLEM) {
 	$options['filter'] = array('value' => TRIGGER_VALUE_TRUE);
 }
+
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 	$options['withUnacknowledgedEvents'] = 1;
 }
