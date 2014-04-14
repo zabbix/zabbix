@@ -203,6 +203,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'clone';
+	unset($_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'full_clone';
@@ -753,6 +754,11 @@ elseif (isset($_REQUEST['form'])) {
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
+
+		$dbHost = array_merge($dbHost, $_REQUEST);
+		// some keys do not match in $_REQUEST and API result
+		$dbHost['name'] = getRequest('visiblename');
+		$dbHost['inventory'] = getRequest('host_inventory', array());
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $hostId,
