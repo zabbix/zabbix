@@ -28,11 +28,6 @@
 #define DO_MIN 2
 #define DO_AVG 3
 
-#define ZBX_PROC_STAT_ALL 0
-#define ZBX_PROC_STAT_RUN 1
-#define ZBX_PROC_STAT_SLEEP 2
-#define ZBX_PROC_STAT_ZOMB 3
-
 static kvm_t	*kd = NULL;
 
 static char	*proc_argv(pid_t pid)
