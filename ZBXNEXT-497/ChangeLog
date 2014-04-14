@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
 ..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
 ...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
 ..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
@@ -39,6 +40,10 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
+..F....... [ZBX-8012] added target blank links for IT services children (Oleg, Eduard)
+..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
+..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
 ..F....... [ZBX-7625] changed the execution order of API checks (Oleg)
 ..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
 ..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
@@ -82,6 +87,9 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
+.......PS. [ZBX-8077] fixed log messages about sending/receiving of the configuration data (Sasha)
+........S. [ZBX-8060] fixed server crash when calculating queue (asaveljevs)
 ..F....... [ZBX-7867] fixed graph item drag and drop when selecting multiple items (Ivo)
 ..F....... [ZBX-8046] fixed application toggling in Latest data page if same item belongs to several applications (Ivo)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
@@ -987,6 +995,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
