@@ -19,18 +19,12 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
 #include "zbxregexp.h"
 
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2
 #define DO_AVG 3
-
-#define ZBX_PROC_STAT_ALL 0
-#define ZBX_PROC_STAT_RUN 1
-#define ZBX_PROC_STAT_SLEEP 2
-#define ZBX_PROC_STAT_ZOMB 3
 
 #if(__FreeBSD_version > 500000)
 #	define ZBX_COMMLEN	COMMLEN
