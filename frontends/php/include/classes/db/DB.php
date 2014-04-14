@@ -142,7 +142,7 @@ class DB {
 
 	/**
 	 * Refresh id record for given table.
-	 * Record created with value of maximum id from table or minimum allowed.
+	 * Record is deleted and then created again with value of maximum id from table or minimum allowed.
 	 *
 	 * @throw APIException
 	 *
@@ -156,6 +156,13 @@ class DB {
 	private static function refreshIds($table, $count) {
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
+
+		// when we reach the maximum ID, we try to refresh them to check if any IDs have been freed
+		$sql = 'DELETE FROM ids WHERE table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
+
+		if (!DBexecute($sql)) {
+			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+		}
 
 		$row = DBfetch(DBselect('SELECT MAX('.$id_name.') AS id FROM '.$table));
 
