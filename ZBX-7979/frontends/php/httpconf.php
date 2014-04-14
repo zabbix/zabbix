@@ -142,7 +142,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['templated']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['httptestid'])) {
+elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$dbResult = true;
 
 	DBstart();
@@ -151,10 +151,10 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['httptestid'])) {
 
 	$httpTest = get_httptest_by_httptestid($httptestId);
 	if ($httpTest) {
-		$dbResult &= delete_history_by_httptestid($httptestId);
+		$dbResult = delete_history_by_httptestid($httptestId);
 		if ($dbResult) {
 
-			$dbResult &= DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+			$dbResult = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
 
 			$host = DBfetch(DBselect(
 				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
