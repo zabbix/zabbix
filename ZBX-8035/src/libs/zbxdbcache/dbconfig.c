@@ -441,11 +441,11 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char item_type, const char *key,
-		zbx_bool_t item_type_only)
+static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
+		unsigned char item_type, const char *key, unsigned char flags)
 {
-	if (0 != proxy_hostid && ZBX_FALSE == item_type_only &&
-			(ITEM_TYPE_AGGREGATE != item_type && ITEM_TYPE_CALCULATED != item_type))
+	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
+				ITEM_TYPE_CALCULATED != item_type))
 	{
 		return ZBX_NO_POLLER;
 	}
@@ -457,7 +457,7 @@ static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char ite
 					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
 					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
 			{
-				if (0 == CONFIG_PINGER_FORKS && ZBX_FALSE == item_type_only)
+				if (0 == CONFIG_PINGER_FORKS)
 					break;
 
 				return ZBX_POLLER_TYPE_PINGER;
@@ -473,17 +473,17 @@ static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char ite
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_CALCULATED:
-			if (0 == CONFIG_POLLER_FORKS && ZBX_FALSE == item_type_only)
+			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_IPMI:
-			if (0 == CONFIG_IPMIPOLLER_FORKS && ZBX_FALSE == item_type_only)
+			if (0 == CONFIG_IPMIPOLLER_FORKS)
 				break;
 
 			return ZBX_POLLER_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
-			if (0 == CONFIG_JAVAPOLLER_FORKS && ZBX_FALSE == item_type_only)
+			if (0 == CONFIG_JAVAPOLLER_FORKS)
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
@@ -510,24 +510,7 @@ static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char ite
  ******************************************************************************/
 static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	unsigned char	poller_type;
-
-	/* For the purposes of queue calculation, server should calculate item nextcheck as close as */
-	/* possible to the way that proxy does it. For this reason, if an item does not have a local */
-	/* poller, that might mean that the item is on the proxy, so we try to determine which type  */
-	/* of poller the item is probably being polled by on the proxy. We either guess correctly or */
-	/* the item is in fact being polled by an unreachable poller. If it is the latter, then that */
-	/* makes no practical difference, because items on unreachable hosts are not included into   */
-	/* queue calculation. Also, an item which does not have a local poller might mean that there */
-	/* are no started pollers of the necessary type. In that case, the items will remain in the  */
-	/* queue forever and it does not make a big difference what we use as a seed for nextcheck.  */
-
-	if (ZBX_NO_POLLER != item->poller_type)
-		poller_type = item->poller_type;
-	else
-		poller_type = poller_by_item(0, item->type, item->key, ZBX_TRUE);
-
-	switch (poller_type)
+	switch (item->poller_type)
 	{
 		case ZBX_POLLER_TYPE_JAVA:
 		case ZBX_POLLER_TYPE_PINGER:
@@ -1019,7 +1002,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		old_poller_type = item->poller_type;
-		item->poller_type = poller_by_item(proxy_hostid, item->type, item->key, ZBX_FALSE);
+		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
 
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
@@ -4626,8 +4609,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
-				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
-						dc_item->key, ZBX_FALSE);
+				dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
+						dc_item->type, dc_item->key, dc_item->flags);
 
 				old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -4915,7 +4898,8 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			return;
 
-		dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type, dc_item->key, ZBX_FALSE);
+		dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
+				dc_item->type, dc_item->key, dc_item->flags);
 	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
