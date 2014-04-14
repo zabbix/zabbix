@@ -117,21 +117,20 @@ class DB {
 			$maxNextId = bcadd($res['nextid'], $count, 0);
 
 			if (bccomp($maxNextId, ZBX_DB_MAX_ID) == 1) {
-				self::exception(
-					self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"'
-				);
+				$nextid = self::refreshIds($table, $count);
 			}
+			else {
+				$sql = 'UPDATE ids'.
+						' SET nextid='.$maxNextId.
+						' WHERE table_name='.zbx_dbstr($table).
+							' AND field_name='.zbx_dbstr($id_name);
 
-			$sql = 'UPDATE ids'.
-					' SET nextid='.$maxNextId.
-					' WHERE table_name='.zbx_dbstr($table).
-						' AND field_name='.zbx_dbstr($id_name);
+				if (!DBexecute($sql)) {
+					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				}
 
-			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				$nextid = bcadd($res['nextid'], 1, 0);
 			}
-
-			$nextid = bcadd($res['nextid'], 1, 0);
 		}
 		else {
 			$nextid = self::refreshIds($table, $count);
