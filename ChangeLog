@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
 ..F....... [ZBXNEXT-2065] added new filter option for the trigger status in Monitoring->Triggers (Oleg)
 ..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
 ..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
