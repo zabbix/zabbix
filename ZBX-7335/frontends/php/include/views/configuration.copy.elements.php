@@ -42,13 +42,14 @@ $triggersForm->addVar('go', 'copy_to');
 $triggersFormList = new CFormList('triggersFormList');
 
 // append copy types to form list
-$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'submit()');
+$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'jQuery("select[name=filter_groupid]").val(null); submit()');
 $copyTypeComboBox->addItem(0, _('Hosts'));
+$copyTypeComboBox->addItem(2, _('Templates'));
 $copyTypeComboBox->addItem(1, _('Host groups'));
 $triggersFormList->addRow(_('Target type'), $copyTypeComboBox);
 
 // append groups to form list
-if ($this->data['copy_type'] == 0) {
+if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
 	$groupComboBox = new CComboBox('filter_groupid', $this->data['filter_groupid'], 'submit()');
 	foreach ($this->data['groups'] as $group) {
 		if (empty($this->data['filter_groupid'])) {
@@ -61,7 +62,7 @@ if ($this->data['copy_type'] == 0) {
 
 // append targets to form list
 $targets = array();
-if ($this->data['copy_type'] == 0) {
+if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
 	foreach ($this->data['hosts'] as $host) {
 		array_push(
 			$targets,
