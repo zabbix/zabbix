@@ -121,7 +121,7 @@ void	zbx_clean_win_version(zbx_win_version_t *os_version)
 {
 	zbx_free(os_version->ComputerName);
 	zbx_free(os_version->CurrentVersion);
-	zbx_free(os_version->CurrentBuild);
+	zbx_free(os_version->CurrentBuildNumber);
 	zbx_free(os_version->ProductName);
 	zbx_free(os_version->CSDVersion);
 	zbx_free(os_version->ProcessorArchitecture);
@@ -166,7 +166,7 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 
 #define ZBX_REGVALUE_PRODUCTNAME	"ProductName"
 #define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
-#define ZBX_REGVALUE_CURRENTBUILD	"CurrentBuild"
+#define ZBX_REGVALUE_CURRENTBUILDNUMBER	"CurrentBuildNumber"
 #define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
 #define ZBX_REGVALUE_ARCHITECTURE	"PROCESSOR_ARCHITECTURE"
 
@@ -197,9 +197,9 @@ int	zbx_get_win_version(zbx_win_version_t *os_version)
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CSDVERSION);
 		goto out;
 	}
-	if (NULL == (os_version->CurrentBuild = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILD))))
+	if (NULL == (os_version->CurrentBuildNumber = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILDNUMBER))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTBUILD);
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTBUILDNUMBER);
 		goto out;
 	}
 	if (NULL == (os_version->CurrentVersion = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTVERSION))))
@@ -264,7 +264,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "Windows %s %s.%s %s %s %s",
 				os_version_info.ComputerName,
 				os_version_info.CurrentVersion,
-				os_version_info.CurrentBuild,
+				os_version_info.CurrentBuildNumber,
 				os_version_info.ProductName,
 				os_version_info.CSDVersion,
 				os_version_info.ProcessorArchitecture

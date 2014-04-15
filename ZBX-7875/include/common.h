@@ -972,7 +972,7 @@ typedef struct
 {
 	char *ProductName;		/* "Windows ..." */
 	char *CSDVersion;		/* "Service pack ..." */
-	char *CurrentBuild;		/* "6xxx" */
+	char *CurrentBuildNumber;	/* "6xxx" */
 	char *CurrentVersion;		/* "6.x" */
 	char *ProcessorArchitecture;	/* "x86" | "x64" | "Intel Itanium-based" */
 	char *ComputerName;		/* DNS name of computer */
