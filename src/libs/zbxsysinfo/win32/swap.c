@@ -50,9 +50,9 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	 * While developing this solution, it was found that sometimes (in         *
 	 * virtualized environments or when page file is disabled) the calculated  *
 	 * swap values are outside of possible bounds. For example, the available  *
-	 * swap size may appear to be larger than the total sap memory size of the *
-	 * system, or even the calculated swap sizes may result in negative values *
-	 * (in system with disabled page file).                                    *
+	 * swap size may appear to be larger than the total swap memory size of    *
+	 * the system, or even the calculated swap sizes may result in negative    *
+	 * values (in system with disabled page file).                             *
 	 *                                                                         *
 	 * Taking these fallacious conditions into account, these calculations     *
 	 * guarantee that the available swap size is never larger than the total   *
@@ -63,7 +63,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	 *                                                                         *
 	 * As the result the returned values might not be exactly accurate         *
 	 * depending on the system and environment, but they ought to be close     *
-	 * enough.
+	 * enough.                                                                 *
 	 *                                                                         *
 	 * NB: The reason why GlobalMemoryStatus[Ex] are used is their             *
 	 * availability on Windows 2000 and later, as opposed to other functions   *
