@@ -6,7 +6,7 @@ New features:
 ..F....... [ZBXNEXT-2065] added new filter option for the trigger status in Monitoring->Triggers (Oleg)
 ..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
 ..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
-...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
+...G...... [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
 ..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
 ...G...... [ZBXNEXT-2194] added configuration option to include all files in a directory on Windows (Nikolaj)
 ........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
