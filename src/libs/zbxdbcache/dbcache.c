@@ -1928,43 +1928,38 @@ int	DCsync_history(int sync_type)
 			if (ZBX_HISTORY_SIZE <= f)
 				f -= ZBX_HISTORY_SIZE;
 
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			num = DCskip_items(f, n);
+
+			if (0 == cache->history[f].itemid)
 			{
-				num = DCskip_items(f, n);
-
-				if (0 == cache->history[f].itemid)
+				if (f == cache->history_first)
 				{
-					if (f == cache->history_first)
-					{
-						cache->history_num -= num;
-						cache->history_gap_num -= num;
-						if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
-							cache->history_first -= ZBX_HISTORY_SIZE;
-					}
-					n -= num;
-					f += num;
-					continue;
+					cache->history_num -= num;
+					cache->history_gap_num -= num;
+					if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
+						cache->history_first -= ZBX_HISTORY_SIZE;
 				}
-
-				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
-						cache->history[f].itemid))
-				{
-					if (0 == skipped_clock)
-						skipped_clock = cache->history[f].ts.sec;
-					n -= num;
-					f += num;
-					continue;
-				}
-				else if (1 < num && 0 == skipped_clock)
-				{
-					skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
-				}
-
-				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
-						&cache->itemids_num, cache->history[f].itemid, 0);
+				n -= num;
+				f += num;
+				continue;
 			}
-			else
-				num = 1;
+
+			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
+					cache->history[f].itemid))
+			{
+				if (0 == skipped_clock)
+					skipped_clock = cache->history[f].ts.sec;
+				n -= num;
+				f += num;
+				continue;
+			}
+			else if (1 < num && 0 == skipped_clock)
+			{
+				skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
+			}
+
+			uint64_array_add(&cache->itemids, &cache->itemids_alloc,
+					&cache->itemids_num, cache->history[f].itemid, 0);
 
 			indices[candidate_num] = f;
 			itemids[candidate_num] = cache->history[f].itemid;
@@ -2085,16 +2080,14 @@ int	DCsync_history(int sync_type)
 		DBcommit();
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-		{
 			DCconfig_unlock_triggers(&triggerids);
 
-			LOCK_CACHE;
+		LOCK_CACHE;
 
-			for (i = 0; i < history_num; i ++)
-				uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
+		for (i = 0; i < history_num; i ++)
+			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
-			UNLOCK_CACHE;
-		}
+		UNLOCK_CACHE;
 
 		for (i = 0; i < history_num; i++)
 		{
