@@ -49,6 +49,23 @@ $clear_templates = get_request('clear_templates', array());
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
 
+if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
+	$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
+	$interfaces[$mainAgentId]['main'] = '1';
+}
+if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP])) {
+	$snmpAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP];
+	$interfaces[$snmpAgentId]['main'] = '1';
+}
+if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX])) {
+	$ipmiAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX];
+	$interfaces[$ipmiAgentId]['main'] = '1';
+}
+if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
+	$jmxAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI];
+	$interfaces[$jmxAgentId]['main'] = '1';
+}
+
 $frm_title = _('Host');
 if ($_REQUEST['hostid'] > 0) {
 	$dbHost = $this->data['dbHost'];
@@ -56,23 +73,6 @@ if ($_REQUEST['hostid'] > 0) {
 	$frm_title .= SPACE.' ['.$dbHost['host'].']';
 	$original_templates = $dbHost['parentTemplates'];
 	$original_templates = zbx_toHash($original_templates, 'templateid');
-
-	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
-		$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
-		$interfaces[$mainAgentId]['main'] = '1';
-	}
-	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP])) {
-		$snmpAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP];
-		$interfaces[$snmpAgentId]['main'] = '1';
-	}
-	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX])) {
-		$ipmiAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX];
-		$interfaces[$ipmiAgentId]['main'] = '1';
-	}
-	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
-		$jmxAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI];
-		$interfaces[$jmxAgentId]['main'] = '1';
-	}
 
 	// get items that populate host inventory fields
 	$hostItemsToInventory = API::Item()->get(array(
@@ -763,19 +763,18 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
-$inventoryMode = (isset($dbHost['inventory']['inventory_mode'])) ? $dbHost['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
 $inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
-	$inventoryMode == HOST_INVENTORY_DISABLED
+	$inventory_mode == HOST_INVENTORY_DISABLED
 );
 $inventoryDisabledBtn->setEnabled(!$isDiscovered);
 
 $inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
-	$inventoryMode == HOST_INVENTORY_MANUAL
+	$inventory_mode == HOST_INVENTORY_MANUAL
 );
 $inventoryManualBtn->setEnabled(!$isDiscovered);
 
 $inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
-	$inventoryMode == HOST_INVENTORY_AUTOMATIC
+	$inventory_mode == HOST_INVENTORY_AUTOMATIC
 );
 $inventoryAutomaticBtn->setEnabled(!$isDiscovered);
 
