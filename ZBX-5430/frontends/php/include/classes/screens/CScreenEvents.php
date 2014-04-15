@@ -55,7 +55,7 @@ class CScreenEvents extends CScreenBase {
 			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 			$item->addRow(array(
-				zbx_date2str(_('d M Y H:i:s'), $event['clock']),
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				get_node_name_by_elid($event['objectid']),
 				$host['host'],
 				new CLink(

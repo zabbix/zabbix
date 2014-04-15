@@ -53,11 +53,7 @@ function shedule2str($timeperiod) {
 	}
 
 	if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-		$str = _s('At %1$s:%2$s on %3$s',
-			date('H', $timeperiod['start_date']),
-			date('i', $timeperiod['start_date']),
-			zbx_date2str(_('d M Y'), $timeperiod['start_date'])
-		);
+		$str = zbx_date2str(DATE_TIME_FORMAT, $timeperiod['start_date']);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
 		$str = _n('At %1$s:%2$s on every day',

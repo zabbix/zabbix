@@ -458,7 +458,7 @@ function make_system_status($filter) {
 	}
 
 	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -800,7 +800,7 @@ function make_hoststat_summary($filter) {
 	}
 
 	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+		'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -872,7 +872,7 @@ function make_status_of_zbx() {
 	}
 
 	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -1105,7 +1105,7 @@ function make_latest_issues(array $filter = array()) {
 		}
 
 		// clock
-		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
+		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
 			'events.php?triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.'&show_unknown=1'.
 				'&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
 				'&period='.ZBX_PERIOD_DEFAULT
@@ -1132,7 +1132,7 @@ function make_latest_issues(array $filter = array()) {
 	zbx_add_post_js('jqBlink.blink();');
 
 	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
@@ -1241,7 +1241,7 @@ function make_webmon_overview($filter) {
 	}
 
 	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+		'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));
@@ -1300,8 +1300,8 @@ function make_discovery_status() {
 		));
 	}
 
-	$script = new CJSScript(get_js(
-		'jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(_('H:i:s'))).'");'
+	$script = new CJSScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
+		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
 	return new CDiv(array($table, $script));

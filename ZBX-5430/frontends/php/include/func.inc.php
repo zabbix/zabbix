@@ -601,7 +601,7 @@ function convert_units($options = array()) {
 
 	// special processing for unix timestamps
 	if ($options['units'] == 'unixtime') {
-		return zbx_date2str(_('Y.m.d H:i:s'), $options['value']);
+		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $options['value']);
 	}
 
 	// special processing of uptime
