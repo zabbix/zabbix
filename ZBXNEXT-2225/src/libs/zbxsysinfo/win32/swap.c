@@ -42,33 +42,28 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	 *                                                                         *
 	 * Due to the way Windows API functions report memory metrics,             *
 	 * it is impossible to accurately retrieve swap (virtual memory)           *
-	 * sizes as Windows either does not report them properly or                *
-	 * reports swap along with actual physical memory as page file             *
-	 * sizes. The only resolution that could be applied was calculatively      *
-	 * deducting the swap sizes knowing the page and physical memory           *
-	 * sizes.                                                                  *
+	 * sizes as Windows reports the total commit memory which is physical      *
+	 * memory plus swap file sizes. The only resolution that could be applied  *
+	 * was calculatively deducting the swap sizes knowing the page and         *
+	 * physical memory sizes.                                                  *
 	 *                                                                         *
-	 * While developing this solution, it was found that in virtualized        *
-	 * environments Windows reports incorrect values for various memory        *
-	 * types. For example, the available memory size may be larger than the    *
-	 * total memory size of the system, or, under certain circumstances        *
-	 * (such as virtual system guests, zero sized virtual memory, dynamically  *
-	 * changing virtual memory size) these functions may return negative       *
-	 * values.                                                                 *
+	 * While developing this solution, it was found that sometimes (in         *
+	 * virtualized environments or when page file is disabled) the calculated  *
+	 * swap values are outside of possible bounds. For example, the available  *
+	 * swap size may appear to be larger than the total sap memory size of the *
+	 * system, or even the calculated swap sizes may result in negative values *
+	 * (in system with disabled page file).                                    *
 	 *                                                                         *
 	 * Taking these fallacious conditions into account, these calculations     *
 	 * guarantee that the available swap size is never larger than the total   *
 	 * available (if it is reported as such, it is lowered to the total        *
 	 * as there is a higher probability of that number staying consistent      *
-	 * than the other way around). In case of the system reporting negative    *
-	 * values, the appropriate metric is returned as 0.                        *
+	 * than the other way around). In case of swap size calculations resulting *
+	 * in negative values, the corresponding values are set to 0.              *
 	 *                                                                         *
-	 * The returned values are not guaranteed to be accurate and may report    *
-	 * inaccurate results which may depend on the system and environment.      *
-	 * In a proper system environment, this should logically work just as any  *
-	 * arithmetic calculation, but the problem lies within the way Windows     *
-	 * itself operates. Although this guestimate should work most of the time, *
-	 * there are no guarantees that it will.                                   *
+	 * As the result the returned values might not be exactly accurate         *
+	 * depending on the system and environment, but they ought to be close     *
+	 * enough.
 	 *                                                                         *
 	 * NB: The reason why GlobalMemoryStatus[Ex] are used is their             *
 	 * availability on Windows 2000 and later, as opposed to other functions   *
