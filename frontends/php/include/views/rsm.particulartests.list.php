@@ -208,17 +208,19 @@ if ($this->data['type'] == RSM_DNS) {
 	}
 
 	$additionInfo = array(
+		new CSpan(array(bold(_('Probes total')), ':', SPACE, $this->data['totalProbes'])),
 		BR(),
-		new CSpan(bold(_s(
-			'%1$s out of %2$s probes reported availability of service',
-			$availProbes.'%',
-			$this->data['totalAvailProbes']
-		)))
+		new CSpan(array(bold(_('Probes offline')), ':', SPACE, $this->data['offlineProbes'])),
+		BR(),
+		new CSpan(array(bold(_('Probes with No Result')), ':', SPACE, $this->data['noResultProbes'])),
+		BR(),
+		new CSpan(array(bold(_('Probes with Result')), ':', SPACE, $this->data['resultProbes'])),
+		BR(),
+		new CSpan(array(bold(_('Probes Up')), ':', SPACE, $this->data['availProbes']))
 	);
 }
 elseif ($this->data['type'] == RSM_DNSSEC) {
 	$additionInfo = array(
-		BR(),
 		new CSpan(bold(_s(
 			'%1$s out of %2$s tests reported availability of service',
 			round($this->data['availTests'] / $this->data['totalTests'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%',
@@ -230,19 +232,33 @@ elseif ($this->data['type'] == RSM_DNSSEC) {
 $tldTriggersLink = new CLink($this->data['tld']['name'], 'tr_status.php?groupid=0&hostid='.$this->data['tld']['hostid']);
 $tldTriggersLink->setTarget('_blank');
 
+if ($this->data['testResult'] === null) {
+	$testResult = $noResult;
+}
+elseif ($this->data['testResult'] == PROBE_UP) {
+	$testResult = $up;
+}
+else {
+	$testResult = $down;
+}
+
 $particularTests = array(
 	new CSpan(array(bold(_('TLD')), ':', SPACE, $tldTriggersLink)),
 	BR(),
 	new CSpan(array(bold(_('Service')), ':', SPACE, $this->data['slvItem']['name'])),
 	BR(),
-	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time'])))
+	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time']))),
+	BR(),
+	new CSpan(array(bold(_('Test result')), ':', SPACE, $testResult))
 );
 
 if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
-	$particularTests = array_merge($particularTests, $additionInfo);
+	$particularTestsInfoTable->addRow(array($particularTests, $additionInfo));
+}
+else {
+	$particularTestsInfoTable->addRow($particularTests);
 }
 
-$particularTestsInfoTable->addRow(array($particularTests));
 $rsmWidget->additem($particularTestsInfoTable);
 
 $rsmWidget->additem($particularTestsTable);

@@ -75,7 +75,9 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	if ($data['type'] == RSM_DNS || $data['type'] == RSM_DNSSEC) {
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 		if ($data['type'] == 0) {
+			$data['offlineProbes'] = 0;
 			$data['availProbes'] = 0;
+			$data['resultProbes'] = 0;
 			$data['noResultProbes'] = 0;
 			$data['totalAvailProbes'] = 0;
 			$data['totalProbes'] = 0;
@@ -184,6 +186,49 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	}
 	else {
 		show_error_message(_('No permissions to referred SLV item or it does not exist!'));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
+
+	// get test resut
+	if ($data['type'] == RSM_DNS) {
+		$key = RSM_SLV_DNS_AVAIL;
+	}
+	elseif ($data['type'] == RSM_DNSSEC) {
+		$key = RSM_SLV_DNSSEC_AVAIL;
+	}
+	elseif ($data['type'] == RSM_RDDS) {
+		$key = RSM_SLV_RDDS_AVAIL;
+	}
+	else {
+		$key = RSM_SLV_EPP_AVAIL;
+	}
+
+	// get items
+	$availItems = API::Item()->get(array(
+		'hostids' => $data['tld']['hostid'],
+		'filter' => array(
+			'key_' => $key
+		),
+		'output' => array('itemid', 'value_type'),
+		'preservekeys' => true
+	));
+
+	if ($availItems) {
+		$availItem = reset($availItems);
+		$testResults = API::History()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $availItem['itemid'],
+			'time_from' => $testTimeFrom,
+			'time_till' => $testTimeTill,
+			'history' => $availItem['value_type'],
+			'limit' => 1
+		));
+		$testResult = reset($testResults);
+		$data['testResult'] = $testResult['value'];
+	}
+	else {
+		show_error_message(_s('Item with key "%1$s" not exist on TLD!', $key));
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit;
 	}
@@ -349,19 +394,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 				$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_DOWN;
 			}
 		}
-		elseif ($data['type'] == RSM_DNS && $item['key_'] == PROBE_DNS_UDP_ITEM) {
-			// avail probes
-			if ($itemValue['value'] == 1) {
-				$data['availProbes']++;
-				$data['totalAvailProbes']++;
-			}
-			elseif ($itemValue['value'] === null) {
-				$data['noResultProbes']++;
-			}
-			else {
-				$data['totalAvailProbes']++;
-			}
-		}
 		elseif ($data['type'] == RSM_DNSSEC && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
 			if (!isset($hosts[$item['hostid']]['value'])) {
 				$hosts[$item['hostid']]['value']['ok'] = 0;
@@ -489,6 +521,30 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	}
 
 	CArrayHelper::sort($data['probes'], array('name'));
+
+	// get probes statistics
+	foreach ($data['probes'] as $probe) {
+		// DNS service
+		if ($data['type'] == RSM_DNS) {
+			if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
+				$data['offlineProbes']++;
+			}
+			else {
+				if (isset($probe['value'])) {
+					if ($probe['value']) {
+						$data['availProbes']++;
+						$data['resultProbes']++;
+					}
+					else {
+						$data['resultProbes']++;
+					}
+				}
+				else {
+					$data['noResultProbes']++;
+				}
+			}
+		}
+	}
 }
 else {
 	access_deny();
