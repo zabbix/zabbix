@@ -1279,25 +1279,42 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		return null;
 	}
 
-	// get groups
-	$data['groups'] = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name')
-	));
-	order_result($data['groups'], 'name');
+	if($data['copy_type'] == 1) {
+		// get groups
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name')
+		));
+		order_result($data['groups'], 'name');
+	}
+	else {
+		// hosts or templates
+		$params = array('output' => API_OUTPUT_EXTEND);
 
-	// get hosts
-	if ($data['copy_type'] == 0) {
-		foreach ($data['groups'] as $group) {
-			if (empty($data['filter_groupid'])) {
-				$data['filter_groupid'] = $group['groupid'];
-			}
+		if($data['copy_type'] == 0) {
+			$params['real_hosts'] = true;
+		}
+		else {
+			$params['templated_hosts'] = true;
 		}
 
-		$data['hosts'] = API::Host()->get(array(
-			'output' => array('groupid', 'name'),
-			'groupids' => $data['filter_groupid'],
-			'templated_hosts' => true
-		));
+		$data['groups'] = API::HostGroup()->get($params);
+		order_result($data['groups'], 'name');
+
+		if (empty($data['filter_groupid'])) {
+			end($data['groups']);
+			$lastGroup = current($data['groups']);
+			$data['filter_groupid'] = $lastGroup['groupid'];
+		}
+
+		$params = array(
+			'output' => API_OUTPUT_EXTEND,
+			'groupids' => $data['filter_groupid']
+		);
+		if($data['copy_type'] == 2) {
+			$params['templated_hosts'] = true;
+		}
+
+		$data['hosts'] = API::Host()->get($params);
 		order_result($data['hosts'], 'name');
 	}
 
