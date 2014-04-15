@@ -61,36 +61,36 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	char swapdev[10];
 	char mode[10];
 
-	if(num_param(param) > 2)
+	if (num_param(param) > 2)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	if (get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
 	{
 		swapdev[0] = '\0';
 	}
-	if(swapdev[0] == '\0')
+	if (swapdev[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(swapdev, sizeof(swapdev), "all");
 	}
-	if(strncmp(swapdev, "all", sizeof(swapdev)))
+	if (strncmp(swapdev, "all", sizeof(swapdev)))
 	{  /* only 'all' parameter supported */
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	if (get_param(param, 2, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
 	}
-	if(mode[0] == '\0')
+	if (mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
-	if(NULL != zbx_GlobalMemoryStatusEx)
+	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
