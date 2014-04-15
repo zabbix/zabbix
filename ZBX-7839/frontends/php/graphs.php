@@ -170,8 +170,6 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 		: API::GraphPrototype()->get($options);
 	$graph = reset($graph);
 
-	$_REQUEST = array_merge($graph, $_REQUEST);
-
 	// graph items
 	$_REQUEST['items'] = API::GraphItem()->get(array(
 		'graphids' => $_REQUEST['graphid'],
@@ -179,6 +177,12 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 		'output' => API_OUTPUT_EXTEND,
 		'expandData' => true
 	));
+
+	// removing checkbox values so they do not get clobbered by merge below
+	unset($graph['show_work_period']);
+	unset($graph['show_triggers']);
+
+	$_REQUEST = array_merge($graph, $_REQUEST);
 
 	unset($_REQUEST['graphid']);
 

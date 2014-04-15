@@ -77,6 +77,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$percentLeftTextBox->attr('style', 'visibility: hidden;');
 			$percentLeftCheckbox->setChecked(0);
 		}
+
+		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
+			$percentLeftTextBox->attr('style', '');
+			$percentLeftCheckbox->setChecked(1);
+		}
+
 		$graphFormList->addRow(_('Percentile line (left)'), array($percentLeftCheckbox, SPACE, $percentLeftTextBox));
 
 		// percent right
@@ -87,6 +93,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$percentRightTextBox->attr('style', 'visibility: hidden;');
 			$percentRightCheckbox->setChecked(0);
 		}
+
+		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
+			$percentRightTextBox->attr('style', '');
+			$percentRightCheckbox->setChecked(1);
+		}
+
 		$graphFormList->addRow(_('Percentile line (right)'), array($percentRightCheckbox, SPACE, $percentRightTextBox));
 	}
 
