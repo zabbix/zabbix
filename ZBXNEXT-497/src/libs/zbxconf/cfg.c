@@ -66,7 +66,7 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 		}
 		else
 		{
-			zbx_rtrim(string_to_parse, "*");
+			zbx_rtrim(string_to_parse, delimiter);
 
 			zbx_error("Use all conf files in path: '%s'", string_to_parse);
 		}
