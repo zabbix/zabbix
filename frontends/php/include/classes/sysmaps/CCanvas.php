@@ -67,7 +67,7 @@ class CCanvas {
 	}
 
 	public function getCanvas() {
-		$date = zbx_date2str(MAPS_DATE_FORMAT);
+		$date = zbx_date2str(DATE_TIME_FORMAT_SECONDS);
 		imagestring($this->canvas, 1, $this->width - 120, $this->height - 12, $date, $this->getColor('gray'));
 		imagestringup($this->canvas, 1,
 			$this->width - 10,

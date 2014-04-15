@@ -546,11 +546,11 @@ function getAvailabilityTable($host) {
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
-		$deleteError->setHint(
-			_s('The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $host['hostDiscovery']['ts_delete'])
-			));
+		$deleteError->setHint(_s(
+			'The host is not discovered anymore and will be deleted in %1$s (%2$s).',
+			zbx_date2age($host['hostDiscovery']['ts_delete']),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $host['hostDiscovery']['ts_delete'])
+		));
 		$ad->addItem($deleteError);
 	}
 
@@ -602,7 +602,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 	$minute = new CNumericBox($name.'_minute', $i, 2);
 	$minute->attr('placeholder', _('mm'));
 
-	$fields = array($day, '/', $month, '/', $year, SPACE, $hour, ':', $minute, $calendarIcon);
+	$fields = array($year, '-', $month, '-', $day, SPACE, $hour, ':', $minute, $calendarIcon);
 
 	zbx_add_post_js('create_calendar(null,'.
 		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.

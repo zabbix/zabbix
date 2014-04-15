@@ -127,12 +127,11 @@ foreach ($this->data['groups'] as $group) {
 	// info, discovered item lifetime indicator
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
 		$info = new CDiv(SPACE, 'status_icon iconwarning');
-		$info->setHint(
-			_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($group['groupDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $group['groupDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $group['groupDiscovery']['ts_delete'])
-			)
-		);
+		$info->setHint(_s(
+			'The host group is not discovered anymore and will be deleted in %1$s (%2$s).',
+			zbx_date2age($group['groupDiscovery']['ts_delete']),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $group['groupDiscovery']['ts_delete'])
+		));
 	}
 	else {
 		$info = '';

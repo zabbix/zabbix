@@ -866,7 +866,7 @@ function getActionMessages(array $alerts) {
 
 		$mediaType = array_pop($alert['mediatypes']);
 
-		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
 
 		if ($alert['esc_step'] > 0) {
 			$time = array(
@@ -959,7 +959,7 @@ function getActionCommands(array $alerts) {
 			continue;
 		}
 
-		$time = zbx_date2str(EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
 
 		if ($alert['esc_step'] > 0) {
 			$time = array(

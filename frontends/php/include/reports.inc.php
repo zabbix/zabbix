@@ -200,8 +200,8 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),
 				$caption,
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']),
 				$color
 			));
 		}
@@ -600,8 +600,8 @@ function validateBarReportPeriods($periods = array()) {
 			return false;
 		}
 		if (!isset($period['caption']) || zbx_empty($period['caption'])) {
-			$period['caption'] = zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']).' - '.
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']);
+			$period['caption'] = zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']).' - '.
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']);
 		}
 
 	}

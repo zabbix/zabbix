@@ -70,8 +70,8 @@ foreach ($this->data['maintenances'] as $maintenance) {
 		$this->data['displayNodes'] ? $maintenance['nodename'] : null,
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
-		zbx_date2str(_('d M Y H:i'), $maintenance['active_since']),
-		zbx_date2str(_('d M Y H:i'), $maintenance['active_till']),
+		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
+		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
 		$maintenanceStatus,
 		$maintenance['description']
 	));
