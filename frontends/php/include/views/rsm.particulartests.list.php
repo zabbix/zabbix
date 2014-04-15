@@ -252,12 +252,12 @@ $particularTests = array(
 	new CSpan(array(bold(_('Test result')), ':', SPACE, $testResult))
 );
 
+$tableHeader[] = $particularTests;
 if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
-	$particularTestsInfoTable->addRow(array($particularTests, $additionInfo));
+	$tableHeader[] = $additionInfo;
 }
-else {
-	$particularTestsInfoTable->addRow($particularTests);
-}
+
+$particularTestsInfoTable->addRow($tableHeader);
 
 $rsmWidget->additem($particularTestsInfoTable);
 
