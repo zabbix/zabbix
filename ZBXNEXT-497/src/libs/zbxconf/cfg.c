@@ -244,8 +244,6 @@ out:
 		goto out;
 	}
 
-
-
 	while (NULL != (d = readdir(dir)))
 	{
 		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, d->d_name, extension_full, *tokens_tmp, i))
@@ -264,17 +262,14 @@ out:
 		zbx_error("File is parsed: %s", incl_file);
 	}
 
-	zbx_free(incl_file);
-
 	if (-1 == closedir(dir))
 	{
 		zbx_error("%s: %s\n", path_tmp, zbx_strerror(errno));
 		ret = FAIL;
 		goto out;
 	}
-
 out:
-
+	zbx_free(incl_file);
 #endif
 	zbx_free(path_tmp);
 	zbx_free(tokens_tmp);
