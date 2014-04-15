@@ -147,7 +147,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 #ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL
+	char 			*path = NULL;
 	wchar_t			*wpath;
 	struct _stat	sb;
 
