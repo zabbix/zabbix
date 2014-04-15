@@ -520,7 +520,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-				0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 			{
 				recv_agenthistory(sock, &jp);
 			}
