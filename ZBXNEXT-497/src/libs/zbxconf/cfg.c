@@ -43,7 +43,6 @@ void	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***toke
 
 	while (NULL != *(*tokens + *tokens_cnt))
 	{
-		zbx_error("token %i: '%s'", *tokens_cnt, *(*tokens + *tokens_cnt));
 		*tokens_cnt = *tokens_cnt + 1;
 		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
 		*(*tokens + *tokens_cnt) = strtok(NULL, delimiter);
@@ -62,8 +61,6 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 			zbx_error("%s: Wrong usage of '*' wildcard", string_to_parse);
 			return FAIL;
 		}
-
-		zbx_error("Splitting filename with wildcards '%s' into tokens", *extension_full + 1);
 
 		parse_string_to_tokens(*extension_full, delimiter, tokens, tokens_cnt);
 
@@ -198,7 +195,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		if (FAIL == __parse_cfg_file(path_tmp, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto out;
-		zbx_error("File parsed: %s filename: %s", path_tmp, file_name);
 	}
 
 	ret = SUCCEED;
@@ -223,8 +219,6 @@ out:
 
 	if (FAIL == parse_file_name_to_tokens(path_tmp, &extension_full, &tokens_tmp, &tokens_cnt))
 		goto out;
-
-	zbx_error("Opening path: %s", path_tmp);
 
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
@@ -258,7 +252,6 @@ out:
 			ret = FAIL;
 			break;
 		}
-		zbx_error("File is parsed: %s", incl_file);
 	}
 
 	if (-1 == closedir(dir))
