@@ -206,7 +206,7 @@ static int	process_proxy(void)
 
 		if (proxy.proxy_config_nextcheck <= now)
 		{
-			char	error[128];
+			char	*error = NULL;
 
 			zbx_json_clean(&j);
 
@@ -214,9 +214,11 @@ static int	process_proxy(void)
 					ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&j, ZBX_PROTO_TAG_DATA);
 
-			if (SUCCEED != (ret = get_proxyconfig_data(proxy.hostid, &j, error, sizeof(error))))
+			if (SUCCEED != (ret = get_proxyconfig_data(proxy.hostid, &j, &error)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot collect proxy configuration: %s", error);
+				zbx_free(error);
+
 				goto network_error;
 			}
 

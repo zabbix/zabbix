@@ -78,14 +78,12 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxyhistory";
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], error[256];
+	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	error[0] = '\0';
-
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
@@ -97,6 +95,8 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -171,14 +171,12 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	const char	*__function_name = "recv_proxy_heartbeat";
 
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], error[256];
+	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	error[0] = '\0';
-
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "heartbeat from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
@@ -188,6 +186,8 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	update_proxy_lastaccess(proxy_hostid);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
