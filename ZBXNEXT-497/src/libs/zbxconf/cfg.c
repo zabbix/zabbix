@@ -81,14 +81,16 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_name,
 		char *extension_full, char *tokens, int tokens_cnt)
 {
-	char	*ex_carret;
+	char	*ex_carret, *delimiter = "*";
 	int	tokens_cnt_tmp = 0;
 
 	if (NULL == tokens)
 		return SUCCEED;
 
-	if (NULL == (ex_carret = strstr(file_name, tokens + tokens_cnt_tmp)) ||
-		((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != file_name)))
+	/* Checks: first token is not found &&
+	 * string have symbols before first token when first symbol is not delimiter */
+	if (NULL == (ex_carret = strstr(file_name, tokens)) ||
+		((NULL == (strchr(extension_full + 1, delimiter[0]))) && (ex_carret != file_name)))
 	{
 		return FAIL;
 	}
@@ -99,10 +101,12 @@ int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_n
 	{
 		if (NULL == (tokens + tokens_cnt_tmp))
 		{
+			/* Checks: string have more symbols than last token &&
+			 * string have not delimiter symbol at the end */
 			if ((strlen(ex_carret) > strlen(tokens + tokens_cnt_tmp - 1)) &&
-					(0 != strcmp(strrchr(cfg_file, '*'), "*")))
+					(0 != strcmp(strrchr(cfg_file, delimiter[0]), delimiter)))
 			{
-				tokens_cnt_tmp--;
+				return FAIL;
 			}
 
 			break;
@@ -251,7 +255,6 @@ out:
 			ret = FAIL;
 			break;
 		}
-
 	}
 
 	if (-1 == closedir(dir))
