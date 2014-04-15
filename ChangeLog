@@ -246,7 +246,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 ...G...... [ZBX-7697] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed secure displaying of LDAP bind password (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ........S. [ZBX-7653] correctly expand ITEM.LOG.* macros when retrieving eventlog specific attributes for log,logrt items (wiper)
 .......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
@@ -1051,7 +1051,7 @@ A......... [ZBX-7703] fixed being able to switch users without proper credential
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed secure displaying of LDAP bind password (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
@@ -2525,7 +2525,7 @@ Changes for 1.8.20
 Changes for 1.8.20rc2
 
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed secure displaying of LDAP bind password (Eduard)
 
 Changes for 1.8.20rc1
 
