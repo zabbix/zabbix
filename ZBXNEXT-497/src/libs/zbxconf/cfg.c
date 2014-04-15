@@ -84,38 +84,37 @@ int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_n
 	char	*ex_carret;
 	int	tokens_cnt_tmp = 0;
 
-	if (NULL != tokens)
+	if (NULL == tokens)
+		return SUCCEED;
+
+	if (NULL == (ex_carret = strstr(file_name, tokens + tokens_cnt_tmp)) ||
+		((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != file_name)))
 	{
-		int tokens_cnt_tmp = 0;
+		return FAIL;
+	}
 
-		if (NULL == (ex_carret = strstr(file_name, tokens + tokens_cnt_tmp)) ||
-			((NULL == (strchr(extension_full + 1, '*'))) && (ex_carret != file_name)))
+	ex_carret += strlen(tokens + tokens_cnt_tmp);
+
+	while (tokens_cnt > tokens_cnt_tmp++)
+	{
+		if (NULL == (tokens + tokens_cnt_tmp))
 		{
-			return FAIL;
-		}
-
-		ex_carret += strlen(tokens + tokens_cnt_tmp);
-
-		while (tokens_cnt > tokens_cnt_tmp++)
-		{
-			if (NULL == (tokens + tokens_cnt_tmp))
+			if ((strlen(ex_carret) > strlen(tokens + tokens_cnt_tmp - 1)) &&
+					(0 != strcmp(strrchr(cfg_file, '*'), "*")))
 			{
-				if ((strlen(ex_carret) > strlen(tokens + tokens_cnt_tmp - 1)) &&
-						(0 != strcmp(strrchr(cfg_file, '*'), "*")))
-				{
-					tokens_cnt_tmp--;
-				}
-
-				break;
+				tokens_cnt_tmp--;
 			}
 
-			if (NULL == (ex_carret = strstr(ex_carret, tokens + tokens_cnt_tmp)))
-				break;
+			break;
 		}
 
-		if (tokens_cnt > tokens_cnt_tmp)
-			return FAIL;
+		if (NULL == (ex_carret = strstr(ex_carret, tokens + tokens_cnt_tmp)))
+			break;
 	}
+
+	if (tokens_cnt > tokens_cnt_tmp)
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -252,6 +251,7 @@ out:
 			ret = FAIL;
 			break;
 		}
+
 	}
 
 	if (-1 == closedir(dir))
