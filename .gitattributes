@@ -178,6 +178,7 @@ frontends/php/include/classes/api/wrappers/CFrontendApiWrapper.php -text
 frontends/php/include/classes/helpers/CConditionHelper.php -text
 frontends/php/include/classes/helpers/CMenuPopupHelper.php -text
 frontends/php/include/classes/parsers/results/CParserResult.php -text
+frontends/php/include/classes/validators/CDecimalValidator.php -text
 frontends/php/include/views/configuration.host.discovery.edit.php -text
 frontends/php/include/views/js/common.init.js.php -text
 frontends/php/include/views/js/monitoring.slides.js.php -text

@@ -151,4 +151,10 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 
 int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error);
 
+#if defined(HAVE_IPV6)
+#define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)						\
+	getnameinfo(sa, AF_INET == (sa)->sa_family ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),	\
+		host, hostlen, serv, servlen, flags)
+#endif
+
 #endif

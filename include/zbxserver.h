@@ -40,6 +40,7 @@
 #define MACRO_TYPE_SCRIPT		0x1000
 #define MACRO_TYPE_SNMP_OID		0x2000
 #define MACRO_TYPE_HTTPTEST_FIELD	0x4000
+#define MACRO_TYPE_LLD_FILTER		0x8000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 

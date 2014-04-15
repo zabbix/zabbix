@@ -74,7 +74,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_SYS_PROCFS_H
 	DIR			*dir;
 	struct dirent		*entries;
-	struct stat		buf;
+	zbx_stat_t		buf;
 	struct psinfo		psinfo;
 	int			fd = -1;
 #else
@@ -131,7 +131,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))
@@ -230,7 +230,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_SYS_PROCFS_H
 	DIR			*dir;
 	struct dirent		*entries;
-	struct stat		buf;
+	zbx_stat_t		buf;
 	struct psinfo		psinfo;
 	int			fd = -1;
 #else
@@ -285,7 +285,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))

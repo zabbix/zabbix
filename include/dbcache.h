@@ -101,6 +101,7 @@ typedef struct
 	int		jmx_errors_from;
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
+	char		inventory_mode;
 }
 DC_HOST;
 
@@ -110,35 +111,45 @@ typedef struct
 	DC_INTERFACE	interface;
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	lastlogsize;
+	zbx_uint64_t	valuemapid;
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
+	unsigned char	delta;
+	unsigned char	multiplier;
+	unsigned char	state;
+	unsigned char	db_state;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	authtype;
+	unsigned char	flags;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+	unsigned char	inventory_link;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
+	char		*formula;
+	char		*units;
 	int		delay;
 	int		nextcheck;
 	int		lastclock;
 	int		mtime;
-	unsigned char	state;
+	int		history;
+	int		trends;
 	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char		snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
 	char		snmp_oid_orig[ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
 	char		snmpv3_securityname_orig[ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
-	unsigned char	snmpv3_securitylevel;
 	char		snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
 	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
 	char		*params;
 	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
-	unsigned char	authtype;
 	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
 	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
-	unsigned char	flags;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
 	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char		*db_error;
 }
 DC_ITEM;
 
@@ -285,6 +296,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
 		zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
@@ -341,7 +353,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
 
-int	DChost_deactivate(zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
+int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
 
 void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
 

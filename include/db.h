@@ -101,7 +101,6 @@ zbx_graph_item_type;
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
-#define ITEM_LASTVALUE_LEN		255
 #define ITEM_ERROR_LEN			128
 #define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
 #define ITEM_TRAPPER_HOSTS_LEN		255
@@ -135,11 +134,6 @@ zbx_graph_item_type;
 #	define ITEM_PARAM_LEN		65535
 #	define ITEM_DESCRIPTION_LEN	65535
 #endif
-
-#define FUNCTION_FUNCTION_LEN		12
-#define FUNCTION_FUNCTION_LEN_MAX	(FUNCTION_FUNCTION_LEN + 1)
-#define FUNCTION_PARAMETER_LEN		255
-#define FUNCTION_PARAMETER_LEN_MAX	(FUNCTION_PARAMETER_LEN + 1)
 
 #define HISTORY_STR_VALUE_LEN		255
 #ifdef HAVE_IBM_DB2
@@ -537,9 +531,6 @@ const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
-
-double	multiply_item_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
