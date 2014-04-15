@@ -38,14 +38,15 @@ $itemForm->addVar('go', 'copy_to');
 $itemFormList = new CFormList('itemFormList');
 
 // append type to form list
-$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'submit()');
+$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'jQuery("select[name=copy_groupid]").val(null); submit()');
 $copyTypeComboBox->addItem(0, _('Hosts'));
+$copyTypeComboBox->addItem(2, _('Templates'));
 $copyTypeComboBox->addItem(1, _('Host groups'));
 $itemFormList->addRow(_('Target type'), $copyTypeComboBox);
 
 // append targets to form list
 $targetList = array();
-if ($this->data['copy_type'] == 0) {
+if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
 	$groupComboBox = new CComboBox('copy_groupid', $this->data['copy_groupid'], 'submit()');
 	foreach ($this->data['groups'] as $group) {
 		$groupComboBox->addItem($group['groupid'],$group['name']);

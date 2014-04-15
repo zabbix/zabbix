@@ -909,25 +909,43 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 		error(_('Incorrect list of items.'));
 	}
 	else {
-		// group
-		$data['groups'] = API::HostGroup()->get(array(
-			'output' => API_OUTPUT_EXTEND
-		));
-		order_result($data['groups'], 'name');
 
-		// hosts
-		if ($data['copy_type'] == 0) {
-			if (empty($data['copy_groupid'])) {
-				foreach ($data['groups'] as $group) {
-					$data['copy_groupid'] = $group['groupid'];
-				}
+		if($data['copy_type'] == 1) {
+			// group
+			$data['groups'] = API::HostGroup()->get(array(
+				'output' => API_OUTPUT_EXTEND
+			));
+			order_result($data['groups'], 'name');
+		}
+		else {
+			// hosts or templates
+			$params = array('output' => API_OUTPUT_EXTEND);
+
+			if($data['copy_type'] == 0) {
+				$params['real_hosts'] = true;
+			}
+			else {
+				$params['templated_hosts'] = true;
 			}
 
-			$data['hosts'] = API::Host()->get(array(
+			$data['groups'] = API::HostGroup()->get($params);
+			order_result($data['groups'], 'name');
+
+			if (empty($data['copy_groupid'])) {
+				end($data['groups']);
+				$lastGroup = current($data['groups']);
+				$data['copy_groupid'] = $lastGroup['groupid'];
+			}
+
+			$params = array(
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $data['copy_groupid'],
-				'templated_hosts' => true
-			));
+				'groupids' => $data['copy_groupid']
+			);
+			if($data['copy_type'] == 2) {
+				$params['templated_hosts'] = true;
+			}
+
+			$data['hosts'] = API::Host()->get($params);
 			order_result($data['hosts'], 'name');
 		}
 	}
