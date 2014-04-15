@@ -38,12 +38,12 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 	const char	*__function_name = "connect_to_proxy";
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:hu timeout:%d", __function_name, proxy->addr, proxy->port, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d", __function_name, proxy->addr,
+			proxy->port, timeout);
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy [%s] [%s]:%hu [%s]",
-				proxy->host, proxy->addr, proxy->port, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
 	}
 
@@ -61,7 +61,8 @@ static int	send_data_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, const char *dat
 
 	if (FAIL == (ret = zbx_tcp_send(sock, data)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy [%s] [%s]", proxy->host, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
+
 		ret = NETWORK_ERROR;
 	}
 
@@ -78,14 +79,12 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_sock_t *sock, char **data)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == (ret = zbx_tcp_recv(sock, data)))
-		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from proxy [%s] [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "cannot obtain data from proxy \"%s\": %s",
 				proxy->host, zbx_tcp_strerror());
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]",
-				__function_name, *data);
+		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": %s", proxy->host, *data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -136,7 +135,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s, &answer)))
 				if (SUCCEED == (ret = zbx_send_response(&s, SUCCEED, NULL, 0)))
-					*data = strdup(answer);
+					*data = zbx_strdup(*data, answer);
 
 		disconnect_proxy(&s);
 	}
@@ -195,12 +194,11 @@ static int	process_proxy(void)
 
 		proxy.addr = proxy.addr_orig;
 
-		zbx_free(port);
-		port = strdup(proxy.port_orig);
+		port = zbx_strdup(port, proxy.port_orig);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(port, &proxy.port))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy [%s] [%s]:%s", proxy.host, proxy.addr, port);
+			zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
 			goto network_error;
 		}
 
