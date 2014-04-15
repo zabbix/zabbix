@@ -105,7 +105,7 @@ class CJSONrpc {
 	}
 
 	public function processResult($call, CApiClientResponse $response) {
-		if ($response->data) {
+		if (!$response->errorCode) {
 			// Notifications MUST NOT be answered
 			if ($call['id'] === null) {
 				return;
