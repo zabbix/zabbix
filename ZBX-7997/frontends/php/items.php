@@ -821,39 +821,67 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'visible' => get_request('visible', array())
 	);
 
-	$data['singleHost'] = null;
-	$data['singleTemplate'] = null;
+	$data['displayApplications'] = true;
+	$data['displayInterfaces'] = true;
 
 	// hosts
 	$data['hosts'] = API::Host()->get(array(
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
-	$data['singleHost'] = (count($data['hosts']) == 1);
-	if ($data['singleHost']) {
-		$data['hosts'] = reset($data['hosts']);
+	$hostCount = count($data['hosts']);
 
-		// set the initial chosen interface to one of the interfaces the items use
-		$items = API::Item()->get(array(
-			'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
-			'output' => array('itemid', 'type')
-		));
-		$usedInterfacesTypes = array();
-		foreach ($items as $item) {
-			$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
-		}
-		$initialItemType = min(array_keys($usedInterfacesTypes));
-		$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
-		$data['initial_item_type'] = $initialItemType;
-		$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
+	if ($hostCount > 1) {
+		$data['displayApplications'] = false;
+		$data['displayInterfaces'] = false;
 	}
+	else {
+		// get template count to display applications multiselect only for single template
+		$templates = API::Template()->get(array(
+			'output' => array('templateid'),
+			'itemids' => $data['itemids']
+		));
+		$templateCount = count($templates);
 
-	// get template count to display applications multiselect only for single template
-	$templates = API::Template()->get(array(
-		'itemids' => $data['itemids'],
-		'countOutput' => true
-	));
-	$data['singleTemplate'] = ($templates == 1);
+		if ($templateCount != 0) {
+			$data['displayInterfaces'] = false;
+
+			if ($templateCount == 1 && !$data['hostid']) {
+				// if selected from filter without 'hostid'
+				$templates = reset($templates);
+				$data['hostid'] = $templates['templateid'];
+			}
+
+			// if items belong to single template and some belong to single host, don't display application multiselect
+			// and don't display application multiselect for multiple templates
+			if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
+				$data['displayApplications'] = false;
+			}
+		}
+
+		if ($hostCount == 1 && $data['displayInterfaces']) {
+			$data['hosts'] = reset($data['hosts']);
+
+			// if selected from filter without 'hostid'
+			if (!$data['hostid']) {
+				$data['hostid'] = $data['hosts']['hostid'];
+			}
+
+			// set the initial chosen interface to one of the interfaces the items use
+			$items = API::Item()->get(array(
+				'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+				'output' => array('itemid', 'type')
+			));
+			$usedInterfacesTypes = array();
+			foreach ($items as $item) {
+				$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
+			}
+			$initialItemType = min(array_keys($usedInterfacesTypes));
+			$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
+			$data['initial_item_type'] = $initialItemType;
+			$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
+		}
+	}
 
 	// application
 	if (count($data['applications']) == 0) {

@@ -50,7 +50,7 @@ $itemFormList->addRow(
 );
 
 // append hosts to form list
-if ($this->data['singleHost']) {
+if ($this->data['displayInterfaces']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	$interfacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
 
@@ -462,9 +462,7 @@ $itemFormList->addRow(
 );
 
 // append applications to form list
-// if items belong to single template and some belong to single host, don't display application multiselect
-if ($this->data['singleHost'] && !$this->data['singleTemplate']
-		|| !$this->data['singleHost'] && $this->data['singleTemplate']) {
+if ($this->data['displayApplications']) {
 	// replace applications
 	$appToReplace = null;
 	if (hasRequest('applications')) {
