@@ -2387,11 +2387,8 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 
 	p = bl + 1;
 
-	if (0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) ||
-			0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2))
-	{
+	if (0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2))
 		ret = SUCCEED;
-	}
 
 	if (SUCCEED == ret && ('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
@@ -2405,7 +2402,7 @@ static void	get_trigger_function_value(const char *expression, char **replace_to
 	if (SUCCEED != ret || ':' != *p++)
 		goto fail;
 
-	if ((0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2)) &&
+	if (0 == strncmp(p, MVAR_ITEM_KEY, sz = sizeof(MVAR_ITEM_KEY) - 2) &&
 			('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{
 		N_functionid = ('}' == p[sz] ? 1 : p[sz] - '0');
@@ -4204,8 +4201,8 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	if ('{' != *pr++)
 		return FAIL;
 
-	/* check for macros {HOST.HOST<1-9>} and {HOSTNAME<1-9>} */
-	if ((0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2)) &&
+	/* check for macros {HOST.HOST<1-9>} */
+	if (0 == strncmp(pr, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2) &&
 			('}' == pr[sz] || ('}' == pr[sz + 1] && '1' <= pr[sz] && pr[sz] <= '9')))
 	{
 		pr += sz + ('}' == pr[sz] ? 1 : 2);
