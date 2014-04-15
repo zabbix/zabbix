@@ -9,7 +9,7 @@ Changes for 1.8.20
 Changes for 1.8.20rc2
 
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed secure displaying of LDAP bind password (Eduard)
 
 Changes for 1.8.20rc1
 
