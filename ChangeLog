@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBXNEXT-2065] added new filter option for the trigger status in Monitoring->Triggers (Oleg)
 ..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
 ..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
 ...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
@@ -44,7 +45,7 @@ Bug fixes:
 ..F....... [ZBX-8012] added target blank links for IT services children (Oleg, Eduard)
 ..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
 ..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
-..F....... [ZBX-7625] changed the execution order of API checks (Oleg)
+A......... [ZBX-7625] changed the execution order of API checks (Oleg)
 ..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
 ..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
 ..F....... [ZBX-6675] fixed graph header, if items belong to multiple hosts (Oleg)
