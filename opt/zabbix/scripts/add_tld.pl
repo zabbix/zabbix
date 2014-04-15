@@ -144,8 +144,8 @@ my $proxies = get_proxies_list();
 
 pfail("cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
 
-create_macro('{$RSM.IP4.MIN.PROBE.ONLINE} ', 25, undef);
-create_macro('{$RSM.IP6.MIN.PROBE.ONLINE} ', 20, undef);
+create_macro('{$RSM.IP4.MIN.PROBE.ONLINE}', 25, undef);
+create_macro('{$RSM.IP6.MIN.PROBE.ONLINE}', 20, undef);
 
 create_macro('{$RSM.IP4.MIN.SERVERS}', 4, undef);
 create_macro('{$RSM.IP6.MIN.SERVERS}', 4, undef);
