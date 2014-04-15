@@ -3359,7 +3359,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
-		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD)))
+		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
@@ -3592,8 +3592,8 @@ typedef struct
 {
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
-	char		function[FUNCTION_FUNCTION_LEN_MAX];
-	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	char		*function;
+	char		*parameter;
 	zbx_timespec_t	timespec;
 	char		*value;
 	char		*error;
@@ -3617,7 +3617,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	DC_FUNCTION	*functions = NULL;
 	int		*errcodes = NULL;
 	zbx_ifunc_t	*ifunc = NULL;
-	zbx_func_t	*func = NULL;
+	zbx_func_t	*func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -3649,10 +3649,11 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 		}
 
 		func = zbx_malloc(NULL, sizeof(zbx_func_t));
+
 		func->functionid = functions[i].functionid;
 		func->triggerid = functions[i].triggerid;
-		strscpy(func->function, functions[i].function);
-		strscpy(func->parameter, functions[i].parameter);
+		func->function = zbx_strdup(NULL, functions[i].function);
+		func->parameter = zbx_strdup(NULL, functions[i].parameter);
 		func->timespec.sec = 0;
 		func->timespec.ns = 0;
 		func->value = NULL;
@@ -3894,6 +3895,8 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 		{
 			func = (zbx_func_t *)ifunc->functions.values[j];
 
+			zbx_free(func->function);
+			zbx_free(func->parameter);
 			zbx_free(func->value);
 			zbx_free(func->error);
 			zbx_free(func);

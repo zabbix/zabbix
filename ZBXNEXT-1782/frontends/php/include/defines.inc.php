@@ -73,8 +73,9 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
-define('TRIGGERS_OPTION_ONLYTRUE',	1);
-define('TRIGGERS_OPTION_ALL',		2);
+define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
+define('TRIGGERS_OPTION_ALL',				2);
+define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);
@@ -127,6 +128,7 @@ define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
+define('T_ZBX_DBL_BIG',		9);
 
 define('O_MAND',	0);
 define('O_OPT',		1);

@@ -121,13 +121,25 @@ static void	lld_filter_clean(lld_filter_t *filter)
  *                                                                            *
  * Parameters: filter     - [IN] the lld filter                               *
  *             lld_ruleid - [IN] the lld rule id                              *
+ *             error      - [OUT] the error description                       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid)
+static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	lld_condition_t	*condition;
+	DC_ITEM		item;
+	int		errcode, ret = FAIL;
+
+	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+
+	if (SUCCEED != errcode)
+	{
+		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].",
+				lld_ruleid);
+		goto out;
+	}
 
 	result = DBselect(
 			"select item_conditionid,macro,value"
@@ -145,7 +157,14 @@ static void	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid)
 		zbx_vector_ptr_create(&condition->regexps);
 
 		if ('@' == *condition->regexp)
+		{
 			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+		}
+		else
+		{
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item,
+					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
+		}
 
 		zbx_vector_ptr_append(&filter->conditions, condition);
 	}
@@ -153,6 +172,12 @@ static void	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid)
 
 	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
+
+	ret = SUCCEED;
+
+	DCconfig_clean_items(&item, &errcode, 1);
+out:
+	return ret;
 }
 
 /******************************************************************************
@@ -524,7 +549,8 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timesp
 	if (0 == hostid)
 		goto clean;
 
-	lld_filter_load(&filter, lld_ruleid);
+	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
+		goto error;
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &error))
 		goto error;
