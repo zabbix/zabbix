@@ -38,9 +38,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char ***tokens, int *tokens_cnt)
 {
-	char	*extension;
+	char	*extension, delimiter[2] = "*";
 
-	if ((NULL != (extension = strrchr(string_to_parse, '*'))) &&
+	if ((NULL != (extension = strrchr(string_to_parse, delimiter[0]))) &&
 		(NULL != (*extension_full = strrchr(string_to_parse, PATH_SEPARATOR))))
 	{
 		if (*extension_full > extension)
@@ -53,14 +53,14 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 
 		*tokens = zbx_malloc(NULL, sizeof(char*));
 
-		if (NULL != (*(*tokens + *tokens_cnt) = strtok(*extension_full + 1, "*")))
+		if (NULL != (*(*tokens + *tokens_cnt) = strtok(*extension_full + 1, delimiter)))
 		{
 			while (NULL != *(*tokens + *tokens_cnt))
 			{
 				zbx_error("token %i: '%s'", *tokens_cnt, *(*tokens + *tokens_cnt));
 				*tokens_cnt = *tokens_cnt + 1;
 				*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
-				*(*tokens + *tokens_cnt) = strtok(NULL, "*");
+				*(*tokens + *tokens_cnt) = strtok(NULL, delimiter);
 			}
 			**extension_full = '\0';
 		}
