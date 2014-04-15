@@ -28,6 +28,12 @@ int	CONFIG_LOG_FILE_SIZE	= 1;
 int	CONFIG_ALLOW_ROOT	= 0;
 int	CONFIG_TIMEOUT		= 3;
 
+#if defined(_WINDOWS)
+#	define PATH_SEPARATOR_STRING "\\"
+#else
+#	define PATH_SEPARATOR_STRING "/"
+#endif
+
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
 int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char ***tokens, int *tokens_cnt)
@@ -35,11 +41,7 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 	char	*extension;
 
 	if ((NULL != (extension = strrchr(string_to_parse, '*'))) &&
-#ifdef _WINDOWS
-		(NULL != (*extension_full = strrchr(string_to_parse, '\\'))))
-#else
-		(NULL != (*extension_full = strrchr(string_to_parse, '/'))))
-#endif
+		(NULL != (*extension_full = strrchr(string_to_parse, PATH_SEPARATOR))))
 	{
 		if (*extension_full > extension)
 		{
@@ -71,11 +73,7 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 	}
 	else
 	{
-#ifdef _WINDOWS
-		zbx_rtrim(string_to_parse, "\\");
-#else
-		zbx_rtrim(string_to_parse, "/");
-#endif
+		zbx_rtrim(string_to_parse, PATH_SEPARATOR_STRING);
 	}
 
 	return SUCCEED;
