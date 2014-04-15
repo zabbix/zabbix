@@ -60,7 +60,7 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 				zbx_error("token %i: '%s'", *tokens_cnt, *(*tokens + *tokens_cnt));
 				*tokens_cnt = *tokens_cnt + 1;
 				*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
-				*(*tokens + *tokens_cnt) = strtok (NULL, "*");
+				*(*tokens + *tokens_cnt) = strtok(NULL, "*");
 			}
 			**extension_full = '\0';
 		}
