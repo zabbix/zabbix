@@ -36,9 +36,23 @@ int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
+void	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***tokens, int *tokens_cnt)
+{
+	*tokens = zbx_malloc(NULL, sizeof(char*));
+	**tokens = strtok(string_to_parse + 1, delimiter);
+
+	while (NULL != *(*tokens + *tokens_cnt))
+	{
+		zbx_error("token %i: '%s'", *tokens_cnt, *(*tokens + *tokens_cnt));
+		*tokens_cnt = *tokens_cnt + 1;
+		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
+		*(*tokens + *tokens_cnt) = strtok(NULL, delimiter);
+	}
+}
+
 int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char ***tokens, int *tokens_cnt)
 {
-	char	*extension, delimiter[2] = "*";
+	char	*extension, *delimiter = "*";
 
 	if ((NULL != (extension = strrchr(string_to_parse, delimiter[0]))) &&
 		(NULL != (*extension_full = strrchr(string_to_parse, PATH_SEPARATOR))))
@@ -51,25 +65,12 @@ int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char
 
 		zbx_error("Splitting filename with wildcards '%s' into tokens", *extension_full + 1);
 
-		*tokens = zbx_malloc(NULL, sizeof(char*));
+		parse_string_to_tokens(*extension_full, delimiter, tokens, tokens_cnt);
 
-		if (NULL != (*(*tokens + *tokens_cnt) = strtok(*extension_full + 1, delimiter)))
-		{
-			while (NULL != *(*tokens + *tokens_cnt))
-			{
-				zbx_error("token %i: '%s'", *tokens_cnt, *(*tokens + *tokens_cnt));
-				*tokens_cnt = *tokens_cnt + 1;
-				*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
-				*(*tokens + *tokens_cnt) = strtok(NULL, delimiter);
-			}
+		if (NULL != **tokens)
 			**extension_full = '\0';
-		}
 		else
-		{
 			zbx_rtrim(string_to_parse, delimiter);
-
-			zbx_error("Use all conf files in path: '%s'", string_to_parse);
-		}
 	}
 	else
 	{
