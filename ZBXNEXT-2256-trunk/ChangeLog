@@ -3,6 +3,9 @@ Changes for 2.3.0
 
 New features:
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
+..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
+..F....... [ZBXNEXT-2065] added new filter option for the trigger status in Monitoring->Triggers (Oleg)
+..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
 ..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
 ...G...PS. [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
 ..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
@@ -40,8 +43,11 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
+..F....... [ZBX-8012] added target blank links for IT services children (Oleg, Eduard)
+..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
 ..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
-..F....... [ZBX-7625] changed the execution order of API checks (Oleg)
+A......... [ZBX-7625] changed the execution order of API checks (Oleg)
 ..F....... [ZBX-8032] fixed links displaying in host inventories overview page (Eduard)
 ..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
 ..F....... [ZBX-6675] fixed graph header, if items belong to multiple hosts (Oleg)
@@ -84,6 +90,10 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+.......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
+.......PS. [ZBX-8035] fixed proxy queue for ICMP, JMX and SNMP items being calculated incorrectly by the server (asaveljevs)
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
+.......PS. [ZBX-8077] fixed log messages about sending/receiving of the configuration data (Sasha)
 ........S. [ZBX-8060] fixed server crash when calculating queue (asaveljevs)
 ..F....... [ZBX-7867] fixed graph item drag and drop when selecting multiple items (Ivo)
 ..F....... [ZBX-8046] fixed application toggling in Latest data page if same item belongs to several applications (Ivo)
@@ -91,12 +101,12 @@ Bug fixes:
 ........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
-.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess unilization of "poller" processes (Sasha)
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess utilisation of "poller" processes (Sasha)
 ....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
 ..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
-..F....... [ZBX-7974] fixed host groups selecting using unexisting node in user group rights page (Eduard)
-..F....... [ZBX-7943] fixed undefined indexes in http test dashboard widget when no history found (Eduard)
+..F....... [ZBX-7974] fixed host group selecting using invalid node in user group rights page (Eduard)
+..F....... [ZBX-7943] fixed undefined indexes in HTTP test dashboard widget when no history is found (Eduard)
 ..F....... [ZBX-7809] improved validation on decimal values (Eduard)
 ..F....... [ZBX-7809] fixed unused graph Y axis min/max fields unseting from db (Eduard)
 ..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
@@ -990,6 +1000,8 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
