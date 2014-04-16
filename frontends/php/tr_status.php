@@ -112,6 +112,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.status_change_days', getRequest('status_change_days', 14),
 		PROFILE_TYPE_INT
 	);
+	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// show triggers
 	// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
@@ -142,13 +143,6 @@ if (hasRequest('filter_set')) {
 		}
 
 		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
-	}
-
-	if (getRequest('application') !== '') {
-		CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
-	}
-	else {
-		CProfile::delete('web.tr_status.filter.application');
 	}
 
 	// update host inventory filter

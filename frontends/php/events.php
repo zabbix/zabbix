@@ -118,12 +118,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
-	/*
-		$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
-		$triggerId = ($source == EVENT_SOURCE_DISCOVERY)
-		? 0
-		: getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
-	*/
 	CProfile::update('web.events.filter.triggerid', getRequest('triggerid', 0), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
@@ -278,18 +272,12 @@ else {
 				'monitored_hosts' => true,
 				'with_monitored_triggers' => true
 			),
-			'triggers' => array(),
 			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid'),
-			'triggerid' => $triggerId
+			'groupid' => getRequest('groupid')
 		));
 
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
-
-		if ($pageFilter->triggerid > 0) {
-			$triggerId = $pageFilter->triggerid;
-		}
 	}
 
 	$eventsWidget = new CWidget();
