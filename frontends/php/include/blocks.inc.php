@@ -398,7 +398,9 @@ function make_system_status($filter) {
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'],
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		);
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
@@ -649,7 +651,9 @@ function make_hoststat_summary($filter) {
 
 		$group_row = new CRow();
 
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'],
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		);
 		$group_row->addItem($name);
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
 
@@ -682,7 +686,9 @@ function make_hoststat_summary($filter) {
 					$host_data = $lastUnack_host_list[$hostid];
 
 					$r = new CRow();
-					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.
+						$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+					));
 
 					foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 						if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
@@ -728,7 +734,9 @@ function make_hoststat_summary($filter) {
 				$host_data = $problematic_host_list[$hostid];
 
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.
+					'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+				));
 
 				foreach ($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 					if (!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) {
