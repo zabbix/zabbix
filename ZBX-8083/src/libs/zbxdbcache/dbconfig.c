@@ -5972,16 +5972,6 @@ double	DCget_required_performance()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
-		{
-			if (0 == strncmp(item->key, "log[", 4) ||
-					0 == strncmp(item->key, "logrt[", 6) ||
-					0 == strncmp(item->key, "eventlog[", 9))
-			{
-				continue;
-			}
-		}
-
 		if (0 != item->delay)
 			nvps += 1.0 / item->delay;
 	}
