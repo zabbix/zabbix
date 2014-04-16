@@ -32,8 +32,6 @@ extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_NODEID;
-extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
@@ -210,9 +208,7 @@ zbx_graph_item_type;
 
 #define ZBX_MAX_SQL_LEN		65535
 
-#define ZBX_STANDALONE_MAX_IDS	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
-#define ZBX_DM_MAX_HISTORY_IDS	(zbx_uint64_t)__UINT64_C(100000000000000)
-#define ZBX_DM_MAX_CONFIG_IDS	(zbx_uint64_t)__UINT64_C(100000000000)
+#define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
 typedef struct
 {
@@ -410,15 +406,6 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define ZBX_SQL_NODE				"%s"
-#define DBand_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 0)
-#define DBwhere_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 1)
-#define DBand_node(field_name, nodeid)		__DBnode(field_name, nodeid, 0)
-#define DBwhere_node(field_name, nodeid)	__DBnode(field_name, nodeid, 1)
-const char	*__DBnode(const char *field_name, int nodeid, int op);
-#define DBis_node_local_id(id)			DBis_node_id(id, CONFIG_NODEID)
-int	DBis_node_id(zbx_uint64_t id, int nodeid);
-
 int	DBconnect(int flag);
 void	DBinit();
 
@@ -559,8 +546,6 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
-
-int	get_nodeid_by_id(zbx_uint64_t id);
 
 #ifdef HAVE_POSTGRESQL
 #	define DBbytea_escape	zbx_db_bytea_escape
