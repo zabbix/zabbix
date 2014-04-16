@@ -2505,7 +2505,6 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			discovery_update_host(&dhost, ip, status, itemtime);
 		else
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
-
 		DBcommit();
 
 		continue;
