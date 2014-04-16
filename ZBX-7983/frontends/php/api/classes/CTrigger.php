@@ -1817,18 +1817,26 @@ class CTrigger extends CTriggerGeneral {
 		// adding last event
 		if ($options['selectLastEvent'] !== null) {
 			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'sortfield' => array('clock', 'eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
+				$result[$triggerId]['lastEvent'] = array();
+			}
 
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			$dbEvents = DBselect(
+				'SELECT e.*'.
+				' FROM ('.
+					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
+					' FROM events e2'.
+					' WHERE e2.object='.EVENT_OBJECT_TRIGGER.
+						' AND e2.source='.EVENT_SOURCE_TRIGGERS.
+						' AND '.dbConditionInt('e2.objectid', $triggerids).
+					' GROUP BY e2.objectid) e2,'.
+					' events e'.
+				' WHERE e.objectid=e2.objectid'.
+				' AND e.clock=e2.clock'.
+				' AND e.eventid=e2.eventid'
+			);
+
+			while ($dbEvent = DBfetch($dbEvents)) {
+				$result[$dbEvent['objectid']]['lastEvent'] = $dbEvent;
 			}
 		}
 
