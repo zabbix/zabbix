@@ -883,19 +883,6 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		}
 	}
 
-	// application
-	if (count($data['applications']) == 0) {
-		array_push($data['applications'], 0);
-	}
-	if (!empty($data['hostid'])) {
-		$data['db_applications'] = DBfetchArray(DBselect(
-			'SELECT a.applicationid,a.name'.
-			' FROM applications a'.
-			' WHERE a.hostid='.zbx_dbstr($data['hostid'])
-		));
-		order_result($data['db_applications'], 'name');
-	}
-
 	// item types
 	$data['itemTypes'] = item_type2str();
 	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
