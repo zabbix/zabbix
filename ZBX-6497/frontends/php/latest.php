@@ -304,7 +304,7 @@ $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShow
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table
@@ -517,7 +517,8 @@ foreach ($items as $key => $item){
 		$applicationId = $itemApplication['applicationid'];
 
 		$applications[$applicationId]['item_cnt']++;
-		$tab_rows[$applicationId][] = $row;
+		// objects may have different properties, so it's better to use a copy of it
+		$tab_rows[$applicationId][] = clone $row;
 	}
 
 	// remove items with applications from the collection
