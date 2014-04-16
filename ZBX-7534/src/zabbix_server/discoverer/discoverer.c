@@ -228,7 +228,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				if (SVC_AGENT == dcheck->type)
 				{
 					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
+						zbx_strlcpy(value, result.str, strlen(value));
 					else
 						ret = FAIL;
 				}
