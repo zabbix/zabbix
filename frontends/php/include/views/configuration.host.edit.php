@@ -92,6 +92,26 @@ else {
 // load data from the DB when opening the full clone form for the first time
 $cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
 if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
+
+	if(hasRequest('visiblename')) {
+		$_REQUEST['name'] = $_REQUEST['visiblename'];
+	}
+
+	if(hasRequest('host_inventory')) {
+		$_REQUEST['inventory'] = $_REQUEST['host_inventory'];
+		$_REQUEST['inventory']['inventory_mode'] = $_REQUEST['inventory_mode'];
+	}
+
+	if(hasRequest('interfaces')) {
+		foreach($_REQUEST['interfaces'] as $id => $reqInterface) {
+			$_REQUEST['interfaces'][$id]['items'] = isset($dbHost['interfaces'][$id]['items'])
+				? $dbHost['interfaces'][$id]['items']
+				: array();
+		}
+	}
+
+	$dbHost = array_merge($dbHost, $_REQUEST);
+
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
