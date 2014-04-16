@@ -92,8 +92,7 @@ static zbx_history_table_t areg = {
  *             hostid        - [OUT] proxy host ID found in database          *
  *             host          - [IN] buffer with minimum size                  *
  *                                  'HOST_HOST_LEN_MAX'                       *
- *             error         - [IN] buffer for printing error messages        *
- *             max_error_len - [IN] "error" buffer size                       *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - proxy ID was found in database                    *
  *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
@@ -102,7 +101,7 @@ static zbx_history_table_t areg = {
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -113,7 +112,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			zbx_snprintf(error, max_error_len, "invalid proxy name \"%s\"", host);
+			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\"", host);
 			return ret;
 		}
 
@@ -141,7 +140,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				}
 				else
 				{
-					zbx_snprintf(error, max_error_len, "proxy \"%s\" is configured in passive mode",
+					*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode",
 							host);
 				}
 			}
@@ -149,12 +148,12 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		else
-			zbx_snprintf(error, max_error_len, "proxy \"%s\" not found", host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
 
 		DBfree_result(result);
 	}
 	else
-		zbx_snprintf(error, max_error_len, "missing name of proxy");
+		*error = zbx_strdup(*error, "missing name of proxy");
 
 	return ret;
 }
@@ -180,13 +179,13 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
+static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
 		zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *httptests)
 {
 	const char	*__function_name = "get_proxyconfig_table";
 	char		*sql = NULL;
 	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		f, fld;
+	int		f, fld, ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -291,7 +290,11 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by t.%s", table->recid);
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		ret = FAIL;
+		goto skip_data;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -330,7 +333,9 @@ skip_data:
 	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint64_t *hosts)
@@ -425,7 +430,7 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
+int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
 	typedef struct
 	{
@@ -456,7 +461,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	const char		*__function_name = "get_proxyconfig_data";
 
-	int			i;
+	int			i, ret = FAIL;
 	const ZBX_TABLE		*table;
 	zbx_vector_uint64_t	hosts, httptests;
 
@@ -475,13 +480,21 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		table = DBget_table(pt[i].table);
 		assert(NULL != table);
 
-		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
+		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
+		{
+			*error = zbx_dsprintf(*error, "failed to get data from table %s", table->table);
+			goto out;
+		}
 	}
 
+	ret = SUCCEED;
+out:
 	zbx_vector_uint64_destroy(&httptests);
 	zbx_vector_uint64_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -651,7 +664,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
  *                                                                            *
  * Purpose: update configuration table                                        *
  *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
