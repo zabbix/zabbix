@@ -95,7 +95,7 @@ static void	process_configuration_sync(size_t *data_size)
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server, datalen " ZBX_FS_SIZE_T,
 			(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);

@@ -118,6 +118,12 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
+	/*
+		$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+		$triggerId = ($source == EVENT_SOURCE_DISCOVERY)
+		? 0
+		: getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+	*/
 	CProfile::update('web.events.filter.triggerid', getRequest('triggerid', 0), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
@@ -141,6 +147,7 @@ if ($triggerId != 0 && hasRequest('hostid')) {
 	));
 
 	foreach ($oldTriggers as $oldTrigger) {
+		$triggerId = 0;
 		$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'], 'hostid');
 		$oldTrigger['items'] = zbx_toHash($oldTrigger['items'], 'itemid');
 		$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'], 'functionid');
@@ -148,10 +155,6 @@ if ($triggerId != 0 && hasRequest('hostid')) {
 
 		if (isset($oldTrigger['hosts'][$hostid])) {
 			break;
-		}
-		else {
-			// unset the old trigger and look for a new one
-			$triggerId = 0;
 		}
 
 		$newTriggers = API::Trigger()->get(array(
@@ -329,6 +332,10 @@ else {
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
+		if (getRequest('triggerid') != 0) {
+			$r_form->addVar('triggerid', get_request('triggerid'));
+		}
+
 		$r_form->addItem(array(
 			_('Group').SPACE,
 			$pageFilter->getGroupsCB(true)

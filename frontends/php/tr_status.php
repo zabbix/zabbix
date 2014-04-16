@@ -100,11 +100,6 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-// show triggers
-// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
-// whole page inaccessible on large installations.
-$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
-
 // filter set
 if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
@@ -117,6 +112,13 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.status_change_days', getRequest('status_change_days', 14),
 		PROFILE_TYPE_INT
 	);
+
+	// show triggers
+	// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
+	// whole page inaccessible on large installations.
+	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
+		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
+	}
 
 	// show events
 	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
@@ -175,6 +177,7 @@ if (hasRequest('filter_set')) {
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
+	CProfile::delete('web.tr_status.filter.show_triggers');
 	CProfile::delete('web.tr_status.filter.show_details');
 	CProfile::delete('web.tr_status.filter.show_maintenance');
 	CProfile::delete('web.tr_status.filter.show_events');
@@ -187,10 +190,14 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
 	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
 	DBend();
-
-	$showTriggers = TRIGGERS_OPTION_ONLYTRUE;
 }
 
+if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
+	$showTriggers = TRIGGERS_OPTION_ALL;
+}
+else {
+	$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+}
 $showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
 $showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
 $showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
@@ -257,7 +264,8 @@ $filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 $statusComboBox = new CComboBox('show_triggers', $showTriggers);
 $statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
+$statusComboBox->additem(TRIGGERS_OPTION_RECENT_PROBLEM, _('Recent problem'));
+$statusComboBox->additem(TRIGGERS_OPTION_IN_PROBLEM, _('Problem'));
 $filterForm->addRow(_('Triggers status'), $statusComboBox);
 
 if ($config['event_ack_enable']) {
@@ -450,8 +458,11 @@ if ($filter['application'] !== '') {
 if (!zbx_empty($txtSelect)) {
 	$options['search'] = array('description' => $txtSelect);
 }
-if ($showTriggers == TRIGGERS_OPTION_ONLYTRUE) {
+if ($showTriggers == TRIGGERS_OPTION_RECENT_PROBLEM) {
 	$options['only_true'] = 1;
+}
+elseif ($showTriggers == TRIGGERS_OPTION_IN_PROBLEM) {
+	$options['filter'] = array('value' => TRIGGER_VALUE_TRUE);
 }
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 	$options['withUnacknowledgedEvents'] = 1;
@@ -753,7 +764,7 @@ foreach ($triggers as $trigger) {
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
-			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
+			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
 				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
 		);
 
