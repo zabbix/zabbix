@@ -496,7 +496,6 @@ function validateBarReportItems($items = array()) {
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 		'selectHosts' => array('name'),
 		'webitems' => true,
-		'nodeids' => get_current_nodeid(true),
 		'itemids' => $itemIds,
 		'preservekeys' => true
 	));
