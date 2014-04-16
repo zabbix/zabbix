@@ -709,8 +709,7 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 	$data['proxies'] = DBfetchArray(DBselect(
 		'SELECT h.hostid,h.host'.
 		' FROM hosts h'.
-		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-			andDbNode('h.hostid')
+		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
 	));
 	order_result($data['proxies'], 'host');
 
@@ -778,8 +777,6 @@ elseif (isset($_REQUEST['form'])) {
 	$hostsWidget->setRootClass($rootClass);
 }
 else {
-	$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0);
-
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -791,7 +788,7 @@ else {
 	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
 
 	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 	$hostsWidget->addHeader(_('Hosts'), $frmGroup);
 	$hostsWidget->addHeaderRowNumber();
@@ -833,7 +830,6 @@ else {
 	$table = new CTableInfo(_('No hosts found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-		$displayNodes ? _('Node') : null,
 		make_sorting_header(_('Name'), 'name'),
 		_('Applications'),
 		_('Items'),
@@ -1035,7 +1031,6 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
-			$displayNodes ? get_node_name_by_elid($host['hostid'], true) : null,
 			$description,
 			$applications,
 			$items,

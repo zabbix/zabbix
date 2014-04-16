@@ -123,10 +123,8 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				"select hostid,status"
 				" from hosts"
 				" where host='%s'"
-					" and status in (%d,%d)"
-					ZBX_SQL_NODE,
-				host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
-				DBand_node_local("hostid"));
+					" and status in (%d,%d)",
+				host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 
 		zbx_free(host_esc);
 
@@ -223,7 +221,6 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		char	field_name[ZBX_FIELDNAME_LEN + 3];
 
 		zbx_snprintf(field_name, sizeof(field_name), "t.%s", table->recid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBwhere_node_local(field_name));
 	}
 	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
@@ -264,9 +261,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "groups"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				",config r where t.groupid=r.discovery_groupid" ZBX_SQL_NODE,
-				DBand_node_local("r.configid"));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",config r where t.groupid=r.discovery_groupid");
 	}
 	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
 	{
@@ -1678,14 +1673,12 @@ static void	proxy_set_lastid(const char *table_name, const char *lastidfield, co
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
-				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
+		DBexecute("insert into ids (table_name,field_name,nextid) values ('%s','%s'," ZBX_FS_UI64 ")",
 				table_name, lastidfield, lastid);
 	}
 	else
 	{
-		DBexecute("update ids set nextid=" ZBX_FS_UI64
-				" where table_name='%s' and field_name='%s'",
+		DBexecute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
 				lastid, table_name, lastidfield);
 	}
 	DBfree_result(result);
