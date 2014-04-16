@@ -373,9 +373,9 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 				proxy_update_service(drule, dcheck, ip, dns, port, status, value, now);
 
-			DBcommit();
-
 			zbx_free(value);
+
+			DBcommit();
 		}
 	}
 
