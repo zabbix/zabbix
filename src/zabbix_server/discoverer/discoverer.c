@@ -106,7 +106,7 @@ static void	proxy_update_host(DB_DRULE *drule, const char *ip, const char *dns, 
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
+static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
@@ -119,7 +119,6 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	init_result(&result);
-	*value = '\0';
 
 	switch (dcheck->type)
 	{
@@ -267,7 +266,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
-						zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
+						*value = zbx_strdup(*value, result.str);
 					else
 						ret = FAIL;
 
@@ -332,7 +331,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 	int		port, first, last;
 	char		*curr_range, *next_range, *last_port;
 	int		status;
-	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		*value = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -361,7 +360,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
-			status = (SUCCEED == discover_service(dcheck, ip, port, value)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+			status = (SUCCEED == discover_service(dcheck, ip, port, &value)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 
 			/* update host status */
 			if (-1 == *host_status || DOBJECT_STATUS_UP == status)
@@ -375,6 +374,8 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 				proxy_update_service(drule, dcheck, ip, dns, port, status, value, now);
 
 			DBcommit();
+
+			zbx_free(value);
 		}
 	}
 
