@@ -40,7 +40,6 @@ $sysmapWidget->addHeaderRowNumber();
 $sysmapTable = new CTableInfo(_('No maps found.'));
 $sysmapTable->setHeader(array(
 	new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Width'), 'width'),
 	make_sorting_header(_('Height'), 'height'),
@@ -50,7 +49,6 @@ $sysmapTable->setHeader(array(
 foreach ($this->data['maps'] as $map) {
 	$sysmapTable->addRow(array(
 		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
-		$this->data['displayNodes'] ? $map['nodename'] : null,
 		new CLink($map['name'], 'sysmap.php?sysmapid='.$map['sysmapid']),
 		$map['width'],
 		$map['height'],
