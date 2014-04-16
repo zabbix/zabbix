@@ -2546,8 +2546,7 @@ function get_status() {
 				' AND i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.delay<>0'.
-				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
-				' AND i.value_type<>'.ITEM_VALUE_TYPE_LOG
+				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 
