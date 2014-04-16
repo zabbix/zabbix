@@ -2506,6 +2506,8 @@ json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
 exit:
+	zbx_free(value);
+
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 
