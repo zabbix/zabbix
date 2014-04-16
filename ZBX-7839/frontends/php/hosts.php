@@ -755,11 +755,6 @@ elseif (isset($_REQUEST['form'])) {
 		));
 		$dbHost = reset($dbHosts);
 
-		$dbHost = array_merge($dbHost, $_REQUEST);
-		// some keys do not match in $_REQUEST and API result
-		$dbHost['name'] = getRequest('visiblename');
-		//$dbHost['inventory'] = getRequest('host_inventory', $dbHost['inventory']);
-
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $hostId,
 			'output' => API_OUTPUT_EXTEND,
