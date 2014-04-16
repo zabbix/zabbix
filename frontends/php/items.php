@@ -885,10 +885,9 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 
 	// valuemap
 	$data['valuemaps'] = DBfetchArray(DBselect(
-			'SELECT v.valuemapid,v.name'.
-			' FROM valuemaps v'.
-			whereDbNode('v.valuemapid')
+		'SELECT v.valuemapid,v.name FROM valuemaps v'
 	));
+
 	order_result($data['valuemaps'], 'name');
 
 	// render view
@@ -944,8 +943,7 @@ else {
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name'),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
+		'sortfield' => getPageSortField('name')
 	);
 
 	// items
@@ -1183,13 +1181,6 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['items'] as $key => $item) {
-			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
-		}
-	}
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

@@ -87,7 +87,6 @@ switch ($data['method']) {
 		}
 
 		$options = array(
-			'nodeids' => get_current_nodeid(true),
 			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
@@ -131,7 +130,7 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'color' => getSeverityColor($trigger['priority'], $event['value']),
-						'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).'[url='.$url_tr_status.']'.$host['host'].'[/url]',
+						'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 							_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
@@ -234,8 +233,6 @@ switch ($data['method']) {
 	 */
 	case 'multiselect.get':
 		$config = select_config();
-		$displayNodes = is_array(get_current_nodeid());
-		$sortFields = $displayNodes ? array(array('field' => 'nodename', 'order' => ZBX_SORT_UP)) : array();
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
@@ -248,15 +245,9 @@ switch ($data['method']) {
 				));
 
 				if ($hostGroups) {
-					if ($displayNodes) {
-						foreach ($hostGroups as &$hostGroup) {
-							$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
-						}
-						unset($hostGroup);
-					}
-
-					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
-					CArrayHelper::sort($hostGroups, $sortFields);
+					CArrayHelper::sort($hostGroups, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
 					if (isset($data['limit'])) {
 						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
@@ -265,7 +256,6 @@ switch ($data['method']) {
 					foreach ($hostGroups as $hostGroup) {
 						$result[] = array(
 							'id' => $hostGroup['groupid'],
-							'prefix' => $displayNodes ? $hostGroup['nodename'] : '',
 							'name' => $hostGroup['name']
 						);
 					}
@@ -282,15 +272,9 @@ switch ($data['method']) {
 				));
 
 				if ($hosts) {
-					if ($displayNodes) {
-						foreach ($hosts as &$host) {
-							$host['nodename'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER);
-						}
-						unset($host);
-					}
-
-					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
-					CArrayHelper::sort($hosts, $sortFields);
+					CArrayHelper::sort($hosts, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
 					if (isset($data['limit'])) {
 						$hosts = array_slice($hosts, 0, $data['limit']);
@@ -299,7 +283,6 @@ switch ($data['method']) {
 					foreach ($hosts as $host) {
 						$result[] = array(
 							'id' => $host['hostid'],
-							'prefix' => $displayNodes ? $host['nodename'] : '',
 							'name' => $host['name']
 						);
 					}
@@ -315,15 +298,9 @@ switch ($data['method']) {
 				));
 
 				if ($templates) {
-					if ($displayNodes) {
-						foreach ($templates as &$template) {
-							$template['nodename'] = get_node_name_by_elid($template['templateid'], true, NAME_DELIMITER);
-						}
-						unset($template);
-					}
-
-					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
-					CArrayHelper::sort($templates, $sortFields);
+					CArrayHelper::sort($templates, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
 					if (isset($data['limit'])) {
 						$templates = array_slice($templates, 0, $data['limit']);
@@ -332,7 +309,6 @@ switch ($data['method']) {
 					foreach ($templates as $template) {
 						$result[] = array(
 							'id' => $template['templateid'],
-							'prefix' => $displayNodes ? $template['nodename'] : '',
 							'name' => $template['name']
 						);
 					}
@@ -348,15 +324,9 @@ switch ($data['method']) {
 				));
 
 				if ($applications) {
-					if ($displayNodes) {
-						foreach ($applications as &$application) {
-							$application['nodename'] = get_node_name_by_elid($application['applicationid'], true, NAME_DELIMITER);
-						}
-						unset($application);
-					}
-
-					$sortFields[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
-					CArrayHelper::sort($applications, $sortFields);
+					CArrayHelper::sort($applications, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
 					if (isset($data['limit'])) {
 						$applications = array_slice($applications, 0, $data['limit']);
@@ -365,7 +335,6 @@ switch ($data['method']) {
 					foreach ($applications as $application) {
 						$result[] = array(
 							'id' => $application['applicationid'],
-							'prefix' => $displayNodes ? $application['nodename'] : '',
 							'name' => $application['name']
 						);
 					}
@@ -382,15 +351,9 @@ switch ($data['method']) {
 				));
 
 				if ($triggers) {
-					if ($displayNodes) {
-						foreach ($triggers as &$trigger) {
-							$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true, NAME_DELIMITER);
-						}
-						unset($trigger);
-					}
-
-					$sortFields[] = array('field' => 'description', 'order' => ZBX_SORT_UP);
-					CArrayHelper::sort($triggers, $sortFields);
+					CArrayHelper::sort($triggers, array(
+						array('field' => 'description', 'order' => ZBX_SORT_UP)
+					));
 
 					if (isset($data['limit'])) {
 						$triggers = array_slice($triggers, 0, $data['limit']);
@@ -407,8 +370,8 @@ switch ($data['method']) {
 
 						$result[] = array(
 							'id' => $trigger['triggerid'],
-							'prefix' => ($displayNodes ? $trigger['nodename'] : '').$hostName,
-							'name' => $trigger['description']
+							'name' => $trigger['description'],
+							'prefix' => $hostName
 						);
 					}
 				}

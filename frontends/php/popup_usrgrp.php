@@ -89,7 +89,10 @@ if(form){
 		_('Name')
 		));
 
-	$userGroups = DBfetchArray(DBselect('SELECT ug.usrgrpid,ug.name FROM usrgrp ug '.whereDbNode('ug.usrgrpid')));
+	$userGroups = DBfetchArray(DBselect(
+		'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'
+	));
+
 	order_result($userGroups, 'name');
 
 	foreach ($userGroups as $userGroup) {
