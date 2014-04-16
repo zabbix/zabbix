@@ -221,7 +221,10 @@ out:
 	path_tmp = zbx_strdup(path_tmp, cfg_file);
 
 	if (FAIL == parse_file_name_to_tokens(path_tmp, &extension_full, &tokens_tmp, &tokens_cnt))
+	{
+		ret = FAIL;
 		goto out;
+	}
 
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
