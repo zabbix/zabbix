@@ -310,7 +310,7 @@ $filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
 	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
 ));
 
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table

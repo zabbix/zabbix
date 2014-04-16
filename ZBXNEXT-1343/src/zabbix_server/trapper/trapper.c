@@ -500,8 +500,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				}
 				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
-							" Datalen " ZBX_FS_SIZE_T,
+					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server,"
+							" datalen " ZBX_FS_SIZE_T,
 							(zbx_fs_size_t)(jp.end - jp.start + 1));
 					recv_proxyconfig(sock, &jp);
 				}

@@ -53,11 +53,11 @@ class CLocalApiClient extends CApiClient {
 		$response = new CApiClientResponse();
 		$newTransaction = false;
 		try {
-			// authenticate
-			$this->authenticate($api, $method, $auth);
-
 			// check method
 			$this->checkMethod($api, $method);
+
+			// authenticate
+			$this->authenticate($api, $method, $auth);
 
 			// the nopermission parameter must not be available for external API calls.
 			unset($params['nopermissions']);

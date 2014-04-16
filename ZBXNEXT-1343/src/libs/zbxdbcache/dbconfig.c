@@ -510,23 +510,20 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
  ******************************************************************************/
 static zbx_uint64_t	get_item_nextcheck_seed(const ZBX_DC_ITEM *item)
 {
-	switch (item->poller_type)
+	if (ITEM_TYPE_JMX == item->type || SUCCEED == is_snmp_type(item->type))
+		return item->interfaceid;
+
+	if (ITEM_TYPE_SIMPLE == item->type)
 	{
-		case ZBX_POLLER_TYPE_JAVA:
-		case ZBX_POLLER_TYPE_PINGER:
-			/* Java and pinger pollers can process multiple items at the same time. To   */
-			/* take advantage of that we must schedule items with the same interface to  */
-			/* be processed at the same time.                                            */
+		if (SUCCEED == cmp_key_id(item->key, SERVER_ICMPPING_KEY) ||
+				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGSEC_KEY) ||
+				SUCCEED == cmp_key_id(item->key, SERVER_ICMPPINGLOSS_KEY))
+		{
 			return item->interfaceid;
-		case ZBX_POLLER_TYPE_NORMAL:
-			/* SNMP items, processed by normal pollers, also support multiple processing */
-			if (SUCCEED == is_snmp_type(item->type))
-				return item->interfaceid;
-			/* break; is not missing here */
-		default:
-			/* by default just try to spread all item processing over the delay period   */
-			return item->itemid;
+		}
 	}
+
+	return item->itemid;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
@@ -5754,7 +5751,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host;
 
-		host = zbx_hashset_search(&config->hosts, &item->hostid);
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == host->maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == host->maintenance_type)
@@ -5781,21 +5779,21 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (NULL == host || 0 != host->errors_from)
+				if (0 != host->errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (NULL == host || 0 != host->snmp_errors_from)
+				if (0 != host->snmp_errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_IPMI:
-				if (NULL == host || 0 != host->ipmi_errors_from)
+				if (0 != host->ipmi_errors_from)
 					continue;
 				break;
 			case ITEM_TYPE_JMX:
-				if (NULL == host || 0 != host->jmx_errors_from)
+				if (0 != host->jmx_errors_from)
 					continue;
 				break;
 			default:
@@ -5811,11 +5809,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			queue_item->itemid = item->itemid;
 			queue_item->type = item->type;
 			queue_item->nextcheck = item->nextcheck;
-
-			if (NULL != host || (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid))))
-				queue_item->proxy_hostid = host->proxy_hostid;
-			else
-				queue_item->proxy_hostid = 0;
+			queue_item->proxy_hostid = host->proxy_hostid;
 
 			zbx_vector_ptr_append(queue, queue_item);
 		}
