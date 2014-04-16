@@ -24,71 +24,48 @@ typedef struct
 {
 	zbx_uint64_t	nread;
 	zbx_uint64_t	nwritten;
-	zbx_uint64_t	nroperations;
-	zbx_uint64_t	nwoperations;
+	zbx_uint64_t	reads;
+	zbx_uint64_t	writes;
 }
-disk_stat_t;
-
-static disk_stat_t	disk_stat;
+zbx_perfstat_t;
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }
 
-static int	get_diskstat_io(const char *devname, disk_stat_t *zk)
+static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp)
 {
-	int	i, disk_num;
-
-	assert(zk);
-
 #if defined(HAVE_LIBPERFSTAT)
-
-	disk_num = perfstat_disk(NULL, NULL, sizeof(perfstat_disk_t), 0);
-
-	/* check that the system actually has disks */
-	if (disk_num == -1)
-		return SYSINFO_RET_FAIL;
-
-	/* check whether we want all the devices or a particular one */
 	if ('\0' != *devname)
 	{
-		perfstat_disk_t	*data = NULL;
 		perfstat_id_t	name;
+		perfstat_disk_t	data;
 
 		strscpy(name.name, devname);
 
-		data = zbx_malloc(data, sizeof(perfstat_disk_t));
-
-		if (0 < perfstat_disk(&name, data, sizeof(perfstat_disk_t), 1))
+		if (0 < perfstat_disk(&name, &data, sizeof(data), 1))
 		{
-			zk->nread = data[0].rblks * data[0].bsize;
-			zk->nwritten = data[0].wblks * data[0].bsize;
-			zk->nroperations = data[0].xrate;
-			zk->nwoperations = data[0].xfers - data[0].xrate;
-
-			zbx_free(data);
+			zp->nread = data.rblks * data.bsize;
+			zp->nwritten = data.wblks * data.bsize;
+			zp->reads = data.xrate;
+			zp->writes = data.xfers - data.xrate;
 
 			return SYSINFO_RET_OK;
 		}
 		else
-		{
-			zbx_free(data);
-
 			return SYSINFO_RET_FAIL;
-		}
 	}
 	else
 	{
 		perfstat_disk_total_t	data;
 
-		/* obtain the data for all the disks available */
-		if (0 < perfstat_disk_total(NULL, &data, sizeof(perfstat_disk_total_t), 1))
+		if (0 < perfstat_disk_total(NULL, &data, sizeof(data), 1))
 		{
-			zk->nread = data.rblks * 512;
-			zk->nwritten = data.wblks * 512;
-			zk->nroperations = data.xrate;
-			zk->nwoperations = data.xfers - data.xrate;
+			zp->nread = data.rblks * 512;
+			zp->nwritten = data.wblks * 512;
+			zp->reads = data.xrate;
+			zp->writes = data.xfers - data.xrate;
 
 			return SYSINFO_RET_OK;
 		}
@@ -102,44 +79,48 @@ static int	get_diskstat_io(const char *devname, disk_stat_t *zk)
 
 static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != get_diskstat_io(devname, &disk_stat))
+	zbx_perfstat_t	zp;
+
+	if (SYSINFO_RET_OK != get_perfstat_io(devname, &zp))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, disk_stat.nread);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
-{
-	if (SYSINFO_RET_OK != get_diskstat_io(devname, &disk_stat))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, disk_stat.nwritten);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_diskstat_io(devname, &disk_stat))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, disk_stat.nwoperations);
+	SET_UI64_RESULT(result, zp.nread);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value;
+	zbx_perfstat_t	zp;
 
-	if (SYSINFO_RET_OK != get_diskstat_io(devname, &disk_stat))
+	if (SYSINFO_RET_OK != get_perfstat_io(devname, &zp))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, disk_stat.nroperations);
+	SET_UI64_RESULT(result, zp.reads);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
+{
+	zbx_perfstat_t	zp;
+
+	if (SYSINFO_RET_OK != get_perfstat_io(devname, &zp))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, zp.nwritten);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
+{
+	zbx_perfstat_t	zp;
+
+	if (SYSINFO_RET_OK != get_perfstat_io(devname, &zp))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, zp.writes);
 
 	return SYSINFO_RET_OK;
 }
