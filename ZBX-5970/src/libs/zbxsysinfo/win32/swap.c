@@ -23,10 +23,10 @@
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	MEMORYSTATUSEX			ms_ex;
-	MEMORYSTATUS			ms;
-	zbx_uint64_t			real_swap_total, real_swap_avail;
-	char				*swapdev, *mode;
+	MEMORYSTATUSEX	ms_ex;
+	MEMORYSTATUS	ms;
+	zbx_uint64_t	real_swap_total, real_swap_avail;
+	char		*swapdev, *mode;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
