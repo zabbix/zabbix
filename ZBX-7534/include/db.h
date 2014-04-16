@@ -255,7 +255,7 @@ typedef struct
 	int		status;
 	int		lastup;
 	int		lastdown;
-	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		*value;
 }
 DB_DSERVICE;
 
