@@ -1311,10 +1311,14 @@ function getCopyElementsFormData($elementsField, $title = null) {
 			'groupids' => $data['filter_groupid']
 		);
 		if($data['copy_type'] == 2) {
-			$params['templated_hosts'] = true;
+			$data['hosts'] = API::Template()->get($params);
+			foreach($data['hosts'] as &$host) {
+				$host['hostid'] = $host['templateid'];
+			}
 		}
-
-		$data['hosts'] = API::Host()->get($params);
+		else {
+			$data['hosts'] = API::Host()->get($params);
+		}
 		order_result($data['hosts'], 'name');
 	}
 

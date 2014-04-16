@@ -38,7 +38,7 @@ $fields = array(
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({itemid})'),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
-	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
+	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'itemid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
@@ -942,10 +942,14 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 				'groupids' => $data['copy_groupid']
 			);
 			if($data['copy_type'] == 2) {
-				$params['templated_hosts'] = true;
+				$data['hosts'] = API::Template()->get($params);
+				foreach($data['hosts'] as &$host) {
+					$host['hostid'] = $host['templateid'];
+				}
 			}
-
-			$data['hosts'] = API::Host()->get($params);
+			else {
+				$data['hosts'] = API::Host()->get($params);
+			}
 			order_result($data['hosts'], 'name');
 		}
 	}
