@@ -106,7 +106,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 {
 	const char	*__function_name = "split_filename";
 	const char	*separator = NULL;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	int		ret = FAIL;
 #ifdef _WINDOWS
 	size_t		sz;
@@ -400,7 +400,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigne
 	const char		*__function_name = "process_logrt";
 	int			i = 0, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, j = 0, reg_error;
 	char			err_buf[MAX_STRING_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
-	struct stat		file_buf;
+	zbx_stat_t		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
 	char			*find_path = NULL;
@@ -642,7 +642,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	const char	*__function_name = "process_log";
 
 	int		f, ret = FAIL;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	zbx_uint64_t	l_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
