@@ -19,7 +19,7 @@
 **/
 
 
-class CApiService {
+class CZBXAPI {
 
 	public static $userData;
 
@@ -312,7 +312,7 @@ class CApiService {
 
 		// create the map from a database table
 		if ($table) {
-			$res = DBselect(API::getApiService()->createSelectQuery($table, array(
+			$res = DBselect(API::getApi()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
 				'filter' => array($baseField => array_keys($objects))
 			)));
@@ -512,7 +512,7 @@ class CApiService {
 
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
-	 * Sorting is currently only supported for CApiService::get() methods.
+	 * Soring is currently only supported for CZBXAPI::get() methods.
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
@@ -663,7 +663,7 @@ class CApiService {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = API::getApiService()->select($tableName, array(
+		$dbObjects = API::getApi()->select($tableName, array(
 			'output' => $fields,
 			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 			'preservekeys' => true

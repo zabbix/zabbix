@@ -63,7 +63,6 @@ class CMaintenance extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'maintenanceids'			=> null,
@@ -225,7 +224,6 @@ class CMaintenance extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($maintenance = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -743,8 +741,7 @@ class CMaintenance extends CApiService {
 			$timeperiods = API::getApiService()->select('timeperiods', array(
 				'output' => $options['selectTimeperiods'],
 				'filter' => array('timeperiodid' => $relationMap->getRelatedIds()),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}
