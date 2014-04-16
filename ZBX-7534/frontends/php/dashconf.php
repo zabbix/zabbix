@@ -159,48 +159,35 @@ $data['severities'] = array(
 if ($data['grpswitch']) {
 	// show groups
 	$data['groups'] = API::HostGroup()->get(array(
-		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['groupIds'],
 		'output' => array('groupid', 'name')
 	));
 
-	foreach ($data['groups'] as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, ': ');
-	}
-	unset($group);
-
 	CArrayHelper::sort($data['groups'], array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
 	foreach ($data['groups'] as &$group) {
 		$group['id'] = $group['groupid'];
-		$group['prefix'] = $group['nodename'];
-		unset($group['groupid'], $group['nodename']);
+
+		unset($group['groupid']);
 	}
 	unset($group);
 
 	// hide groups
 	$data['hideGroups'] = API::HostGroup()->get(array(
-		'nodeids' => get_current_nodeid(true),
 		'groupids' => $data['hideGroupIds'],
 		'output' => array('groupid', 'name')
 	));
-	foreach ($data['hideGroups'] as &$hideGroup) {
-		$hideGroup['nodename'] = get_node_name_by_elid($hideGroup['groupid'], true, ': ');
-	}
-	unset($hideGroup);
 
 	CArrayHelper::sort($data['hideGroups'], array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
 	foreach ($data['hideGroups'] as &$group) {
 		$group['id'] = $group['groupid'];
-		$group['prefix'] = $group['nodename'];
-		unset($group['groupid'], $group['nodename']);
+
+		unset($group['groupid']);
 	}
 	unset($group);
 }
