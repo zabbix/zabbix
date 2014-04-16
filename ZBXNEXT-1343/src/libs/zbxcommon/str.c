@@ -2112,57 +2112,6 @@ size_t	zbx_hex2binary(char *io)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_next_field                                               *
- *                                                                            *
- * Purpose: return current field of character separated string                *
- *                                                                            *
- * Parameters:                                                                *
- *      line - null terminated, character separated string                    *
- *      output - output buffer (current field)                                *
- *      olen - allocated output buffer size                                   *
- *      separator - fields separator                                          *
- *                                                                            *
- * Return value: pointer to the next field                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator)
-{
-	char	*ret;
-	size_t	flen;
-
-	assert(line);
-
-	if (NULL == *line)
-	{
-		(*output)[0] = '\0';
-		return 0;
-	}
-
-	if (NULL != (ret = strchr(*line, separator)))
-	{
-		flen = ret - *line;
-		ret++;
-	}
-	else
-		flen = strlen(*line);
-
-	if (*olen < flen + 1)
-	{
-		*olen = flen * 2;
-		*output = zbx_realloc(*output, *olen);
-	}
-	memcpy(*output, *line, flen);
-	(*output)[flen] = '\0';
-
-	*line = ret;
-
-	return flen;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
@@ -2446,15 +2395,6 @@ int	zbx_mismatch(const char *s1, const char *s2)
 	}
 
 	return i;
-}
-
-int	starts_with(const char *str, const char *prefix)
-{
-	const char	*p, *q;
-
-	for (p = str, q = prefix; *p == *q && *q != '\0'; p++, q++);
-
-	return (*q == '\0' ? SUCCEED : FAIL);
 }
 
 int	cmp_key_id(const char *key_1, const char *key_2)
