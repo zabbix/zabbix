@@ -315,7 +315,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			index = zbx_vector_ptr_search(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 			if (FAIL != index)
 			{
@@ -435,7 +435,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags) || CONDITION_EVAL_TYPE_EXPRESSION != item->evaltype)
 			continue;
 
-		index = zbx_vector_ptr_search(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		index = zbx_vector_ptr_bsearch(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		if (FAIL == index)
 		{
@@ -714,7 +714,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 				continue;
 
-			index = zbx_vector_ptr_search(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			index = zbx_vector_ptr_bsearch(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 			if (FAIL == index)
 			{
@@ -1092,11 +1092,8 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	get_template_lld_rule_map(&items, &lld_rules);
 
-	if (0 != lld_rules.values_num)
-	{
-		new_conditions = calculate_template_lld_rule_conditionids(&lld_rules);
-		update_template_lld_rule_formulas(&items, &lld_rules);
-	}
+	new_conditions = calculate_template_lld_rule_conditionids(&lld_rules);
+	update_template_lld_rule_formulas(&items, &lld_rules);
 
 	save_template_items(hostid, &items);
 	save_template_lld_rules(&items, &lld_rules, new_conditions);
