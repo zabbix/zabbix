@@ -343,8 +343,6 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 					if (itemid != rule->itemid)
 						continue;
 
-					rule = (zbx_lld_rule_map_t *)rules->values[i];
-
 					ZBX_STR2UINT64(item_conditionid, row[0]);
 					zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
 
