@@ -135,7 +135,6 @@ class CImage extends CZBXAPI {
 			}
 			else {
 				$imageids[$image['imageid']] = $image['imageid'];
-				unset($image['image']);
 
 				if (!isset($result[$image['imageid']])) {
 					$result[$image['imageid']] = array();
@@ -549,5 +548,21 @@ class CImage extends CZBXAPI {
 		if (@imageCreateFromString($image) === false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
 		}
+	}
+
+	/**
+	 * Unset image field from output.
+	 *
+	 * @see CZBXAPI::applyQueryOutputOptions()
+	 */
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if (is_array($options['output'])) {
+			unset($options['output']['image']);
+		}
+		elseif ($options['output'] == API_OUTPUT_EXTEND) {
+			$options['output'] = array('imageid', 'imagetype', 'name');
+		}
+
+		return parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 	}
 }
