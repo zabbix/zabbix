@@ -115,7 +115,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// show triggers
-	// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
+	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
 	// whole page inaccessible on large installations.
 	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
 		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
