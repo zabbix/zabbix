@@ -799,14 +799,15 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'],
+									$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($functionData['itemid']),
 								$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'],
+								'items.php?form=update&itemid='.$functionData['itemid'].'&switch_node='.
+									id2nodeid($functionData['itemid']),
 								$style
 							);
 						}
@@ -1025,7 +1026,8 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'
+					' AND h.hostid=i.hostid'.
+					andDbNode('i.itemid')
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];
@@ -1104,7 +1106,8 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
 					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'
+					' AND h.hostid=i.hostid'.
+					andDbNode('i.itemid')
 			);
 			if ($dbItem = DBfetch($dbItems)) {
 				$items[] = $dbItem;
@@ -1222,6 +1225,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	foreach ($dbTriggers as $trigger) {
 		$host = reset($trigger['hosts']);
 
+		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 		$hostNames[$host['hostid']] = $host['name'];
 
@@ -1590,6 +1594,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	$config = select_config();
 
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => array(),
@@ -1645,6 +1650,9 @@ function make_trigger_details($trigger) {
 	array_pop($hostNames);
 
 	$table = new CTableInfo();
+	if (is_show_all_nodes()) {
+		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
+	}
 	$table->addRow(array(
 		new CCol(_n('Host', 'Hosts', count($hosts))),
 		new CCol($hostNames, 'wraptext')

@@ -162,9 +162,9 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$dbApplications = DBselect(
 		'SELECT a.applicationid,a.name,a.hostid'.
 		' FROM applications a'.
-		' WHERE '.dbConditionInt('a.applicationid', $applications)
+		' WHERE '.dbConditionInt('a.applicationid', $applications).
+			andDbNode('a.applicationid')
 	);
-
 	while ($dbApplication = DBfetch($dbApplications)) {
 		if (!isset($applications[$dbApplication['applicationid']])) {
 			continue;
@@ -205,9 +205,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 				' LEFT JOIN items i ON ia.itemid=i.itemid'.
 			' WHERE ia.applicationid='.zbx_dbstr($appid).
 				' AND i.hostid='.zbx_dbstr($hostId).
-				' AND i.type<>'.ITEM_TYPE_HTTPTEST
+				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
+				andDbNode('ia.applicationid')
 		);
-
 		while ($item = DBfetch($dbItems)) {
 			$result &= $enable ? activate_item($item['itemid']) : disable_item($item['itemid']);
 			$updated++;
@@ -265,6 +265,8 @@ else {
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
+	$data['displayNodes'] = (is_array(get_current_nodeid())
+		&& $data['pageFilter']->groupid == 0 && $data['pageFilter']->hostid == 0);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// get application ids
@@ -314,6 +316,13 @@ else {
 						$application['sourceTemplates'][] = $parentTemplates[$parentAppId];
 					}
 				}
+			}
+		}
+
+		// nodes
+		if ($data['displayNodes']) {
+			foreach ($data['applications'] as $key => $application) {
+				$data['applications'][$key]['nodename'] = get_node_name_by_elid($application['applicationid'], true);
 			}
 		}
 	}

@@ -42,6 +42,7 @@ $userGroupsForm->setName('userGroupsForm');
 $userGroupTable = new CTableInfo(_('No user groups found.'));
 $userGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	'#',
 	_('Members'),
@@ -117,6 +118,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 
 	$userGroupTable->addRow(array(
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
+		$this->data['displayNodes'] ? $usrgrp['nodename'] : null,
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
 		array(new CLink(_('Users'), 'users.php?&filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
 		new CCol($users, 'wraptext'),

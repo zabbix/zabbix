@@ -60,11 +60,13 @@ static int	get_minnextcheck(int now)
 				" and t.status=%d"
 				" and h.proxy_hostid is null"
 				" and h.status=%d"
-				" and (h.maintenance_status=%d or h.maintenance_type=%d)",
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				ZBX_SQL_NODE,
 			CONFIG_HTTPPOLLER_FORKS, process_num - 1,
 			HTTPTEST_STATUS_MONITORED,
 			HOST_STATUS_MONITORED,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL);
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
+			DBand_node_local("t.httptestid"));
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 	{

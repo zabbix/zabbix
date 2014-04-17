@@ -607,7 +607,7 @@ function getMenuPopupTrigger(options) {
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update');
+				+ '&form=update&switch_node=' + options.configuration.switchNode);
 
 		items[items.length] = {
 			label: t('Configuration'),

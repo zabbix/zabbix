@@ -15,7 +15,7 @@ Changelog entries are prefixed with a position-based identificator, that denotes
 
 A line, referencing all components would thus be ADFGIJLPST
 
-API and frontend would be A.F.......
+API and Frontend would be A.F.......
 Server and proxy would be .......PS.
 
 Commit messages that do not actually change anything (for example, creation and

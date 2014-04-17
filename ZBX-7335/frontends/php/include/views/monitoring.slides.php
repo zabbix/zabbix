@@ -75,7 +75,10 @@ if ($this->data['slideshows']) {
 
 	$slideshowsComboBox = new CComboBox('elementid', $this->data['elementId'], 'submit()');
 	foreach ($this->data['slideshows'] as $slideshow) {
-		$slideshowsComboBox->addItem($slideshow['slideshowid'], $slideshow['name']);
+		$slideshowsComboBox->addItem(
+			$slideshow['slideshowid'],
+			get_node_name_by_elid($slideshow['slideshowid'], null, NAME_DELIMITER).$slideshow['name']
+		);
 	}
 	$slideshowForm->addItem(array(_('Slide show').SPACE, $slideshowsComboBox));
 

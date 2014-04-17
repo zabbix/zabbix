@@ -63,6 +63,7 @@ class CTrigger extends CTriggerGeneral {
 		);
 
 		$defOptions = array(
+			'nodeids'						=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
@@ -421,6 +422,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 
 		// return count or grouped counts via direct SQL count
 		if (!is_null($options['countOutput']) && !$this->requiresPostSqlFiltering($options)) {
@@ -502,11 +504,18 @@ class CTrigger extends CTriggerGeneral {
 			'output' => API_OUTPUT_EXTEND
 		);
 
+		if (isset($triggerData['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($triggerData['node']);
+		}
+		else {
+			if (isset($triggerData['nodeids'])) {
+				$options['nodeids'] = $triggerData['nodeids'];
+			}
+		}
+
 		// expression is checked later
 		unset($options['filter']['expression']);
-
 		$result = $this->get($options);
-
 		if (isset($triggerData['expression'])) {
 			foreach ($result as $tnum => $trigger) {
 				$tmpExp = explode_exp($trigger['expression']);
@@ -545,12 +554,20 @@ class CTrigger extends CTriggerGeneral {
 			$object['host'] = reset($expressionHosts);
 		}
 
-		$triggers = $this->get(array(
+		$options = array(
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
-		));
+		);
 
+		if (isset($object['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		}
+		elseif (isset($object['nodeids'])) {
+			$options['nodeids'] = $object['nodeids'];
+		}
+
+		$triggers = $this->get($options);
 		foreach ($triggers as $trigger) {
 			$tmpExp = explode_exp($trigger['expression']);
 			if (strcmp($tmpExp, $object['expression']) == 0) {
@@ -681,8 +698,8 @@ class CTrigger extends CTriggerGeneral {
 							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 								' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 								' AND h.host='.zbx_dbstr($exprPart['host']).
-								' AND h.hostid=i.hostid';
-
+								' AND h.hostid=i.hostid'.
+								andDbNode('i.itemid');
 					if (!DBfetch(DBselect($sql))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".', $exprPart['item'], $exprPart['host']));
@@ -1619,6 +1636,7 @@ class CTrigger extends CTriggerGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'triggerids' => $ids,
 			'countOutput' => true
 		));
@@ -1640,6 +1658,7 @@ class CTrigger extends CTriggerGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'triggerids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -1726,6 +1745,7 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'triggerid', 'itemid', 'functions');
 			$items = API::Item()->get(array(
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'webitems' => true,
@@ -1751,6 +1771,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,

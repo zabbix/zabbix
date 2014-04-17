@@ -17,7 +17,8 @@ function parse_schema($path) {
 				$str = explode('|', $rest_line);
 				$table = trim($str[0]);
 				$key = trim($str[1]);
-				$schema[$table] = array('key' => $key, 'fields' => array());
+				$type = false !== strstr($str[2], 'ZBX_SYNC') ? 'DB::TABLE_TYPE_CONFIG' : 'DB::TABLE_TYPE_HISTORY';
+				$schema[$table] = array('key' => $key, 'fields' => array(), 'type' => $type);
 				break;
 			case 'FIELD':
 				$str = explode('|', $rest_line);
@@ -97,6 +98,7 @@ function parse_schema($path) {
 	$str .= 'return array('."\n";
 	foreach ($schema as $table => $data) {
 		$str .= "\t'$table' => array(\n";
+		$str .= "\t\t'type' => {$data['type']},\n";
 		$str .= "\t\t'key' => '{$data['key']}',\n";
 		$str .= "\t\t'fields' => array(\n";
 		foreach ($data['fields'] as $field => $fieldata) {

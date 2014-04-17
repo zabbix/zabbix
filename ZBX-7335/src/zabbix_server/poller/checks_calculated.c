@@ -217,7 +217,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		zbx_free(host_esc);
 	}
 
-	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_SQL_NODE, DBand_node_local("h.hostid"));
 
 	db_result = DBselect("%s", sql);
 

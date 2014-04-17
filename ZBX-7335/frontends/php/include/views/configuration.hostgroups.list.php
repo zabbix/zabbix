@@ -47,6 +47,7 @@ $hostGroupForm->setName('hostgroupForm');
 $hostGroupTable = new CTableInfo(_('No host groups found.'));
 $hostGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	' # ',
 	_('Members'),
@@ -139,6 +140,7 @@ foreach ($this->data['groups'] as $group) {
 
 	$hostGroupTable->addRow(array(
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
+		$this->data['displayNodes'] ? $group['nodename'] : null,
 		$name,
 		array(
 			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),

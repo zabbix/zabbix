@@ -55,6 +55,7 @@ $rprt_wdgt->addItem(BR());
 
 $table = new CTableInfo(_('No triggers found.'));
 $table->setHeader(array(
+	is_show_all_nodes() ? _('Node') : null,
 	_('Host'),
 	_('Trigger'),
 	_('Severity'),
@@ -170,6 +171,7 @@ foreach ($triggers as $trigger) {
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
 
 	$table->addRow(array(
+		get_node_name_by_elid($trigger['triggerid']),
 		$hostName,
 		$triggerDescription,
 		getSeverityCell($trigger['priority']),

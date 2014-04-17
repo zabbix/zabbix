@@ -36,6 +36,13 @@ class CDecimalValidator extends CValidator {
 	public $maxScale;
 
 	/**
+	 * Value label.
+	 *
+	 * @var string
+	 */
+	public $label;
+
+	/**
 	 * Error message for format validation.
 	 *
 	 * @var string
@@ -73,7 +80,7 @@ class CDecimalValidator extends CValidator {
 	public function validate($value) {
 		// validate format
 		if (!preg_match('/^-?(?:\d+|\d*\.\d+)$/', $value)) {
-			$this->error($this->messageFormat, $value);
+			$this->error($this->messageFormat, $value, $this->label);
 
 			return false;
 		}
@@ -94,7 +101,7 @@ class CDecimalValidator extends CValidator {
 
 		// validate scale without natural
 		if ($scaleSize > 0 && $naturalSize == 0) {
-			$this->error($this->messageFormat, $value);
+			$this->error($this->messageFormat, $value, $this->label);
 
 			return false;
 		}
@@ -104,7 +111,7 @@ class CDecimalValidator extends CValidator {
 
 			// validate precision
 			if ($naturalSize + $scaleSize > $this->maxPrecision) {
-				$this->error($this->messagePrecision, $value, $maxNaturals, $this->maxScale);
+				$this->error($this->messagePrecision, $value, $this->label, $maxNaturals, $this->maxScale);
 
 				return false;
 			}
@@ -112,7 +119,7 @@ class CDecimalValidator extends CValidator {
 			// validate digits before point
 			if ($this->maxScale !== null) {
 				if ($naturalSize > $maxNaturals) {
-					$this->error($this->messageNatural, $value, $maxNaturals);
+					$this->error($this->messageNatural, $value, $this->label, $maxNaturals);
 
 					return false;
 				}
@@ -121,7 +128,7 @@ class CDecimalValidator extends CValidator {
 
 		// validate scale
 		if ($this->maxScale !== null && $scaleSize > $this->maxScale) {
-			$this->error($this->messageScale, $value, $this->maxScale);
+			$this->error($this->messageScale, $value, $this->label, $this->maxScale);
 
 			return false;
 		}

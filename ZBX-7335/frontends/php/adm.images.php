@@ -154,6 +154,7 @@ $imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array(
 	'form' => get_request('form'),
+	'displayNodes' => is_array(get_current_nodeid()),
 	'widget' => &$imageWidget
 );
 
@@ -179,6 +180,14 @@ else {
 		'output' => array('imageid', 'imagetype', 'name')
 	));
 	order_result($data['images'], 'name');
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['images'] as &$image) {
+			$image['nodename'] = get_node_name_by_elid($image['imageid'], true).NAME_DELIMITER;
+		}
+		unset($image);
+	}
 
 	$imageForm = new CView('administration.general.image.list', $data);
 }

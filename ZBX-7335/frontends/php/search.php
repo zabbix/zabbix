@@ -77,6 +77,7 @@ $searchWidget->addHeader(array(
 
 // FIND Hosts
 $params = array(
+	'nodeids' => get_current_nodeid(true),
 	'search' => array(
 		'host' => $search,
 		'name' => $search,
@@ -107,12 +108,14 @@ $hostids = zbx_objectValues($hosts, 'hostid');
 
 $rw_hosts = API::Host()->get(array(
 	'output' => array('hostid'),
+	'nodeids' => get_current_nodeid(true),
 	'hostids' => $hostids,
 	'editable' => 1
 ));
 $rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 
 $params = array(
+	'nodeids' => get_current_nodeid(true),
 	'search' => array(
 		'host' => $search,
 		'name' => $search,
@@ -128,6 +131,7 @@ $viewCount = count($hosts);
 
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
+	ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
 	new CCol(_('Host')),
 	new CCol(_('IP')),
 	new CCol(_('DNS')),
@@ -156,7 +160,7 @@ foreach ($hosts as $hnum => $host) {
 	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? 'on' : null;
 
 	$group = reset($host['groups']);
-	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
+	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
 	// highlight visible name
 	$visibleName = make_decoration($host['name'], $search);
@@ -214,6 +218,7 @@ foreach ($hosts as $hnum => $host) {
 	$hostdns = make_decoration($host['dns'], $search);
 
 	$table->addRow(array(
+		get_node_name_by_elid($hostid, true),
 		$hostCell,
 		$hostip,
 		$hostdns,
@@ -243,6 +248,7 @@ $searchWidget->addItem(new CDiv($searchHostWidget));
 
 // Find Host groups
 $params = array(
+	'nodeids' => get_current_nodeid(true),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_COUNT,
 	'selectTemplates' => API_OUTPUT_COUNT,
@@ -257,12 +263,14 @@ $groupids = zbx_objectValues($hostGroups, 'groupid');
 
 $rw_hostGroups = API::HostGroup()->get(array(
 	'output' => array('groupid'),
+	'nodeids' => get_current_nodeid(true),
 	'groupids' => $groupids,
 	'editable' => true
 ));
 $rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 $params = array(
+	'nodeids' => get_current_nodeid(true),
 	'search' => array('name' => $search),
 	'countOutput' => 1
 );
@@ -270,6 +278,7 @@ $overalCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
 
 $header = array(
+	ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
 	new CCol(_('Host group')),
 	new CCol(_('Latest data')),
 	new CCol(_('Triggers')),
@@ -287,7 +296,7 @@ foreach ($hostGroups as $hnum => $group) {
 	$hostgroupid = $group['groupid'];
 
 	$caption = make_decoration($group['name'], $search);
-	$link = 'groupid='.$hostgroupid.'&hostid=0';
+	$link = 'groupid='.$hostgroupid.'&hostid=0&switch_node='.id2nodeid($hostgroupid);
 
 	$hostsLink = null;
 	$templatesLink = null;
@@ -296,7 +305,7 @@ foreach ($hostGroups as $hnum => $group) {
 		if (isset($rw_hostGroups[$hostgroupid])) {
 			if ($group['hosts']) {
 				$hostsLink = array(
-					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid),
+					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid.'&switch_node='.id2nodeid($hostgroupid)),
 					' ('.$group['hosts'].')'
 				);
 			}
@@ -306,7 +315,7 @@ foreach ($hostGroups as $hnum => $group) {
 
 			if ($group['templates']) {
 				$templatesLink = array(
-					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid),
+					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid.'&switch_node='.id2nodeid($hostgroupid)),
 					' ('.$group['templates'].')'
 				);
 			}
@@ -323,6 +332,7 @@ foreach ($hostGroups as $hnum => $group) {
 	}
 
 	$table->addRow(array(
+		get_node_name_by_elid($hostgroupid, true),
 		$hgroup_link,
 		new CLink(_('Latest data'), 'latest.php?'.$link),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
@@ -355,6 +365,7 @@ if ($admin) {
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
+		'nodeids' => get_current_nodeid(true),
 		'search' => array(
 			'host' => $search,
 			'name' => $search
@@ -372,12 +383,14 @@ if ($admin) {
 
 	$rw_templates = API::Template()->get(array(
 		'output' => array('templateid'),
+		'nodeids' => get_current_nodeid(true),
 		'templateids' => $templateids,
 		'editable' => 1
 	));
 	$rw_templates = zbx_toHash($rw_templates, 'templateid');
 
 	$params = array(
+		'nodeids' => get_current_nodeid(true),
 		'search' => array(
 			'host' => $search,
 			'name' => $search
@@ -390,6 +403,7 @@ if ($admin) {
 	$viewCount = count($templates);
 
 	$header = array(
+		ZBX_DISTRIBUTED ? new CCol(_('Node')) : null,
 		new CCol(_('Template')),
 		new CCol(_('Applications')),
 		new CCol(_('Items')),
@@ -407,7 +421,7 @@ if ($admin) {
 		$templateid = $template['templateid'];
 
 		$group = reset($template['groups']);
-		$link = 'groupid='.$group['groupid'].'&hostid='.$templateid;
+		$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
 		// highlight visible name
 		$templateVisibleName = make_decoration($template['name'], $search);
@@ -415,7 +429,7 @@ if ($admin) {
 		if (isset($rw_templates[$templateid])) {
 			// template
 			$templateCell = array(new CLink($templateVisibleName,
-				'templates.php?form=update&'.'&templateid='.$templateid
+				'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid)
 			));
 
 			$applications_link = array(
@@ -469,6 +483,7 @@ if ($admin) {
 		}
 
 		$table->addRow(array(
+			get_node_name_by_elid($templateid, true),
 			$templateCell,
 			$applications_link,
 			$items_link,

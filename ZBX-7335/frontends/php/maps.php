@@ -87,6 +87,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $maps = API::Map()->get(array(
 	'output' => array('sysmapid', 'name'),
+	'nodeids' => get_current_nodeid(),
 	'preservekeys' => true
 ));
 order_result($maps, 'name');

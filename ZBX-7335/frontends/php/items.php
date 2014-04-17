@@ -840,9 +840,6 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'visible' => get_request('visible', array())
 	);
 
-	$data['displayApplications'] = true;
-	$data['displayInterfaces'] = true;
-
 	// hosts
 	$data['hosts'] = API::Host()->get(array(
 		'output' => array('hostid'),
@@ -850,58 +847,36 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'selectItems' => array('itemid'),
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
-	$hostCount = count($data['hosts']);
+	$data['singleHost'] = (count($data['hosts']) == 1);
+	if ($data['singleHost']) {
+		$data['hosts'] = reset($data['hosts']);
 
-	if ($hostCount > 1) {
-		$data['displayApplications'] = false;
-		$data['displayInterfaces'] = false;
-	}
-	else {
-		// get template count to display applications multiselect only for single template
-		$templates = API::Template()->get(array(
-			'output' => array('templateid'),
-			'itemids' => $data['itemids']
+		// set the initial chosen interface to one of the interfaces the items use
+		$items = API::Item()->get(array(
+			'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+			'output' => array('itemid', 'type')
 		));
-		$templateCount = count($templates);
-
-		if ($templateCount != 0) {
-			$data['displayInterfaces'] = false;
-
-			if ($templateCount == 1 && !$data['hostid']) {
-				// if selected from filter without 'hostid'
-				$templates = reset($templates);
-				$data['hostid'] = $templates['templateid'];
-			}
-
-			// if items belong to single template and some belong to single host, don't display application multiselect
-			// and don't display application multiselect for multiple templates
-			if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
-				$data['displayApplications'] = false;
-			}
+		$usedInterfacesTypes = array();
+		foreach ($items as $item) {
+			$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
 		}
+		$initialItemType = min(array_keys($usedInterfacesTypes));
+		$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
+		$data['initial_item_type'] = $initialItemType;
+		$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
+	}
 
-		if ($hostCount == 1 && $data['displayInterfaces']) {
-			$data['hosts'] = reset($data['hosts']);
-
-			// if selected from filter without 'hostid'
-			if (!$data['hostid']) {
-				$data['hostid'] = $data['hosts']['hostid'];
-			}
-
-			// set the initial chosen interface to one of the interfaces the items use
-			$items = API::Item()->get(array(
-				'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
-				'output' => array('itemid', 'type')
-			));
-			$usedInterfacesTypes = array();
-			foreach ($items as $item) {
-				$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
-			}
-			$initialItemType = min(array_keys($usedInterfacesTypes));
-			$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
-			$data['initial_item_type'] = $initialItemType;
-			$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
-		}
+	// application
+	if (count($data['applications']) == 0) {
+		array_push($data['applications'], 0);
+	}
+	if (!empty($data['hostid'])) {
+		$data['db_applications'] = DBfetchArray(DBselect(
+			'SELECT a.applicationid,a.name'.
+			' FROM applications a'.
+			' WHERE a.hostid='.zbx_dbstr($data['hostid'])
+		));
+		order_result($data['db_applications'], 'name');
 	}
 
 	// item types
@@ -910,9 +885,10 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 
 	// valuemap
 	$data['valuemaps'] = DBfetchArray(DBselect(
-		'SELECT v.valuemapid,v.name FROM valuemaps v'
+			'SELECT v.valuemapid,v.name'.
+			' FROM valuemaps v'.
+			whereDbNode('v.valuemapid')
 	));
-
 	order_result($data['valuemaps'], 'name');
 
 	// render view
@@ -990,7 +966,8 @@ else {
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sortfield' => getPageSortField('name'),
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
 	);
 
 	// items
@@ -1228,6 +1205,13 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['items'] as $key => $item) {
+			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
+		}
+	}
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

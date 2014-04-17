@@ -22,8 +22,13 @@
 $proxyWidget = new CWidget();
 
 // create new proxy button
+$configComboBox = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
+$configComboBox->addItem('nodes.php', _('Nodes'));
+$configComboBox->addItem('proxies.php', _('Proxies'));
+
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$createForm->addItem($configComboBox);
 $createForm->addItem(new CSubmit('form', _('Create proxy')));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
@@ -37,6 +42,7 @@ $proxyForm->setName('proxyForm');
 $proxyTable = new CTableInfo(_('No proxies found.'));
 $proxyTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'hosts');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'host'),
 	_('Mode'),
 	_('Last seen (age)'),
@@ -86,6 +92,7 @@ foreach ($this->data['proxies'] as $proxy) {
 
 	$proxyTable->addRow(array(
 		new CCheckBox('hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
+		$this->data['displayNodes'] ? $proxy['nodename'] : null,
 		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']) : '',
 		(isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) ? _('Active') : _('Passive'),
 		$lastAccess,

@@ -50,6 +50,7 @@ class CGraphItem extends CApiService {
 		);
 
 		$defOptions = array(
+			'nodeids'		=> null,
 			'graphids'		=> null,
 			'itemids'		=> null,
 			'type'			=> null,
@@ -115,6 +116,7 @@ class CGraphItem extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -170,6 +172,7 @@ class CGraphItem extends CApiService {
 		if ($options['selectGraphs'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
 			$graphs = API::Graph()->get(array(
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGraphs'],
 				'gitemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true

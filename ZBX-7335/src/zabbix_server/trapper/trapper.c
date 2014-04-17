@@ -27,6 +27,10 @@
 #include "proxy.h"
 #include "zbxself.h"
 
+#include "../nodewatcher/nodecomms.h"
+#include "../nodewatcher/nodesender.h"
+#include "nodesync.h"
+#include "nodehistory.h"
 #include "trapper.h"
 #include "active.h"
 #include "nodecommand.h"
@@ -74,12 +78,14 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxyhistory";
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		host[HOST_HOST_LEN_MAX], error[256];
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
+	error[0] = '\0';
+
+	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
@@ -91,8 +97,6 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
-
-	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -167,12 +171,14 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	const char	*__function_name = "recv_proxy_heartbeat";
 
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		host[HOST_HOST_LEN_MAX], error[256];
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
+	error[0] = '\0';
+
+	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "heartbeat from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
@@ -182,8 +188,6 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	update_proxy_lastaccess(proxy_hostid);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
-
-	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -516,7 +520,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+				0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 			{
 				recv_agenthistory(sock, &jp);
 			}
@@ -573,6 +577,59 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s);
+	}
+	else if (0 == strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23)) /* request for last IDs */
+	{
+		send_history_last_id(sock, s);
+	}
+	else if (0 == strncmp(s, "Data", 4))	/* node data exchange */
+	{
+		int	res, nodeid, sender_nodeid;
+		char	*data, *answer;
+
+		node_sync_lock(0);
+
+		res = node_sync(s, &sender_nodeid, &nodeid);
+		if (FAIL == res)
+		{
+			alarm(CONFIG_TIMEOUT);
+			send_data_to_node(sender_nodeid, sock, "FAIL");
+			alarm(0);
+		}
+		else
+		{
+			res = calculate_checksums(nodeid, NULL, 0);
+			if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes"
+						" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
+						CONFIG_NODEID,
+						sender_nodeid,
+						nodeid,
+						(zbx_fs_size_t)strlen(data));
+				alarm(CONFIG_TRAPPER_TIMEOUT);
+				res = send_data_to_node(sender_nodeid, sock, data);
+				zbx_free(data);
+				if (SUCCEED == res)
+					res = recv_data_from_node(sender_nodeid, sock, &answer);
+				if (SUCCEED == res && 0 == strcmp(answer, "OK"))
+					res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
+				alarm(0);
+			}
+		}
+
+		node_sync_unlock(0);
+	}
+	else if (0 == strncmp(s, "History", 7))	/* slave node history */
+	{
+		const char	*reply;
+
+		reply = (SUCCEED == node_history(s, strlen(s)) ? "OK" : "FAIL");
+
+		alarm(CONFIG_TIMEOUT);
+		if (SUCCEED != zbx_tcp_send_raw(sock, reply))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
+		alarm(0);
 	}
 	else
 	{

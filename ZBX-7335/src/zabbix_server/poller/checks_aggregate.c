@@ -291,7 +291,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 		zbx_free(group);
 	}
 
-	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_SQL_NODE, DBand_node_local("h.hostid"));
 
 	result = DBselect("%s", sql);
 

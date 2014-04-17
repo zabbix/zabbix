@@ -2336,16 +2336,20 @@ function get_status() {
 			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u'));
-
+	$row = DBfetch(DBselect(
+			'SELECT COUNT(*) AS usr_cnt'.
+			' FROM users u'.
+			whereDbNode('u.userid')
+	));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
-		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-		' FROM sessions s'.
-		' WHERE s.status='.ZBX_SESSION_ACTIVE.
-		' GROUP BY s.userid,s.status'
+			'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+			' FROM sessions s'.
+			' WHERE s.status='.ZBX_SESSION_ACTIVE.
+				andDbNode('s.userid').
+			' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
@@ -2356,12 +2360,12 @@ function get_status() {
 	// comments: !!! Don't forget sync code with C !!!
 	$row = DBfetch(DBselect(
 		'SELECT SUM(1.0/i.delay) AS qps'.
-		' FROM items i,hosts h'.
-		' WHERE i.status='.ITEM_STATUS_ACTIVE.
-		' AND i.hostid=h.hostid'.
-		' AND h.status='.HOST_STATUS_MONITORED.
-		' AND i.delay<>0'.
-		' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
+				' FROM items i,hosts h'.
+				' WHERE i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.hostid=h.hostid'.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND i.delay<>0'.
+				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 

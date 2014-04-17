@@ -112,8 +112,8 @@ function slideshow_accessible($slideshowid, $perm) {
 
 	$sql = 'SELECT s.slideshowid'.
 			' FROM slideshows s'.
-			' WHERE s.slideshowid='.zbx_dbstr($slideshowid);
-
+			' WHERE s.slideshowid='.zbx_dbstr($slideshowid).
+				andDbNode('s.slideshowid', get_current_nodeid(null, $perm));
 	if (DBselect($sql)) {
 		$result = true;
 
@@ -174,12 +174,10 @@ function add_slideshow($name, $delay, $slides) {
 
 	// validate slide name
 	$db_slideshow = DBfetch(DBselect(
-		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name)
+		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name).' '.andDbNode('s.slideshowid')
 	));
-
-	if ($db_slideshow) {
+	if (!empty($db_slideshow)) {
 		error(_s('Slide show "%s" already exists.', $name));
-
 		return false;
 	}
 
@@ -237,7 +235,8 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
 		' WHERE s.name='.zbx_dbstr($name).
-			' AND s.slideshowid<>'.zbx_dbstr($slideshowid)
+			' AND s.slideshowid<>'.zbx_dbstr($slideshowid).
+			' '.andDbNode('s.slideshowid')
 	));
 	if ($dbSlideshow) {
 		error(_s('Slide show "%1$s" already exists.', $name));
@@ -323,14 +322,16 @@ function check_dynamic_items($elid, $config = 0) {
 		$sql = 'SELECT si.screenitemid'.
 				' FROM screens_items si'.
 				' WHERE si.screenid='.zbx_dbstr($elid).
-					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
+					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM.
+					' '.andDbNode('si.screenitemid');
 	}
 	else {
 		$sql = 'SELECT si.screenitemid'.
 				' FROM slides s,screens_items si'.
 				' WHERE s.slideshowid='.zbx_dbstr($elid).
 					' AND si.screenid=s.screenid'.
-					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
+					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM.
+					' '.andDbNode('si.screenitemid');
 	}
 	if (DBfetch(DBselect($sql, 1))) {
 		return true;

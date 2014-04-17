@@ -32,6 +32,7 @@ class CHost extends CHostGeneral {
 	 * Get host data.
 	 *
 	 * @param array         $options
+	 * @param array         $options['nodeids']                  Node IDs
 	 * @param array         $options['groupids']                 HostGroup IDs
 	 * @param array         $options['hostids']                  Host IDs
 	 * @param boolean       $options['monitored_hosts']          only monitored Hosts
@@ -76,6 +77,7 @@ class CHost extends CHostGeneral {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'proxyids'					=> null,
@@ -431,6 +433,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -463,27 +466,55 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Get Host ID by Host name.
+	 * Get Host ID by Host name
 	 *
 	 * @param array $host_data
 	 * @param string $host_data['host']
 	 *
-	 * @return array
+	 * @return int|boolean
 	 */
 	public function getObjects($hostData) {
-		return $this->get(array(
+		$options = array(
 			'filter' => $hostData,
 			'output' => API_OUTPUT_EXTEND
-		));
+		);
+
+		if (isset($hostData['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
+		}
+		elseif (isset($hostData['nodeids'])) {
+			$options['nodeids'] = $hostData['nodeids'];
+		}
+
+		$result = $this->get($options);
+
+		return $result;
 	}
 
 	public function exists($object) {
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
+		$keyFields = array(
+			array(
+				'hostid',
+				'host',
+				'name'
+			)
+		);
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('hostid'),
-			'nopermissions' => true,
+			'nopermissions' => 1,
 			'limit' => 1
-		));
+		);
+
+		if (isset($object['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		}
+		elseif (isset($object['nodeids'])) {
+			$options['nodeids'] = $object['nodeids'];
+		}
+
+		$objs = $this->get($options);
 
 		return !empty($objs);
 	}
@@ -1479,6 +1510,7 @@ class CHost extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
 			'templated_hosts' => true,
 			'countOutput' => true
@@ -1505,6 +1537,7 @@ class CHost extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
 			'editable' => true,
 			'templated_hosts' => true,
@@ -1512,6 +1545,27 @@ class CHost extends CHostGeneral {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['hostids'] === null &&
+				$options['proxyids'] === null &&
+				$options['templateids'] === null &&
+				$options['interfaceids'] === null &&
+				$options['itemids'] === null &&
+				$options['triggerids'] === null &&
+				$options['maintenanceids'] === null &&
+				$options['graphids'] === null &&
+				$options['applicationids'] === null &&
+				$options['dserviceids'] === null &&
+				$options['httptestids'] === null &&
+				$options['groupids'] === null) {
+
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1524,7 +1578,8 @@ class CHost extends CHostGeneral {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $options['selectInventory'],
-				'filter' => array('hostid' => $hostids)
+				'filter' => array('hostid' => $hostids),
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
@@ -1534,6 +1589,7 @@ class CHost extends CHostGeneral {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
 				$interfaces = API::HostInterface()->get(array(
 					'output' => $this->outputExtend($options['selectInterfaces'], array('hostid', 'interfaceid')),
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -1549,6 +1605,7 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$interfaces = API::HostInterface()->get(array(
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1567,6 +1624,7 @@ class CHost extends CHostGeneral {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
 				$screens = API::TemplateScreen()->get(array(
 					'output' => $this->outputExtend($options['selectScreens'], array('hostid')),
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true
 				));
@@ -1585,6 +1643,7 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$screens = API::TemplateScreen()->get(array(
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1611,6 +1670,7 @@ class CHost extends CHostGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -1622,7 +1682,8 @@ class CHost extends CHostGeneral {
 			$hostDiscoveries = API::getApiService()->select('host_discovery', array(
 				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
 				'filter' => array('hostid' => $hostids),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
 

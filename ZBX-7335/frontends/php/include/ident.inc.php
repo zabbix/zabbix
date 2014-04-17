@@ -27,24 +27,43 @@ function getImageByIdent($ident) {
 	}
 
 	static $images;
-
-	if ($images === null) {
+	if (is_null($images)) {
 		$images = array();
 
 		$dbImages = API::Image()->get(array(
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
 		));
-
 		foreach ($dbImages as $image) {
 			if (!isset($images[$image['name']])) {
 				$images[$image['name']] = array();
 			}
 
-			$images[$image['name']][] = $image;
+			$nodeName = get_node_name_by_elid($image['imageid'], true);
+
+			if (!is_null($nodeName)) {
+				$images[$image['name']][$nodeName] = $image;
+			}
+			else {
+				$images[$image['name']][] = $image;
+			}
 		}
 	}
 
 	$ident['name'] = trim($ident['name'], ' ');
+	if (!isset($images[$ident['name']])) {
+		return 0;
+	}
 
-	return isset($images[$ident['name']]) ? reset($images[$ident['name']]) : 0;
+	$searchedImages = $images[$ident['name']];
+
+	if (!isset($ident['node'])) {
+		return reset($searchedImages);
+	}
+	elseif (isset($searchedImages[$ident['node']])) {
+		return $searchedImages[$ident['node']];
+	}
+	else {
+		return 0;
+	}
 }

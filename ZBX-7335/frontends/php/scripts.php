@@ -267,7 +267,9 @@ if (isset($_REQUEST['form'])) {
 	$scriptView->show();
 }
 else {
-	$data = array();
+	$data = array(
+		'displayNodes' => is_array(get_current_nodeid())
+	);
 
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
@@ -303,6 +305,13 @@ else {
 	// sorting & paging
 	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
 	$data['paging'] = getPagingLine($data['scripts'], array('scriptid'));
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['scripts'] as $key => $script) {
+			$data['scripts'][$key]['nodename'] = get_node_name_by_elid($script['scriptid'], true);
+		}
+	}
 
 	// render view
 	$scriptView = new CView('administration.script.list', $data);

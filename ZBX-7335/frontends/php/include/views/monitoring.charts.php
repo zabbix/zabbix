@@ -22,9 +22,9 @@
 $chartsWidget = new CWidget('hat_charts');
 $chartForm = new CForm('get');
 $chartForm->addVar('fullscreen', $this->data['fullscreen']);
-$chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
+$chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
+$chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB(true)));
 
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
 

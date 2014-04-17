@@ -21,6 +21,7 @@
 
 $iconMapTable = new CTableInfo(_('No icon maps found.'));
 $iconMapTable->setHeader(array(
+	$this->data['displayNodes'] ? _('Node') : null,
 	_('Name'),
 	_('Icon map')
 ));
@@ -35,6 +36,7 @@ foreach ($this->data['iconmaps'] as $iconMap) {
 	}
 
 	$iconMapTable->addRow(array(
+		$this->data['displayNodes'] ? $iconMap['nodename'] : null,
 		new CLink($iconMap['name'], 'adm.iconmapping.php?form=update&iconmapid='.$iconMap['iconmapid']),
 		$row
 	));

@@ -42,11 +42,12 @@ foreach ($this->data['images'] as $image) {
 		? new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'), 'image.php?imageid='.$image['imageid'])
 		: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 
+	$nodeName = $this->data['displayNodes'] ? new CSpan($image['nodename'], 'unknown') : null;
 	$name = new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid']);
 
 	$imgColumn = new CCol();
 	$imgColumn->setAttribute('align', 'center');
-	$imgColumn->addItem(array($img, BR(), $name), 'center');
+	$imgColumn->addItem(array($img, BR(), $nodeName, $name), 'center');
 	$imageRow->addItem($imgColumn);
 
 	$count++;

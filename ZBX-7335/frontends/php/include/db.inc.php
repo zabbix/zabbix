@@ -663,21 +663,153 @@ function zbx_sql_mod($x, $y) {
 	}
 }
 
+function DBid2nodeid($id_name) {
+	global $DB;
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_MYSQL:
+			$result = '('.$id_name.' div '.ZBX_DM_MAX_HISTORY_IDS.')';
+			break;
+		case ZBX_DB_ORACLE:
+			$result = 'round('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
+			break;
+		default:
+			$result = '('.$id_name.'/'.ZBX_DM_MAX_HISTORY_IDS.')';
+	}
+	return $result;
+}
+
+function id2nodeid($id) {
+	return (int) bcdiv("$id", ZBX_DM_MAX_HISTORY_IDS);
+}
+
+/**
+ * Generates the filter by a node for the SQL statement.
+ * For a standalone setup the function will return an empty string.
+ *
+ * For example, function will return " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ *   for $fieldName = 'h.hostid', $nodes = 5, $operator = 'AND'
+ *
+ * Don't call this function directly. Use wrapper functions whereDbNode(), andDbNode() and sqlPartDbNode()
+ *
+ * @param string $fieldName
+ * @param mixed  $nodes
+ * @param string $operator		SQL operator ('AND', 'WHERE')
+ *
+ * @return string
+ */
+function dbNode($fieldName, $nodes = null, $operator = '') {
+	if (is_null($nodes)) {
+		$nodes = get_current_nodeid();
+	}
+	elseif (is_bool($nodes)) {
+		$nodes = get_current_nodeid($nodes);
+	}
+
+	if (empty($nodes)) {
+		$nodes = array(0);
+	}
+	elseif (!is_array($nodes)) {
+		if (is_string($nodes)) {
+			if (!preg_match('/^([0-9,]+)$/', $nodes)) {
+				fatal_error('Incorrect "nodes" for "dbNode". Passed ['.$nodes.']');
+			}
+		}
+		elseif (!zbx_ctype_digit($nodes)) {
+			fatal_error('Incorrect type of "nodes" for "dbNode". Passed ['.gettype($nodes).']');
+		}
+		$nodes = zbx_toArray($nodes);
+	}
+
+	$sql = '';
+	if (count($nodes) == 1) {
+		$nodeid = reset($nodes);
+		if ($nodeid != 0) {
+			$sql = $fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999';
+		}
+	}
+	else {
+		foreach ($nodes as $nodeid) {
+			$sql .= '('.$fieldName.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
+		}
+		$sql = '('.rtrim($sql, ' OR ').')';
+	}
+
+	if ($sql != '' && $operator != '') {
+		$sql = ' '.$operator.' '.$sql;
+	}
+
+	return $sql;
+}
+
+/**
+ * Wrapper function to generate condition like " WHERE h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string.
+ *
+ * @param string $fieldName
+ * @param mixed  $nodes
+ *
+ * @return string
+ */
+function whereDbNode($fieldName, $nodes = null) {
+	return dbNode($fieldName, $nodes, 'WHERE');
+}
+
+/**
+ * Wrapper function to generate condition like " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
+ * For a standalone setup the function will return an empty string.
+ *
+ * @param string $fieldName
+ * @param mixed nodes
+ *
+ * @return string
+ */
+function andDbNode($fieldName, $nodes = null) {
+	return dbNode($fieldName, $nodes, 'AND');
+}
+
+/**
+ * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999" to an array $sqlPartWhere.
+ * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes.
+ *
+ * @param array  $sqlPartWhere
+ * @param string $fieldName
+ * @param mixed  $nodes
+ *
+ * @return array
+ */
+function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null) {
+	$sql = dbNode($fieldName, $nodes);
+
+	if ($sql != '') {
+		$sqlPartWhere[] = $sql;
+	}
+
+	return $sqlPartWhere;
+}
+
 function get_dbid($table, $field) {
 	// PGSQL on transaction failure on all queries returns false..
-	global $DB;
+	global $DB, $ZBX_LOCALNODEID;
 
 	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_NO_FAILED_SQLS']) {
 		return 0;
 	}
 
+	$nodeid = get_current_nodeid(false);
 	$found = false;
 
-	$min = 0;
-	$max = ZBX_DB_MAX_ID;
+	if ($nodeid == 0) {
+		$min = 0;
+		$max = ZBX_STANDALONE_MAX_IDS;
+	}
+	else {
+		$min = bcadd(bcmul($nodeid, ZBX_DM_MAX_HISTORY_IDS), bcmul($ZBX_LOCALNODEID, ZBX_DM_MAX_CONFIG_IDS), 0);
+		$max = bcadd($min, bcsub(ZBX_DM_MAX_CONFIG_IDS, 1), 0);
+	}
 
 	do {
-		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
+		$dbSelect = DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field));
 		if (!$dbSelect) {
 			return false;
 		}
@@ -686,24 +818,24 @@ function get_dbid($table, $field) {
 		if (!$row) {
 			$row = DBfetch(DBselect('SELECT MAX('.$field.') AS id FROM '.$table.' WHERE '.$field.' BETWEEN '.$min.' AND '.$max));
 			if (!$row || ($row['id'] == 0)) {
-				DBexecute("INSERT INTO ids (table_name,field_name,nextid) VALUES ('$table','$field',$min)");
+				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 			}
 			else {
-				DBexecute("INSERT INTO ids (table_name,field_name,nextid) VALUES ('$table','$field',".$row['id'].')');
+				DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row['id'].')');
 			}
 			continue;
 		}
 		else {
 			$ret1 = $row['nextid'];
 			if (bccomp($ret1, $min) < 0 || !bccomp($ret1, $max) < 0) {
-				DBexecute('DELETE FROM ids WHERE table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+				DBexecute('DELETE FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 				continue;
 			}
 
-			$sql = 'UPDATE ids SET nextid=nextid+1 WHERE table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
+			$sql = 'UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
 			DBexecute($sql);
 
-			$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
+			$row = DBfetch(DBselect('SELECT i.nextid FROM ids i WHERE i.nodeid='.$nodeid.' AND i.table_name='.zbx_dbstr($table).' AND i.field_name='.zbx_dbstr($field)));
 			if (!$row || is_null($row['nextid'])) {
 				// should never be here
 				continue;

@@ -21,7 +21,10 @@
 
 function get_maintenance_by_maintenanceid($maintenanceid) {
 	return DBfetch(DBselect(
-		'SELECT m.* FROM maintenances m WHERE m.maintenanceid='.zbx_dbstr($maintenanceid)
+			'SELECT m.*'.
+			' FROM maintenances m'.
+			' WHERE m.maintenanceid='.zbx_dbstr($maintenanceid).
+				andDbNode('m.maintenanceid')
 	));
 }
 

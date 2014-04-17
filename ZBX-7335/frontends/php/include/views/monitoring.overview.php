@@ -28,8 +28,8 @@ $typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
 $typeComboBox->addItem(SHOW_DATA, _('Data'));
 
 $headerForm = new CForm('get');
-$headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$headerForm->addItem(array(SPACE, _('Application'), SPACE, $this->data['pageFilter']->getApplicationsCB()));
+$headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$headerForm->addItem(array(SPACE, _('Application'), SPACE, $this->data['pageFilter']->getApplicationsCB(true)));
 $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 
 $overviewWidget->addHeader(_('Overview'), $headerForm);

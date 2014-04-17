@@ -71,7 +71,7 @@ if (isset($_REQUEST['new_groups'])) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
+				'name' => $newHostGroup['new'] . ' (new)',
 				'isNew' => true
 			);
 		}

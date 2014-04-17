@@ -103,7 +103,14 @@ foreach ($dbGraph['hosts'] as $gItemHost) {
 	}
 }
 
-$graph->setHeader(($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name']);
+$chartHeader = '';
+if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
+	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
+}
+
+$chartHeader .= ($hostName === '') ? $dbGraph['name'] : $hostName.NAME_DELIMITER.$dbGraph['name'];
+
+$graph->setHeader($chartHeader);
 $graph->setPeriod($timeline['period']);
 $graph->setSTime($timeline['stime']);
 

@@ -28,7 +28,7 @@ $icon = $fsIcon = null;
 if (!empty($this->data['maps'])) {
 	$mapComboBox = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
 	foreach ($this->data['maps'] as $sysmapId => $map) {
-		$mapComboBox->addItem($sysmapId, $map['name']);
+		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, NAME_DELIMITER).$map['name']);
 	}
 
 	$headerMapForm = new CForm('get');
