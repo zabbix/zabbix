@@ -519,3 +519,114 @@ void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhos
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: discovery_clean_services                                         *
+ *                                                                            *
+ * Purpose: clean dservices and dhosts not presenting in drule                *
+ *                                                                            *
+ ******************************************************************************/
+void	discovery_clean_services(zbx_uint64_t druleid)
+{
+	const char		*__function_name = "discovery_clean_services";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*iprange = NULL;
+	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
+	zbx_uint64_t		dhostid, dserviceid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
+
+	if (NULL != (row = DBfetch(result)))
+		iprange = zbx_strdup(iprange, row[0]);
+	DBfree_result(result);
+
+	if (NULL == iprange)
+		goto out;
+
+	zbx_vector_uint64_create(&keep_dhostids);
+	zbx_vector_uint64_create(&del_dhostids);
+	zbx_vector_uint64_create(&del_dserviceids);
+
+	result = DBselect("select dh.dhostid,ds.dserviceid,ds.ip"
+			" from dhosts dh,dservices ds"
+			" where dh.dhostid=ds.dhostid"
+				" and dh.druleid=" ZBX_FS_UI64,
+			druleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(dhostid, row[0]);
+
+		if (SUCCEED != ip_in_list(iprange, row[2]))
+		{
+			ZBX_STR2UINT64(dserviceid, row[1]);
+
+			zbx_vector_uint64_append(&del_dhostids, dhostid);
+			zbx_vector_uint64_append(&del_dserviceids, dserviceid);
+		}
+		else
+			zbx_vector_uint64_append(&keep_dhostids, dhostid);
+	}
+	DBfree_result(result);
+
+	zbx_free(iprange);
+
+	if (0 != del_dserviceids.values_num)
+	{
+		int	i;
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset;
+
+		/* remove dservices */
+
+		zbx_vector_uint64_sort(&del_dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dservices where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+				del_dserviceids.values, del_dserviceids.values_num);
+
+		DBexecute("%s", sql);
+
+		/* remove dhosts */
+
+		zbx_vector_uint64_sort(&keep_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&keep_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < del_dhostids.values_num; i++)
+		{
+			dhostid = del_dhostids.values[i];
+
+			if (FAIL != zbx_vector_uint64_bsearch(&keep_dhostids, dhostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				zbx_vector_uint64_remove_noorder(&del_dhostids, i--);
+		}
+
+		if (0 != del_dhostids.values_num)
+		{
+			zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					del_dhostids.values, del_dhostids.values_num);
+
+			DBexecute("%s", sql);
+		}
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&del_dserviceids);
+	zbx_vector_uint64_destroy(&del_dhostids);
+	zbx_vector_uint64_destroy(&keep_dhostids);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
