@@ -56,7 +56,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data);
 int	get_host_availability_data(struct zbx_json *j);
 void	process_host_availability(struct zbx_json_parse *jp_data);
 
-void	zbx_clean_dhost_list(zbx_uint64_t druleid);
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid);
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid);
 int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid);
