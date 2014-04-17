@@ -497,8 +497,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
-		'paging' => null,
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
+		'paging' => null
 	);
 
 	if ($data['pageFilter']->hostsSelected) {
@@ -550,14 +549,6 @@ else {
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['httpTests'] as &$httpTest) {
-			$httpTest['nodename'] = get_node_name_by_elid($httpTest['httptestid'], true);
-		}
-		unset($httpTest);
 	}
 
 	// render view
