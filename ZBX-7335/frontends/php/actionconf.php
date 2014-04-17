@@ -479,8 +479,7 @@ if (hasRequest('form')) {
 }
 else {
 	$data = array(
-		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
-		'displayNodes' => is_array(get_current_nodeid())
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
 	);
 
 	$sortfield = getPageSortField('name');
@@ -498,14 +497,6 @@ else {
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions'], array('actionid'));
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['actions'] as &$action) {
-			$action['nodename'] = get_node_name_by_elid($action['actionid'], true);
-		}
-		unset($action);
-	}
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

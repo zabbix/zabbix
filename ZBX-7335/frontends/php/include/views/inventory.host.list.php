@@ -22,7 +22,7 @@
 $hostInventoryWidget = new CWidget();
 
 $rForm = new CForm('get');
-$rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
 $hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
 $hostInventoryWidget->addHeader(_('Hosts'), $rForm);
 
@@ -73,7 +73,6 @@ $hostInventoryWidget->addHeaderRowNumber();
 
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
-	is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 	make_sorting_header(_('Host'), 'name'),
 	_('Group'),
 	make_sorting_header(_('Name'), 'pr_name'),
@@ -93,7 +92,6 @@ foreach ($this->data['hosts'] as $host) {
 	$hostGroups = implode(', ', $hostGroups);
 
 	$row = array(
-		get_node_name_by_elid($host['hostid']),
 		new CLink(
 			$host['name'],
 			'?hostid='.$host['hostid'].url_param('groupid'),
