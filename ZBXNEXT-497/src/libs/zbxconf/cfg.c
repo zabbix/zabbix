@@ -53,11 +53,10 @@ int	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***token
 	else
 	{
 		zbx_error("<>*<> is first");
-		*tokens_cnt = 1;
 		**tokens = string_to_parse;
-		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
+		*tokens_cnt = 1;
+		*tokens = zbx_realloc(*tokens, sizeof(char*) * 2);
 		*(*tokens + 1) = token_tmp + 1;
-
 	}
 	*token_tmp = '\0';
 
@@ -122,8 +121,13 @@ int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_n
 
 	for (; tokens_cnt >= tokens_cnt_tmp; tokens_cnt_tmp++)
 	{
+zbx_error("0 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
+
+		if (NULL == tokens[tokens_cnt_tmp])
+			return FAIL;
+
 		if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
-			break;
+			return FAIL;
 
 		ex_carret += strlen(tokens[tokens_cnt_tmp]);
 
@@ -132,10 +136,34 @@ int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_n
 
 		if (tokens_cnt == tokens_cnt_tmp)
 		{
+zbx_error("1 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
+
+				char	*carret_tmp = NULL;
+
+				while (1)
+				{
+					carret_tmp = ex_carret;
+zbx_error("2 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
+					if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
+						break;
+
+					ex_carret += strlen(tokens[tokens_cnt_tmp]);
+					/*if (0 == strlen(ex_carret))
+						break;*/
+
+				}
+
+				ex_carret = carret_tmp;
+
 			if (0 != strlen(ex_carret))
 			{
+					zbx_error("3 ex_carret: %s, %s, %i", ex_carret, carret_tmp, tokens_cnt_tmp);
+
 				if ('\0' != *(strrchr(cfg_file, delimiter[0]) + 1))
+				{
+					zbx_error("4 ex_carret: %s, %s, %i", ex_carret, carret_tmp, tokens_cnt_tmp);
 					return FAIL;
+				}
 			}
 		}
 	}
@@ -249,9 +277,11 @@ out:
 		ret = FAIL;
 		goto out;
 	}
+	zbx_error("token count %i", tokens_cnt);
+/*
 	for (; 0 <= tokens_cnt; tokens_cnt--)
 		zbx_error("token %i: %s", tokens_cnt, tokens_tmp[tokens_cnt]);
-
+*/
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
 		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
