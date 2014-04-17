@@ -62,9 +62,9 @@ class CStringValidatorTest extends CValidatorTest {
 				'Empty string'
 			),
 			array(
-				array('messageEmpty' => 'Empty string'),
+				array('messageInvalid' => 'Not a string'),
 				null,
-				'Empty string'
+				'Not a string'
 			),
 			array(
 				array('messageInvalid' => 'Not a string'),
