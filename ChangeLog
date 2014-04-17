@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8093] fixed incorrect plural in global script property host and user group labels (Richlv)
 ..F....... [ZBX-7997] fixed applications not being displayed in template item mass update form (Ivo)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-8035] fixed proxy queue for ICMP, JMX and SNMP items being calculated incorrectly by the server (asaveljevs)
