@@ -331,11 +331,11 @@ else {
 
 		$r_form->addItem(array(
 			_('Group').SPACE,
-			$pageFilter->getGroupsCB(true)
+			$pageFilter->getGroupsCB()
 		));
 		$r_form->addItem(array(
 			SPACE._('Host').SPACE,
-			$pageFilter->getHostsCB(true)
+			$pageFilter->getHostsCB()
 		));
 	}
 
@@ -480,7 +480,6 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 else {
 	$header = array(
 		_('Time'),
-		is_show_all_nodes() ? _('Node') : null,
 		($_REQUEST['hostid'] == 0) ? _('Host') : null,
 		_('Description'),
 		_('Status'),
@@ -633,7 +632,6 @@ else {
 	else {
 		if ($csvExport || $pageFilter->hostsSelected) {
 			$options = array(
-				'nodeids' => get_current_nodeid(),
 				'output' => array('triggerid'),
 				'monitored' => true
 			);
@@ -656,7 +654,6 @@ else {
 			$events = API::Event()->get(array(
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
-				'nodeids' => get_current_nodeid(),
 				'objectids' => zbx_objectValues($triggers, 'triggerid'),
 				'time_from' => $from,
 				'time_till' => $till,
@@ -673,7 +670,6 @@ else {
 			$events = API::Event()->get(array(
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
-				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
@@ -755,7 +751,6 @@ else {
 				if ($csvExport) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						($_REQUEST['hostid'] == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
@@ -797,7 +792,6 @@ else {
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 							'action'
 						),
-						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						$hostName,
 						$triggerDescription,
 						$statusSpan,

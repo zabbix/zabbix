@@ -37,7 +37,6 @@ class CIconMap extends CApiService {
 	/**
 	 * Get IconMap data.
 	 * @param array $options
-	 * @param array $options['nodeids']
 	 * @param array $options['iconmapids']
 	 * @param array $options['sysmapids']
 	 * @param array $options['editable']
@@ -58,7 +57,6 @@ class CIconMap extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'iconmapids'				=> null,
 			'sysmapids'					=> null,
 			'nopermissions'				=> null,
@@ -118,7 +116,6 @@ class CIconMap extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($iconMap = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
@@ -338,7 +335,6 @@ class CIconMap extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'iconmapids' => $ids,
 			'countOutput' => true
 		));
@@ -362,7 +358,6 @@ class CIconMap extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'iconmapids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -461,8 +456,7 @@ class CIconMap extends CApiService {
 			$mappings = API::getApiService()->select('icon_mapping', array(
 				'output' => $this->outputExtend($options['selectMappings'], array('iconmapid', 'iconmappingid')),
 				'filter' => array('iconmapid' => $iconMapIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
 
