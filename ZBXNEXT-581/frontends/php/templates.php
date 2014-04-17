@@ -115,15 +115,17 @@ if ($exportData) {
 if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
 	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
-if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
-	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
+if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
+	$_REQUEST['clear_templates'] = getRequest('clear_templates', array());
 
-	if (isset($_REQUEST['unlink'])) {
-		$unlinkTemplates = array_keys($_REQUEST['unlink']);
+	$unlinkTemplates = array();
+
+	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
+		$unlinkTemplates = array_keys(getRequest('unlink'));
 	}
-	else {
-		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
-		$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
+	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
+		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
+		$_REQUEST['clear_templates'] = array_merge(getRequest('unlink_and_clear'), $unlinkTemplates);
 	}
 
 	foreach ($unlinkTemplates as $id) {
@@ -351,7 +353,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 		'hosts' => array()
 	));
 	if ($result) {
-		$result = API::Template()->delete($_REQUEST['templateid']);
+		$result = API::Template()->delete(array(getRequest('templateid')));
 	}
 
 	$result = DBend($result);
@@ -368,7 +370,7 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	DBstart();
 
 	$goResult = true;
-	$result = API::Template()->delete($_REQUEST['templateid']);
+	$result = API::Template()->delete(array(getRequest('templateid')));
 
 	$result = DBend($result);
 
@@ -468,8 +470,6 @@ if (isset($_REQUEST['form'])) {
 	$templateWidget->addItem($templateForm->render());
 }
 else {
-	$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0);
-
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$frmForm->addItem(new CDiv(array(
@@ -481,7 +481,7 @@ else {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 	$templateWidget->addHeader(_('Templates'), $frmGroup);
 	$templateWidget->addHeaderRowNumber();
@@ -492,7 +492,6 @@ else {
 	$table = new CTableInfo(_('No templates found.'));
 	$table->setHeader(array(
 		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-		$displayNodes ? _('Node') : null,
 		make_sorting_header(_('Templates'), 'name'),
 		_('Applications'),
 		_('Items'),
@@ -640,7 +639,6 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			$displayNodes ? get_node_name_by_elid($template['templateid'], true) : null,
 			$templatesOutput,
 			$applications,
 			$items,

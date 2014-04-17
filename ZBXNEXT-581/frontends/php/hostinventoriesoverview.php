@@ -80,7 +80,7 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true), SPACE));
+$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(), SPACE));
 $r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
 $hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
 $hostinvent_wdgt->addItem(BR());
@@ -127,7 +127,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	foreach($report as $rep){
 		$row = array(
-			new CSpan($rep['inventory_field'], 'pre'),
+			new CSpan(zbx_str2links($rep['inventory_field']), 'pre'),
 			new CLink($rep['host_count'],'hostinventories.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['inventory_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
 		);
 		$table->addRow($row);

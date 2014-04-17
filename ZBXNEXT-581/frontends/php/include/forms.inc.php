@@ -24,15 +24,10 @@ function getUserFormData($userid, $isProfile = false) {
 	$data = array('is_profile' => $isProfile);
 
 	if (isset($userid)) {
-		$options = array(
+		$users = API::User()->get(array(
 			'userids' => $userid,
 			'output' => API_OUTPUT_EXTEND
-		);
-		if ($data['is_profile']) {
-			$options['nodeids'] = id2nodeid($userid);
-		}
-
-		$users = API::User()->get($options);
+		));
 		$user = reset($users);
 
 		$data['auth_type'] = get_user_system_auth($userid);
@@ -172,37 +167,13 @@ function getUserFormData($userid, $isProfile = false) {
 }
 
 function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
-	// nodes
-	if (ZBX_DISTRIBUTED) {
-		$lists['node']['label']		= _('Nodes');
-		$lists['node']['read_write']= new CListBox('nodes_write', null, 10);
-		$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
-		$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
-
-		$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
-		foreach ($nodes as $node) {
-			switch($node['permission']) {
-				case PERM_READ:
-					$list_name = 'read_only';
-					break;
-				case PERM_READ_WRITE:
-					$list_name = 'read_write';
-					break;
-				default:
-					$list_name = 'deny';
-			}
-			$lists['node'][$list_name]->addItem($node['nodeid'], $node['name']);
-		}
-		unset($nodes);
-	}
-
 	// group
 	$lists['group']['label']		= _('Host groups');
 	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
 	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 	foreach ($groups as $group) {
 		switch($group['permission']) {
@@ -215,7 +186,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 			default:
 				$list_name = 'deny';
 		}
-		$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].NAME_DELIMITER).$group['name']);
+		$lists['group'][$list_name]->addItem($group['groupid'], $group['name']);
 	}
 	unset($groups);
 
@@ -225,7 +196,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 	foreach ($hosts as $host) {
 		switch($host['permission']) {
@@ -241,7 +212,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 		if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
 			$host['host_name'] = $host['host'];
 		}
-		$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].NAME_DELIMITER).$host['host_name']);
+		$lists['host'][$list_name]->addItem($host['hostid'], $host['host_name']);
 	}
 	unset($hosts);
 
@@ -328,8 +299,6 @@ function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
 }
 
 function getItemFilterForm(&$items) {
-	$displayNodes = is_array(get_current_nodeid());
-
 	$filter_groupId				= $_REQUEST['filter_groupid'];
 	$filter_hostId				= $_REQUEST['filter_hostid'];
 	$filter_application			= $_REQUEST['filter_application'];
@@ -510,8 +479,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$groupFilter[] = array(
 				'id' => $getHostInfo['groupid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => $displayNodes ? get_node_name_by_elid($getHostInfo['groupid'], true, NAME_DELIMITER) : ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}
@@ -548,8 +516,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$hostFilterData[] = array(
 				'id' => $getHostInfo['hostid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => $displayNodes ? get_node_name_by_elid($filter_hostId, true, NAME_DELIMITER) : ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}
@@ -1214,11 +1181,8 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		}
 	}
 	else {
-		$data['valuemaps'] = DBfetchArray(DBselect(
-				'SELECT v.*'.
-				' FROM valuemaps v'.
-				whereDbNode('v.valuemapid')
-		));
+		$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
+
 		order_result($data['valuemaps'], 'name');
 	}
 
@@ -1321,16 +1285,20 @@ function getTriggerMassupdateFormData() {
 	// get dependencies
 	$data['dependencies'] = API::Trigger()->get(array(
 		'triggerids' => $data['dependencies'],
-		'output' => array('triggerid', 'description'),
+		'output' => array('triggerid', 'flags', 'description'),
 		'preservekeys' => true,
-		'selectHosts' => array('name')
+		'selectHosts' => array('hostid', 'name')
 	));
 	foreach ($data['dependencies'] as &$dependency) {
-		if (!empty($dependency['hosts'][0]['name'])) {
-			$dependency['host'] = $dependency['hosts'][0]['name'];
+		if (count($dependency['hosts']) > 1) {
+			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
 		}
-		unset($dependency['hosts']);
+
+		$dependency['hosts'] = array_values($dependency['hosts']);
+		$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
 	}
+	unset($dependency);
+
 	order_result($data['dependencies'], 'description');
 
 	return $data;
@@ -1485,14 +1453,20 @@ function getTriggerFormData() {
 	if (empty($data['parent_discoveryid'])) {
 		$data['db_dependencies'] = API::Trigger()->get(array(
 			'triggerids' => $data['dependencies'],
-			'output' => array('triggerid', 'description'),
+			'output' => array('triggerid', 'flags', 'description'),
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('hostid', 'name')
 		));
 		foreach ($data['db_dependencies'] as &$dependency) {
-			$dependency['host'] = $dependency['hosts'][0]['name'];
-			unset($dependency['hosts']);
+			if (count($dependency['hosts']) > 1) {
+				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+			}
+
+			$dependency['hosts'] = array_values($dependency['hosts']);
+			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
 		}
+		unset($dependency);
+
 		order_result($data['db_dependencies'], 'description');
 	}
 	return $data;

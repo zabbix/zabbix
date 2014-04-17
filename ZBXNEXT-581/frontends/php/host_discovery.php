@@ -116,9 +116,7 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -159,18 +157,6 @@ else {
 }
 
 /*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.host_discovery.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
-
-/*
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
@@ -187,7 +173,7 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
-	$result = API::DiscoveryRule()->delete($_REQUEST['itemid']);
+	$result = API::DiscoveryRule()->delete(array(getRequest('itemid')));
 
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);

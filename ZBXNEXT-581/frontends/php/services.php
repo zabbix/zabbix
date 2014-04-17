@@ -105,7 +105,7 @@ if (!empty($_REQUEST['serviceid'])) {
 if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 	DBstart();
 
-	$result = API::Service()->delete($service['serviceid']);
+	$result = API::Service()->delete(array($service['serviceid']));
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
@@ -460,14 +460,6 @@ else {
 		}
 	}
 	unset($service);
-
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($services as &$service) {
-			$service['name'] = get_node_name_by_elid($service['serviceid'], true, NAME_DELIMITER).$service['name'];
-		}
-		unset($service);
-	}
 
 	$treeData = array();
 	createServiceConfigurationTree($services, $treeData);

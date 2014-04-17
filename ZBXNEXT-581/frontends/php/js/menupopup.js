@@ -579,7 +579,7 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?triggerid=' + options.triggerid);
+	var url = new Curl('events.php?triggerid=' + options.triggerid + '&source=0');
 
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
@@ -607,7 +607,7 @@ function getMenuPopupTrigger(options) {
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update&switch_node=' + options.configuration.switchNode);
+				+ '&form=update');
 
 		items[items.length] = {
 			label: t('Configuration'),

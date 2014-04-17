@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CDRule extends CZBXAPI {
+class CDRule extends CApiService {
 
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';
@@ -39,7 +39,6 @@ class CDRule extends CZBXAPI {
 	 */
 	public function get(array $options = array()) {
 		$result = array();
-		$nodeCheck = false;
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -51,7 +50,6 @@ class CDRule extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -81,18 +79,10 @@ class CDRule extends CZBXAPI {
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // druleids
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 			$sqlParts['where']['druleid'] = dbConditionInt('dr.druleid', $options['druleids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dr.druleid', $nodeids);
-			}
 		}
 
 // dhostids
@@ -105,11 +95,6 @@ class CDRule extends CZBXAPI {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.dhostid', $nodeids);
 			}
 		}
 
@@ -127,17 +112,6 @@ class CDRule extends CZBXAPI {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dserviceid', $nodeids);
-			}
-		}
-
-		// node check !!!!!
-		// should be last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dr.druleid', $nodeids);
 		}
 
 // search
@@ -163,7 +137,6 @@ class CDRule extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($drule = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -204,14 +177,9 @@ class CDRule extends CZBXAPI {
 		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
 		if (isset($object['druleids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
-
 		$objs = $this->get($options);
 
-	return !empty($objs);
+		return !empty($objs);
 	}
 
 	public function checkInput(array &$dRules) {
@@ -646,7 +614,6 @@ class CDRule extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
 			'countOutput' => true
 		));
@@ -669,7 +636,6 @@ class CDRule extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'druleids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -689,7 +655,6 @@ class CDRule extends CZBXAPI {
 				$relationMap = $this->createRelationMap($result, 'druleid', 'dcheckid', 'dchecks');
 				$dchecks = API::DCheck()->get(array(
 					'output' => $options['selectDChecks'],
-					'nodeids' => $options['nodeids'],
 					'dcheckids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -701,7 +666,6 @@ class CDRule extends CZBXAPI {
 			}
 			else {
 				$dchecks = API::DCheck()->get(array(
-					'nodeids' => $options['nodeids'],
 					'druleids' => $druleids,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -723,7 +687,6 @@ class CDRule extends CZBXAPI {
 				$relationMap = $this->createRelationMap($result, 'druleid', 'dhostid', 'dhosts');
 				$dhosts = API::DHost()->get(array(
 					'output' => $options['selectDHosts'],
-					'nodeids' => $options['nodeids'],
 					'dhostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -734,7 +697,6 @@ class CDRule extends CZBXAPI {
 			}
 			else {
 				$dhosts = API::DHost()->get(array(
-					'nodeids' => $options['nodeids'],
 					'druleids' => $druleids,
 					'countOutput' => true,
 					'groupCount' => true

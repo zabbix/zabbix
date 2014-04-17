@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.0');
 define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030032);
+define('ZABBIX_DB_VERSION',	 2030091);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -73,8 +73,9 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
-define('TRIGGERS_OPTION_ONLYTRUE',	1);
-define('TRIGGERS_OPTION_ALL',		2);
+define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
+define('TRIGGERS_OPTION_ALL',				2);
+define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
 define('ZBX_ACK_STS_ANY',				1);
 define('ZBX_ACK_STS_WITH_UNACK',		2);
@@ -96,9 +97,7 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('ZBX_STANDALONE_MAX_IDS', '9223372036854775807');
-define('ZBX_DM_MAX_HISTORY_IDS', '100000000000000');
-define('ZBX_DM_MAX_CONFIG_IDS', '100000000000');
+define('ZBX_DB_MAX_ID', '9223372036854775807');
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -127,6 +126,7 @@ define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
+define('T_ZBX_DBL_BIG',		9);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
@@ -176,7 +176,6 @@ define('AUDIT_RESOURCE_VALUE_MAP',		17);
 define('AUDIT_RESOURCE_IT_SERVICE',		18);
 define('AUDIT_RESOURCE_MAP',			19);
 define('AUDIT_RESOURCE_SCREEN',			20);
-define('AUDIT_RESOURCE_NODE',			21);
 define('AUDIT_RESOURCE_SCENARIO',		22);
 define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 define('AUDIT_RESOURCE_SLIDESHOW',		24);
@@ -205,7 +204,6 @@ define('CONDITION_TYPE_TEMPLATE',			13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
 define('CONDITION_TYPE_MAINTENANCE',		16);
-define('CONDITION_TYPE_NODE',				17);
 define('CONDITION_TYPE_DRULE',				18);
 define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
@@ -625,10 +623,6 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
-define('ZBX_NODE_CHILD',	0);
-define('ZBX_NODE_LOCAL',	1);
-define('ZBX_NODE_MASTER',	2);
-
 define('HTTPTEST_AUTH_NONE',	0);
 define('HTTPTEST_AUTH_BASIC',	1);
 define('HTTPTEST_AUTH_NTLM',	2);
@@ -769,7 +763,6 @@ define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');

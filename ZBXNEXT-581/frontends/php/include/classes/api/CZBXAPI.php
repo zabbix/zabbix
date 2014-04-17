@@ -77,7 +77,6 @@ class CZBXAPI {
 		$this->pk = $this->pk($this->tableName());
 
 		$this->globalGetOptions = array(
-			'nodeids'				=> null,
 			// filter
 			'filter'				=> null,
 			'search'				=> null,
@@ -315,8 +314,7 @@ class CZBXAPI {
 		if ($table) {
 			$res = DBselect(API::getApi()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
-				'filter' => array($baseField => array_keys($objects)),
-				'nodeids' => get_current_nodeid(true)
+				'filter' => array($baseField => array_keys($objects))
 			)));
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
@@ -405,9 +403,6 @@ class CZBXAPI {
 
 		// add output options
 		$sqlParts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// add node options
-		$sqlParts = $this->applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// add sort options
 		$sqlParts = $this->applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -510,29 +505,6 @@ class CZBXAPI {
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search($tableId, $options, $sqlParts);
-		}
-
-		return $sqlParts;
-	}
-
-	/**
-	 * Modifies the SQL parts to implement all of the node related options.
-	 *
-	 * @param string $tableName
-	 * @param string $tableAlias
-	 * @param array  $options
-	 * @param array  $sqlParts
-	 *
-	 * @return array
-	 */
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pkOption = $this->pkOption($tableName);
-		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
-
-		// if no specific ids are given, apply the node filter
-		if (!isset($options[$pkOption])) {
-			$nodeIds = isset($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeIds);
 		}
 
 		return $sqlParts;

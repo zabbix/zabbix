@@ -50,8 +50,8 @@ else {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'), $createForm);
 
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
+	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	$graphWidget->addHeader(_('Graphs'), $filterForm);
 
@@ -73,7 +73,6 @@ if (!empty($this->data['parent_discoveryid'])) {
 $graphTable = new CTableInfo(!empty($this->data['parent_discoveryid']) ? _('No graph prototypes found.') : _('No graphs found.'));
 $graphTable->setHeader(array(
 	new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	!empty($this->data['hostid']) ? null : _('Hosts'),
 	make_sorting_header(_('Name'), 'name'),
 	_('Width'),
@@ -142,7 +141,6 @@ foreach ($this->data['graphs'] as $graph) {
 
 	$graphTable->addRow(array(
 		$checkBox,
-		$this->data['displayNodes'] ? $graph['nodename'] : null,
 		$hostList,
 		$name,
 		$graph['width'],

@@ -37,19 +37,19 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),		'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
-	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form})&&{form}=="update"'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
 	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Width').' (min:20, max:65535)'),
 	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Height').' (min:20, max:65535)'),
-	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
-	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
 	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({save})'),
-	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
-	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
 	'show_3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'show_legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
-	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
-	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
+	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
+	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
+	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&({graphtype}==0||{graphtype}==1)'),
+	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&({graphtype}==0||{graphtype}==1)'),
+	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&{ymin_type}==3'),
+	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&{ymax_type}==3'),
 	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')),
 	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')),
 	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
@@ -58,7 +58,7 @@ $fields = array(
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -97,7 +97,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (!empty($_REQUEST['parent_discoveryid'])) {
 		// check whether discovery rule is editable by user
 		$discovery_rule = API::DiscoveryRule()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => array($_REQUEST['parent_discoveryid']),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
@@ -130,7 +129,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
 			'output' => array('graphid'),
-			'nodeids' => get_current_nodeid(true),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => array($_REQUEST['graphid']),
 			'editable' => true,
@@ -144,7 +142,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid'),
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => array($_REQUEST['hostid']),
 			'templated_hosts' => true,
 			'editable' => true,
@@ -196,22 +193,22 @@ elseif (hasRequest('save')) {
 	unset($item);
 
 	$graph = array(
-		'name' => $_REQUEST['name'],
-		'width' => $_REQUEST['width'],
-		'height' => $_REQUEST['height'],
-		'ymin_type' => get_request('ymin_type', 0),
-		'ymax_type' => get_request('ymax_type', 0),
-		'yaxismin' => get_request('yaxismin', 0),
-		'yaxismax' => get_request('yaxismax', 0),
-		'ymin_itemid' => $_REQUEST['ymin_itemid'],
-		'ymax_itemid' => $_REQUEST['ymax_itemid'],
-		'show_work_period' => get_request('show_work_period', 0),
-		'show_triggers' => get_request('show_triggers', 0),
-		'graphtype' => $_REQUEST['graphtype'],
-		'show_legend' => get_request('show_legend', 1),
-		'show_3d' => get_request('show_3d', 0),
-		'percent_left' => get_request('percent_left', 0),
-		'percent_right' => get_request('percent_right', 0),
+		'name' => getRequest('name'),
+		'width' => getRequest('width'),
+		'height' => getRequest('height'),
+		'ymin_type' => getRequest('ymin_type', 0),
+		'ymax_type' => getRequest('ymax_type', 0),
+		'yaxismin' => getRequest('yaxismin', 0),
+		'yaxismax' => getRequest('yaxismax', 0),
+		'ymin_itemid' => getRequest('ymin_itemid'),
+		'ymax_itemid' => getRequest('ymax_itemid'),
+		'show_work_period' => getRequest('show_work_period', 0),
+		'show_triggers' => getRequest('show_triggers', 0),
+		'graphtype' => getRequest('graphtype'),
+		'show_legend' => getRequest('show_legend', 1),
+		'show_3d' => getRequest('show_3d', 0),
+		'percent_left' => getRequest('percent_left', 0),
+		'percent_right' => getRequest('percent_right', 0),
 		'gitems' => $items
 	);
 
@@ -277,13 +274,13 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
 
 	if (hasRequest('parent_discoveryid')) {
-		$result = API::GraphPrototype()->delete($graphId);
+		$result = API::GraphPrototype()->delete(array($graphId));
 
 		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
 		clearCookies($result, getRequest('parent_discoveryid'));
 	}
 	else {
-		$result = API::Graph()->delete($graphId);
+		$result = API::Graph()->delete(array($graphId));
 
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 		clearCookies($result, getRequest('hostid'));
@@ -316,7 +313,6 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		$options = array(
 			'output' => array('hostid'),
 			'editable' => true,
-			'nodes' => get_current_nodeid(true),
 			'templated_hosts' => true
 		);
 
@@ -331,7 +327,6 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 			$dbGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
 				'groupids' => $_REQUEST['copy_targetid'],
-				'nodes' => get_current_nodeid(true),
 				'editable' => true
 			));
 			$dbGroups = zbx_toHash($dbGroups, 'groupid');
@@ -510,8 +505,8 @@ elseif (isset($_REQUEST['form'])) {
 
 		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['yaxismin'] = get_request('yaxismin', '0.00');
-		$data['yaxismax'] = get_request('yaxismax', '100.00');
+		$data['yaxismin'] = get_request('yaxismin', 0);
+		$data['yaxismax'] = get_request('yaxismax', 100);
 		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
 		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
 		$data['show_work_period'] = get_request('show_work_period', 0);
@@ -565,24 +560,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
 
-	$_REQUEST['items'] = $data['items'];
-	$_REQUEST['name'] = $data['name'];
-	$_REQUEST['width'] = $data['width'];
-	$_REQUEST['height'] = $data['height'];
-	$_REQUEST['ymin_type'] = $data['ymin_type'];
-	$_REQUEST['ymax_type'] = $data['ymax_type'];
-	$_REQUEST['yaxismin'] = $data['yaxismin'];
-	$_REQUEST['yaxismax'] = $data['yaxismax'];
-	$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
-	$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
-	$_REQUEST['show_work_period'] = $data['show_work_period'];
-	$_REQUEST['show_triggers'] = $data['show_triggers'];
-	$_REQUEST['graphtype'] = $data['graphtype'];
-	$_REQUEST['show_legend'] = $data['show_legend'];
-	$_REQUEST['show_3d'] = $data['show_3d'];
-	$_REQUEST['percent_left'] = $data['percent_left'];
-	$_REQUEST['percent_right'] = $data['percent_right'];
-
 	$data['items'] = array_values($data['items']);
 	$itemCount = count($data['items']);
 	for ($i = 0; $i < $itemCount - 1;) {
@@ -619,8 +596,7 @@ else {
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
-		'displayNodes' => (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0)
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
 	);
 
 	$sortfield = getPageSortField('name');
@@ -672,13 +648,6 @@ else {
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['graphs'] as $key => $graph) {
-			$data['graphs'][$key]['nodename'] = get_node_name_by_elid($graph['graphid'], true);
-		}
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);

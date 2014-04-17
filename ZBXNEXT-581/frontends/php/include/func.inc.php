@@ -1089,8 +1089,18 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
 	}
 }
 
-/************* SELECT *************/
-function selectByPattern(&$table, $column, $pattern, $limit) {
+/**
+ * Sort an array of objects so that the objects whose $column value matches $pattern are at the top.
+ * Return the first $limit objects.
+ *
+ * @param array 	$table		array of objects to sort
+ * @param string 	$column		name of the $column to search
+ * @param string 	$pattern	string to match the value of $column against
+ * @param int		$limit		number of objects to return
+ *
+ * @return array
+ */
+function selectByPattern(array $table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();
@@ -2326,20 +2336,16 @@ function get_status() {
 			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect(
-			'SELECT COUNT(*) AS usr_cnt'.
-			' FROM users u'.
-			whereDbNode('u.userid')
-	));
+	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u'));
+
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
-			'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-			' FROM sessions s'.
-			' WHERE s.status='.ZBX_SESSION_ACTIVE.
-				andDbNode('s.userid').
-			' GROUP BY s.userid,s.status'
+		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+		' FROM sessions s'.
+		' WHERE s.status='.ZBX_SESSION_ACTIVE.
+		' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
@@ -2350,12 +2356,12 @@ function get_status() {
 	// comments: !!! Don't forget sync code with C !!!
 	$row = DBfetch(DBselect(
 		'SELECT SUM(1.0/i.delay) AS qps'.
-				' FROM items i,hosts h'.
-				' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0'.
-				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
+		' FROM items i,hosts h'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+		' AND i.hostid=h.hostid'.
+		' AND h.status='.HOST_STATUS_MONITORED.
+		' AND i.delay<>0'.
+		' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 
