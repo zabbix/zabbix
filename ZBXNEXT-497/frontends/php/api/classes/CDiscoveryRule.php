@@ -61,7 +61,6 @@ class CDiscoveryRule extends CItemGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -220,7 +219,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -288,12 +286,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (isset($object['host'])) {
 			$options['filter']['host'] = $object['host'];
 		}
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
+
 		$objs = $this->get($options);
 
 		return !empty($objs);
@@ -535,7 +528,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
 			'countOutput' => true
 		));
@@ -562,7 +554,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -1284,7 +1275,6 @@ class CDiscoveryRule extends CItemGeneral {
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
 				$items = API::ItemPrototype()->get(array(
 					'output' => $options['selectItems'],
-					'nodeids' => $options['nodeids'],
 					'itemids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -1293,7 +1283,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			else {
 				$items = API::ItemPrototype()->get(array(
-					'nodeids' => $options['nodeids'],
 					'discoveryids' => $itemIds,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1324,7 +1313,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$triggers = API::TriggerPrototype()->get(array(
 					'output' => $options['selectTriggers'],
-					'nodeids' => $options['nodeids'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1332,7 +1320,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			else {
 				$triggers = API::TriggerPrototype()->get(array(
-					'nodeids' => $options['nodeids'],
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1362,7 +1349,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
-					'nodeids' => $options['nodeids'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1370,7 +1356,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			else {
 				$graphs = API::GraphPrototype()->get(array(
-					'nodeids' => $options['nodeids'],
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1389,7 +1374,6 @@ class CDiscoveryRule extends CItemGeneral {
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
 				$hostPrototypes = API::HostPrototype()->get(array(
 					'output' => $options['selectHostPrototypes'],
-					'nodeids' => $options['nodeids'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -1398,7 +1382,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			else {
 				$hostPrototypes = API::HostPrototype()->get(array(
-					'nodeids' => $options['nodeids'],
 					'discoveryids' => $itemIds,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1431,7 +1414,6 @@ class CDiscoveryRule extends CItemGeneral {
 					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
 					'filter' => array('itemid' => $itemIds),
 					'preservekeys' => true,
-					'nodeids' => get_current_nodeid(true),
 					'sortfield' => 'item_conditionid'
 				));
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
