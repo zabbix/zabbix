@@ -2693,18 +2693,18 @@ void	DCsync_configuration(void)
 {
 	const char		*__function_name = "DCsync_configuration";
 
-	DB_RESULT		item_result;
-	DB_RESULT		trig_result;
-	DB_RESULT		tdep_result;
-	DB_RESULT		func_result;
-	DB_RESULT		host_result;
-	DB_RESULT		hi_result;
-	DB_RESULT		htmpl_result;
-	DB_RESULT		gmacro_result;
-	DB_RESULT		hmacro_result;
-	DB_RESULT		if_result;
-	DB_RESULT		conf_result;
-	DB_RESULT		expr_result;
+	DB_RESULT		item_result = NULL;
+	DB_RESULT		trig_result = NULL;
+	DB_RESULT		tdep_result = NULL;
+	DB_RESULT		func_result = NULL;
+	DB_RESULT		hi_result = NULL;
+	DB_RESULT		host_result = NULL;
+	DB_RESULT		htmpl_result = NULL;
+	DB_RESULT		gmacro_result = NULL;
+	DB_RESULT		hmacro_result = NULL;
+	DB_RESULT		if_result = NULL;
+	DB_RESULT		conf_result = NULL;
+	DB_RESULT		expr_result = NULL;
 
 	int			i;
 	double			sec, csec, isec, tsec, dsec, fsec, hsec, hisec, htsec, gmsec, hmsec, ifsec, expr_sec,
@@ -2715,11 +2715,13 @@ void	DCsync_configuration(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
-	conf_result = DCsync_config_select();
+
+	if (NULL == (conf_result = DCsync_config_select()))
+		goto out;
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
-	item_result = DBselect(
+	if (NULL == (item_result = DBselect(
 			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.ipmi_sensor,i.delay,i.delay_flex,"
@@ -2736,11 +2738,14 @@ void	DCsync_configuration(void)
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			DBand_node_local("i.itemid"));
+			DBand_node_local("i.itemid"))))
+	{
+		goto out;
+	}
 	isec = zbx_time() - sec;
 
 	sec = zbx_time();
-	trig_result = DBselect(
+	if (NULL == (trig_result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,"
 				"t.priority,t.type,t.value,t.state,t.lastchange"
 			" from hosts h,items i,functions f,triggers t"
@@ -2756,20 +2761,26 @@ void	DCsync_configuration(void)
 			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			DBand_node_local("h.hostid"));
+			DBand_node_local("h.hostid"))))
+	{
+		goto out;
+	}
 	tsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	tdep_result = DBselect(
+	if (NULL == (tdep_result = DBselect(
 			"select d.triggerid_down,d.triggerid_up"
 			" from trigger_depends d"
 			ZBX_SQL_NODE
 			" order by d.triggerid_down",
-			DBwhere_node_local("d.triggerid_down"));
+			DBwhere_node_local("d.triggerid_down"))))
+	{
+		goto out;
+	}
 	dsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	func_result = DBselect(
+	if (NULL == (func_result = DBselect(
 			"select i.itemid,f.functionid,f.function,f.parameter,t.triggerid"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
@@ -2784,11 +2795,14 @@ void	DCsync_configuration(void)
 			ITEM_STATUS_ACTIVE,
 			TRIGGER_STATUS_ENABLED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			DBand_node_local("h.hostid"));
+			DBand_node_local("h.hostid"))))
+	{
+		goto out;
+	}
 	fsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	host_result = DBselect(
+	if (NULL == (host_result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,"
@@ -2801,56 +2815,77 @@ void	DCsync_configuration(void)
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			DBand_node_local("hostid"));
+			DBand_node_local("hostid"))))
+	{
+		goto out;
+	}
 	hsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	hi_result = DBselect(
+	if (NULL == (hi_result = DBselect(
 			"select hostid,inventory_mode"
 			" from host_inventory"
 				ZBX_SQL_NODE,
-			DBwhere_node_local("hostid"));
+			DBwhere_node_local("hostid"))))
+	{
+		goto out;
+	}
 	hisec = zbx_time() - sec;
 
 	sec = zbx_time();
-	htmpl_result = DBselect(
+	if (NULL == (htmpl_result = DBselect(
 			"select hostid,templateid"
 			" from hosts_templates"
 			ZBX_SQL_NODE
 			" order by hostid,templateid",
-			DBwhere_node_local("hosttemplateid"));
+			DBwhere_node_local("hosttemplateid"))))
+	{
+		goto out;
+	}
 	htsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	gmacro_result = DBselect(
+	if (NULL == (gmacro_result = DBselect(
 			"select globalmacroid,macro,value"
 			" from globalmacro"
 			ZBX_SQL_NODE,
-			DBwhere_node_local("globalmacroid"));
+			DBwhere_node_local("globalmacroid"))))
+	{
+		goto out;
+	}
 	gmsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	hmacro_result = DBselect(
+	if (NULL == (hmacro_result = DBselect(
 			"select hostmacroid,hostid,macro,value"
 			" from hostmacro"
 			ZBX_SQL_NODE,
-			DBwhere_node_local("hostmacroid"));
+			DBwhere_node_local("hostmacroid"))))
+	{
+		goto out;
+	}
 	hmsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if_result = DBselect(
+	if (NULL == (if_result = DBselect(
 			"select interfaceid,hostid,type,main,useip,ip,dns,port"
 			" from interface"
 			ZBX_SQL_NODE,
-			DBwhere_node_local("interfaceid"));
+			DBwhere_node_local("interfaceid"))))
+	{
+		goto out;
+	}
 	ifsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	expr_result = DBselect(
+	if (NULL == (expr_result = DBselect(
 			"select r.name,e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 			" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid" ZBX_SQL_NODE,
-			DBand_node_local("r.regexpid"));
+			DBand_node_local("r.regexpid"))))
+	{
+		goto out;
+	}
 	expr_sec = zbx_time() - sec;
 
 	START_SYNC;
@@ -3027,7 +3062,7 @@ void	DCsync_configuration(void)
 	zbx_mem_dump_stats(strpool->mem_info);
 
 	FINISH_SYNC;
-
+out:
 	DBfree_result(conf_result);
 	DBfree_result(item_result);
 	DBfree_result(trig_result);
