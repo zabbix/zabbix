@@ -387,11 +387,21 @@ class CHostGroup extends CApiService {
 		));
 	}
 
+	/**
+	 * Check if Host group exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('hostgroup.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array('name', 'groupid'), $object),
 			'output' => array('groupid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -417,7 +427,13 @@ class CHostGroup extends CApiService {
 			if (!isset($group['name']) || zbx_empty($group['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
-			if ($this->exists(array('name' => $group['name']))) {
+
+			$hostGroupExists = $this->get(array(
+				'output' => array('groupid'),
+				'filter' => array('name' => $group['name']),
+				'limit' => 1
+			));
+			if ($hostGroupExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 			}
 		}
