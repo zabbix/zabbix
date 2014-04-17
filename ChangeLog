@@ -2,6 +2,14 @@
 Changes for 2.3.0
 
 New features:
+A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
+........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
+..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
+..F....... [ZBXNEXT-2065] added a filter option to hide recently resolved triggers in Monitoring -> Triggers (Oleg)
+..F....... [ZBXNEXT-949] improved filters by adding different titles for open and collapsed states (Krists)
+..F....... [ZBXNEXT-2107] added links to dependency triggers and added comma separated host list if dependency trigger belongs to multiple hosts in trigger edit and massupdate forms (Ivo)
+...G...... [ZBXNEXT-2225] added a percentage free parameter to system.swap.size item; changed the way swap size is calculated (Juris)
+..F....... [ZBXNEXT-1119] changed the global search to also search by technical host and template names (Pavels)
 ...G...... [ZBXNEXT-2194] added configuration option to include all files in a directory on Windows (Nikolaj)
 ........S. [ZBXNEXT-751] added support of user macros in the notifications and commands (Nikolaj)
 A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
@@ -36,6 +44,15 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
+..F....... [ZBX-8012] made links to other IT services from the dependency management to open in a new browser tab (Eduard, Oleg)
+..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
+..F....... [ZBX-8029] changed built-in font size from 0 to 1 for Zabbix home page and date in maps and graphs to support image functions for HHVM (Ivo)
+A......... [ZBX-7625] changed the execution order of API checks (Oleg)
+..F....... [ZBX-8032] enabled hyperlinks in host inventory overview page (Eduard)
+..F....... [ZBX-7120] fixed undefined index in menu for event csv export (Eduard)
+..F....... [ZBX-6675] removed host from the graph title if items from multiple hosts are included (Oleg)
+A.F....... [ZBX-7781] fixed no error being triggered when trying to pass the "auth" parameter to a method that does not require authentication (Pavels)
 ..F....... [ZBX-8001] fixed host massupdate inventory tab being reset after choosing an inventory mode (Ivo)
 ..F....... [ZBX-7873] removed redundant error message in login page in event when frontend access for guest is not available (Eduard)
 ..F....... [ZBX-7969] fixed discovery checks sorting in action configuration page (Eduard)
@@ -65,6 +82,50 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.4rc1
+
+New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
+
+Bug fixes:
+..F....... [ZBX-7997] fixed applications not being displayed in template item mass update form (Ivo)
+.......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
+.......PS. [ZBX-8035] fixed proxy queue for ICMP, JMX and SNMP items being calculated incorrectly by the server (asaveljevs)
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
+.......PS. [ZBX-8077] fixed log messages about sending/receiving of the configuration data (Sasha)
+........S. [ZBX-8060] fixed server crash when calculating queue (asaveljevs)
+..F....... [ZBX-7867] fixed graph item drag and drop when selecting multiple items (Ivo)
+..F....... [ZBX-8046] fixed application toggling in Latest data page if same item belongs to several applications (Ivo)
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
+........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
+...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
+.......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess utilisation of "poller" processes (Sasha)
+....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
+..F....... [ZBX-7957] improved graph Y axis min/max value validation for line and stacked graphs (Ivo)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
+..F....... [ZBX-7974] fixed host group selecting using invalid node in user group rights page (Eduard)
+..F....... [ZBX-7943] fixed undefined indexes in HTTP test dashboard widget when no history is found (Eduard)
+..F....... [ZBX-7809] improved validation on decimal values (Eduard)
+A.F....... [ZBX-7809] fixed unused graph Y axis min/max fields unsetting from db (Eduard)
+..F....... [ZBX-7976] fixed template "unlink and clear" leaving items attached to parent template (Ivo)
+..F....... [ZBX-7545] fixed item mass update form being rendered with a delay when updating template items (Pavels)
+..F....... [ZBX-7864] fixed filter by host group in "Availability reports" page (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3
+
+2.2.3rc2 was released as 2.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.3rc2
+
+Bug fixes:
+.......P.. [ZBX-8006] fixed memory leak in proxy when handling ssh, telnet and database monitor items (Juris)
+.......P.. [ZBXNEXT-166] fixed proxy not storing items with text value type (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.3rc1
@@ -187,7 +248,7 @@ A.F....... [ZBX-4218] rewrote the item key parser's source code for independence
 ...G...... [ZBX-7697] fixed items system.swap.in[] and system.swap.out[] going into an infinite loop on Solaris (asaveljevs)
 A......... [ZBX-7647] fixed trigger.get trying to sort by "lastchange" DESC even if a different sort field or sort order is given (Pavels)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed LDAP bind password being included in page source (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ........S. [ZBX-7653] correctly expand ITEM.LOG.* macros when retrieving eventlog specific attributes for log,logrt items (wiper)
 .......PS. [ZBX-7661] fixed configuration parser to allow 2G cache values (it was restricted to 2G-1 before) (wiper)
@@ -938,9 +999,14 @@ Changes for 2.0.12rc1
 New features:
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
+.......PS. [ZBX-4675] added error checks to avoid partial configuration loading (dimir)
+.D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
+...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
+..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
 ...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
@@ -988,7 +1054,7 @@ A......... [ZBX-7703] fixed being able to switch users without proper credential
 ........S. [ZBX-7109] improved performance of processing discovered triggers by the low-level discovery rule (Sasha)
 A.F....... [ZBX-4218] rewrote the item key parser's source code for independence on the mbstring.func_overload option (Sasha)
 .......PS. [ZBX-7686] fixed UTF-8 strings not being fetched fully from Oracle (asaveljevs)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed LDAP bind password being included in page source (Eduard)
 ..F....... [ZBX-7609] fixed sound playing after frontend messages closing (Eduard)
 ..F....... [ZBX-7554] fixed script execution confirmation label encoding (Eduard)
 ...G...... [ZBX-6790] changed net.tcp.listen and net.udp.listen keys to read the whole /proc/net/(tcp|udp)(6) file in a single operation to avoid losing data if the file is changed between reading operations (wiper)
@@ -2462,7 +2528,7 @@ Changes for 1.8.20
 Changes for 1.8.20rc2
 
 A......... [ZBX-7693] fixed admin user being able to update media for other users (Pavels)
-..F....... [ZBX-6721] fixed LDAP authentication (Eduard)
+..F....... [ZBX-6721] fixed LDAP bind password being included in page source (Eduard)
 
 Changes for 1.8.20rc1
 

@@ -75,15 +75,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
 		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 
-		if (CWebUser::$data['userid'] == 0) {
-			$conString = _('Not connected');
-		}
-		elseif (ZBX_DISTRIBUTED) {
-			$conString = _s('Connected as \'%1$s\' from \'%2$s\'', CWebUser::$data['alias'], CWebUser::$data['node']['name']);
-		}
-		else {
-			$conString = _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
-		}
+		$conString = (CWebUser::$data['userid'] == 0)
+			? _('Not connected')
+			: _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
 
 		$table->addRow(array(
 			new CCol(new CLink(

@@ -273,7 +273,6 @@ function make_system_status($filter) {
 
 	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
 		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
 		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH])) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
@@ -287,19 +286,12 @@ function make_system_status($filter) {
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
-		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => true,
 		'output' => array('groupid', 'name'),
 		'preservekeys' => true
 	));
 
-	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid']);
-	}
-	unset($group);
-
 	CArrayHelper::sort($groups, array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
@@ -320,7 +312,6 @@ function make_system_status($filter) {
 
 	// get triggers
 	$triggers = API::Trigger()->get(array(
-		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupIds,
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
@@ -407,11 +398,9 @@ function make_system_status($filter) {
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
-		if (is_show_all_nodes()) {
-			$groupRow->addItem($group['nodename']);
-		}
-
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'],
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		);
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
@@ -454,6 +443,7 @@ function make_system_status($filter) {
 					break;
 			}
 		}
+
 		$table->addRow($groupRow);
 	}
 
@@ -467,7 +457,6 @@ function make_system_status($filter) {
 function make_hoststat_summary($filter) {
 	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
 		_('Without problems'),
 		_('With problems'),
@@ -476,26 +465,18 @@ function make_hoststat_summary($filter) {
 
 	// get host groups
 	$groups = API::HostGroup()->get(array(
-		'nodeids' => get_current_nodeid(),
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
 		'output' => array('groupid', 'name')
 	));
 	$groups = zbx_toHash($groups, 'groupid');
 
-	foreach($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid']);
-	}
-	unset($group);
-
 	CArrayHelper::sort($groups, array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
 	// get hosts
 	$hosts = API::Host()->get(array(
-		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'hostids' => !empty($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
@@ -508,7 +489,6 @@ function make_hoststat_summary($filter) {
 
 	// get triggers
 	$triggers = API::Trigger()->get(array(
-		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
 		'expandData' => true,
@@ -522,7 +502,6 @@ function make_hoststat_summary($filter) {
 
 	if ($filter['extAck']) {
 		$triggers_unack = API::Trigger()->get(array(
-			'nodeids' => get_current_nodeid(),
 			'monitored' => true,
 			'maintenance' => $filter['maintenance'],
 			'withLastEventUnacknowledged' => true,
@@ -671,11 +650,10 @@ function make_hoststat_summary($filter) {
 		}
 
 		$group_row = new CRow();
-		if (is_show_all_nodes()) {
-			$group_row->addItem($group['nodename']);
-		}
 
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'],
+			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		);
 		$group_row->addItem($name);
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
 
@@ -708,7 +686,9 @@ function make_hoststat_summary($filter) {
 					$host_data = $lastUnack_host_list[$hostid];
 
 					$r = new CRow();
-					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.
+						$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+					));
 
 					foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 						if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
@@ -754,7 +734,9 @@ function make_hoststat_summary($filter) {
 				$host_data = $problematic_host_list[$hostid];
 
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.
+					'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+				));
 
 				foreach ($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 					if (!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) {
@@ -796,6 +778,7 @@ function make_hoststat_summary($filter) {
 				$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
 				break;
 		}
+
 		$table->addRow($group_row);
 	}
 
@@ -1007,7 +990,6 @@ function make_latest_issues(array $filter = array()) {
 
 	$table = new CTableInfo(_('No events found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? array($hostHeaderDiv, $sortDiv) : _('Host'),
 		($showSortIndicator && ($filter['sortfield'] === 'priority')) ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
 		($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? array($lastChangeHeaderDiv, $sortDiv) : _('Last change'),
@@ -1106,8 +1088,9 @@ function make_latest_issues(array $filter = array()) {
 
 		// clock
 		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&hostid='.$trigger['hostid'].
-				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+			'events.php?triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.'&show_unknown=1'.
+				'&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 		// actions
@@ -1116,7 +1099,6 @@ function make_latest_issues(array $filter = array()) {
 			: SPACE;
 
 		$table->addRow(array(
-			get_node_name_by_elid($trigger['triggerid']),
 			$hostDiv,
 			$description,
 			$clock,
@@ -1159,13 +1141,7 @@ function make_webmon_overview($filter) {
 		'preservekeys' => true
 	));
 
-	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid']);
-	}
-	unset($group);
-
 	CArrayHelper::sort($groups, array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
 	));
 
@@ -1183,7 +1159,6 @@ function make_webmon_overview($filter) {
 
 	$table = new CTableInfo(_('No web scenarios found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
 		_('Ok'),
 		_('Failed'),
@@ -1205,21 +1180,28 @@ function make_webmon_overview($filter) {
 	$httpTestData = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 	foreach ($result as $row) {
-		if (!isset($httpTestData[$row['httptestid']])) {
-			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
-		}
-		elseif ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
-			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
+		if (isset($httpTestData[$row['httptestid']]) && $httpTestData[$row['httptestid']]['lastfailedstep'] !== null) {
+			if ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
+				$data[$row['groupid']]['failed'] = isset($data[$row['groupid']]['failed'])
+					? ++$data[$row['groupid']]['failed']
+					: 1;
+			}
+			else {
+				$data[$row['groupid']]['ok'] = isset($data[$row['groupid']]['ok'])
+					? ++$data[$row['groupid']]['ok']
+					: 1;
+			}
 		}
 		else {
-			$data[$row['groupid']]['ok'] = empty($data[$row['groupid']]['ok']) ? 1 : ++$data[$row['groupid']]['ok'];
+			$data[$row['groupid']]['unknown'] = isset($data[$row['groupid']]['unknown'])
+				? ++$data[$row['groupid']]['unknown']
+				: 1;
 		}
 	}
 
 	foreach ($groups as $group) {
 		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
-				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
 				new CSpan(
@@ -1246,17 +1228,9 @@ function make_discovery_status() {
 	);
 	$drules = API::DRule()->get($options);
 
-	foreach($drules as &$drule) {
-		$drule['nodename'] = get_node_name_by_elid($drule['druleid']);
-	}
-	unset($drule);
-
-	// we need natural sort
-	$sortFields = array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+	CArrayHelper::sort($drules, array(
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($drules, $sortFields);
+	));
 
 	foreach ($drules as $drnum => $drule) {
 		$drules[$drnum]['up'] = 0;
@@ -1273,7 +1247,6 @@ function make_discovery_status() {
 	}
 
 	$header = array(
-		is_show_all_nodes() ? new CCol(_('Node'), 'center') : null,
 		new CCol(_('Discovery rule'), 'center'),
 		new CCol(_x('Up', 'discovery results in dashboard')),
 		new CCol(_x('Down', 'discovery results in dashboard'))
@@ -1284,8 +1257,7 @@ function make_discovery_status() {
 
 	foreach ($drules as $drule) {
 		$table->addRow(array(
-			$drule['nodename'],
-			new CLink($drule['nodename'].($drule['nodename'] ? NAME_DELIMITER : '').$drule['name'], 'discovery.php?druleid='.$drule['druleid']),
+			new CLink($drule['name'], 'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'], 'green'),
 			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
 		));
@@ -1315,7 +1287,6 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 	$popupTable = new CTableInfo();
 	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host'),
 		_('Issue'),
 		_('Age'),
@@ -1350,7 +1321,6 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 			: _('-');
 
 		$popupTable->addRow(array(
-			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hosts'][0]['name'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
 			zbx_date2age($trigger['lastchange']),

@@ -74,7 +74,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
 	int		i, ret = FAIL, dev_exists = FAIL;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
-	struct stat 	dev_st;
+	zbx_stat_t 	dev_st;
 	int		found = 0;
 
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)
@@ -139,7 +139,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
 	int		ret = FAIL;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
-	struct stat	dev_st;
+	zbx_stat_t	dev_st;
 
 	if ('\0' == *devname)
 		return ret;

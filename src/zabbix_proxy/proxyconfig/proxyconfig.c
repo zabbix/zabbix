@@ -89,13 +89,13 @@ static void	process_configuration_sync(size_t *data_size)
 
 		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. " ZBX_PROTO_TAG_INFO
-				":\"%s\"", ZBX_NULL2EMPTY_STR(info));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
+				ZBX_NULL2EMPTY_STR(info));
 		zbx_free(info);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server, datalen " ZBX_FS_SIZE_T,
 			(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);

@@ -176,7 +176,7 @@ elseif (hasRequest('save')) {
 	unset($_REQUEST['save']);
 }
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
-	$result = API::TriggerPrototype()->delete(getRequest('triggerid'));
+	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));
 
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 	clearCookies($result, getRequest('parent_discoveryid'));
@@ -277,8 +277,7 @@ else {
 		'discovery_rule' => $discovery_rule,
 		'hostid' => get_request('hostid'),
 		'showdisabled' => get_request('showdisabled', 1),
-		'triggers' => array(),
-		'displayNodes' => false
+		'triggers' => array()
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CAction extends CZBXAPI {
+class CAction extends CApiService {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
@@ -63,7 +63,6 @@ class CAction extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'actionids'					=> null,
@@ -253,7 +252,6 @@ class CAction extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($action = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
@@ -471,23 +469,13 @@ class CAction extends CZBXAPI {
 	}
 
 	public function exists($object) {
-		$keyFields = array(array('actionid', 'name'));
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
 			'output' => array('actionid'),
 			'nopermissions' => true,
 			'limit' => 1
-		);
+		));
 
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$objs = $this->get($options);
 		return !empty($objs);
 	}
 
@@ -1251,8 +1239,14 @@ class CAction extends CZBXAPI {
 		DB::delete('operations', array('operationid' => $operationids));
 	}
 
-	public function delete($actionids) {
-		$actionids = zbx_toArray($actionids);
+	/**
+	 * Delete actions.
+	 *
+	 * @param array $actionids
+	 *
+	 * @return array
+	 */
+	public function delete(array $actionids) {
 		if (empty($actionids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -1650,7 +1644,6 @@ class CAction extends CZBXAPI {
 					break;
 
 					case CONDITION_TYPE_TRIGGER_NAME:
-					case CONDITION_TYPE_NODE:
 					case CONDITION_TYPE_DUPTIME:
 					case CONDITION_TYPE_DVALUE:
 					case CONDITION_TYPE_APPLICATION:
@@ -1731,11 +1724,10 @@ class CAction extends CZBXAPI {
 
 		// adding conditions
 		if (!is_null($options['selectConditions']) && $options['selectConditions'] != API_OUTPUT_COUNT) {
-			$conditions = API::getApi()->select('conditions', array(
+			$conditions = API::getApiService()->select('conditions', array(
 				'output' => $this->outputExtend($options['selectConditions'], array('actionid', 'conditionid')),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 
@@ -1745,13 +1737,12 @@ class CAction extends CZBXAPI {
 
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
-			$operations = API::getApi()->select('operations', array(
+			$operations = API::getApiService()->select('operations', array(
 				'output' => $this->outputExtend($options['selectOperations'],
 					array('operationid', 'actionid', 'operationtype')
 				),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($operations, 'actionid', 'operationid');
 			$operationIds = $relationMap->getRelatedIds();

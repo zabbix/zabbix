@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CApplication extends CZBXAPI {
+class CApplication extends CApiService {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';
@@ -63,7 +63,6 @@ class CApplication extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -206,7 +205,6 @@ class CApplication extends CZBXAPI {
 		// output
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($application = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -240,21 +238,13 @@ class CApplication extends CZBXAPI {
 	}
 
 	public function exists($object) {
-		$keyFields = array(array('hostid', 'host'), 'name');
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
 			'output' => array('applicationid'),
 			'nopermissions' => 1,
 			'limit' => 1
-		);
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-		$objs = $this->get($options);
+		));
+
 		return !empty($objs);
 	}
 
@@ -392,14 +382,14 @@ class CApplication extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Applications
+	 * Delete Applications.
 	 *
 	 * @param array $applicationids
+	 * @param bool  $nopermissions
+	 *
 	 * @return array
 	 */
-	public function delete($applicationids, $nopermissions = false) {
-		$applicationids = zbx_toArray($applicationids);
-		$delApplicationIds = $applicationids;
+	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'applicationids' => $applicationids,
@@ -454,7 +444,7 @@ class CApplication extends CZBXAPI {
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
 
-		return array('applicationids' => $delApplicationIds);
+		return array('applicationids' => $applicationids);
 	}
 
 	/**
