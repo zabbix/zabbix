@@ -36,84 +36,108 @@ int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
 
-void	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***tokens, int *tokens_cnt)
+int	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***tokens, int *tokens_cnt)
 {
-	*tokens = zbx_malloc(NULL, sizeof(char*));
-	**tokens = strtok(string_to_parse + 1, delimiter);
+	char    *token_tmp;
 
-	while (NULL != *(*tokens + *tokens_cnt))
+	if (NULL == (token_tmp = strchr(string_to_parse, *delimiter)))
+		return FALSE;
+
+	*tokens = zbx_malloc(NULL, sizeof(char*));
+
+	if (string_to_parse == token_tmp)
+	{
+		zbx_error("*<> is first");
+		**tokens = token_tmp + 1;
+	}
+	else
+	{
+		zbx_error("<>*<> is first");
+		*tokens_cnt = 1;
+		**tokens = string_to_parse;
+		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
+		*(*tokens + 1) = token_tmp + 1;
+
+	}
+	*token_tmp = '\0';
+
+	while (NULL != (token_tmp = strchr(token_tmp + 1, *delimiter)))
 	{
 		*tokens_cnt = *tokens_cnt + 1;
 		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
-		*(*tokens + *tokens_cnt) = strtok(NULL, delimiter);
+		*(*tokens + *tokens_cnt) = token_tmp + 1;
+
+		if (0 == **(*tokens + *tokens_cnt))
+			*tokens_cnt = *tokens_cnt - 1;
+
+		*token_tmp = '\0';
 	}
+
+	return SUCCEED;
 }
 
 int	parse_file_name_to_tokens(char *string_to_parse, char **extension_full, char ***tokens, int *tokens_cnt)
 {
 	char	*extension, *delimiter = "*";
 
-	if ((NULL != (extension = strrchr(string_to_parse, delimiter[0]))) &&
-		(NULL != (*extension_full = strrchr(string_to_parse, PATH_SEPARATOR))))
-	{
-		if (*extension_full > extension)
-		{
-			zbx_error("%s: Wrong usage of '*' wildcard", string_to_parse);
-			return FAIL;
-		}
+	if (NULL == (*extension_full = strrchr(string_to_parse, PATH_SEPARATOR)))
+		return FAIL;
 
-		parse_string_to_tokens(*extension_full, delimiter, tokens, tokens_cnt);
-
-		if (NULL != **tokens)
-			**extension_full = '\0';
-		else
-			zbx_rtrim(string_to_parse, delimiter);
-	}
-	else
+	if (NULL == (extension = strrchr(string_to_parse, delimiter[0])))
 	{
 		zbx_rtrim(string_to_parse, PATH_SEPARATOR_STRING);
+		return SUCCEED;
 	}
+
+	if (*extension_full > extension)
+	{
+		zbx_error("%s: Wrong usage of '*' wildcard", string_to_parse);
+		return FAIL;
+	}
+
+	parse_string_to_tokens(*extension_full + 1, delimiter, tokens, tokens_cnt);
+
+	**extension_full = '\0';
 
 	return SUCCEED;
 }
 
 
-int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_name,
-		char *extension_full, char *tokens, int tokens_cnt)
+int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_name, char *extension_full, char **tokens, int tokens_cnt)
 {
 	char	*ex_carret, *delimiter = "*";
 	int	tokens_cnt_tmp = 0;
 
-	if (NULL == tokens)
+	if (NULL == tokens[0])
 		return SUCCEED;
 
-	/* Checks: first token is not found &&
-	 * string have symbols before first token when first symbol is not delimiter */
-	if (NULL == (ex_carret = strstr(file_name, tokens)) ||
-		((NULL == (strchr(extension_full + 1, delimiter[0]))) && (ex_carret != file_name)))
-	{
+	if (NULL == (ex_carret = strstr(file_name, tokens[0])))
 		return FAIL;
+
+	if (0 != strcmp(ex_carret,file_name))
+	{
+		if ('*' != *(strrchr(cfg_file, PATH_SEPARATOR) + 1))
+			return FAIL;
 	}
 
-	ex_carret += strlen(tokens + tokens_cnt_tmp);
-
-	while (tokens_cnt > tokens_cnt_tmp++)
+	for (; tokens_cnt >= tokens_cnt_tmp; tokens_cnt_tmp++)
 	{
-		if (NULL == (tokens + tokens_cnt_tmp))
+		if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
+			break;
+
+		ex_carret += strlen(tokens[tokens_cnt_tmp]);
+
+		if ('\0' == *ex_carret)
+			break;
+
+		if (tokens_cnt == tokens_cnt_tmp)
 		{
-			/* Checks: string have more symbols than last token &&
-			 * string have not delimiter symbol at the end */
-			if ((strlen(ex_carret) > strlen(tokens + tokens_cnt_tmp - 1)) &&
-					(0 != strcmp(strrchr(cfg_file, delimiter[0]), delimiter)))
+			if (0 != strlen(ex_carret))
 			{
-				return FAIL;
+				if ('\0' != *(strrchr(cfg_file, delimiter[0]) + 1))
+					return FAIL;
 			}
-
-			break;
 		}
-
-		if (NULL == (ex_carret = strstr(ex_carret, tokens + tokens_cnt_tmp)))
-			break;
 	}
 
 	if (tokens_cnt > tokens_cnt_tmp)
@@ -189,7 +213,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
 
-		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, file_name, extension_full, *tokens_tmp, tokens_cnt))
+		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, file_name, extension_full, tokens_tmp, tokens_cnt))
 			continue;
 
 		path_tmp = zbx_dsprintf(path_tmp, "%s\\%s", path, file_name);
@@ -225,6 +249,8 @@ out:
 		ret = FAIL;
 		goto out;
 	}
+	for (; 0 <= tokens_cnt; tokens_cnt--)
+		zbx_error("token %i: %s", tokens_cnt, tokens_tmp[tokens_cnt]);
 
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
@@ -245,7 +271,8 @@ out:
 
 	while (NULL != (d = readdir(dir)))
 	{
-		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, d->d_name, extension_full, *tokens_tmp, tokens_cnt))
+		zbx_error("CHECKING file %s", d->d_name);
+		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, d->d_name, extension_full, tokens_tmp, tokens_cnt))
 			continue;
 
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", path_tmp, d->d_name);
@@ -258,6 +285,7 @@ out:
 			ret = FAIL;
 			break;
 		}
+		zbx_error("file parsed: %s", incl_file);
 	}
 
 	if (-1 == closedir(dir))
