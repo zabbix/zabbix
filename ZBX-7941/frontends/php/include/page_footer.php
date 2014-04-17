@@ -66,12 +66,10 @@ show_messages();
 
 if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 
-	$isFullscreen = getRequest('fullscreen', 0);
-
 	if (!is_null(CWebUser::$data)
 			&& isset(CWebUser::$data['debug_mode'])
 			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED
-			&& ! $isFullscreen
+			&& !getRequest('fullscreen')
 	) {
 		CProfiler::getInstance()->stop();
 		CProfiler::getInstance()->show();
