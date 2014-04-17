@@ -20,6 +20,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#define ZBX_DEV_PFX	"/dev/"
+
 typedef struct
 {
 	zbx_uint64_t	nread;
@@ -131,12 +133,14 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
-		return SYSINFO_RET_FAIL;
+		return ret;
 
 	devname = get_rparam(request, 0);
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, 5))
+		devname += 5;
 
 	mode = get_rparam(request, 1);
 
@@ -156,12 +160,14 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
-		return SYSINFO_RET_FAIL;
+		return ret;
 
 	devname = get_rparam(request, 0);
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, 5))
+		devname += 5;
 
 	mode = get_rparam(request, 1);
 
