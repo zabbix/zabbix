@@ -65,6 +65,7 @@ class CGraphPrototype extends CGraphGeneral {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -299,6 +300,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -594,6 +596,7 @@ class CGraphPrototype extends CGraphGeneral {
 		if ($options['selectItems'] !== null && $options['selectItems'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'graphid', 'itemid', 'graphs_items');
 			$items = API::Item()->get(array(
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'webitems' => true,
@@ -619,6 +622,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -640,6 +644,7 @@ class CGraphPrototype extends CGraphGeneral {
 		$itemIds = $this->validateItemsCreate($graphs);
 
 		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,
@@ -702,6 +707,7 @@ class CGraphPrototype extends CGraphGeneral {
 		$itemIds = $this->validateItemsUpdate($graphs);
 
 		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemIds,
 			'webitems' => true,
 			'editable' => true,

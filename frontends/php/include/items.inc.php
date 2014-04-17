@@ -672,6 +672,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	foreach ($dbItems as $dbItem) {
 		$name = $dbItem['name_expanded'];
 
+		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
 		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with

@@ -34,6 +34,7 @@ class CTemplateScreen extends CScreen {
 	 * Get screen data.
 	 *
 	 * @param array  $options
+	 * @param array  $options['nodeids']		Node IDs
 	 * @param bool   $options['with_items']		only with items
 	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
 	 * @param int    $options['count']			count Hosts, returned column name is rowscount
@@ -58,6 +59,7 @@ class CTemplateScreen extends CScreen {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'templateids'				=> null,
@@ -130,6 +132,9 @@ class CTemplateScreen extends CScreen {
 						')';
 			}
 		}
+
+		// nodeids
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// screenids
 		if (!is_null($options['screenids'])) {
@@ -205,6 +210,7 @@ class CTemplateScreen extends CScreen {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -233,7 +239,8 @@ class CTemplateScreen extends CScreen {
 					array('screenid', 'screenitemid', 'resourcetype', 'resourceid')
 				),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
@@ -387,13 +394,22 @@ class CTemplateScreen extends CScreen {
 	}
 
 	public function exists($data) {
-		$screens = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $data),
+		$keyFields = array(array('screenid', 'name'), 'templateid');
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $data),
 			'preservekeys' => true,
 			'output' => array('screenid'),
 			'nopermissions' => true,
 			'limit' => 1
-		));
+		);
+		if (isset($data['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($data['node']);
+		}
+		elseif (isset($data['nodeids'])) {
+			$options['nodeids'] = $data['nodeids'];
+		}
+		$screens = $this->get($options);
 
 		return !empty($screens);
 	}

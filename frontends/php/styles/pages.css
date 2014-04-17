@@ -87,6 +87,7 @@
 /* latest monitoring */
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
+.latest-mon .tableinfo td.latest-node { width: 5%; }
 .latest-mon .tableinfo td.latest-host { width: 9%; }
 .latest-mon .tableinfo td.latest-interval { width: 5%; }
 .latest-mon .tableinfo td.latest-history { width: 5%; }

@@ -49,6 +49,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = array()) {
 		$result = array();
+		$nodeCheck = false;
 
 		$sqlParts = array(
 			'select'	=> array('history' => 'h.itemid'),
@@ -61,6 +62,7 @@ class CHistory extends CApiService {
 
 		$defOptions = array(
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
+			'nodeids'					=> null,
 			'hostids'					=> null,
 			'itemids'					=> null,
 			'editable'					=> null,
@@ -104,10 +106,18 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
+		// nodeids
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			$sqlParts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.itemid', $nodeids);
+			}
 		}
 
 		// hostids
@@ -117,6 +127,16 @@ class CHistory extends CApiService {
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'i.hostid', $nodeids);
+			}
+		}
+
+		// should be last, after all ****IDS checks
+		if (!$nodeCheck) {
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'h.itemid', $nodeids);
 		}
 
 		// time_from

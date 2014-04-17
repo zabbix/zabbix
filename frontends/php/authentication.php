@@ -237,7 +237,10 @@ switch ($config['authentication_type']) {
 // get user list
 if (get_user_auth(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['user_list'] = DBfetchArray(DBselect(
-		'SELECT u.alias,u.userid FROM users u ORDER BY u.alias'
+		'SELECT u.alias,u.userid'.
+		' FROM users u'.
+		whereDbNode('u.userid').
+		' ORDER BY u.alias'
 	));
 }
 

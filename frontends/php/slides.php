@@ -188,8 +188,11 @@ $data = array(
 );
 
 // get slideshows
-$dbSlideshows = DBselect('SELECT s.slideshowid,s.name FROM slideshows s');
-
+$dbSlideshows = DBselect(
+	'SELECT s.slideshowid,s.name'.
+	' FROM slideshows s'.
+	whereDbNode('s.slideshowid')
+);
 while ($dbSlideshow = DBfetch($dbSlideshows)) {
 	if (slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
 		$data['slideshows'][$dbSlideshow['slideshowid']] = $dbSlideshow;

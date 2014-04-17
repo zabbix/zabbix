@@ -36,6 +36,7 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'description'),
 	make_sorting_header(_('Type'), 'type'),
 	_('Status'),
@@ -98,6 +99,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	// append row
 	$mediaTypeTable->addRow(array(
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
+		$this->data['displayNodes'] ? $mediaType['nodename'] : null,
 		new CLink($mediaType['description'], '?form=edit&mediatypeid='.$mediaType['mediatypeid']),
 		media_type2str($mediaType['typeid']),
 		$status,

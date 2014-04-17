@@ -77,6 +77,7 @@ if ($dashboardConfig['filterEnable'] == 1) {
 			// get all groups if no selected groups defined
 			if (!$dashboardConfig['groupids']) {
 				$dbHostGroups = API::HostGroup()->get(array(
+					'nodeids' => get_current_nodeid(),
 					'output' => array('groupid')
 				));
 				$dashboardConfig['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
@@ -478,7 +479,8 @@ $widgetRefreshParams[WIDGET_WEB_OVERVIEW] = array(
 $dbDiscoveryRules = DBfetch(DBselect(
 	'SELECT COUNT(d.druleid) AS cnt'.
 	' FROM drules d'.
-	' WHERE d.status='.DRULE_STATUS_ACTIVE
+	' WHERE d.status='.DRULE_STATUS_ACTIVE.
+		andDbNode('d.druleid')
 ));
 
 if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {

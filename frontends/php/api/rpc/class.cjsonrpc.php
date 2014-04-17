@@ -105,12 +105,7 @@ class CJSONrpc {
 	}
 
 	public function processResult($call, CApiClientResponse $response) {
-		if ($response->errorCode) {
-			$errno = $this->_zbx2jsonErrors[$response->errorCode];
-
-			$this->jsonError($call['id'], $errno, $response->errorMessage, $response->debug);
-		}
-		else {
+		if ($response->data) {
 			// Notifications MUST NOT be answered
 			if ($call['id'] === null) {
 				return;
@@ -123,6 +118,11 @@ class CJSONrpc {
 			);
 
 			$this->_response = $formedResp;
+		}
+		else {
+			$errno = $this->_zbx2jsonErrors[$response->errorCode];
+
+			$this->jsonError($call['id'], $errno, $response->errorMessage, $response->debug);
 		}
 	}
 

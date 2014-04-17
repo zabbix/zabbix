@@ -21,8 +21,12 @@
 #define ZABBIX_DBSCHEMA_H
 
 /* flags */
-#define ZBX_NOTNULL		0x01
-#define ZBX_PROXY		0x02
+#define	ZBX_SYNC		0x01
+#define ZBX_NOTNULL		0x02
+#define ZBX_HISTORY		0x04
+#define ZBX_HISTORY_SYNC	0x08
+#define ZBX_HISTORY_TRENDS	0x10
+#define ZBX_PROXY		0x20
 
 /* FK flags */
 #define ZBX_FK_CASCADE_DELETE	0x01

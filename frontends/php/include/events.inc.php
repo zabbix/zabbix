@@ -106,6 +106,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 	$config = select_config();
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'output' => array('triggerid'),
 		'monitored' => 1,
 		'skipDependent' => 1,
@@ -407,6 +408,9 @@ function getLastEvents($options) {
 		$eventOptions['limit'] = $options['eventLimit'];
 	}
 
+	if (isset($options['nodeids'])) {
+		$triggerOptions['nodeids'] = $options['nodeids'];
+	}
 	if (isset($options['priority'])) {
 		$triggerOptions['filter']['priority'] = $options['priority'];
 	}

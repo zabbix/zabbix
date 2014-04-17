@@ -45,11 +45,12 @@ AGENT_VALUE
 	unsigned char	state;
 };
 
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error);
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error,
+			int max_error_len);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 
-int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error);
+void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j);
 void	process_proxyconfig(struct zbx_json_parse *jp_data);
 
 int	get_host_availability_data(struct zbx_json *j);

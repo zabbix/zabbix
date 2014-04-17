@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxtypes.h"
-#include "zbxalgo.h"
+#ifndef ZABBIX_NODEWATCHER_HISTORY_H
+#define ZABBIX_NODEWATCHER_HISTORY_H
 
-void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
+void main_historysender(void);
+
+#endif

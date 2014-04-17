@@ -1056,6 +1056,7 @@ class CConfigurationExport {
 		$groups = API::HostGroup()->get(array(
 			'groupids' => $groupIds,
 			'output' => array('name'),
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1079,6 +1080,7 @@ class CConfigurationExport {
 		$hosts = API::Host()->get(array(
 			'hostids' => $hostIds,
 			'output' => array('host'),
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1102,6 +1104,7 @@ class CConfigurationExport {
 		$screens = API::Screen()->get(array(
 			'screenids' => $screenIds,
 			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1125,6 +1128,7 @@ class CConfigurationExport {
 		$maps = API::Map()->get(array(
 			'sysmapids' => $mapIds,
 			'output' => array('name'),
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1149,6 +1153,7 @@ class CConfigurationExport {
 			'graphids' => $graphIds,
 			'selectHosts' => array('host'),
 			'output' => array('name'),
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1178,6 +1183,7 @@ class CConfigurationExport {
 			'itemids' => $itemIds,
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
+			'nodeids' => get_current_nodeid(true),
 			'webitems' => true,
 			'preservekeys' => true,
 			'filter' => array('flags' => null)
@@ -1208,6 +1214,7 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get(array(
 			'triggerids' => $triggerIds,
 			'output' => array('description', 'expression'),
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 
@@ -1234,6 +1241,7 @@ class CConfigurationExport {
 		$images = API::Image()->get(array(
 			'imageids' => $imageIds,
 			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 

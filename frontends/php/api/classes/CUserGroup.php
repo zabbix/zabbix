@@ -34,6 +34,7 @@ class CUserGroup extends CApiService {
 	 * Get user groups.
 	 *
 	 * @param array  $options
+	 * @param array  $options['nodeids']
 	 * @param array  $options['usrgrpids']
 	 * @param array  $options['userids']
 	 * @param bool   $options['status']
@@ -59,6 +60,7 @@ class CUserGroup extends CApiService {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
@@ -140,6 +142,7 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -177,11 +180,11 @@ class CUserGroup extends CApiService {
 		$usrgrpids = array();
 
 		$res = DBselect(
-			'SELECT g.usrgrpid'.
-			' FROM usrgrp g'.
-			' WHERE g.name='.zbx_dbstr($groupData['name'])
+				'SELECT g.usrgrpid'.
+				' FROM usrgrp g'.
+				' WHERE g.name='.zbx_dbstr($groupData['name']).
+					andDbNode('g.usrgrpid', false)
 		);
-
 		while ($group = DBfetch($res)) {
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
@@ -194,12 +197,18 @@ class CUserGroup extends CApiService {
 	}
 
 	public function exists($object) {
-		$objs = $this->get(array(
+		$options = array(
 			'filter' => array('name' => $object['name']),
 			'output' => array('usrgrpid'),
-			'nopermissions' => true,
+			'nopermissions' => 1,
 			'limit' => 1,
-		));
+		);
+		if (isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		elseif (isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
+
+		$objs = $this->get($options);
 
 		return !empty($objs);
 	}
@@ -226,7 +235,7 @@ class CUserGroup extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			if ($this->exists(array('name' => $usrgrp['name']))) {
+			if ($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('User group').' [ '.$usrgrp['name'].' ] '._('already exists'));
 			}
 			$insert[$gnum] = $usrgrp;
@@ -679,6 +688,7 @@ class CUserGroup extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'countOutput' => true
 		));
@@ -697,6 +707,7 @@ class CUserGroup extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'editable' => true,
 			'countOutput' => true

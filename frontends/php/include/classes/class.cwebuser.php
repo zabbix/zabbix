@@ -122,7 +122,7 @@ class CWebUser {
 			'userid' => 0,
 			'lang' => 'en_gb',
 			'type' => '0',
-			'debug_mode' => false
+			'node' => array('name' => '- unknown -', 'nodeid' => 0)
 		);
 	}
 

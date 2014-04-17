@@ -34,6 +34,7 @@ class CDService extends CApiService {
 	 * Get discovery service data.
 	 *
 	 * @param array  $options
+	 * @param array  $options['nodeids']				Node IDs
 	 * @param array  $options['groupids']				ServiceGroup IDs
 	 * @param array  $options['hostids']				Service IDs
 	 * @param bool   $options['monitored_hosts']		only monitored Services
@@ -59,6 +60,7 @@ class CDService extends CApiService {
 	 */
 	public function get($options = array()) {
 		$result = array();
+		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		$sqlParts = array(
@@ -71,6 +73,7 @@ class CDService extends CApiService {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'dserviceids'				=> null,
 			'dhostids'					=> null,
 			'dcheckids'					=> null,
@@ -108,10 +111,18 @@ class CDService extends CApiService {
 			return array();
 		}
 
+// nodeids
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+
 // dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dserviceid', $nodeids);
+			}
 		}
 
 // dhostids
@@ -123,7 +134,13 @@ class CDService extends CApiService {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dhostid'] = 'ds.dhostid';
 			}
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dhostid', $nodeids);
+			}
 		}
+
 
 // dcheckids
 		if (!is_null($options['dcheckids'])) {
@@ -153,6 +170,17 @@ class CDService extends CApiService {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
 			}
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dh.druleid', $nodeids);
+			}
+		}
+
+		// node check !!!!!
+		// should last, after all ****IDS checks
+		if (!$nodeCheck) {
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'ds.dserviceid', $nodeids);
 		}
 
 // filter
@@ -173,6 +201,7 @@ class CDService extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dservice = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -204,14 +233,22 @@ class CDService extends CApiService {
 	}
 
 	public function exists($object) {
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
+		$keyFields = array(array('dserviceid'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('dserviceid'),
 			'nopermissions' => 1,
 			'limit' => 1
-		));
+		);
+		if (isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		elseif (isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-		return !empty($objs);
+		$objs = $this->get($options);
+
+	return !empty($objs);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -247,6 +284,7 @@ class CDService extends CApiService {
 
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
+				'nodeids' => $options['nodeids'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -261,6 +299,7 @@ class CDService extends CApiService {
 			$relationMap = $this->createRelationMap($result, 'dserviceid', 'dhostid');
 			$dhosts = API::DHost()->get(array(
 				'output' => $options['selectDHosts'],
+				'nodeids' => $options['nodeids'],
 				'dhosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -287,6 +326,7 @@ class CDService extends CApiService {
 
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
+					'nodeids' => $options['nodeids'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true,
 					'sortfield' => 'status'
@@ -298,6 +338,7 @@ class CDService extends CApiService {
 			}
 			else {
 				$hosts = API::Host()->get(array(
+					'nodeids' => $options['nodeids'],
 					'dserviceids' => $dserviceIds,
 					'countOutput' => true,
 					'groupCount' => true

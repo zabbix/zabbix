@@ -37,6 +37,7 @@ $discoveryForm->setName('druleForm');
 $discoveryTable = new CTableInfo(_('No discovery rules found.'));
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('IP range'),
 	_('Delay'),
@@ -54,6 +55,7 @@ foreach ($data['drules'] as $drule) {
 
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),
+		$this->data['displayNodes'] ? $drule['nodename'] : null,
 		$drule['description'],
 		$drule['iprange'],
 		$drule['delay'],

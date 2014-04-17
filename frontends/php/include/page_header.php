@@ -35,6 +35,8 @@ if ($_REQUEST['fullscreen'] === '1') {
 
 require_once dirname(__FILE__).'/menu.inc.php';
 
+zbx_define_menu_restrictions($page, $ZBX_MENU);
+
 if (!defined('ZBX_PAGE_NO_THEME')) {
 	define('ZBX_PAGE_NO_THEME', false);
 }
@@ -109,6 +111,15 @@ switch ($page['type']) {
 			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 		}
 		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
+
+		if (ZBX_DISTRIBUTED) {
+			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
+				$pageTitle .= ' ('._('All nodes').') ';
+			}
+			elseif (!empty($ZBX_NODES)) {
+				$pageTitle .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
+			}
+		}
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
@@ -249,13 +260,104 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$menu_table->setCellPadding(5);
 	$menu_table->addRow($main_menu);
 
-	$serverName = (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME))
-		? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles server-name')
-		: null;
+	$node_form = null;
+	if (ZBX_DISTRIBUTED && !defined('ZBX_HIDE_NODE_SELECTION')) {
+		insert_js_function('check_all');
+
+		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_DATA_ARRAY);
+		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
+		if (empty($available_nodes[0])) {
+			unset($available_nodes[0]);
+		}
+
+		if (!empty($available_nodes)) {
+			$node_form = new CForm('get');
+			$node_form->cleanItems();
+			$node_form->setAttribute('id', 'node_form');
+
+			// create ComboBox with selected nodes
+			$nodesComboBox = null;
+			if (count($ZBX_VIEWED_NODES['nodes']) > 0) {
+				$nodesComboBox = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
+
+				foreach ($ZBX_VIEWED_NODES['nodes'] as $nodeid => $nodedata) {
+					$nodesComboBox->addItem($nodeid, $nodedata['name']);
+				}
+			}
+
+			$jscript = 'javascript: '.
+				" var pos = getPosition('button_show_tree');".
+				" showHide('div_node_tree', 'table');".
+				' pos.top += 20;'.
+				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
+			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
+			$button_show_tree->setAttribute('id', 'button_show_tree');
+
+			// create node tree
+			$node_tree = array();
+			$node_tree[0] = array(
+				'id' => 0,
+				'caption' => _('All'),
+				'combo_select_node' => new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);"),
+				'parentid' => 0 // master
+			);
+
+			foreach ($available_nodes as $node) {
+				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
+				$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
+				$combo_select_node->setAttribute('style', 'margin: 1px 4px 2px 4px;');
+
+				// if no parent for node, link it to root (0)
+				if (!isset($available_nodes[$node['masterid']])) {
+					$node['masterid'] = 0;
+				}
+
+				$node_tree[$node['nodeid']] = array(
+					'id' => $node['nodeid'],
+					'caption' => $node['name'],
+					'combo_select_node' => $combo_select_node,
+					'parentid' => $node['masterid']
+				);
+			}
+			unset($node);
+
+			$node_tree = new CTree('nodes', $node_tree, array('caption' => bold(_('Node')), 'combo_select_node' => SPACE));
+
+			$div_node_tree = new CDiv();
+			$div_node_tree->addItem($node_tree->getHTML());
+			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display: 'none'});"));
+			$div_node_tree->setAttribute('id', 'div_node_tree');
+			$div_node_tree->addStyle('display: none');
+
+			if (!is_null($nodesComboBox)) {
+				$node_form->addItem(array(new CSpan(_('Current node').SPACE, 'textcolorstyles'), $nodesComboBox));
+			}
+			$node_form->addItem($button_show_tree);
+			$node_form->addItem($div_node_tree);
+			unset($nodesComboBox);
+		}
+	}
+
+	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+		$table = new CTable();
+		$table->addStyle('width: 100%;');
+
+		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
+		if (is_null($node_form)) {
+			$tableColumn->addStyle('padding-right: 5px;');
+		}
+		else {
+			$tableColumn->addStyle('padding-right: 20px; padding-bottom: 2px;');
+		}
+		$table->addRow(array($tableColumn, $node_form));
+		$node_form = $table;
+	}
 
 	// 1st level menu
 	$table = new CTable(null, 'maxwidth');
-	$table->addRow(array($menu_table, $serverName));
+	$r_col = new CCol($node_form, 'right');
+	$r_col->setAttribute('style', 'line-height: 1.8em;');
+	$table->addRow(array($menu_table, $r_col));
 
 	$page_menu = new CDiv(null, 'textwhite');
 	$page_menu->setAttribute('id', 'mmenu');
@@ -330,7 +432,7 @@ elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 }
 
 // unset multiple variables
-unset($ZBX_MENU, $table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
+unset($ZBX_MENU, $table, $top_page_row, $menu_table, $node_form, $main_menu_row, $db_nodes, $node_data, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('initMessages({});');

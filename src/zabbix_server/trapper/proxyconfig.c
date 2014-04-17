@@ -38,12 +38,14 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_proxyconfig";
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX], *error = NULL;
+	char		host[HOST_HOST_LEN_MAX], error[256];
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, &error))
+	error[0] = '\0';
+
+	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
@@ -55,12 +57,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != get_proxyconfig_data(proxy_hostid, &j, &error))
-	{
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot collect proxy configuration: %s", error);
-		goto clean;
-	}
+	get_proxyconfig_data(proxy_hostid, &j);
 
 	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\", datalen " ZBX_FS_SIZE_T,
 			host, (zbx_fs_size_t)j.buffer_size);
@@ -72,11 +69,9 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration: %s", zbx_tcp_strerror());
 
 	alarm(0);
-clean:
+
 	zbx_json_free(&j);
 out:
-	zbx_free(error);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

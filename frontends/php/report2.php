@@ -142,6 +142,7 @@ $triggerData = isset($_REQUEST['triggerid'])
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
+		'nodeids' => get_current_nodeid(true),
 		'expandDescription' => true
 	))
 	: null;
@@ -230,7 +231,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($groups, 'name');
 
 		foreach ($groups as $group) {
-			$groupsComboBox->addItem($group['groupid'], $group['name']);
+			$groupsComboBox->addItem(
+				$group['groupid'],
+				get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']
+			);
 		}
 		$filterForm->addRow(_('Template group'), $groupsComboBox);
 
@@ -249,7 +253,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		foreach ($templates as $template) {
 			$templateIds[$template['templateid']] = $template['templateid'];
 
-			$templateComboBox->addItem($template['templateid'], $template['name']);
+			$templateComboBox->addItem(
+				$template['templateid'],
+				get_node_name_by_elid($template['templateid'], null, NAME_DELIMITER).$template['name']
+			);
 		}
 		$filterForm->addRow(_('Template'), $templateComboBox);
 
@@ -271,13 +278,17 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 				' AND h.status='.HOST_STATUS_TEMPLATE.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 					$sqlCondition.
+					andDbNode('t.triggerid').
 			' ORDER BY t.description';
 		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
 
 		foreach ($triggers as $trigger) {
 			$templateName = empty($_REQUEST['filter_hostid']) ? $trigger['name'].NAME_DELIMITER : '';
 
-			$triggerComboBox->addItem($trigger['triggerid'], $templateName.$trigger['description']);
+			$triggerComboBox->addItem(
+				$trigger['triggerid'],
+				get_node_name_by_elid($trigger['triggerid'], null, NAME_DELIMITER).$templateName.$trigger['description']
+			);
 		}
 
 		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
@@ -299,7 +310,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($hostGroups, 'name');
 
 		foreach ($hostGroups as $hostGroup) {
-			$hostGroupsComboBox->addItem($hostGroup['groupid'], $hostGroup['name']);
+			$hostGroupsComboBox->addItem(
+				$hostGroup['groupid'],
+				get_node_name_by_elid($hostGroup['groupid'], null, NAME_DELIMITER).$hostGroup['name']
+			);
 		}
 
 		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
@@ -323,7 +337,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($groups, 'name');
 
 		foreach ($groups as $group) {
-			$groupsComboBox->addItem($group['groupid'], $group['name']);
+			$groupsComboBox->addItem(
+				$group['groupid'],
+				get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']
+			);
 		}
 		$filterForm->addRow(_('Host group'), $groupsComboBox);
 
@@ -341,7 +358,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hosts = zbx_toHash($hosts, 'hostid');
 
 		foreach ($hosts as $host) {
-			$hostsComboBox->addItem($host['hostid'], $host['name']);
+			$hostsComboBox->addItem(
+				$host['hostid'],
+				get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name']
+			);
 		}
 		$filterForm->addRow(_('Host'), $hostsComboBox);
 
@@ -378,6 +398,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 */
 	$triggerTable = new CTableInfo(_('No triggers found.'));
 	$triggerTable->setHeader(array(
+		is_show_all_nodes() ? _('Node') : null,
 		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
 		_('Name'),
 		_('Problems'),
@@ -397,6 +418,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		);
 
 		$triggerTable->addRow(array(
+			get_node_name_by_elid($trigger['hostid']),
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
 			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid'].

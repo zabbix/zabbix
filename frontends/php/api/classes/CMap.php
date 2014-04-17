@@ -34,6 +34,7 @@ class CMap extends CMapElement {
 	 * Get map data.
 	 *
 	 * @param array  $options
+	 * @param array  $options['nodeids']					Node IDs
 	 * @param array  $options['groupids']					HostGroup IDs
 	 * @param array  $options['hostids']					Host IDs
 	 * @param bool   $options['monitored_hosts']			only monitored Hosts
@@ -67,6 +68,7 @@ class CMap extends CMapElement {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -117,6 +119,7 @@ class CMap extends CMapElement {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($sysmap = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -190,9 +193,12 @@ class CMap extends CMapElement {
 					}
 				}
 
+				$nodeIds = get_current_nodeid(true);
+
 				if ($hostsToCheck) {
 					$allowedHosts = API::Host()->get(array(
 						'hostids' => $hostsToCheck,
+						'nodeids' => $nodeIds,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => array('hostid')
@@ -213,6 +219,7 @@ class CMap extends CMapElement {
 				if ($mapsToCheck) {
 					$allowedMaps = $this->get(array(
 						'sysmapids' => $mapsToCheck,
+						'nodeids' => $nodeIds,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => array('sysmapid')
@@ -233,6 +240,7 @@ class CMap extends CMapElement {
 				if ($triggersToCheck) {
 					$allowedTriggers = API::Trigger()->get(array(
 						'triggerids' => $triggersToCheck,
+						'nodeids' => $nodeIds,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => array('triggerid')
@@ -253,6 +261,7 @@ class CMap extends CMapElement {
 				if ($hostGroupsToCheck) {
 					$allowedHostGroups = API::HostGroup()->get(array(
 						'groupids' => $hostGroupsToCheck,
+						'nodeids' => $nodeIds,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => array('groupid')
@@ -295,22 +304,41 @@ class CMap extends CMapElement {
 	 * @param array $sysmapData['name']
 	 * @param array $sysmapData['sysmapid']
 	 *
-	 * @return array
+	 * @return string sysmapid
 	 */
 	public function getObjects(array $sysmapData) {
-		return $this->get(array(
+		$options = array(
 			'filter' => $sysmapData,
 			'output' => API_OUTPUT_EXTEND
-		));
+		);
+
+		if (isset($sysmapData['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
+		}
+		elseif (isset($sysmapData['nodeids'])) {
+			$options['nodeids'] = $sysmapData['nodeids'];
+		}
+
+		return $this->get($options);
 	}
 
 	public function exists($object) {
-		$objs = $this->get(array(
-			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
+		$keyFields = array(array('sysmapid', 'name'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('sysmapid'),
 			'nopermissions' => true,
 			'limit' => 1
-		));
+		);
+		if (isset($object['node'])) {
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		}
+		elseif (isset($object['nodeids'])) {
+			$options['nodeids'] = $object['nodeids'];
+		}
+
+		$objs = $this->get($options);
 
 		return !empty($objs);
 	}
@@ -870,6 +898,7 @@ class CMap extends CMapElement {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
 			'countOutput' => true
 		));
@@ -885,12 +914,22 @@ class CMap extends CMapElement {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'sysmapids' => $ids,
 			'editable' => true,
 			'countOutput' => true
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['sysmapids'] === null) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -903,7 +942,8 @@ class CMap extends CMapElement {
 			$selements = API::getApiService()->select('sysmaps_elements', array(
 				'output' => $this->outputExtend($options['selectSelements'], array('selementid', 'sysmapid')),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
@@ -970,7 +1010,8 @@ class CMap extends CMapElement {
 			$links = API::getApiService()->select('sysmaps_links', array(
 				'output' => $this->outputExtend($options['selectLinks'], array('sysmapid', 'linkid')),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
 
@@ -994,7 +1035,8 @@ class CMap extends CMapElement {
 			$links = API::getApiService()->select('sysmap_url', array(
 				'output' => $this->outputExtend($options['selectUrls'], array('sysmapid', 'sysmapurlid')),
 				'filter' => array('sysmapid' => $sysmapIds),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nodeids' => get_current_nodeid(true)
 			));
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 

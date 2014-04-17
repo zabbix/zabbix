@@ -34,6 +34,7 @@ class CUser extends CApiService {
 	 * Get users data.
 	 *
 	 * @param array  $options
+	 * @param array  $options['nodeids']		filter by Node IDs
 	 * @param array  $options['usrgrpids']		filter by UserGroup IDs
 	 * @param array  $options['userids']		filter by User IDs
 	 * @param bool   $options['type']			filter by User type [USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3]
@@ -59,6 +60,7 @@ class CUser extends CApiService {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'mediaids'					=> null,
@@ -162,6 +164,7 @@ class CUser extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($user = DBfetch($res)) {
@@ -349,8 +352,10 @@ class CUser extends CApiService {
 			}
 
 			if (isset($user['alias'])) {
+				$nodeids = $update ? id2nodeid($user['userid']) : get_current_nodeid(false);
 				$userExist = $this->get(array(
 					'output' => array('userid'),
+					'nodeids' => $nodeids,
 					'filter' => array('alias' => $user['alias']),
 					'nopermissions' => true
 				));
@@ -931,11 +936,14 @@ class CUser extends CApiService {
 	}
 
 	private function dbLogin($user) {
+		global $ZBX_LOCALNODEID;
+
 		$login = DBfetch(DBselect(
 			'SELECT NULL'.
 			' FROM users u'.
 			' WHERE u.alias='.zbx_dbstr($user['user']).
-				' AND u.passwd='.zbx_dbstr(md5($user['password']))
+				' AND u.passwd='.zbx_dbstr(md5($user['password'])).
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 
 		if ($login) {
@@ -947,13 +955,16 @@ class CUser extends CApiService {
 	}
 
 	public function logout() {
+		global $ZBX_LOCALNODEID;
+
 		$sessionId = CWebUser::$data['sessionid'];
 
 		$session = DBfetch(DBselect(
 			'SELECT s.userid'.
 			' FROM sessions s'.
 			' WHERE s.sessionid='.zbx_dbstr($sessionId).
-				' AND s.status='.ZBX_SESSION_ACTIVE
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				andDbNode('s.userid', $ZBX_LOCALNODEID)
 		));
 
 		if (!$session) {
@@ -976,13 +987,16 @@ class CUser extends CApiService {
 	 * @return string					session id
 	 */
 	public function login($user) {
+		global $ZBX_LOCALNODEID;
+
 		$name = $user['user'];
 		$password = md5($user['password']);
 
 		$userInfo = DBfetch(DBselect(
 			'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 			' FROM users u'.
-			' WHERE u.alias='.zbx_dbstr($name)
+			' WHERE u.alias='.zbx_dbstr($name).
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
@@ -1101,6 +1115,8 @@ class CUser extends CApiService {
 	 * @return array				an array of user data
 	 */
 	public function checkAuthentication(array $sessionid) {
+		global $ZBX_LOCALNODEID;
+
 		$sessionid = reset($sessionid);
 
 		// access DB only once per page load
@@ -1116,7 +1132,8 @@ class CUser extends CApiService {
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND s.userid=u.userid'.
-				' AND (s.lastaccess+u.autologout>'.$time.' OR u.autologout=0)'
+				' AND (s.lastaccess+u.autologout>'.$time.' OR u.autologout=0)'.
+				andDbNode('u.userid', $ZBX_LOCALNODEID)
 		));
 
 		if (!$userInfo) {
@@ -1160,6 +1177,8 @@ class CUser extends CApiService {
 	}
 
 	private function _getUserData($userid) {
+		global $ZBX_LOCALNODEID, $ZBX_NODES;
+
 		$userData = DBfetch(DBselect(
 			'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
 			' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
@@ -1179,6 +1198,15 @@ class CUser extends CApiService {
 			? $_SERVER['HTTP_X_FORWARDED_FOR']
 			: $_SERVER['REMOTE_ADDR'];
 
+		if (isset($ZBX_NODES[$ZBX_LOCALNODEID])) {
+			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else {
+			$userData['node'] = array();
+			$userData['node']['name'] = '- unknown -';
+			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
+		}
+
 		return $userData;
 	}
 
@@ -1193,6 +1221,7 @@ class CUser extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'countOutput' => true
 		));
@@ -1211,12 +1240,21 @@ class CUser extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'userids' => $ids,
 			'editable' => true,
 			'countOutput' => true
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if (!isset($options['usrgrpids'])) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

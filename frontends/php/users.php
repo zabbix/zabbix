@@ -338,6 +338,7 @@ if (!empty($_REQUEST['form'])) {
 }
 else {
 	$data = array(
+		'displayNodes' => is_array(get_current_nodeid()),
 		'config' => $config
 	);
 
@@ -360,8 +361,11 @@ else {
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
 	$data['paging'] = getPagingLine($data['users'], array('userid'));
 
-	// set default lastaccess time to 0
-	foreach ($data['users'] as $user) {
+	foreach ($data['users'] as $key => $user) {
+		// nodes
+		$data['users'][$key]['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($user['userid'], true) : '';
+
+		// set default lastaccess time to 0
 		$data['usersSessions'][$user['userid']] = array('lastaccess' => 0);
 	}
 

@@ -166,28 +166,6 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 	return result;
 }
 
-#if defined(HAVE_MYSQL)
-static int	is_recoverable_mysql_error(void)
-{
-	switch (mysql_errno(conn))
-	{
-		case CR_CONN_HOST_ERROR:
-		case CR_SERVER_GONE_ERROR:
-		case CR_CONNECTION_ERROR:
-		case CR_SERVER_LOST:
-		case CR_UNKNOWN_HOST:
-		case ER_SERVER_SHUTDOWN:
-		case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
-		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
-		case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
-		case ER_UNKNOWN_ERROR:
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_connect                                                   *
@@ -201,7 +179,7 @@ static int	is_recoverable_mysql_error(void)
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int		ret = ZBX_DB_OK;
+	int		rc, ret = ZBX_DB_OK;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
@@ -254,12 +232,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* set autocommit on */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
-			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+								(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 		ret = ZBX_DB_DOWN;
 
 	/* we do not generate vendor escape clause sequences */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
-			(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
+								(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
 		ret = ZBX_DB_DOWN;
 
 	/* set current schema */
@@ -268,8 +246,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		char	*dbschema_esc;
 
 		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
-		if (0 < (ret = zbx_db_execute("set current schema='%s'", dbschema_esc)))
-			ret = ZBX_DB_OK;
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set current schema='%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
+			ret = rc;
 		zbx_free(dbschema_esc);
 	}
 
@@ -285,7 +263,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
 
-	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
+	if (!mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 		ret = ZBX_DB_FAIL;
@@ -297,15 +275,32 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
-		ret = ZBX_DB_DOWN;
+	if (ZBX_DB_FAIL == ret)
+	{
+		switch (mysql_errno(conn))
+		{
+			case CR_CONN_HOST_ERROR:
+			case CR_SERVER_GONE_ERROR:
+			case CR_CONNECTION_ERROR:
+			case CR_SERVER_LOST:
+			case CR_UNKNOWN_HOST:
+			case ER_SERVER_SHUTDOWN:
+			case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
+			case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
+			case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
+			case ER_UNKNOWN_ERROR:
+				ret = ZBX_DB_DOWN;
+				break;
+			default:
+				break;
+		}
+	}
 
 	if (ZBX_DB_OK == ret)
 	{
-		if (0 < (ret = zbx_db_execute("%s", "set names utf8")))
-			ret = ZBX_DB_OK;
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set names utf8")) || ZBX_DB_FAIL == rc)
+			ret = rc;
 	}
-
 #elif defined(HAVE_ORACLE)
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
 	if (NULL == getenv("NLS_LANG"))
@@ -382,8 +377,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 	{
-		if (0 < (ret = zbx_db_execute("%s", "alter session set nls_numeric_characters='. '")))
-			ret = ZBX_DB_OK;
+		rc = zbx_db_execute("%s", "alter session set nls_numeric_characters='. '");
+
+		if (ZBX_DB_DOWN == rc || ZBX_DB_FAIL == rc)
+			ret = rc;
 	}
 
 	zbx_free(connect);
@@ -419,11 +416,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
-	if (0 < (ret = zbx_db_execute("%s", "set escape_string_warning to off")))
-		ret = ZBX_DB_OK;
-
-	if (ZBX_DB_OK != ret)
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set escape_string_warning to off")) || ZBX_DB_FAIL == rc)
+	{
+		ret = rc;
 		goto out;
+	}
 
 	result = zbx_db_select("%s", "show standard_conforming_strings");
 
@@ -440,8 +437,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (90000 <= ZBX_PG_SVERSION)
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */
-		if (0 < (ret = zbx_db_execute("%s", "set bytea_output=escape")))
-			ret = ZBX_DB_OK;
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "set bytea_output=escape")) || ZBX_DB_FAIL == rc)
+			ret = rc;
 	}
 out:
 #elif defined(HAVE_SQLITE3)
@@ -459,17 +456,17 @@ out:
 	/* do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
 
-	if (0 < (ret = zbx_db_execute("%s", "pragma synchronous=0")))
-		ret = ZBX_DB_OK;
-
-	if (ZBX_DB_OK != ret)
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "pragma synchronous=0")) || ZBX_DB_FAIL == rc)
+	{
+		ret = rc;
 		goto out;
+	}
 
-	if (0 < (ret = zbx_db_execute("%s", "pragma temp_store=2")))
-		ret = ZBX_DB_OK;
-
-	if (ZBX_DB_OK != ret)
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("%s", "pragma temp_store=2")) || ZBX_DB_FAIL == rc)
+	{
+		ret = rc;
 		goto out;
+	}
 
 	path = zbx_strdup(NULL, dbname);
 
@@ -478,8 +475,8 @@ out:
 	else
 		*path = '\0';
 
-	if (0 < (ret = zbx_db_execute("pragma temp_store_directory='%s'", path)))
-		ret = ZBX_DB_OK;
+	if (ZBX_DB_DOWN == (rc = zbx_db_execute("pragma temp_store_directory='%s'", path)) || ZBX_DB_FAIL == rc)
+		ret = rc;
 
 	zbx_free(path);
 out:
@@ -906,16 +903,9 @@ out:
 }
 #endif
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_vexecute                                                  *
- *                                                                            *
- * Purpose: Execute SQL statement. For non-select statements only.            *
- *                                                                            *
- * Return value: ZBX_DB_FAIL (on error) or ZBX_DB_DOWN (on recoverable error) *
- *               or number of rows affected (on success)                      *
- *                                                                            *
- ******************************************************************************/
+/*
+ * Execute SQL statement. For non-select statements only.
+ */
 int	zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
@@ -1006,7 +996,23 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
-			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+			switch (mysql_errno(conn))
+			{
+				case CR_CONN_HOST_ERROR:
+				case CR_SERVER_GONE_ERROR:
+				case CR_CONNECTION_ERROR:
+				case CR_SERVER_LOST:
+				case ER_SERVER_SHUTDOWN:
+				case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
+				case ER_UNKNOWN_ERROR:
+					ret = ZBX_DB_DOWN;
+					break;
+				default:
+					ret = ZBX_DB_FAIL;
+					break;
+			}
 		}
 		else
 		{
@@ -1226,8 +1232,23 @@ error:
 		if (0 != mysql_query(conn, sql))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-
-			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			switch (mysql_errno(conn))
+			{
+				case CR_CONN_HOST_ERROR:
+				case CR_SERVER_GONE_ERROR:
+				case CR_CONNECTION_ERROR:
+				case CR_SERVER_LOST:
+				case ER_SERVER_SHUTDOWN:
+				case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
+				case ER_UNKNOWN_ERROR:
+					result = (DB_RESULT)ZBX_DB_DOWN;
+					break;
+				default:
+					result = NULL;
+					break;
+			}
 		}
 		else
 			result = mysql_store_result(conn);

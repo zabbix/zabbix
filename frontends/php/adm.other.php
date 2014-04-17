@@ -144,9 +144,10 @@ $data['discovery_groups'] = API::HostGroup()->get(array(
 order_result($data['discovery_groups'], 'name');
 
 $data['alert_usrgrps'] = DBfetchArray(DBselect(
-	'SELECT u.usrgrpid,u.name FROM usrgrp u'
+	'SELECT u.usrgrpid,u.name'.
+	' FROM usrgrp u'.
+	whereDbNode('u.usrgrpid')
 ));
-
 order_result($data['alert_usrgrps'], 'name');
 
 $otherForm = new CView('administration.general.other.edit', $data);

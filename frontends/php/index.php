@@ -20,6 +20,8 @@
 
 
 define('ZBX_PAGE_NO_AUTHORIZATION', true);
+define('ZBX_NOT_ALLOW_ALL_NODES', true);
+define('ZBX_HIDE_NODE_SELECTION', true);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';

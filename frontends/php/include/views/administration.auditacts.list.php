@@ -65,6 +65,7 @@ $auditForm->setName('auditForm');
 // create table
 $auditTable = new CTableInfo(_('No action log entries found.'));
 $auditTable->setHeader(array(
+	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
 	_('Action'),
 	_('Type'),
@@ -123,6 +124,7 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
+		get_node_name_by_elid($alert['alertid']),
 		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),

@@ -126,6 +126,7 @@ class CZabbixServer {
 	public function executeScript($scriptId, $hostId) {
 		return $this->request(array(
 			'request' => 'command',
+			'nodeid' => id2nodeid($hostId),
 			'scriptid' => $scriptId,
 			'hostid' => $hostId
 		));

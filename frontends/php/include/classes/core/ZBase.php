@@ -98,6 +98,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/profiles.inc.php';
 		require_once $this->getRootDir().'/include/locales.inc.php';
 		require_once $this->getRootDir().'/include/db.inc.php';
+		require_once $this->getRootDir().'/include/nodes.inc.php';
 
 		// page specific includes
 		require_once $this->getRootDir().'/include/acknow.inc.php';
@@ -133,22 +134,27 @@ class ZBase {
 			case self::EXEC_MODE_DEFAULT:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->initNodes();
 				$this->authenticateUser();
+				// init nodes after user is authenticated
+				init_nodes();
 				$this->initLocales();
 				break;
-
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->initNodes();
 				$this->initLocales();
 				break;
-
 			case self::EXEC_MODE_SETUP:
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
+					$this->initNodes();
 					$this->authenticateUser();
+					// init nodes after user is authenticated
+					init_nodes();
 					$this->initLocales();
 					DBclose();
 				}
@@ -308,6 +314,23 @@ class ZBase {
 		$error = null;
 		if (!DBconnect($error)) {
 			throw new DBException($error);
+		}
+	}
+
+	/**
+	 * Check if distributed monitoring is enabled.
+	 */
+	protected function initNodes() {
+		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_NODES;
+
+		if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
+			$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+			$ZBX_LOCMASTERID = $local_node_data['masterid'];
+			$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
+			define('ZBX_DISTRIBUTED', true);
+		}
+		else {
+			define('ZBX_DISTRIBUTED', false);
 		}
 	}
 

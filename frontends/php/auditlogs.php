@@ -124,6 +124,7 @@ $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resource
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere).
+			andDbNode('u.userid', get_current_nodeid(null, PERM_READ)).
 		' ORDER BY a.clock DESC';
 $dbAudit = DBselect($sql, $config['search_limit'] + 1);
 while ($audit = DBfetch($dbAudit)) {
@@ -177,7 +178,8 @@ unset($sqlWhere['from'], $sqlWhere['till']);
 $sql = 'SELECT MIN(a.clock) AS clock'.
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
-			implode('', $sqlWhere);
+			implode('', $sqlWhere).
+			andDbNode('u.userid', get_current_nodeid(null, PERM_READ));
 $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 
 $data['timeline'] = array(

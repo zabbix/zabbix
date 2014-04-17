@@ -34,6 +34,7 @@ class CMediatype extends CApiService {
 	 * Get Media types data
 	 *
 	 * @param array $options
+	 * @param array $options['nodeids'] filter by Node IDs
 	 * @param array $options['mediatypeids'] filter by Mediatype IDs
 	 * @param boolean $options['type'] filter by Mediatype type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
 	 * @param boolean $options['output'] output only Mediatype IDs if not set.
@@ -46,6 +47,7 @@ class CMediatype extends CApiService {
 	 */
 	public function get($options = array()) {
 		$result = array();
+		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		$sqlParts = array(
@@ -58,6 +60,7 @@ class CMediatype extends CApiService {
 		);
 
 		$defOptions = array(
+			'nodeids'					=> null,
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
 			'userids'					=> null,
@@ -90,10 +93,18 @@ class CMediatype extends CApiService {
 			return array();
 		}
 
+		// nodeids
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 			$sqlParts['where'][] = dbConditionInt('mt.mediatypeid', $options['mediatypeids']);
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'mt.mediatypeid', $nodeids);
+			}
 		}
 
 		// mediaids
@@ -103,6 +114,11 @@ class CMediatype extends CApiService {
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.mediaid', $nodeids);
+			}
 		}
 
 		// userids
@@ -112,6 +128,16 @@ class CMediatype extends CApiService {
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.userid', $options['userids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
+
+			if (!$nodeCheck) {
+				$nodeCheck = true;
+				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'm.userid', $nodeids);
+			}
+		}
+
+		// should last, after all ****IDS checks
+		if (!$nodeCheck) {
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'mt.mediatypeid', $nodeids);
 		}
 
 		// filter
@@ -131,6 +157,7 @@ class CMediatype extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($mediatype = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {

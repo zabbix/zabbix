@@ -119,6 +119,7 @@ int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 0;
+int	CONFIG_NODEWATCHER_FORKS	= 0;
 int	CONFIG_WATCHDOG_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 1;
 
@@ -177,6 +178,10 @@ char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
+int	CONFIG_NODEID			= 0;
+int	CONFIG_MASTER_NODEID		= 0;
+int	CONFIG_NODE_NOEVENTS		= 0;
+int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -194,6 +199,9 @@ char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
+
+/* mutex for node syncs; not used in proxy */
+ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *

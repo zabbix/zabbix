@@ -91,8 +91,8 @@ try {
 
 		$sql = 'SELECT v.name,v.valuemapid'.
 				' FROM valuemaps v'.
-				' WHERE v.valuemapid='.zbx_dbstr($_REQUEST['valuemapid']);
-
+				' WHERE v.valuemapid='.zbx_dbstr($_REQUEST['valuemapid']).
+					andDbNode('v.valuemapid');
 		if ($valueMapToDelete = DBfetch(DBselect($sql))) {
 			$result = deleteValueMap($_REQUEST['valuemapid']);
 
@@ -192,22 +192,33 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'valuemaps' => array()
+		'valuemaps' => array(),
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 
 	$valueMapWidget->addHeader(_('Value mapping'));
 	$valueMapWidget->addItem(BR());
 
-	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v');
-
+	$dbValueMaps = DBselect(
+		'SELECT v.valuemapid,v.name'.
+		' FROM valuemaps v'.
+			whereDbNode('v.valuemapid')
+	);
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
+		$dbValueMap['nodename'] = $data['displayNodes']
+			? get_node_name_by_elid($dbValueMap['valuemapid'], true)
+			: '';
+
 		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
 		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
 	}
 	order_result($data['valuemaps'], 'name');
 
-	$dbMaps = DBselect('SELECT m.valuemapid,m.value,m.newvalue FROM mappings m');
-
+	$dbMaps = DBselect(
+		'SELECT m.valuemapid,m.value,m.newvalue'.
+		' FROM mappings m'.
+			whereDbNode('m.mappingid')
+	);
 	while ($dbMap = DBfetch($dbMaps)) {
 		$data['valuemaps'][$dbMap['valuemapid']]['maps'][] = array(
 			'value' => $dbMap['value'],

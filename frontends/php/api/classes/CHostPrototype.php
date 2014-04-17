@@ -1208,6 +1208,7 @@ class CHostPrototype extends CHostBase {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -1226,6 +1227,7 @@ class CHostPrototype extends CHostBase {
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupLinks'],
+				'nodeids' => $options['nodeids'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -1247,6 +1249,7 @@ class CHostPrototype extends CHostBase {
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApiService()->select('group_prototype', array(
 				'output' => $options['selectGroupPrototypes'],
+				'nodeids' => $options['nodeids'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -1272,6 +1275,7 @@ class CHostPrototype extends CHostBase {
 
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectParentHost'],
+				'nodeids' => $options['nodeids'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
@@ -1286,6 +1290,7 @@ class CHostPrototype extends CHostBase {
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
 				$templates = API::Template()->get(array(
 					'output' => $options['selectTemplates'],
+					'nodeids' => $options['nodeids'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1293,6 +1298,7 @@ class CHostPrototype extends CHostBase {
 			}
 			else {
 				$templates = API::Template()->get(array(
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostPrototypeIds,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1318,7 +1324,8 @@ class CHostPrototype extends CHostBase {
 			}
 			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $output,
-				'filter' => array('hostid' => $hostPrototypeIds)
+				'filter' => array('hostid' => $hostPrototypeIds),
+				'nodeids' => get_current_nodeid(true)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}

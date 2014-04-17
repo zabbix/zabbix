@@ -234,7 +234,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		);
 
 		$caption = array(new CLink(
-			$service['name'],
+			array(get_node_name_by_elid($service['serviceid'], null, NAME_DELIMITER), $service['name']),
 			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
 		));
 		$trigger = $service['trigger'];

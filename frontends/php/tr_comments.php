@@ -45,6 +45,7 @@ if (!isset($_REQUEST['triggerid'])) {
  * Permissions
  */
 $trigger = API::Trigger()->get(array(
+	'nodeids' => get_current_nodeid(true),
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true

@@ -117,7 +117,8 @@ function get_userid_by_usrgrpid($userGroupIds) {
 		'SELECT DISTINCT u.userid'.
 		' FROM users u,users_groups ug'.
 		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds)
+			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds).
+			andDbNode('ug.usrgrpid', false)
 	);
 	while ($user = DBFetch($dbUsers)) {
 		$userIds[$user['userid']] = $user['userid'];

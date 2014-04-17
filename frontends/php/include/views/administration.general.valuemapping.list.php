@@ -21,6 +21,7 @@
 
 $valueMappingTable = new CTableInfo(_('No value maps found.'));
 $valueMappingTable->setHeader(array(
+	$this->data['displayNodes'] ? _('Node') : null,
 	_('Name'),
 	_('Value map')
 ));
@@ -34,6 +35,7 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 		$mappings[] = BR();
 	}
 	$valueMappingTable->addRow(array(
+		$this->data['displayNodes'] ? $valuemap['nodename'] : null,
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings
 	));

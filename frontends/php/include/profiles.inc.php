@@ -38,6 +38,7 @@ class CProfile {
 			'SELECT p.*'.
 			' FROM profiles p'.
 			' WHERE p.userid='.self::$userDetails['userid'].
+				andDbNode('p.profileid', false).
 			' ORDER BY p.userid,p.profileid'
 		);
 		while ($profile = DBfetch($db_profiles)) {
@@ -217,7 +218,6 @@ class CProfile {
 		if (!isset(self::$profiles[$idx])) {
 			self::$profiles[$idx] = array();
 		}
-
 		self::$profiles[$idx][$idx2] = $value;
 	}
 
@@ -232,22 +232,29 @@ class CProfile {
 			'type' => $type,
 			'idx2' => $idx2
 		);
-
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}
 
 	private static function updateDB($idx, $value, $type, $idx2) {
-		$sqlIdx2 = ($idx2 > 0) ? ' AND idx2='.zbx_dbstr($idx2) : '';
+		$sql_cond = '';
 
-		$valueType = self::getFieldByType($type);
+		if ($idx != 'web.nodes.switch_node') {
+			$sql_cond .= andDbNode('profileid', false);
+		}
+
+		if ($idx2 > 0) {
+			$sql_cond .= ' AND idx2='.$idx2.andDbNode('idx2', false);
+		}
+
+		$value_type = self::getFieldByType($type);
 
 		return DBexecute(
 			'UPDATE profiles SET '.
-				$valueType.'='.zbx_dbstr($value).','.
+				$value_type.'='.zbx_dbstr($value).','.
 				' type='.$type.
 			' WHERE userid='.self::$userDetails['userid'].
 				' AND idx='.zbx_dbstr($idx).
-				$sqlIdx2
+				$sql_cond
 		);
 	}
 
@@ -263,7 +270,6 @@ class CProfile {
 			default:
 				$field = 'value_id';
 		}
-
 		return $field;
 	}
 
@@ -282,16 +288,22 @@ class CProfile {
 }
 
 /************ CONFIG **************/
-function select_config($cache = true) {
-	global $page;
+function select_config($cache = true, $nodeid = null) {
+	global $page, $ZBX_LOCALNODEID;
 	static $config;
 
 	if ($cache && isset($config)) {
 		return $config;
 	}
+	if (is_null($nodeid)) {
+		$nodeid = $ZBX_LOCALNODEID;
+	}
 
-	$db_config = DBfetch(DBselect('SELECT c.* FROM config c'));
-
+	$db_config = DBfetch(DBselect(
+			'SELECT c.*'.
+			' FROM config c'.
+			whereDbNode('c.configid', $nodeid)
+	));
 	if (!empty($db_config)) {
 		$config = $db_config;
 		return $db_config;
@@ -299,7 +311,6 @@ function select_config($cache = true) {
 	elseif (isset($page['title']) && $page['title'] != _('Installation')) {
 		error(_('Unable to select configuration.'));
 	}
-
 	return $db_config;
 }
 
@@ -405,7 +416,11 @@ function update_config($configs) {
 		return null;
 	}
 
-	return DBexecute('UPDATE config SET '.implode(',', $update));
+	return DBexecute(
+			'UPDATE config'.
+			' SET '.implode(',', $update).
+			whereDbNode('configid', false)
+	);
 }
 
 /************ HISTORY **************/
