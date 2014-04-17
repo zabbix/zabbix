@@ -163,24 +163,24 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes", 	VFS_DEV_WRITE_BYTES},
-		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
-		{NULL,		NULL}
-	};
-
-	return process_mode_function(request, result, fl);
-}
-
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
+		{NULL,		NULL}
+	};
+
+	return process_mode_function(request, result, fl);
+}
+
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const MODE_FUNCTION	fl[] =
+	{
+		{"bytes", 	VFS_DEV_WRITE_BYTES},
+		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
 		{NULL,		NULL}
 	};
 
