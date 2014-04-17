@@ -102,7 +102,6 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
 	$hosts = API::Host()->get(array(
-		'nodeids' => get_current_nodeid(true),
 		'hostids' => $hostIds,
 		'output' => array('status'),
 		'nopermissions' => true,
@@ -325,7 +324,6 @@ function add_elementNames(&$selements) {
 		'hostids' => $hostids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -333,7 +331,6 @@ function add_elementNames(&$selements) {
 		'mapids' => $mapids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -342,7 +339,6 @@ function add_elementNames(&$selements) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -350,7 +346,6 @@ function add_elementNames(&$selements) {
 		'hostgroupids' => $hostgroupids,
 		'output' => array('name'),
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -358,7 +353,6 @@ function add_elementNames(&$selements) {
 		'imageids' => $imageids,
 		'output' => API_OUTPUT_EXTEND,
 		'nopermissions' => true,
-		'nodeids' => get_current_nodeid(true),
 		'preservekeys' => true
 	));
 
@@ -404,7 +398,6 @@ function add_triggerExpressions(&$selements, $triggers = array()) {
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
 			'nopermissions' => true,
-			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
 	}
@@ -785,8 +778,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						'sysmapids' => $mapids,
 						'output' => array('sysmapid'),
 						'selectSelements' => API_OUTPUT_EXTEND,
-						'nopermissions' => true,
-						'nodeids' => get_current_nodeid(true)
+						'nopermissions' => true
 					));
 
 					$mapids = array();
@@ -844,8 +836,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$hosts = API::Host()->get(array(
 			'hostids' => array_keys($hosts_map),
 			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
-			'nopermissions' => true,
-			'nodeids' => get_current_nodeid(true)
+			'nopermissions' => true
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
@@ -860,8 +851,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'groupids' => array_keys($hostgroups_map),
 			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
 			'selectGroups' => array('groupid'),
-			'nopermissions' => true,
-			'nodeids' => get_current_nodeid(true)
+			'nopermissions' => true
 		));
 		$all_hosts = array_merge($all_hosts, $hosts);
 		foreach ($hosts as $host) {
@@ -887,7 +877,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	if (!empty($triggers_map)) {
 		$triggers = API::Trigger()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
 			'filter' => array('state' => null),
 			'output' => API_OUTPUT_EXTEND,
@@ -905,7 +894,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	// triggers from submaps, skip dependent
 	if (!empty($triggers_map_submaps)) {
 		$triggers = API::Trigger()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
@@ -937,7 +925,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'selectItems' => array('itemid'),
 			'nopermissions' => true,
 			'filter' => array('state' => null),
-			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
 			'skipDependent' => true,
 		));
@@ -1008,7 +995,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		'triggerids' => array_keys($all_triggers),
 		'withLastEventUnacknowledged' => true,
 		'output' => array('triggerid'),
-		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
 		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'state' => null)
