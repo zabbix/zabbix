@@ -112,7 +112,7 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details', getRequest('show_details'), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
