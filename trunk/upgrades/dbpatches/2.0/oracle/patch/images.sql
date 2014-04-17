@@ -1,0 +1,1 @@
+ALTER TABLE images MODIFY imageid DEFAULT NULL;
