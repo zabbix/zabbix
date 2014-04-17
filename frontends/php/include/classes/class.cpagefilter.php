@@ -54,9 +54,6 @@ class CPageFilter {
 	 * @var array
 	 */
 	protected $config = array(
-		// whether to allow all nodes
-		'all_nodes' => null,
-
 		// select the latest object viewed by the user on any page
 		'select_latest' => null,
 
@@ -231,9 +228,6 @@ class CPageFilter {
 	 * @param string $options['severityMin']
 	 */
 	public function __construct(array $options = array()) {
-		global $ZBX_WITH_ALL_NODES;
-
-		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
 		$this->config['DDReset'] = get_request('ddreset', null);
 		$this->config['popupDD'] = isset($options['config']['popupDD']);
@@ -418,7 +412,6 @@ class CPageFilter {
 	 */
 	private function _initGroups($groupid, array $options, $hostid) {
 		$def_options = array(
-			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => array('groupid', 'name')
 		);
 		$options = zbx_array_merge($def_options, $options);
@@ -435,7 +428,6 @@ class CPageFilter {
 			// set group only if host is in group or hostid is not set
 			if ($hostid) {
 				$host = API::Host()->get(array(
-					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 					'output' => array('hostid'),
 					'hostids' => $hostid,
 					'groupids' => $this->_profileIds['groupid']
@@ -489,7 +481,6 @@ class CPageFilter {
 		}
 		else {
 			$defaultOptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name', 'status'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
@@ -547,7 +538,6 @@ class CPageFilter {
 		}
 		else {
 			$def_ptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('graphid', 'name'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null,
@@ -611,7 +601,6 @@ class CPageFilter {
 		}
 		else {
 			$def_ptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('triggerid', 'description'),
 				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
 				'hostids' => ($this->hostid > 0) ? $this->hostid : null
@@ -642,7 +631,6 @@ class CPageFilter {
 	 */
 	private function _initDiscoveries($druleid, array $options) {
 		$def_options = array(
-			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND
 		);
 		$options = zbx_array_merge($def_options, $options);
@@ -694,7 +682,6 @@ class CPageFilter {
 		}
 		else {
 			$def_options = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('name'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
@@ -758,11 +745,9 @@ class CPageFilter {
 	/**
 	 * Get hosts combobox with selected item.
 	 *
-	 * @param bool $withNode
-	 *
 	 * @return CComboBox
 	 */
-	public function getHostsCB($withNode = false) {
+	public function getHostsCB() {
 		$items = $classes = array();
 		foreach ($this->hosts as $id => $host) {
 			$items[$id] = $host['name'];
@@ -770,45 +755,39 @@ class CPageFilter {
 		}
 		$options = array('objectName' => 'hosts', 'classes' => $classes);
 
-		return $this->_getCB('hostid', $this->hostid, $items, $withNode, $options);
+		return $this->_getCB('hostid', $this->hostid, $items, $options);
 	}
 
 	/**
 	 * Get host groups combobox with selected item.
 	 *
-	 * @param bool $withNode
-	 *
 	 * @return CComboBox
 	 */
-	public function getGroupsCB($withNode = false) {
+	public function getGroupsCB() {
 		$items = array();
 		foreach ($this->groups as $id => $group) {
 			$items[$id] = $group['name'];
 		}
-		return $this->_getCB('groupid', $this->groupid, $items, $withNode, array('objectName' => 'groups'));
+		return $this->_getCB('groupid', $this->groupid, $items, array('objectName' => 'groups'));
 	}
 
 	/**
 	 * Get graphs combobox with selected item.
 	 *
-	 * @param bool $withNode
-	 *
 	 * @return CComboBox
 	 */
-	public function getGraphsCB($withNode = false) {
-		$graphs = $this->graphs;
-		if ($withNode) {
-			foreach ($graphs as $id => $graph) {
-				$graphs[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$graph['name'];
-			}
-		}
-
-		natcasesort($graphs);
-		$graphs = array(0 => _('not selected')) + $graphs;
-
+	public function getGraphsCB() {
 		$graphComboBox = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
-		foreach ($graphs as $id => $name) {
-			$graphComboBox->addItem($id, $name);
+		$graphComboBox->addItem(0, _('not selected'));
+
+		if ($this->graphs) {
+			$graphs = $this->graphs;
+
+			order_result($graphs, 'name');
+
+			foreach ($graphs as $graph) {
+				$graphComboBox->addItem($graph['graphid'], $graph['name']);
+			}
 		}
 
 		return $graphComboBox;
@@ -817,31 +796,28 @@ class CPageFilter {
 	/**
 	 * Get discovery rules combobox with selected item.
 	 *
-	 * @param bool $withNode
-	 *
 	 * @return CComboBox
 	 */
-	public function getDiscoveryCB($withNode = false) {
+	public function getDiscoveryCB() {
 		$items = array();
 		foreach ($this->drules as $id => $drule) {
 			$items[$id] = $drule['name'];
 		}
-		return $this->_getCB('druleid', $this->druleid, $items, $withNode, array('objectName' => 'discovery'));
+		return $this->_getCB('druleid', $this->druleid, $items, array('objectName' => 'discovery'));
 	}
 
 	/**
 	 * Get applications combobox with selected item.
 	 *
-	 * @param bool $withNode
-	 *
 	 * @return CComboBox
 	 */
-	public function getApplicationsCB($withNode = false) {
+	public function getApplicationsCB() {
 		$items = array();
 		foreach ($this->applications as $id => $application) {
 			$items[$id] = $application['name'];
 		}
-		return $this->_getCB('application', $this->application, $items, $withNode, array(
+
+		return $this->_getCB('application', $this->application, $items, array(
 			'objectName' => 'applications'
 		));
 	}
@@ -857,12 +833,11 @@ class CPageFilter {
 
 	/**
 	 * Create combobox with available data.
-	 * Preselect active item. Display nodes. Add addition 'not selected' or 'all' item to top adjusted by configuration.
+	 * Preselect active item. Add addition 'not selected' or 'all' item to top adjusted by configuration.
 	 *
 	 * @param string $name
 	 * @param string $selectedId
 	 * @param array  $items
-	 * @param bool   $withNode
 	 * @param int    $allValue
 	 * @param array  $options
 	 * @param string $options['objectName']
@@ -870,14 +845,8 @@ class CPageFilter {
 	 *
 	 * @return CComboBox
 	 */
-	private function _getCB($name, $selectedId, $items, $withNode, array $options = array()) {
+	private function _getCB($name, $selectedId, $items, array $options = array()) {
 		$comboBox = new CComboBox($name, $selectedId, 'javascript: submit();');
-
-		if ($withNode) {
-			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$item;
-			}
-		}
 
 		natcasesort($items);
 
@@ -890,7 +859,7 @@ class CPageFilter {
 				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
 			}
 
-			if ($name == 'application') {
+			if ($name === 'application') {
 				$items = array('' => $firstLabel) + $items;
 			}
 			else {

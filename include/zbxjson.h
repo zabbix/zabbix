@@ -54,7 +54,6 @@
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
 #define ZBX_PROTO_TAG_HOSTID		"hostid"
-#define ZBX_PROTO_TAG_NODEID		"nodeid"
 #define ZBX_PROTO_TAG_AVAILABLE		"available"
 #define ZBX_PROTO_TAG_SNMP_AVAILABLE	"snmp_available"
 #define ZBX_PROTO_TAG_IPMI_AVAILABLE	"ipmi_available"

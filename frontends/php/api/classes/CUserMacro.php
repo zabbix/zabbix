@@ -34,7 +34,6 @@ class CUserMacro extends CApiService {
 	 * Get UserMacros data.
 	 *
 	 * @param array $options
-	 * @param array $options['nodeids'] node ids
 	 * @param array $options['groupids'] usermacrosgroup ids
 	 * @param array $options['hostids'] host ids
 	 * @param array $options['hostmacroids'] host macros ids
@@ -69,7 +68,6 @@ class CUserMacro extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'hostmacroids'				=> null,
@@ -122,12 +120,8 @@ class CUserMacro extends CApiService {
 			}
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// global macro
 		if (!is_null($options['globalmacro'])) {
-			$sqlPartsGlobal['where'] = sqlPartDbNode($sqlPartsGlobal['where'], 'gm.globalmacroid', $nodeids);
 			$options['groupids'] = null;
 			$options['hostmacroids'] = null;
 			$options['triggerids'] = null;
@@ -136,9 +130,6 @@ class CUserMacro extends CApiService {
 			$options['selectGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
-		}
-		else {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hm.hostmacroid', $nodeids);
 		}
 
 		// globalmacroids

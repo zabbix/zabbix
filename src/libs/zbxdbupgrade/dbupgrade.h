@@ -57,7 +57,6 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 		int unique);
 int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
-int	DBmodify_proxy_table_id_field(const char *table_name);
 
 #endif
 
