@@ -1078,7 +1078,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	const char		*__function_name = "DBcopy_template_items";
 
 	zbx_vector_ptr_t	items, lld_rules;
-	int			new_conditions;
+	int			new_conditions = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1094,8 +1094,8 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	if (0 != lld_rules.values_num)
 	{
-		if (0 != (new_conditions = calculate_template_lld_rule_conditionids(&lld_rules)))
-			update_template_lld_rule_formulas(&items, &lld_rules);
+		new_conditions = calculate_template_lld_rule_conditionids(&lld_rules);
+		update_template_lld_rule_formulas(&items, &lld_rules);
 	}
 
 	save_template_items(hostid, &items);
