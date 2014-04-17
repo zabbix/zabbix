@@ -184,23 +184,28 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 		$sysmapIds[] = $_REQUEST['sysmapid'];
 	}
 
-	$maps = API::Map()->get(array(
-		'sysmapids' => $sysmapIds,
-		'output' => array('name'),
-		'editable' => true
-	));
-	$goResult = API::Map()->delete($sysmapIds);
+	DBstart();
 
-	show_messages($goResult, _('Network map deleted'), _('Cannot delete network map'));
-	clearCookies($goResult);
+	$result = API::Map()->delete($sysmapIds);
 
-	if ($goResult) {
+	if ($result) {
 		unset($_REQUEST['form']);
+
+		$maps = API::Map()->get(array(
+			'sysmapids' => $sysmapIds,
+			'output' => array('name'),
+			'editable' => true
+		));
 
 		foreach ($maps as $map) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
 		}
 	}
+
+	$result = DBend($result);
+
+	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
+	clearCookies($result);
 }
 
 /*
