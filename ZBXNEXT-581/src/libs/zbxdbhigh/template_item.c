@@ -437,7 +437,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 
 		index = zbx_vector_ptr_search(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		if (FAIL == index);
+		if (FAIL == index)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
