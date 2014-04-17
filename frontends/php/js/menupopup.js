@@ -339,7 +339,7 @@ function getMenuPopupMap(options) {
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1');
+			var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
 
 			jQuery.each(options.gotos.triggerStatus, function(name, value) {
 				url.setArgument(name, value);
