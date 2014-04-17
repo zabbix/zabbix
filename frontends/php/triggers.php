@@ -35,7 +35,7 @@ $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'),
+	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN(array(COPY_TO_HOST, COPY_TO_TEMPLATE, COPY_TO_HOST_GROUP)), 'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
@@ -278,14 +278,17 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('hostid'));
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
-	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
-		if ($_REQUEST['copy_type'] == 0) { // hosts
-			$hosts_ids = $_REQUEST['copy_targetid'];
+elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_triggerid')) {
+	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+		if (getRequest('copy_type') == COPY_TO_HOST) { // hosts
+			$hosts_ids = getRequest('copy_targetid');
+		}
+		else if (getRequest('copy_type') == COPY_TO_TEMPLATE) { // templates
+			$hosts_ids = getRequest('copy_targetid');
 		}
 		else { // groups
 			$hosts_ids = array();
-			$group_ids = $_REQUEST['copy_targetid'];
+			$group_ids = getRequest('copy_targetid');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -300,11 +303,11 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		DBstart();
 
-		$goResult = copyTriggersToHosts($_REQUEST['g_triggerid'], $hosts_ids, get_request('hostid'));
+		$goResult = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Trigger added'), _('Cannot add trigger'));
-		clearCookies($goResult, $_REQUEST['hostid']);
+		clearCookies($goResult, getRequest(['hostid']));
 
 		$_REQUEST['go'] = 'none2';
 	}

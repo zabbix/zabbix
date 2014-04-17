@@ -1264,7 +1264,7 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		'title' => $title,
 		'elements_field' => $elementsField,
 		'elements' => getRequest($elementsField, array()),
-		'copy_type' => getRequest('copy_type', 0),
+		'copy_type' => getRequest('copy_type', COPY_TO_HOST_GROUP),
 		'filter_groupid' => getRequest('filter_groupid', 0),
 		'copy_targetid' => getRequest('copy_targetid', array()),
 		'hostid' => getRequest('hostid', 0),
@@ -1279,7 +1279,7 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		return null;
 	}
 
-	if($data['copy_type'] == 1) {
+	if($data['copy_type'] == COPY_TO_HOST_GROUP) {
 		// get groups
 		$data['groups'] = API::HostGroup()->get(array(
 			'output' => array('groupid', 'name')
@@ -1288,9 +1288,9 @@ function getCopyElementsFormData($elementsField, $title = null) {
 	}
 	else {
 		// hosts or templates
-		$params = array('output' => API_OUTPUT_EXTEND);
+		$params = array('output' => array('name', 'groupid'));
 
-		if($data['copy_type'] == 0) {
+		if($data['copy_type'] == COPY_TO_HOST) {
 			$params['real_hosts'] = true;
 		}
 		else {
@@ -1300,26 +1300,31 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		$data['groups'] = API::HostGroup()->get($params);
 		order_result($data['groups'], 'name');
 
-		if (empty($data['filter_groupid'])) {
-			end($data['groups']);
-			$lastGroup = current($data['groups']);
-			$data['filter_groupid'] = $lastGroup['groupid'];
+		$groupIds = [];
+		foreach($data['groups'] as $group) {
+			$groupIds[] = $group['groupid'];
+		}
+
+		if (!in_array($data['filter_groupid'], $groupIds)
+			|| $data['filter_groupid'] == 0
+		) {
+			$data['filter_groupid'] = reset($groupIds);
 		}
 
 		$params = array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('name'),
 			'groupids' => $data['filter_groupid']
 		);
-		if($data['copy_type'] == 2) {
-			$data['hosts'] = API::Template()->get($params);
-			foreach($data['hosts'] as &$host) {
-				$host['hostid'] = $host['templateid'];
-			}
+		if($data['copy_type'] == COPY_TO_TEMPLATE) {
+			$params['output'][] = 'templateid';
+			$data['templates'] = API::Template()->get($params);
+			order_result($data['templates'], 'name');
 		}
-		else {
+		elseif($data['copy_type'] == COPY_TO_HOST) {
+			$params['output'][] = 'hostid';
 			$data['hosts'] = API::Host()->get($params);
+			order_result($data['hosts'], 'name');
 		}
-		order_result($data['hosts'], 'name');
 	}
 
 	return $data;

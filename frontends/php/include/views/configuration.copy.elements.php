@@ -42,14 +42,14 @@ $triggersForm->addVar('go', 'copy_to');
 $triggersFormList = new CFormList('triggersFormList');
 
 // append copy types to form list
-$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'jQuery("select[name=filter_groupid]").val(null); submit()');
-$copyTypeComboBox->addItem(0, _('Hosts'));
-$copyTypeComboBox->addItem(2, _('Templates'));
-$copyTypeComboBox->addItem(1, _('Host groups'));
+$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'submit()');
+$copyTypeComboBox->addItem(COPY_TO_HOST, _('Hosts'));
+$copyTypeComboBox->addItem(COPY_TO_TEMPLATE, _('Templates'));
+$copyTypeComboBox->addItem(COPY_TO_HOST_GROUP, _('Host groups'));
 $triggersFormList->addRow(_('Target type'), $copyTypeComboBox);
 
 // append groups to form list
-if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
+if ($this->data['copy_type'] == COPY_TO_HOST || $this->data['copy_type'] == COPY_TO_TEMPLATE) {
 	$groupComboBox = new CComboBox('filter_groupid', $this->data['filter_groupid'], 'submit()');
 	foreach ($this->data['groups'] as $group) {
 		if (empty($this->data['filter_groupid'])) {
@@ -62,7 +62,7 @@ if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
 
 // append targets to form list
 $targets = array();
-if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
+if ($this->data['copy_type'] == COPY_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
 		array_push(
 			$targets,
@@ -74,8 +74,19 @@ if ($this->data['copy_type'] == 0 || $this->data['copy_type'] == 2) {
 			)
 		);
 	}
-}
-else {
+} elseif ($this->data['copy_type'] == COPY_TO_TEMPLATE) {
+	foreach ($this->data['templates'] as $template) {
+		array_push(
+			$targets,
+			array(
+				new CCheckBox('copy_targetid['.$template['templateid'].']', uint_in_array($template['templateid'], $this->data['copy_targetid']), null, $template['templateid']),
+				SPACE,
+				$template['name'],
+				BR()
+			)
+		);
+	}
+} else {
 	foreach ($this->data['groups'] as $group) {
 		array_push(
 			$targets,
