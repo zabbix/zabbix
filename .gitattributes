@@ -215,6 +215,7 @@ frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
+frontends/php/robots.txt svneol=native#text/plain
 frontends/php/styles/themes/classic/images/bg_flat_0_999999.png -text
 frontends/php/styles/themes/classic/images/bg_flat_0_c9c9c9.png -text
 frontends/php/styles/themes/classic/images/bg_flat_100_fef1ec.png -text
