@@ -50,6 +50,30 @@ abstract class CMapElement extends CApiService {
 			);
 		}
 
+		// check images
+		$imageIds = array_merge(
+			zbx_objectValues($selements, 'iconid_on'),
+			zbx_objectValues($selements, 'iconid_off'),
+			zbx_objectValues($selements, 'iconid_disabled'),
+			zbx_objectValues($selements, 'iconid_maintenance')
+		);
+
+		if ($imageIds) {
+			$imageIds = zbx_toHash($imageIds);
+
+			unset($imageIds[0]);
+
+			$dbImagesCount = API::Image()->get(array(
+				'imageids' => $imageIds,
+				'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+				'countOutput' => true
+			));
+
+			if (count($imageIds) != $dbImagesCount) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
 		foreach ($selements as &$selement) {
 			if (!check_db_fields($selementDbFields, $selement)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element.'));
