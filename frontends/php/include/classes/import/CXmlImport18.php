@@ -874,10 +874,23 @@ class CXmlImport18 {
 				if (!isset($host_db['status'])) {
 					$host_db['status'] = HOST_STATUS_TEMPLATE;
 				}
-				$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE)
-						? API::Template()->exists($host_db)
-						: API::Host()->exists($host_db);
 
+				if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
+					$current_host = API::Template()->get(array(
+						'output' => array('templateid'),
+						'filter' => array('host' => $host_db['host']),
+						'nopermissions' => true,
+						'limit' => 1
+					));
+				}
+				else {
+					$current_host = API::Host()->get(array(
+						'output' => array('hostid'),
+						'filter' => array('host' => $host_db['host']),
+						'nopermissions' => true,
+						'limit' => 1
+					));
+				}
 
 				if (!$current_host
 						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['createMissing']))
@@ -1042,34 +1055,32 @@ class CXmlImport18 {
 				}
 
 				foreach ($groups_to_parse as $group) {
-					$current_group = API::HostGroup()->exists($group);
+					$hostGroup = API::HostGroup()->get(array(
+						'output' => API_OUTPUT_EXTEND,
+						'filter' => $group,
+						'editable' => true,
+						'limit' => 1
+					));
 
-					if ($current_group) {
-						$options = array(
-							'filter' => $group,
-							'output' => API_OUTPUT_EXTEND,
-							'editable' => 1
-						);
-						$current_group = API::HostGroup()->get($options);
-						if (empty($current_group)) {
-							throw new Exception(_s('No permissions for group "%1$s".', $group['name']));
-						}
-
-						$host_db['groups'][] = reset($current_group);
+					if ($hostGroup) {
+						$host_db['groups'][] = reset($hostGroup);
 					}
 					else {
-						$result = API::HostGroup()->create($group);
-						if (!$result) {
-							throw new Exception();
+						if ($rules['groups']['createMissing']) {
+							$result = API::HostGroup()->create($group);
+							if ($result) {
+								$newHostGroup = API::HostGroup()->get(array(
+									'output' => API_OUTPUT_EXTEND,
+									'groupids' => $result['groupids'],
+									'limit' => 1
+								));
+
+								$host_db['groups'][] = reset($newHostGroup);
+							}
 						}
-
-						$options = array(
-							'groupids' => $result['groupids'],
-							'output' => API_OUTPUT_EXTEND
-						);
-						$new_group = API::HostGroup()->get($options);
-
-						$host_db['groups'][] = reset($new_group);
+						else {
+							throw new Exception(_s('No permissions for host group "%1$s".', $group['name']));
+						}
 					}
 				}
 // }}} HOST GROUPS
