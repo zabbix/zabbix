@@ -116,8 +116,8 @@ $fields = array(
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({value_type})&&{value_type}==2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_targetid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
+	'copy_targetid' =>		    array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'filter_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -137,7 +137,6 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_name' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -234,7 +233,7 @@ if (!empty($hosts)) {
 }
 
 // filter
-if (isset($_REQUEST['filter_set'])) {
+if (hasRequest('filter_set') || getRequest('go') == 'copy_to') {
 	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
 	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
 	$_REQUEST['filter_application'] = get_request('filter_application');
@@ -256,7 +255,10 @@ if (isset($_REQUEST['filter_set'])) {
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
-	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
+	if(getRequest('go') != 'copy_to') {
+		CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
+	}
+
 	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
@@ -679,16 +681,17 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('hostid'));
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
-	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
-		// host
-		if ($_REQUEST['copy_type'] == 0) {
-			$hosts_ids = $_REQUEST['copy_targetid'];
+elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
+	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+		if (getRequest('copy_type') == COPY_TO_HOST) { // host
+			$hosts_ids = getRequest('copy_targetid');
 		}
-		// groups
-		else {
+		elseif(getRequest('copy_type') == COPY_TO_TEMPLATE) { // template
+			$hosts_ids = getRequest('copy_targetid');
+		}
+		else { // host groups
 			$hosts_ids = array();
-			$group_ids = $_REQUEST['copy_targetid'];
+			$group_ids = getRequest('copy_targetid');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -703,11 +706,11 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		DBstart();
 
-		$goResult = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
+		$goResult = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
-		clearCookies($goResult, get_request('hostid'));
+		clearCookies($goResult, getRequest('hostid'));
 
 		$_REQUEST['go'] = 'none2';
 	}
@@ -896,68 +899,11 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$itemView->render();
 	$itemView->show();
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
-	$data = array(
-		'group_itemid' => get_request('group_itemid', array()),
-		'hostid' => get_request('hostid', 0),
-		'copy_type' => get_request('copy_type', 0),
-		'copy_groupid' => get_request('copy_groupid', 0),
-		'copy_targetid' => get_request('copy_targetid', array())
-	);
-
-	if (!is_array($data['group_itemid']) || (is_array($data['group_itemid']) && count($data['group_itemid']) < 1)) {
-		error(_('Incorrect list of items.'));
-	}
-	else {
-
-		if($data['copy_type'] == 1) {
-			// group
-			$data['groups'] = API::HostGroup()->get(array(
-				'output' => API_OUTPUT_EXTEND
-			));
-			order_result($data['groups'], 'name');
-		}
-		else {
-			// hosts or templates
-			$params = array('output' => API_OUTPUT_EXTEND);
-
-			if($data['copy_type'] == 0) {
-				$params['real_hosts'] = true;
-			}
-			else {
-				$params['templated_hosts'] = true;
-			}
-
-			$data['groups'] = API::HostGroup()->get($params);
-			order_result($data['groups'], 'name');
-
-			if (empty($data['copy_groupid'])) {
-				end($data['groups']);
-				$lastGroup = current($data['groups']);
-				$data['copy_groupid'] = $lastGroup['groupid'];
-			}
-
-			$params = array(
-				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $data['copy_groupid']
-			);
-			if($data['copy_type'] == 2) {
-				$data['hosts'] = API::Template()->get($params);
-				foreach($data['hosts'] as &$host) {
-					$host['hostid'] = $host['templateid'];
-				}
-			}
-			else {
-				$data['hosts'] = API::Host()->get($params);
-			}
-			order_result($data['hosts'], 'name');
-		}
-	}
-
+elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
 	// render view
-	$itemView = new CView('configuration.item.copy', $data);
-	$itemView->render();
-	$itemView->show();
+	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid'));
+	$graphView->render();
+	$graphView->show();
 }
 // list of items
 else {

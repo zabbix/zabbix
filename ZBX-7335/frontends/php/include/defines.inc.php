@@ -927,6 +927,11 @@ define('QUEUE_DETAILS', 2);
 // item count to display in the details queue
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
+// constants for element "copy to..." target types
+define('COPY_TO_HOST', 0);
+define('COPY_TO_TEMPLATE', 2);
+define('COPY_TO_HOST_GROUP', 1);
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 

@@ -35,7 +35,7 @@ $fields = array(
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2'),	'isset({copy})'),
+	'copy_type' => array(T_ZBX_INT, O_OPT, P_SYS, IN(array(COPY_TO_HOST, COPY_TO_HOST_GROUP, COPY_TO_TEMPLATE)), 'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
 	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form})&&{form}=="update"'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
@@ -308,9 +308,8 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 		clearCookies($result, getRequest('hostid'));
 	}
-}
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
-	if (!empty($_REQUEST['copy_targetid']) && isset($_REQUEST['copy_type'])) {
+} elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
+	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$goResult = true;
 
 		$options = array(
@@ -320,35 +319,34 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 			'templated_hosts' => true
 		);
 
-		// hosts
-		if ($_REQUEST['copy_type'] == 0) {
-			$options['hostids'] = $_REQUEST['copy_targetid'];
-		}
-		// groups
-		else {
-			zbx_value2array($_REQUEST['copy_targetid']);
+		if (getRequest('copy_type') == COPY_TO_HOST) { // hosts
+			$options['hostids'] = getRequest('copy_targetid');
+		} elseif (getRequest('copy_type') == COPY_TO_TEMPLATE) { // templates
+			$options['hostids'] = getRequest('copy_targetid');
+		} else { // host groups
+			zbx_value2array(getRequest('copy_targetid'));
 
 			$dbGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
-				'groupids' => $_REQUEST['copy_targetid'],
+				'groupids' => getRequest('copy_targetid'),
 				'nodes' => get_current_nodeid(true),
 				'editable' => true
 			));
 			$dbGroups = zbx_toHash($dbGroups, 'groupid');
 
-			foreach ($_REQUEST['copy_targetid'] as $groupid) {
+			foreach (getRequest('copy_targetid') as $groupid) {
 				if (!isset($dbGroups[$groupid])) {
 					access_deny();
 				}
 			}
 
-			$options['groupids'] = $_REQUEST['copy_targetid'];
+			$options['groupids'] = getRequest('copy_targetid');
 		}
 
 		$dbHosts = API::Host()->get($options);
 
 		DBstart();
-		foreach ($_REQUEST['group_graphid'] as $graphid) {
+		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
 				$goResult &= (bool) copyGraphToHost($graphid, $host['hostid']);
 			}
@@ -357,7 +355,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
 		clearCookies($goResult,
-			empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+			getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
 		);
 
 		$_REQUEST['go'] = 'none2';
