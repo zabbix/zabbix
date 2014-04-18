@@ -384,10 +384,7 @@ class CMenuPopupHelper {
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			$host = reset($trigger['hosts']);
 
-			$data['configuration'] = array(
-				'hostid' => $host['hostid'],
-				'switchNode' => id2nodeid($trigger['triggerid'])
-			);
+			$data['configuration'] = array('hostid' => $host['hostid']);
 		}
 
 		return $data;
