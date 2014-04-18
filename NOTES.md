@@ -126,3 +126,48 @@ grep "13\/Mar\/2014" /var/log/apache2/access.log \
 | awk -F: '{print $2$3}' \
 | sort | uniq -c | less
 ```
+
+
+## Zabbix server log insights
+
+### Item became not supported counts
+
+(note: adjust cut..f1-2 to 1 for hostname counts or 2 for item counts)
+
+```sh
+grep " item \[" /var/log/zabbix/zabbix_server.log \
+| awk -F[\]\[] '{print $2}' \
+| cut -d':' -f1-2 \
+| sort | uniq -c | sort -n \
+| less
+```
+
+### Agent item failed network error counts
+
+```sh
+grep " failed: " /var/log/zabbix/zabbix_server.log \
+| grep -o "on host \".*\" failed:" \
+| awk -F\" '{print $2}' \
+| sort | uniq -c | sort -n \
+| less
+```
+
+(note: after an agent item has failed it should have a correlated connection restored)
+
+```sh
+grep " connection restored" /var/log/zabbix/zabbix_server.log \
+| grep -o "on host \".*" \
+| awk -F\" '{print $2}' \
+| sort | uniq -c | sort -n \
+| less
+```
+
+### Discovery rule became supported
+
+```sh
+grep " discovery rule " /var/log/zabbix/zabbix_server.log \
+| awk -F[\]\[] '{print $2,$4}' \
+| cut -d':' -f2 \
+| sort | uniq -c | sort -n \
+| less
+```
