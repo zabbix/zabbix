@@ -185,9 +185,6 @@ div.hintbox {
 #search_wdgt { padding: 5px; }
 #search_wdgt .widget { display: inline-block; }
 
-/* node tree */
-#div_node_tree { right: 0; background-color: gray; border: 2px solid black; position: absolute; z-index: 200;}
-
 /* triggers info */
 table.triggers_info { width: 100%; background-color: #FFFFFF; border: 0; }
 table.triggers_info tr td {
