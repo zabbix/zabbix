@@ -805,7 +805,7 @@ static int	process_discovery(int now)
 	{
 		ZBX_STR2UINT64(druleid, row[0]);
 
-		if (SUCCEED != DBis_null(row[4]))
+		if (SUCCEED == DBis_null(row[4]))
 		{
 			memset(&drule, 0, sizeof(drule));
 
@@ -819,8 +819,8 @@ static int	process_discovery(int now)
 
 		discovery_clean_services(druleid);
 
-		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64,
-				now, drule.druleid);
+		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64, now, druleid);
+
 		rule_count++;
 	}
 	DBfree_result(result);
