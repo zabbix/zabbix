@@ -2500,8 +2500,6 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
-		discovery_clean_services(drule.druleid);
-
 		DBbegin();
 		if (-1 == dcheck.type)
 			discovery_update_host(&dhost, ip, status, itemtime);
