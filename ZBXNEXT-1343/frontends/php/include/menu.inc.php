@@ -281,7 +281,6 @@ $ZBX_MENU = array(
 		'label'					=> _('Login'),
 		'user_type'				=> 0,
 		'default_page_id'		=> 0,
-		'hide_node_selection'	=> 1,
 		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
