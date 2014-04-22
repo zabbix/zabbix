@@ -626,38 +626,28 @@ class CXmlImport18 {
 			$images_to_add = array();
 			$images_to_update = array();
 			foreach ($images as $image) {
-				if (API::Image()->exists($image)) {
-					if ((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['updateExisting']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (!empty($rules['images']['updateExisting'])))
-					) {
+				$dbImage = API::Image()->get(array(
+					'output' => array('imageid'),
+					'filter' => array('name' => $image['name']),
+					'limit' => 1
+				));
 
-						$options = array(
-							'filter' => array('name' => $image['name']),
-							'output' => array('imageid')
-						);
-						$imgs = API::Image()->get($options);
-						$img = reset($imgs);
+				if ($dbImage && $rules['images']['updateExisting']) {
+					$dbImage = reset($dbImage);
+					$image['imageid'] = $dbImage['imageid'];
 
-						$image['imageid'] = $img['imageid'];
+					// image will be decoded in class.image.php
+					$image['image'] = $image['encodedImage'];
+					unset($image['encodedImage']);
 
-						// image will be decoded in class.image.php
-						$image['image'] = $image['encodedImage'];
-						unset($image['encodedImage']);
-
-						$images_to_update[] = $image;
-					}
+					$images_to_update[] = $image;
 				}
-				else {
-					if ((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['createMissing']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && !empty($rules['images']['createMissing']))
-					) {
+				elseif (!$dbImage && $rules['images']['createMissing']) {
+					// No need to decode_base64
+					$image['image'] = $image['encodedImage'];
 
-						// No need to decode_base64
-						$image['image'] = $image['encodedImage'];
-
-						unset($image['encodedImage']);
-						$images_to_add[] = $image;
-					}
+					unset($image['encodedImage']);
+					$images_to_add[] = $image;
 				}
 			}
 
@@ -1446,51 +1436,53 @@ class CXmlImport18 {
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['hostid'] = $current_hostid;
+						$current_trigger = false;
 
-						if ($current_trigger = API::Trigger()->exists($trigger_db)) {
-							$ctriggers = API::Trigger()->get(array(
-								'filter' => array(
-									'description' => $trigger_db['description']
-								),
-								'hostids' => $current_hostid,
-								'output' => API_OUTPUT_EXTEND,
-								'editable' => 1
-							));
-
-							$current_trigger = false;
-							foreach ($ctriggers as $ct) {
-								$tmp_exp = explode_exp($ct['expression']);
-								if (strcmp($trigger_db['expression'], $tmp_exp) == 0) {
-									$current_trigger = $ct;
-									break;
+						$dbTriggers = API::Trigger()->get(array(
+							'output' => API_OUTPUT_EXTEND,
+							'filter' => array('description' => $trigger_db['description']),
+							'hostids' => array($current_hostid),
+							'editable' => true
+						));
+						// one or more triggers found with same description
+						if ($dbTriggers) {
+							foreach ($dbTriggers as $dbTrigger) {
+								$expression = explode_exp($dbTrigger['expression']);
+								// expression does not match
+								if (strcmp($trigger_db['expression'], $expression) != 0) {
+									// treate it as new trigger
+									if ($rules['triggers']['createMissing']) {
+										$triggers_to_add[] = $trigger_db;
+									}
+									// skip creating it
+									else {
+										info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
+										continue;
+									}
+								}
+								// trigger with same description and expression
+								else {
+									// update it if necessary
+									if ($rules['triggers']['updateExisting']) {
+										$trigger_db['triggerid'] = $dbTrigger['triggerid'];
+										$triggers_to_upd[] = $trigger_db;
+									}
+									// skip updating
+									else {
+										info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
+										continue;
+									}
 								}
 							}
-							if (!$current_trigger) {
-								throw new Exception(_s('No permission for trigger "%s".', $trigger_db['description']));
-							}
 						}
-						unset($trigger_db['hostid']);
-
-
-						if (!$current_trigger && empty($rules['triggers']['createMissing'])) {
-							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
-							continue; // break if not update updateExisting
-						}
-						if ($current_trigger && empty($rules['triggers']['updateExisting'])) {
-							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
-							continue; // break if not update updateExisting
-						}
-
-						if ($current_trigger && !empty($rules['triggers']['updateExisting'])) {
-							$trigger_db['triggerid'] = $current_trigger['triggerid'];
-							$triggers_to_upd[] = $trigger_db;
-						}
-						if (!$current_trigger && !empty($rules['triggers']['createMissing'])) {
+						// no such trigger with description found
+						elseif ($rules['triggers']['createMissing']) {
 							$triggers_to_add[] = $trigger_db;
 						}
+						unset($trigger_db['hostid']);
 					}
 
-					if (!empty($triggers_to_upd)) {
+					if ($triggers_to_upd) {
 						$result = API::Trigger()->update($triggers_to_upd);
 						if (!$result) {
 							throw new Exception();
@@ -1504,7 +1496,8 @@ class CXmlImport18 {
 
 						$triggersForDependencies = array_merge($triggersForDependencies, $r);
 					}
-					if (!empty($triggers_to_add)) {
+
+					if ($triggers_to_add) {
 						$result = API::Trigger()->create($triggers_to_add);
 						if (!$result) {
 							throw new Exception();
@@ -1546,7 +1539,14 @@ class CXmlImport18 {
 							}
 							$gitem_db['key_'] = implode(':', $data);
 
-							if ($current_item = API::Item()->exists($gitem_db)) {
+							$itemExists = API::Item()->get(array(
+								'output' => array('itemid'),
+								'filter' => array('key_' => $gitem_db['key_']),
+								'webitems' => true,
+								'nopermissions' => true,
+								'limit' => 1
+							));
+							if ($itemExists) {
 								$current_item = API::Item()->get(array(
 									'filter' => array('key_' => $gitem_db['key_']),
 									'webitems' => true,

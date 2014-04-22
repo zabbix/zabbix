@@ -255,18 +255,22 @@ class CMaintenance extends CApiService {
 
 
 	/**
-	 * Determine, whether an object already exists
+	 * Check if maintenance exists.
 	 *
-	 * @param array $object
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
+		self::deprecated('maintenance.exists method is deprecated.');
+
 		$keyFields = array(array('maintenanceid', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('maintenanceid'),
-			'nopermissions' => true,
 			'limit' => 1
 		);
 		$objs = $this->get($options);
@@ -343,7 +347,13 @@ class CMaintenance extends CApiService {
 			}
 
 			// validate if maintenance name already exists
-			if ($this->exists(array('name' => $maintenance['name']))) {
+			$maintenanceExists = $this->get(array(
+				'output' => array('maintenanceid'),
+				'filter' => array('name' => $maintenance['name']),
+				'nopermissions' => true,
+				'limit' => 1
+			));
+			if ($maintenanceExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
 			}
 

@@ -322,7 +322,6 @@ class CTemplate extends CHostGeneral {
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'output' => array('templateid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
