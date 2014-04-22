@@ -299,8 +299,8 @@ if ($filterShowDetails) {
 $latestWidget = new CWidget(null, 'latest-mon');
 
 $form = new CForm('get');
-$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-$form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 
 $latestWidget->addHeader(_('Items'), $form);
 
@@ -315,19 +315,11 @@ $filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
 	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
 ));
 
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table
 $table = new CTableInfo(_('No values found.'));
-
-if (is_show_all_nodes()) {
-	$nodeHeader = new CCol(new CSpan(_('Node')), 'latest-node');
-	$nodeHeader->setAttribute('title', _('Node'));
-}
-else {
-	$nodeHeader = null;
-}
 
 if (getRequest('hostid')) {
 	$hostHeader = null;
@@ -373,7 +365,6 @@ if ($filterShowDetails) {
 	$table->addClass('latest-details');
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$nodeHeader,
 		$hostHeader,
 		$nameHeader,
 		$intervalHeader,
@@ -390,7 +381,6 @@ if ($filterShowDetails) {
 else {
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$nodeHeader,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
@@ -491,7 +481,6 @@ foreach ($items as $key => $item){
 
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? SPACE : null,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -513,7 +502,6 @@ foreach ($items as $key => $item){
 	else {
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? SPACE : null,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -564,7 +552,6 @@ foreach ($applications as $appid => $dbApp) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
-		get_node_name_by_elid($dbApp['applicationid']),
 		$hostName,
 		new CCol(array(
 				bold($dbApp['name']),
@@ -672,7 +659,6 @@ foreach ($items as $item) {
 
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -694,7 +680,6 @@ foreach ($items as $item) {
 	else {
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -737,7 +722,6 @@ foreach ($hosts as $hostId => $dbHost) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
-		get_node_name_by_elid($dbHost['hostid']),
 		$hostName,
 		new CCol(
 			array(

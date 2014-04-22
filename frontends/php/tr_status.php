@@ -104,7 +104,7 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_details'] = 0;
 	$_REQUEST['show_maintenance'] = 1;
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
+	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_RECENT_PROBLEM;
 	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
 	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
@@ -167,7 +167,24 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 // show triggers
 // the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
 // whole page inaccessible on large installations.
-$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
+if (hasRequest('show_triggers')) {
+	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
+		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
+	}
+}
+else {
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.tr_status.filter.show_triggers',
+			getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM), PROFILE_TYPE_INT
+		);
+		$_REQUEST['show_triggers'] = getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+	}
+	else {
+		$_REQUEST['show_triggers'] = CProfile::get('web.tr_status.filter.show_triggers',
+			TRIGGERS_OPTION_RECENT_PROBLEM
+		);
+	}
+}
 
 // show events
 if (isset($_REQUEST['show_events'])) {
@@ -290,8 +307,6 @@ validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 /*
  * Display
  */
-$displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
-
 $showTriggers = $_REQUEST['show_triggers'];
 $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
@@ -300,8 +315,8 @@ $ackStatus = $_REQUEST['ack_status'];
 $triggerWidget = new CWidget(null, 'trigger-mon');
 
 $rightForm = new CForm('get');
-$rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-$rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+$rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $triggerWidget->addPageHeader(
@@ -323,7 +338,8 @@ $filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 $statusComboBox = new CComboBox('show_triggers', $showTriggers);
 $statusComboBox->addItem(TRIGGERS_OPTION_ALL, _('Any'));
-$statusComboBox->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
+$statusComboBox->additem(TRIGGERS_OPTION_RECENT_PROBLEM, _('Recent problem'));
+$statusComboBox->additem(TRIGGERS_OPTION_IN_PROBLEM, _('Problem'));
 $filterForm->addRow(_('Triggers status'), $statusComboBox);
 
 if ($config['event_ack_enable']) {
@@ -456,7 +472,6 @@ $triggerTable->setHeader(array(
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
-	$displayNodes ? _('Node') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description'),
 	_('Comments')
@@ -467,7 +482,6 @@ $sortfield = getPageSortField('description');
 $sortorder = getPageSortOrder();
 $options = array(
 	'output' => array('triggerid', $sortfield),
-	'nodeids' => get_current_nodeid(),
 	'output' => array('triggerid', $sortfield),
 	'monitored' => true,
 	'skipDependent' => true,
@@ -516,9 +530,14 @@ if ($filter['application'] !== '') {
 if (!zbx_empty($_REQUEST['txt_select'])) {
 	$options['search'] = array('description' => $_REQUEST['txt_select']);
 }
-if ($showTriggers == TRIGGERS_OPTION_ONLYTRUE) {
+
+if ($showTriggers == TRIGGERS_OPTION_RECENT_PROBLEM) {
 	$options['only_true'] = 1;
 }
+elseif ($showTriggers == TRIGGERS_OPTION_IN_PROBLEM) {
+	$options['filter'] = array('value' => TRIGGER_VALUE_TRUE);
+}
+
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 	$options['withUnacknowledgedEvents'] = 1;
 }
@@ -541,7 +560,6 @@ $paging = getPagingLine($triggers);
 
 
 $triggers = API::Trigger()->get(array(
-	'nodeids' => get_current_nodeid(),
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
@@ -624,7 +642,6 @@ if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$options = array(
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
-		'nodeids' => get_current_nodeid(),
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -903,7 +920,6 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		$displayNodes ? get_node_name_by_elid($trigger['triggerid']) : null,
 		$hostColumn,
 		$triggerDescription,
 		$comments
@@ -951,7 +967,6 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				$displayNodes ? SPACE : null,
 				$emptyColumn
 			), 'odd_row');
 			$row->setAttribute('data-parentid', $trigger['triggerid']);

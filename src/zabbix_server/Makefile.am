@@ -7,13 +7,11 @@ SUBDIRS = \
 	discoverer \
 	housekeeper \
 	httppoller \
-	nodewatcher \
 	pinger \
 	poller \
 	snmptrapper \
 	timer \
 	trapper \
-	utils \
 	watchdog \
 	escalator \
 	proxypoller \
@@ -40,8 +38,6 @@ zabbix_server_LDADD = \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
 	snmptrapper/libzbxsnmptrapper.a \
-	nodewatcher/libzbxnodewatcher.a \
-	utils/libzbxutils.a \
 	httppoller/libzbxhttppoller.a \
 	watchdog/libzbxwatchdog.a \
 	escalator/libzbxescalator.a \

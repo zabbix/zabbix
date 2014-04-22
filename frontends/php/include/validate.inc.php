@@ -321,23 +321,23 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 	elseif ($type == T_ZBX_DBL) {
 		$decimalValidator = new CDecimalValidator(array(
-			'label' => $caption,
 			'maxPrecision' => 16,
 			'maxScale' => 4,
-			'messageFormat' => _('Value "%1$s" of "%2$s" has incorrect decimal format.'),
+			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
 			'messagePrecision' => _(
-				'Value "%1$s" of "%2$s" is too long: it cannot have more than %3$s digits before the decimal point '.
+				'Value "%2$s" of "%1$s" is too long: it cannot have more than %3$s digits before the decimal point '.
 				'and more than %4$s digits after the decimal point.'
 			),
 			'messageNatural' => _(
-				'Value "%1$s" of "%2$s" has too many digits before the decimal point: '.
+				'Value "%2$s" of "%1$s" has too many digits before the decimal point: '.
 				'it cannot have more than %3$s digits.'
 			),
 			'messageScale' => _(
-				'Value "%1$s" of "%2$s" has too many digits after the decimal point: '.
+				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
 				'it cannot have more than %3$s digits.'
 			)
 		));
+		$decimalValidator->setObjectName($caption);
 
 		if (!$decimalValidator->validate($var)) {
 			$error = true;
@@ -346,14 +346,14 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 	elseif ($type == T_ZBX_DBL_BIG) {
 		$decimalValidator = new CDecimalValidator(array(
-			'label' => $caption,
 			'maxScale' => 4,
-			'messageFormat' => _('Value "%1$s" of "%2$s" has incorrect decimal format.'),
+			'messageFormat' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
 			'messageScale' => _(
-				'Value "%1$s" of "%2$s" has too many digits after the decimal point: '.
+				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
 				'it cannot have more than %3$s digits.'
 			)
 		));
+		$decimalValidator->setObjectName($caption);
 
 		if (!$decimalValidator->validate($var)) {
 			$error = true;
@@ -516,7 +516,6 @@ function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = array(
 		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
-		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
 		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
 		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),

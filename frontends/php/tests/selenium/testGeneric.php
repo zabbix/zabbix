@@ -95,7 +95,6 @@ class testGeneric extends CWebTest {
 			array('adm.triggerdisplayoptions.php',	'Configuration of trigger displaying options'),
 			array('adm.other.php',					'Other configuration parameters'),
 
-			array('nodes.php',						'Configuration of nodes'),
 			array('proxies.php',					'Configuration of proxies'),
 			array('authentication.php',				'Configuration of authentication'),
 			array('usergrps.php',					'Configuration of user groups'),

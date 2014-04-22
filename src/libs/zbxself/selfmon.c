@@ -65,7 +65,6 @@ extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_DISCOVERER_FORKS;
 extern int	CONFIG_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
-extern int	CONFIG_NODEWATCHER_FORKS;
 extern int	CONFIG_HOUSEKEEPER_FORKS;
 extern int	CONFIG_WATCHDOG_FORKS;
 extern int	CONFIG_DATASENDER_FORKS;
@@ -121,8 +120,6 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_ALERTER_FORKS;
 		case ZBX_PROCESS_TYPE_TIMER:
 			return CONFIG_TIMER_FORKS;
-		case ZBX_PROCESS_TYPE_NODEWATCHER:
-			return CONFIG_NODEWATCHER_FORKS;
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return CONFIG_HOUSEKEEPER_FORKS;
 		case ZBX_PROCESS_TYPE_WATCHDOG:
@@ -188,8 +185,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "alerter";
 		case ZBX_PROCESS_TYPE_TIMER:
 			return "timer";
-		case ZBX_PROCESS_TYPE_NODEWATCHER:
-			return "node watcher";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return "housekeeper";
 		case ZBX_PROCESS_TYPE_WATCHDOG:
