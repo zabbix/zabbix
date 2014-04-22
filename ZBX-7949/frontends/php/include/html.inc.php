@@ -317,7 +317,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$proxyName = CHtml::encode($proxy['host']).NAME_DELIMITER;
 	}
 
-	$name = get_node_name_by_elid($dbHost['hostid'], true, NAME_DELIMITER).$proxyName.CHtml::encode($dbHost['name']);
+	$name = $proxyName.CHtml::encode($dbHost['name']);
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($name, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
