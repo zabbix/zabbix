@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
@@ -18,23 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once __DIR__.'/../../include/defines.inc.php';
-require_once __DIR__.'/../../include/func.inc.php';
-require_once __DIR__.'/../../include/gettextwrapper.inc.php';
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 
-// register autoloader
-require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
-
-$autoloader = new CAutoloader(array(
-	__DIR__.'/../../include/classes/core',
-	__DIR__.'/../../include/classes/helpers',
-	__DIR__.'/../../include/classes/db',
-	__DIR__.'/../../include/classes/api',
-	__DIR__.'/../../include/classes/api/clients',
-	__DIR__.'/../../include/classes/api/wrappers',
-	__DIR__.'/../../include/classes/validators',
-	__DIR__.'/../../include/classes/validators/string',
-	__DIR__.'/../../api/classes',
-	__DIR__.'/include/classes/validators',
-));
-$autoloader->register();
+void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
