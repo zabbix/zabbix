@@ -24,7 +24,7 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 
 	SYSTEM_INFO	si;
-	char		*os = NULL;
+	const char	*arch;
 	PGNSI		pGNSI;
 
 	memset(&si, 0, sizeof(si));
@@ -37,22 +37,19 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	switch (si.wProcessorArchitecture)
 	{
 		case PROCESSOR_ARCHITECTURE_INTEL:
-			os = zbx_malloc(os, 4);
-			zbx_strdup(os, "x86");
+			arch = "x86";
 			break;
 		case PROCESSOR_ARCHITECTURE_AMD64:
-			os = zbx_malloc(os, 4);
-			zbx_strdup(os, "x64");
+			arch = "x64";
 			break;
 		case PROCESSOR_ARCHITECTURE_IA64:
-			os = zbx_malloc(os, 20);
-			zbx_strdup(os, "Intel Itanium-based");
+			arch = "Intel Itanium-based";
 			break;
-		default :
+		default:
 			return SYSINFO_RET_FAIL;
 	}
 
-	SET_STR_RESULT(result, os);
+	SET_STR_RESULT(result, zbx_strdup(NULL, arch));
 
 	return SYSINFO_RET_OK;
 }
