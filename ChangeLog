@@ -12,7 +12,7 @@ Bug fixes:
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
-...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+...G...PS. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
