@@ -821,6 +821,8 @@ static void	process_active_checks(char *server, unsigned short port)
 
 		if (0 == is_logrt || 1 == is_logrt)
 		{
+			int	err;
+
 			ret = FAIL;
 
 			do {
@@ -866,6 +868,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				/* do not flood local system if file grows too fast */
 				p_count = 4 * maxlines_persec * active_metrics[i].refresh;
 
+				err = active_metrics[i].error_count;
+
 				ret = process_logrt(is_logrt, filename, &active_metrics[i].lastlogsize,
 						&active_metrics[i].mtime, &active_metrics[i].skip_old_data,
 						&active_metrics[i].big_rec, &active_metrics[i].use_ino,
@@ -873,11 +877,19 @@ static void	process_active_checks(char *server, unsigned short port)
 						&active_metrics[i].logfiles_num, encoding, regexps, regexps_num,
 						pattern, &p_count, &s_count, process_value, server, port,
 						CONFIG_HOSTNAME, active_metrics[i].key_orig);
+
+				/* reset errors if things have improved */
+				if (0 < active_metrics[i].error_count && SUCCEED == ret
+						&& active_metrics[i].error_count == err)
+				{
+					active_metrics[i].error_count = 0;
+				}
+
+				/* too many errors, time to go NOTSUPPORTED */
+				if (2 < active_metrics[i].error_count)
+					ret = FAIL;
 			}
 			while (0);
-
-			if (3 <= active_metrics[i].error_count)
-				ret = FAIL;
 
 			if (FAIL == ret)
 			{
