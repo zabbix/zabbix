@@ -173,7 +173,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY);
 
 	foreach ($groups as $group) {
 		switch($group['permission']) {
@@ -196,7 +196,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY);
 
 	foreach ($hosts as $host) {
 		switch($host['permission']) {

@@ -145,7 +145,7 @@ function get_user_system_auth($userid) {
 	$rights[i]['permission']= permission for resource
 	$rights[i]['id']	= resource id
 */
-function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res = null) {
+function get_accessible_hosts_by_rights(&$rights, $user_type, $perm) {
 	$result = array();
 	$res_perm = array();
 
@@ -202,13 +202,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 			continue;
 		}
 
-		switch ($perm_res) {
-			case PERM_RES_DATA_ARRAY:
-				$result[$dbHost['hostid']] = $dbHost;
-				break;
-			default:
-				$result[$dbHost['hostid']] = $dbHost['hostid'];
-		}
+		$result[$dbHost['hostid']] = $dbHost;
 	}
 
 	CArrayHelper::sort($result, array(
@@ -218,7 +212,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 	return $result;
 }
 
-function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res = null) {
+function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
 	$result = array();
 
 	$group_perm = array();
@@ -243,14 +237,7 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 			continue;
 		}
 
-		switch ($perm_res) {
-			case PERM_RES_DATA_ARRAY:
-				$result[$dbHostGroup['groupid']] = $dbHostGroup;
-				break;
-
-			default:
-				$result[$dbHostGroup['groupid']] = $dbHostGroup['groupid'];
-		}
+		$result[$dbHostGroup['groupid']] = $dbHostGroup;
 	}
 
 	CArrayHelper::sort($result, array(
