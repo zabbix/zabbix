@@ -193,11 +193,21 @@ class CUserGroup extends CApiService {
 		return $result;
 	}
 
+	/**
+	 * Check if user group exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('usergroup.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => array('name' => $object['name']),
 			'output' => array('usrgrpid'),
-			'nopermissions' => true,
 			'limit' => 1,
 		));
 
@@ -226,8 +236,13 @@ class CUserGroup extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			if ($this->exists(array('name' => $usrgrp['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User group').' [ '.$usrgrp['name'].' ] '._('already exists'));
+			$userGroupExists = $this->get(array(
+				'output' => array('usrgrpid'),
+				'filter' => array('name' => $usrgrp['name']),
+				'limit' => 1
+			));
+			if ($userGroupExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" already exists.', $usrgrp['name']));
 			}
 			$insert[$gnum] = $usrgrp;
 		}

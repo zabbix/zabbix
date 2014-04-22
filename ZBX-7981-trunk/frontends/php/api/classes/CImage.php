@@ -171,18 +171,20 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Check image existence.
+	 * Check if image exists.
 	 *
-	 * @param array $images
-	 * @param array $images['name']
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return boolean
+	 * @param array	$object
+	 *
+	 * @return bool
 	 */
 	public function exists($object) {
+		self::deprecated('image.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
 			'output' => array('imageid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -216,7 +218,13 @@ class CImage extends CApiService {
 			if (!check_db_fields($imageDbFields, $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
 			}
-			if ($this->exists(array('name' => $image['name']))) {
+
+			$imageExists = $this->get(array(
+				'output' => array('imageid'),
+				'filter' => array('name' => $image['name']),
+				'limit' => 1
+			));
+			if ($imageExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 			}
 
@@ -326,9 +334,9 @@ class CImage extends CApiService {
 			}
 
 			$imageExists = $this->get(array(
-				'filter' => array('name' => $image['name']),
 				'output' => array('imageid'),
-				'nopermissions' => true
+				'filter' => array('name' => $image['name']),
+				'limit' => 1
 			));
 			$imageExists = reset($imageExists);
 

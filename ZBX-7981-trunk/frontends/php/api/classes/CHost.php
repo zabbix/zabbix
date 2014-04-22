@@ -478,7 +478,7 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Check if Host exists.
+	 * Check if host exists.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
@@ -492,7 +492,6 @@ class CHost extends CHostGeneral {
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'output' => array('hostid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 

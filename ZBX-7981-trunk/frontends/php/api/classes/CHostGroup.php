@@ -388,7 +388,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Check if Host group exists.
+	 * Check if host group exists.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
