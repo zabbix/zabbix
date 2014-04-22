@@ -594,12 +594,10 @@ function getItemFilterForm(&$items) {
 		new CCol()
 	), 'item-list-row');
 
-	$filter = new CButton('filter', _('Filter'),
-		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
-	);
+	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$filter->useJQueryStyle('main');
 
-	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$reset->useJQueryStyle();
 
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
