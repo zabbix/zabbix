@@ -446,19 +446,11 @@ class CTrigger extends CTriggerGeneral {
 			return $result;
 		}
 
-		$triggers = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
+		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
 
 		// return count for post SQL filtered result sets
 		if (!is_null($options['countOutput'])) {
-			return count($triggers);
-		}
-
-		foreach ($triggers as $trigger) {
-			if (!isset($result[$trigger['triggerid']])) {
-				$result[$trigger['triggerid']] = array();
-			}
-
-			$result[$trigger['triggerid']] += $trigger;
+			return count($result);
 		}
 
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
@@ -479,6 +471,7 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
+
 		// expandComment
 		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
@@ -1820,8 +1813,10 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerId]['lastEvent'] = array();
 			}
 
+			$outputFields = is_array($options['selectLastEvent']) ? implode(',e.', $options['selectLastEvent']) : '*';
+
 			$dbEvents = DBselect(
-				'SELECT e.*'.
+				'SELECT e.'.$outputFields.
 				' FROM ('.
 					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
 					' FROM events e2'.
