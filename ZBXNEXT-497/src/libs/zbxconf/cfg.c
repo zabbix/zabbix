@@ -41,7 +41,7 @@ int	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***token
 	char    *token_tmp;
 
 	if (NULL == (token_tmp = strchr(string_to_parse, *delimiter)))
-		return -1;
+		return FAIL;
 
 	*tokens = zbx_malloc(NULL, sizeof(char*));
 
