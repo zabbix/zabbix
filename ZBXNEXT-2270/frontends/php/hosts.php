@@ -957,7 +957,7 @@ else {
 					$statusClass = 'orange';
 				}
 				else {
-					$statusCaption = _('Monitored');
+					$statusCaption = _('Enabled');
 					$statusClass = 'enabled';
 				}
 
@@ -966,7 +966,7 @@ else {
 				break;
 
 			case HOST_STATUS_NOT_MONITORED:
-				$statusCaption = _('Not monitored');
+				$statusCaption = _('Disabled');
 				$statusUrl = 'hosts.php?hosts'.SQUAREBRACKETS.'='.$host['hostid'].'&go=activate'.url_param('groupid');
 				$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
 				$statusClass = 'disabled';
