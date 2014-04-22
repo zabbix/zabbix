@@ -28,7 +28,7 @@ extern int	CONFIG_TIMEOUT;
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct stat	buf;
+	zbx_stat_t	buf;
 	char		filename[MAX_STRING_LEN];
 	int		ret = SYSINFO_RET_FAIL;
 
@@ -50,7 +50,7 @@ err:
 
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct stat	buf;
+	zbx_stat_t	buf;
 	char		filename[MAX_STRING_LEN], type[8];
 	int		ret = SYSINFO_RET_FAIL;
 
@@ -82,7 +82,7 @@ err:
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct stat	buf;
+	zbx_stat_t	buf;
 	char		filename[MAX_STRING_LEN];
 	int		ret = SYSINFO_RET_FAIL;
 
@@ -109,7 +109,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	size_t		contents_alloc = 512, contents_offset = 0;
 	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
-	struct stat	stat_buf;
+	zbx_stat_t	stat_buf;
 	double		ts;
 
 	ts = zbx_time();
