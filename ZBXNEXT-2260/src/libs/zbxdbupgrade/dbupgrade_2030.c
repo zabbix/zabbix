@@ -870,8 +870,103 @@ static int	DBpatch_2030091(void)
 
 	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
-#endif
 
+static int	DBreplace_macro(const char *table_name, const char *field_name, const char *uid,
+				const char *old_macro, const char **sub_macros, const char *new_macro)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		id;
+	const char		*f = NULL, *s = NULL, **o = NULL;
+	char			*p = NULL, *c = NULL, *n = NULL;
+	size_t			alloc = 0, offset = 0;
+	int			i = 0, ret = SUCCEED;
+	zbx_vector_ptr_t	markers;
+
+
+	result = DBselect("select %s,%s from %s where %s like '%%%s%%'", uid, field_name, table_name,
+				field_name, old_macro);
+
+	if(NULL == result)
+		return FAIL;
+
+	zbx_vector_ptr_create(&markers);
+
+	while(NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		for (f = s = row[1]; NULL != (p = strstr(s, old_macro)); s = c)
+		{
+			c = (p + strlen(old_macro));
+
+			if ('\0' == *c)
+				break;
+			else if ('}' == *c || ('1' <= *c && *c <= '9' && '}' == *(c + 1)))
+				zbx_vector_ptr_append(&markers, p);
+			else if ('.' == *c && '\0' != *(c + 1) && c++)
+			{
+				if (NULL == (o = sub_macros))
+				{
+					/* In this case, we have found a macro in the database */
+					/* that contains a dot. This condition indicates that  */
+					/* either an empty `sub_macros' was passed, which is   */
+					/* an error and indicates an incorrect call to this    */
+					/* function,  or that it  is a  macro  which  does not */
+					/* support `sub macros'. In the first case, it is an   */
+					/* error on "our" side. In the latter, it is an error  */
+					/* on the users side, as this field contains only user */
+					/* supplied data.                                      */
+					/* Either way, there is no simple way of verifying     */
+					/* the case, so this case gets simply ignored and we   */
+					/* proceed further.                                    */
+				}
+				else
+				{
+				while (NULL != *o && 0 != strncmp(c, *o, strlen(*o)))
+						o++;
+
+					if (NULL != *o)
+					{
+						c += strlen(*o);
+
+						if ('}' == *c || ('1' <= *c && *c <= '9' && '}' == *(c + 1)))
+							zbx_vector_ptr_append(&markers, p);
+					}
+				}
+			}
+		}
+
+		if (0 == markers.values_num)
+			continue;
+		else
+		{
+			for (i = 0; i < markers.values_num; i++)
+			{
+				zbx_strncpy_alloc(&n, &alloc, &offset, f, (char *)markers.values[i] - f);
+				zbx_strncpy_alloc(&n, &alloc, &offset, new_macro, strlen(new_macro));
+				f = markers.values[i] + strlen(old_macro);
+			}
+		}
+
+		if (ZBX_DB_OK > DBexecute("update %s set %s='%s' where %s='%d'", table_name, field_name, n, uid, id))
+			ret = FAIL;
+
+		zbx_vector_ptr_clean(&markers, zbx_ptr_free);
+
+		if(ret = FAIL)
+			break;
+
+		offset = 0;
+	}
+
+	zbx_free(n);
+	zbx_vector_ptr_destory(&markers);
+
+	return ret;
+}
+
+#endif
 DBPATCH_START(2030)
 
 /* version, duplicates flag, mandatory flag */
