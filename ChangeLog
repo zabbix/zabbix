@@ -44,6 +44,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-2840] fixed map configuration with broken images (Eduard)
 ..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
 ..F....... [ZBX-8012] made links to other IT services from the dependency management to open in a new browser tab (Eduard, Oleg)
 ..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
