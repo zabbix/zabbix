@@ -184,15 +184,15 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.type=%d"
+				" and i.status in (%d,%d)"
 				" and i.flags<>%d"
 				" and h.hostid=" ZBX_FS_UI64
-				" and h.proxy_hostid is null"
-				" and i.status<>%d",
+				" and h.proxy_hostid is null",
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			hostid,
-			ITEM_STATUS_DISABLED);
+			hostid);
 
 	result = DBselect("%s", buffer);
 
@@ -340,15 +340,15 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.type=%d"
+				" and i.status in (%d,%d)"
 				" and i.flags<>%d"
 				" and h.hostid=" ZBX_FS_UI64
-				" and h.proxy_hostid is null"
-				" and i.status<>%d",
+				" and h.proxy_hostid is null",
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			ZBX_FLAG_DISCOVERY_CHILD,
-			hostid,
-			ITEM_STATUS_DISABLED);
+			hostid);
 
 	zbx_free(name_esc);
 
