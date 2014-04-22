@@ -216,6 +216,7 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*key_esc, *ip_esc, *dns_esc;
+	size_t		value_len, value_offset = 0;
 
 	zbx_uint64_t	dhostid;
 
@@ -267,7 +268,9 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 		dservice->status = atoi(row[2]);
 		dservice->lastup = atoi(row[3]);
 		dservice->lastdown = atoi(row[4]);
-		dservice->value = zbx_strdup(dservice->value, row[5]);
+
+		value_len = strlen(dservice->value);
+		zbx_strcpy_alloc(&dservice->value, &value_len, &value_offset, row[5]);
 
 		if (dhostid != dhost->dhostid)
 		{
@@ -354,6 +357,7 @@ static void	discovery_update_dservice_value(DB_DSERVICE *service)
 static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, const char *value, int now)
 {
 	zbx_timespec_t	ts;
+	size_t		value_len, value_offset = 0;
 
 	ts.sec = now;
 	ts.ns = 0;
@@ -366,14 +370,18 @@ static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, c
 			dservice->lastdown = 0;
 			dservice->lastup = now;
 
-			dservice->value = zbx_strdup(dservice->value, value);
+			value_len = strlen(dservice->value);
+			zbx_strcpy_alloc(&dservice->value, &value_len, &value_offset, value);
+
 			discovery_update_dservice(dservice);
 			add_event(0, EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
 					DOBJECT_STATUS_DISCOVER, NULL, NULL, 0, 0);
 		}
 		else if (0 != strcmp(dservice->value, value))
 		{
-			dservice->value = zbx_strdup(dservice->value, value);
+			value_len = strlen(dservice->value);
+			zbx_strcpy_alloc(&dservice->value, &value_len, &value_offset, value);
+
 			discovery_update_dservice_value(dservice);
 		}
 	}
@@ -504,6 +512,8 @@ void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhos
 			__function_name, ip, port, status);
 
 	memset(&dservice, 0, sizeof(dservice));
+
+	dservice.value = zbx_strdup(dservice.value, "");
 
 	/* register host if is not registered yet */
 	if (0 == dhost->dhostid)
