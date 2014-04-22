@@ -41,28 +41,18 @@ int	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***token
 	char    *token_tmp;
 
 	if (NULL == (token_tmp = strchr(string_to_parse, *delimiter)))
-		return FALSE;
+		return -1;
 
 	*tokens = zbx_malloc(NULL, sizeof(char*));
 
-	if (string_to_parse == token_tmp)
-	{
-		zbx_error("*<> is first");
-		**tokens = token_tmp + 1;
-	}
-	else
-	{
-		zbx_error("<>*<> is first");
+	if (string_to_parse != token_tmp)
 		**tokens = string_to_parse;
-		*tokens_cnt = 1;
-		*tokens = zbx_realloc(*tokens, sizeof(char*) * 2);
-		*(*tokens + 1) = token_tmp + 1;
-	}
-	*token_tmp = '\0';
 
-	while (NULL != (token_tmp = strchr(token_tmp + 1, *delimiter)))
+	while (NULL != (token_tmp = strchr(token_tmp, *delimiter)))
 	{
-		*tokens_cnt = *tokens_cnt + 1;
+		if(NULL != **tokens)
+			*tokens_cnt = *tokens_cnt + 1;
+
 		*tokens = zbx_realloc(*tokens, sizeof(char*) * (*tokens_cnt + 1));
 		*(*tokens + *tokens_cnt) = token_tmp + 1;
 
@@ -70,7 +60,11 @@ int	parse_string_to_tokens(char *string_to_parse, char *delimiter, char ***token
 			*tokens_cnt = *tokens_cnt - 1;
 
 		*token_tmp = '\0';
+		token_tmp++;
 	}
+
+	if(NULL != **tokens)
+		*tokens_cnt = *tokens_cnt + 1;
 
 	return SUCCEED;
 }
@@ -107,64 +101,41 @@ int	check_tokens_in_file_name(const char *cfg_file, char *path_tmp, char *file_n
 	char	*ex_carret, *delimiter = "*";
 	int	tokens_cnt_tmp = 0;
 
-	if (NULL == tokens[0])
+	if ((0 == tokens_cnt) || (NULL == tokens[0]))
 		return SUCCEED;
 
 	if (NULL == (ex_carret = strstr(file_name, tokens[0])))
 		return FAIL;
 
-	if (0 != strcmp(ex_carret,file_name))
+	if ((0 != strcmp(ex_carret,file_name)) && ('*' != *(strrchr(cfg_file, PATH_SEPARATOR) + 1)))
+		return FAIL;
+
+	for (; tokens_cnt > tokens_cnt_tmp; tokens_cnt_tmp++)
 	{
-		if ('*' != *(strrchr(cfg_file, PATH_SEPARATOR) + 1))
-			return FAIL;
-	}
-
-	for (; tokens_cnt >= tokens_cnt_tmp; tokens_cnt_tmp++)
-	{
-zbx_error("0 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
-
-		if (NULL == tokens[tokens_cnt_tmp])
-			return FAIL;
-
-		if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
+		if ((NULL == tokens[tokens_cnt_tmp]) || (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp]))))
 			return FAIL;
 
 		ex_carret += strlen(tokens[tokens_cnt_tmp]);
 
-		if ('\0' == *ex_carret)
-			break;
-
-		if (tokens_cnt == tokens_cnt_tmp)
+		if (tokens_cnt - 1 == tokens_cnt_tmp)
 		{
-zbx_error("1 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
+			char	*carret_tmp = NULL;
 
-				char	*carret_tmp = NULL;
+			while (0 != *tokens[tokens_cnt_tmp])
+			{
+				carret_tmp = ex_carret;
 
-				while (1)
-				{
-					carret_tmp = ex_carret;
-zbx_error("2 ex_carret: %s, %i, %i, %s", ex_carret, tokens_cnt, tokens_cnt_tmp, tokens[tokens_cnt_tmp]);
-					if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
-						break;
+				if (NULL == (ex_carret = strstr(ex_carret, tokens[tokens_cnt_tmp])))
+					break;
 
-					ex_carret += strlen(tokens[tokens_cnt_tmp]);
-					/*if (0 == strlen(ex_carret))
-						break;*/
+				ex_carret += strlen(tokens[tokens_cnt_tmp]);
+			}
 
-				}
-
+			if (NULL != carret_tmp)
 				ex_carret = carret_tmp;
 
-			if (0 != strlen(ex_carret))
-			{
-					zbx_error("3 ex_carret: %s, %s, %i", ex_carret, carret_tmp, tokens_cnt_tmp);
-
-				if ('\0' != *(strrchr(cfg_file, delimiter[0]) + 1))
-				{
-					zbx_error("4 ex_carret: %s, %s, %i", ex_carret, carret_tmp, tokens_cnt_tmp);
-					return FAIL;
-				}
-			}
+			if (('\0' != *ex_carret) && ('\0' != *(strrchr(cfg_file, delimiter[0]) + 1)))
+				return FAIL;
 		}
 	}
 
@@ -194,7 +165,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	const char		*__function_name = "parse_cfg_object";
 	char 			*path_tmp = NULL, *file_name;
 	char			*extension_full = NULL, **tokens_tmp = NULL;
-	int			tokens_cnt = 0, ret;
+	int			tokens_cnt = 0, ret = FAIL;
 
 #ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
@@ -202,8 +173,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	char 			*path = NULL;
 	wchar_t			*wpath;
 	struct _stat	sb;
-
-	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -266,26 +235,16 @@ out:
 	char		*extension, *ex_carret;
 	size_t		alloc_len = MAX_STRING_LEN, offset = 0;
 
-	ret = SUCCEED;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	path_tmp = zbx_strdup(path_tmp, cfg_file);
 
 	if (FAIL == parse_file_name_to_tokens(path_tmp, &extension_full, &tokens_tmp, &tokens_cnt))
-	{
-		ret = FAIL;
 		goto out;
-	}
-	zbx_error("token count %i", tokens_cnt);
-/*
-	for (; 0 <= tokens_cnt; tokens_cnt--)
-		zbx_error("token %i: %s", tokens_cnt, tokens_tmp[tokens_cnt]);
-*/
+
 	if (-1 == zbx_stat(path_tmp, &sb))
 	{
 		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
-		ret = FAIL;
 		goto out;
 	}
 
@@ -295,13 +254,11 @@ out:
 	if (NULL == (dir = opendir(path_tmp)))
 	{
 		zbx_error("%s: %s", path_tmp, zbx_strerror(errno));
-		ret = FAIL;
 		goto out;
 	}
 
 	while (NULL != (d = readdir(dir)))
 	{
-		zbx_error("CHECKING file %s", d->d_name);
 		if (FAIL == check_tokens_in_file_name(cfg_file, path_tmp, d->d_name, extension_full, tokens_tmp, tokens_cnt))
 			continue;
 
@@ -315,13 +272,13 @@ out:
 			ret = FAIL;
 			break;
 		}
-		zbx_error("file parsed: %s", incl_file);
+		else
+			ret = SUCCEED;
 	}
 
 	if (-1 == closedir(dir))
 	{
 		zbx_error("%s: %s\n", path_tmp, zbx_strerror(errno));
-		ret = FAIL;
 		goto out;
 	}
 out:
