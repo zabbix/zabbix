@@ -255,7 +255,7 @@ if (hasRequest('filter_set') || getRequest('go') == 'copy_to') {
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
-	if(getRequest('go') != 'copy_to') {
+	if (getRequest('go') != 'copy_to') {
 		CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
 	}
 
@@ -686,7 +686,7 @@ elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group
 		if (getRequest('copy_type') == COPY_TO_HOST) { // host
 			$hosts_ids = getRequest('copy_targetid');
 		}
-		elseif(getRequest('copy_type') == COPY_TO_TEMPLATE) { // template
+		elseif (getRequest('copy_type') == COPY_TO_TEMPLATE) { // template
 			$hosts_ids = getRequest('copy_targetid');
 		}
 		else { // host groups
