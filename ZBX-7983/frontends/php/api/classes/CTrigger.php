@@ -1813,10 +1813,24 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerId]['lastEvent'] = array();
 			}
 
-			$outputFields = is_array($options['selectLastEvent']) ? implode(',e.', $options['selectLastEvent']) : '*';
+			if (is_array($options['selectLastEvent'])) {
+				$pkFieldId = $this->pk('events');
+				$outputFields = array($pkFieldId => $this->fieldId($pkFieldId, 'e'));
+
+				foreach ($options['selectLastEvent'] as $field) {
+					if ($this->hasField($field, 'events')) {
+						$outputFields[$field] = $this->fieldId($field, 'e');
+					}
+				}
+
+				$outputFields = implode(',', $outputFields);
+			}
+			else {
+				$outputFields = 'e.*';
+			}
 
 			$dbEvents = DBselect(
-				'SELECT e.'.$outputFields.
+				'SELECT '.$outputFields.
 				' FROM ('.
 					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
 					' FROM events e2'.
