@@ -1264,8 +1264,8 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		'title' => $title,
 		'elements_field' => $elementsField,
 		'elements' => getRequest($elementsField, array()),
-		'copy_type' => getRequest('copy_type', COPY_TO_HOST_GROUP),
-		'filter_groupid' => getRequest('filter_groupid', 0),
+		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
+		'copy_groupid' => getRequest('copy_groupid', 0),
 		'copy_targetid' => getRequest('copy_targetid', array()),
 		'hostid' => getRequest('hostid', 0),
 		'groups' => array(),
@@ -1280,7 +1280,7 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		return null;
 	}
 
-	if ($data['copy_type'] == COPY_TO_HOST_GROUP) {
+	if ($data['copy_type'] == COPY_TYPE_TO_HOST_GROUP) {
 		// get groups
 		$data['groups'] = API::HostGroup()->get(array(
 			'output' => array('groupid', 'name')
@@ -1291,7 +1291,7 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		// hosts or templates
 		$params = array('output' => array('name', 'groupid'));
 
-		if ($data['copy_type'] == COPY_TO_HOST) {
+		if ($data['copy_type'] == COPY_TYPE_TO_HOST) {
 			$params['real_hosts'] = true;
 		}
 		else {
@@ -1303,21 +1303,21 @@ function getCopyElementsFormData($elementsField, $title = null) {
 
 		$groupIds = zbx_objectValues($data['groups'], 'groupid');
 
-		if (!in_array($data['filter_groupid'], $groupIds) || $data['filter_groupid'] == 0) {
-			$data['filter_groupid'] = reset($groupIds);
+		if (!in_array($data['copy_groupid'], $groupIds) || $data['copy_groupid'] == 0) {
+			$data['copy_groupid'] = reset($groupIds);
 		}
 
-		if ($data['copy_type'] == COPY_TO_TEMPLATE) {
+		if ($data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
 			$data['templates'] = API::Template()->get(array(
 				'output' => array('name', 'templateid'),
-				'groupids' => $data['filter_groupid']
+				'groupids' => $data['copy_groupid']
 			));
 			order_result($data['templates'], 'name');
 		}
-		elseif ($data['copy_type'] == COPY_TO_HOST) {
+		elseif ($data['copy_type'] == COPY_TYPE_TO_HOST) {
 			$data['hosts'] = API::Host()->get(array(
 				'output' => array('name', 'hostid'),
-				'groupids' => $data['filter_groupid']
+				'groupids' => $data['copy_groupid']
 			));
 			order_result($data['hosts'], 'name');
 		}

@@ -117,7 +117,8 @@ $fields = array(
 		'isset({save})&&isset({value_type})&&{value_type}==2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		    array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'filter_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'copy_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'filter_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -255,10 +256,7 @@ if (hasRequest('filter_set') || getRequest('go') == 'copy_to') {
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
-	if (getRequest('go') != 'copy_to') {
-		CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
-	}
-
+	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
@@ -684,7 +682,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
-		if (getRequest('copy_type') == COPY_TO_HOST || getRequest('copy_type') == COPY_TO_TEMPLATE) {
+		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetid');
 		}
 		// host groups
@@ -900,7 +898,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 }
 elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
 	// render view
-	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid'));
+	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS')));
 	$graphView->render();
 	$graphView->show();
 }
