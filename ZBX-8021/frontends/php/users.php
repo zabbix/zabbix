@@ -143,6 +143,8 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (isset($_REQUEST['save'])) {
 	$config = select_config();
 
+	$isValid = true;
+
 	$usrgrps = getRequest('user_groups', array());
 
 	// authentication type
@@ -155,15 +157,30 @@ elseif (isset($_REQUEST['save'])) {
 			: $config['authentication_type'];
 	}
 
-	if (isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
-		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
-	}
-	elseif (!isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
-		$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+	// password validation
+	if ($authType != ZBX_AUTH_INTERNAL) {
+		if (isset($_REQUEST['password1'])) {
+			show_error_message(_s(
+				'Password is unavailable for users with %1$s.',
+				authentication2str($authType)
+			));
+
+			$isValid = false;
+		}
+		else {
+			if (isset($_REQUEST['userid'])) {
+				$_REQUEST['password1'] = null;
+				$_REQUEST['password2'] = null;
+			}
+			else {
+				$_REQUEST['password1'] = 'zabbix';
+				$_REQUEST['password2'] = 'zabbix';
+			}
+		}
 	}
 	else {
-		$_REQUEST['password1'] = get_request('password1', null);
-		$_REQUEST['password2'] = get_request('password2', null);
+		$_REQUEST['password1'] = getRequest('password1', null);
+		$_REQUEST['password2'] = getRequest('password2', null);
 	}
 
 	if ($_REQUEST['password1'] != $_REQUEST['password2']) {
@@ -173,14 +190,21 @@ elseif (isset($_REQUEST['save'])) {
 		else {
 			show_error_message(_('Cannot add user. Both passwords must be equal.'));
 		}
+
+		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] == ZBX_GUEST_USER && !zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('For guest, password must be empty'));
+
+		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] != ZBX_GUEST_USER && zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('Password should not be empty'));
+
+		$isValid = false;
 	}
-	else {
+
+	if ($isValid) {
 		$user = array();
 		$user['alias'] = get_request('alias');
 		$user['name'] = get_request('name');
