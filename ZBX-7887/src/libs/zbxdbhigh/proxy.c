@@ -92,8 +92,7 @@ static zbx_history_table_t areg = {
  *             hostid        - [OUT] proxy host ID found in database          *
  *             host          - [IN] buffer with minimum size                  *
  *                                  'HOST_HOST_LEN_MAX'                       *
- *             error         - [IN] buffer for printing error messages        *
- *             max_error_len - [IN] "error" buffer size                       *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - proxy ID was found in database                    *
  *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
@@ -102,7 +101,7 @@ static zbx_history_table_t areg = {
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -113,7 +112,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			zbx_snprintf(error, max_error_len, "invalid proxy name \"%s\"", host);
+			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\"", host);
 			return ret;
 		}
 
@@ -141,7 +140,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				}
 				else
 				{
-					zbx_snprintf(error, max_error_len, "proxy \"%s\" is configured in passive mode",
+					*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode",
 							host);
 				}
 			}
@@ -149,12 +148,12 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		else
-			zbx_snprintf(error, max_error_len, "proxy \"%s\" not found", host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
 
 		DBfree_result(result);
 	}
 	else
-		zbx_snprintf(error, max_error_len, "missing name of proxy");
+		*error = zbx_strdup(*error, "missing name of proxy");
 
 	return ret;
 }
@@ -180,13 +179,13 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
+static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
 		zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *httptests)
 {
 	const char	*__function_name = "get_proxyconfig_table";
 	char		*sql = NULL;
 	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		f, fld;
+	int		f, fld, ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -291,7 +290,11 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by t.%s", table->recid);
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		ret = FAIL;
+		goto skip_data;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -330,7 +333,9 @@ skip_data:
 	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint64_t *hosts)
@@ -425,7 +430,7 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
+int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
 	typedef struct
 	{
@@ -456,7 +461,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	const char		*__function_name = "get_proxyconfig_data";
 
-	int			i;
+	int			i, ret = FAIL;
 	const ZBX_TABLE		*table;
 	zbx_vector_uint64_t	hosts, httptests;
 
@@ -475,13 +480,21 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		table = DBget_table(pt[i].table);
 		assert(NULL != table);
 
-		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
+		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
+		{
+			*error = zbx_dsprintf(*error, "failed to get data from table %s", table->table);
+			goto out;
+		}
 	}
 
+	ret = SUCCEED;
+out:
 	zbx_vector_uint64_destroy(&httptests);
 	zbx_vector_uint64_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -651,7 +664,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
  *                                                                            *
  * Purpose: update configuration table                                        *
  *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -664,9 +677,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
 				move_out = 0, move_field_nr = 0;
-#ifdef HAVE_MYSQL
-	int			ex_fields_count = 0;
-#endif
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
@@ -681,6 +691,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	zbx_hashset_t           h_id_offsets, h_del;
 	zbx_hashset_iter_t	iter;
 	zbx_id_offset_t		id_offset, *p_id_offset = NULL;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_ptr_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
 
@@ -734,30 +746,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto out;
 		}
 	}
-
-#ifdef HAVE_MYSQL
-	/* MySQL: BLOB and TEXT columns doesn't have a default value; we shall add them into an insert statement */
-	for (i = 0; NULL != table->fields[i].name; i++)
-	{
-		switch (table->fields[i].type)
-		{
-			case ZBX_TYPE_BLOB:
-			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
-				for (f = 0; f < fields_count; f++)
-				{
-					if (fields[f] == &table->fields[i])
-						break;
-				}
-
-				if (f == fields_count)
-					fields[fields_count + ex_fields_count++] = &table->fields[i];
-
-				break;
-		}
-	}
-#endif
 
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
@@ -846,7 +834,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				NULL == (pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
-			goto clean;
+			goto clean2;
 		}
 
 		/* check whether we need to update existing entry or insert a new one */
@@ -867,7 +855,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
-					goto clean;
+					goto clean2;
 				}
 
 				/* find the field requiring special preprocessing in JSON record */
@@ -880,7 +868,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					{
 						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 								jp_row.end - jp_row.start + 1, jp_row.start);
-						goto clean;
+						goto clean2;
 					}
 
 					if (move_field_nr == f)
@@ -938,7 +926,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					del->values_num);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto clean;
+				goto clean2;
 
 			zbx_vector_uint64_clear(del);
 		}
@@ -960,8 +948,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					moves.values_num);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto clean;
+				goto clean2;
 		}
+	}
+
+	if (0 != ins.values_num)
+	{
+		zbx_vector_ptr_create(&values);
+
+		zbx_db_insert_prepare_dyn(&db_insert, table, fields, fields_count);
 	}
 
 	sql_offset = 0;
@@ -984,27 +979,98 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 		if (0 != insert)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
+			/* perform insert operation */
 
-#ifdef HAVE_MYSQL
-			for (f = 0; f < fields_count + ex_fields_count; f++)
-#else
-			for (f = 0; f < fields_count; f++)
-#endif
+			zbx_db_value_t	*value;
+
+			/* add the id field */
+			value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+			value->ui64 = recid;
+			zbx_vector_ptr_append(&values, value);
+
+			/* add the rest of fields */
+			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)); f++)
 			{
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, fields[f]->name);
-				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+				if (f == fields_count)
+				{
+					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
+							jp_row.end - jp_row.start + 1, jp_row.start);
+					goto clean;
+				}
+
+				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
+				{
+					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
+							table->table, fields[f]->name);
+					goto clean;
+				}
+
+				value = zbx_malloc(NULL, sizeof(zbx_db_value_t));
+
+				switch (fields[f]->type)
+				{
+					case ZBX_TYPE_INT:
+						value->i32 = atoi(buf);
+						break;
+					case ZBX_TYPE_UINT:
+						ZBX_STR2UINT64(value->ui64, buf);
+						break;
+					case ZBX_TYPE_ID:
+						if (0 == is_null)
+							ZBX_STR2UINT64(value->ui64, buf);
+						else
+							value->ui64 = 0;
+						break;
+					case ZBX_TYPE_FLOAT:
+						value->dbl = atof(buf);
+						break;
+					case ZBX_TYPE_CHAR:
+					case ZBX_TYPE_TEXT:
+					case ZBX_TYPE_SHORTTEXT:
+					case ZBX_TYPE_LONGTEXT:
+						value->str = zbx_strdup(NULL, buf);
+						break;
+					default:
+						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
+								fields[f]->type, table->table, fields[f]->name);
+						goto clean;
+
+				}
+
+				zbx_vector_ptr_append(&values, value);
 			}
 
-			sql_offset--;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
-		}
-		else if (1 == fields_count)	/* only primary key given, no update needed */
-		{
-			continue;
+			zbx_db_insert_add_values_dyn(&db_insert, (const zbx_db_value_t **)values.values,
+					values.values_num);
+
+			for (f = 0; f < fields_count; f++)
+			{
+				switch (fields[f]->type)
+				{
+					case ZBX_TYPE_CHAR:
+					case ZBX_TYPE_TEXT:
+					case ZBX_TYPE_SHORTTEXT:
+					case ZBX_TYPE_LONGTEXT:
+						value = values.values[f];
+						zbx_free(value->str);
+				}
+			}
+			zbx_vector_ptr_clean(&values, zbx_ptr_free);
+
+			if (f != fields_count)
+			{
+				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
+						jp_row.end - jp_row.start + 1, jp_row.start);
+				goto clean;
+			}
 		}
 		else
 		{
+			/* perform update operation */
+
+			if (1 == fields_count)	/* only primary key given, no update needed */
+				continue;
+
 			/* locate a copy of this record as found in database */
 			id_offset.id = recid;
 			if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
@@ -1014,89 +1080,66 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
-		}
 
-		f = 1;
-		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
-		{
-			int	field_differ = 1;
-
-			/* parse values for the entry (lines 10-12 in T1) */
-
-			if (f == fields_count)
+			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)); f++)
 			{
-				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1, jp_row.start);
-				goto clean;
-			}
+				int	field_differ = 1;
 
-			if (0 == insert)
-			{
-				if (0 != (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
-						is_null, &last_n, &last_pos)))
+				/* parse values for the entry (lines 10-12 in T1) */
+
+				if (f == fields_count)
 				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
-					rec_differ++;
+					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
+							jp_row.end - jp_row.start + 1, jp_row.start);
+					goto clean;
 				}
-			}
 
-			if (0 != is_null)
-			{
-				if (0 != (fields[f]->flags & ZBX_NOTNULL))
+				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
 					goto clean;
 				}
 
-				if (0 != field_differ)
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
-			}
-			else
-			{
-				if (0 != field_differ)
+				if (0 == (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
+						is_null, &last_n, &last_pos)))
 				{
-					switch (fields[f]->type)
-					{
-						case ZBX_TYPE_INT:
-						case ZBX_TYPE_UINT:
-						case ZBX_TYPE_ID:
-						case ZBX_TYPE_FLOAT:
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", buf);
-							break;
-						default:
-							esc = DBdyn_escape_string(buf);
-							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
-							zbx_free(esc);
-					}
+					continue;
+				}
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
+				rec_differ++;
+
+				if (0 != is_null)
+				{
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
+					continue;
+				}
+
+				switch (fields[f]->type)
+				{
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+					case ZBX_TYPE_ID:
+					case ZBX_TYPE_FLOAT:
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", buf);
+						break;
+					default:
+						esc = DBdyn_escape_string(buf);
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
+						zbx_free(esc);
 				}
 			}
 
-			f++;
-		}
-
-		if (f != fields_count)
-		{
-			*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-					jp_row.end - jp_row.start + 1, jp_row.start);
-			goto clean;
-		}
-
-		sql_offset--;
-		if (0 != insert)
-		{
-#ifdef HAVE_MYSQL
-			for (f = fields_count; f < fields_count + ex_fields_count; f++)
+			if (f != fields_count)
 			{
-				esc = DBdyn_escape_string(fields[f]->default_value);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",'%s'", esc);
-				zbx_free(esc);
+				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
+						jp_row.end - jp_row.start + 1, jp_row.start);
+				goto clean;
 			}
-#endif
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ");\n");
-		}
-		else
-		{
+
+			sql_offset--;
+
 			if (0 != rec_differ)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
@@ -1107,10 +1150,10 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
 				*(sql + sql_offset) = '\0';
 			}
-		}
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-			goto clean;
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto clean;
+		}
 	}
 
 	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
@@ -1121,8 +1164,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto clean;
 	}
 
-	ret = SUCCEED;
+	ret = (0 == ins.values_num ? SUCCEED : zbx_db_insert_execute(&db_insert));
 clean:
+	if (0 != ins.values_num)
+	{
+		zbx_db_insert_clean(&db_insert);
+		zbx_vector_ptr_destroy(&values);
+	}
+clean2:
 	zbx_hashset_destroy(&h_id_offsets);
 	zbx_hashset_destroy(&h_del);
 	zbx_vector_uint64_destroy(&ins);
@@ -1916,6 +1965,7 @@ try_again:
 		records++;
 	}
 
+	DCconfig_clean_items(dc_items, errcodes, data_num);
 	zbx_free(dc_items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64, __function_name, records, *lastid);
@@ -2063,9 +2113,6 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 
 		if (proxy_hostid != items[i].host.proxy_hostid)
-			continue;
-
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == items[i].flags)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

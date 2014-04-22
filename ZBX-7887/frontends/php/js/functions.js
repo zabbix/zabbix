@@ -574,7 +574,7 @@ function create_page_menu(e, id) {
 
 // triggers js menu
 function create_mon_trigger_menu(e, args, items) {
-	var tr_menu = [[t('Triggers'), null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], [t('Events'), 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
+	var tr_menu = [[t('Triggers'), null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], [t('Events'), 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange + '&source=0', null]];
 	if (args.length > 1 && !is_null(args[1])) {
 		tr_menu.push(args[1]);
 	}
@@ -1038,8 +1038,7 @@ function executeScript(hostId, scriptId, confirmation) {
 				id: 'scriptDialog',
 				css: {
 					display: 'none',
-					'white-space': 'normal',
-					'z-index': 1000
+					'white-space': 'normal'
 				}
 			});
 
@@ -1058,7 +1057,7 @@ function executeScript(hostId, scriptId, confirmation) {
 						jQuery(this).dialog('destroy');
 					}}
 				],
-				draggable: false,
+				draggable: true,
 				modal: true,
 				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
 				resizable: false,
@@ -1128,8 +1127,7 @@ function showModalWindow(title, text, buttons) {
 			css: {
 				padding: '10px',
 				display: 'none',
-				'white-space': 'normal',
-				'z-index': 1000
+				'white-space': 'normal'
 			}
 		});
 

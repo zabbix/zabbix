@@ -137,11 +137,6 @@ zbx_graph_item_type;
 #	define ITEM_DESCRIPTION_LEN	65535
 #endif
 
-#define FUNCTION_FUNCTION_LEN		12
-#define FUNCTION_FUNCTION_LEN_MAX	(FUNCTION_FUNCTION_LEN + 1)
-#define FUNCTION_PARAMETER_LEN		255
-#define FUNCTION_PARAMETER_LEN_MAX	(FUNCTION_PARAMETER_LEN + 1)
-
 #define HISTORY_STR_VALUE_LEN		255
 #ifdef HAVE_IBM_DB2
 #	define HISTORY_TEXT_VALUE_LEN	2048
@@ -521,7 +516,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
@@ -538,9 +532,6 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
-
-double	multiply_item_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
@@ -576,5 +567,40 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 #	define DBbytea_escape	zbx_db_bytea_escape
 size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
 #endif
+
+/* bulk insert support */
+
+/* database field value */
+typedef union
+{
+	int		i32;
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+}
+zbx_db_value_t;
+
+/* database bulk insert data */
+typedef struct
+{
+	/* the target table */
+	const ZBX_TABLE		*table;
+	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
+	zbx_vector_ptr_t	fields;
+	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
+	zbx_vector_ptr_t	rows;
+	/* index of autoincrement field */
+	int			autoincrement;
+}
+zbx_db_insert_t;
+
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+		int fields_num);
+void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
+int	zbx_db_insert_execute(zbx_db_insert_t *self);
+void	zbx_db_insert_clean(zbx_db_insert_t *self);
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 
 #endif

@@ -1013,8 +1013,9 @@ function make_latest_issues(array $filter = array()) {
 
 		// clock
 		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&hostid='.$trigger['hostid'].
-				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+			'events.php?triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.'&show_unknown=1'.
+				'&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 		// actions
@@ -1110,14 +1111,22 @@ function make_webmon_overview($filter) {
 	$httpTestData = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 	foreach ($result as $row) {
-		if (!isset($httpTestData[$row['httptestid']])) {
-			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
-		}
-		elseif ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
-			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
+		if (isset($httpTestData[$row['httptestid']]) && $httpTestData[$row['httptestid']]['lastfailedstep'] !== null) {
+			if ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
+				$data[$row['groupid']]['failed'] = isset($data[$row['groupid']]['failed'])
+					? ++$data[$row['groupid']]['failed']
+					: 1;
+			}
+			else {
+				$data[$row['groupid']]['ok'] = isset($data[$row['groupid']]['ok'])
+					? ++$data[$row['groupid']]['ok']
+					: 1;
+			}
 		}
 		else {
-			$data[$row['groupid']]['ok'] = empty($data[$row['groupid']]['ok']) ? 1 : ++$data[$row['groupid']]['ok'];
+			$data[$row['groupid']]['unknown'] = isset($data[$row['groupid']]['unknown'])
+				? ++$data[$row['groupid']]['unknown']
+				: 1;
 		}
 	}
 

@@ -34,13 +34,13 @@ abstract class CGraphGeneral extends CZBXAPI {
 	const ERROR_GRAPH_SUM = 'graphSum';
 
 	/**
-	 * Update existing graphs.
+	 * Update graphs.
 	 *
 	 * @param array $graphs
 	 *
 	 * @return array
 	 */
-	public function update($graphs) {
+	public function update(array $graphs) {
 		$graphs = zbx_toArray($graphs);
 		$graphIds = zbx_objectValues($graphs, 'graphid');
 
@@ -49,16 +49,17 @@ abstract class CGraphGeneral extends CZBXAPI {
 		);
 
 		$dbGraphs = $this->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'graphids' => $graphIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'selectGraphItems' => API_OUTPUT_EXTEND
+			'preservekeys' => true
 		));
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
 			'messageAllowed' => _('Cannot update a discovered graph.')
 		));
+
 		foreach ($graphs as &$graph) {
 			// check permissions
 			if (!isset($dbGraphs[$graph['graphid']])) {
@@ -70,18 +71,19 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			// validate items on set or pass existing items from DB
 			if (isset($graph['gitems'])) {
-				foreach ($graph['gitems'] as $gitems) {
-					if (isset($gitems['gitemid']) && !$gitems['gitemid']) {
+				foreach ($graph['gitems'] as $item) {
+					if (isset($item['gitemid']) && !$item['gitemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "gitemid" field for item.'));
 					}
 
-					if (isset($gitems['gitemid']) && $gitems['gitemid']) {
-						$validGitemIds = array();
-						foreach ($dbGraphs[$graph['graphid']]['gitems'] as $dbGitem) {
-							$validGitemIds[$dbGitem['gitemid']] = $dbGitem['gitemid'];
+					if (isset($item['gitemid']) && $item['gitemid']) {
+						$validGraphItemIds = array();
+
+						foreach ($dbGraphs[$graph['graphid']]['gitems'] as $dbItem) {
+							$validGraphItemIds[$dbItem['gitemid']] = $dbItem['gitemid'];
 						}
 
-						if (!in_array($gitems['gitemid'], $validGitemIds)) {
+						if (!in_array($item['gitemid'], $validGraphItemIds)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_('No permissions to referred object or it does not exist!')
 							);
@@ -102,8 +104,27 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
 
-			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
+			// Y axis min clean unused fields
+			if (isset($graph['ymin_type'])) {
+				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['yaxismin'] = null;
+				}
+				else {
+					$graph['ymin_itemid'] = null;
+				}
+			}
 
+			// Y axis max clean unused fields
+			if (isset($graph['ymax_type'])) {
+				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['yaxismax'] = null;
+				}
+				else {
+					$graph['ymax_itemid'] = null;
+				}
+			}
+
+			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
 			$this->inherit($graph);
 		}
 
@@ -111,13 +132,13 @@ abstract class CGraphGeneral extends CZBXAPI {
 	}
 
 	/**
-	 * Create new graphs.
+	 * Create graphs.
 	 *
 	 * @param array $graphs
 	 *
 	 * @return array
 	 */
-	public function create($graphs) {
+	public function create(array $graphs) {
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
@@ -172,12 +193,12 @@ abstract class CGraphGeneral extends CZBXAPI {
 	/**
 	 * Updates the graph if $graph differs from $dbGraph.
 	 *
-	 * @param $graph
-	 * @param $dbGraph
+	 * @param array $graph
+	 * @param array $dbGraph
 	 *
 	 * @return string
 	 */
-	protected function updateReal($graph, $dbGraph) {
+	protected function updateReal(array $graph, array $dbGraph) {
 		$dbGitems = zbx_toHash($dbGraph['gitems'], 'gitemid');
 		$dbGitemIds = zbx_toHash(zbx_objectValues($dbGitems, 'gitemid'));
 
@@ -221,7 +242,10 @@ abstract class CGraphGeneral extends CZBXAPI {
 	}
 
 	/**
+	 * Check if object exist.
+	 *
 	 * @param array $object
+	 *
 	 * @return bool
 	 */
 	public function exists($object) {
@@ -260,7 +284,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graphData
 	 *
-	 * @return string|boolean
+	 * @return array
 	 */
 	public function getObjects($graphData) {
 		$options = array(
@@ -273,6 +297,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		elseif (isset($graphData['nodeids'])) {
 			$options['nodeids'] = $graphData['nodeids'];
 		}
+
 		return $this->get($options);
 	}
 
@@ -280,9 +305,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * Check values for Y axis items and values.
 	 *
 	 * @param array $graph
-	 * @param bool $tpl
-	.*.
-	 * @return void
+	 * @param bool  $tpl
 	 */
 	protected function checkAxisItems(array $graph, $tpl = false) {
 		$axisItems = array();
@@ -510,8 +533,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * Check if new items are from same templated host, validate Y axis items and values and hosts and templates.
 	 *
 	 * @param array $graphs
-	 *
-	 * @return void
 	 */
 	protected function validateCreate(array $graphs) {
 		$colorValidator = new CColorValidator();
@@ -577,6 +598,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * @return array
 	 */
 	protected function validateItemsUpdate(array $graphs) {
+		$dbFields = array('itemid' => null);
+
 		foreach ($graphs as $graph) {
 			// graph items are optional
 			if (isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems'])) {
@@ -587,10 +610,9 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			// validate item fields
 			if (isset($graph['gitems'])) {
-				$fields = array('itemid' => null);
 				foreach ($graph['gitems'] as $gitem) {
 					// "itemid" is required only if no "gitemid" is set
-					if (!isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)) {
+					if (!isset($gitem['gitemid']) && !check_db_fields($dbFields, $gitem)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 					}
 
@@ -599,7 +621,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				}
 			}
 
-			// add Y axis item IDs for persmission validation
+			// add Y min axis item IDs for persmission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -610,6 +632,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 					$itemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
 				}
 			}
+
+			// add Y max axis item IDs for persmission validation
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -632,8 +656,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 *
-	 * @return void
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
@@ -641,25 +663,30 @@ abstract class CGraphGeneral extends CZBXAPI {
 		foreach ($graphs as $graph) {
 			// check for "templateid", because it is not allowed
 			if (array_key_exists('templateid', $graph)) {
-				$error = _s($this->getErrorMsg(self::ERROR_TEMPLATED_ID), $graph['name']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s($this->getErrorMsg(self::ERROR_TEMPLATED_ID), $graph['name'])
+				);
 			}
 
 			$templatedGraph = false;
+
 			if (isset($graph['gitems'])) {
 				// first item determines to which host graph belongs to
 				$gitem = array_shift($dbGraphs[$graph['graphid']]['gitems']);
+
 				$graphHosts = API::Host()->get(array(
 					'itemids' => $gitem['itemid'],
 					'output' => array('hostid', 'status'),
 					'editable' => true,
 					'templated_hosts' => true
 				));
+
 				$host = array_shift($graphHosts);
 
 				// if the current graph is templated and new items to be added
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
+
 					$itemIds = array();
 
 					foreach ($graph['gitems'] as $gitem) {
@@ -678,6 +705,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 						// only one host is allowed and it has to be the current. other templated hosts are allowed
 						$itemHosts = array_unique(zbx_objectValues($itemHosts, 'hostid'));
+
 						if (count($itemHosts) > 1 || !in_array($host['hostid'], $itemHosts)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name'])
@@ -706,8 +734,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 	 * Check if graph already exists somewhere in DB.
 	 *
 	 * @param array $graphs
-	 *
-	 * @return void
 	 */
 	protected function validateHostsAndTemplates(array $graphs) {
 		$graphNames = array();
@@ -758,6 +784,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				if (!isset($graphNames[$graph['name']])) {
 					$graphNames[$graph['name']] = array();
 				}
+
 				if (isset($graphNames[$graph['name']][$id])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('More than one graph with name "%1$s" within host.', $graph['name'])

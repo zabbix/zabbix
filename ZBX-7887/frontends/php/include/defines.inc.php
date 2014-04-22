@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.2.3rc1');
-define('ZABBIX_API_VERSION', '2.2.3');
+define('ZABBIX_VERSION',     '2.2.4rc1');
+define('ZABBIX_API_VERSION', '2.2.4');
 define('ZABBIX_DB_VERSION',	 2020000);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -126,6 +126,7 @@ define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
+define('T_ZBX_DBL_BIG',		9);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
@@ -789,7 +790,7 @@ define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
 	() # match empty and only empty part
 )');
 define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
-(?<param>( # name parameter group used in recursion
+(?P<param>( # name parameter group used in recursion
 	\[ # match opening bracket
 		(
 			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter

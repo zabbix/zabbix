@@ -690,64 +690,72 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 	}
 }
 
+/**
+ * Draws a text on an image. Supports TrueType fonts.
+ *
+ * @param resource 	$image
+ * @param int		$fontsize
+ * @param int 		$angle
+ * @param int		$x
+ * @param int 		$y
+ * @param int		$color		a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
+ * @param string	$string
+ */
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
-	$gdinfo = gd_info();
-
-	if ($gdinfo['FreeType Support'] && function_exists('imagettftext')) {
-		if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
-			$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
-			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
-		}
-		elseif ($angle == 0) {
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
-		}
-		else {
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-			$size = imageTextSize($fontsize, 0, $string);
-
-			$imgg = imagecreatetruecolor($size['width'] + 1, $size['height']);
-			$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
-			imagefill($imgg, 0, 0, $transparentColor);
-			imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
-
-			$imgg = imagerotate($imgg, $angle, $transparentColor);
-			ImageAlphaBlending($imgg, false);
-			imageSaveAlpha($imgg, true);
-			imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width'] + 1);
-			imagedestroy($imgg);
-		}
+	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
+		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+	}
+	elseif ($angle == 0) {
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 	}
 	else {
-		show_error_message(_('PHP gd FreeType support missing'));
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		$size = imageTextSize($fontsize, 0, $string);
+
+		$imgg = imagecreatetruecolor($size['width'] + 1, $size['height']);
+		$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
+		imagefill($imgg, 0, 0, $transparentColor);
+		imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
+
+		$imgg = imagerotate($imgg, $angle, $transparentColor);
+		imagealphablending($imgg, false);
+		imagesavealpha($imgg, true);
+		imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width'] + 1);
+		imagedestroy($imgg);
 	}
 }
 
+/**
+ * Calculates the size of the given string.
+ *
+ * Returns the following data:
+ * - height 	- height of the text;
+ * - width		- width of the text;
+ * - baseline	- baseline Y coordinate (can only be used for horizontal text, can be negative).
+ *
+ * @param int 		$fontsize
+ * @param int 		$angle
+ * @param string 	$string
+ *
+ * @return array
+ */
 function imageTextSize($fontsize, $angle, $string) {
-	$gdinfo = gd_info();
-
-	$result = array();
-
-	if ($gdinfo['FreeType Support'] && function_exists('imagettfbbox')) {
-		if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
-			$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
-		}
-		else {
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-		}
-
-		$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
-
-		$result['height'] = abs($ar[1] - $ar[5]);
-		$result['width'] = abs($ar[0] - $ar[4]);
-		$result['baseline'] = $ar[1];
+	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
+		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
 	else {
-		show_error_message(_('PHP gd FreeType support missing'));
-		return false;
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 	}
 
-	return $result;
+	$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
+
+	return array(
+		'height' => abs($ar[1] - $ar[5]),
+		'width' => abs($ar[0] - $ar[4]),
+		'baseline' => $ar[1]
+	);
 }
 
 function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
