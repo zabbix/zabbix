@@ -947,25 +947,371 @@ static int	DBreplace_macro(const char *table_name, const char *field_name, const
 				zbx_strncpy_alloc(&n, &alloc, &offset, new_macro, strlen(new_macro));
 				f = markers.values[i] + strlen(old_macro);
 			}
+
+			zbx_strncpy_alloc(&n, &alloc, &offset, f, strlen(f));
 		}
 
 		if (ZBX_DB_OK > DBexecute("update %s set %s='%s' where %s='%d'", table_name, field_name, n, uid, id))
 			ret = FAIL;
 
-		zbx_vector_ptr_clean(&markers, zbx_ptr_free);
+		markers.values_num = 0;
 
-		if(ret = FAIL)
+		if(ret == FAIL)
 			break;
 
 		offset = 0;
 	}
 
 	zbx_free(n);
-	zbx_vector_ptr_destory(&markers);
+	zbx_vector_ptr_destroy(&markers);
 
 	return ret;
 }
 
+const char	*sub_macros[] =	{
+					"DEVICETYPE",
+					"NAME",
+					"OS",
+					"SERIALNO",
+					"TAG",
+					"MACADDRESS",
+					"HARDWARE",
+					"SOFTWARE",
+					"CONTACT",
+					"LOCATION",
+					"NOTES",
+					NULL
+				};
+
+static int	DBpatch_2030092(void)
+{
+	return DBreplace_macro("httptest", "name", "httptestid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030093(void)
+{
+	return DBreplace_macro("httptest", "variables", "httptestid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030094(void)
+{
+	return DBreplace_macro("httpstep", "name", "httpstepid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030095(void)
+{
+	return DBreplace_macro("httpstep", "url", "httpstepid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030096(void)
+{
+	return DBreplace_macro("httpstep", "posts", "httpstepid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030097(void)
+{
+	return DBreplace_macro("httpstep", "required", "httpstepid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030098(void)
+{
+	return DBreplace_macro("items", "params", "itemid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030099(void)
+{
+	return DBreplace_macro("items", "key_", "itemid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030100(void)
+{
+	return DBreplace_macro("interface", "ip", "interfaceid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030101(void)
+{
+	return DBreplace_macro("interface", "dns", "interfaceid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030102(void)
+{
+	return DBreplace_macro("triggers", "description", "triggerid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030103(void)
+{
+	return DBreplace_macro("triggers", "comments", "triggerid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030104(void)
+{
+	return DBreplace_macro("sysmaps_elements", "label", "selementid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030105(void)
+{
+	return DBreplace_macro("scripts", "command", "scriptid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030106(void)
+{
+	return DBreplace_macro("scripts", "confirmation", "scriptid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030107(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030108(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030109(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030110(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030111(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030112(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{IPADDRESS", NULL, "{HOST.IP");
+}
+
+static int	DBpatch_2030113(void)
+{
+	return DBreplace_macro("httptest", "name", "httptestid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030114(void)
+{
+	return DBreplace_macro("httptest", "variables", "httptestid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030115(void)
+{
+	return DBreplace_macro("httpstep", "name", "httpstepid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030116(void)
+{
+	return DBreplace_macro("httpstep", "url", "httpstepid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030117(void)
+{
+	return DBreplace_macro("httpstep", "posts", "httpstepid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030118(void)
+{
+	return DBreplace_macro("httpstep", "required", "httpstepid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030119(void)
+{
+	return DBreplace_macro("items", "params", "itemid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030120(void)
+{
+	return DBreplace_macro("items", "key_", "itemid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030121(void)
+{
+	return DBreplace_macro("interface", "ip", "interfaceid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030122(void)
+{
+	return DBreplace_macro("interface", "dns", "interfaceid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030123(void)
+{
+	return DBreplace_macro("triggers", "description", "triggerid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030124(void)
+{
+	return DBreplace_macro("triggers", "comments", "triggerid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030125(void)
+{
+	return DBreplace_macro("sysmaps_elements", "label", "selementid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030126(void)
+{
+	return DBreplace_macro("scripts", "command", "scriptid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030127(void)
+{
+	return DBreplace_macro("scripts", "confirmation", "scriptid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030128(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030129(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030130(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030131(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030132(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030133(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{HOSTNAME", NULL, "{HOST.HOST");
+}
+
+static int	DBpatch_2030134(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030135(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030136(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030137(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030138(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030139(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{PROFILE", sub_macros, "{INVENTORY");
+}
+
+static int	DBpatch_2030140(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030141(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030142(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030143(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030144(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030145(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{TRIGGER.KEY", NULL, "{ITEM.KEY");
+}
+
+static int	DBpatch_2030146(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030147(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030148(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030149(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030150(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030151(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{TRIGGER.COMMENT", NULL, "{TRIGGER.DESCRIPTION");
+}
+
+static int	DBpatch_2030152(void)
+{
+	return DBreplace_macro("actions", "def_shortdata", "actionid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
+
+static int	DBpatch_2030153(void)
+{
+	return DBreplace_macro("actions", "def_longdata", "actionid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
+
+static int	DBpatch_2030154(void)
+{
+	return DBreplace_macro("actions", "r_shortdata", "actionid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
+
+static int	DBpatch_2030155(void)
+{
+	return DBreplace_macro("actions", "r_longdata", "actionid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
+
+static int	DBpatch_2030156(void)
+{
+	return DBreplace_macro("opmessage", "subject", "operationid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
+
+static int	DBpatch_2030157(void)
+{
+	return DBreplace_macro("opmessage", "message", "operationid", "{STATUS", NULL, "{TRIGGER.STATUS");
+}
 #endif
 DBPATCH_START(2030)
 
@@ -1062,5 +1408,71 @@ DBPATCH_ADD(2030088, 0, 1)
 DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
+DBPATCH_ADD(2030092, 0, 1)
+DBPATCH_ADD(2030093, 0, 1)
+DBPATCH_ADD(2030094, 0, 1)
+DBPATCH_ADD(2030095, 0, 1)
+DBPATCH_ADD(2030096, 0, 1)
+DBPATCH_ADD(2030097, 0, 1)
+DBPATCH_ADD(2030098, 0, 1)
+DBPATCH_ADD(2030099, 0, 1)
+DBPATCH_ADD(2030100, 0, 1)
+DBPATCH_ADD(2030101, 0, 1)
+DBPATCH_ADD(2030102, 0, 1)
+DBPATCH_ADD(2030103, 0, 1)
+DBPATCH_ADD(2030104, 0, 1)
+DBPATCH_ADD(2030105, 0, 1)
+DBPATCH_ADD(2030106, 0, 1)
+DBPATCH_ADD(2030107, 0, 1)
+DBPATCH_ADD(2030108, 0, 1)
+DBPATCH_ADD(2030109, 0, 1)
+DBPATCH_ADD(2030110, 0, 1)
+DBPATCH_ADD(2030111, 0, 1)
+DBPATCH_ADD(2030112, 0, 1)
+DBPATCH_ADD(2030113, 0, 1)
+DBPATCH_ADD(2030114, 0, 1)
+DBPATCH_ADD(2030115, 0, 1)
+DBPATCH_ADD(2030116, 0, 1)
+DBPATCH_ADD(2030117, 0, 1)
+DBPATCH_ADD(2030118, 0, 1)
+DBPATCH_ADD(2030119, 0, 1)
+DBPATCH_ADD(2030120, 0, 1)
+DBPATCH_ADD(2030121, 0, 1)
+DBPATCH_ADD(2030122, 0, 1)
+DBPATCH_ADD(2030123, 0, 1)
+DBPATCH_ADD(2030124, 0, 1)
+DBPATCH_ADD(2030125, 0, 1)
+DBPATCH_ADD(2030126, 0, 1)
+DBPATCH_ADD(2030127, 0, 1)
+DBPATCH_ADD(2030128, 0, 1)
+DBPATCH_ADD(2030129, 0, 1)
+DBPATCH_ADD(2030130, 0, 1)
+DBPATCH_ADD(2030131, 0, 1)
+DBPATCH_ADD(2030132, 0, 1)
+DBPATCH_ADD(2030133, 0, 1)
+DBPATCH_ADD(2030134, 0, 1)
+DBPATCH_ADD(2030135, 0, 1)
+DBPATCH_ADD(2030136, 0, 1)
+DBPATCH_ADD(2030137, 0, 1)
+DBPATCH_ADD(2030138, 0, 1)
+DBPATCH_ADD(2030139, 0, 1)
+DBPATCH_ADD(2030140, 0, 1)
+DBPATCH_ADD(2030141, 0, 1)
+DBPATCH_ADD(2030142, 0, 1)
+DBPATCH_ADD(2030143, 0, 1)
+DBPATCH_ADD(2030144, 0, 1)
+DBPATCH_ADD(2030145, 0, 1)
+DBPATCH_ADD(2030146, 0, 1)
+DBPATCH_ADD(2030147, 0, 1)
+DBPATCH_ADD(2030148, 0, 1)
+DBPATCH_ADD(2030149, 0, 1)
+DBPATCH_ADD(2030150, 0, 1)
+DBPATCH_ADD(2030151, 0, 1)
+DBPATCH_ADD(2030152, 0, 1)
+DBPATCH_ADD(2030153, 0, 1)
+DBPATCH_ADD(2030154, 0, 1)
+DBPATCH_ADD(2030155, 0, 1)
+DBPATCH_ADD(2030156, 0, 1)
+DBPATCH_ADD(2030157, 0, 1)
 
 DBPATCH_END()
