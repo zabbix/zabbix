@@ -2435,6 +2435,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		memset(&dcheck, 0, sizeof(dcheck));
 		*key_ = '\0';
 		*dns = '\0';
+		value = zbx_strdup(value, "");
 		port = 0;
 		status = 0;
 		dcheck.key_ = key_;
