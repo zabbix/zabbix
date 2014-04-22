@@ -45,6 +45,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-6497] improved frontend filters, Filter and Reset now is submit buttons, removed JS form reset scripts, changed filter data saving process in profiles (Oleg)
 ..F....... [ZBX-2840] fixed map configuration with broken images (Eduard)
 ..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
 ..F....... [ZBX-8012] made links to other IT services from the dependency management to open in a new browser tab (Eduard, Oleg)
