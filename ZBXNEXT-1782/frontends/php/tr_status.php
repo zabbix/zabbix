@@ -61,10 +61,10 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))) {
 	access_deny();
 }
-if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
 	access_deny();
 }
 
@@ -94,35 +94,55 @@ $pageFilter = new CPageFilter(array(
 		'monitored_hosts' => true,
 		'with_monitored_triggers' => true
 	),
-	'hostid' => get_request('hostid', null),
-	'groupid' => get_request('groupid', null)
+	'hostid' => getRequest('hostid', null),
+	'groupid' => getRequest('groupid', null)
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-// reset filter
-if (isset($_REQUEST['filter_rst'])) {
-	$_REQUEST['show_details'] = 0;
-	$_REQUEST['show_maintenance'] = 1;
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_RECENT_PROBLEM;
-	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
-	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
-	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-	$_REQUEST['txt_select'] = '';
-	$_REQUEST['status_change'] = 0;
-	$_REQUEST['status_change_days'] = 14;
+// filter set
+if (hasRequest('filter_set')) {
+	CProfile::update('web.tr_status.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.show_severity',
+		getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED), PROFILE_TYPE_INT
+	);
+	CProfile::update('web.tr_status.filter.txt_select', getRequest('txt_select', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.tr_status.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.tr_status.filter.status_change_days', getRequest('status_change_days', 14),
+		PROFILE_TYPE_INT
+	);
+	CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
-	CProfile::delete('web.tr_status.filter.application');
-	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
-	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
-}
-// update filter in profiles
-elseif (hasRequest('filter_set')) {
-	if (getRequest('application') !== '') {
-		CProfile::update('web.tr_status.filter.application', getRequest('application'), PROFILE_TYPE_STR);
+	// show triggers
+	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
+	// whole page inaccessible on large installations.
+	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
+		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
 	}
-	else {
-		CProfile::delete('web.tr_status.filter.application');
+
+	// show events
+	$showEvents = getRequest('show_events', EVENTS_OPTION_NOEVENT);
+
+	if (hasRequest('show_events')) {
+		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
+			if (!str_in_array($showEvents, array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
+				$showEvents = EVENTS_OPTION_NOEVENT;
+			}
+		}
+
+		CProfile::update('web.tr_status.filter.show_events', $showEvents, PROFILE_TYPE_INT);
+	}
+
+	// ack status
+	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
+
+	if (hasRequest('ack_status')) {
+		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
+			$ackStatus = ZBX_ACK_STS_ANY;
+		}
+
+		CProfile::update('web.tr_status.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
 	}
 
 	// update host inventory filter
@@ -145,8 +165,46 @@ elseif (hasRequest('filter_set')) {
 
 		$i++;
 	}
+
 	CProfile::delete('web.tr_status.filter.inventory.field', $idx2);
 	CProfile::delete('web.tr_status.filter.inventory.value', $idx2);
+}
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.tr_status.filter.show_triggers');
+	CProfile::delete('web.tr_status.filter.show_details');
+	CProfile::delete('web.tr_status.filter.show_maintenance');
+	CProfile::delete('web.tr_status.filter.show_events');
+	CProfile::delete('web.tr_status.filter.ack_status');
+	CProfile::delete('web.tr_status.filter.show_severity');
+	CProfile::delete('web.tr_status.filter.txt_select');
+	CProfile::delete('web.tr_status.filter.status_change');
+	CProfile::delete('web.tr_status.filter.status_change_days');
+	CProfile::delete('web.tr_status.filter.application');
+	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
+	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
+	DBend();
+}
+
+if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
+	$showTriggers = TRIGGERS_OPTION_ALL;
+}
+else {
+	$showTriggers = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+}
+$showDetails = CProfile::get('web.tr_status.filter.show_details', 0);
+$showMaintenance = CProfile::get('web.tr_status.filter.show_maintenance', 1);
+$showSeverity = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
+$txtSelect = CProfile::get('web.tr_status.filter.txt_select', '');
+$showChange = CProfile::get('web.tr_status.filter.status_change', 0);
+$statusChangeBydays = CProfile::get('web.tr_status.filter.status_change_days', 14);
+$ackStatus = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
+	? ZBX_ACK_STS_ANY : CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
+$showEvents = CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
+
+// check event acknowledges
+if ($config['event_ack_enable'] == EVENT_ACK_DISABLED && $showEvents == EVENTS_OPTION_NOT_ACK) {
+	$showEvents = EVENTS_OPTION_NOEVENT;
 }
 
 // fetch filter from profiles
@@ -164,141 +222,6 @@ while (CProfile::get('web.tr_status.filter.inventory.field', null, $i) !== null)
 	$i++;
 }
 
-// show triggers
-// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
-// whole page inaccessible on large installations.
-if (hasRequest('show_triggers')) {
-	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
-		CProfile::update('web.tr_status.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
-	}
-}
-else {
-	if (hasRequest('filter_set')) {
-		CProfile::update('web.tr_status.filter.show_triggers',
-			getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM), PROFILE_TYPE_INT
-		);
-		$_REQUEST['show_triggers'] = getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-	}
-	else {
-		$_REQUEST['show_triggers'] = CProfile::get('web.tr_status.filter.show_triggers',
-			TRIGGERS_OPTION_RECENT_PROBLEM
-		);
-	}
-}
-
-// show events
-if (isset($_REQUEST['show_events'])) {
-	if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-		if (!str_in_array($_REQUEST['show_events'], array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
-			$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
-		}
-	}
-
-	CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['show_events'] = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
-		? EVENTS_OPTION_NOEVENT
-		: CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
-}
-
-// show details
-if (isset($_REQUEST['show_details'])) {
-	CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
-}
-else {
-	if (isset($_REQUEST['filter_set'])) {
-		CProfile::update('web.tr_status.filter.show_details', 0, PROFILE_TYPE_INT);
-		$_REQUEST['show_details'] = 0;
-	}
-	else {
-		$_REQUEST['show_details'] = CProfile::get('web.tr_status.filter.show_details', 0);
-	}
-}
-
-// show maintenance
-if (isset($_REQUEST['show_maintenance'])) {
-	CProfile::update('web.tr_status.filter.show_maintenance', $_REQUEST['show_maintenance'], PROFILE_TYPE_INT);
-}
-else {
-	if (isset($_REQUEST['filter_set'])) {
-		CProfile::update('web.tr_status.filter.show_maintenance', 0, PROFILE_TYPE_INT);
-		$_REQUEST['show_maintenance'] = 0;
-	}
-	else {
-		$_REQUEST['show_maintenance'] = CProfile::get('web.tr_status.filter.show_maintenance', 1);
-	}
-}
-
-// show severity
-if (isset($_REQUEST['show_severity'])) {
-	CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['show_severity'] = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
-}
-
-// status change
-if (isset($_REQUEST['status_change'])) {
-	CProfile::update('web.tr_status.filter.status_change', $_REQUEST['status_change'], PROFILE_TYPE_INT);
-}
-else {
-	if (isset($_REQUEST['filter_set'])) {
-		CProfile::update('web.tr_status.filter.status_change', 0, PROFILE_TYPE_INT);
-		$_REQUEST['status_change'] = 0;
-	}
-	else {
-		$_REQUEST['status_change'] = CProfile::get('web.tr_status.filter.status_change', 0);
-	}
-}
-
-// status change days
-if (isset($_REQUEST['status_change_days'])) {
-	$maxDays = DAY_IN_YEAR * 2;
-
-	if ($_REQUEST['status_change_days'] > $maxDays) {
-		$_REQUEST['status_change_days'] = $maxDays;
-	}
-
-	CProfile::update('web.tr_status.filter.status_change_days', $_REQUEST['status_change_days'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['status_change_days'] = CProfile::get('web.tr_status.filter.status_change_days');
-
-	if (!$_REQUEST['status_change_days']) {
-		$_REQUEST['status_change_days'] = 14;
-	}
-}
-
-// ack status
-if (isset($_REQUEST['ack_status'])) {
-	if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
-		$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
-	}
-
-	CProfile::update('web.tr_status.filter.ack_status', $_REQUEST['ack_status'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['ack_status'] = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
-		? ZBX_ACK_STS_ANY
-		: CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
-}
-
-// txt select
-if (isset($_REQUEST['txt_select'])) {
-	CProfile::update('web.tr_status.filter.txt_select', $_REQUEST['txt_select'], PROFILE_TYPE_STR);
-}
-else {
-	$_REQUEST['txt_select'] = CProfile::get('web.tr_status.filter.txt_select', '');
-}
-
-/*
- * Clean cookies
- */
-if (get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')) {
-	clearCookies(true);
-}
-
 /*
  * Page sorting
  */
@@ -307,11 +230,6 @@ validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 /*
  * Display
  */
-$showTriggers = $_REQUEST['show_triggers'];
-$showEvents = $_REQUEST['show_events'];
-$showSeverity = $_REQUEST['show_severity'];
-$ackStatus = $_REQUEST['ack_status'];
-
 $triggerWidget = new CWidget(null, 'trigger-mon');
 
 $rightForm = new CForm('get');
@@ -350,7 +268,7 @@ if ($config['event_ack_enable']) {
 	$filterForm->addRow(_('Acknowledge status'), $ackStatusComboBox);
 }
 
-$eventsComboBox = new CComboBox('show_events', $_REQUEST['show_events']);
+$eventsComboBox = new CComboBox('show_events', $showEvents);
 $eventsComboBox->addItem(EVENTS_OPTION_NOEVENT, _('Hide all'));
 $eventsComboBox->addItem(EVENTS_OPTION_ALL, _('Show all').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
 if ($config['event_ack_enable']) {
@@ -369,20 +287,20 @@ $severityComboBox->addItems(array(
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
-$statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 3, false, false, false);
-if (!$_REQUEST['status_change']) {
+$statusChangeDays = new CNumericBox('status_change_days', $statusChangeBydays, 3, false, false, false);
+if (!$showChange) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
 $statusChangeDays->addStyle('vertical-align: middle;');
 
-$statusChangeCheckBox = new CCheckBox('status_change', $_REQUEST['status_change'], 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1);
+$statusChangeCheckBox = new CCheckBox('status_change', $showChange, 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1);
 $statusChangeCheckBox->addStyle('vertical-align: middle;');
 
 $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
 $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
-$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $showDetails, null, 1));
+$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $txtSelect, 40));
 $filterForm->addRow(_('Filter by application'), array(
 	new CTextBox('application', $filter['application'], 40),
 	new CButton('application_name', _('Select'),
@@ -422,7 +340,7 @@ $inventoryFilterTable->addRow(
 $filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 
 // maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
+$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $showMaintenance, null, 1));
 
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
 $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
@@ -445,7 +363,7 @@ $triggerForm->addVar('backurl', $page['file']);
 /*
  * Table
  */
-$showEventColumn = ($config['event_ack_enable'] && $_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT);
+$showEventColumn = ($config['event_ack_enable'] && $showEvents != EVENTS_OPTION_NOEVENT);
 
 $switcherName = 'trigger_switchers';
 
@@ -527,17 +445,15 @@ if ($filter['application'] !== '') {
 	$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 }
 
-if (!zbx_empty($_REQUEST['txt_select'])) {
-	$options['search'] = array('description' => $_REQUEST['txt_select']);
+if (!zbx_empty($txtSelect)) {
+	$options['search'] = array('description' => $txtSelect);
 }
-
 if ($showTriggers == TRIGGERS_OPTION_RECENT_PROBLEM) {
 	$options['only_true'] = 1;
 }
 elseif ($showTriggers == TRIGGERS_OPTION_IN_PROBLEM) {
 	$options['filter'] = array('value' => TRIGGER_VALUE_TRUE);
 }
-
 if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 	$options['withUnacknowledgedEvents'] = 1;
 }
@@ -547,10 +463,10 @@ if ($ackStatus == ZBX_ACK_STS_WITH_LAST_UNACK) {
 if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
-if ($_REQUEST['status_change']) {
-	$options['lastChangeSince'] = time() - $_REQUEST['status_change_days'] * SEC_PER_DAY;
+if ($showChange) {
+	$options['lastChangeSince'] = time() - $statusChangeBydays * SEC_PER_DAY;
 }
-if (!get_request('show_maintenance')) {
+if (!$showMaintenance) {
 	$options['maintenance'] = false;
 }
 $triggers = API::Trigger()->get($options);
@@ -722,7 +638,7 @@ foreach ($triggers as $trigger) {
 	$description = new CSpan($trigger['description'], 'link_menu');
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
 
-	if ($_REQUEST['show_details']) {
+	if ($showDetails) {
 		$description = array(
 			$description,
 			BR(),
@@ -840,8 +756,8 @@ foreach ($triggers as $trigger) {
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
-			'events.php?triggerid='.$trigger['triggerid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
-				'&period='.ZBX_PERIOD_DEFAULT.'&source='.EVENT_SOURCE_TRIGGERS
+			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
+				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 	// acknowledge

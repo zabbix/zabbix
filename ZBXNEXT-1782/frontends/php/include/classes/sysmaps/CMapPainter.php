@@ -70,8 +70,13 @@ class CMapPainter {
 
 	protected function paintBackground() {
 		$this->canvas->fill($this->options['map']['bgColor']);
-		if ($this->mapData['backgroundid'] && ($bgImage = get_image_by_imageid($this->mapData['backgroundid']))) {
-			$this->canvas->setBgImage($bgImage['image']);
+
+		if ($this->mapData['backgroundid']) {
+			$image = get_image_by_imageid($this->mapData['backgroundid']);
+
+			if ($image['image']) {
+				$this->canvas->setBgImage($image['image']);
+			}
 		}
 	}
 

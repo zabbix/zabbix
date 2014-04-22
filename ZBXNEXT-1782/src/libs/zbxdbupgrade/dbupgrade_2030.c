@@ -811,14 +811,6 @@ static int	DBpatch_2030081(void)
 	return DBcreate_index("scripts", "scripts_3", "name", 1);
 }
 
-static int	DBpatch_2030082(void)
-{
-	if (SUCCEED != check_data_uniqueness("services", "name"))
-		return FAIL;
-
-	return DBcreate_index("services", "services_2", "name", 1);
-}
-
 static int	DBpatch_2030083(void)
 {
 	if (SUCCEED != check_data_uniqueness("slideshows", "name"))
@@ -1128,7 +1120,6 @@ DBPATCH_ADD(2030078, 0, 1)
 DBPATCH_ADD(2030079, 0, 1)
 DBPATCH_ADD(2030080, 0, 1)
 DBPATCH_ADD(2030081, 0, 1)
-DBPATCH_ADD(2030082, 0, 1)
 DBPATCH_ADD(2030083, 0, 1)
 DBPATCH_ADD(2030084, 0, 1)
 DBPATCH_ADD(2030085, 0, 1)
