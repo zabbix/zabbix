@@ -817,7 +817,8 @@ static int	process_discovery(int now)
 			process_rule(&drule);
 		}
 
-		discovery_clean_services(druleid);
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			discovery_clean_services(druleid);
 
 		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64, now, druleid);
 
