@@ -95,6 +95,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	// filter
 	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
+	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
@@ -152,23 +153,25 @@ if ($exportData) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_set'])) {
-	$_REQUEST['filter_ip'] = get_request('filter_ip');
-	$_REQUEST['filter_dns'] = get_request('filter_dns');
-	$_REQUEST['filter_host'] = get_request('filter_host');
-	$_REQUEST['filter_port'] = get_request('filter_port');
+if (hasRequest('filter_set')) {
+	CProfile::update('web.hosts.filter_ip', getRequest('filter_ip', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
+}
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.hosts.filter_ip');
+	CProfile::delete('web.hosts.filter_dns');
+	CProfile::delete('web.hosts.filter_host');
+	CProfile::delete('web.hosts.filter_port');
+	DBend();
+}
 
-	CProfile::update('web.hosts.filter_ip', $_REQUEST['filter_ip'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_dns', $_REQUEST['filter_dns'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
-	CProfile::update('web.hosts.filter_port', $_REQUEST['filter_port'], PROFILE_TYPE_STR);
-}
-else {
-	$_REQUEST['filter_ip'] = CProfile::get('web.hosts.filter_ip');
-	$_REQUEST['filter_dns'] = CProfile::get('web.hosts.filter_dns');
-	$_REQUEST['filter_host'] = CProfile::get('web.hosts.filter_host');
-	$_REQUEST['filter_port'] = CProfile::get('web.hosts.filter_port');
-}
+$filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
+$filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
+$filter['host'] = CProfile::get('web.hosts.filter_host', '');
+$filter['port'] = CProfile::get('web.hosts.filter_port', '');
 
 /*
  * Actions
@@ -794,21 +797,19 @@ else {
 	// filter
 	$filterTable = new CTable('', 'filter');
 	$filterTable->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
-		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
+		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
+		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
+		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
+		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
 	));
 
-	$filter = new CButton('filter', _('Filter'),
-		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
-	);
-	$filter->useJQueryStyle('main');
+	$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
+	$filterButton->useJQueryStyle('main');
 
-	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
-	$reset->useJQueryStyle();
+	$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
+	$resetButton->useJQueryStyle();
 
-	$divButtons = new CDiv(array($filter, SPACE, $reset));
+	$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
 	$divButtons->setAttribute('style', 'padding: 4px 0;');
 
 	$filterTable->addRow(new CCol($divButtons, 'center', 4));
@@ -855,12 +856,12 @@ else {
 			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
-				'name' => empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host'],
-				'ip' => empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip'],
-				'dns' => empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']
+				'name' => ($filter['host'] === '') ? null : $filter['host'],
+				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
 			),
 			'filter' => array(
-				'port' => empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']
+				'port' => ($filter['port'] === '') ? null : $filter['port']
 			)
 		));
 	}
