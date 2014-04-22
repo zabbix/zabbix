@@ -156,11 +156,9 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('Monitored by proxy'), $proxyTb);
 }
 
-$cmbStatus = new CComboBox('status', $hostPrototype['status']);
-$cmbStatus->addItem(HOST_STATUS_MONITORED, _('Monitored'));
-$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
-
-$hostList->addRow(_('Status'), $cmbStatus);
+$hostList->addVar('status', HOST_STATUS_NOT_MONITORED);
+$cmbStatus = new CCheckBox('status', HOST_STATUS_MONITORED == $hostPrototype['status'], null, HOST_STATUS_MONITORED);
+$hostList->addRow(_('Enabled'), $cmbStatus);
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
