@@ -319,11 +319,12 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 			'templated_hosts' => true
 		);
 
-		if (getRequest('copy_type') == COPY_TO_HOST) { // hosts
+		// hosts or templates
+		if (getRequest('copy_type') == COPY_TO_HOST || getRequest('copy_type') == COPY_TO_TEMPLATE) {
 			$options['hostids'] = getRequest('copy_targetid');
-		} elseif (getRequest('copy_type') == COPY_TO_TEMPLATE) { // templates
-			$options['hostids'] = getRequest('copy_targetid');
-		} else { // host groups
+		}
+		// host groups
+		else {
 			zbx_value2array(getRequest('copy_targetid'));
 
 			$dbGroups = API::HostGroup()->get(array(

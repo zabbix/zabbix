@@ -683,13 +683,12 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 }
 elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
-		if (getRequest('copy_type') == COPY_TO_HOST) { // host
+		// hosts or templates
+		if (getRequest('copy_type') == COPY_TO_HOST || getRequest('copy_type') == COPY_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetid');
 		}
-		elseif (getRequest('copy_type') == COPY_TO_TEMPLATE) { // template
-			$hosts_ids = getRequest('copy_targetid');
-		}
-		else { // host groups
+		// host groups
+		else {
 			$hosts_ids = array();
 			$group_ids = getRequest('copy_targetid');
 

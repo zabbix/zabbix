@@ -1269,7 +1269,8 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		'copy_targetid' => getRequest('copy_targetid', array()),
 		'hostid' => getRequest('hostid', 0),
 		'groups' => array(),
-		'hosts' => array()
+		'hosts' => array(),
+		'templates' => array()
 	);
 
 	// validate elements
@@ -1300,29 +1301,24 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		$data['groups'] = API::HostGroup()->get($params);
 		order_result($data['groups'], 'name');
 
-		$groupIds = [];
-		foreach($data['groups'] as $group) {
-			$groupIds[] = $group['groupid'];
-		}
+		$groupIds = zbx_objectValues($data['groups'], 'groupid');
 
-		if (!in_array($data['filter_groupid'], $groupIds)
-			|| $data['filter_groupid'] == 0
-		) {
+		if (!in_array($data['filter_groupid'], $groupIds) || $data['filter_groupid'] == 0) {
 			$data['filter_groupid'] = reset($groupIds);
 		}
 
-		$params = array(
-			'output' => array('name'),
-			'groupids' => $data['filter_groupid']
-		);
 		if ($data['copy_type'] == COPY_TO_TEMPLATE) {
-			$params['output'][] = 'templateid';
-			$data['templates'] = API::Template()->get($params);
+			$data['templates'] = API::Template()->get(array(
+				'output' => array('name', 'templateid'),
+				'groupids' => $data['filter_groupid']
+			));
 			order_result($data['templates'], 'name');
 		}
 		elseif ($data['copy_type'] == COPY_TO_HOST) {
-			$params['output'][] = 'hostid';
-			$data['hosts'] = API::Host()->get($params);
+			$data['hosts'] = API::Host()->get(array(
+				'output' => array('name', 'hostid'),
+				'groupids' => $data['filter_groupid']
+			));
 			order_result($data['hosts'], 'name');
 		}
 	}
