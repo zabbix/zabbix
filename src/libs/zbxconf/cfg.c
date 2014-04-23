@@ -47,41 +47,36 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  ******************************************************************************/
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
 {
-#ifdef _WINDOWS
-	const char		*__function_name = "parse_cfg_object";
-
 	int			ret = FAIL;
+	char			*path = NULL;
+	zbx_stat_t		sb;
+
+#ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*path = NULL, *file_name;
-	wchar_t			*wpath;
-	struct _stat		sb;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	char 			*file_name;
+	wchar_t			*wpath = NULL;
 
 	path = zbx_strdup(path, cfg_file);
 	zbx_rtrim(path, "\\");
 
-	wpath = zbx_utf8_to_unicode(path);
-
-	if (0 != _wstat(wpath, &sb))
+	if (0 != zbx_stat(path, &sb))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
-		goto out;
+		goto clean;
 	}
-	zbx_free(wpath);
 
 	if (0 == S_ISDIR(sb.st_mode))
 	{
 		ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-		goto out;
+		goto clean;
 	}
 
 	path = zbx_dsprintf(path, "%s\\*", cfg_file);
 	wpath = zbx_utf8_to_unicode(path);
 
 	if (INVALID_HANDLE_VALUE == (h_find = FindFirstFileW(wpath, &find_file_data)))
-		goto out;
+		goto clean;
 
 	while (0 != FindNextFileW(h_find, &find_file_data))
 	{
@@ -95,63 +90,56 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		zbx_free(file_name);
 
 		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
-			goto out;
+			goto close;
 	}
 
 	ret = SUCCEED;
-out:
+close:
 	FindClose(h_find);
+clean:
 	zbx_free(wpath);
 	zbx_free(path);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
 #else
 	DIR		*dir;
-	zbx_stat_t	sb;
 	struct dirent	*d;
-	char		*incl_file = NULL;
-	int		result = SUCCEED;
 
-	if (-1 == zbx_stat(cfg_file, &sb))
+	if (0 != zbx_stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		return ret;
 	}
 
-	if (!S_ISDIR(sb.st_mode))
+	if (0 == S_ISDIR(sb.st_mode))
 		return __parse_cfg_file(cfg_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
 
 	if (NULL == (dir = opendir(cfg_file)))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		return FAIL;
+		return ret;
 	}
 
 	while (NULL != (d = readdir(dir)))
 	{
-		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
+		path = zbx_dsprintf(path, "%s/%s", cfg_file, d->d_name);
 
-		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
+		if (0 != zbx_stat(path, &sb) || 0 != S_ISREG(sb.st_mode))
 			continue;
 
-		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
-		{
-			result = FAIL;
-			break;
-		}
+		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+			goto clean;
 	}
-	zbx_free(incl_file);
 
-	if (-1 == closedir(dir))
+	ret = SUCCEED;
+clean:
+	zbx_free(path);
+
+	if (0 != closedir(dir))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
 	}
-
-	return result;
 #endif
+	return ret;
 }
 
 /******************************************************************************
