@@ -2410,7 +2410,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
-	size_t			value_alloc = 0;
+	size_t			value_alloc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2427,6 +2427,9 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	memset(&drule, 0, sizeof(drule));
 	*last_ip = '\0';
 
+	value = zbx_strdup(value, "");
+	value_alloc = 1;
+
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
@@ -2435,7 +2438,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		memset(&dcheck, 0, sizeof(dcheck));
 		*key_ = '\0';
 		*dns = '\0';
-		value = zbx_strdup(value, "");
+		*value = '\0';
 		port = 0;
 		status = 0;
 		dcheck.key_ = key_;
