@@ -343,9 +343,9 @@ else {
 	$data = array(
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
-		'triggers' => array(),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
+		'triggers' => array()
 	);
+
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
@@ -353,12 +353,8 @@ else {
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null),
-		'triggerid' => get_request('triggerid', null)
+		'hostid' => get_request('hostid', null)
 	));
-	if ($data['pageFilter']->triggerid > 0) {
-		$data['triggerid'] = $data['pageFilter']->triggerid;
-	}
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
@@ -456,14 +452,6 @@ else {
 	}
 	else {
 		$data['showInfoColumn'] = true;
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['triggers'] as &$trigger) {
-			$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true);
-		}
-		unset($trigger);
 	}
 
 	// render view

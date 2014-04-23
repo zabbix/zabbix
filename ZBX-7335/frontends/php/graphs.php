@@ -97,7 +97,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (!empty($_REQUEST['parent_discoveryid'])) {
 		// check whether discovery rule is editable by user
 		$discovery_rule = API::DiscoveryRule()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => array($_REQUEST['parent_discoveryid']),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
@@ -130,7 +129,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
 			'output' => array('graphid'),
-			'nodeids' => get_current_nodeid(true),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => array($_REQUEST['graphid']),
 			'editable' => true,
@@ -144,7 +142,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid'),
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => array($_REQUEST['hostid']),
 			'templated_hosts' => true,
 			'editable' => true,
@@ -315,7 +312,6 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		$options = array(
 			'output' => array('hostid'),
 			'editable' => true,
-			'nodes' => get_current_nodeid(true),
 			'templated_hosts' => true
 		);
 
@@ -330,7 +326,6 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 			$dbGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
 				'groupids' => getRequest('copy_targetid'),
-				'nodes' => get_current_nodeid(true),
 				'editable' => true
 			));
 			$dbGroups = zbx_toHash($dbGroups, 'groupid');
@@ -600,8 +595,7 @@ else {
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
-		'displayNodes' => (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0)
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
 	);
 
 	$sortfield = getPageSortField('name');
@@ -653,13 +647,6 @@ else {
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['graphs'] as $key => $graph) {
-			$data['graphs'][$key]['nodename'] = get_node_name_by_elid($graph['graphid'], true);
-		}
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);

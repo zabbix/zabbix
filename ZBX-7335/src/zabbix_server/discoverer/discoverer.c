@@ -667,44 +667,161 @@ static void	process_rule(DB_DRULE *drule)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: discovery_clean_services                                         *
+ *                                                                            *
+ * Purpose: clean dservices and dhosts not presenting in drule                *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovery_clean_services(zbx_uint64_t druleid)
+{
+	const char		*__function_name = "discovery_clean_services";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*iprange = NULL;
+	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
+	zbx_uint64_t		dhostid, dserviceid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
+
+	if (NULL != (row = DBfetch(result)))
+		iprange = zbx_strdup(iprange, row[0]);
+	DBfree_result(result);
+
+	if (NULL == iprange)
+		goto out;
+
+	zbx_vector_uint64_create(&keep_dhostids);
+	zbx_vector_uint64_create(&del_dhostids);
+	zbx_vector_uint64_create(&del_dserviceids);
+
+	result = DBselect("select dh.dhostid,ds.dserviceid,ds.ip"
+			" from dhosts dh,dservices ds"
+			" where dh.dhostid=ds.dhostid"
+				" and dh.druleid=" ZBX_FS_UI64,
+			druleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(dhostid, row[0]);
+
+		if (SUCCEED != ip_in_list(iprange, row[2]))
+		{
+			ZBX_STR2UINT64(dserviceid, row[1]);
+
+			zbx_vector_uint64_append(&del_dhostids, dhostid);
+			zbx_vector_uint64_append(&del_dserviceids, dserviceid);
+		}
+		else
+			zbx_vector_uint64_append(&keep_dhostids, dhostid);
+	}
+	DBfree_result(result);
+
+	zbx_free(iprange);
+
+	if (0 != del_dserviceids.values_num)
+	{
+		int	i;
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset;
+
+		/* remove dservices */
+
+		zbx_vector_uint64_sort(&del_dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dservices where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+				del_dserviceids.values, del_dserviceids.values_num);
+
+		DBexecute("%s", sql);
+
+		/* remove dhosts */
+
+		zbx_vector_uint64_sort(&keep_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&keep_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < del_dhostids.values_num; i++)
+		{
+			dhostid = del_dhostids.values[i];
+
+			if (FAIL != zbx_vector_uint64_bsearch(&keep_dhostids, dhostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				zbx_vector_uint64_remove_noorder(&del_dhostids, i--);
+		}
+
+		if (0 != del_dhostids.values_num)
+		{
+			zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					del_dhostids.values, del_dhostids.values_num);
+
+			DBexecute("%s", sql);
+		}
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&del_dserviceids);
+	zbx_vector_uint64_destroy(&del_dhostids);
+	zbx_vector_uint64_destroy(&keep_dhostids);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 static int	process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_DRULE	drule;
 	int		rule_count = 0;
+	zbx_uint64_t	druleid;
 
 	result = DBselect(
-			"select distinct r.druleid,r.iprange,r.name,c.dcheckid"
+			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid"
 			" from drules r"
 				" left join dchecks c"
 					" on c.druleid=r.druleid"
-						" and uniq=1"
-			" where r.proxy_hostid is null"
-				" and r.status=%d"
+						" and c.uniq=1"
+			" where r.status=%d"
 				" and (r.nextcheck<=%d or r.nextcheck>%d+r.delay)"
-				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d"
-				ZBX_SQL_NODE,
+				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d",
 			DRULE_STATUS_MONITORED,
 			now,
 			now,
 			CONFIG_DISCOVERER_FORKS,
-			process_num - 1,
-			DBand_node_local("r.druleid"));
+			process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		memset(&drule, 0, sizeof(drule));
+		ZBX_STR2UINT64(druleid, row[0]);
 
-		ZBX_STR2UINT64(drule.druleid, row[0]);
-		drule.iprange = row[1];
-		drule.name = row[2];
-		ZBX_DBROW2UINT64(drule.unique_dcheckid, row[3]);
+		if (SUCCEED == DBis_null(row[4]))
+		{
+			memset(&drule, 0, sizeof(drule));
 
-		process_rule(&drule);
+			drule.druleid = druleid;
+			drule.iprange = row[1];
+			drule.name = row[2];
+			ZBX_DBROW2UINT64(drule.unique_dcheckid, row[3]);
 
-		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64,
-				now, drule.druleid);
+			process_rule(&drule);
+		}
+
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			discovery_clean_services(druleid);
+
+		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64, now, druleid);
+
 		rule_count++;
 	}
 	DBfree_result(result);
@@ -721,12 +838,9 @@ static int	get_minnextcheck(int now)
 	result = DBselect(
 			"select count(*),min(nextcheck)"
 			" from drules"
-			" where proxy_hostid is null"
-				" and status=%d"
-				" and " ZBX_SQL_MOD(druleid,%d) "=%d"
-				ZBX_SQL_NODE,
-			DRULE_STATUS_MONITORED, CONFIG_DISCOVERER_FORKS, process_num - 1,
-			DBand_node_local("druleid"));
+			" where status=%d"
+				" and " ZBX_SQL_MOD(druleid,%d) "=%d",
+			DRULE_STATUS_MONITORED, CONFIG_DISCOVERER_FORKS, process_num - 1);
 
 	row = DBfetch(result);
 
