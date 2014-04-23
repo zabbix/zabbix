@@ -166,12 +166,21 @@ class CDRule extends CApiService {
 	return $result;
 	}
 
-
+	/**
+	 * Check if discovery rule exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists(array $object) {
+		self::deprecated('drule.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array(),
 			'output' => array('druleid'),
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
@@ -391,7 +400,12 @@ class CDRule extends CApiService {
 
 		// checking to the duplicate names
 		foreach ($dRules as $dRule) {
-			if ($this->exists($dRule)) {
+			$dRuleExists = $this->get(array(
+				'output' => array('druleid'),
+				'filter' => array('name' => $dRule['name']),
+				'limit' => 1
+			));
+			if ($dRuleExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 			}
 		}
@@ -460,7 +474,12 @@ class CDRule extends CApiService {
 		foreach ($dRules as $dRule) {
 			// validate drule duplicate names
 			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
-				if ($this->exists($dRule)) {
+				$dRuleExists = $this->get(array(
+					'output' => array('druleid'),
+					'filter' => array('name' => $dRule['name']),
+					'limit' => 1
+				));
+				if ($dRuleExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 				}
 			}
