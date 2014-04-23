@@ -120,6 +120,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
 
 	init_result(&result);
 
+	*value = zbx_strdup(*value, "");
+
 	switch (dcheck->type)
 	{
 		case SVC_SSH:
