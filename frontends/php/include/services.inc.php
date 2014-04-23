@@ -240,7 +240,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		$trigger = $service['trigger'];
 		if ($trigger) {
 			$url = new CLink($trigger['description'],
-				'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
+				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
 			);
 			$caption[] = ' - ';
 			$caption[] = $url;
@@ -252,7 +252,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$problemList = new CList(null, 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
-					'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
 				));
 			}
 		}
