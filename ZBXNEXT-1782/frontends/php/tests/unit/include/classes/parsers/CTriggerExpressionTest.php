@@ -3199,20 +3199,20 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array("{host:key.count(1,\"\r\n\")}=0", null, true),
 			array("{host:key.count(1,\"\t\")}=0", null, true),
 
-			array("{host:key.count(1,\r\"\")}=0", null, false),
-			array("{host:key.count(1,\n\"\")}=0", null, false),
-			array("{host:key.count(1,\r\n\"\")}=0", null, false),
-			array("{host:key.count(1,\t\"\")}=0", null, false),
+			array("{host:key.count(1,\r\"\")}=0", null, true),
+			array("{host:key.count(1,\n\"\")}=0", null, true),
+			array("{host:key.count(1,\r\n\"\")}=0", null, true),
+			array("{host:key.count(1,\t\"\")}=0", null, true),
 
-			array("{host:key.count(1\r,\"\")}=0", null, false),
-			array("{host:key.count(1\n,\"\")}=0", null, false),
-			array("{host:key.count(1\r\n,\"\")}=0", null, false),
-			array("{host:key.count(1\t,\"\")}=0", null, false),
+			array("{host:key.count(1\r,\"\")}=0", null, true),
+			array("{host:key.count(1\n,\"\")}=0", null, true),
+			array("{host:key.count(1\r\n,\"\")}=0", null, true),
+			array("{host:key.count(1\t,\"\")}=0", null, true),
 
-			array("{host:key.count(\r1,\"\")}=0", null, false),
-			array("{host:key.count(\n1,\"\")}=0", null, false),
-			array("{host:key.count(\r\n1,\"\")}=0", null, false),
-			array("{host:key.count(\t1,\"\")}=0", null, false),
+			array("{host:key.count(\r1,\"\")}=0", null, true),
+			array("{host:key.count(\n1,\"\")}=0", null, true),
+			array("{host:key.count(\r\n1,\"\")}=0", null, true),
+			array("{host:key.count(\t1,\"\")}=0", null, true),
 		);
 	}
 
