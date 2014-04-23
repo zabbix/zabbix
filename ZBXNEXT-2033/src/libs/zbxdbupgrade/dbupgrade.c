@@ -2438,18 +2438,20 @@ static int	DBpatch_2020006(void)
 
 static int	DBpatch_2020007(void)
 {
-	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("ticket", 1, &field);
+	return DBdrop_index("ticket", "ticket_1");
 }
 
 static int	DBpatch_2020008(void)
 {
-	const ZBX_FIELD field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+	return DBcreate_index("ticket", "ticket_1", "eventid,clock", 0);
+}
+
+static int	DBpatch_2020009(void)
+{
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("ticket", 2, &field);
+	return DBadd_foreign_key("ticket", 1, &field);
 }
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
@@ -2707,6 +2709,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2020006, 0, 1)
 	DBPATCH_ADD(2020007, 0, 1)
 	DBPATCH_ADD(2020008, 0, 1)
+	DBPATCH_ADD(2020009, 0, 1)
 
 	DBPATCH_END()
 
