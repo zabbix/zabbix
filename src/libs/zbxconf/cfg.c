@@ -32,6 +32,85 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 /******************************************************************************
  *                                                                            *
+ * Function: match_glob                                                       *
+ *                                                                            *
+ * Purpose: see whether a file (e.g., "parameter.conf")                       *
+ *          matches a pattern (e.g., "p*.conf")                               *
+ *                                                                            *
+ * Return value: SUCCEED - file matches a pattern                             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	match_glob(const char *file, const char *pattern)
+{
+	const char	*f, *g, *p, *q;
+
+	f = file;
+	p = pattern;
+
+	while (1)
+	{
+		/* corner case */
+
+		if ('\0' == *p)
+			return '\0' == *f ? SUCCEED : FAIL;
+
+		/* find a set of literal characters */
+
+		while ('*' == *p)
+			p++;
+
+		for (q = p; '\0' != *q && '*' != *q; q++)
+			;
+
+		/* if literal characters are at the beginning... */
+
+		if (pattern == p)
+		{
+			if (0 != strncmp(f, p, q - p))
+				return FAIL;
+
+			f += q - p;
+			p = q;
+
+			continue;
+		}
+
+		/* if literal characters are at the end... */
+
+		if ('\0' == *q)
+		{
+			for (g = f; '\0' != *g; g++)
+				;
+
+			if (g - f < q - p)
+				return FAIL;
+
+			return 0 == strcmp(g - (q - p), p) ? SUCCEED : FAIL;
+		}
+
+		/* if literal characters are in the middle... */
+
+		while (1)
+		{
+			if ('\0' == *f)
+				return FAIL;
+
+			if (0 == strncmp(f, p, q - p))
+			{
+				f += q - p;
+				p = q;
+
+				break;
+			}
+
+			f++;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_glob                                                       *
  *                                                                            *
  * Purpose: parse a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"   *
@@ -42,7 +121,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
  *             pattern - [OUT] parsed pattern, if path is directory           *
  *                                                                            *
  * Return value: SUCCEED - glob is valid and was parsed successfully          *
- *               FAIL - glob is invalid                                       *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	parse_glob(const char *glob, char **path, char **pattern)
@@ -150,7 +229,15 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			continue;
 
 		file_name = zbx_unicode_to_utf8(find_file_data.cFileName);
+
+		if (NULL != pattern && SUCCEED != match_glob(file_name, pattern))
+		{
+			zbx_free(file_name);
+			continue;
+		}
+
 		file = zbx_dsprintf(file, "%s\\%s", path, file_name);
+
 		zbx_free(file_name);
 
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
@@ -168,6 +255,9 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		file = zbx_dsprintf(file, "%s/%s", path, d->d_name);
 
 		if (0 != zbx_stat(file, &sb) || 0 == S_ISREG(sb.st_mode))
+			continue;
+
+		if (NULL != pattern && SUCCEED != match_glob(d->d_name, pattern))
 			continue;
 
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
