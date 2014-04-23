@@ -444,9 +444,14 @@ class CXmlImport18 {
 
 		foreach ($importScreens as $mnum => &$screen) {
 			unset($screen['screenid']);
-			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-			if ($exists && !empty($rules['screens']['updateExisting'])) {
+			$screenExists = API::Screen()->get(array(
+				'output' => array('screenid'),
+				'filter' => array('name' => $screen['name']),
+				'nopermissions' => true,
+				'limit' => 1
+			));
+			if ($screenExists && $rules['screens']['updateExisting']) {
 				$db_screens = API::Screen()->get(array(
 					'output' => array('screenid'),
 					'filter' => array('name' => $screen['name'])
@@ -459,7 +464,7 @@ class CXmlImport18 {
 
 				$screen['screenid'] = $db_screen['screenid'];
 			}
-			else if ($exists || empty($rules['screens']['createMissing'])) {
+			elseif ($screenExists || !$rules['screens']['createMissing']) {
 				info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
 				unset($importScreens[$mnum]);
 				continue; // break if not update exist
@@ -673,13 +678,18 @@ class CXmlImport18 {
 		$importMaps = $importMaps['zabbix_export']['sysmaps'];
 		foreach ($importMaps as $mnum => &$sysmap) {
 			unset($sysmap['sysmapid']);
-			$exists = API::Map()->exists(array('name' => $sysmap['name']));
 
 			if (!isset($sysmap['label_format'])) {
 				$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
 			}
 
-			if ($exists && !empty($rules['maps']['updateExisting'])) {
+			$mapExists = API::Map()->get(array(
+				'output' => array('sysmapid'),
+				'filter' => array('name' => $sysmap['name']),
+				'nopermissions' => true,
+				'limit' => 1
+			));
+			if ($mapExists && $rules['maps']['updateExisting']) {
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 				if (empty($db_maps)) {
 					throw new Exception(_s('No permissions for map "%1$s".', $sysmap['name']));
@@ -688,10 +698,10 @@ class CXmlImport18 {
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
 			}
-			else if ($exists || empty($rules['maps']['createMissing'])) {
+			elseif ($mapExists || !$rules['maps']['createMissing']) {
 				info(_s('Map "%1$s" skipped - user rule.', $sysmap['name']));
 				unset($importMaps[$mnum]);
-				continue; // break if not update updateExisting
+				continue;
 			}
 
 			if (isset($sysmap['backgroundid'])) {
@@ -1580,14 +1590,19 @@ class CXmlImport18 {
 							$graph_db['show_legend'] = 1;
 						}
 
-						$current_graph = API::Graph()->exists($graph_db);
+						$current_graph = API::Graph()->get(array(
+							'output' => array('graphid'),
+							'filter' => array('name' => $graph_db['name']),
+							'nopermissions' => true,
+							'limit' => 1
+						));
 
 						if ($current_graph) {
 							$current_graph = API::Graph()->get(array(
-								'filter' => array('name' => $graph_db['name']),
-								'hostids' => $graph_db['hostids'],
 								'output' => API_OUTPUT_EXTEND,
-								'editable' => 1
+								'hostids' => $graph_db['hostids'],
+								'filter' => array('name' => $graph_db['name']),
+								'editable' => true
 							));
 
 							if (empty($current_graph)) {
