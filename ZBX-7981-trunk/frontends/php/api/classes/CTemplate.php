@@ -308,7 +308,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Check if Template exists.
+	 * Check if template exists.
 	 *
 	 * @deprecated	As of version 2.4, use get method instead.
 	 *
