@@ -86,7 +86,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Optional IP and mandatory port are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -100,7 +100,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid port number."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -255,7 +255,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (5 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Maximum 5 parameters are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -284,7 +284,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 		if (NULL == qt[i].name)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query type. Must be one of: ANY, A, NS, CNAME, MB, MG, MR, PTR, MD, MF, MX, SOA, NULL, WKS, HINFO, MINFO, TXT, SRV."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -295,7 +295,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		retrans = 1;
 	else if (SUCCEED != is_uint31(param, &retrans) || 0 == retrans)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number for retransmission timeout."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -305,7 +305,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		retry = 2;
 	else if (SUCCEED != is_uint31(param, &retry) || 0 == retry)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of retries."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

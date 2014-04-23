@@ -72,7 +72,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Host name and optional path and port are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -82,7 +82,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == hostname || '\0' == *hostname)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Host name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -95,7 +95,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		port_number = ZBX_DEFAULT_HTTP_PORT;
 	else if (FAIL == is_ushort(port_str, &port_number))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid port number."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -118,7 +118,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Host name and optional path and port are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -128,7 +128,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == hostname || '\0' == *hostname)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Host name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -141,7 +141,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 		port_number = ZBX_DEFAULT_HTTP_PORT;
 	else if (FAIL == is_ushort(port_str, &port_number))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid port number."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -165,7 +165,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (6 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Maximum 6 parameters are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -178,7 +178,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == hostname || '\0' == *hostname)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Host name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -191,13 +191,13 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		port_number = ZBX_DEFAULT_HTTP_PORT;
 	else if (FAIL == is_ushort(port_str, &port_number))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid port number."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == regexp)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Regular expression cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -209,7 +209,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		length = MAX_BUFFER_LEN - 1;
 	else if (FAIL == is_uint31_1(length_str, &length))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid maximum number of characters."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

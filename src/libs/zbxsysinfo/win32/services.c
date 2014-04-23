@@ -33,7 +33,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only service name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -41,7 +41,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == name || '\0' == *name)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Service name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -194,7 +194,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional type, service state and exclude list are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -212,7 +212,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		start_type = ZBX_SRV_STARTTYPE_DISABLED;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: all, automatic, disabled, manual."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -236,7 +236,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		service_state = ZBX_SRV_STATE_PAUSED;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid service state. Must be one of: all, continue_pending, paused, paused_pending, running, started, start_pending, stopped, stop_pending"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

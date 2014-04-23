@@ -137,7 +137,7 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device and type are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -150,7 +150,7 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: bytes, operations."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -169,7 +169,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional device and type are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -182,7 +182,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VFS_DEV_READ_BYTES(devname, result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: bytes, operations."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

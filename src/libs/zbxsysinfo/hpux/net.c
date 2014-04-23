@@ -403,7 +403,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -426,7 +426,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, mib.mib_if.ifInDiscards);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -440,7 +440,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -463,7 +463,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, mib.mib_if.ifOutDiscards);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -477,7 +477,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only interface name and optional mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -509,7 +509,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: bytes, dropped, errors, packets."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

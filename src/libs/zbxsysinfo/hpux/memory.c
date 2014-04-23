@@ -132,7 +132,7 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional mode is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -154,7 +154,7 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: active, available, free, pavailable, pused, total, used."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		ret = SYSINFO_RET_FAIL;
 	}
 	return ret;

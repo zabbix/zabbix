@@ -35,7 +35,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 != request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters. Only counter name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -43,7 +43,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == counter || '\0' == *counter)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Counter name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -99,7 +99,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only counter name and optional interval are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -107,7 +107,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Counter name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -119,7 +119,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		interval = 1;
 	else if (FAIL == is_uint31(tmp, &interval))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid interval."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -55,7 +55,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only section and optional type are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -64,7 +64,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == section)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Section cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -72,7 +72,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (1 != request->nparam && collector->vmstat.shared_enabled)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. It should be empty for given section."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 		else if (!collector->vmstat.shared_enabled)
@@ -87,7 +87,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (NULL == type)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. It cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -99,7 +99,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, collector->vmstat.kthr_b);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: b, r."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -119,7 +119,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, collector->vmstat.sr);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: fi, fo, fr, pi, po, sr."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -133,7 +133,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, collector->vmstat.cs);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: cs, in, sy."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -157,7 +157,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, collector->vmstat.cpu_app);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: app, ec, id, lbusy, pc, sy, us, wa."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -169,7 +169,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, collector->vmstat.disk_tps);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: bps, tps."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -181,13 +181,13 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_UI64_RESULT(result, collector->vmstat.mem_fre);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type for given section. Must be one of: avm, fre."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid section. Must be one of: cpu, disk, ent, faults, kthr, memory, page."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

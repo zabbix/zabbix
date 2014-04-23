@@ -108,7 +108,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only optional procname and user are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -316,7 +316,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only procname and optional attribute and type are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -326,7 +326,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == proc_name || '\0' == *proc_name)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Procname cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -344,7 +344,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == attrList[attr_id])     /* Unsupported attribute */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid attribute. Must be one of: gdiobj, io_other_b, io_other_op, io_read_b, io_read_op, io_write_b, io_write_op, ktime, pf, utime, userobj, vmsize, wkset"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -362,7 +362,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == typeList[type_id])	/* Unsupported type */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: avg, min, max, sum."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

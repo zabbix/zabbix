@@ -153,7 +153,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: available, free, pavailable, pused, total, used."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		ret = SYSINFO_RET_FAIL;
 	}
 
