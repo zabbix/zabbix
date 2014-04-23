@@ -351,12 +351,8 @@ else {
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null),
-		'triggerid' => get_request('triggerid', null)
+		'hostid' => get_request('hostid', null)
 	));
-	if ($data['pageFilter']->triggerid > 0) {
-		$data['triggerid'] = $data['pageFilter']->triggerid;
-	}
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
