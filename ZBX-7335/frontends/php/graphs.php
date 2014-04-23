@@ -57,7 +57,6 @@ $fields = array(
 	'show_work_period' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
