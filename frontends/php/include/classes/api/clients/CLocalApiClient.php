@@ -50,6 +50,10 @@ class CLocalApiClient extends CApiClient {
 	public function callMethod($api, $method, array $params, $auth) {
 		global $DB;
 
+		// api and method names must be case insensitive
+		$api = strtolower($api);
+		$method = strtolower($method);
+
 		$response = new CApiClientResponse();
 		$newTransaction = false;
 		try {
