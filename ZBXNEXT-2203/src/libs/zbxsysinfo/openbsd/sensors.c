@@ -137,7 +137,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only device name, sensor name and optional mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -147,13 +147,13 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == device || '\0' == *device)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Device name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == name || '\0' == *name)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sensor name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -167,7 +167,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		do_task = DO_MIN;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid mode. Must be one of: avg, empty, max, min."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

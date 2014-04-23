@@ -221,14 +221,20 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	check_time = zbx_time();
 
 	if (3 < request->nparam)
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	service = get_rparam(request, 0);
 	ip_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
 	if (NULL == service || '\0' == *service)
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == ip_str || '\0' == *ip_str)
 		strscpy(ip, default_addr);
@@ -237,8 +243,8 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 
 	if (NULL != port_str && SUCCEED != is_ushort(port_str, &port))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
-		return ret;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == strcmp(service, "ssh"))
@@ -301,8 +307,8 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Required \"port\" parameter missing"));
-			return ret;
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			return SYSINFO_RET_FAIL;
 		}
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}

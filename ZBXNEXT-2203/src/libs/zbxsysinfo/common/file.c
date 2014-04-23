@@ -35,7 +35,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. File name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -43,7 +43,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
@@ -68,7 +68,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. File name and optional mode are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -77,7 +77,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
@@ -95,7 +95,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, buf.st_ctime);
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid type. Must be one of: access, change, modify."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto err;
 	}
 
@@ -112,7 +112,7 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only file name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -120,7 +120,7 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
@@ -151,7 +151,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (2 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. File name and optional encoding are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -165,7 +165,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
@@ -255,7 +255,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (6 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Maximum 6 parameters are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -268,13 +268,13 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
 	if (NULL == regexp || '\0' == *regexp)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Regular expression cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto err;
 	}
 
@@ -287,7 +287,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		start_line = 0;
 	else if (FAIL == is_uint32(start_line_str, &start_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Start line parameter should be numeric."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
 	}
 
@@ -295,7 +295,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		end_line = 0xffffffff;
 	else if (FAIL == is_uint32(end_line_str, &end_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "End line parameter should be numeric."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
 	}
 
@@ -375,7 +375,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (5 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Maximum 5 parameters are expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -387,13 +387,13 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
 	if (NULL == regexp || '\0' == *regexp)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Regular expression cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto err;
 	}
 
@@ -406,7 +406,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		start_line = 0;
 	else if (FAIL == is_uint32(start_line_str, &start_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid start line."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
 	}
 
@@ -414,7 +414,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		end_line = 0xffffffff;
 	else if (FAIL == is_uint32(end_line_str, &end_line))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid end line."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
 	}
 
@@ -489,7 +489,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only file name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -497,7 +497,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
@@ -628,7 +628,7 @@ int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters. Only file name is expected."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
@@ -636,7 +636,7 @@ int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "File name cannot be empty."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		goto err;
 	}
 
