@@ -411,9 +411,7 @@ else {
 }
 $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
-$hostList->addVar('status', HOST_STATUS_NOT_MONITORED);
-$cmbStatus = new CCheckBox('status', HOST_STATUS_MONITORED == $status, null, HOST_STATUS_MONITORED);
-$hostList->addRow(_('Enabled'), $cmbStatus);
+$hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED == $status), null, HOST_STATUS_MONITORED));
 
 if ($_REQUEST['form'] == 'full_clone') {
 	// host applications

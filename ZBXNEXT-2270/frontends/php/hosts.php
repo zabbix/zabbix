@@ -54,7 +54,7 @@ $fields = array(
 	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,			IN('0,1,3'), 'isset({save})'),
+	'status' =>			array(T_ZBX_INT, O_OPT, null,			IN(array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)), null),
 	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
@@ -225,7 +225,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		$hosts = array('hosts' => $hosts);
 
 		$properties = array(
-			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status', 'description'
+			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'description'
 		);
 
 		$newValues = array();
@@ -233,6 +233,10 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			if (isset($visible[$property])) {
 				$newValues[$property] = $_REQUEST[$property];
 			}
+		}
+
+		if (isset($visible['status'])) {
+			$newValues['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		}
 
 		if (isset($visible['inventory_mode'])) {
@@ -387,7 +391,7 @@ elseif (hasRequest('save')) {
 		if (!$create && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$host = array(
 				'hostid' => $hostId,
-				'status' => getRequest('status'),
+				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? array()
 					: getRequest('host_inventory', array())
@@ -459,7 +463,7 @@ elseif (hasRequest('save')) {
 			$host = array(
 				'host' => getRequest('host'),
 				'name' => getRequest('visiblename'),
-				'status' => getRequest('status'),
+				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 				'description' => getRequest('description'),
 				'proxy_hostid' => getRequest('proxy_hostid', 0),
 				'ipmi_authtype' => getRequest('ipmi_authtype'),
