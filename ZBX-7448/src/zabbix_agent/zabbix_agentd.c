@@ -601,6 +601,8 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start agent: specified number of agents %d is over limit %d",
 				threads_num, MAXIMUM_WAIT_OBJECTS);
+		zbx_error("cannot start agent: specified number of agents %d is over limit %d",
+				threads_num, MAXIMUM_WAIT_OBJECTS);
 		exit(EXIT_FAILURE);
 	}
 #endif
