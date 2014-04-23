@@ -83,11 +83,9 @@ static int	is_operator_delimiter(unsigned char c)
 static double	evaluate_number()
 {
 	int		digits = 0, dots = 0;
-	const char	*iter;
+	const char	*iter = ptr;
 	double		result;
 	zbx_uint64_t	factor = 1;
-
-	iter = ptr;
 
 	while (1)
 	{
