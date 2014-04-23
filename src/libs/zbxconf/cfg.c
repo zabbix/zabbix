@@ -67,7 +67,11 @@ static int	match_glob(const char *file, const char *pattern)
 
 		if (pattern == p)
 		{
+#ifdef _WINDOWS
+			if (0 != zbx_strncasecmp(f, p, q - p))
+#else
 			if (0 != strncmp(f, p, q - p))
+#endif
 				return FAIL;
 
 			f += q - p;
@@ -85,8 +89,11 @@ static int	match_glob(const char *file, const char *pattern)
 
 			if (g - f < q - p)
 				return FAIL;
-
+#ifdef _WINDOWS
+			return 0 == strcasecmp(g - (q - p), p) ? SUCCEED : FAIL;
+#else
 			return 0 == strcmp(g - (q - p), p) ? SUCCEED : FAIL;
+#endif
 		}
 
 		/* if literal characters are in the middle... */
@@ -95,8 +102,11 @@ static int	match_glob(const char *file, const char *pattern)
 		{
 			if ('\0' == *f)
 				return FAIL;
-
+#ifdef _WINDOWS
+			if (0 == zbx_strncasecmp(f, p, q - p))
+#else
 			if (0 == strncmp(f, p, q - p))
+#endif
 			{
 				f += q - p;
 				p = q;
