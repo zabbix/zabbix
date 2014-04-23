@@ -99,7 +99,7 @@ elseif (isset($_REQUEST['cancel'])) {
 	redirect(CWebUser::$data['last_page']['url']);
 }
 elseif (isset($_REQUEST['save'])) {
-	$auth_type = get_user_system_auth(CWebUser::$data['userid']);
+	$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
 
 	if ($auth_type != ZBX_AUTH_INTERNAL) {
 		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
