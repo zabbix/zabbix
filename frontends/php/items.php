@@ -38,7 +38,7 @@ $fields = array(
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({itemid})'),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
-	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
+	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'itemid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
@@ -116,8 +116,8 @@ $fields = array(
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({value_type})&&{value_type}==2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_targetid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
+	'copy_targetid' =>		    array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'copy_groupid' =>		    array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -686,16 +686,16 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('hostid'));
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
-	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
-		// host
-		if ($_REQUEST['copy_type'] == 0) {
-			$hosts_ids = $_REQUEST['copy_targetid'];
+elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_itemid')) {
+	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+		// hosts or templates
+		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
+			$hosts_ids = getRequest('copy_targetid');
 		}
-		// groups
+		// host groups
 		else {
 			$hosts_ids = array();
-			$group_ids = $_REQUEST['copy_targetid'];
+			$group_ids = getRequest('copy_targetid');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -710,7 +710,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		DBstart();
 
-		$goResult = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
+		$goResult = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
@@ -927,46 +927,11 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$itemView->render();
 	$itemView->show();
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
-	$data = array(
-		'group_itemid' => getRequest('group_itemid', array()),
-		'hostid' => getRequest('hostid', 0),
-		'copy_type' => getRequest('copy_type', 0),
-		'copy_groupid' => getRequest('copy_groupid', 0),
-		'copy_targetid' => getRequest('copy_targetid', array())
-	);
-
-	if (!is_array($data['group_itemid']) || (is_array($data['group_itemid']) && count($data['group_itemid']) < 1)) {
-		error(_('Incorrect list of items.'));
-	}
-	else {
-		// group
-		$data['groups'] = API::HostGroup()->get(array(
-			'output' => API_OUTPUT_EXTEND
-		));
-		order_result($data['groups'], 'name');
-
-		// hosts
-		if ($data['copy_type'] == 0) {
-			if (empty($data['copy_groupid'])) {
-				foreach ($data['groups'] as $group) {
-					$data['copy_groupid'] = $group['groupid'];
-				}
-			}
-
-			$data['hosts'] = API::Host()->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $data['copy_groupid'],
-				'templated_hosts' => true
-			));
-			order_result($data['hosts'], 'name');
-		}
-	}
-
+elseif (getRequest('go') == 'copy_to' && hasRequest('group_itemid')) {
 	// render view
-	$itemView = new CView('configuration.item.copy', $data);
-	$itemView->render();
-	$itemView->show();
+	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS')));
+	$graphView->render();
+	$graphView->show();
 }
 // list of items
 else {
