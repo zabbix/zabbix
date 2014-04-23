@@ -174,9 +174,9 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	ret = SUCCEED;
-
-	DCconfig_clean_items(&item, &errcode, 1);
 out:
+	DCconfig_clean_items(&item, &errcode, 1);
+
 	return ret;
 }
 
@@ -326,8 +326,8 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
  * Purpose: check if the lld data passes filter evaluation by custom          *
  *          expression                                                        *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
+ * Parameters: filter - [IN] the lld filter                                   *
+ *             jp_row - [IN] the lld data row                                 *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -342,7 +342,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 	const char	*__function_name = "filter_evaluate_expression";
 
 	int		i, ret = FAIL, id_len;
-	char		*expression, id[32], *p, error[256];
+	char		*expression, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256];
 	double		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __function_name, filter->expression);
@@ -362,12 +362,11 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
+		id_len = strlen(id);
 		p = expression;
 
 		while (NULL != (p = strstr(p, id)))
 		{
-			id_len = strlen(id);
-
 			*p = (SUCCEED == ret ? '1' : '0');
 			memset(p + 1, ' ', id_len - 1);
 			p += id_len;
