@@ -57,12 +57,8 @@ $currentYear = date('Y');
 
 // fetch media types
 $media_types = array();
-$db_media_types = DBselect(
-	'SELECT mt.*'.
-	' FROM media_type mt'.
-		whereDbNode('mt.mediatypeid').
-	' ORDER BY mt.description'
-);
+$db_media_types = DBselect('SELECT mt.* FROM media_type mt ORDER BY mt.description');
+
 while ($media_type_data = DBfetch($db_media_types)) {
 	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
 }
@@ -123,12 +119,7 @@ else {
 	show_table_header(_('Notifications'), $form);
 
 	$header = array();
-	$db_users = DBselect(
-			'SELECT u.*'.
-			' FROM users u'.
-			whereDbNode('u.userid').
-			' ORDER BY u.alias,u.userid'
-	);
+	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
 		$header[] = new CCol($user_data['alias'], 'vertical_rotation');
 		$users[$user_data['userid']] = $user_data['alias'];
