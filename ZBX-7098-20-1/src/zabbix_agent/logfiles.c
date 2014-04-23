@@ -1034,6 +1034,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 #ifndef _WINDOWS
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
+	(*logfiles)[i].ino_hi = 0;
 #endif
 	++(*logfiles_num);
 out:

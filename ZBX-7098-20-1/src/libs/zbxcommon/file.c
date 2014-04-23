@@ -311,7 +311,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
 							" (showing only the first 64 characters). Only the first 64 kB"
 							" will be analyzed, the rest will be ignored while Zabbix agent"
-							" is running", value);
+							" is running.", value);
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 					send_err = SUCCEED;
