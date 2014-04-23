@@ -547,9 +547,10 @@ function getAvailabilityTable($host) {
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
 		$deleteError->setHint(_s(
-			'The host is not discovered anymore and will be deleted in %1$s (%2$s).',
+			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($host['hostDiscovery']['ts_delete']),
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $host['hostDiscovery']['ts_delete'])
+			zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
+			zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
 		));
 		$ad->addItem($deleteError);
 	}

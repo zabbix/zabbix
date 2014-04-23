@@ -127,9 +127,10 @@ foreach ($this->data['groups'] as $group) {
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
 		$info = new CDiv(SPACE, 'status_icon iconwarning');
 		$info->setHint(_s(
-			'The host group is not discovered anymore and will be deleted in %1$s (%2$s).',
+			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($group['groupDiscovery']['ts_delete']),
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $group['groupDiscovery']['ts_delete'])
+			zbx_date2str(DATE_FORMAT, $group['groupDiscovery']['ts_delete']),
+			zbx_date2str(TIME_FORMAT, $group['groupDiscovery']['ts_delete'])
 		));
 	}
 	else {
