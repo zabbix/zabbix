@@ -380,7 +380,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 		$itemValue = reset($itemValue);
 
-		if ($data['type'] == RSM_DNS && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
+		if ($data['type'] == RSM_DNS && zbx_substring($item['key_'], 0, 16) == PROBE_DNS_UDP_ITEM_RTT) {
 			preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
 			$nsValues = explode(',', $matches[1]);
 
@@ -394,7 +394,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 				$nsArray[$item['hostid']][$nsValues[1]]['value'][] = NS_DOWN;
 			}
 		}
-		elseif ($data['type'] == RSM_DNSSEC && zbx_substring($item['key_'], 0, 20) == PROBE_DNS_UDP_ITEM_RTT) {
+		elseif ($data['type'] == RSM_DNSSEC && zbx_substring($item['key_'], 0, 16) == PROBE_DNS_UDP_ITEM_RTT) {
 			if (!isset($hosts[$item['hostid']]['value'])) {
 				$hosts[$item['hostid']]['value']['ok'] = 0;
 				$hosts[$item['hostid']]['value']['fail'] = 0;
