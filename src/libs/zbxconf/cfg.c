@@ -122,7 +122,7 @@ clean:
 	{
 		path = zbx_dsprintf(path, "%s/%s", cfg_file, d->d_name);
 
-		if (0 != zbx_stat(path, &sb) || 0 != S_ISREG(sb.st_mode))
+		if (0 != zbx_stat(path, &sb) || 0 == S_ISREG(sb.st_mode))
 			continue;
 
 		if (FAIL == __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
