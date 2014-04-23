@@ -108,13 +108,13 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			$groupComboBox = new CComboBox('tr_groupid', $groupid, 'submit()');
 			$groupComboBox->addItem(0, _('all'));
 			foreach ($groups as $group) {
-				$groupComboBox->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']);
+				$groupComboBox->addItem($group['groupid'], $group['name']);
 			}
 
 			$hostComboBox = new CComboBox('tr_hostid', $hostid, 'submit()');
 			$hostComboBox->addItem(0, _('all'));
 			foreach ($hosts as $host) {
-				$hostComboBox->addItem($host['hostid'], get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['host']);
+				$hostComboBox->addItem($host['hostid'], $host['host']);
 			}
 
 			if ($this->mode == SCREEN_MODE_EDIT) {

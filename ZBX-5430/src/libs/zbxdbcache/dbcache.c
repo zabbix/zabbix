@@ -53,7 +53,6 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 extern unsigned char	daemon_type;
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern int		CONFIG_NODE_NOHISTORY;
 
 static int		ZBX_HISTORY_SIZE = 0;	/* must be greater than ZBX_SYNC_MAX */
 
@@ -1353,7 +1352,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  * Function: dc_add_history_dbl                                               *
  *                                                                            *
  * Purpose: helper function for DCmass_add_history()                          *
- *          for writing float-type items into history/history_sync tables.    *
  *                                                                            *
  ******************************************************************************/
 static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
@@ -1377,25 +1375,6 @@ static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
-
-	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
-	{
-		zbx_db_insert_prepare(&db_insert, "history_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null || 0 == history[i].keep_history)
-				continue;
-
-			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
-					history[i].ts.sec, history[i].ts.ns, history[i].value.dbl);
-		}
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
 }
 
 /******************************************************************************
@@ -1426,26 +1405,6 @@ static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
-
-	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
-	{
-		zbx_db_insert_prepare(&db_insert, "history_uint_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null || 0 == history[i].keep_history)
-				continue;
-
-			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
-					history[i].ts.sec, history[i].ts.ns, history[i].value.ui64);
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
 }
 
 /******************************************************************************
@@ -1476,26 +1435,6 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
-
-	if (0 == CONFIG_NODE_NOHISTORY && 0 != CONFIG_MASTER_NODEID)
-	{
-		zbx_db_insert_prepare(&db_insert, "history_str_sync", "nodeid", "itemid", "clock", "ns", "value", NULL);
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (ITEM_VALUE_TYPE_STR != history[i].value_type)
-				continue;
-
-			if (0 != history[i].value_null || 0 == history[i].keep_history)
-				continue;
-
-			zbx_db_insert_add_values(&db_insert, get_nodeid_by_id(history[i].itemid), history[i].itemid,
-					history[i].ts.sec, history[i].ts.ns, history[i].value_orig.str);
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
 }
 
 /******************************************************************************
@@ -1928,43 +1867,38 @@ int	DCsync_history(int sync_type)
 			if (ZBX_HISTORY_SIZE <= f)
 				f -= ZBX_HISTORY_SIZE;
 
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			num = DCskip_items(f, n);
+
+			if (0 == cache->history[f].itemid)
 			{
-				num = DCskip_items(f, n);
-
-				if (0 == cache->history[f].itemid)
+				if (f == cache->history_first)
 				{
-					if (f == cache->history_first)
-					{
-						cache->history_num -= num;
-						cache->history_gap_num -= num;
-						if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
-							cache->history_first -= ZBX_HISTORY_SIZE;
-					}
-					n -= num;
-					f += num;
-					continue;
+					cache->history_num -= num;
+					cache->history_gap_num -= num;
+					if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
+						cache->history_first -= ZBX_HISTORY_SIZE;
 				}
-
-				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
-						cache->history[f].itemid))
-				{
-					if (0 == skipped_clock)
-						skipped_clock = cache->history[f].ts.sec;
-					n -= num;
-					f += num;
-					continue;
-				}
-				else if (1 < num && 0 == skipped_clock)
-				{
-					skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
-				}
-
-				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
-						&cache->itemids_num, cache->history[f].itemid, 0);
+				n -= num;
+				f += num;
+				continue;
 			}
-			else
-				num = 1;
+
+			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
+					cache->history[f].itemid))
+			{
+				if (0 == skipped_clock)
+					skipped_clock = cache->history[f].ts.sec;
+				n -= num;
+				f += num;
+				continue;
+			}
+			else if (1 < num && 0 == skipped_clock)
+			{
+				skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
+			}
+
+			uint64_array_add(&cache->itemids, &cache->itemids_alloc,
+					&cache->itemids_num, cache->history[f].itemid, 0);
 
 			indices[candidate_num] = f;
 			itemids[candidate_num] = cache->history[f].itemid;
@@ -2085,16 +2019,14 @@ int	DCsync_history(int sync_type)
 		DBcommit();
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-		{
 			DCconfig_unlock_triggers(&triggerids);
 
-			LOCK_CACHE;
+		LOCK_CACHE;
 
-			for (i = 0; i < history_num; i ++)
-				uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
+		for (i = 0; i < history_num; i ++)
+			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
-			UNLOCK_CACHE;
-		}
+		UNLOCK_CACHE;
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -3055,12 +2987,12 @@ void	free_database_cache()
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
 	const char	*__function_name = "DCget_nextid";
-	int		i, nodeid;
+	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	ZBX_DC_ID	*id;
-	zbx_uint64_t	min, max, nextid, lastid;
+	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d",
 			__function_name, table_name, num);
@@ -3097,23 +3029,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
-
-	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
-
-	if (table->flags & ZBX_SYNC)
-	{
-		min += ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)nodeid;
-		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
-	}
-	else
-		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-			table->recid,
-			table_name,
-			table->recid,
-			min, max);
+			table->recid, table_name, table->recid, min, max);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 		id->lastid = min;

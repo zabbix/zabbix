@@ -145,17 +145,41 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (isset($_REQUEST['save'])) {
 	$config = select_config();
 
-	$authType = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+	$isValid = true;
 
-	if (isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
-		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
-	}
-	elseif (!isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
-		$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+	$usrgrps = getRequest('user_groups', array());
+
+	// authentication type
+	if ($usrgrps) {
+		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$_REQUEST['password1'] = get_request('password1', null);
-		$_REQUEST['password2'] = get_request('password2', null);
+		$authType = hasRequest('userid')
+			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
+			: $config['authentication_type'];
+	}
+
+	// password validation
+	if ($authType != ZBX_AUTH_INTERNAL) {
+		if (hasRequest('password1')) {
+			show_error_message(_s('Password is unavailable for users with %1$s.', authentication2str($authType)));
+
+			$isValid = false;
+		}
+		else {
+			if (hasRequest('userid')) {
+				$_REQUEST['password1'] = null;
+				$_REQUEST['password2'] = null;
+			}
+			else {
+				$_REQUEST['password1'] = 'zabbix';
+				$_REQUEST['password2'] = 'zabbix';
+			}
+		}
+	}
+	else {
+		$_REQUEST['password1'] = getRequest('password1', null);
+		$_REQUEST['password2'] = getRequest('password2', null);
 	}
 
 	if ($_REQUEST['password1'] != $_REQUEST['password2']) {
@@ -165,14 +189,21 @@ elseif (isset($_REQUEST['save'])) {
 		else {
 			show_error_message(_('Cannot add user. Both passwords must be equal.'));
 		}
+
+		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] == ZBX_GUEST_USER && !zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('For guest, password must be empty'));
+
+		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] != ZBX_GUEST_USER && zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('Password should not be empty'));
+
+		$isValid = false;
 	}
-	else {
+
+	if ($isValid) {
 		$user = array();
 		$user['alias'] = get_request('alias');
 		$user['name'] = get_request('name');
@@ -186,7 +217,7 @@ elseif (isset($_REQUEST['save'])) {
 		$user['rows_per_page'] = get_request('rows_per_page');
 		$user['type'] = get_request('user_type');
 		$user['user_medias'] = get_request('user_medias', array());
-		$user['usrgrps'] = zbx_toObject(get_request('user_groups', array()), 'usrgrpid');
+		$user['usrgrps'] = zbx_toObject($usrgrps, 'usrgrpid');
 
 		if (hasRequest('lang')) {
 			$user['lang'] = getRequest('lang');
@@ -338,7 +369,6 @@ if (!empty($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
 		'config' => $config
 	);
 
@@ -361,11 +391,8 @@ else {
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
 	$data['paging'] = getPagingLine($data['users'], array('userid'));
 
-	foreach ($data['users'] as $key => $user) {
-		// nodes
-		$data['users'][$key]['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($user['userid'], true) : '';
-
-		// set default lastaccess time to 0
+	// set default lastaccess time to 0
+	foreach ($data['users'] as $user) {
 		$data['usersSessions'][$user['userid']] = array('lastaccess' => 0);
 	}
 

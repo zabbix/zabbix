@@ -51,7 +51,6 @@ $usersForm->setName('userForm');
 $usersTable = new CTableInfo(_('No users found.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Alias'), 'alias'),
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Surname'), 'surname'),
@@ -133,7 +132,6 @@ foreach ($this->data['users'] as $user) {
 	// append user to table
 	$usersTable->addRow(array(
 		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
-		$this->data['displayNodes'] ? $user['nodename'] : null,
 		new CLink($user['alias'], 'users.php?form=update&userid='.$userId),
 		$user['name'],
 		$user['surname'],

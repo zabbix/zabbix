@@ -157,7 +157,6 @@ if (empty($data['elementid']) && !$data['use_screen_name']) {
 }
 
 $data['screens'] = API::Screen()->get(array(
-	'nodeids' => get_current_nodeid(),
 	'output' => array('screenid', 'name')
 ));
 

@@ -45,7 +45,7 @@ $fields = array(
 	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
@@ -109,26 +109,22 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 /*
  * Filter
  */
-$filterSelect = getRequest('select');
-$filterShowWithoutData = getRequest('show_without_data', 0);
-$filterShowDetails = getRequest('show_details', 0);
-
-if (hasRequest('filter_rst')) {
-	$filterSelect = '';
-	$filterShowWithoutData = 1;
-	$filterShowDetails = 0;
+if (hasRequest('filter_set')) {
+	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+}
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.latest.filter.select');
+	CProfile::delete('web.latest.filter.show_without_data');
+	CProfile::delete('web.latest.filter.show_details');
+	DBend();
 }
 
-if (hasRequest('filter_set') || hasRequest('filter_rst')) {
-	CProfile::update('web.latest.filter.select', $filterSelect, PROFILE_TYPE_STR);
-	CProfile::update('web.latest.filter.show_without_data', $filterShowWithoutData, PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details', $filterShowDetails, PROFILE_TYPE_INT);
-}
-else {
-	$filterSelect = CProfile::get('web.latest.filter.select', '');
-	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
-	$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
-}
+$filterSelect = CProfile::get('web.latest.filter.select', '');
+$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
+$filterShowDetails = CProfile::get('web.latest.filter.show_details');
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
@@ -294,8 +290,8 @@ if ($filterShowDetails) {
 $latestWidget = new CWidget(null, 'latest-mon');
 
 $form = new CForm('get');
-$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-$form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 
 $latestWidget->addHeader(_('Items'), $form);
 
@@ -306,23 +302,13 @@ $filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filt
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
-));
+$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
+$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 // table
 $table = new CTableInfo(_('No values found.'));
-
-if (is_show_all_nodes()) {
-	$nodeHeader = new CCol(new CSpan(_('Node')), 'latest-node');
-	$nodeHeader->setAttribute('title', _('Node'));
-}
-else {
-	$nodeHeader = null;
-}
 
 if (getRequest('hostid')) {
 	$hostHeader = null;
@@ -368,7 +354,6 @@ if ($filterShowDetails) {
 	$table->addClass('latest-details');
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$nodeHeader,
 		$hostHeader,
 		$nameHeader,
 		$intervalHeader,
@@ -385,7 +370,6 @@ if ($filterShowDetails) {
 else {
 	$table->setHeader(array(
 		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
-		$nodeHeader,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
@@ -486,7 +470,6 @@ foreach ($items as $key => $item){
 
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? SPACE : null,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -508,7 +491,6 @@ foreach ($items as $key => $item){
 	else {
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? SPACE : null,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -559,7 +541,6 @@ foreach ($applications as $appid => $dbApp) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
-		get_node_name_by_elid($dbApp['applicationid']),
 		$hostName,
 		new CCol(array(
 				bold($dbApp['name']),
@@ -667,7 +648,6 @@ foreach ($items as $item) {
 
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$hostColumn,
 			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
 			new CCol(new CSpan(
@@ -689,7 +669,6 @@ foreach ($items as $item) {
 	else {
 		$row = new CRow(array(
 			SPACE,
-			is_show_all_nodes() ? ($host['item_cnt'] ? SPACE : get_node_name_by_elid($item['itemid'])) : null,
 			$hostColumn,
 			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
 			new CCol(new CSpan($lastClock, $stateCss)),
@@ -732,7 +711,6 @@ foreach ($hosts as $hostId => $dbHost) {
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
-		get_node_name_by_elid($dbHost['hostid']),
 		$hostName,
 		new CCol(
 			array(
