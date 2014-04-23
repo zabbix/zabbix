@@ -29,11 +29,6 @@ function getUserFormData($userid, $isProfile = false) {
 			'output' => API_OUTPUT_EXTEND
 		));
 		$user = reset($users);
-
-		$data['auth_type'] = get_user_system_auth($userid);
-	}
-	else {
-		$data['auth_type'] = $config['authentication_type'];
 	}
 
 	if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
@@ -105,6 +100,16 @@ function getUserFormData($userid, $isProfile = false) {
 			$data['messages']['triggers.severities'] = array();
 		}
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
+	}
+
+	// authentication type
+	if ($data['user_groups']) {
+		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
+	}
+	else {
+		$data['auth_type'] = ($userid === null)
+			? $config['authentication_type']
+			: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
 	}
 
 	// set autologout
