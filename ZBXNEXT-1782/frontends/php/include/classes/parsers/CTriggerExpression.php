@@ -257,7 +257,6 @@ class CTriggerExpression {
 					case self::STATE_INIT:
 					case self::STATE_AFTER_OPEN_BRACE:
 					case self::STATE_AFTER_BINARY_OPERATOR:
-					case self::STATE_AFTER_LOGICAL_OPERATOR:
 						if ($afterSpace || $state == self::STATE_INIT || $state == self::STATE_AFTER_OPEN_BRACE) {
 							if ($this->parseUsing($this->notOperatorParser)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
@@ -268,19 +267,48 @@ class CTriggerExpression {
 						switch ($this->expression[$this->pos]) {
 							case '-':
 								$state = self::STATE_AFTER_MINUS_OPERATOR;
-								break;
+								break 2;
 							case '(':
 								$state = self::STATE_AFTER_OPEN_BRACE;
 								$level++;
-								break;
+								break 2;
 							default:
-								if (!$this->parseConstant()) {
-									break 3;
+								if ($this->parseConstant()) {
+									$state = self::STATE_AFTER_CONSTANT;
+									break 2;
 								}
-								$state = self::STATE_AFTER_CONSTANT;
 						}
 
-						break;
+						// error, break the loop
+						break 2;
+					case self::STATE_AFTER_LOGICAL_OPERATOR:
+						if ($afterSpace) {
+							switch ($this->expression[$this->pos]) {
+								case '-':
+									$state = self::STATE_AFTER_MINUS_OPERATOR;
+									break 2;
+								default:
+									if ($this->parseUsing($this->notOperatorParser)) {
+										$state = self::STATE_AFTER_NOT_OPERATOR;
+										break 2;
+									}
+									elseif ($this->parseConstant()) {
+										$state = self::STATE_AFTER_CONSTANT;
+										break 2;
+									}
+							}
+						}
+
+						switch ($this->expression[$this->pos]) {
+							case '(':
+								$state = self::STATE_AFTER_OPEN_BRACE;
+								$level++;
+
+								break 2;
+						}
+
+						// error, break the loop
+						break 2;
 					case self::STATE_AFTER_CLOSE_BRACE:
 					case self::STATE_AFTER_CONSTANT:
 						if ($afterSpace || $state == self::STATE_AFTER_CLOSE_BRACE) {
@@ -297,15 +325,16 @@ class CTriggerExpression {
 									break 3;
 								}
 								$level--;
-								break;
+								break 2;
 							default:
-								if (!$this->parseUsing($this->binaryOperatorParser)) {
-									break 3;
+								if ($this->parseUsing($this->binaryOperatorParser)) {
+									$state = self::STATE_AFTER_BINARY_OPERATOR;
+									break 2;
 								}
-								$state = self::STATE_AFTER_BINARY_OPERATOR;
 						}
 
-						break;
+						// error, break the loop
+						break 2;
 					case self::STATE_AFTER_NOT_OPERATOR:
 						if ($afterSpace) {
 							switch ($this->expression[$this->pos]) {
@@ -324,26 +353,26 @@ class CTriggerExpression {
 							case '(':
 								$state = self::STATE_AFTER_OPEN_BRACE;
 								$level++;
-								break;
-							default:
-								break 3;
+								break 2;
 						}
 
-						break;
+						// error, break the loop
+						break 2;
 					case self::STATE_AFTER_MINUS_OPERATOR:
 						switch ($this->expression[$this->pos]) {
 							case '(':
 								$state = self::STATE_AFTER_OPEN_BRACE;
 								$level++;
-								break;
+								break 2;
 							default:
-								if (!$this->parseConstant()) {
-									break 3;
+								if ($this->parseConstant()) {
+									$state = self::STATE_AFTER_CONSTANT;
+									break 2;
 								}
-								$state = self::STATE_AFTER_CONSTANT;
 						}
 
-						break;
+						// error, break the loop
+						break 2;
 				}
 			}
 
