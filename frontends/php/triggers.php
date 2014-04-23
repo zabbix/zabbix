@@ -52,7 +52,6 @@ $fields = array(
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
