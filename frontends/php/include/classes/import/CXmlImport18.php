@@ -1412,8 +1412,8 @@ class CXmlImport18 {
 				if (!empty($rules['triggers']['updateExisting']) || !empty($rules['triggers']['createMissing'])) {
 					$triggers = $xpath->query('triggers/trigger', $host);
 
-					$triggers_to_add = array();
-					$triggers_to_upd = array();
+					$triggersToCreate = array();
+					$triggersToUpdate = array();
 
 					foreach ($triggers as $trigger) {
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
@@ -1436,79 +1436,79 @@ class CXmlImport18 {
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['hostid'] = $current_hostid;
-						$current_trigger = false;
 
-						$dbTriggers = API::Trigger()->get(array(
-							'output' => API_OUTPUT_EXTEND,
+						$currentTrigger = false;
+
+						$currentTrigger = API::Trigger()->get(array(
+							'output' => array('triggerid'),
 							'filter' => array('description' => $trigger_db['description']),
 							'hostids' => array($current_hostid),
-							'editable' => true
+							'nopermissions' => true,
+							'limit' => 1,
 						));
-						// one or more triggers found with same description
-						if ($dbTriggers) {
+						if ($currentTrigger) {
+							$dbTriggers = API::Trigger()->get(array(
+								'output' => API_OUTPUT_EXTEND,
+								'filter' => array('description' => $trigger_db['description']),
+								'hostids' => array($current_hostid),
+								'editable' => true
+							));
+
 							foreach ($dbTriggers as $dbTrigger) {
 								$expression = explode_exp($dbTrigger['expression']);
-								// expression does not match
-								if (strcmp($trigger_db['expression'], $expression) != 0) {
-									// treate it as new trigger
-									if ($rules['triggers']['createMissing']) {
-										$triggers_to_add[] = $trigger_db;
-									}
-									// skip creating it
-									else {
-										info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
-										continue;
-									}
+
+								if (strcmp($trigger_db['expression'], $expression) == 0) {
+									$currentTrigger = $dbTrigger;
+									break;
 								}
-								// trigger with same description and expression
-								else {
-									// update it if necessary
-									if ($rules['triggers']['updateExisting']) {
-										$trigger_db['triggerid'] = $dbTrigger['triggerid'];
-										$triggers_to_upd[] = $trigger_db;
-									}
-									// skip updating
-									else {
-										info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
-										continue;
-									}
+
+								if (!$currentTrigger) {
+									throw new Exception(_s('No permission for trigger "%1$s".',
+										$trigger_db['description']
+									));
 								}
 							}
 						}
-						// no such trigger with description found
-						elseif ($rules['triggers']['createMissing']) {
-							$triggers_to_add[] = $trigger_db;
-						}
 						unset($trigger_db['hostid']);
-					}
 
-					if ($triggers_to_upd) {
-						$result = API::Trigger()->update($triggers_to_upd);
-						if (!$result) {
-							throw new Exception();
+						if (!$currentTrigger && !$rules['triggers']['createMissing']) {
+							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
+							continue;
+						}
+						if ($currentTrigger && !$rules['triggers']['updateExisting']) {
+							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
+							continue;
 						}
 
-						$options = array(
-							'triggerids' => $result['triggerids'],
-							'output' => API_OUTPUT_EXTEND
-						);
-						$r = API::Trigger()->get($options);
-
-						$triggersForDependencies = array_merge($triggersForDependencies, $r);
+						if (!$currentTrigger && $rules['triggers']['createMissing']) {
+							$triggersToCreate[] = $trigger_db;
+						}
+						if ($currentTrigger && $rules['triggers']['updateExisting']) {
+							$trigger_db['triggerid'] = $currentTrigger['triggerid'];
+							$triggersToUpdate[] = $trigger_db;
+						}
 					}
 
-					if ($triggers_to_add) {
-						$result = API::Trigger()->create($triggers_to_add);
-						if (!$result) {
-							throw new Exception();
-						}
+					if ($triggersToUpdate) {
+						$result = API::Trigger()->update($triggersToUpdate);
 
-						$options = array(
-							'triggerids' => $result['triggerids'],
-							'output' => API_OUTPUT_EXTEND
-						);
-						$r = API::Trigger()->get($options);
-						$triggersForDependencies = array_merge($triggersForDependencies, $r);
+						$triggersUpdated = API::Trigger()->get(array(
+							'output' => API_OUTPUT_EXTEND,
+							'triggerids' => $result['triggerids']
+						));
+
+						$triggersForDependencies = array_merge($triggersForDependencies, $triggersUpdated);
+					}
+
+					if ($triggersToCreate) {
+						$result = API::Trigger()->create($triggersToCreate);
+
+						$triggersCreated = API::Trigger()->get(array(
+							'output' => API_OUTPUT_EXTEND,
+							'triggerids' => $result['triggerids']
+						));
+
+						$triggersForDependencies = array_merge($triggersForDependencies, $triggersCreated);
 					}
 				}
 // }}} TRIGGERS
