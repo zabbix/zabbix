@@ -159,16 +159,13 @@ elseif (isset($_REQUEST['save'])) {
 
 	// password validation
 	if ($authType != ZBX_AUTH_INTERNAL) {
-		if (isset($_REQUEST['password1'])) {
-			show_error_message(_s(
-				'Password is unavailable for users with %1$s.',
-				authentication2str($authType)
-			));
+		if (hasRequest('password1')) {
+			show_error_message(_s('Password is unavailable for users with %1$s.', authentication2str($authType)));
 
 			$isValid = false;
 		}
 		else {
-			if (isset($_REQUEST['userid'])) {
+			if (hasRequest('userid')) {
 				$_REQUEST['password1'] = null;
 				$_REQUEST['password2'] = null;
 			}
