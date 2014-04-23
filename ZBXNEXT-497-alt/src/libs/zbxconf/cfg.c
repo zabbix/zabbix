@@ -106,18 +106,20 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	int			ret = FAIL;
 	char			*path = NULL, *pattern = NULL, *file = NULL;
 	zbx_stat_t		sb;
-
 #ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*find_path = NULL, *file_name;
 	wchar_t			*wfind_path = NULL;
-
+#else
+	DIR			*dir;
+	struct dirent		*d;
+#endif
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
-
+#ifdef _WINDOWS
 	zbx_rtrim(path, "\\");
-
+#endif
 	if (0 != zbx_stat(path, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
@@ -135,7 +137,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		zbx_error("%s: path before pattern is not a directory\n", cfg_file);
 		goto clean;
 	}
-
+#ifdef _WINDOWS
 	find_path = zbx_dsprintf(find_path, "%s\\*", path);
 	wfind_path = zbx_utf8_to_unicode(find_path);
 
@@ -154,41 +156,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto close;
 	}
-
-	ret = SUCCEED;
-close:
-	FindClose(h_find);
-clean:
-	zbx_free(file);
-	zbx_free(wfind_path);
-	zbx_free(find_path);
-	zbx_free(pattern);
-	zbx_free(path);
 #else
-	DIR		*dir;
-	struct dirent	*d;
-
-	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
-		goto clean;
-
-	if (0 != zbx_stat(path, &sb))
-	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
-		goto clean;
-	}
-
-	if (0 == S_ISDIR(sb.st_mode))
-	{
-		if (NULL == pattern)
-		{
-			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-			goto clean;
-		}
-
-		zbx_error("%s: path before pattern is not a directory\n", cfg_file);
-		goto clean;
-	}
-
 	if (NULL == (dir = opendir(path)))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
@@ -205,19 +173,27 @@ clean:
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto close;
 	}
-
+#endif
 	ret = SUCCEED;
 close:
+#ifdef _WINDOWS
+	FindClose(h_find);
+#else
 	if (0 != closedir(dir))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		ret = FAIL;
 	}
+#endif
 clean:
+#ifdef _WINDOWS
+	zbx_free(wfind_path);
+	zbx_free(find_path);
+#endif
 	zbx_free(file);
 	zbx_free(pattern);
 	zbx_free(path);
-#endif
+
 	return ret;
 }
 
