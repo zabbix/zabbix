@@ -599,10 +599,8 @@ int	MAIN_ZABBIX_ENTRY()
 #ifdef _WINDOWS
 	if (MAXIMUM_WAIT_OBJECTS < threads_num)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start agent: specified number of agents %d is over limit %d",
-				threads_num, MAXIMUM_WAIT_OBJECTS);
-		zbx_error("cannot start agent: specified number of agents %d is over limit %d",
-				threads_num, MAXIMUM_WAIT_OBJECTS);
+		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
+				" parameter or the number of active servers in ServerActive configuration parameter.");
 		exit(EXIT_FAILURE);
 	}
 #endif
