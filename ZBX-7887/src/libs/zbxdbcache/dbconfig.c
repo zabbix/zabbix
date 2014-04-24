@@ -99,10 +99,10 @@ typedef struct
 	unsigned char	data_type;
 	unsigned char	value_type;
 	unsigned char	poller_type;
-	unsigned char	db_state;
 	unsigned char	state;
-	unsigned char	location;
+	unsigned char	db_state;
 	unsigned char	inventory_link;
+	unsigned char	location;
 	unsigned char	flags;
 }
 ZBX_DC_ITEM;

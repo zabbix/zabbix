@@ -23,12 +23,12 @@
 
 typedef struct
 {
-	int		functionid;
-	char		*host;
-	char		*key;
-	char		*func;
-	char		*params;
-	char		*value;
+	int	functionid;
+	char	*host;
+	char	*key;
+	char	*func;
+	char	*params;
+	char	*value;
 }
 function_t;
 
@@ -36,7 +36,8 @@ typedef struct
 {
 	char		*exp;
 	function_t	*functions;
-	int		functions_alloc, functions_num;
+	int		functions_alloc;
+	int		functions_num;
 }
 expression_t;
 
@@ -138,11 +139,10 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
-	function_t	*f = NULL;
+	function_t	*f;
 	char		*buf, replace[16];
 	int		i, ret = SUCCEED;
 	time_t		now;
-
 	zbx_host_key_t	*keys = NULL;
 	DC_ITEM		*items = NULL;
 	int		*errcodes = NULL;
@@ -165,7 +165,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
 		{
 			zbx_snprintf(error, max_error_len,
-					"Invalid first parameter in function [%s(%s)]",
+					"Invalid first parameter in function [%s(%s)].",
 					f->func, f->params);
 			ret = NOTSUPPORTED;
 		}
@@ -199,7 +199,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		{
 			zbx_snprintf(error, max_error_len,
 					"Cannot evaluate function [%s(%s)]:"
-					" item [%s:%s] does not exist, is disabled or belongs to a disabled host",
+					" item [%s:%s] does not exist, is disabled or belongs to a disabled host.",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;
@@ -209,7 +209,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		{
 			zbx_snprintf(error, max_error_len,
 					"Cannot evaluate function [%s(%s)]:"
-					" item [%s:%s] not supported",
+					" item [%s:%s] not supported.",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;
@@ -219,13 +219,13 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 		if (SUCCEED != evaluate_function(f->value, &items[i], f->func, f->params, now))
 		{
-			zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)]",
+			zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)].",
 					f->func, f->params);
 			ret = NOTSUPPORTED;
 			break;
 		}
-		else
-			f->value = zbx_realloc(f->value, strlen(f->value) + 1);
+
+		f->value = zbx_realloc(f->value, strlen(f->value) + 1);
 
 		zbx_snprintf(replace, sizeof(replace), "{%d}", f->functionid);
 		buf = string_replace(exp->exp, replace, f->value);
