@@ -147,15 +147,8 @@ $form->addItem($generalComboBox);
 if (!isset($_REQUEST['form'])) {
 	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
 
-	if($imageType == IMAGE_TYPE_ICON) {
-		$submitCaption = _('Upload icon');
-	}
-	else {
-		$submitCaption = _('Upload background image');
-	}
-
 	$form->addVar('imagetype', $imageType);
-	$form->addItem(new CSubmit('form', $submitCaption));
+	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Upload icon') : _('Upload background image')));
 }
 
 $imageWidget = new CWidget();
