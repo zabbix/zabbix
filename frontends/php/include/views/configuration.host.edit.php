@@ -34,7 +34,6 @@ if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_gro
 $newgroup = get_request('newgroup', '');
 $host = get_request('host', '');
 $visiblename = get_request('visiblename', '');
-$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 $proxy_hostid = get_request('proxy_hostid', '');
 $ipmi_authtype = get_request('ipmi_authtype', -1);
 $ipmi_privilege = get_request('ipmi_privilege', 2);
@@ -46,6 +45,13 @@ $macros = get_request('macros', array());
 $interfaces = get_request('interfaces', array());
 $templateIds = get_request('templates', array());
 $clear_templates = get_request('clear_templates', array());
+
+if ((getRequest('hostid', 0) == 0) && !hasRequest('form_refresh')) {
+	$status = HOST_STATUS_MONITORED;
+}
+else {
+	$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
+}
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
 
