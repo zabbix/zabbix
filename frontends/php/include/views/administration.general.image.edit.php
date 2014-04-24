@@ -43,7 +43,7 @@ if (!empty($this->data['imageid'])) {
 
 // append tab
 $imageTab = new CTabView();
-$imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON ? _('Icon') : _('Background')), $imageFormList);
+$imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $imageFormList);
 $imageForm->addItem($imageTab);
 
 // append buttons
