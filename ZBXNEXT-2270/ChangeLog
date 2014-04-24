@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
 ..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
@@ -44,6 +45,9 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7335] improved element copy dialog by having hosts, templates and host group in separate target types and empty groups are not shown (Krists)
+.......PS. [ZBX-3336] fixed autodiscovery rule doesn't clear/rescan hosts in dhosts/dservices (Nikolaj)
+..F....... [ZBX-6497] improved frontend filters, Filter and Reset now is submit buttons, removed JS form reset scripts, changed filter data saving process in profiles (Oleg)
 ..F....... [ZBX-2840] fixed map configuration with broken images (Eduard)
 ..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
 ..F....... [ZBX-8012] made links to other IT services from the dependency management to open in a new browser tab (Eduard, Oleg)
@@ -93,6 +97,10 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8021] fixed password changing for users with internal authentication (Eduard)
+........S. [ZBX-8133] fixed possible deadlock while updating host_inventory table (Sasha)
+..F....... [ZBX-8104] fixed inverted case sensitivity for regular expressions (Krists)
+...G...... [ZBX-8117] fixed possible crash of agent under Windows after asking the "system.sw.arch" item (Sasha)
 ..F....... [ZBX-8093] fixed incorrect plural in global script property host and user group labels (Richlv)
 ..F....... [ZBX-7997] fixed applications not being displayed in template item mass update form (Ivo)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)

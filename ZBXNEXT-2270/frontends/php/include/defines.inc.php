@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.0');
 define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030032);
+define('ZABBIX_DB_VERSION',	 2030091);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -675,6 +675,10 @@ define('GRAPH_TYPE_COLUMN',			7);
 define('GRAPH_TYPE_BAR_STACKED',	8);
 define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
+define('BR_DISTRIBUTION_MULTIPLE_PERIODS',	1);
+define('BR_DISTRIBUTION_MULTIPLE_ITEMS',	2);
+define('BR_COMPARE_VALUE_MULTIPLE_PERIODS',	3);
+
 define('GRAPH_3D_ANGLE', 70);
 
 define('GRAPH_STACKED_ALFA', 15); // 0..100 transparency
@@ -917,6 +921,11 @@ define('QUEUE_DETAILS', 2);
 
 // item count to display in the details queue
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
+
+// constants for element "copy to..." target types
+define('COPY_TYPE_TO_HOST', 0);
+define('COPY_TYPE_TO_TEMPLATE', 2);
+define('COPY_TYPE_TO_HOST_GROUP', 1);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
