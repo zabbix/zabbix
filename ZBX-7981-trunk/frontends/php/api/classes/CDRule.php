@@ -394,20 +394,17 @@ class CDRule extends CApiService {
 	 * @return array
 	 */
 	public function create(array $dRules) {
-
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		// checking to the duplicate names
-		foreach ($dRules as $dRule) {
-			$dRuleExists = $this->get(array(
-				'output' => array('druleid'),
-				'filter' => array('name' => $dRule['name']),
-				'limit' => 1
-			));
-			if ($dRuleExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
-			}
+		$dbDRules = API::getApiService()->select($this->tableName(), array(
+			'output' => array('name'),
+			'filter' => array('name' => zbx_objectValues($dRules, 'name'))
+		));
+		if ($dbDRules) {
+			$dbDRule = reset($dbDRules);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.', $dbDRule['name']));
 		}
 
 		$druleids = DB::insert('drules', $dRules);
@@ -469,21 +466,32 @@ class CDRule extends CApiService {
 
 		$defaultValues = DB::getDefaults('dchecks');
 
-		$dRulesUpdate = $dCheckIdsDelete = $dChecksCreate = array();
+		$dRulesUpdate = array();
+		$dCheckIdsDelete = array();
+		$dChecksCreate = array();
+		$dRuleNamesChanged = array();
+
+		// validate drule duplicate names
+		foreach ($dRules as $dRule) {
+			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
+				$dRuleNamesChanged[] = $dRule['name'];
+			}
+		}
+
+		if ($dRuleNamesChanged) {
+			$dbDRules = API::getApiService()->select($this->tableName(), array(
+				'output' => array('name'),
+				'filter' => array('name' => zbx_objectValues($dRuleNamesChanged, 'name'))
+			));
+			if ($dbDRules) {
+				$dbDRule = reset($dbDRules);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.',
+					$dbDRule['name']
+				));
+			}
+		}
 
 		foreach ($dRules as $dRule) {
-			// validate drule duplicate names
-			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
-				$dRuleExists = $this->get(array(
-					'output' => array('druleid'),
-					'filter' => array('name' => $dRule['name']),
-					'limit' => 1
-				));
-				if ($dRuleExists) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
-				}
-			}
-
 			$dRulesUpdate[] = array(
 				'values' => $dRule,
 				'where' => array('druleid' => $dRule['druleid'])
