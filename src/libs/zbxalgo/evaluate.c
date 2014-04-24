@@ -111,10 +111,10 @@ static double	evaluate_number()
 
 		if (0 != isalpha((unsigned char)*iter))
 		{
-			if (0 == (factor = suffix2factor(*iter)))
+			if (NULL == strchr("KMGTsmhdw", *iter))
 				return ZBX_INFINITY;
 
-			iter++;
+			factor = suffix2factor(*iter++);
 		}
 
 		if (SUCCEED != is_number_delimiter(*iter))
