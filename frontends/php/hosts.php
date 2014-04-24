@@ -687,7 +687,7 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		'mass_clear_tpls' => get_request('mass_clear_tpls'),
 		'groups' => get_request('groups', array()),
 		'newgroup' => get_request('newgroup', ''),
-		'status' => get_request('status', HOST_STATUS_MONITORED),
+		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => get_request('proxy_hostid', ''),
 		'ipmi_authtype' => get_request('ipmi_authtype', -1),

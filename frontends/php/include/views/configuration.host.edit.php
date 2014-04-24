@@ -34,7 +34,7 @@ if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_gro
 $newgroup = get_request('newgroup', '');
 $host = get_request('host', '');
 $visiblename = get_request('visiblename', '');
-$status = get_request('status', HOST_STATUS_MONITORED);
+$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 $proxy_hostid = get_request('proxy_hostid', '');
 $ipmi_authtype = get_request('ipmi_authtype', -1);
 $ipmi_privilege = get_request('ipmi_privilege', 2);
