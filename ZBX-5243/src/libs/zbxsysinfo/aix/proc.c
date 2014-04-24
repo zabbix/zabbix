@@ -49,7 +49,7 @@ static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 	int	i;
 	char	procargs[MAX_STRING_LEN];
 
-	if (0 != getargs(procentry, sizeof(*procentry), procargs, sizeof(procargs)))
+	if (0 != getargs(procentry, (int)sizeof(*procentry), procargs, (int)sizeof(procargs)))
 		return FAIL;
 
 	for (i = 0; i < sizeof(procargs) - 1; i++)
@@ -63,7 +63,7 @@ static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 		}
 	}
 
-	if (i == sizeof(procargs))
+	if (i == sizeof(procargs) - 1)
 		procargs[i] = '\0';
 
 	return NULL != zbx_regexp_match(procargs, proccomm, NULL) ? SUCCEED : FAIL;
