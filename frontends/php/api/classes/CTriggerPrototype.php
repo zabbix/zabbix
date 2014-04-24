@@ -63,7 +63,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'						=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
@@ -387,7 +386,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -816,7 +814,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'triggerid', 'itemid', 'functions');
 			$items = API::Item()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'webitems' => true,
@@ -842,7 +839,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
-				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -865,7 +861,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
 		if ($items) {
 			$itemDiscoveries = API::getApiService()->select('item_discovery', array(
-				'nodeids' => get_current_nodeid(true),
 				'output' => array('parent_itemid'),
 				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
 			));

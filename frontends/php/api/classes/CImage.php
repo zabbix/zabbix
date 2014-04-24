@@ -59,7 +59,6 @@ class CImage extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'imageids'					=> null,
 			'sysmapids'					=> null,
 			// filter
@@ -126,7 +125,6 @@ class CImage extends CApiService {
 		$imageids = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($image = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -166,22 +164,10 @@ class CImage extends CApiService {
 	 * @return array|boolean
 	 */
 	public function getObjects($imageData) {
-		$options = array(
+		return $this->get(array(
 			'filter' => $imageData,
 			'output' => API_OUTPUT_EXTEND
-		);
-
-		if (isset($imageData['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($imageData['node']);
-		}
-		elseif (isset($imageData['nodeids'])) {
-			$options['nodeids'] = $imageData['nodeids'];
-		}
-		else {
-			$options['nodeids'] = get_current_nodeid(true);
-		}
-
-		return $this->get($options);
+		));
 	}
 
 	/**
@@ -193,23 +179,12 @@ class CImage extends CApiService {
 	 * @return boolean
 	 */
 	public function exists($object) {
-		$keyFields = array(array('imageid', 'name'), 'imagetype');
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
 			'output' => array('imageid'),
 			'nopermissions' => true,
 			'limit' => 1
-		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$objs = $this->get($options);
+		));
 
 		return !empty($objs);
 	}

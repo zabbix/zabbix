@@ -92,9 +92,12 @@ $servicesChildTable->setAttribute('style', 'min-width:500px;');
 $servicesChildTable->setAttribute('id', 'service_children');
 $servicesChildTable->setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
 foreach ($this->data['children'] as $child) {
+	$childrenLink = new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']);
+	$childrenLink->setAttribute('target', '_blank');
+
 	$row = new CRow(array(
 		array(
-			new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']),
+			$childrenLink,
 			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
 			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 		),

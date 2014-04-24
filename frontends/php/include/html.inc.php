@@ -311,7 +311,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$proxyName = CHtml::encode($proxy['host']).NAME_DELIMITER;
 	}
 
-	$name = get_node_name_by_elid($dbHost['hostid'], true, NAME_DELIMITER).$proxyName.CHtml::encode($dbHost['name']);
+	$name = $proxyName.CHtml::encode($dbHost['name']);
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($name, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
@@ -323,11 +323,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 					$status = new CSpan(_('In maintenance'), 'orange');
 				}
 				else {
-					$status = new CSpan(_('Monitored'), 'enabled');
+					$status = new CSpan(_('Enabled'), 'enabled');
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Not monitored'), 'on');
+				$status = new CSpan(_('Disabled'), 'on');
 				break;
 			default:
 				$status = _('Unknown');
