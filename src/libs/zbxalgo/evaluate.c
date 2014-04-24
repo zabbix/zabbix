@@ -70,9 +70,12 @@ static int	is_number_delimiter(unsigned char c)
  * Purpose: check whether the character delimits a symbolic operator token    *
  *                                                                            *
  ******************************************************************************/
-static int	is_operator_delimiter(unsigned char c)
+static int	is_operator_delimiter(char c)
 {
-	return NULL != strchr("()" ZBX_WHITESPACE, c) ? SUCCEED : FAIL;	/* includes '\0' */
+	if (' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c)
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -136,7 +139,7 @@ static double	evaluate_term9()
 {
 	double	result;
 
-	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
+	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
 
 	if ('\0' == *ptr)
@@ -171,7 +174,7 @@ static double	evaluate_term9()
 		}
 	}
 
-	while ('\0' != *ptr && NULL != strchr(ZBX_WHITESPACE, *ptr))
+	while ('\0' != *ptr && (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr))
 		ptr++;
 
 	return result;
@@ -186,7 +189,7 @@ static double	evaluate_term8()
 {
 	double	result;
 
-	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
+	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
 
 	if ('-' == *ptr)
@@ -213,7 +216,7 @@ static double	evaluate_term7()
 {
 	double	result;
 
-	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
+	while (' ' == *ptr || '\r' == *ptr || '\n' == *ptr || '\t' == *ptr)
 		ptr++;
 
 	if ('n' == ptr[0] && 'o' == ptr[1] && 't' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
