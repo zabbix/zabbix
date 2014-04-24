@@ -75,15 +75,14 @@ if (isset($_REQUEST['save'])) {
 			}
 		}
 
-		if (isset($_REQUEST['imageid'])) {
+		if (hasRequest('imageid')) {
 			$result = API::Image()->update(array(
-				'imageid' => $_REQUEST['imageid'],
-				'name' => $_REQUEST['name'],
-				'imagetype' => $_REQUEST['imagetype'],
+				'imageid' => getRequest('imageid'),
+				'name' => getRequest('name'),
 				'image' => $image
 			));
 
-			$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+			$audit_action = 'Image ['.getRequest('name').'] updated';
 		}
 		else {
 			$result = API::Image()->create(array(
@@ -146,7 +145,17 @@ $generalComboBox->addItems(array(
 $form->addItem($generalComboBox);
 
 if (!isset($_REQUEST['form'])) {
-	$form->addItem(new CSubmit('form', _('Create image')));
+	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
+
+	if($imageType == IMAGE_TYPE_ICON) {
+		$submitCaption = _('Upload icon');
+	}
+	else {
+		$submitCaption = _('Upload background image');
+	}
+
+	$form->addVar('imagetype', $imageType);
+	$form->addItem(new CSubmit('form', $submitCaption));
 }
 
 $imageWidget = new CWidget();
@@ -166,7 +175,7 @@ if (!empty($data['form'])) {
 	else {
 		$data['imageid'] = null;
 		$data['imagename'] = get_request('name', '');
-		$data['imagetype'] = get_request('imagetype', 1);
+		$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 	}
 
 	$imageForm = new CView('administration.general.image.edit', $data);
