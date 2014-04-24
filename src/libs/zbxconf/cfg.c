@@ -221,10 +221,13 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
-
+#ifdef _WINDOWS
 	wpath = zbx_utf8_to_unicode(path);
 
 	if (0 != _wstat(wpath, &sb))
+#else
+	if (0 != zbx_stat(path, &sb))
+#endif
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto clean;
