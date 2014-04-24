@@ -172,7 +172,7 @@ trim:
 #ifdef _WINDOWS
 	zbx_rtrim(*path, "\\");
 
-	if (':' == (*path)[1] && '\0' == (*path)[2])	/* retain backslash for "C:\" */
+	if (':' == (*path)[1] && '\0' == (*path)[2] && '\\' == glob[2])	/* retain backslash for "C:\" */
 	{
 		(*path)[2] = '\\';
 		(*path)[3] = '\0';
@@ -180,7 +180,7 @@ trim:
 #else
 	zbx_rtrim(*path, "/");
 
-	if ('\0' == (*path)[0])				/* retain forward slash for "/" */
+	if ('\0' == (*path)[0] && '/' == glob[0])			/* retain forward slash for "/" */
 	{
 		(*path)[0] = '/';
 		(*path)[1] = '\0';
