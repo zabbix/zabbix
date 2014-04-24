@@ -216,7 +216,7 @@ static double	evaluate_term7()
 	while (' ' == *ptr || '\t' == *ptr || '\r' == *ptr || '\n' == *ptr)
 		ptr++;
 
-	if ('n' == *ptr && 'o' == *(ptr + 1) && 't' == *(ptr + 2) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
+	if ('n' == ptr[0] && 'o' == ptr[1] && 't' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
 
@@ -314,17 +314,17 @@ static double	evaluate_term4()
 
 	while (1)
 	{
-		if ('<' == *ptr && '=' == *(ptr + 1))
+		if ('<' == ptr[0] && '=' == ptr[1])
 		{
 			op = 'l';
 			ptr += 2;
 		}
-		else if ('>' == *ptr && '=' == *(ptr + 1))
+		else if ('>' == ptr[0] && '=' == ptr[1])
 		{
 			op = 'g';
 			ptr += 2;
 		}
-		else if (('<' == *ptr && '>' != *(ptr + 1)) || '>' == *ptr)
+		else if (('<' == ptr[0] && '>' != ptr[1]) || '>' == ptr[0])
 		{
 			op = *ptr++;
 		}
@@ -366,7 +366,7 @@ static double	evaluate_term3()
 		{
 			op = *ptr++;
 		}
-		else if ('<' == *ptr && '>' == *(ptr + 1))
+		else if ('<' == ptr[0] && '>' == ptr[1])
 		{
 			op = '#';
 			ptr += 2;
@@ -398,7 +398,7 @@ static double	evaluate_term2()
 	if (ZBX_INFINITY == (result = evaluate_term3()))
 		return ZBX_INFINITY;
 
-	while ('a' == *ptr && 'n' == *(ptr + 1) && 'd' == *(ptr + 2) && SUCCEED == is_operator_delimiter(*(ptr + 3)))
+	while ('a' == ptr[0] && 'n' == ptr[1] && 'd' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
 
@@ -431,7 +431,7 @@ static double	evaluate_term1()
 	if (ZBX_INFINITY == (result = evaluate_term2()))
 		return ZBX_INFINITY;
 
-	while ('o' == *ptr && 'r' == *(ptr + 1) && SUCCEED == is_operator_delimiter(*(ptr + 2)))
+	while ('o' == ptr[0] && 'r' == ptr[1] && SUCCEED == is_operator_delimiter(ptr[2]))
 	{
 		ptr += 2;
 

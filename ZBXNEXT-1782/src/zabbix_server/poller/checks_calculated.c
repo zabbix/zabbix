@@ -108,7 +108,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		}
 
 		if ((0 == strncmp("and", e, len = 3) || 0 == strncmp("not", e, 3) || 0 == strncmp("or", e, len = 2)) &&
-				NULL != strchr("()" ZBX_WHITESPACE, *(e + len)))
+				NULL != strchr("()" ZBX_WHITESPACE, e[len]))
 		{
 			zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, len);
 			e += len - 1;
