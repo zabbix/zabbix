@@ -808,16 +808,16 @@ function make_status_of_zbx() {
 		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? 'off' : 'on')),
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
-	$title = new CSpan(_('Number of hosts (monitored/not monitored/templates)'));
+	$title = new CSpan(_('Number of hosts (enabled/disabled/templates)'));
 	$title->setAttribute('title', 'asdad');
-	$table->addRow(array(_('Number of hosts (monitored/not monitored/templates)'), $status['hosts_count'],
+	$table->addRow(array(_('Number of hosts (enabled/disabled/templates)'), $status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'], 'off'), ' / ',
 			new CSpan($status['hosts_count_not_monitored'], 'on'), ' / ',
 			new CSpan($status['hosts_count_template'], 'unknown')
 		)
 	));
-	$title = new CSpan(_('Number of items (monitored/disabled/not supported)'));
+	$title = new CSpan(_('Number of items (enabled/disabled/not supported)'));
 	$title->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
 	$table->addRow(array($title, $status['items_count'],
 		array(
