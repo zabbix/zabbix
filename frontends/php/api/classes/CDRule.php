@@ -402,6 +402,7 @@ class CDRule extends CApiService {
 			'output' => array('name'),
 			'filter' => array('name' => zbx_objectValues($dRules, 'name'))
 		));
+
 		if ($dbDRules) {
 			$dbDRule = reset($dbDRules);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.', $dbDRule['name']));
@@ -483,6 +484,7 @@ class CDRule extends CApiService {
 				'output' => array('name'),
 				'filter' => array('name' => zbx_objectValues($dRuleNamesChanged, 'name'))
 			));
+
 			if ($dbDRules) {
 				$dbDRule = reset($dbDRules);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.',
