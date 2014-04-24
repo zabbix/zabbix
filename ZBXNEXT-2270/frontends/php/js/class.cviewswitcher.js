@@ -126,23 +126,21 @@ var CViewSwitcher = Class.create({
 		if (is_null(obj)) {
 			return null;
 		}
-		var aValue = null;
 
-		switch (obj.tagName.toLowerCase()) {
-			case 'select':
-				aValue = obj.options[obj.selectedIndex].value;
-				break;
-			case 'input':
-				var inpType = obj.getAttribute('type');
-				if (!is_null(inpType) && inpType.toLowerCase() == 'checkbox') {
-					aValue = obj.checked ? obj.value : null;
-					break;
+		switch (obj.tagName) {
+			case 'SELECT':
+				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
+
+			case 'INPUT':
+				if (obj.getAttribute('type') === 'CHECKBOX') {
+					return obj.checked ? obj.value : null;
 				}
-			case 'textarea':
+
 			default:
-				aValue = obj.value;
+				return obj.value;
 		}
-		return aValue;
+
+		return null;
 	},
 
 	setObjValue : function (obj, value) {
