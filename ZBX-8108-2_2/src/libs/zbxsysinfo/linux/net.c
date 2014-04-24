@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
+#include "log.h"
+
 typedef struct
 {
 	zbx_uint64_t ibytes;
@@ -106,22 +108,31 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
  ******************************************************************************/
 static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc)
 {
-	int	n, fd;
+	int	n, fd, ret = -1;
+	size_t	offset = 0;
 
 	if (-1 == (fd = open(filename, O_RDONLY)))
 		return -1;
 
-	while (*buffer_alloc == (n = read(fd, *buffer, *buffer_alloc)))
+	while (0 != (n = read(fd, *buffer + offset, *buffer_alloc - offset)))
 	{
-		*buffer_alloc *= 2;
-		*buffer = zbx_realloc(*buffer, *buffer_alloc);
+		if (-1 == n)
+			goto out;
 
-		lseek(fd, 0, SEEK_SET);
+		offset += n;
+
+		if (offset == *buffer_alloc)
+		{
+			*buffer_alloc *= 2;
+			*buffer = zbx_realloc(*buffer, *buffer_alloc);
+		}
 	}
 
+	ret = offset;
+out:
 	close(fd);
 
-	return n;
+	return ret;
 }
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -326,7 +337,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
+	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 16/*64 * ZBX_KIBIBYTE*/;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -340,6 +351,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 < (n = proc_read_file("/proc/net/udp", &buffer, &buffer_alloc)))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "n: '%d' buffer: '%s'", n, buffer);
 		ret = SYSINFO_RET_OK;
 
 		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 07", (unsigned int)port);
