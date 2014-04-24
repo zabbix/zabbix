@@ -21,8 +21,6 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-#include "log.h"
-
 typedef struct
 {
 	zbx_uint64_t ibytes;
@@ -337,7 +335,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 16/*64 * ZBX_KIBIBYTE*/;
+	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -351,7 +349,6 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 < (n = proc_read_file("/proc/net/udp", &buffer, &buffer_alloc)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "n: '%d' buffer: '%s'", n, buffer);
 		ret = SYSINFO_RET_OK;
 
 		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 07", (unsigned int)port);
