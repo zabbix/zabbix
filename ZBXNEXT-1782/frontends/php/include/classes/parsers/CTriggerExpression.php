@@ -20,7 +20,6 @@
 
 class CTriggerExpression {
 	// for parsing of trigger expression
-	const STATE_INIT = 0;
 	const STATE_AFTER_OPEN_BRACE = 1;
 	const STATE_AFTER_BINARY_OPERATOR = 2;
 	const STATE_AFTER_LOGICAL_OPERATOR = 3;
@@ -243,140 +242,205 @@ class CTriggerExpression {
 		$this->pos = 0;
 		$this->expression = $expression;
 
-		$state = self::STATE_INIT;
-		$afterSpace = true;
+		$state = self::STATE_AFTER_OPEN_BRACE;
+		$afterSpace = false;
 		$level = 0;
 
 		while (isset($this->expression[$this->pos])) {
-			// check if this is a space
-			$isSpace = isset($this->spaceChars[$this->expression[$this->pos]]);
+			if (isset($this->spaceChars[$this->expression[$this->pos]])) {
+					$afterSpace = true;
+					$this->pos++;
+					continue;
+			}
 
-			// skip space characters
-			if (!$isSpace) {
-				switch ($state) {
-					case self::STATE_INIT:
-					case self::STATE_AFTER_OPEN_BRACE:
-					case self::STATE_AFTER_BINARY_OPERATOR:
-						if ($afterSpace || $state == self::STATE_INIT || $state == self::STATE_AFTER_OPEN_BRACE) {
+			switch ($state) {
+				case self::STATE_AFTER_OPEN_BRACE:
+					switch ($this->expression[$this->pos]) {
+						case '-':
+							$state = self::STATE_AFTER_MINUS_OPERATOR;
+							break;
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
 							if ($this->parseUsing($this->notOperatorParser)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							elseif ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
+					}
+
+					break;
+				case self::STATE_AFTER_BINARY_OPERATOR:
+					switch ($this->expression[$this->pos]) {
+						case '-':
+							$state = self::STATE_AFTER_MINUS_OPERATOR;
+							break;
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
 								break;
 							}
-						}
 
-						switch ($this->expression[$this->pos]) {
-							case '-':
-								$state = self::STATE_AFTER_MINUS_OPERATOR;
-								break 2;
-							case '(':
-								$state = self::STATE_AFTER_OPEN_BRACE;
-								$level++;
-								break 2;
-							default:
-								if ($this->parseConstant()) {
-									$state = self::STATE_AFTER_CONSTANT;
-									break 2;
-								}
-						}
-
-						// error, break the loop
-						break 2;
-					case self::STATE_AFTER_LOGICAL_OPERATOR:
-						if ($afterSpace) {
-							switch ($this->expression[$this->pos]) {
-								case '-':
-									$state = self::STATE_AFTER_MINUS_OPERATOR;
-									break 2;
-								default:
-									if ($this->parseUsing($this->notOperatorParser)) {
-										$state = self::STATE_AFTER_NOT_OPERATOR;
-										break 2;
-									}
-									elseif ($this->parseConstant()) {
-										$state = self::STATE_AFTER_CONSTANT;
-										break 2;
-									}
+							if (!$afterSpace) {
+								break 3;
 							}
-						}
 
-						switch ($this->expression[$this->pos]) {
-							case '(':
-								$state = self::STATE_AFTER_OPEN_BRACE;
-								$level++;
+							if ($this->parseUsing($this->notOperatorParser)) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							else {
+								break 3;
+							}
+					}
 
-								break 2;
-						}
+					break;
+				case self::STATE_AFTER_LOGICAL_OPERATOR:
+					switch ($this->expression[$this->pos]) {
+						case '-':
+							if (!$afterSpace) {
+								break 3;
+							}
+							$state = self::STATE_AFTER_MINUS_OPERATOR;
+							break;
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if (!$afterSpace) {
+								break 3;
+							}
 
-						// error, break the loop
-						break 2;
-					case self::STATE_AFTER_CLOSE_BRACE:
-					case self::STATE_AFTER_CONSTANT:
-						if ($afterSpace || $state == self::STATE_AFTER_CLOSE_BRACE) {
+							if ($this->parseUsing($this->notOperatorParser)) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							elseif ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
+					}
+
+					break;
+				case self::STATE_AFTER_CLOSE_BRACE:
+					switch ($this->expression[$this->pos]) {
+						case ')':
+							if ($level == 0) {
+								break 3;
+							}
+							$level--;
+							break;
+						default:
+							if ($this->parseUsing($this->binaryOperatorParser)) {
+								$state = self::STATE_AFTER_BINARY_OPERATOR;
+								break;
+							}
+
 							if ($this->parseUsing($this->logicalOperatorParser)) {
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 								break;
 							}
-						}
 
-						switch ($this->expression[$this->pos]) {
-							case ')':
-								$state = self::STATE_AFTER_CLOSE_BRACE;
-								if ($level == 0) {
-									break 3;
-								}
-								$level--;
-								break 2;
-							default:
-								if ($this->parseUsing($this->binaryOperatorParser)) {
-									$state = self::STATE_AFTER_BINARY_OPERATOR;
-									break 2;
-								}
-						}
-
-						// error, break the loop
-						break 2;
-					case self::STATE_AFTER_NOT_OPERATOR:
-						if ($afterSpace) {
-							switch ($this->expression[$this->pos]) {
-								case '-':
-									$state = self::STATE_AFTER_MINUS_OPERATOR;
-									break 2;
-								default:
-									if ($this->parseConstant()) {
-										$state = self::STATE_AFTER_CONSTANT;
-										break 2;
-									}
+							if (!$afterSpace) {
+								break 3;
 							}
-						}
 
-						switch ($this->expression[$this->pos]) {
-							case '(':
-								$state = self::STATE_AFTER_OPEN_BRACE;
-								$level++;
-								break 2;
-						}
+							if ($this->parseUsing($this->notOperatorParser)) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							else {
+								break 3;
+							}
+					}
 
-						// error, break the loop
-						break 2;
-					case self::STATE_AFTER_MINUS_OPERATOR:
-						switch ($this->expression[$this->pos]) {
-							case '(':
-								$state = self::STATE_AFTER_OPEN_BRACE;
-								$level++;
-								break 2;
-							default:
-								if ($this->parseConstant()) {
-									$state = self::STATE_AFTER_CONSTANT;
-									break 2;
-								}
-						}
+					break;
+				case self::STATE_AFTER_CONSTANT:
+					switch ($this->expression[$this->pos]) {
+						case ')':
+							if ($level == 0) {
+								break 3;
+							}
+							$level--;
+							$state = self::STATE_AFTER_CLOSE_BRACE;
+							break;
+						default:
+							if ($this->parseUsing($this->binaryOperatorParser)) {
+								$state = self::STATE_AFTER_BINARY_OPERATOR;
+								break;
+							}
 
-						// error, break the loop
-						break 2;
-				}
+							if (!$afterSpace) {
+								break 3;
+							}
+
+							if ($this->parseUsing($this->notOperatorParser)) {
+								$state = self::STATE_AFTER_NOT_OPERATOR;
+							}
+							elseif ($this->parseUsing($this->logicalOperatorParser)) {
+								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
+							}
+							else {
+								break 3;
+							}
+					}
+
+					break;
+				case self::STATE_AFTER_NOT_OPERATOR:
+					switch ($this->expression[$this->pos]) {
+						case '-':
+							if (!$afterSpace) {
+								break 3;
+							}
+							$state = self::STATE_AFTER_MINUS_OPERATOR;
+							break;
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if (!$afterSpace) {
+								break 3;
+							}
+
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
+					}
+
+					break;
+				case self::STATE_AFTER_MINUS_OPERATOR:
+					switch ($this->expression[$this->pos]) {
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
+					}
+
+					break;
 			}
 
-			$afterSpace = $isSpace;
+			$afterSpace = false;
 			$this->pos++;
 		}
 
@@ -432,7 +496,8 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Parses a constant in the trigger expression and moves a current position ($this->pos) on a last symbol of the constant
+	 * Parses a constant in the trigger expression and moves a current position ($this->pos) on a last symbol of the
+	 * constant
 	 *
 	 * The constant can be:
 	 *  - trigger function like {host:item[].func()}
@@ -746,30 +811,31 @@ class CTriggerExpression {
 	 */
 	private function parseNumber() {
 		$j = $this->pos;
+		$digits = 0;
+		$dots = 0;
 
-		if ($this->expression[$j] < '0' || $this->expression[$j] > '9') {
-			return false;
-		}
-
-		$j++;
-		while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
-			$j++;
-		}
-
-		if (isset($this->expression[$j]) && $this->expression[$j] == '.') {
-			$j++;
-			if (!isset($this->expression[$j]) || $this->expression[$j] < '0' || $this->expression[$j] > '9') {
-				return false;
-			}
-
-			$j++;
-			while (isset($this->expression[$j]) && $this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+		while (isset($this->expression[$j])) {
+			if ($this->expression[$j] >= '0' && $this->expression[$j] <= '9') {
+				$digits++;
 				$j++;
+				continue;
 			}
+
+			if ($this->expression[$j] == '.') {
+				$dots++;
+				$j++;
+				continue;
+			}
+
+			break;
 		}
+
+		if ($digits == 0 || $dots > 1)
+			return false;
 
 		// check for an optional suffix
-		if (isset($this->expression[$j]) && strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
+		if (isset($this->expression[$j])
+				&& strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
 			$j++;
 		}
 
