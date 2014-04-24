@@ -340,9 +340,14 @@ class CImage extends CApiService {
 			if (isset($image['name'])) {
 				$values['name'] = zbx_dbstr($image['name']);
 			}
-			if (isset($image['imagetype'])) {
-				$values['imagetype'] = $image['imagetype'];
-			}
+
+			$this->checkNoParameters(
+				$image,
+				array('imagetype'),
+				_('Can not update "%1$s" for image "%2$s".'),
+				$image['name']
+			);
+
 			if (isset($image['image'])) {
 				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
