@@ -324,12 +324,17 @@ OSVERSIONINFOEX		zbx_win_getversion()
 {
 	static OSVERSIONINFOEX  vi = {sizeof(OSVERSIONINFOEX)};
 
-	#define ZBX_REGKEY_VERSION				"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-	#define ZBX_REGVALUE_CURRENTVERSION		"CurrentVersion"
+	#define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+	#define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
 	#define ZBX_REGVALUE_CURRENTBUILDNUMBER	"CurrentBuildNumber"
+	#define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
+
+	#define ZBX_REGKEY_PRODUCT		"System\\CurrentControlSet\\Control\\ProductOptions"
+	#define ZBX_REGVALUE_PRODUCTTYPE	"ProductType"
 
 	HKEY		h_key_registry;
-	char		*version_num = NULL;
+	char		*key_value = NULL;
+	WCHAR		*wkey_value = NULL;
 	double		ver_num;
 
 	if (0 == vi.dwMajorVersion)
@@ -339,29 +344,89 @@ OSVERSIONINFOEX		zbx_win_getversion()
 			zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_VERSION);
 			goto out;
 		}
-		if (NULL == (version_num = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTVERSION))))
+
+		if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTVERSION))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTVERSION);
 			goto out;
 		}
 
-		ver_num = strtod(version_num, NULL);
+		ver_num = strtod(key_value, NULL);
 
-		GetVersionEx((OSVERSIONINFO *)&vi);
-
-		if (6.2 < ver_num)
+		if (6.2 > ver_num)
+		{
+			GetVersionEx((OSVERSIONINFO *)&vi);
+		}
+		else
 		{
 			vi.dwMajorVersion = (DWORD)ver_num;
-			vi.dwMinorVersion = atol(strchr(version_num, '.') + 1);
+			vi.dwMinorVersion = atol(strchr(key_value, '.') + 1);
 
-			if (NULL == (version_num = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILDNUMBER))))
+			zbx_free(key_value);
+
+			if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CSDVERSION))))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CSDVERSION);
+				goto out;
+			}
+
+			wkey_value = zbx_utf8_to_unicode(key_value);
+			wcscpy_s(vi.szCSDVersion, sizeof(vi.szCSDVersion), wkey_value);
+
+			zbx_free(key_value);
+
+			if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_CURRENTBUILDNUMBER))))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_CURRENTBUILDNUMBER);
 				goto out;
 			}
 
-			vi.dwBuildNumber = atol(version_num);
+			if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to close registry key '%s'", ZBX_REGKEY_VERSION);
+				goto out;
+			}
+
+			vi.dwBuildNumber = atoi(key_value);
+
+			zbx_free(key_value);
+
+			if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_PRODUCT), 0, KEY_READ, &h_key_registry))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to open registry key '%s'", ZBX_REGKEY_PRODUCT);
+				goto out;
+			}
+
+			if (NULL == (key_value = read_registry_value(h_key_registry, TEXT(ZBX_REGVALUE_PRODUCTTYPE))))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to read registry value '%s'", ZBX_REGVALUE_PRODUCTTYPE);
+				goto out;
+			}
+
+			if (ERROR_SUCCESS != RegCloseKey(h_key_registry))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to close registry key '%s'", ZBX_REGKEY_PRODUCT);
+				goto out;
+			}
+
+			if (0 == strstr(key_value, "WinNT"))
+			{
+				vi.wProductType = 1;
+				vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			}
+			else if (0 == strstr(key_value, "LenmanNT"))
+			{
+				vi.wProductType = 2;
+				vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			}
+			else if (0 == strstr(key_value, "ServerNT"))
+			{
+				vi.wProductType = 3;
+				vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+			}
 		}
+
+		zbx_free(key_value);
 	}
 out:
 	return vi;
