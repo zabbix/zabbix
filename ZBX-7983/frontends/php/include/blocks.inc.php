@@ -254,7 +254,7 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('triggerid', 'priority', 'state', 'description'),
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	));
