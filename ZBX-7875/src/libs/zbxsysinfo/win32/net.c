@@ -33,13 +33,11 @@ static LPSTR	get_if_description(MIB_IFROW *pIfRow)
 
 	if (NULL == mb_to_unicode)
 	{
-		OSVERSIONINFOEX	version_info = {sizeof(OSVERSIONINFOEX)};
-
-		version_info = zbx_win_getversion();
+		const OSVERSIONINFOEX	*vi;
 
 		/* starting with Windows Vista (Windows Server 2008) the interface description */
 		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
-		if (6 <= version_info.dwMajorVersion)
+		if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
 			mb_to_unicode = zbx_oemcp_to_unicode;
 		else
 			mb_to_unicode = zbx_acp_to_unicode;
