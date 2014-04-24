@@ -143,7 +143,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 		*path = zbx_strdup(NULL, glob);
 		*pattern = NULL;
 
-		return SUCCEED;
+		goto trim;
 	}
 
 	if (NULL != strchr(p + 1, PATH_SEPARATOR))
@@ -165,13 +165,27 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 	while (PATH_SEPARATOR != *p);
 
 	*path = zbx_strdup(NULL, glob);
-#ifdef _WINDOWS
 	(*path)[p - glob] = '\0';
-#else
-	(*path)[glob == p ? 1 : p - glob] = '\0';	/* root directory "/" should remain as is */
-#endif
-	*pattern = zbx_strdup(NULL, p + 1);
 
+	*pattern = zbx_strdup(NULL, p + 1);
+trim:
+#ifdef _WINDOWS
+	zbx_rtrim(*path, "\\");
+
+	if (':' == (*path)[1] && '\0' == (*path)[2])	/* retain backslash for "C:\" */
+	{
+		(*path)[2] = '\\';
+		(*path)[3] = '\0';
+	}
+#else
+	zbx_rtrim(*path, "/");
+
+	if ('\0' == (*path)[0])				/* retain forward slash for "/" */
+	{
+		(*path)[0] = '/';
+		(*path)[1] = '\0';
+	}
+#endif
 	return SUCCEED;
 }
 
@@ -194,24 +208,25 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 	int			ret = FAIL;
 	char			*path = NULL, *pattern = NULL, *file = NULL;
-	zbx_stat_t		sb;
 #ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*find_path = NULL, *file_name;
-	wchar_t			*wfind_path = NULL;
+	wchar_t			*wfind_path = NULL, *wpath = NULL;
+	struct _stat		sb;
 #else
 	DIR			*dir;
 	struct dirent		*d;
+	zbx_stat_t		sb;
 #endif
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
-#ifdef _WINDOWS
-	zbx_rtrim(path, "\\");
-#endif
-	if (0 != zbx_stat(path, &sb))
+
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (0 != _wstat(wpath, &sb))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto clean;
 	}
 
@@ -256,7 +271,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 #else
 	if (NULL == (dir = opendir(path)))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto clean;
 	}
 
@@ -281,7 +296,7 @@ close:
 #else
 	if (0 != closedir(dir))
 	{
-		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		ret = FAIL;
 	}
 #endif
@@ -289,6 +304,7 @@ clean:
 #ifdef _WINDOWS
 	zbx_free(wfind_path);
 	zbx_free(find_path);
+	zbx_free(wpath);
 #endif
 	zbx_free(file);
 	zbx_free(pattern);
