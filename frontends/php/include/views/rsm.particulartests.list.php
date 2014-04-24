@@ -148,8 +148,8 @@ foreach ($this->data['probes'] as $probe) {
 				$rdds = $down;
 			}
 			elseif ($probe['value'] == 3) {
-				$rdds43 = new CSpan(_('Down'), 'green');
-				$rdds80 = new CSpan(_('Up'), 'red');
+				$rdds43 = $down;
+				$rdds80 = $up;
 				$rdds = $down;
 			}
 		}
