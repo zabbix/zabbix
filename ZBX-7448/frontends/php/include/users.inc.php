@@ -76,7 +76,7 @@ function user_type2str($userType = null) {
  */
 function user_auth_type2str($authType) {
 	if ($authType === null) {
-		$authType = get_user_auth(CWebUser::$data['userid']);
+		$authType = getUserGuiAccess(CWebUser::$data['userid']);
 	}
 
 	$authUserType = array(
@@ -117,8 +117,7 @@ function get_userid_by_usrgrpid($userGroupIds) {
 		'SELECT DISTINCT u.userid'.
 		' FROM users u,users_groups ug'.
 		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds).
-			andDbNode('ug.usrgrpid', false)
+			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds)
 	);
 	while ($user = DBFetch($dbUsers)) {
 		$userIds[$user['userid']] = $user['userid'];
