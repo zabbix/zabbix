@@ -1958,6 +1958,8 @@ zbx_uint64_t	suffix2factor(char c)
 			return ZBX_GIBIBYTE;
 		case 'T':
 			return ZBX_TEBIBYTE;
+		case 's':
+			return 1;
 		case 'm':
 			return SEC_PER_MIN;
 		case 'h':
@@ -1966,7 +1968,6 @@ zbx_uint64_t	suffix2factor(char c)
 			return SEC_PER_DAY;
 		case 'w':
 			return SEC_PER_WEEK;
-		case 's':
 		default:
 			return 1;
 	}

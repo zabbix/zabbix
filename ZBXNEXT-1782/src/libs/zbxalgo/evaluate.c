@@ -72,10 +72,7 @@ static int	is_number_delimiter(unsigned char c)
  ******************************************************************************/
 static int	is_operator_delimiter(char c)
 {
-	if (' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c)
-		return SUCCEED;
-
-	return FAIL;
+	return ' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
