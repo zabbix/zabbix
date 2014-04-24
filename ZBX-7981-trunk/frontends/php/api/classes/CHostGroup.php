@@ -427,16 +427,18 @@ class CHostGroup extends CApiService {
 			if (!isset($group['name']) || zbx_empty($group['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group name cannot be empty.'));
 			}
-
-			$hostGroupExists = $this->get(array(
-				'output' => array('groupid'),
-				'filter' => array('name' => $group['name']),
-				'limit' => 1
-			));
-			if ($hostGroupExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
-			}
 		}
+
+		$dbHostGroups = API::getApiService()->select($this->tableName(), array(
+			'output' => array('name'),
+			'filter' => array('name' => zbx_objectValues($groups, 'name'))
+		));
+
+		if ($dbHostGroups) {
+			$dbHostGroup = reset($dbHostGroups);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $dbHostGroup['name']));
+		}
+
 		$groupids = DB::insert('groups', $groups);
 
 		return array('groupids' => $groupids);
