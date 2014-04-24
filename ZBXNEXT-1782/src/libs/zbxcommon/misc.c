@@ -1958,8 +1958,6 @@ zbx_uint64_t	suffix2factor(char c)
 			return ZBX_GIBIBYTE;
 		case 'T':
 			return ZBX_TEBIBYTE;
-		case 's':
-			return 1;
 		case 'm':
 			return SEC_PER_MIN;
 		case 'h':
@@ -1968,9 +1966,10 @@ zbx_uint64_t	suffix2factor(char c)
 			return SEC_PER_DAY;
 		case 'w':
 			return SEC_PER_WEEK;
+		case 's':
+		default:
+			return 1;
 	}
-
-	return 0;
 }
 
 /******************************************************************************
@@ -2032,12 +2031,10 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 double	str2double(const char *str)
 {
 	size_t	sz;
-	double	factor;
 
 	sz = strlen(str) - 1;
-	factor = suffix2factor(str[sz]);
 
-	return atof(str) * (0 == factor ? 1 : factor);
+	return atof(str) * suffix2factor(str[sz]);
 }
 
 /******************************************************************************
