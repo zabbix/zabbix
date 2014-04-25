@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:41+0300\n"
-"PO-Revision-Date: 2014-03-31 05:13+0300\n"
+"POT-Creation-Date: 2014-04-25 13:57+0300\n"
+"PO-Revision-Date: 2014-04-23 06:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1396235619.0\n"
+"X-POOTLE-MTIME: 1398227566.0\n"
 
 #: api/classes/CMaintenance.php:352 api/classes/CMaintenance.php:357
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:471
@@ -5048,7 +5048,7 @@ msgstr "次で実行"
 
 #: include/views/administration.auditacts.list.php:84
 msgid "Executed"
-msgstr ""
+msgstr "実行"
 
 #: include/items.inc.php:1320
 #: include/views/configuration.host.discovery.edit.php:179
@@ -10281,7 +10281,7 @@ msgstr "期間T内に含まれる(条件Oを満たす)値Vの個数 NOT N"
 
 #: include/blocks.inc.php:829
 msgid "Number of triggers (enabled/disabled [problem/ok])"
-msgstr ""
+msgstr "トリガー数 (有効/無効 [障害/正常])"
 
 #: include/classes/items/CHelpItems.php:871
 msgid "Number of triggers in Zabbix database."
@@ -13744,7 +13744,7 @@ msgstr "トリガーのプロトタイプ"
 #: api/classes/CTriggerPrototype.php:872
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
 #: api/classes/CTriggerPrototype.php:878
 #, c-format
