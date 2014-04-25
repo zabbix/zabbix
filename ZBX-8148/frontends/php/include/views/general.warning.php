@@ -19,7 +19,7 @@
 **/
 
 
-$pageHeader = new CPageHeader(_('Warning [refreshed every 30 sec]'));
+$pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']');
 $pageHeader->addCssInit();
 $pageHeader->display();
 
