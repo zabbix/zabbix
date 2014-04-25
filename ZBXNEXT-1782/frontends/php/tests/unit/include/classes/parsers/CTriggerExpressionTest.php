@@ -29,6 +29,8 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 			array('.5', null, true),
 			array('5.', null, true),
+			array('..5', null, false),
+			array('5..', null, false),
 
 			array('1', null, true),
 			array('1s', null, true),
