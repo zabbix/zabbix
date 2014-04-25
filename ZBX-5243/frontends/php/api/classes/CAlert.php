@@ -63,7 +63,6 @@ class CAlert extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'eventsource'				=> EVENT_SOURCE_TRIGGERS,
 			'eventobject'				=> EVENT_OBJECT_TRIGGER,
 			'groupids'					=> null,
@@ -292,7 +291,6 @@ class CAlert extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
@@ -428,8 +426,7 @@ class CAlert extends CApiService {
 			$mediatypes = API::getApiService()->select('media_type', array(
 				'output' => $options['selectMediatypes'],
 				'filter' => array('mediatypeid' => $relationMap->getRelatedIds()),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
 		}

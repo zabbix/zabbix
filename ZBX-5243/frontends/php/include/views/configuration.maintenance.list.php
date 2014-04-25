@@ -29,7 +29,7 @@ $maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $cr
 
 // header
 $filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
 $maintenanceWidget->addHeader(_('Maintenance periods'), $filterForm);
 $maintenanceWidget->addHeaderRowNumber();
 
@@ -41,7 +41,6 @@ $maintenanceForm->setName('maintenanceForm');
 $maintenanceTable = new CTableInfo(_('No maintenance periods found.'));
 $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Type'), 'maintenance_type'),
 	make_sorting_header(_('Active since'), 'active_since'),
@@ -67,7 +66,6 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 	$maintenanceTable->addRow(array(
 		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
-		$this->data['displayNodes'] ? $maintenance['nodename'] : null,
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(_('d M Y H:i'), $maintenance['active_since']),

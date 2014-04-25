@@ -339,7 +339,7 @@ function getMenuPopupMap(options) {
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1');
+			var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
 
 			jQuery.each(options.gotos.triggerStatus, function(name, value) {
 				url.setArgument(name, value);
@@ -579,8 +579,7 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?triggerid=' + options.triggerid + '&source=0');
-
+	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
@@ -607,7 +606,7 @@ function getMenuPopupTrigger(options) {
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update&switch_node=' + options.configuration.switchNode);
+				+ '&form=update');
 
 		items[items.length] = {
 			label: t('Configuration'),

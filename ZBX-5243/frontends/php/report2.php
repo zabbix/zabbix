@@ -33,35 +33,35 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'mode' =>				array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),		null),
-	'hostgroupid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'tpl_triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
+	'mode' =>				array(T_ZBX_INT,	O_OPT,	P_SYS,			IN('0,1'),	null),
+	'hostgroupid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'tpl_triggerid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'triggerid' =>			array(T_ZBX_INT,	O_OPT,	P_SYS|P_NZERO,	DB_ID,		null),
 	// filter
-	'filter_groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'filter_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
-	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN(array(0, 1)),	null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,			null),
-	'filter_timesince' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
-	'filter_timetill' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null,	null),
+	'filter_groupid'=>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'filter_hostid' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null),
+	'filter_rst'=>			array(T_ZBX_STR,	O_OPT,	P_SYS,			null,		null),
+	'filter_set' =>			array(T_ZBX_STR,	O_OPT,	P_SYS,			null,		null),
+	'filter_timesince' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null),
+	'filter_timetill' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null),
 	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,			null)
+	'filterState' =>		array(T_ZBX_INT,	O_OPT,	P_ACT,			null,		null)
 );
 check_fields($fields);
 
-$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
+$availabilityReportMode = getRequest('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 
 /*
  * Permissions
  */
 if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))
-			|| get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
-			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
+	if (getRequest('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))
+			|| getRequest('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| getRequest('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
 		access_deny();
 	}
-	if (get_request('tpl_triggerid')) {
+	if (getRequest('tpl_triggerid')) {
 		$trigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['tpl_triggerid'],
 			'output' => array('triggerid'),
@@ -73,12 +73,12 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	}
 }
 else {
-	if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
-			|| get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
+	if (getRequest('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid']))
+			|| getRequest('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))) {
 		access_deny();
 	}
 }
-if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
+if (getRequest('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
 	access_deny();
 }
 
@@ -96,34 +96,47 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_rst'])) {
+if (hasRequest('filter_rst')) {
 	$_REQUEST['filter_groupid'] = 0;
 	$_REQUEST['filter_hostid'] = 0;
 	$_REQUEST['filter_timesince'] = 0;
 	$_REQUEST['filter_timetill'] = 0;
+
+	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		$_REQUEST['tpl_triggerid'] = 0;
+		$_REQUEST['hostgroupid'] = 0;
+	}
 }
+
+if (!hasRequest('filter_rst')) {
+	$_REQUEST['filter_groupid'] = getRequest('filter_groupid',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0)
+	);
+	$_REQUEST['filter_hostid'] = getRequest('filter_hostid',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0)
+	);
+	$_REQUEST['filter_timesince'] = getRequest('filter_timesince',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0)
+	);
+	$_REQUEST['filter_timetill'] = getRequest('filter_timetill',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0)
+	);
+}
+
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid', 0),
+	PROFILE_TYPE_ID
+);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', getRequest('filter_timesince', 0),
+	PROFILE_TYPE_STR
+);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getRequest('filter_timetill', 0),
+	PROFILE_TYPE_STR
+);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid', 0),
+	PROFILE_TYPE_ID
+);
 
 $config = select_config();
-
-if ($config['dropdown_first_remember']) {
-	if (!isset($_REQUEST['filter_rst'])) {
-		$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0));
-		$_REQUEST['filter_hostid'] = get_request('filter_hostid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0));
-		$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0));
-		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0));
-	}
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
-}
-elseif (!isset($_REQUEST['filter_rst'])) {
-	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
-	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
-	$_REQUEST['filter_timesince'] = get_request('filter_timesince', 0);
-	$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
-}
-
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 
 if ($_REQUEST['filter_timetill'] > 0 && $_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill']) {
 	zbx_swap($_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
@@ -142,7 +155,6 @@ $triggerData = isset($_REQUEST['triggerid'])
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'nodeids' => get_current_nodeid(true),
 		'expandDescription' => true
 	))
 	: null;
@@ -231,10 +243,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($groups, 'name');
 
 		foreach ($groups as $group) {
-			$groupsComboBox->addItem(
-				$group['groupid'],
-				get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']
-			);
+			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
 		$filterForm->addRow(_('Template group'), $groupsComboBox);
 
@@ -253,15 +262,12 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		foreach ($templates as $template) {
 			$templateIds[$template['templateid']] = $template['templateid'];
 
-			$templateComboBox->addItem(
-				$template['templateid'],
-				get_node_name_by_elid($template['templateid'], null, NAME_DELIMITER).$template['name']
-			);
+			$templateComboBox->addItem($template['templateid'], $template['name']);
 		}
 		$filterForm->addRow(_('Template'), $templateComboBox);
 
 		// filter trigger
-		$triggerComboBox = new CComboBox('tpl_triggerid', get_request('tpl_triggerid', 0), 'javascript: submit()');
+		$triggerComboBox = new CComboBox('tpl_triggerid', getRequest('tpl_triggerid', 0), 'javascript: submit()');
 		$triggerComboBox->addItem(0, _('all'));
 
 		$sqlCondition = empty($_REQUEST['filter_hostid'])
@@ -278,17 +284,13 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 				' AND h.status='.HOST_STATUS_TEMPLATE.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 					$sqlCondition.
-					andDbNode('t.triggerid').
 			' ORDER BY t.description';
 		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
 
 		foreach ($triggers as $trigger) {
 			$templateName = empty($_REQUEST['filter_hostid']) ? $trigger['name'].NAME_DELIMITER : '';
 
-			$triggerComboBox->addItem(
-				$trigger['triggerid'],
-				get_node_name_by_elid($trigger['triggerid'], null, NAME_DELIMITER).$templateName.$trigger['description']
-			);
+			$triggerComboBox->addItem($trigger['triggerid'], $templateName.$trigger['description']);
 		}
 
 		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
@@ -298,7 +300,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$filterForm->addRow(_('Template trigger'), $triggerComboBox);
 
 		// filter host group
-		$hostGroupsComboBox = new CComboBox('hostgroupid', get_request('hostgroupid', 0), 'javascript: submit()');
+		$hostGroupsComboBox = new CComboBox('hostgroupid', getRequest('hostgroupid', 0), 'javascript: submit()');
 		$hostGroupsComboBox->addItem(0, _('all'));
 
 		$hostGroups = API::HostGroup()->get(array(
@@ -310,10 +312,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($hostGroups, 'name');
 
 		foreach ($hostGroups as $hostGroup) {
-			$hostGroupsComboBox->addItem(
-				$hostGroup['groupid'],
-				get_node_name_by_elid($hostGroup['groupid'], null, NAME_DELIMITER).$hostGroup['name']
-			);
+			$hostGroupsComboBox->addItem($hostGroup['groupid'], $hostGroup['name']);
 		}
 
 		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
@@ -337,10 +336,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		order_result($groups, 'name');
 
 		foreach ($groups as $group) {
-			$groupsComboBox->addItem(
-				$group['groupid'],
-				get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']
-			);
+			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
 		$filterForm->addRow(_('Host group'), $groupsComboBox);
 
@@ -358,10 +354,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$hosts = zbx_toHash($hosts, 'hostid');
 
 		foreach ($hosts as $host) {
-			$hostsComboBox->addItem(
-				$host['hostid'],
-				get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name']
-			);
+			$hostsComboBox->addItem($host['hostid'], $host['name']);
 		}
 		$filterForm->addRow(_('Host'), $hostsComboBox);
 
@@ -388,8 +381,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	// filter buttons
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
-	$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-		'javascript: var url = new Curl(location.href); url.setArgument("filter_rst", 1); location.href = url.getUrl();'));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 	$reportWidget->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 
@@ -398,7 +390,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	 */
 	$triggerTable = new CTableInfo(_('No triggers found.'));
 	$triggerTable->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
 		_('Name'),
 		_('Problems'),
@@ -418,10 +409,9 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		);
 
 		$triggerTable->addRow(array(
-			get_node_name_by_elid($trigger['hostid']),
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid'].
+			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
 				'&source='.EVENT_SOURCE_TRIGGERS
 			),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
