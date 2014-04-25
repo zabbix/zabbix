@@ -173,6 +173,13 @@ class CTriggerExpression {
 	protected $notOperatorParser;
 
 	/**
+	 * Parser for the {TRIGGER.VALUE} macro.
+	 *
+	 * @var CSetParser
+	 */
+	protected $macroParser;
+
+	/**
 	 * Chars that should be treated as spaces.
 	 *
 	 * @var array
@@ -191,6 +198,7 @@ class CTriggerExpression {
 		$this->binaryOperatorParser = new CSetParser(array('<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>'));
 		$this->logicalOperatorParser = new CSetParser(array('and', 'or'));
 		$this->notOperatorParser = new CSetParser(array('not'));
+		$this->macroParser = new CSetParser(array('{TRIGGER.VALUE}'));
 	}
 
 	/**
@@ -479,20 +487,20 @@ class CTriggerExpression {
 	 *
 	 * @param CParser $parser
 	 *
-	 * @return bool		true if a match has been found, false otherwise
+	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
 	 */
 	protected function parseUsing(CParser $parser) {
 		$j = $this->pos;
 
 		$result = $parser->parse($this->expression, $j);
 
-		if ($result->match === null) {
+		if (!$result) {
 			return false;
 		}
 
 		$this->pos = $result->endPos - 1;
 
-		return true;
+		return $result;
 	}
 
 	/**
@@ -851,20 +859,15 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseMacro() {
-		$macros = array('{TRIGGER.VALUE}');
+		$result = $this->parseUsing($this->macroParser);
 
-		foreach ($macros as $macro) {
-			$len = strlen($macro);
-
-			if (substr($this->expression, $this->pos, $len) != $macro) {
-				continue;
-			}
-
-			$this->macros[] = array('expression' => $macro);
-			$this->pos += $len - 1;
-			return true;
+		if (!$result) {
+			return false;
 		}
-		return false;
+
+		$this->macros[] = array('expression' => $result->match);
+
+		return true;
 	}
 
 	/**

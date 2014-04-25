@@ -97,9 +97,7 @@ class CSetParserTest extends PHPUnit_Framework_TestCase {
 	public function testParseInvalid($string, $pos, $expectedEndPos) {
 		$result = $this->parser->parse($string, $pos);
 
-		$this->assertSame(null, $result->match);
-		$this->assertSame($expectedEndPos, $result->endPos);
-		$this->assertSame($string, $result->source);
-		$this->assertSame($pos, $result->startPos);
+		$this->assertSame(false, $result);
+		$this->assertSame($expectedEndPos, $this->parser->getPos());
 	}
 }
