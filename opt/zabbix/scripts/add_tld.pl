@@ -46,6 +46,7 @@ use constant LINUX_TEMPLATEID => 10001;
 use constant VALUE_TYPE_AVAIL => 0;
 use constant VALUE_TYPE_PERC => 1;
 
+use constant ZBX_EC_INTERNAL          => -1;   # internal error (general)
 use constant ZBX_EC_DNS_NS_NOREPLY    => -200; # no reply from Name Server
 use constant ZBX_EC_DNS_NS_ERRREPLY   => -201; # invalid reply from Name Server
 use constant ZBX_EC_DNS_NS_NOTS       => -202; # no UNIX timestamp
@@ -557,6 +558,14 @@ sub create_item_dns_rtt {
 
     create_item($options);
 
+    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: Internal error '.$ns_name.' ['.$ip.']',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL.
+                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
+
     $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from Name Server '.$ns_name.' ['.$ip.']',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY.
 					    '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
@@ -740,6 +749,13 @@ sub create_items_rdds {
                                               'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
 
+    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: Internal error',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
+                        'priority' => '2',
+                };
+    
+    create_trigger($options);
+
     $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOREPLY,
                         'priority' => '2',
@@ -813,6 +829,13 @@ sub create_items_rdds {
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => value_mappings->{'rsm_rdds_rttudp'}};
     create_item($options);
+
+    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: Internal error',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
+                        'priority' => '2',
+                };
+
+    create_trigger($options);
 
     $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_NOREPLY,
@@ -915,6 +938,13 @@ sub create_items_epp {
 		'valuemapid' => value_mappings->{'rsm_epp'}};
 
     create_item($options);
+
+    $options = { 'description' => 'EPP-INFO {HOST.NAME}: Internal error',
+                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
+                'priority' => '2',
+    };
+
+    create_trigger($options);
 
     $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 2 - IP is missing',
                  'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_NO_IP,
