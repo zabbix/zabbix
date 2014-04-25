@@ -35,7 +35,7 @@ $fields = array(
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),		'isset({copy})'),
+	'copy_type' => array(T_ZBX_INT, O_OPT, P_SYS, IN(array(COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_TEMPLATE)), 'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
 	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form})&&{form}=="update"'),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
@@ -58,7 +58,7 @@ $fields = array(
 	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
+	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -97,7 +97,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (!empty($_REQUEST['parent_discoveryid'])) {
 		// check whether discovery rule is editable by user
 		$discovery_rule = API::DiscoveryRule()->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'itemids' => array($_REQUEST['parent_discoveryid']),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
@@ -130,7 +129,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
 			'output' => array('graphid'),
-			'nodeids' => get_current_nodeid(true),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => array($_REQUEST['graphid']),
 			'editable' => true,
@@ -144,7 +142,6 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid'),
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => array($_REQUEST['hostid']),
 			'templated_hosts' => true,
 			'editable' => true,
@@ -308,47 +305,44 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 		clearCookies($result, getRequest('hostid'));
 	}
-}
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
-	if (!empty($_REQUEST['copy_targetid']) && isset($_REQUEST['copy_type'])) {
+} elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('group_graphid')) {
+	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$goResult = true;
 
 		$options = array(
 			'output' => array('hostid'),
 			'editable' => true,
-			'nodes' => get_current_nodeid(true),
 			'templated_hosts' => true
 		);
 
-		// hosts
-		if ($_REQUEST['copy_type'] == 0) {
-			$options['hostids'] = $_REQUEST['copy_targetid'];
+		// hosts or templates
+		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
+			$options['hostids'] = getRequest('copy_targetid');
 		}
-		// groups
+		// host groups
 		else {
-			zbx_value2array($_REQUEST['copy_targetid']);
+			zbx_value2array(getRequest('copy_targetid'));
 
 			$dbGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
-				'groupids' => $_REQUEST['copy_targetid'],
-				'nodes' => get_current_nodeid(true),
+				'groupids' => getRequest('copy_targetid'),
 				'editable' => true
 			));
 			$dbGroups = zbx_toHash($dbGroups, 'groupid');
 
-			foreach ($_REQUEST['copy_targetid'] as $groupid) {
+			foreach (getRequest('copy_targetid') as $groupid) {
 				if (!isset($dbGroups[$groupid])) {
 					access_deny();
 				}
 			}
 
-			$options['groupids'] = $_REQUEST['copy_targetid'];
+			$options['groupids'] = getRequest('copy_targetid');
 		}
 
 		$dbHosts = API::Host()->get($options);
 
 		DBstart();
-		foreach ($_REQUEST['group_graphid'] as $graphid) {
+		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
 				$goResult &= (bool) copyGraphToHost($graphid, $host['hostid']);
 			}
@@ -357,7 +351,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
 		clearCookies($goResult,
-			empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+			getRequest('parent_discoveryid') == 0 ? getRequest('hostid') : getRequest('parent_discoveryid')
 		);
 
 		$_REQUEST['go'] = 'none2';
@@ -601,8 +595,7 @@ else {
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array(),
-		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule,
-		'displayNodes' => (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0)
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
 	);
 
 	$sortfield = getPageSortField('name');
@@ -654,13 +647,6 @@ else {
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['graphs'] as $key => $graph) {
-			$data['graphs'][$key]['nodename'] = get_node_name_by_elid($graph['graphid'], true);
-		}
 	}
 
 	order_result($data['graphs'], $sortfield, $sortorder);

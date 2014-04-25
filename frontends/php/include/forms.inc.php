@@ -24,21 +24,11 @@ function getUserFormData($userid, $isProfile = false) {
 	$data = array('is_profile' => $isProfile);
 
 	if (isset($userid)) {
-		$options = array(
+		$users = API::User()->get(array(
 			'userids' => $userid,
 			'output' => API_OUTPUT_EXTEND
-		);
-		if ($data['is_profile']) {
-			$options['nodeids'] = id2nodeid($userid);
-		}
-
-		$users = API::User()->get($options);
+		));
 		$user = reset($users);
-
-		$data['auth_type'] = get_user_system_auth($userid);
-	}
-	else {
-		$data['auth_type'] = $config['authentication_type'];
 	}
 
 	if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
@@ -112,6 +102,16 @@ function getUserFormData($userid, $isProfile = false) {
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 	}
 
+	// authentication type
+	if ($data['user_groups']) {
+		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
+	}
+	else {
+		$data['auth_type'] = ($userid === null)
+			? $config['authentication_type']
+			: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
+	}
+
 	// set autologout
 	if ($data['autologin'] || !isset($data['autologout'])) {
 		$data['autologout'] = 0;
@@ -172,37 +172,13 @@ function getUserFormData($userid, $isProfile = false) {
 }
 
 function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
-	// nodes
-	if (ZBX_DISTRIBUTED) {
-		$lists['node']['label']		= _('Nodes');
-		$lists['node']['read_write']= new CListBox('nodes_write', null, 10);
-		$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
-		$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
-
-		$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
-		foreach ($nodes as $node) {
-			switch($node['permission']) {
-				case PERM_READ:
-					$list_name = 'read_only';
-					break;
-				case PERM_READ_WRITE:
-					$list_name = 'read_write';
-					break;
-				default:
-					$list_name = 'deny';
-			}
-			$lists['node'][$list_name]->addItem($node['nodeid'], $node['name']);
-		}
-		unset($nodes);
-	}
-
 	// group
 	$lists['group']['label']		= _('Host groups');
 	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
 	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 	foreach ($groups as $group) {
 		switch($group['permission']) {
@@ -215,7 +191,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 			default:
 				$list_name = 'deny';
 		}
-		$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].NAME_DELIMITER).$group['name']);
+		$lists['group'][$list_name]->addItem($group['groupid'], $group['name']);
 	}
 	unset($groups);
 
@@ -225,7 +201,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
 	foreach ($hosts as $host) {
 		switch($host['permission']) {
@@ -241,7 +217,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 		if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
 			$host['host_name'] = $host['host'];
 		}
-		$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].NAME_DELIMITER).$host['host_name']);
+		$lists['host'][$list_name]->addItem($host['hostid'], $host['host_name']);
 	}
 	unset($hosts);
 
@@ -328,8 +304,6 @@ function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
 }
 
 function getItemFilterForm(&$items) {
-	$displayNodes = is_array(get_current_nodeid());
-
 	$filter_groupId				= $_REQUEST['filter_groupid'];
 	$filter_hostId				= $_REQUEST['filter_hostid'];
 	$filter_application			= $_REQUEST['filter_application'];
@@ -510,8 +484,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$groupFilter[] = array(
 				'id' => $getHostInfo['groupid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => $displayNodes ? get_node_name_by_elid($getHostInfo['groupid'], true, NAME_DELIMITER) : ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}
@@ -548,8 +521,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($getHostInfo)) {
 			$hostFilterData[] = array(
 				'id' => $getHostInfo['hostid'],
-				'name' => $getHostInfo['name'],
-				'prefix' => $displayNodes ? get_node_name_by_elid($filter_hostId, true, NAME_DELIMITER) : ''
+				'name' => $getHostInfo['name']
 			);
 		}
 	}
@@ -627,12 +599,10 @@ function getItemFilterForm(&$items) {
 		new CCol()
 	), 'item-list-row');
 
-	$filter = new CButton('filter', _('Filter'),
-		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
-	);
+	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$filter->useJQueryStyle('main');
 
-	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
 	$reset->useJQueryStyle();
 
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
@@ -1214,11 +1184,8 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		}
 	}
 	else {
-		$data['valuemaps'] = DBfetchArray(DBselect(
-				'SELECT v.*'.
-				' FROM valuemaps v'.
-				whereDbNode('v.valuemapid')
-		));
+		$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
+
 		order_result($data['valuemaps'], 'name');
 	}
 
@@ -1264,12 +1231,13 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		'title' => $title,
 		'elements_field' => $elementsField,
 		'elements' => getRequest($elementsField, array()),
-		'copy_type' => getRequest('copy_type', 0),
-		'filter_groupid' => getRequest('filter_groupid', 0),
+		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
+		'copy_groupid' => getRequest('copy_groupid', 0),
 		'copy_targetid' => getRequest('copy_targetid', array()),
 		'hostid' => getRequest('hostid', 0),
 		'groups' => array(),
-		'hosts' => array()
+		'hosts' => array(),
+		'templates' => array()
 	);
 
 	// validate elements
@@ -1279,26 +1247,47 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		return null;
 	}
 
-	// get groups
-	$data['groups'] = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name')
-	));
-	order_result($data['groups'], 'name');
+	if ($data['copy_type'] == COPY_TYPE_TO_HOST_GROUP) {
+		// get groups
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name')
+		));
+		order_result($data['groups'], 'name');
+	}
+	else {
+		// hosts or templates
+		$params = array('output' => array('name', 'groupid'));
 
-	// get hosts
-	if ($data['copy_type'] == 0) {
-		foreach ($data['groups'] as $group) {
-			if (empty($data['filter_groupid'])) {
-				$data['filter_groupid'] = $group['groupid'];
-			}
+		if ($data['copy_type'] == COPY_TYPE_TO_HOST) {
+			$params['real_hosts'] = true;
+		}
+		else {
+			$params['templated_hosts'] = true;
 		}
 
-		$data['hosts'] = API::Host()->get(array(
-			'output' => array('groupid', 'name'),
-			'groupids' => $data['filter_groupid'],
-			'templated_hosts' => true
-		));
-		order_result($data['hosts'], 'name');
+		$data['groups'] = API::HostGroup()->get($params);
+		order_result($data['groups'], 'name');
+
+		$groupIds = zbx_objectValues($data['groups'], 'groupid');
+
+		if (!in_array($data['copy_groupid'], $groupIds) || $data['copy_groupid'] == 0) {
+			$data['copy_groupid'] = reset($groupIds);
+		}
+
+		if ($data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
+			$data['templates'] = API::Template()->get(array(
+				'output' => array('name', 'templateid'),
+				'groupids' => $data['copy_groupid']
+			));
+			order_result($data['templates'], 'name');
+		}
+		elseif ($data['copy_type'] == COPY_TYPE_TO_HOST) {
+			$data['hosts'] = API::Host()->get(array(
+				'output' => array('name', 'hostid'),
+				'groupids' => $data['copy_groupid']
+			));
+			order_result($data['hosts'], 'name');
+		}
 	}
 
 	return $data;
