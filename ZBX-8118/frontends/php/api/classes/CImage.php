@@ -325,28 +325,32 @@ class CImage extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for image.'));
 			}
 
-			$imageExists = $this->get(array(
-				'filter' => array('name' => $image['name']),
-				'output' => array('imageid'),
-				'nopermissions' => true
-			));
-			$imageExists = reset($imageExists);
-
-			if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
-			}
-
 			$values = array();
 			if (isset($image['name'])) {
+				$imageExists = $this->get(array(
+					'filter' => array('name' => $image['name']),
+					'output' => array('imageid'),
+					'nopermissions' => true
+				));
+				$imageExists = reset($imageExists);
+
+				if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
+				}
+
 				$values['name'] = zbx_dbstr($image['name']);
 			}
 
-			$this->checkNoParameters(
-				$image,
-				array('imagetype'),
-				_('Can not update "%1$s" for image "%2$s".'),
-				$image['name']
-			);
+			if(array_key_exists('imagetype', $image)) {
+				$imageName = $this->get(array(
+					'filter' => array('imageid' => $image['imageid']),
+					'output' => array('name'),
+					'nopermissions' => true
+				));
+				$imageName = reset($imageName);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "imagetype" for image "%1$s".', $imageName['name']));
+			}
 
 			if (isset($image['image'])) {
 				// decode BASE64
