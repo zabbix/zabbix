@@ -62,17 +62,17 @@ jQuery(function($) {
 	 * @param string options['id']				multi select id in dom
 	 * @param string options['url']				backend url
 	 * @param string options['name']			input element name
-	 * @param object options['labels']			translated labels
-	 * @param object options['data']			preload data {id, name, prefix}
+	 * @param object options['labels']			translated labels (optional)
+	 * @param object options['data']			preload data {id, name, prefix} (optional)
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
-	 * @param string options['data'][prefix]
-	 * @param array  options['ignored']			preload ignored {id: name}
-	 * @param string options['defaultValue']	default value for input element
-	 * @param bool   options['disabled']		turn on/off readonly state
-	 * @param bool   options['addNew']			allow user to create new names
-	 * @param int    options['selectedLimit']	how many items can be selected
-	 * @param int    options['limit']			how many available items can be received from backend
+	 * @param string options['data'][prefix]	(optional)
+	 * @param array  options['ignored']			preload ignored {id: name} (optional)
+	 * @param string options['defaultValue']	default value for input element (optional)
+	 * @param bool   options['disabled']		turn on/off readonly state (optional)
+	 * @param bool   options['addNew']			allow user to create new names (optional)
+	 * @param int    options['selectedLimit']	how many items can be selected (optional)
+	 * @param int    options['limit']			how many available items can be received from backend (optional)
 	 *
 	 * @return object
 	 */
