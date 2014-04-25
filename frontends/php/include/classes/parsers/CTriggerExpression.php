@@ -248,9 +248,9 @@ class CTriggerExpression {
 
 		while (isset($this->expression[$this->pos])) {
 			if (isset($this->spaceChars[$this->expression[$this->pos]])) {
-					$afterSpace = true;
-					$this->pos++;
-					continue;
+				$afterSpace = true;
+				$this->pos++;
+				continue;
 			}
 
 			switch ($state) {
@@ -821,7 +821,7 @@ class CTriggerExpression {
 				continue;
 			}
 
-			if ($this->expression[$j] == '.') {
+			if ($this->expression[$j] === '.') {
 				$dots++;
 				$j++;
 				continue;
@@ -830,8 +830,9 @@ class CTriggerExpression {
 			break;
 		}
 
-		if ($digits == 0 || $dots > 1)
+		if ($digits == 0 || $dots > 1) {
 			return false;
+		}
 
 		// check for an optional suffix
 		if (isset($this->expression[$j])
