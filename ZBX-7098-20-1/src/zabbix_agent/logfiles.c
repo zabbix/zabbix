@@ -681,7 +681,10 @@ static int	is_uniq_row(const char *arr, int n_cols, int row)
 		if ('1' == *p++)
 		{
 			if (2 == ++ones)
-				break;		/* non-unique mapping in the row */
+			{
+				ret = -1;	/* non-unique mapping in the row */
+				break;
+			}
 
 			ret = i;
 		}
@@ -718,7 +721,10 @@ static int	is_uniq_col(const char *arr, int n_rows, int n_cols, int col)
 		if ('1' == *p)
 		{
 			if (2 == ++ones)
-				break;		/* non-unique mapping in the column */
+			{
+				ret = -1;	/* non-unique mapping in the column */
+				break;
+			}
 
 			ret = i;
 		}
