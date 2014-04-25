@@ -21,30 +21,25 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
-$divTabs = new CTabView();
-if (!isset($_REQUEST['form_refresh'])) {
-	$divTabs->setSelected(0);
-}
-
-$host_groups = get_request('groups', array());
+$host_groups = getRequest('groups', array());
 if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_groups)) {
 	array_push($host_groups, $_REQUEST['groupid']);
 }
 
-$newgroup = get_request('newgroup', '');
-$host = get_request('host', '');
-$visiblename = get_request('visiblename', '');
-$proxy_hostid = get_request('proxy_hostid', '');
-$ipmi_authtype = get_request('ipmi_authtype', -1);
-$ipmi_privilege = get_request('ipmi_privilege', 2);
-$ipmi_username = get_request('ipmi_username', '');
-$ipmi_password = get_request('ipmi_password', '');
-$inventory_mode = get_request('inventory_mode', HOST_INVENTORY_DISABLED);
-$host_inventory = get_request('host_inventory', array());
-$macros = get_request('macros', array());
-$interfaces = get_request('interfaces', array());
-$templateIds = get_request('templates', array());
-$clear_templates = get_request('clear_templates', array());
+$newgroup = getRequest('newgroup', '');
+$host = getRequest('host', '');
+$visiblename = getRequest('visiblename', '');
+$proxy_hostid = getRequest('proxy_hostid', '');
+$ipmi_authtype = getRequest('ipmi_authtype', -1);
+$ipmi_privilege = getRequest('ipmi_privilege', 2);
+$ipmi_username = getRequest('ipmi_username', '');
+$ipmi_password = getRequest('ipmi_password', '');
+$inventory_mode = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
+$host_inventory = getRequest('host_inventory', array());
+$macros = getRequest('macros', array());
+$interfaces = getRequest('interfaces', array());
+$templateIds = getRequest('templates', array());
+$clear_templates = getRequest('clear_templates', array());
 
 if ((getRequest('hostid', 0) == 0) && !hasRequest('form_refresh')) {
 	$status = HOST_STATUS_MONITORED;
@@ -53,7 +48,7 @@ else {
 	$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 }
 
-$_REQUEST['hostid'] = get_request('hostid', 0);
+$_REQUEST['hostid'] = getRequest('hostid', 0);
 
 if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
 	$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
@@ -72,11 +67,9 @@ if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
 	$interfaces[$jmxAgentId]['main'] = '1';
 }
 
-$frm_title = _('Host');
 if ($_REQUEST['hostid'] > 0) {
 	$dbHost = $this->data['dbHost'];
 
-	$frm_title .= SPACE.' ['.$dbHost['host'].']';
 	$original_templates = $dbHost['parentTemplates'];
 	$original_templates = zbx_toHash($original_templates, 'templateid');
 
@@ -95,29 +88,11 @@ else {
 	$original_templates = array();
 }
 
-// load data from the DB when opening the full clone form for the first time
-$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
+$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && (getRequest('form_refresh') == 1));
+$cloneFromOpenedDiscovered = ($cloneFormOpened && ($dbHost['flags'] & ZBX_FLAG_DISCOVERY_CREATED));
 
-	if(hasRequest('visiblename')) {
-		$_REQUEST['name'] = $_REQUEST['visiblename'];
-	}
-
-	if(hasRequest('host_inventory')) {
-		$_REQUEST['inventory'] = $_REQUEST['host_inventory'];
-		$_REQUEST['inventory']['inventory_mode'] = $_REQUEST['inventory_mode'];
-	}
-
-	if(hasRequest('interfaces')) {
-		foreach($_REQUEST['interfaces'] as $id => $reqInterface) {
-			$_REQUEST['interfaces'][$id]['items'] = isset($dbHost['interfaces'][$id]['items'])
-				? $dbHost['interfaces'][$id]['items']
-				: array();
-		}
-	}
-
-	$dbHost = array_merge($dbHost, $_REQUEST);
-
+// Use data from database when host is opened and form is shown for first time or discovered host is being cloned.
+if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFromOpenedDiscovered)) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -127,7 +102,9 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 		$visiblename = '';
 	}
 
-	$status = $dbHost['status'];
+	$status = $cloneFromOpenedDiscovered
+		? getRequest('status', HOST_STATUS_NOT_MONITORED)
+		: $dbHost['status'];
 
 	$ipmi_authtype = $dbHost['ipmi_authtype'];
 	$ipmi_privilege = $dbHost['ipmi_privilege'];
@@ -162,23 +139,37 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 		$interfaces[$hinum]['locked'] = $locked;
 	}
 }
+else {
+
+
+}
 
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
 natcasesort($templateIds);
 
 // whether this is a discovered host
-$isDiscovered = (get_request('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED && get_request('form') == 'update');
+$isDiscovered = (
+	getRequest('hostid')
+	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+	//&& in_array(getRequest('form'), array('update', 'clone', 'full_clone'))
+	&& in_array(getRequest('form'), array('update'))
+);
+
+$divTabs = new CTabView();
+if (!isset($_REQUEST['form_refresh'])) {
+	$divTabs->setSelected(0);
+}
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
-$frmHost->addVar('form', get_request('form', 1));
+$frmHost->addVar('form', getRequest('form', 1));
 
 $frmHost->addVar('clear_templates', $clear_templates);
 
 $hostList = new CFormList('hostlist');
 
-if ($_REQUEST['hostid'] > 0 && get_request('form') != 'clone') {
+if ($_REQUEST['hostid'] > 0 && getRequest('form') != 'clone') {
 	$frmHost->addVar('hostid', $_REQUEST['hostid']);
 }
 if ($_REQUEST['groupid'] > 0) {
