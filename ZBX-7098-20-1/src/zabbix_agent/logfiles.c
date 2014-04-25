@@ -1544,8 +1544,19 @@ out1:
 		if (0 != from_first_file)
 		{
 			/* We have processed the file where we left off in the previous check. */
-			/* Now proceed from the beginning of the new file list to process the remaining files. */
 			from_first_file = 0;
+
+			/* If there are more files to process they must be processed from start (lastlogsize = 0). */
+			for (j = 0; j < logfiles_num; j++)
+			{
+				if (logfiles[j].size != logfiles[j].processed_size)
+				{
+					*lastlogsize = 0;
+					break;
+				}
+			}
+
+			/* Now proceed from the beginning of the new file list to process the remaining files. */
 			i = 0;
 			continue;
 		}
