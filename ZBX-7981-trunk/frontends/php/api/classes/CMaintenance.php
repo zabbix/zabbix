@@ -336,27 +336,33 @@ class CMaintenance extends CApiService {
 		$insertTimeperiods = array();
 		$now = time();
 		$now -= $now % SEC_PER_MIN;
-		foreach ($maintenances as $mnum => $maintenance) {
+
+		// check fields
+		foreach ($maintenances as $maintenance) {
 			$dbFields = array(
 				'name' => null,
 				'active_since' => $now,
 				'active_till' => $now + SEC_PER_DAY
 			);
+
 			if (!check_db_fields($dbFields, $maintenance)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
+		}
 
-			// validate if maintenance name already exists
-			$maintenanceExists = $this->get(array(
-				'output' => array('maintenanceid'),
-				'filter' => array('name' => $maintenance['name']),
-				'nopermissions' => true,
-				'limit' => 1
-			));
-			if ($maintenanceExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
-			}
+		// validate if maintenance name already exists
+		$dbMaintenances = $this->get(array(
+			'output' => array('name'),
+			'filter' => array('name' => zbx_objectValues($maintenances, 'name')),
+			'nopermissions' => true
+		));
 
+		if ($dbMaintenances) {
+			$dbMaintenance = reset($dbMaintenances);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $dbMaintenance['name']));
+		}
+
+		foreach ($maintenances as $mnum => $maintenance) {
 			// validate maintenance active since
 			if (!validateUnixTime($maintenance['active_since'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
@@ -441,8 +447,6 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$hostids = array();
-		$groupids = array();
 		$updMaintenances = $this->get(array(
 			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 			'editable' => true,
@@ -453,24 +457,43 @@ class CMaintenance extends CApiService {
 			'preservekeys' => true
 		));
 
+		$maintenanceNames = array();
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
+					'No permissions to referred object or it does not exist!'
+				));
 			}
 
-			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
-			$receivedMaintenances = API::Maintenance()->get(array(
-				'output' => array('maintenanceid'),
-				'filter' => array('name' => $maintenance['name'])
+			if (isset($maintenance['name']) && !zbx_empty($maintenance['name'])) {
+				$maintenanceNames[] = $maintenance['name'];
+			}
+		}
+
+		// check if maintenance already exists
+		if ($maintenanceNames) {
+			$dbMaintenances = $this->get(array(
+				'output' => array('maintenanceid', 'name'),
+				'filter' => array('name' => zbx_objectValues($maintenances, 'name')),
+				'preservekeys' => true,
+				'nopermissions' => true
 			));
 
-			// validate if maintenance name already exists
-			foreach ($receivedMaintenances as $rMaintenance) {
-				if (bccomp($rMaintenance['maintenanceid'], $maintenance['maintenanceid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
+			if ($dbMaintenances) {
+				foreach ($maintenances as $maintenance) {
+					if (!isset($dbMaintenances[$maintenance['maintenanceid']]['maintenanceid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Maintenance "%1$s" already exists.', $maintenance['name']
+						));
+					}
 				}
 			}
+		}
 
+		$hostids = array();
+		$groupids = array();
+
+		foreach ($maintenances as $maintenance) {
 			// validate maintenance active since
 			if (!validateUnixTime($maintenance['active_since'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
