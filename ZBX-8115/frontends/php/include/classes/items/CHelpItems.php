@@ -125,6 +125,10 @@ class CHelpItems {
 					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 				),
 				array(
+					'key' => 'net.udp.listen[port]',
+					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
+				),
+				array(
 					'key' => 'perf_counter[counter,<interval>]',
 					'description' => _('Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.')
 				),
@@ -377,6 +381,10 @@ class CHelpItems {
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
 					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+				),
+				array(
+					'key' => 'net.udp.listen[port]',
+					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',

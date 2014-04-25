@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-08 17:23+0300\n"
+"POT-Creation-Date: 2014-04-25 13:35+0300\n"
 "PO-Revision-Date: 2014-03-24 18:16+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -102,11 +102,11 @@ msgstr "(0 - donekonečna)"
 msgid "(Only super admins can create groups)"
 msgstr "(Skupiny môžu vytvárať iba super administrátori)"
 
-#: include/forms.inc.php:591 include/forms.inc.php:606
+#: include/forms.inc.php:596 include/forms.inc.php:611
 msgid "(in days)"
 msgstr "(v dňoch)"
 
-#: include/forms.inc.php:451
+#: include/forms.inc.php:456
 msgid "(in sec)"
 msgstr "(v sek)"
 
@@ -407,8 +407,8 @@ msgstr "Aktívny do"
 #: include/views/administration.usergroups.edit.php:107
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
-#: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:201
+#: include/views/administration.users.edit.php:70
+#: include/views/administration.users.edit.php:212
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:523
@@ -470,7 +470,7 @@ msgstr "Pridať linku"
 msgid "Add missing"
 msgstr "Pridať chýbajuce"
 
-#: include/views/configuration.item.massupdate.php:537
+#: include/views/configuration.item.massupdate.php:534
 msgid "Add new or existing applications"
 msgstr "Pridať novú alebo existujúcu aplikáciu"
 
@@ -540,7 +540,7 @@ msgid "Agent"
 msgstr "Agent"
 
 #: include/classes/items/CHelpItems.php:65
-#: include/classes/items/CHelpItems.php:307
+#: include/classes/items/CHelpItems.php:311
 msgid "Agent host name defined in the configuration file. String value."
 msgstr "Agentovo hostovo meno je definované v konfiguračnom súbore. Hodnota reťazca."
 
@@ -555,7 +555,7 @@ msgstr "Rozhrania agenta"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Agent alebo SNMP alebo JMX alebo IPMI rozhranie"
 
-#: include/classes/items/CHelpItems.php:561
+#: include/classes/items/CHelpItems.php:569
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "Agregované kontroly nevyžadujú spustenie agenta na monitorovanom hostovi. Zabbix server zhromažďuje agregované informácie priamymi databázovými dotazmi. Pozri Zabbix manuál."
 
@@ -608,8 +608,8 @@ msgstr "Všetky uzly"
 msgid "Allowed hosts"
 msgstr "Povolené hosty"
 
-#: include/classes/items/CHelpItems.php:289
-#: include/classes/items/CHelpItems.php:543
+#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:551
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr "Veľkosť pamäte v bytoch. Ak mode chýba, je použitý total."
 
@@ -622,7 +622,7 @@ msgid "Any character string included"
 msgstr "Obsahuje ktorýkoľvek reťazec"
 
 #: applications.php:118 httpconf.php:42 include/actions.inc.php:90
-#: include/audit.inc.php:32 include/forms.inc.php:577
+#: include/audit.inc.php:32 include/forms.inc.php:582
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.httpconf.edit.php:64
@@ -659,7 +659,7 @@ msgstr "Aplikácia bola aktualizovaná"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
 
-#: hosts.php:808 hosts.php:898 include/forms.inc.php:902
+#: hosts.php:808 hosts.php:898 include/forms.inc.php:907
 #: include/html.inc.php:401 include/html.inc.php:405
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:433
@@ -688,7 +688,7 @@ msgstr "Budúca"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:1693 include/func.inc.php:132
+#: include/forms.inc.php:1698 include/func.inc.php:132
 #: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "Apríl"
@@ -756,7 +756,7 @@ msgstr[0] "O %1$s:%2$s každý deň"
 msgstr[1] "O %1$s:%2$s každý %3$s deň"
 msgstr[2] "O %1$s:%2$s každý %3$s deň"
 
-#: include/forms.inc.php:1774
+#: include/forms.inc.php:1779
 msgid "At (hour:minute)"
 msgstr "O (hodina:minúta)"
 
@@ -798,7 +798,7 @@ msgstr "Logy auditu"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:1685 include/func.inc.php:136
+#: include/forms.inc.php:1690 include/func.inc.php:136
 #: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "August"
@@ -848,11 +848,11 @@ msgstr "Autentifikačný protokol"
 msgid "Auto registration"
 msgstr "Automatická registrácia"
 
-#: include/views/administration.users.edit.php:149
+#: include/views/administration.users.edit.php:160
 msgid "Auto-login"
 msgstr "Automatické prihlásenie"
 
-#: include/views/administration.users.edit.php:150 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:161 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatické odhlásenie (min. 90 sekúnd)"
 
@@ -1191,23 +1191,23 @@ msgstr "NASTAVENIE PRACOVNEJ DOBY"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "NASTAVENIE ZABBIXU"
 
-#: include/classes/items/CHelpItems.php:181
-#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:185
+#: include/classes/items/CHelpItems.php:443
 msgid "CPU info - lists full info for all CPUs by default"
 msgstr "CPU informácie - zoznam úplných informácií všetkých CPU"
 
-#: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:411
+#: include/classes/items/CHelpItems.php:161
+#: include/classes/items/CHelpItems.php:419
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
 msgstr "Vyťaženie CPU. Vyťaženie procesora. cpu a mode sú nepovinné. Ak cpu chýba, je použité all. Ak mode chýba, je použité avg1. Poznámka: nie je to v percentách."
 
-#: include/classes/items/CHelpItems.php:169
-#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:173
+#: include/classes/items/CHelpItems.php:431
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
 msgstr "Využitie CPU. Vyťaženie procesora v percentách. cpu, type a mode sú nepovinné. Ak cpu chýba, je použité all. Ak type chýba, je použité user. Ak mode chýba, je použité avg1."
 
-#: include/classes/items/CHelpItems.php:261
-#: include/classes/items/CHelpItems.php:515
+#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:523
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 msgstr "Vypočíta MD5 kontrolný súčet súboru. Reťazec MD5 hash súboru. Môže byť použitý len na súbory menšie ako 64MB. Príklad: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
@@ -1215,13 +1215,13 @@ msgstr "Vypočíta MD5 kontrolný súčet súboru. Reťazec MD5 hash súboru. M�
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "Výpočet SLA, akceptovateľná SLA (v %)"
 
-#: include/classes/items/CHelpItems.php:249
-#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:511
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
 msgstr "Vypočíta kontrolný súčet súboru. Kontrolný súčet súboru je vypočítaný štandardným algoritmom používaným UNIX programom cksum. Príklad: vfs.file.cksum[/etc/passwd]"
 
-#: include/classes/items/CHelpItems.php:285
-#: include/classes/items/CHelpItems.php:539
+#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:547
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 msgstr "Vypočíta priestor diskového oddielu. Priestor je v KB. Ak mode chýba, je použitý total. V prípade pripojeného oddielu je vypočítané nepoužité miesto súborového systému. Príklad: vfs.fs.size[/tmp,free]."
 
@@ -1435,11 +1435,11 @@ msgstr "Nie je možné pridať spúšťač"
 msgid "Cannot add trigger prototype"
 msgstr "Nie je možné pridať prototyp spúšťača"
 
-#: users.php:218
+#: users.php:248
 msgid "Cannot add user"
 msgstr "Nie je možné pridať používateľa"
 
-#: users.php:164
+#: users.php:188
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "Nie je možné pridať používateľa. Obe heslá musia byť rovnaké."
 
@@ -1784,7 +1784,7 @@ msgstr "Nie je možné zmazať spúšťače"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Nie je možné zmazať spúštače vytvorené nízkoúrovňovným zisťovaním."
 
-#: users.php:247 users.php:355
+#: users.php:277 users.php:385
 msgid "Cannot delete user"
 msgstr "Nie je možné zmazať používateľa"
 
@@ -2277,7 +2277,7 @@ msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 msgid "Cannot switch host for interface."
 msgstr "Nie je môžné prepnúť hosta pre interface."
 
-#: users.php:323
+#: users.php:353
 msgid "Cannot unblock users"
 msgstr "Nie je možné odblokovať používateľov"
 
@@ -2570,7 +2570,7 @@ msgstr "Nie je možné aktualizovať prototyp spúšťača"
 msgid "Cannot update trigger prototypes"
 msgstr "Nie je možné aktualizovať prototypy spúšťačov"
 
-#: profile.php:176 users.php:211 users.php:269 users.php:293
+#: profile.php:176 users.php:241 users.php:299 users.php:323
 msgid "Cannot update user"
 msgstr "Nie je možné aktualizovať používateľa"
 
@@ -2578,7 +2578,7 @@ msgstr "Nie je možné aktualizovať používateľa"
 msgid "Cannot update user media."
 msgstr "Nie je možné aktualizovať médiá používateľa."
 
-#: profile.php:113 users.php:161
+#: profile.php:113 users.php:185
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "Nie je možné aktualizovať používateľa. Heslá musia byť rovnaké."
 
@@ -2603,11 +2603,11 @@ msgstr "Titulok"
 msgid "Case sensitive"
 msgstr "Rozlišovať veľkosť písmen"
 
-#: include/classes/items/CHelpItems.php:781
+#: include/classes/items/CHelpItems.php:789
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr "Zachytávať všetky SNMP oznámenia z IP adries, ktoré vyberie regulárny výraz. Predvolený regulárny výraz je prázdny reťazec."
 
-#: include/classes/items/CHelpItems.php:777
+#: include/classes/items/CHelpItems.php:785
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr "Zachytávať všetky SNMP oznámenia, ktoré nie sú zachytené snmptrap[] z príslušných adries rozhrania."
 
@@ -2629,11 +2629,11 @@ msgstr "Zmena"
 
 #: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:70
-#: include/views/administration.users.edit.php:68
+#: include/views/administration.users.edit.php:97
 msgid "Change password"
 msgstr "Zmeniť heslo"
 
-#: include/forms.inc.php:426 include/items.inc.php:125
+#: include/forms.inc.php:431 include/items.inc.php:125
 #: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2651,8 +2651,8 @@ msgstr "Neobsahuje reťazec"
 msgid "Chassis"
 msgstr "Šasi"
 
-#: include/classes/items/CHelpItems.php:177
-#: include/classes/items/CHelpItems.php:431
+#: include/classes/items/CHelpItems.php:181
+#: include/classes/items/CHelpItems.php:439
 msgid "Chassis info - returns full info by default"
 msgstr "Šasi informácie - vráti všetky informácie"
 
@@ -2665,31 +2665,31 @@ msgstr "Kontrola už existuje."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Skontrolujte časť výrazu začínajúcu od \"%1$s\"."
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:511
+#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:519
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Kontrola či súbor existuje. 0 - súbor neexistuje, 1 - súbor existuje"
 
-#: include/classes/items/CHelpItems.php:583
+#: include/classes/items/CHelpItems.php:591
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak <ip> chýba, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak <port> chýba, potom je použitý predvolený port služby."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:379
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak chýba IP, potom je použité 127.0.0.1. Ak chýba port, potom je použitý predvolený port služby. Príklad: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:375
+#: include/classes/items/CHelpItems.php:379
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojenia ku službe. Ak chýba IP, potom je použité 127.0.0.1. Ak chýba port, potom je použitý predvolený port služby."
 
-#: include/classes/items/CHelpItems.php:579
+#: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojenia ku službe. Ak chýba <ip>, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak chýba <port>, potom je použitý predvolený port služby."
 
 #: include/classes/items/CHelpItems.php:69
-#: include/classes/items/CHelpItems.php:311
+#: include/classes/items/CHelpItems.php:315
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr "Kontrola dostupnosti agenta. Vždy vráti 1. Môže byť použitá ako TCP ping."
 
@@ -2702,7 +2702,7 @@ msgid "Check type"
 msgstr "Typ kontroly"
 
 #: include/classes/items/CHelpItems.php:117
-#: include/classes/items/CHelpItems.php:371
+#: include/classes/items/CHelpItems.php:375
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
 msgstr "Kontrola, či je možné vytvoriť TCP spojenie na zadaný port. 0 - nie je možné spojenie, 1 - je možné spojenie. IP adresa je voliteľná. Ak IP chýba, potom je použitá 127.0.0.1. Príklad: net.tcp.port[,80]"
 
@@ -2712,16 +2712,18 @@ msgid "Checks"
 msgstr "Kontroly"
 
 #: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:343
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Kontrola, či je DNS služba dostupná. 0 - DNS je nedostupný (server neodpovedal alebo DNS preklad zlyhal), 1 - DNS je dostupný."
 
-#: include/classes/items/CHelpItems.php:567
+#: include/classes/items/CHelpItems.php:575
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
 msgstr "Kontrola, či je server dostupný cez ICMP ping. 0 - ICMP ping zlyhal. 1 - ICMP ping úspešný. Jeden zo zabbix_server procesov vykonáva ICMP pingy raz za PingerFrequency sekúnd."
 
 #: include/classes/items/CHelpItems.php:113
-#: include/classes/items/CHelpItems.php:367
+#: include/classes/items/CHelpItems.php:129
+#: include/classes/items/CHelpItems.php:371
+#: include/classes/items/CHelpItems.php:387
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr "Kontrola, či port je v LISTEN stave. 0 - nie je, 1 - je v LISTEN stave."
 
@@ -2922,7 +2924,7 @@ msgstr "Podmienky"
 msgid "Configuration"
 msgstr "Nastavenie"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Nastavenie cache štatistík. Cache - buffer (módy: pfree, total, used, free)."
 
@@ -3167,8 +3169,8 @@ msgstr "Kontakt"
 msgid "Context name"
 msgstr "Meno kontextu"
 
-#: include/classes/items/CHelpItems.php:165
-#: include/classes/items/CHelpItems.php:419
+#: include/classes/items/CHelpItems.php:169
+#: include/classes/items/CHelpItems.php:427
 msgid "Context switches."
 msgstr "Prepnutia kontextu."
 
@@ -3382,8 +3384,8 @@ msgstr "Vytvorené: Web scenár \"%1$s\" na \"%2$s\"."
 msgid "Critical"
 msgstr "Kritický"
 
-#: include/classes/items/CHelpItems.php:209
-#: include/classes/items/CHelpItems.php:463
+#: include/classes/items/CHelpItems.php:213
+#: include/classes/items/CHelpItems.php:471
 msgid "Current OS - returns full info by default"
 msgstr "Aktuálny OS - vráti uplné informácie"
 
@@ -3539,7 +3541,7 @@ msgstr "DNS meno"
 msgid "DOWN"
 msgstr "DOWN"
 
-#: include/forms.inc.php:1642 include/maintenances.inc.php:36
+#: include/forms.inc.php:1647 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3574,7 +3576,7 @@ msgstr "Čiarkovaná čiara"
 msgid "Data"
 msgstr "Údaje"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:891
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Cache štatistiky. Cache - jedna z hodnôt (módy: all, float, uint, str, log, text), história (módy: pfree, total, used, free), trend (módy: pfree, total, used, free), text (módy: pfree, total, used, free)."
 
@@ -3596,7 +3598,7 @@ msgstr "Prehľad dát"
 msgid "Data storage period (in days)"
 msgstr "Perióda uloženia údajov (v dňoch)"
 
-#: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
+#: include/forms.inc.php:463 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
 msgid "Data type"
 msgstr "Dátový typ"
@@ -3641,7 +3643,7 @@ msgstr "Typ databázy"
 msgid "Database user"
 msgstr "Databázový používateľ"
 
-#: include/forms.inc.php:1709 include/forms.inc.php:1770 jsrpc.php:137
+#: include/forms.inc.php:1714 include/forms.inc.php:1775 jsrpc.php:137
 msgid "Date"
 msgstr "Dátum"
 
@@ -3661,12 +3663,12 @@ msgstr "Dátum vypršania kontraktu podpory HW"
 msgid "Date HW purchased"
 msgstr "Dátum kúpy HW"
 
-#: include/forms.inc.php:1711 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1716 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:295 tr_status.php:297
 msgid "Day"
 msgstr "Deň"
 
-#: include/forms.inc.php:1743
+#: include/forms.inc.php:1748
 msgid "Day of month"
 msgstr "Deň v mesiaci"
 
@@ -3686,8 +3688,8 @@ msgstr "Deň v mesiaci je > N"
 msgid "Day of month is NOT N"
 msgstr "Deň v mesiaci NIE JE N"
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1714
-#: include/forms.inc.php:1739
+#: include/forms.inc.php:1676 include/forms.inc.php:1719
+#: include/forms.inc.php:1744
 msgid "Day of week"
 msgstr "Deň v týždni"
 
@@ -3707,7 +3709,7 @@ msgstr "Deň v týždni je > N"
 msgid "Day of week is NOT N"
 msgstr "Deň v týždni NIE JE N"
 
-#: include/forms.inc.php:1787 tr_status.php:295 tr_status.php:297
+#: include/forms.inc.php:1792 tr_status.php:295 tr_status.php:297
 msgid "Days"
 msgstr "dní"
 
@@ -3729,7 +3731,7 @@ msgstr "Ladiaci režim aktualizovaný"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:1705 include/func.inc.php:140
+#: include/forms.inc.php:1710 include/func.inc.php:140
 #: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "December"
@@ -3907,8 +3909,8 @@ msgstr "Zmazať skript?"
 #: include/views/administration.usergroups.edit.php:112
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
-#: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:74
+#: include/views/administration.users.edit.php:215
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -4050,7 +4052,7 @@ msgstr "Zmazať označené prototypy spúšťačov?"
 msgid "Delete selected triggers?"
 msgstr "Zmazať označené spúšťače?"
 
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:383
 msgid "Delete selected user?"
 msgstr "Zmazať označeného používateľa?"
 
@@ -4176,7 +4178,7 @@ msgstr "Rozdiel (jednoduchá zmena)"
 msgid "Delta (speed per second)"
 msgstr "Rozdiel (rýchlosť za sekundu)"
 
-#: include/forms.inc.php:264 include/perm.inc.php:33
+#: include/forms.inc.php:269 include/perm.inc.php:33
 #: include/views/administration.usergroups.edit.php:82
 msgid "Deny"
 msgstr "Zakázať"
@@ -4207,7 +4209,7 @@ msgstr "Stav nasadenia"
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
 #: include/views/configuration.item.edit.php:483
-#: include/views/configuration.item.massupdate.php:550
+#: include/views/configuration.item.massupdate.php:546
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:48
 #: include/views/configuration.triggers.edit.php:245 popup.php:1076
@@ -4233,18 +4235,18 @@ msgstr "Podrobnosti scenára"
 msgid "Device"
 msgstr "Zariadenie"
 
-#: include/classes/items/CHelpItems.php:153
-#: include/classes/items/CHelpItems.php:407
+#: include/classes/items/CHelpItems.php:157
+#: include/classes/items/CHelpItems.php:415
 msgid "Device interrupts."
 msgstr "Prerušenia zariadenia."
 
-#: include/classes/items/CHelpItems.php:185
-#: include/classes/items/CHelpItems.php:439
+#: include/classes/items/CHelpItems.php:189
+#: include/classes/items/CHelpItems.php:447
 msgid "Device list - lists PCI devices by default"
 msgstr "Zoznam zariadení - zoznam PCI zariadení"
 
-#: include/classes/items/CHelpItems.php:241
-#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:245
+#: include/classes/items/CHelpItems.php:503
 msgid "Device read statistics."
 msgstr "Štatistiky čítania zariadenia."
 
@@ -4252,8 +4254,8 @@ msgstr "Štatistiky čítania zariadenia."
 msgid "Device uniqueness criteria"
 msgstr "Unikátny identifikátor zariadenia"
 
-#: include/classes/items/CHelpItems.php:245
-#: include/classes/items/CHelpItems.php:499
+#: include/classes/items/CHelpItems.php:249
+#: include/classes/items/CHelpItems.php:507
 msgid "Device write statistics."
 msgstr "Štatistiky zápisov zariadenia."
 
@@ -4297,8 +4299,8 @@ msgstr "Rozdiel medzi poslednou a jej predchádzajúcou hodnotou je > N"
 msgid "Difference between last and previous value is NOT N"
 msgstr "Rozdiel medzi poslednou a jej predchádzajúcou hodnotou je NOT N"
 
-#: include/classes/items/CHelpItems.php:141
-#: include/classes/items/CHelpItems.php:395
+#: include/classes/items/CHelpItems.php:145
+#: include/classes/items/CHelpItems.php:403
 msgid "Different information about specific process(es)"
 msgstr "Rôzne informácie o konkrétnom procese(och)"
 
@@ -4407,7 +4409,7 @@ msgstr "Zakázať označené spúšťače?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:170
+#: include/views/administration.users.edit.php:181
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4475,7 +4477,7 @@ msgid "Discovery object"
 msgstr "Objekt zisťovania"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1190 include/forms.inc.php:1131
+#: include/blocks.inc.php:1190 include/forms.inc.php:1136
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4713,7 +4715,7 @@ msgstr "UDALOSTI"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Každá URL by mala mať jedinečné meno. Prosim uistite sa, že existuje len jedna URL s takýmto menom"
 
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:207
 #: include/views/configuration.action.edit.php:385
 #: include/views/configuration.action.edit.php:398
 #: include/views/configuration.maintenance.edit.php:112
@@ -4969,7 +4971,7 @@ msgstr "Povoliť označené spúšťače?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:166
+#: include/views/administration.users.edit.php:177
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:61
@@ -5074,11 +5076,11 @@ msgstr "Udalosti"
 msgid "Events and alerts"
 msgstr "Udalosti a poplachy"
 
-#: include/forms.inc.php:1654
+#: include/forms.inc.php:1659
 msgid "Every day(s)"
 msgstr "Každý deň(dni)"
 
-#: include/forms.inc.php:1661
+#: include/forms.inc.php:1666
 msgid "Every week(s)"
 msgstr "Každý týždeň(e)"
 
@@ -5160,8 +5162,8 @@ msgstr "Export do CSV súboru"
 msgid "Expression"
 msgstr "Výraz"
 
-#: include/forms.inc.php:1480 include/forms.inc.php:1485
-#: include/forms.inc.php:1498
+#: include/forms.inc.php:1485 include/forms.inc.php:1490
+#: include/forms.inc.php:1503
 msgid "Expression Syntax Error."
 msgstr "Syntaktická chyba vo výraze."
 
@@ -5250,7 +5252,7 @@ msgstr "Obľúbené"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:1683 include/func.inc.php:130
+#: include/forms.inc.php:1688 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "Február"
@@ -5325,8 +5327,8 @@ msgstr "Súbor je príliš veľký, maximálna veľkosť je %1$s bytov."
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "Súbor poskytnutý pre pohľad neexistuje. Nenašiel som \"%s\"."
 
-#: include/classes/items/CHelpItems.php:277
-#: include/classes/items/CHelpItems.php:531
+#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:539
 msgid "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
 msgstr "Informácia o čase súboru. Počet sekúnd. Mode je voliteľný. Ak mode chýba, je použitý modify."
 
@@ -5335,7 +5337,7 @@ msgid "Filled region"
 msgstr "Oblasť výplne"
 
 #: events.php:362 hosts.php:779 include/classes/class.cwidget.php:130
-#: include/forms.inc.php:627
+#: include/forms.inc.php:632
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.item.edit.php:340
@@ -5362,13 +5364,13 @@ msgstr "Nájdi reťazec V v poslednej hodnote. N = 1 - ak sa nájde, 0 - inak"
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "Nájdi reťazec V v poslednej hodnote. N NOT 1 - ak sa nájde, 0 - inak"
 
-#: include/classes/items/CHelpItems.php:269
-#: include/classes/items/CHelpItems.php:523
+#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:531
 msgid "Find string in a file. 0 - expression not found, 1 - found"
 msgstr "Nájdi reťazec v súbore. 0 - výraz nenájdený, 1 - nájdený"
 
-#: include/classes/items/CHelpItems.php:265
-#: include/classes/items/CHelpItems.php:519
+#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:527
 msgid "Find string in a file. Matched string"
 msgstr "Nájdi reťazec v súbore. Vybraný reťazec"
 
@@ -5380,7 +5382,7 @@ msgstr "Ukončiť"
 msgid "Finnish (fi_FI)"
 msgstr "Fínsky (fi_FI)"
 
-#: include/forms.inc.php:1721 include/maintenances.inc.php:118
+#: include/forms.inc.php:1726 include/maintenances.inc.php:118
 msgid "First"
 msgstr "Prvý"
 
@@ -5403,7 +5405,7 @@ msgstr "Pevná"
 msgid "Flexible intervals"
 msgstr "Flexibilné intervaly"
 
-#: profile.php:116 users.php:168
+#: profile.php:116 users.php:194
 msgid "For guest, password must be empty"
 msgstr "Heslo účtu guest musí byť prázdne"
 
@@ -5411,7 +5413,7 @@ msgstr "Heslo účtu guest musí byť prázdne"
 msgid "Formula"
 msgstr "Vzorec"
 
-#: include/forms.inc.php:1724 include/maintenances.inc.php:121
+#: include/forms.inc.php:1729 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "Štvrtý"
 
@@ -5423,7 +5425,7 @@ msgstr "Francúzsky (fr_FR)"
 msgid "Fri"
 msgstr "Pi"
 
-#: include/forms.inc.php:1668 include/forms.inc.php:1736
+#: include/forms.inc.php:1673 include/forms.inc.php:1741
 #: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Piatok"
@@ -5449,7 +5451,7 @@ msgstr "Frontend prístup"
 msgid "Frontend access updated"
 msgstr "Frontend prístup aktualizovaný"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:226
 msgid "Frontend messaging"
 msgstr "Frontend správy"
 
@@ -5513,18 +5515,18 @@ msgstr "Vygenerované za %s sekúnd"
 msgid "German (de_DE)"
 msgstr "Nemecky (de_DE)"
 
-#: include/classes/items/CHelpItems.php:293
-#: include/classes/items/CHelpItems.php:547
+#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:555
 msgid "Get content of WEB page. Default path is /"
 msgstr "Získať obsah web stránky. Predvolená cesta je /"
 
-#: include/classes/items/CHelpItems.php:253
-#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:257
+#: include/classes/items/CHelpItems.php:515
 msgid "Get contents of a given file."
 msgstr "Získať obsah daného súboru."
 
-#: include/classes/items/CHelpItems.php:301
-#: include/classes/items/CHelpItems.php:555
+#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:563
 msgid "Get first occurence of regexp in WEB page. Default path is /"
 msgstr "Získať prvý výber regulárnym výrazom na web stránke. Predvolená cesta je /"
 
@@ -5532,8 +5534,8 @@ msgstr "Získať prvý výber regulárnym výrazom na web stránke. Predvolená 
 msgid "Get support"
 msgstr "Získať podporu"
 
-#: include/classes/items/CHelpItems.php:297
-#: include/classes/items/CHelpItems.php:551
+#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:559
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr "Získať čas načítania úplnej web stránky. Predvolená cesta je /"
 
@@ -5867,7 +5869,7 @@ msgstr "Skupina aktualizovaná"
 msgid "Grouping by"
 msgstr "Zoskupovať podľa"
 
-#: include/reports.inc.php:342 include/views/administration.users.edit.php:87
+#: include/reports.inc.php:342 include/views/administration.users.edit.php:67
 #: include/views/administration.users.list.php:59
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.host.edit.php:213
@@ -5928,7 +5930,7 @@ msgstr "PROBLÉMY HOSTA"
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:222
+#: include/perm.inc.php:50
 msgid "HTTP authentication"
 msgstr "HTTP autentifikácia"
 
@@ -6009,7 +6011,7 @@ msgstr "Skryť označené skupiny"
 msgid "High"
 msgstr "Kritická"
 
-#: history.php:27 include/forms.inc.php:591 include/forms.inc.php:937
+#: history.php:27 include/forms.inc.php:596 include/forms.inc.php:942
 #: include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:139
 #: include/views/configuration.item.list.php:68
@@ -6073,7 +6075,7 @@ msgstr "Vodorovné zarovnanie"
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
-#: include/forms.inc.php:555 include/html.inc.php:383 include/maps.inc.php:24
+#: include/forms.inc.php:560 include/html.inc.php:383 include/maps.inc.php:24
 #: include/setup.inc.php:365 include/triggers.inc.php:1287
 #: include/triggers.inc.php:1639
 #: include/views/configuration.application.list.php:45
@@ -6167,8 +6169,9 @@ msgstr[2] "Hosty povolené"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
-#: include/blocks.inc.php:1093 include/forms.inc.php:517
-#: include/maps.inc.php:25 include/views/administration.script.list.php:44
+#: include/blocks.inc.php:1093 include/forms.inc.php:522
+#: include/maps.inc.php:25 include/views/administration.script.edit.php:84
+#: include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
 #: include/views/js/configuration.action.edit.js.php:197
@@ -6215,8 +6218,7 @@ msgstr "Typ popisku skupiny"
 msgid "Host group name cannot be empty."
 msgstr "Meno skupiny hostov nemôže byť prázdne."
 
-#: include/forms.inc.php:197 include/menu.inc.php:160
-#: include/views/administration.script.edit.php:84
+#: include/forms.inc.php:202 include/menu.inc.php:160
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/configuration.item.copy.php:43
@@ -6402,8 +6404,8 @@ msgstr "Host s rovnakým zobrazovaným menom \"%1$s\" už existuje."
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host s rovnakým zobrazovaným menom\"%s\" už existuje."
 
-#: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:220
-#: include/forms.inc.php:897 include/items.inc.php:728
+#: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:225
+#: include/forms.inc.php:902 include/items.inc.php:728
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -6457,7 +6459,7 @@ msgstr "Hosty aktualizované"
 msgid "Hourly"
 msgstr "Hodinovo"
 
-#: include/forms.inc.php:1789
+#: include/forms.inc.php:1794
 msgid "Hours"
 msgstr "hodín"
 
@@ -7229,7 +7231,7 @@ msgstr "Neplatná hodnota typu položky \"%1$s\" poskytnutá pre spúšťaciu fu
 msgid "Incorrect key."
 msgstr "Neplatný kľúč."
 
-#: include/forms.inc.php:1302 items.php:888
+#: include/forms.inc.php:1307 items.php:913
 msgid "Incorrect list of items."
 msgstr "Neplatný zoznam položiek."
 
@@ -7478,11 +7480,11 @@ msgstr "Neplatná funkcia spúšťača \"%1$s\" pre výraz."
 msgid "Incorrect type of asort_by_key."
 msgstr "Neplatný typ asort_by_key."
 
-#: include/perm.inc.php:157
+#: include/perm.inc.php:198
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
 msgstr "Neplatné používateľské údaje v \"get_accessible_groups_by_user\"."
 
-#: include/perm.inc.php:245
+#: include/perm.inc.php:286
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "Neplatné používateľské údaje v \"get_accessible_nodes_by_user\"."
 
@@ -7568,7 +7570,7 @@ msgstr "Informatívna"
 msgid "Insert"
 msgstr "Vložiť"
 
-#: include/forms.inc.php:1492 jsLoader.php:109
+#: include/forms.inc.php:1497 jsLoader.php:109
 msgid "Insert macro"
 msgstr "Vložiť makro"
 
@@ -7649,7 +7651,7 @@ msgstr "Perióda uloženia údajov interných udalostí a poplachov (v dňoch) \
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: include/forms.inc.php:947
+#: include/forms.inc.php:952
 #: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.list.php:67
@@ -7809,7 +7811,7 @@ msgid "Italian (it_IT)"
 msgstr "Taliansky (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:165
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1134
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1139
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
 #: include/views/configuration.triggers.expression.php:57 items.php:498
@@ -7896,7 +7898,7 @@ msgstr "Položka je v \"not supported\" stave"
 msgid "Item not selected"
 msgstr "Položka nevybraná"
 
-#: include/forms.inc.php:1134
+#: include/forms.inc.php:1139
 msgid "Item prototype"
 msgstr "Prototyp položky"
 
@@ -8086,7 +8088,7 @@ msgstr "Jabber účet"
 msgid "Jan"
 msgstr "Jan"
 
-#: include/forms.inc.php:1678 include/func.inc.php:129
+#: include/forms.inc.php:1683 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "Január"
@@ -8099,7 +8101,7 @@ msgstr "Japonsky (ja_JP)"
 msgid "Jul"
 msgstr "Júl"
 
-#: include/forms.inc.php:1680 include/func.inc.php:135
+#: include/forms.inc.php:1685 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "Júl"
@@ -8108,7 +8110,7 @@ msgstr "Júl"
 msgid "Jun"
 msgstr "Jún"
 
-#: include/forms.inc.php:1703 include/func.inc.php:134
+#: include/forms.inc.php:1708 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "Jún"
@@ -8122,7 +8124,7 @@ msgstr "K"
 msgid "Keep lost resources period (in days)"
 msgstr "Ponechať stratené zdroje (v dňoch)"
 
-#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:617
+#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:622
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.item.edit.php:78
 #: include/views/configuration.item.list.php:66
@@ -8164,7 +8166,7 @@ msgstr "POSLEDNÉ ÚDAJE"
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:219
+#: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP autentifikácia"
 
@@ -8206,11 +8208,11 @@ msgstr "Popisok"
 msgid "Label location"
 msgstr "Umiestnenie popisku"
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:145
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/forms.inc.php:1725 include/maintenances.inc.php:122
+#: include/forms.inc.php:1730 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "Posledný"
 
@@ -8428,7 +8430,7 @@ msgid "List is empty"
 msgstr "Zoznam je prázdny"
 
 #: include/classes/items/CHelpItems.php:101
-#: include/classes/items/CHelpItems.php:355
+#: include/classes/items/CHelpItems.php:359
 msgid "List of network interfaces. Text value."
 msgstr "Zoznam sieťových rozhraní. Textová hodnota."
 
@@ -8462,7 +8464,7 @@ msgstr "Zemepisná šírka umiestnenia"
 msgid "Location longitude"
 msgstr "Zemepisná dĺžka umiestnenia"
 
-#: include/forms.inc.php:427 include/items.inc.php:127
+#: include/forms.inc.php:432 include/items.inc.php:127
 #: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8573,8 +8575,8 @@ msgstr "Po"
 msgid "M Y"
 msgstr "M Y"
 
-#: include/classes/items/CHelpItems.php:189
-#: include/classes/items/CHelpItems.php:443
+#: include/classes/items/CHelpItems.php:193
+#: include/classes/items/CHelpItems.php:451
 msgid "MAC address - lists all MAC addresses with interface names by default"
 msgstr "MAC adresy - zoznam všetkých MAC adries s menom rozhrania"
 
@@ -8691,7 +8693,7 @@ msgstr "Údržba zmazaná"
 msgid "Maintenance period"
 msgstr "Perióda údržby"
 
-#: include/forms.inc.php:1784
+#: include/forms.inc.php:1789
 msgid "Maintenance period length"
 msgstr "Dĺžka periódy údržby"
 
@@ -8804,7 +8806,7 @@ msgstr "Mapy"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1688 include/func.inc.php:131
+#: include/forms.inc.php:1693 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "Marec"
@@ -8826,7 +8828,7 @@ msgid "Mask"
 msgstr "Maska"
 
 #: hosts.php:1011 include/views/configuration.item.list.php:281
-#: include/views/configuration.item.massupdate.php:558
+#: include/views/configuration.item.massupdate.php:554
 #: include/views/configuration.triggers.list.php:278
 msgid "Mass update"
 msgstr "Hromadná aktualizácia"
@@ -8899,12 +8901,12 @@ msgid "Maximum number of flexible intervals added"
 msgstr "Maximálne číslo flexibilných intervalov bolo pridané"
 
 #: include/classes/items/CHelpItems.php:77
-#: include/classes/items/CHelpItems.php:323
+#: include/classes/items/CHelpItems.php:327
 msgid "Maximum number of opened files supported by OS."
 msgstr "Maximálny počet otvorených súborov podporovaných OS."
 
 #: include/classes/items/CHelpItems.php:81
-#: include/classes/items/CHelpItems.php:327
+#: include/classes/items/CHelpItems.php:331
 msgid "Maximum number of processes supported by OS."
 msgstr "Maximálny počet procesov podporovaných OS."
 
@@ -8940,7 +8942,7 @@ msgstr[0] "Maximálna zobrazovaná dĺžka mena hostu je %1$d znakov, \"%2$s\" m
 msgstr[1] "Maximálna zobrazovaná dĺžka mena hostu je %1$d znakov, \"%2$s\" má %3$d znaky."
 msgstr[2] "Maximálna zobrazovaná dĺžka mena hostu je %1$d znakov, \"%2$s\" má %3$d znakov."
 
-#: include/forms.inc.php:1698 include/func.inc.php:133
+#: include/forms.inc.php:1703 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "Máj"
@@ -8950,8 +8952,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "Máj"
 
-#: include/views/administration.users.edit.php:200
-#: include/views/administration.users.edit.php:328 popup_media.php:27
+#: include/views/administration.users.edit.php:211
+#: include/views/administration.users.edit.php:339 popup_media.php:27
 msgid "Media"
 msgstr "Médiá"
 
@@ -9015,8 +9017,8 @@ msgstr "Členstvo/členovia"
 msgid "Memory limit: %s"
 msgstr "Pamäťový limit: %s"
 
-#: include/classes/items/CHelpItems.php:133
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:137
+#: include/classes/items/CHelpItems.php:395
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
 msgstr "Pamäť používaná procesom. <name> meno procesu (predvolene: \"all processes\"). <user> meno používateľa (predvolene: \"all users\"). <mode> možné hodnoty: avg, max, min, sum (predvolene). <cmdline> filterovanie príkazového riadku (podporuje regulárne výrazy). Príklad: proc.mem[,root]."
 
@@ -9043,11 +9045,11 @@ msgstr "Akcie správ"
 msgid "Message text limit"
 msgstr "Limit na text správy"
 
-#: include/views/administration.users.edit.php:221
+#: include/views/administration.users.edit.php:232
 msgid "Message timeout"
 msgstr "Časový limit správy"
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:227
 msgid "Message timeout (seconds)"
 msgstr "Časový limit správy (sekundy)"
 
@@ -9055,7 +9057,7 @@ msgstr "Časový limit správy (sekundy)"
 msgid "Messages"
 msgstr "Správy"
 
-#: include/views/administration.users.edit.php:357
+#: include/views/administration.users.edit.php:368
 msgid "Messaging"
 msgstr "Správy"
 
@@ -9135,7 +9137,7 @@ msgstr "Minimálna hodnota pre periódu T je > N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Minimálna hodnota pre periódu T je NOT N"
 
-#: include/forms.inc.php:1791
+#: include/forms.inc.php:1796
 msgid "Minutes"
 msgstr "minút"
 
@@ -9207,7 +9209,7 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Po"
 
-#: include/forms.inc.php:1664 include/forms.inc.php:1732
+#: include/forms.inc.php:1669 include/forms.inc.php:1737
 #: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Pondelok"
@@ -9233,23 +9235,23 @@ msgstr "Monitorovaný host"
 msgid "Monitoring"
 msgstr "Monitorovanie"
 
-#: include/classes/items/CHelpItems.php:319
+#: include/classes/items/CHelpItems.php:323
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
 msgstr "Monitorovanie Windows udalostí. pattern, severity, eventid - regulárne výrazy"
 
-#: include/classes/items/CHelpItems.php:335
+#: include/classes/items/CHelpItems.php:339
 msgid "Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression"
 msgstr "Monitorovanie logovacieho súboru s rotovaním. fileformat - [path][regexp], pattern - regulárny výraz"
 
-#: include/classes/items/CHelpItems.php:331
+#: include/classes/items/CHelpItems.php:335
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr "Monitorovanie logovacieho súboru s rotovaním. pattern - regulárny výraz"
 
-#: include/forms.inc.php:1707 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1712 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "Mesiac"
 
-#: include/forms.inc.php:1644 include/maintenances.inc.php:40
+#: include/forms.inc.php:1649 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:405
 #: include/reports.inc.php:413 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9312,7 +9314,7 @@ msgstr "NTLM autentifikácia"
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
-#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:602
+#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
 #: include/hosts.inc.php:115 include/reports.inc.php:174
 #: include/setup.inc.php:384
 #: include/views/administration.general.iconmap.edit.php:29
@@ -9404,12 +9406,12 @@ msgid "Network discovery event and alert data storage period (in days) \"%1$s\".
 msgstr "Perióda uloženia údajov udalostí a poplachov zisťovania sietí (v dňoch) \"%1$s\"."
 
 #: include/classes/items/CHelpItems.php:97
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:355
 msgid "Network interface input statistic. Integer value. If mode is missing bytes is used."
 msgstr "Štatistika vstupov sieťového rozhrania. Celočíselná hodnota. Ak mode chýba, je použitý bytes."
 
 #: include/classes/items/CHelpItems.php:105
-#: include/classes/items/CHelpItems.php:359
+#: include/classes/items/CHelpItems.php:363
 msgid "Network interface output statistic. Integer value. If mode is missing bytes is used."
 msgstr "Štatistika výstupov sieťového rozhrania. Celočíselná hodnota. Ak mode chýba, je použitý bytes."
 
@@ -9581,7 +9583,7 @@ msgstr "Neposkytnutá URL pre obrazovkový element."
 msgid "No URLs defined."
 msgstr "Nedefinovaná URL."
 
-#: include/forms.inc.php:262
+#: include/forms.inc.php:267
 msgid "No accessible resources"
 msgstr "Nie sú dostupné žiadne zdroje"
 
@@ -9908,7 +9910,7 @@ msgstr "Nenájdené žiadne mapy."
 msgid "No matches found"
 msgstr "Žiadne výbery nenájdené"
 
-#: include/views/administration.users.edit.php:162
+#: include/views/administration.users.edit.php:173
 msgid "No media found."
 msgstr "Nenájdené žiadne médiá."
 
@@ -10223,7 +10225,7 @@ msgstr "Uzol s totožným ID už existuje."
 
 #: include/actions.inc.php:827 include/actions.inc.php:906
 #: include/actions.inc.php:964 include/classes/screens/CScreenActions.php:123
-#: include/forms.inc.php:174
+#: include/forms.inc.php:179
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
 #: include/views/administration.node.list.php:32
@@ -10254,7 +10256,7 @@ msgstr "Normálne zobrazenie"
 msgid "Not Ack"
 msgstr "Nepotvrdené"
 
-#: include/forms.inc.php:612 include/forms.inc.php:795
+#: include/forms.inc.php:617 include/forms.inc.php:800
 msgid "Not Templated items"
 msgstr "Položky bez šablóny"
 
@@ -10325,7 +10327,7 @@ msgstr "Hlásenia"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/forms.inc.php:1700 include/func.inc.php:139
+#: include/forms.inc.php:1705 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "November"
@@ -10334,8 +10336,8 @@ msgstr "November"
 msgid "Now"
 msgstr "Teraz"
 
-#: include/classes/items/CHelpItems.php:161
-#: include/classes/items/CHelpItems.php:415
+#: include/classes/items/CHelpItems.php:165
+#: include/classes/items/CHelpItems.php:423
 msgid "Number of available proccessors."
 msgstr "Počet dostupných procesorov."
 
@@ -10343,8 +10345,8 @@ msgstr "Počet dostupných procesorov."
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Počet hostov (monitorovaných/nemonitorovaných/šablón)"
 
-#: include/classes/items/CHelpItems.php:281
-#: include/classes/items/CHelpItems.php:535
+#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:543
 msgid "Number of inodes for a given volume. If mode is missing total is used."
 msgstr "Počet inodov daného oddielu. Ak mode chýba, potom je použitý total."
 
@@ -10352,36 +10354,36 @@ msgstr "Počet inodov daného oddielu. Ak mode chýba, potom je použitý total.
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Počet položiek (monitorovaných/vypnutých/nepodporovaných)"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:827
 msgid "Number of items in Zabbix database."
 msgstr "Počet položiek v Zabbix databáze."
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Počet položiek v histórii proxy, ktoré ešte neboli odoslané serveru"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Počet položiek vo fronte, ktoré meškajú od do sekúnd vrátane."
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of monitored hosts"
 msgstr "Počet monitorovaných hostov"
 
-#: include/classes/items/CHelpItems.php:137
-#: include/classes/items/CHelpItems.php:391
+#: include/classes/items/CHelpItems.php:141
+#: include/classes/items/CHelpItems.php:399
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "Počet procesov. <name> a <user> také isté ako v proc.mem položke. <state> all (predvolene), run, sleep, zomb. <cmdline> filter príkazového riadku (podporuje regulárny výraz). Príklad: proc.num[apache2,www-data]. Na Windows len <name> a <user> sú podporované."
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:639
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových jadier na VMware, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových threadov na VMware, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:699
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Počet procesorov na virtuálnom stroji VMware, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
@@ -10429,11 +10431,11 @@ msgstr "Počet úspešne načítaných hodnôt V (ktoré spĺňajú operátor O)
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr "Počet spúšťačov (povolených/zakázaných) [problem/ok]"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:871
 msgid "Number of triggers in Zabbix database."
 msgstr "Počet spúšťačov v Zabbix databáze."
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Počet nepodporovaných položiek v Zabbix databáze."
 
@@ -10441,44 +10443,44 @@ msgstr "Počet nepodporovaných položiek v Zabbix databáze."
 msgid "Number of users (online)"
 msgstr "Počet používateľov (online)"
 
-#: include/classes/items/CHelpItems.php:237
-#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:241
+#: include/classes/items/CHelpItems.php:499
 msgid "Number of users connected. Command who is used on agent side."
 msgstr "Počet pripojených používateľov. Príkaz who je použitý na strane agenta."
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:799
 msgid "Number of values stored in table HISTORY."
 msgstr "Počet hodnôt uložených v tabuľke HISTORY."
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:803
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Počet hodnôt uložených v tabuľke HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Počet hodnôt uložených v tabuľke HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:811
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Počet hodnôt uložených v tabuľke HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Počet hodnôt uložených v tabuľke HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of values stored in table TRENDS."
 msgstr "Počet hodnôt uložených v tabuľke TRENDS."
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:867
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Počet hodnôt uložených v tabuľke TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:691
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet virtuálnych serverov na VMware hypervízorovi, <url> - URL VMware služby , <uuid> - VMware hypervízor host meno"
 
-#: include/forms.inc.php:425 include/items.inc.php:123
+#: include/forms.inc.php:430 include/items.inc.php:123
 #: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -10490,7 +10492,7 @@ msgstr "Číslo (float)"
 msgid "Numeric (integer 64bit)"
 msgstr "Číslo (integer 64bit)"
 
-#: include/forms.inc.php:424 include/items.inc.php:121
+#: include/forms.inc.php:429 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -10561,7 +10563,7 @@ msgstr "Okt"
 msgid "Octal"
 msgstr "Osmičkový"
 
-#: include/forms.inc.php:1695 include/func.inc.php:138
+#: include/forms.inc.php:1700 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "Október"
@@ -10587,7 +10589,7 @@ msgstr "Zapnuté"
 msgid "On status change triggers blink for"
 msgstr "Pri zmena stavu spúšťača blikať po dobu"
 
-#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:230
 msgid "Once"
 msgstr "Raz"
 
@@ -10595,7 +10597,7 @@ msgstr "Raz"
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z objekov je bez skupiny hostov."
 
-#: include/forms.inc.php:1641 include/maintenances.inc.php:34
+#: include/forms.inc.php:1646 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "Jednorázovo"
 
@@ -10771,9 +10773,9 @@ msgstr "Operátor"
 #: include/views/configuration.item.massupdate.php:431
 #: include/views/configuration.item.massupdate.php:449
 #: include/views/configuration.item.massupdate.php:459
-#: include/views/configuration.item.massupdate.php:492
-#: include/views/configuration.item.massupdate.php:539
-#: include/views/configuration.item.massupdate.php:552
+#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.massupdate.php:535
+#: include/views/configuration.item.massupdate.php:548
 #: include/views/configuration.triggers.massupdate.php:76
 #: include/views/configuration.triggers.massupdate.php:138
 msgid "Original"
@@ -10827,7 +10829,7 @@ msgid "Others"
 msgstr "Ďalšie"
 
 #: include/classes/items/CHelpItems.php:93
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:351
 msgid "Out-of-window collision. Collisions count."
 msgstr "Out-of-window kolízie. Počet kolízií."
 
@@ -11089,8 +11091,9 @@ msgstr "Pasívny"
 #: httpconf.php:55 include/setup.inc.php:326
 #: include/views/administration.mediatypes.edit.php:82
 #: include/views/administration.mediatypes.edit.php:86
-#: include/views/administration.users.edit.php:60
-#: include/views/administration.users.edit.php:73
+#: include/views/administration.users.edit.php:84
+#: include/views/administration.users.edit.php:102
+#: include/views/administration.users.edit.php:106
 #: include/views/configuration.action.edit.php:721
 #: include/views/configuration.action.edit.php:754
 #: include/views/configuration.host.edit.php:736
@@ -11105,15 +11108,20 @@ msgstr "Pasívny"
 msgid "Password"
 msgstr "Heslo"
 
-#: include/views/administration.users.edit.php:61
+#: include/views/administration.users.edit.php:88
 msgid "Password (once again)"
 msgstr "Heslo (ešte raz)"
+
+#: users.php:163
+#, c-format
+msgid "Password is unavailable for users with %1$s."
+msgstr ""
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
 msgstr "Heslo je požadované pre daný typ média."
 
-#: profile.php:119 users.php:171
+#: profile.php:119 users.php:199
 msgid "Password should not be empty"
 msgstr "Heslo nemôže byť prázdne"
 
@@ -11131,7 +11139,7 @@ msgid "Percentile line (right)"
 msgstr "Percentilová čiara (vpravo)"
 
 #: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:339
+#: include/classes/items/CHelpItems.php:343
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Vykoná DNS dotaz. V prípade úspechu vráti a reťazec s požadovaným typom informácie."
 
@@ -11146,7 +11154,7 @@ msgstr "Vykoná DNS dotaz. V prípade úspechu vráti a reťazec s požadovaným
 msgid "Period"
 msgstr "Perióda"
 
-#: include/forms.inc.php:1646
+#: include/forms.inc.php:1651
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Typ periódy"
@@ -11157,11 +11165,11 @@ msgid "Periods"
 msgstr "Periódy"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:354
+#: include/views/administration.users.edit.php:365
 msgid "Permissions"
 msgstr "Oprávnenia"
 
-#: include/views/administration.users.edit.php:352
+#: include/views/administration.users.edit.php:363
 msgid "Permissions can be assigned for user groups only."
 msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k používateľovi."
 
@@ -11185,12 +11193,12 @@ msgstr "Algoritmus umiestňovania"
 msgid "Plain text"
 msgstr "Jednoduchý text"
 
-#: include/views/administration.users.edit.php:234
-#: include/views/administration.users.edit.php:271
+#: include/views/administration.users.edit.php:245
+#: include/views/administration.users.edit.php:282
 msgid "Play"
 msgstr "Prehrať"
 
-#: include/views/administration.users.edit.php:222
+#: include/views/administration.users.edit.php:233
 msgid "Play sound"
 msgstr "Prehrať zvuk"
 
@@ -11219,7 +11227,7 @@ msgid "Populates host inventory field"
 msgstr "Vypĺňa polia hostovho inventára"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:776 include/forms.inc.php:493 include/setup.inc.php:379
+#: hosts.php:776 include/forms.inc.php:498 include/setup.inc.php:379
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -11479,12 +11487,12 @@ msgstr "RMCP+"
 msgid "Read"
 msgstr "Čítanie"
 
-#: include/forms.inc.php:264 include/perm.inc.php:32
+#: include/forms.inc.php:269 include/perm.inc.php:32
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read only"
 msgstr "Len čítanie"
 
-#: include/forms.inc.php:264 include/perm.inc.php:31
+#: include/forms.inc.php:269 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read-write"
 msgstr "Čítanie a zápis"
@@ -11516,7 +11524,7 @@ msgstr "Prijímateľ (zostupne)"
 msgid "Recipient(s)"
 msgstr "Prijímateľ(ia)"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:242
 msgid "Recovery"
 msgstr "Zotavenie"
 
@@ -11529,7 +11537,7 @@ msgstr "Text správy po zotavení"
 msgid "Recovery subject"
 msgstr "Predmet správy po zotavení"
 
-#: include/views/administration.users.edit.php:151 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:162 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
 msgstr "Obnoviť (v sekundách)"
 
@@ -11697,7 +11705,7 @@ msgstr "Zmazať označené"
 msgid "Replace"
 msgstr "Nahradiť"
 
-#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.massupdate.php:489
 msgid "Replace applications"
 msgstr "Nahradiť aplikácie"
 
@@ -11753,7 +11761,7 @@ msgstr "Požadované oprávnenia na hosta"
 msgid "Required performance (vps)"
 msgstr "Požadovaný výkon (hodnoty za sekundu)"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Požadovaný výkon Zabbix servera, očakávaná hodnota v nových údajoch za sekundu."
 
@@ -11769,7 +11777,7 @@ msgstr "Požadovaný stavový kód"
 msgid "Required string"
 msgstr "Požadovaný reťazec"
 
-#: events.php:363 hosts.php:784 include/forms.inc.php:632
+#: events.php:363 hosts.php:784 include/forms.inc.php:637
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -11869,29 +11877,29 @@ msgstr "Ostáva pokusov (zostupne)"
 msgid "Retry"
 msgstr "Opakovať"
 
-#: include/classes/items/CHelpItems.php:575
+#: include/classes/items/CHelpItems.php:583
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Vráti ICMP ping čas v sekundách. Príklad: 0.02"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:819
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Vráti dostupnosť konkrétneho typu kontroly na hostovi. Hodnoty položky zodpovedajú ikonám dostupnosti v zozname hostov. Platné typy sú: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:229
-#: include/classes/items/CHelpItems.php:483
+#: include/classes/items/CHelpItems.php:233
+#: include/classes/items/CHelpItems.php:491
 msgid "Returns detailed host information. String value"
 msgstr "Vráti detailné informácie o hostovi. Reťazec"
 
-#: include/classes/items/CHelpItems.php:173
-#: include/classes/items/CHelpItems.php:427
+#: include/classes/items/CHelpItems.php:177
+#: include/classes/items/CHelpItems.php:435
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr "Vráti hostname (alebo NetBIOS meno (predvolene) na Windows). Reťazec. Príklad vrátenej hodnoty: www.zabbix.com"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:835
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Vráti informácie príslušné k Zabbix Java gateway. Platné parametre sú: ping, version."
 
-#: include/classes/items/CHelpItems.php:571
+#: include/classes/items/CHelpItems.php:579
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí percento stratených ICMP ping paketov."
 
@@ -11917,7 +11925,7 @@ msgstr "Rozsah riadkov"
 msgid "Rows"
 msgstr "Riadky"
 
-#: include/views/administration.users.edit.php:152 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:163 profile.php:53 users.php:64
 msgid "Rows per page"
 msgstr "Počet riadkov na stránku"
 
@@ -11965,8 +11973,8 @@ msgstr "Spusti vzdialené príkazy na skupine"
 msgid "Run remote commands on hosts"
 msgstr "Spusti vzdialené príkazy na hostoch"
 
-#: include/classes/items/CHelpItems.php:197
-#: include/classes/items/CHelpItems.php:451
+#: include/classes/items/CHelpItems.php:201
+#: include/classes/items/CHelpItems.php:459
 msgid "Run specified command on the host."
 msgstr "Spustí zadaný príkaz na hostovi."
 
@@ -12047,13 +12055,13 @@ msgstr "SNMP"
 msgid "SNMP Key"
 msgstr "SNMP kľúč"
 
-#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:486
+#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:491
 #: include/views/configuration.item.edit.php:119
 #: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:472
+#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:477
 #: include/views/configuration.item.edit.php:127
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/js/configuration.discovery.edit.js.php:39 items.php:85
@@ -12144,7 +12152,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "So"
 
-#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/forms.inc.php:1674 include/forms.inc.php:1742
 #: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Sobota"
@@ -12171,9 +12179,9 @@ msgstr "Sobota"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:365
-#: include/views/administration.users.edit.php:369
-#: include/views/administration.users.edit.php:379
+#: include/views/administration.users.edit.php:376
+#: include/views/administration.users.edit.php:380
+#: include/views/administration.users.edit.php:390
 #: include/views/configuration.action.edit.php:1053
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -12403,7 +12411,7 @@ msgstr "Vyhľadávací vzor je prázdny"
 msgid "Search/Filter elements limit"
 msgstr "Obmedzenie počtu položiek pre vyhľadávanie/filter"
 
-#: include/forms.inc.php:1722 include/maintenances.inc.php:119
+#: include/forms.inc.php:1727 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "Druhý"
 
@@ -12435,7 +12443,7 @@ msgstr "Sekundárny POC telefón B"
 msgid "Secondary POC screen name"
 msgstr "Sekundárne POC meno obrazovky"
 
-#: include/views/administration.users.edit.php:220
+#: include/views/administration.users.edit.php:231
 msgid "Seconds"
 msgstr "sekúnd"
 
@@ -12445,14 +12453,14 @@ msgstr "sekúnd"
 msgid "Security level"
 msgstr "Bezpečnostná úroveň"
 
-#: include/forms.inc.php:479 include/views/configuration.item.edit.php:131
+#: include/forms.inc.php:484 include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:115
 #: include/views/js/configuration.discovery.edit.js.php:56
 msgid "Security name"
 msgstr "Bezpečnostné meno"
 
 #: events.php:344 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:580 include/page_header.php:328
+#: include/forms.inc.php:585 include/page_header.php:328
 #: include/reports.inc.php:431
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -12562,7 +12570,7 @@ msgstr "Sep"
 msgid "Separated"
 msgstr "Oddelene"
 
-#: include/forms.inc.php:1690 include/func.inc.php:137
+#: include/forms.inc.php:1695 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "September"
@@ -12840,8 +12848,8 @@ msgstr "Umiestnenie polica"
 msgid "Site state / province"
 msgstr "Umiestnenie štát / provincia"
 
-#: include/classes/items/CHelpItems.php:273
-#: include/classes/items/CHelpItems.php:527
+#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:535
 msgid "Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]"
 msgstr "Veľkosť daného súboru. Veľkosť v bytoch. Súbor musí byť čitatelný používateľom zabbix. Príklad: vfs.file.size[/var/log/syslog]"
 
@@ -12941,13 +12949,13 @@ msgstr "Softvér aplikácia D"
 msgid "Software application E"
 msgstr "Softvér aplikácia E"
 
-#: include/classes/items/CHelpItems.php:205
-#: include/classes/items/CHelpItems.php:459
+#: include/classes/items/CHelpItems.php:209
+#: include/classes/items/CHelpItems.php:467
 msgid "Software architecture"
 msgstr "Softvérová architektúra"
 
-#: include/classes/items/CHelpItems.php:213
-#: include/classes/items/CHelpItems.php:467
+#: include/classes/items/CHelpItems.php:217
+#: include/classes/items/CHelpItems.php:475
 msgid "Software package list - lists all packages for all supported package managers by default"
 msgstr "Zoznam softvérových balíčkov - zoznam všetkých balíčkov podporovaných balíčkovacími manažérmi"
 
@@ -12997,17 +13005,17 @@ msgstr "Štandardné položky"
 msgid "Start in"
 msgstr "Začiatok v"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:795
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Čas štartu Zabbix servera, Unix timestamp."
 
-#: include/forms.inc.php:533 include/forms.inc.php:922
+#: include/forms.inc.php:538 include/forms.inc.php:927
 #: include/views/configuration.maintenance.list.php:47
 msgid "State"
 msgstr "Stav"
 
-#: include/classes/items/CHelpItems.php:145
-#: include/classes/items/CHelpItems.php:399
+#: include/classes/items/CHelpItems.php:149
+#: include/classes/items/CHelpItems.php:407
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "Stav služby. 0 - beží, 1 - pozastavená, 2 - štartovaná, 3 - pozastavovaná, 4 - neurčitá, 5 - zastavovaná, 6 - zastavená, 7 - neznáme, 255 - žiadna taká služba"
 
@@ -13018,7 +13026,7 @@ msgstr "Stav služby. 0 - beží, 1 - pozastavená, 2 - štartovaná, 3 - pozast
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:126 include/events.inc.php:201
 #: include/events.inc.php:279 include/events.inc.php:282
-#: include/forms.inc.php:572 include/forms.inc.php:917
+#: include/forms.inc.php:577 include/forms.inc.php:922
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:42
 #: include/views/administration.usergroups.list.php:49
@@ -13113,8 +13121,8 @@ msgstr "Krok s menom \"%1$s\" už existuje."
 msgid "Steps"
 msgstr "Kroky"
 
-#: include/views/administration.users.edit.php:235
-#: include/views/administration.users.edit.php:272
+#: include/views/administration.users.edit.php:246
+#: include/views/administration.users.edit.php:283
 msgid "Stop"
 msgstr "Zastaviť"
 
@@ -13131,7 +13139,7 @@ msgstr "Priamy"
 msgid "Style"
 msgstr "Štýl"
 
-#: include/forms.inc.php:950
+#: include/forms.inc.php:955
 msgid "Subfilter [affects only filtered data!]"
 msgstr "Subfilter [ovplyvňuje len filtrované údaje!]"
 
@@ -13152,7 +13160,7 @@ msgid "Success Audit"
 msgstr "Audit úspešný"
 
 #: include/classes/items/CHelpItems.php:109
-#: include/classes/items/CHelpItems.php:363
+#: include/classes/items/CHelpItems.php:367
 msgid "Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped"
 msgstr "Súhrnná štatistika sieťového rozhrania. Celočíselná hodnota. Mode - jeden z bytes (prevolene), packets, errors alebo dropped"
 
@@ -13176,7 +13184,7 @@ msgstr "Súčet hodnôt v periode T NIE JE N"
 msgid "Sun"
 msgstr "Ne"
 
-#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/forms.inc.php:1675 include/forms.inc.php:1743
 #: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Nedeľa"
@@ -13190,18 +13198,18 @@ msgstr "Podpora"
 msgid "Surname"
 msgstr "Priezvisko"
 
-#: include/classes/items/CHelpItems.php:217
-#: include/classes/items/CHelpItems.php:471
+#: include/classes/items/CHelpItems.php:221
+#: include/classes/items/CHelpItems.php:479
 msgid "Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used."
 msgstr "Swap in. Ak type je count - počet swapov je vrátený. Ak type je pages - počet swapovaných stránok je vrátený. Ak swap chýba, potom all je použitý."
 
-#: include/classes/items/CHelpItems.php:221
-#: include/classes/items/CHelpItems.php:475
+#: include/classes/items/CHelpItems.php:225
+#: include/classes/items/CHelpItems.php:483
 msgid "Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used."
 msgstr "Swap out. Ak type je count - počet swapov je vrátený. Ak type je pages - počet swapovaných stránok je vrátený. Ak swap chýba, potom all je použitý."
 
-#: include/classes/items/CHelpItems.php:225
-#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:229
+#: include/classes/items/CHelpItems.php:487
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr "Swapovací priestor. Hodnota v bytoch. Ak swap chýba, je použitý all. Ak mode chýba, je použitý used."
 
@@ -13213,7 +13221,7 @@ msgstr "Švédsky (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých sedeni okrem Vásho! Pokračovať?"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:139
+#: include/users.inc.php:83 include/views/administration.users.edit.php:150
 msgid "System default"
 msgstr "Predvolené nastavenie systémom"
 
@@ -13221,8 +13229,8 @@ msgstr "Predvolené nastavenie systémom"
 msgid "System error."
 msgstr "Sytémová chyba."
 
-#: include/classes/items/CHelpItems.php:193
-#: include/classes/items/CHelpItems.php:447
+#: include/classes/items/CHelpItems.php:197
+#: include/classes/items/CHelpItems.php:455
 msgid "System local time. Time in seconds."
 msgstr "Systémový lokálny čas. Čas v sekundách."
 
@@ -13230,8 +13238,8 @@ msgstr "Systémový lokálny čas. Čas v sekundách."
 msgid "System status"
 msgstr "Stav systému"
 
-#: include/classes/items/CHelpItems.php:233
-#: include/classes/items/CHelpItems.php:487
+#: include/classes/items/CHelpItems.php:237
+#: include/classes/items/CHelpItems.php:495
 msgid "System uptime in seconds."
 msgstr "Systémový čas prevádzky v sekundách."
 
@@ -13310,7 +13318,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
-#: include/forms.inc.php:608 include/forms.inc.php:927
+#: include/forms.inc.php:613 include/forms.inc.php:932
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:376
 #: include/views/configuration.triggers.list.php:126 report2.php:259
@@ -13402,7 +13410,7 @@ msgstr "Šablóna s rovnakým viditeľným menom \"%1$s\" už existuje."
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Šablóna s rovnakým zobrazovaným menom \"%s\" už existuje."
 
-#: include/forms.inc.php:611 include/forms.inc.php:798
+#: include/forms.inc.php:616 include/forms.inc.php:803
 msgid "Templated items"
 msgstr "Položky šablóny"
 
@@ -13455,7 +13463,7 @@ msgstr "Testovacie výrazy"
 msgid "Test string"
 msgstr "Testovací reťazec"
 
-#: include/forms.inc.php:428 include/items.inc.php:129
+#: include/forms.inc.php:433 include/items.inc.php:129
 #: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13531,7 +13539,7 @@ msgstr "Požadovaná vzdialená procedúra neexistuje / nie je dostupná"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Aplikácia web scenára patrí k inému hostovi, ako je host web scenára."
 
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:152
 msgid "Theme"
 msgstr "Téma"
 
@@ -13543,7 +13551,7 @@ msgstr[0] "Tam je \"%1$d\" skupina s interným GUI prístupom."
 msgstr[1] "Tam sú \"%1$d\" skupiny s interným GUI prístupom."
 msgstr[2] "Tam je \"%1$d\" skupín s interným GUI prístupom."
 
-#: include/forms.inc.php:1723 include/maintenances.inc.php:120
+#: include/forms.inc.php:1728 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "Tretí"
 
@@ -13576,7 +13584,7 @@ msgstr "Tento rok"
 msgid "Thu"
 msgstr "Št"
 
-#: include/forms.inc.php:1667 include/forms.inc.php:1735
+#: include/forms.inc.php:1672 include/forms.inc.php:1740
 #: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Štvrtok"
@@ -13619,11 +13627,11 @@ msgstr "Čas (vzostupne)"
 msgid "Time (descending)"
 msgstr "Čas (zostupne)"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:839
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "Čas určitého Zabbix procesu alebo skupiny procesov (identifikované <type> a <num>) strávené v <state> v percentách."
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:843
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Posledný čas prístupu proxy. Name - meno proxy. Param - posledný prístup. Unix timestamp."
 
@@ -13663,8 +13671,8 @@ msgstr "Časová značka nie je odlišná od serverového Zabbix času o viac ak
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
 msgstr "Časová značka nie je odlišná od serverového Zabbix času o viac ako T sekúnd, potom N NIE JE 1, 0 - inak"
 
-#: include/classes/items/CHelpItems.php:149
-#: include/classes/items/CHelpItems.php:403
+#: include/classes/items/CHelpItems.php:153
+#: include/classes/items/CHelpItems.php:411
 msgid "Timestamp of system boot."
 msgstr "Timestamp štartu systému."
 
@@ -13736,7 +13744,7 @@ msgstr "Perióda uloženia trendov"
 msgid "Trend storage period (in days)"
 msgstr "Perióda uloženia trendov (v dňoch)"
 
-#: include/forms.inc.php:606 include/forms.inc.php:942
+#: include/forms.inc.php:611 include/forms.inc.php:947
 #: include/views/administration.general.housekeeper.edit.php:160
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.prototype.list.php:55 items.php:157
@@ -13941,7 +13949,7 @@ msgstr "Prototypy spúšťačov aktualizované"
 msgid "Trigger severities"
 msgstr "Závažnosti spúšťačov"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:279
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:290
 msgid "Trigger severity"
 msgstr "Závažnosť spúšťača"
 
@@ -13953,7 +13961,7 @@ msgstr "Spúšťač aktualizovaný"
 msgid "Trigger value"
 msgstr "Hodnota spúšťača"
 
-#: hosts.php:810 hosts.php:902 include/forms.inc.php:593
+#: hosts.php:810 hosts.php:902 include/forms.inc.php:598
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
 #: include/triggers.inc.php:1262
 #: include/views/configuration.action.list.php:33
@@ -14019,7 +14027,7 @@ msgstr "Pokus o čítanie nedostupnej vlastnosti \"%s\"."
 msgid "Tue"
 msgstr "Ut"
 
-#: include/forms.inc.php:1665 include/forms.inc.php:1733
+#: include/forms.inc.php:1670 include/forms.inc.php:1738
 #: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Utorok"
@@ -14039,7 +14047,7 @@ msgstr "Dve položky (\"%1$s\" and \"%2$s\") nie je možné naplniť jedným inv
 
 #: include/actions.inc.php:829 include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
-#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:529
+#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:534
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:36
@@ -14090,7 +14098,7 @@ msgstr "Typ (zostupne)"
 msgid "Type of calculation"
 msgstr "Typ kalkulácie"
 
-#: include/forms.inc.php:531 include/forms.inc.php:912
+#: include/forms.inc.php:536 include/forms.inc.php:917
 #: include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.edit.php:227
 #: include/views/configuration.item.massupdate.php:215 popup.php:818
@@ -14106,7 +14114,7 @@ msgstr "Typ informácie musí byť \"Log\" pre log kľúč."
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Typ informácie musí byť \"Numeric (float)\" pre agregované položky."
 
-#: include/forms.inc.php:907
+#: include/forms.inc.php:912
 msgid "Types"
 msgstr "Typy"
 
@@ -14127,7 +14135,7 @@ msgstr "UP"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:153
+#: include/views/administration.users.edit.php:164
 msgid "URL (after login)"
 msgstr "URL (po prihlásení)"
 
@@ -14201,6 +14209,11 @@ msgstr "Nepotvrdené PROBLÉMOVÉ udalosti"
 msgid "Unacknowledged only"
 msgstr "Len nepotvrdené"
 
+#: include/views/administration.users.edit.php:107
+#, c-format
+msgid "Unavailable for users with %1$s."
+msgstr ""
+
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
 msgstr "Odblokovať označené"
@@ -14234,11 +14247,11 @@ msgstr "Jednotky"
 #: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:278 include/perm.inc.php:36
-#: include/regexp.inc.php:206 include/screens.inc.php:55
-#: include/triggers.inc.php:62 include/triggers.inc.php:177
-#: include/triggers.inc.php:196 include/triggers.inc.php:2491
-#: include/triggers.inc.php:2497 include/users.inc.php:66
-#: include/users.inc.php:88
+#: include/perm.inc.php:53 include/regexp.inc.php:206
+#: include/screens.inc.php:55 include/triggers.inc.php:62
+#: include/triggers.inc.php:177 include/triggers.inc.php:196
+#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
 msgstr "Neznámy"
@@ -14396,7 +14409,7 @@ msgstr "Dostupný"
 #: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.host.massupdate.php:299
 #: include/views/configuration.httpconf.popup.php:93
-#: include/views/configuration.item.massupdate.php:562
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/js/adm.regexprs.edit.js.php:255
 #: include/views/js/configuration.discovery.edit.js.php:348
 #: popup_period.php:134
@@ -14407,7 +14420,7 @@ msgstr "Aktualizovať"
 msgid "Update existing"
 msgstr "Aktulizovať existujúce"
 
-#: include/forms.inc.php:451 include/views/configuration.httpconf.list.php:65
+#: include/forms.inc.php:456 include/views/configuration.httpconf.list.php:65
 #: items.php:155
 msgid "Update interval"
 msgstr "Interval obnovovania"
@@ -14490,7 +14503,7 @@ msgstr "Mapa najvyššej úrovne"
 msgid "Uptime"
 msgstr "Doba prevádzky"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:875
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Doba prevádzky Zabbix server procesov v sekundách."
 
@@ -14519,7 +14532,7 @@ msgstr "Používané v akciách"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:326
+#: include/views/administration.users.edit.php:337
 #: include/views/configuration.action.edit.php:528
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -14530,11 +14543,11 @@ msgstr "Používateľ"
 msgid "User \"%s\" cannot be without user group."
 msgstr "Používateľ \"%s\" nemôže byť bez používateľskej skupiny."
 
-#: users.php:218
+#: users.php:248
 msgid "User added"
 msgstr "Používateľ pridaný"
 
-#: include/views/administration.users.edit.php:344
+#: include/views/administration.users.edit.php:355
 msgid "User can't change type for himself"
 msgstr "Používateľ si nemôže sám sebe zmeniť typ"
 
@@ -14555,11 +14568,12 @@ msgstr "Používateľ nemôže sám sebe meniť stav"
 msgid "User cannot change status of himself."
 msgstr "Používateľ nemôže sám sebe meniť stav."
 
-#: users.php:247 users.php:355
+#: users.php:277 users.php:385
 msgid "User deleted"
 msgstr "Používateľ zmazaný"
 
 #: api/classes/CUserGroup.php:252 include/audit.inc.php:31
+#: include/views/administration.script.edit.php:78
 #: include/views/administration.script.list.php:43
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.users.list.php:41
@@ -14610,7 +14624,6 @@ msgstr "Používateľská skupina pre správu o nefunčnej databáze"
 msgid "User group for database down message \"%1$s\"."
 msgstr "Používateľská skupina pre správu o nedostupnej databáze \"%1$s\"."
 
-#: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
 #: include/views/administration.usergroups.list.php:34
 #: include/views/administration.users.list.php:28 popup.php:48
@@ -14665,13 +14678,13 @@ msgstr "Perióda uloženia údajov používateľských sedení (v dňoch) \"%1$s
 msgid "User sessions"
 msgstr "Používateľské sedenia"
 
-#: include/views/administration.users.edit.php:344
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:355
+#: include/views/administration.users.edit.php:359
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "Typ používateľa"
 
-#: profile.php:176 users.php:211 users.php:269 users.php:293
+#: profile.php:176 users.php:241 users.php:299 users.php:323
 msgid "User updated"
 msgstr "Používateľ aktualizovaný"
 
@@ -14701,183 +14714,183 @@ msgstr "Používatelia"
 msgid "Users (online)"
 msgstr "Používatelia (online)"
 
-#: users.php:323
+#: users.php:353
 msgid "Users unblocked"
 msgstr "Používatelia odblokovaní"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware štatistiky cache. Platné módy sú: total, free, pfree, used a pused."
 
-#: include/classes/items/CHelpItems.php:587
+#: include/classes/items/CHelpItems.php:595
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klustra, <url> - URL VMware služby, <name> - VMware kluster meno"
 
-#: include/classes/items/CHelpItems.php:591
+#: include/classes/items/CHelpItems.php:599
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "VMware protokol udalostí, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware BIOS uuid, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware veľkosť balloned pamäti, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:611
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware kluster meno, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware štatistika čítania datastore, <url> - URL VMware služby, <uuid> - VMware host meno, <datastore> - datastore meno, <mode> - latencia"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware štatistika zápisov datastore, <url> - URL VMware služby, <uuid> - VMware host meno, <datastore> - datastore meno, <mode> - latencia"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware meno, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware vstupné sieťové štatistiky, <url> - URL VMware služby, <uuid> - VMware host meno, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware výstupné sieťové štatistiky, <url> - URL VMware služby, <uuid> - VMware host meno, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware frekvencia procesora, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model procesora, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využitie procesora v Hz, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:647
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware celková veľkosť pamäte, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware prevádzkový čas, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware veľkosť použitej pamäte, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware meno predajcu, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware verzia, <url> - URL VMware služby, <uuid> - VMware host meno"
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:603
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware plné meno služby, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:607
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verzia, <url> - URL VMware služby"
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť balloned pamäti virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware použitý úložný priestor virtuálnym strojom, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť komprimovanej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware štatistika čítania diskov virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja, <instance> - inštancia disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware štatistika zápisov diskov virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja, <instance> - inštancia disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware štatistika súborového systému virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja, <fsname> - meno súborového systému, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využitie hostiteľskej pamäti virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využitie hostovej pamäti virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware meno hypervízora virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware meno virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware štatistika vstupov sieťového rozhrania virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja, <instance> - sieťové rozhranie, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware štatistika výstupov sieťového rozhrania virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja, <instance> - sieťové rozhranie, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware stav napájania virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť privátnej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využitie procesora virtuálneho stroja v Hz, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť zdielanej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť swapovanej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware celková veľkosť pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nevyužitý priestor virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nezdieľaný priestor virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware čas prevádzky virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
@@ -14916,31 +14929,31 @@ msgstr "Hodnota \"%1$s\" je príliš dlhá pre pole \"%2$s\" - %3$d znakov. Povo
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Hodnota \"%1$s\" je príliš dlhá pre pole \"%2$s\" - %3$d znakov. Povolená dĺžka je do 2048 znakov."
 
-#: include/validate.inc.php:334 include/validate.inc.php:358
+#: include/validate.inc.php:333 include/validate.inc.php:357
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has incorrect decimal format."
+msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
 
-#: include/validate.inc.php:344 include/validate.inc.php:360
+#: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
+msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:340
+#: include/validate.inc.php:339
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
+msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:336
+#: include/validate.inc.php:335
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
+msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Využitie cache hodnôt. Platné parametre sú: requests, hits a misses."
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:879
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Štatistiky cache hodnôt. Platné módy sú: total, free, pfree, used a pused."
 
@@ -14997,8 +15010,8 @@ msgstr "Mapovanie hodnôt"
 msgid "Value mapping must have at least one mapping."
 msgstr "Mapovanie hodnôt musí mať najmenej jedno mapovanie."
 
-#: include/classes/items/CHelpItems.php:129
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:133
+#: include/classes/items/CHelpItems.php:391
 msgid "Value of any performance counter, where \"counter\" parameter is the counter path and \"interval\" parameter is a number of last seconds, for which the agent returns an average value."
 msgstr "Hodnota nejakého počítadla výkonu, kde parameter \"counter\" je počítadlova cesta a parameter \"interval\" je počet posledných sekúnd, pre ktoré agent vráti priemernú hodnotu."
 
@@ -15025,7 +15038,7 @@ msgid "Verbose"
 msgstr "Rozvláčny"
 
 #: include/classes/items/CHelpItems.php:73
-#: include/classes/items/CHelpItems.php:315
+#: include/classes/items/CHelpItems.php:319
 msgid "Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1"
 msgstr "Verzia zabbix_agent(d)a bežiaceho na monitorovanom hoste. Reťazec. Príklad vrátenej hodnoty: 1.1"
 
@@ -15041,8 +15054,8 @@ msgstr "Vertikálne zarovnanie"
 msgid "View is not rendered."
 msgstr "Pohľad nie je vykresľovaný."
 
-#: include/classes/items/CHelpItems.php:201
-#: include/classes/items/CHelpItems.php:455
+#: include/classes/items/CHelpItems.php:205
+#: include/classes/items/CHelpItems.php:463
 msgid "Virtual memory statistics."
 msgstr "Štatistiky virtuálnej pamäti."
 
@@ -15149,7 +15162,7 @@ msgstr "Web scenáre"
 msgid "Wed"
 msgstr "St"
 
-#: include/forms.inc.php:1666 include/forms.inc.php:1734
+#: include/forms.inc.php:1671 include/forms.inc.php:1739
 #: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Streda"
@@ -15158,7 +15171,7 @@ msgstr "Streda"
 msgid "Week"
 msgstr "Týždeň"
 
-#: include/forms.inc.php:1643 include/maintenances.inc.php:38
+#: include/forms.inc.php:1648 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:404
 #: include/reports.inc.php:412 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15191,8 +15204,8 @@ msgstr "S poslednou udalosťou nepotvrdenou"
 msgid "With problems"
 msgstr "S problémami"
 
-#: include/forms.inc.php:596 include/forms.inc.php:823
-#: include/forms.inc.php:932
+#: include/forms.inc.php:601 include/forms.inc.php:828
+#: include/forms.inc.php:937
 msgid "With triggers"
 msgstr "So spúšťačmi"
 
@@ -15204,7 +15217,7 @@ msgstr "S nepotvrdenými udalosťami"
 msgid "Without problems"
 msgstr "Bez problémov"
 
-#: include/forms.inc.php:597 include/forms.inc.php:820
+#: include/forms.inc.php:602 include/forms.inc.php:825
 msgid "Without triggers"
 msgstr "Bez spúšťačov"
 
@@ -15425,7 +15438,7 @@ msgstr "Áno"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:130
+#: include/views/administration.users.edit.php:141
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Nemôžete si vybrať niektoré jazyky pretože locales pre ne nie sú nainštalované na web servery."
 
@@ -15556,7 +15569,7 @@ msgstr "Zabbix prijal neplatnú požiadavku."
 msgid "Zabbix internal"
 msgstr "Zabbix interne"
 
-#: authentication.php:216
+#: include/perm.inc.php:48
 msgid "Zabbix internal authentication"
 msgstr "Zabbix interná autentifikácia"
 
@@ -15649,10 +15662,10 @@ msgstr "agent"
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:116
-#: include/forms.inc.php:380 include/forms.inc.php:423
-#: include/forms.inc.php:438 include/forms.inc.php:445
-#: include/forms.inc.php:462 include/forms.inc.php:595
-#: include/forms.inc.php:610 include/graphs.inc.php:86
+#: include/forms.inc.php:385 include/forms.inc.php:428
+#: include/forms.inc.php:443 include/forms.inc.php:450
+#: include/forms.inc.php:467 include/forms.inc.php:600
+#: include/forms.inc.php:615 include/graphs.inc.php:86
 #: include/views/js/configuration.graph.edit.js.php:46 report2.php:222
 #: report2.php:241 report2.php:263 report2.php:300 report2.php:328
 #: report2.php:347 report4.php:94 report4.php:270
@@ -15885,9 +15898,9 @@ msgid "last"
 msgstr "naposledy"
 
 #: hosts.php:773 hosts.php:774 hosts.php:775 include/actions.inc.php:29
-#: include/forms.inc.php:472 include/forms.inc.php:479
-#: include/forms.inc.php:486 include/forms.inc.php:493
-#: include/forms.inc.php:602 include/forms.inc.php:617
+#: include/forms.inc.php:477 include/forms.inc.php:484
+#: include/forms.inc.php:491 include/forms.inc.php:498
+#: include/forms.inc.php:607 include/forms.inc.php:622
 #: include/views/inventory.host.list.php:40
 msgid "like"
 msgstr "obsahuje"
@@ -15957,6 +15970,12 @@ msgstr "musí byť platný LDAP používateľ"
 msgid "new"
 msgstr "nový"
 
+#: include/views/configuration.host.massupdate.php:74
+#: include/views/configuration.item.massupdate.php:502
+msgctxt "new element in multiselect"
+msgid "new"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
@@ -15976,7 +15995,7 @@ msgid "not running"
 msgstr "nebeží"
 
 #: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:807
-#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1149
+#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1154
 msgid "not selected"
 msgstr "nie je vybratý"
 
