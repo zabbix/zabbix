@@ -206,7 +206,6 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'clone';
-	unset($_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'full_clone';
