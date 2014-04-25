@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:41+0300\n"
-"PO-Revision-Date: 2013-10-10 08:30+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2014-04-25 13:57+0300\n"
+"PO-Revision-Date: 2014-04-13 14:12+0300\n"
+"Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
@@ -12,34 +12,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1381386611.0\n"
+"X-POOTLE-MTIME: 1397391161.0\n"
 
 #: api/classes/CMaintenance.php:352 api/classes/CMaintenance.php:357
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:471
 #: maintenance.php:145 maintenance.php:157 services.php:193 services.php:207
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr "\"%s\" باید بین 1970.01.01 و  2038.01.18 باشد."
+msgstr "\"%s\" می بايست بين 1970.01.01 و 2038.01.18 باشد."
 
 #: include/profiles.inc.php:359
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"هشدار های صحیح\" باید باشند \"0\" یا یک مقدار صحیح مثبت."
+msgstr "مقدار \"نمايش تريگرهای OK\" می بايست \"0\" يا يک مقدار صحيح مثبت باشد."
 
 #: include/profiles.inc.php:364
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"هشدار های چشمک زن در هنگام تغییر وضعیت\" باید باشند \"0\" یا یک مقدار صحیح مثبت.\"هشدار های چشمک زن در هنگام تغییر وضعیت\" باید باشند \"0\" یا یک مقدار صحیح مثبت.\"هشدار های چشمک زن در هنگام تغییر وضعیت\" باید باشند \"0\" یا یک مقدار صحیح مثبت.\"هشدار های چشمک زن در هنگام تغییر وضعیت\" باید باشند \"0\" یا یک مقدار صحیح مثبت.\"هشدار های چشمک زن در هنگام تغییر وضعیت\" باید باشند \"0\" یا یک مقدار صحیح مثبت."
+msgstr "مقدار \"چشمک زدن هنگام تغيير وضعيت تريگرها\" می بايست \"0\" يا يک مقدار صحيح مثبت باشد."
 
 #: include/func.inc.php:465
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d روز%1$d روز"
 
 #: include/blocks.inc.php:1120
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
+msgstr[0] "تعداد %1$d از %2$d مشکل نمايش داده شده استتعداد %1$d از %2$d مشکل ها نمايش داده شده اند"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -50,7 +50,7 @@ msgstr "%1$s(سال%2$s)"
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] "%1$s آیتم"
+msgstr[0] "%1$s آيتم%1$s آيتم"
 
 #: include/views/configuration.item.edit.php:326
 #: include/views/configuration.item.edit.php:330
@@ -110,11 +110,11 @@ msgstr ""
 
 #: include/forms.inc.php:566 include/forms.inc.php:581
 msgid "(in days)"
-msgstr ""
+msgstr "(به روز)"
 
 #: include/forms.inc.php:428
 msgid "(in sec)"
-msgstr ""
+msgstr "(به ثانيه)"
 
 #: include/views/configuration.action.edit.php:449
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -185,14 +185,14 @@ msgstr "<دستی>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "لاگ فعاليت"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:195
 msgid "ALARM ACKNOWLEDGES"
@@ -205,7 +205,7 @@ msgstr "و"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "لاگ مميزی"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"

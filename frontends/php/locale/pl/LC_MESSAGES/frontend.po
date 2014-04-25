@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:41+0300\n"
-"PO-Revision-Date: 2013-11-03 18:39+0300\n"
-"Last-Translator: daftu <dawidmos@rudasl.pl>\n"
+"POT-Creation-Date: 2014-04-25 13:57+0300\n"
+"PO-Revision-Date: 2014-04-01 19:53+0300\n"
+"Last-Translator: refaston <refaston@o2.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1383496764.0\n"
+"X-POOTLE-MTIME: 1396374795.0\n"
 
 #: api/classes/CMaintenance.php:352 api/classes/CMaintenance.php:357
 #: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:471
@@ -71,21 +71,21 @@ msgstr[1] "%1$s dni"
 msgstr[2] "%1$s dni"
 
 #: jsLoader.php:220 jsLoader.php:221 jsLoader.php:222 jsLoader.php:223
-#, c-format
+#, fuzzy, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s minuta"
+msgstr[1] "%1$s minuta"
+msgstr[2] "%1$s minut(y)"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
-#, c-format
+#, fuzzy, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s próba została"
+msgstr[1] "%1$s próba została"
+msgstr[2] "%1$s próbyzostały"
 
 #: jsLoader.php:218 jsLoader.php:219
 #, c-format
