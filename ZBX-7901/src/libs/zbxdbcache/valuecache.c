@@ -120,6 +120,11 @@ typedef struct
 	/* the flag indicating that all data from DB are cached       */
 	unsigned char	cached_all;
 
+	/* The flag indicating that the first (earliest) second       */
+	/* might not be fully cached and should be reloaded from      */
+	/* database if more data are being requested.                 */
+	unsigned char	reload_first;
+
 	/* The total number of item values in cache.                  */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -202,6 +207,7 @@ static zbx_vc_cache_t	*vc_cache = NULL;
 static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
 static int	vc_history_record_compare_asc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
 static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
+static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
 
 static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
@@ -327,6 +333,9 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 	int			ret = FAIL;
 
+	if (0 >= seconds)
+		return SUCCEED;
+
 	vc_try_unlock();
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -373,9 +382,6 @@ out:
  *              count           - [IN] the number of values to read                 *
  *              read_timestamp  - [IN] the value timestamp to start reading with    *
  *              count_timestamp - [IN] the value timestamp to start counting with   *
- *              direct          - [IN] 1 - data is read from DB to directly         *
- *                                         return it to user                        *
- *                                     0 - data is read from DB to store in cache   *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *
@@ -395,11 +401,11 @@ out:
  *                                                                                  *
  ************************************************************************************/
 static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values,
-		int count, int read_timestamp, const zbx_timespec_t *count_ts, int direct)
+		int count, int end_timestamp)
 {
 	char			*sql = NULL;
 	size_t	 		sql_alloc = 0, sql_offset = 0;
-	int			last_timestamp = 0, clock_to, clock_from, step = 0, ret = FAIL;
+	int			clock_to, clock_from, step = 0, ret = FAIL;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -407,7 +413,7 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 
 	vc_try_unlock();
 
-	clock_to = read_timestamp;
+	clock_to = end_timestamp;
 
 	while (-1 != periods[step] && values->values_num < count)
 	{
@@ -426,33 +432,20 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc,ns desc");
 
-		if (1 == direct)
-			result = DBselectN(sql, count);
-		else
-			result = DBselect("%s", sql);
+		result = DBselectN(sql, count);
 
 		if (NULL == result)
 			goto out;
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = DBfetch(result)) && values->values_num < count)
 		{
 			zbx_history_record_t	value;
 
 			value.timestamp.sec = atoi(row[0]);
-
-			if (values->values_num >= count && value.timestamp.sec != last_timestamp)
-				break;
-
 			value.timestamp.ns = atoi(row[1]);
 			table->rtov(&value.value, row + 2);
 
 			zbx_vector_history_record_append_ptr(values, &value);
-
-			if (0 < zbx_timespec_compare(&value.timestamp, count_ts))
-				count++;
-
-			if (1 != direct)
-				last_timestamp = value.timestamp.sec;
 		}
 		DBfree_result(result);
 
@@ -488,60 +481,38 @@ out:
 static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts,
 		zbx_history_record_t *value)
 {
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
 	int				ret = FAIL, i;
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_vc_history_table_t		*table = &vc_history_tables[value_type];
 	zbx_vector_history_record_t	values;
 
-	vc_try_unlock();
+	zbx_history_record_vector_create(&values);
 
-	/* first try to find a value matching the target timestamp */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select clock,ns,%s"
-			" from %s"
-			" where itemid=" ZBX_FS_UI64
-				" and clock=%d and ns=%d",
-			table->fields, table->name, itemid, ts->sec, ts->ns);
+	/* first try to find value in the requested second */
+	vc_db_read_values_by_time(itemid, value_type, &values, 1, ts->sec);
+	zbx_vector_history_record_sort(&values, (zbx_compare_func_t)vc_history_record_compare_desc_func);
 
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	if (NULL != (row = DBfetch(result)))
+	if (0 == values.values_num ||
+		0 > zbx_timespec_compare(ts, &values.values[values.values_num - 1].timestamp))
 	{
-		value->timestamp.sec = atoi(row[0]);
-		value->timestamp.ns = atoi(row[1]);
-		table->rtov(&value->value, row + 2);
-		ret = SUCCEED;
-	}
-	else
-	{
-		/* if failed to find a value matching target timestamp - */
-		/* find the older value closest to the timestamp         */
+		/* if the requested second does not contain matching values, */
+		/* get the first older value outside the requested second    */
+		vc_history_record_vector_clean(&values, value_type);
 
-		zbx_history_record_vector_create(&values);
-		vc_db_read_values_by_count(itemid, value_type, &values, 1, ts->sec, ts, 0);
+		vc_db_read_values_by_count(itemid, value_type, &values, 1, ts->sec - 1);
 		zbx_vector_history_record_sort(&values, (zbx_compare_func_t)vc_history_record_compare_desc_func);
-
-		for (i = 0; i < values.values_num; i++)
-		{
-			if ((values.values[i].timestamp.sec == ts->sec && values.values[i].timestamp.ns <= ts->ns) ||
-					values.values[i].timestamp.sec < ts->sec)
-			{
-				vc_history_record_copy(value, &values.values[0], value_type);
-				ret = SUCCEED;
-			}
-		}
-
-		zbx_history_record_vector_destroy(&values, value_type);
 	}
 
-	DBfree_result(result);
+	for (i = 0; i < values.values_num; i++)
+	{
+		if (0 <= zbx_timespec_compare(ts, &values.values[i].timestamp))
+		{
+			vc_history_record_copy(value, &values.values[i], value_type);
+			ret = SUCCEED;
 
-	vc_try_lock();
+			break;
+		}
+	}
+
+	zbx_history_record_vector_destroy(&values, value_type);
 
 	return ret;
 }
@@ -678,6 +649,36 @@ static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
 	plog->value = zbx_strdup(NULL, log->value);
 
 	return plog;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_history_record_vector_clean                                   *
+ *                                                                            *
+ * Purpose: reelases resources allocated to store history values              *
+ *                                                                            *
+ * Parameters: vector      - [IN] the value vector                            *
+ *             value_type  - [IN] the type of vector values                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type)
+{
+	int	i;
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			for (i = 0; i < vector->values_num; i++)
+				zbx_free(vector->values[i].value.str);
+
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			for (i = 0; i < vector->values_num; i++)
+				vc_history_logfree(vector->values[i].value.log);
+	}
+
+	vector->values_num = 0;
 }
 
 /******************************************************************************
@@ -1177,7 +1178,7 @@ static void	vc_item_release(zbx_vc_item_t *item)
  *             value_type - [IN] the item value type                          *
  *             seconds    - [IN] the time period to retrieve data for         *
  *             count      - [IN] the number of history values to retrieve     *
- *             timestamp  - [IN] the period end timestamp                     *
+ *             timestamp  - [IN] the period end timestamp (timeshift)         *
  *             ts         - [IN] the value timestamp                          *
  *             values     - [OUT] the cached values                           *
  *                                                                            *
@@ -1196,7 +1197,8 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 	/* read the item values from database */
 	if (NULL != ts)
 	{
-		ret = vc_db_read_values_by_count(itemid, value_type, values, 1, now, ts, 0);
+		if (SUCCEED == (ret = vc_db_read_values_by_count(itemid, value_type, values, 1, ts->sec - 1)))
+			ret = vc_db_read_values_by_time(itemid, value_type, values, now - ts->sec + 1, now);
 	}
 	else if (0 == count)
 	{
@@ -1204,9 +1206,8 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 	}
 	else
 	{
-		zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
-
-		ret = vc_db_read_values_by_count(itemid, value_type, values, count, now, &ts, 0);
+		if (SUCCEED == (ret = vc_db_read_values_by_count(itemid, value_type, values, count, timestamp)))
+			ret = vc_db_read_values_by_time(itemid, value_type, values, now - timestamp, now);
 	}
 
 	if (SUCCEED == ret)
@@ -1472,49 +1473,6 @@ static int	vch_item_get_last_value(const zbx_vc_item_t *item, int end_timestamp,
 
 /******************************************************************************
  *                                                                            *
- * Function: vch_item_get_last_value_by_timespec                              *
- *                                                                            *
- * Purpose: gets the chunk and index of the last value with a timestamp less  *
- *          or equal to the specified timestamp                               *
- *                                                                            *
- * Parameters:  item          - [IN] the item                                 *
- *              timestamp     - [IN] the target timestamp                     *
- *              pchunk        - [OUT] the chunk containing the target value   *
- *              pindex        - [OUT] the index of the target value           *
- *                                                                            *
- * Return value: SUCCEED - the last value was found successfully              *
- *               FAIL - all values in cache have timestamps greater than the  *
- *                      target (timeshift) timestamp.                         *
- *                                                                            *
- * Comments: This function is similar to vch_item_get_last_value() with       *
- *           increased resolution to nanoseconds.                             *
- *                                                                            *
- ******************************************************************************/
-static int	vch_item_get_last_value_by_timespec(const zbx_vc_item_t *item, const zbx_timespec_t *timestamp,
-		zbx_vc_chunk_t **pchunk, int *pindex)
-{
-	int	ret = FAIL;
-
-	if (SUCCEED == vch_item_get_last_value(item, timestamp->sec, pchunk, pindex))
-	{
-		while (0 < zbx_timespec_compare(&(*pchunk)->slots[*pindex].timestamp, timestamp))
-		{
-			if (--(*pindex) < (*pchunk)->first_value)
-			{
-				if (NULL == (*pchunk = (*pchunk)->prev))
-					goto out;
-
-				*pindex = (*pchunk)->last_value;
-			}
-		}
-		ret = SUCCEED;
-	}
-out:
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vch_item_copy_value                                              *
  *                                                                            *
  * Purpose: copies value in the specified item's chunk slot                   *
@@ -1687,6 +1645,8 @@ static void	vch_item_remove_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
  ******************************************************************************/
 static void	vch_item_clean_cache(zbx_vc_item_t *item)
 {
+	zbx_vc_chunk_t	*next;
+
 	if (0 != item->range)
 	{
 		zbx_vc_chunk_t	*tail = item->tail;
@@ -1698,7 +1658,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp)
 		{
-			zbx_vc_chunk_t	*next = chunk->next;
+			/* don't remove the head chunk */
+			if (NULL == (next = chunk->next))
+				break;
 
 			/* Values with the same timestamps (seconds resolution) always should be either   */
 			/* kept in cache or removed together. There should not be a case when one of them */
@@ -1708,8 +1670,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 			/* In this case increase the first value index of the next chunk until the first  */
 			/* value timestamp is greater.                                                    */
 
-			if (NULL != next && next->slots[next->first_value].timestamp.sec !=
-					next->slots[next->last_value].timestamp.sec)
+			if (next->slots[next->first_value].timestamp.sec != next->slots[next->last_value].timestamp.sec)
 			{
 				while (next->slots[next->first_value].timestamp.sec ==
 						chunk->slots[chunk->last_value].timestamp.sec)
@@ -1724,10 +1685,53 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 			chunk = next;
 		}
 
-		/* reset the cached_all flag if data was removed from cache */
+		/* reset the cached_all and reload_first flags if data was removed from cache */
 		if (tail != item->tail)
+		{
 			item->cached_all = 0;
+			item->reload_first = 0;
+		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vch_item_drop_first_second                                       *
+ *                                                                            *
+ * Purpose: drops the data of first (earliest) second from the cache          *
+ *                                                                            *
+ * Parameters:  item   - [IN] the item to add history data to                 *
+ *                                                                            *
+ * Return value: the number of dropped values                                 *
+ *                                                                            *
+ * Comments: When the cache are updated with count() based request,           *
+ *           there are no guarantees that the whole first second is cached.   *
+ *           In this case reload_first flag is set and when upon the next     *
+ *           update the first second data is reloaded from database.          *
+ *                                                                            *
+ ******************************************************************************/
+static int	vch_item_drop_first_second(zbx_vc_item_t *item)
+{
+	int	first_second, count = 0;
+
+	if (NULL == item->tail)
+		return 0;
+
+	first_second = item->tail->slots[item->tail->first_value].timestamp.sec;
+
+	while (NULL != item->tail && first_second == item->tail->slots[item->tail->first_value].timestamp.sec)
+	{
+		vc_item_free_values(item, item->tail->slots, item->tail->first_value, item->tail->first_value);
+		item->tail->first_value++;
+		count++;
+
+		if (item->tail->first_value > item->tail->last_value)
+			vch_item_remove_chunk(item, item->tail);
+	}
+
+	item->reload_first = 0;
+
+	return count;
 }
 
 /******************************************************************************
@@ -1931,10 +1935,14 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	}
 	else if (start < now - item->range)
 	{
-		/* We need to get item values before the first cached value, but not including it.    */
-		/* As vc_item_read_values_by_time() function returns data including the end timestamp */
-		/* decrement the first timestamp by 1.                                                */
-		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+		/* We need to get item values before the first cached value, but not including it     */
+		/* unless reload_first flag is set (in which case we need to include the first cached */
+		/* value).                                                                            */
+		update_end = item->tail->slots[item->tail->first_value].timestamp.sec;
+
+		if (1 != item->reload_first)
+			update_end--;
+
 		update_seconds = update_end - start;
 	}
 
@@ -1942,6 +1950,9 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	if (0 < update_seconds && 0 == item->cached_all)
 	{
 		zbx_vector_history_record_t	records;
+
+		if (1 == item->reload_first)
+			vch_item_drop_first_second(item);
 
 		zbx_vector_history_record_create(&records);
 
@@ -1951,7 +1962,10 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 			zbx_vector_history_record_sort(&records,
 					(zbx_compare_func_t)vc_history_record_compare_asc_func);
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			{
 				ret = records.values_num;
+				item->reload_first = 0;
+			}
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
@@ -1976,7 +1990,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  *           and updates cache from database if necessary.                    *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const zbx_timespec_t *timestamp)
+static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int timestamp)
 {
 	int	ret = SUCCEED, cache_records = 0, update_end;
 
@@ -1986,7 +2000,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 		zbx_vc_chunk_t	*chunk;
 		int		index;
 
-		if (SUCCEED == vch_item_get_last_value_by_timespec(item, timestamp, &chunk, &index))
+		if (SUCCEED == vch_item_get_last_value(item, timestamp, &chunk, &index))
 		{
 			cache_records = index - chunk->first_value + 1;
 
@@ -1994,10 +2008,13 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 				cache_records += chunk->last_value - chunk->first_value + 1;
 		}
 
-		/* We need to get item values before the first cached value, but not including it.     */
-		/* As vc_item_read_values_by_count() function returns data including the end timestamp */
-		/* decrement the first timestamp by 1.                                                 */
-		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+		/* We need to get item values before the first cached value, but not including it     */
+		/* unless reload_first flag is set (in which case we need to include the first cached */
+		/* value).                                                                            */
+		update_end = item->tail->slots[item->tail->first_value].timestamp.sec;
+
+		if (1 != item->reload_first)
+			update_end--;
 	}
 	else
 		update_end = ZBX_VC_TIME();
@@ -2007,16 +2024,35 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const 
 	{
 		zbx_vector_history_record_t	records;
 
+		if (1 == item->reload_first)
+			cache_records -= vch_item_drop_first_second(item);
+
 		zbx_vector_history_record_create(&records);
 
-		if (SUCCEED == (ret = vc_db_read_values_by_count(item->itemid, item->value_type,
-				&records, count - cache_records, update_end, timestamp, 0)) && 0 < records.values_num)
+		if (SUCCEED != (ret = vc_db_read_values_by_count(item->itemid, item->value_type, &records,
+				count - cache_records, timestamp < update_end ? timestamp : update_end)))
+		{
+			goto clean;
+		}
+
+		if (SUCCEED != (ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records,
+				update_end - timestamp, update_end)))
+		{
+			goto clean;
+		}
+
+		if (0 < records.values_num)
 		{
 			zbx_vector_history_record_sort(&records,
 					(zbx_compare_func_t)vc_history_record_compare_asc_func);
+
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			{
 				ret = records.values_num;
+				item->reload_first = 1;
+			}
 		}
+clean:
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
 
@@ -2203,9 +2239,7 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item, zbx_vector_history_reco
 	}
 	else
 	{
-		zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
-
-		if (FAIL == (ret = vch_item_cache_values_by_count(item, count, &ts)))
+		if (FAIL == (ret = vch_item_cache_values_by_count(item, count, timestamp)))
 			goto out;
 
 		records_read = ret;
@@ -2255,8 +2289,10 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	if (NULL == item->tail || 0 < zbx_timespec_compare(&item->tail->slots[item->tail->first_value].timestamp, ts))
 	{
-		/* the requested value is not in cache, request cache update */
-		if (FAIL == vch_item_cache_values_by_count(item, 1, ts))
+		if (1 == item->reload_first)
+			vch_item_drop_first_second(item);
+
+		if (FAIL == vch_item_cache_values_by_count(item, 1, ts->sec - 1))
 			goto out;
 
 		misses++;
@@ -2266,12 +2302,23 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	ret = SUCCEED;
 
-	if (FAIL == vch_item_get_last_value_by_timespec(item, ts, &chunk, &index))
+	if (FAIL == vch_item_get_last_value(item, ts->sec, &chunk, &index))
 	{
 		/* even after cache update the requested value is not there */
 		goto out;
 	}
 
+	/* find the value by checking nanoseconds too */
+	while (0 < zbx_timespec_compare(&chunk->slots[index].timestamp, ts))
+	{
+		if (--index < chunk->first_value)
+		{
+			if (NULL == (chunk = chunk->prev))
+				goto out;
+
+			index = chunk->last_value;
+		}
+	}
 	vc_update_statistics(item, hits, misses);
 
 	vc_history_record_copy(value, &chunk->slots[index], item->value_type);
@@ -2322,6 +2369,8 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
 			/* check if the init value vector contains the requested value */
 			if (0 < zbx_timespec_compare(&values->values->timestamp, ts))
 				item->cached_all = 1;
+			else
+				item->reload_first = 1;
 		}
 		else if (0 != count)
 		{
@@ -2337,6 +2386,8 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_history_record_t *values, in
 			}
 			if (0 < count)
 				item->cached_all = 1;
+			else
+				item->reload_first = 1;
 		}
 
 		now = ZBX_VC_TIME();
@@ -2658,15 +2709,9 @@ out:
 		cache_used = 0;
 
 		if (0 == count)
-		{
 			ret = vc_db_read_values_by_time(itemid, value_type, values, seconds, timestamp);
-		}
 		else
-		{
-			zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
-
-			ret = vc_db_read_values_by_count(itemid, value_type, values, count, timestamp, &ts, 1);
-		}
+			ret = vc_db_read_values_by_count(itemid, value_type, values, count, timestamp);
 
 		if (SUCCEED == ret)
 		{
@@ -2835,22 +2880,9 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
  ******************************************************************************/
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type)
 {
-	int	i;
-
 	if (NULL != vector->values)
 	{
-		switch (value_type)
-		{
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				for (i = 0; i < vector->values_num; i++)
-					zbx_free(vector->values[i].value.str);
-
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				for (i = 0; i < vector->values_num; i++)
-					vc_history_logfree(vector->values[i].value.log);
-		}
+		vc_history_record_vector_clean(vector, value_type);
 		zbx_vector_history_record_destroy(vector);
 	}
 }
@@ -2942,3 +2974,4 @@ void	zbx_vc_unlock(void)
 	vc_locked = 0;
 	zbx_mutex_unlock(&vc_lock);
 }
+
