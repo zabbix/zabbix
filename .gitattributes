@@ -280,6 +280,7 @@ frontends/php/tests/unit/include/classes/api/APITest.php -text
 frontends/php/tests/unit/include/classes/api/clients/CLocalApiClientTest.php -text
 frontends/php/tests/unit/include/classes/core/CRegistryFactoryTest.php -text
 frontends/php/tests/unit/include/classes/validators/CCollectionValidatorTest.php -text
+frontends/php/tests/unit/include/classes/validators/CColorValidatorTest.php -text
 frontends/php/tests/unit/include/classes/validators/CValidatorTest.php -text
 frontends/php/tests/unit/include/classes/validators/string/CStringValidatorTest.php -text
 frontends/php/tests/unit/phpunit.xml -text
