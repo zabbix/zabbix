@@ -34,14 +34,13 @@ if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
 elseif ($this->data['type'] == RSM_RDDS) {
 	$headers = array(
 		_('Probe ID'),
-		_('Row result'),
 		_('RDDS43'),
-		_('RDDS43 IP'),
-		_('RDDS43 RTT'),
-		_('RDDS43 UPD'),
+		_('IP'),
+		_('RTT'),
+		_('UPD'),
 		_('RDDS80'),
-		_('RDDS80 IP'),
-		_('RDDS80 RTT'),
+		_('IP'),
+		_('RTT'),
 	);
 }
 else {
@@ -74,7 +73,7 @@ foreach ($this->data['probes'] as $probe) {
 			$link = $offline;
 		}
 		elseif ($this->data['type'] == RSM_RDDS) {
-			$rdds = $offline;
+			$rdds = 'red';
 			$rdds43 = $offline;
 			$rdds80 = $offline;
 		}
@@ -130,27 +129,27 @@ foreach ($this->data['probes'] as $probe) {
 			if (!isset($probe['value']) || $probe['value'] === null) {
 				$rdds43 = $noResult;
 				$rdds80 = $noResult;
-				$rdds = $noResult;
+				$rdds = 'gray';
 			}
 			elseif ($probe['value'] == 0) {
 				$rdds43 = $down;
 				$rdds80 = $down;
-				$rdds = $down;
+				$rdds = 'red';
 			}
 			elseif ($probe['value'] == 1) {
 				$rdds43 = $up;
 				$rdds80 = $up;
-				$rdds = $up;
+				$rdds = 'green';
 			}
 			elseif ($probe['value'] == 2) {
 				$rdds43 = $up;
 				$rdds80 = $down;
-				$rdds = $down;
+				$rdds = 'red';
 			}
 			elseif ($probe['value'] == 3) {
 				$rdds43 = $down;
 				$rdds80 = $up;
-				$rdds = $down;
+				$rdds = 'red';
 			}
 		}
 		else {
@@ -175,8 +174,7 @@ foreach ($this->data['probes'] as $probe) {
 	}
 	elseif ($this->data['type'] == RSM_RDDS) {
 		$row = array(
-			$probe['name'],
-			$rdds,
+			new CSpan($probe['name'], $rdds),
 			$rdds43,
 			(isset($probe['rdds43']['ip']) && $probe['rdds43']['ip']) ? $probe['rdds43']['ip'] : '-',
 			(isset($probe['rdds43']['rtt']) && $probe['rdds43']['rtt']) ? $probe['rdds43']['rtt'] : '-',
