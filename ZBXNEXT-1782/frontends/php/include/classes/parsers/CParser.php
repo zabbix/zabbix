@@ -21,12 +21,28 @@
 abstract class CParser {
 
 	/**
+	 * Current cursor position.
+	 *
+	 * @var int
+	 */
+	protected $pos;
+
+	/**
+	 * Returns the current cursor position.
+	 *
+	 * @return int
+	 */
+	public function getPos() {
+		return $this->pos;
+	}
+
+	/**
 	 * Try to parse the string starting from the given position.
 	 *
 	 * @param string	$source		string to parse
 	 * @param int 		$startPos	position to start from
 	 *
-	 * @return CParserResult
+	 * @return CParserResult|bool   returns a CParserResult object if a match has been found or false otherwise
 	 */
 	abstract public function parse($source, $startPos = 0);
 }

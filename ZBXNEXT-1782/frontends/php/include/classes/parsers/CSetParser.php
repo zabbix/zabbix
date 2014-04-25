@@ -50,30 +50,29 @@ class CSetParser extends CParser {
 	 * Find one of the given strings at the given position.
 	 *
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
-	 *
-	 * @param string 	$source
-	 * @param int 		$startPos
-	 *
-	 * @return CParserResult
 	 */
 	public function parse($source, $startPos = 0) {
-		$pos = $startPos;
+		$this->pos = $startPos;
 
 		$match = null;
 		$matchPos = null;
 		$token = '';
-		while (isset($source[$pos]) && isset($this->chars[$source[$pos]])) {
-			$token .= $source[$pos];
+		while (isset($source[$this->pos]) && isset($this->chars[$source[$this->pos]])) {
+			$token .= $source[$this->pos];
 
-			$pos++;
+			$this->pos++;
 
 			// when we found a match, keep looking to see of there may be a longer match
 			if (isset($this->needles[$token])) {
 				$match = $token;
-				$matchPos = $pos;
+				$matchPos = $this->pos;
 			}
 		}
 
-		return new CParserResult($source, $match, $startPos, ($matchPos !== null) ? $matchPos : $pos);
+		if ($matchPos === null) {
+			return false;
+		}
+
+		return new CParserResult($source, $match, $startPos, $matchPos);
 	}
 }
