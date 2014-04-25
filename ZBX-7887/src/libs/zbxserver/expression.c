@@ -3784,6 +3784,8 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		}
 	}
 
+	DCconfig_clean_items(items, errcodes, ifuncs->values_num);
+
 	zbx_free(errcodes);
 	zbx_free(items);
 
