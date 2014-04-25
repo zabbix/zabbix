@@ -990,8 +990,7 @@ class CTemplate extends CHostGeneral {
 			$templateExists = $this->get(array(
 				'output' => array('templateid'),
 				'filter' => array('name' => $data['name']),
-				'nopermissions' => true,
-				'limit' => 1
+				'nopermissions' => true
 			));
 			$templateExist = reset($templateExists);
 			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
@@ -1005,8 +1004,7 @@ class CTemplate extends CHostGeneral {
 			$hostExists = API::Host()->get(array(
 				'output' => array('hostid'),
 				'filter' => array('name' => $data['name']),
-				'nopermissions' => true,
-				'limit' => 1
+				'nopermissions' => true
 			));
 			if ($hostExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
@@ -1027,8 +1025,7 @@ class CTemplate extends CHostGeneral {
 			$templateExists = $this->get(array(
 				'output' => array('templateid'),
 				'filter' => array('host' => $data['host']),
-				'nopermissions' => true,
-				'limit' => 1
+				'nopermissions' => true
 			));
 			$templateExist = reset($templateExists);
 			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
@@ -1042,8 +1039,7 @@ class CTemplate extends CHostGeneral {
 			$hostExists = API::Host()->get(array(
 				'output' => array('hostid'),
 				'filter' => array('host' => $template['host']),
-				'nopermissions' => true,
-				'limit' => 1
+				'nopermissions' => true
 			));
 			if ($hostExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
