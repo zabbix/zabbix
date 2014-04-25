@@ -117,7 +117,7 @@ static int	find_ssh_ident_string(char *buf, size_t siz, char **retbuf, int *remo
 		memset(buffer, 0, bufsiz);
 		cp = buffer;
 
-		while (bufsiz-- && '\0' != (*cp = buf[i++]) && '\n' != *cp)
+		while (0 != bufsiz-- && '\0' != (*cp = buf[i++]) && '\n' != *cp)
 		{
 			if ('\r' == *cp)
 				*cp = '\n';
