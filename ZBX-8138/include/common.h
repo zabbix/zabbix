@@ -62,6 +62,11 @@
 #endif
 #define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
+#ifdef strncasecmp
+#	undef strncasecmp
+#endif
+#define strncasecmp	ERROR_DO_NOT_USE_STRNCASECMP_FUNCTION_TRY_TO_USE_ZBX_STRNCASECMP
+
 #define ON	1
 #define OFF	0
 
@@ -932,6 +937,8 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
 char	*zbx_strdcat(char *dest, const char *src);
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
+
+int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);

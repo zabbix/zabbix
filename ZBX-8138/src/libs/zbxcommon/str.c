@@ -2373,7 +2373,7 @@ char	*zbx_time2str(time_t time)
 	return buffer;
 }
 
-static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
+int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 {
 	if (NULL == s1 && NULL == s2)
 		return 0;

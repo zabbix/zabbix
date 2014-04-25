@@ -97,11 +97,58 @@ lbl_ret:
 }
 #endif	/* HAVE_LDAP */
 
+static int	find_ssh_ident_string(char *buf, size_t siz, char **retbuf, int *remote_major, int *remote_minor)
+{
+	char	buffer[256] = { 0 };		/* Per RFC4253, Section 4.2 - maximum identification string length */
+	char	remote_version[256] = { 0 };	/* Not really returned. Used for storage. */
+	char	*cp = NULL;
+	size_t	i = 0, bufsiz = 0;
+	int	ret = 0;
+	int	major = 0, minor = 0;
+
+	*retbuf = NULL;
+
+	for (;;)
+	{
+		if ('\0' == buf[i])
+			break;
+
+		bufsiz = sizeof(buffer);
+		memset(buffer, 0, bufsiz);
+		cp = buffer;
+
+		while (bufsiz-- && '\0' != (*cp = buf[i++]) && '\n' != *cp)
+		{
+			if ('\r' == *cp)
+				*cp = '\n';
+			cp++;
+		}
+
+		*(--cp) = '\0';
+
+		if (0 == zbx_strncasecmp(buffer, "SSH-", 4))
+		{
+			if((sscanf(buffer, "SSH-%d.%d-%[^\n]\n", &major, &minor, &remote_version)) == 3)
+			{
+				ret = strlen(buffer);
+				*retbuf = zbx_strdup(NULL, buffer);
+				*remote_major = major;
+				*remote_minor = minor;
+				break;
+			}
+		}
+	}
+
+	return ret;
+}
+
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_STRING_LEN], *recv_buf, *ssh_server, *ssh_proto;
+	char		send_buf[MAX_STRING_LEN], *recv_buf;
+	char		*ssh_ident_str = NULL;
+	int		remote_major = 0, remote_minor = 0;
 
 	*value_int = 0;
 
@@ -109,14 +156,13 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
 		{
-			if (0 == strncmp(recv_buf, "SSH", 3))
+			if (0 != find_ssh_ident_string(recv_buf, strlen(recv_buf), &ssh_ident_str, &remote_major,
+					&remote_minor))
 			{
-				ssh_server = ssh_proto = recv_buf + 4;
-				ssh_server += strspn(ssh_proto, "0123456789-. ");
-				ssh_server[-1] = '\0';
-
-				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%s-%s\n", ssh_proto, "zabbix_agent");
+				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-%s\n", remote_major, remote_minor, "zabbix_agent");
 				*value_int = 1;
+
+				zbx_free(ssh_ident_str);
 			}
 			else
 				zbx_snprintf(send_buf, sizeof(send_buf), "0\n");
