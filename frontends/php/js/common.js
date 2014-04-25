@@ -187,44 +187,6 @@ function checkLocalAll(form_name, chkMain, chkName) {
 	return true;
 }
 
-function clearAllForm(form) {
-	form = $(form);
-
-	var inputs = form.getElementsByTagName('input');
-	for (var i = 0; i < inputs.length; i++) {
-		var type = inputs[i].getAttribute('type');
-		switch (type) {
-			case 'button':
-			case 'hidden':
-			case 'submit':
-				break;
-			case 'checkbox':
-				jQuery(inputs[i]).prop('checked', false).trigger('change');
-				break;
-			case 'text':
-			case 'password':
-			default:
-				jQuery(inputs[i]).val('').trigger('change');
-		}
-	}
-
-	var selects = form.getElementsByTagName('select');
-	for (var i = 0; i < selects.length; i++) {
-		jQuery(selects[i]).val(null).trigger('change');
-	}
-
-	var areas = form.getElementsByTagName('textarea');
-	for (var i = 0; i < areas.length; i++) {
-		jQuery(areas[i]).val('').trigger('change');
-	}
-
-	jQuery('.multiselect').each(function() {
-		jQuery(this).multiSelect.clean(jQuery(this).attr('id'));
-	});
-
-	return true;
-}
-
 function close_window() {
 	window.setTimeout('window.close();', 500); // solve bug for Internet Explorer
 	return false;

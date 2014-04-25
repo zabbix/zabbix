@@ -34,7 +34,6 @@ if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_gro
 $newgroup = get_request('newgroup', '');
 $host = get_request('host', '');
 $visiblename = get_request('visiblename', '');
-$status = get_request('status', HOST_STATUS_MONITORED);
 $proxy_hostid = get_request('proxy_hostid', '');
 $ipmi_authtype = get_request('ipmi_authtype', -1);
 $ipmi_privilege = get_request('ipmi_privilege', 2);
@@ -46,6 +45,13 @@ $macros = get_request('macros', array());
 $interfaces = get_request('interfaces', array());
 $templateIds = get_request('templates', array());
 $clear_templates = get_request('clear_templates', array());
+
+if ((getRequest('hostid', 0) == 0) && !hasRequest('form_refresh')) {
+	$status = HOST_STATUS_MONITORED;
+}
+else {
+	$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
+}
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
 
@@ -431,11 +437,7 @@ else {
 }
 $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
-$cmbStatus = new CComboBox('status', $status);
-$cmbStatus->addItem(HOST_STATUS_MONITORED, _('Monitored'));
-$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
-
-$hostList->addRow(_('Status'), $cmbStatus);
+$hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED == $status), null, HOST_STATUS_MONITORED));
 
 if ($_REQUEST['form'] == 'full_clone') {
 	// host applications
