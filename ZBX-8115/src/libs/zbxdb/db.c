@@ -845,17 +845,19 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	switch (type)
 	{
 		case ZBX_TYPE_ID:
-			if ( 0 == *(zbx_uint64_t *)buffer)
+			if (0 == *(zbx_uint64_t *)buffer)
 			{
 				err = zbx_oracle_bind_parameter((ub4)position, NULL, 0, SQLT_VNU);
 				break;
 			}
+			/* break; is not missing here */
 		case ZBX_TYPE_UINT:
 			if (oci_ids_num >= oci_ids_alloc)
 			{
 				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
 				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber));
 			}
+
 			if (OCI_SUCCESS == (err = OCINumberFromInt(oracle.errhp, buffer, sizeof(zbx_uint64_t),
 					OCI_NUMBER_UNSIGNED, &oci_ids[oci_ids_num])))
 			{
