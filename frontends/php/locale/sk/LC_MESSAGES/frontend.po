@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 2.2\n"
+"Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-27 22:19+0300\n"
-"PO-Revision-Date: 2014-03-24 18:16+0300\n"
+"POT-Creation-Date: 2014-04-27 22:45+0300\n"
+"PO-Revision-Date: 2014-04-12 18:10+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395677788.0\n"
+"X-POOTLE-MTIME: 1397319011.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -14266,7 +14266,7 @@ msgstr "Neznámy algoritmus výpočtu stavu služby"
 
 #: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
-msgstr ""
+msgstr "Neznáma chyba"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14291,7 +14291,7 @@ msgstr "Neznámy zdroj"
 #: httpmon.php:157
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "Neznámy chybný krok: %1$s"
 
 #: include/items.inc.php:893
 msgid "Unknown value type"

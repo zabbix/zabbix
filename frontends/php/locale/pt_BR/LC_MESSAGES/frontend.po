@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 2.2\n"
+"Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-27 22:19+0300\n"
-"PO-Revision-Date: 2014-04-06 12:24+0300\n"
+"POT-Creation-Date: 2014-04-27 22:45+0300\n"
+"PO-Revision-Date: 2014-04-24 10:59+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1396779875.0\n"
+"X-POOTLE-MTIME: 1398329949.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -3579,7 +3579,7 @@ msgstr "Host do banco de dados"
 
 #: include/items.inc.php:92
 msgid "Database monitor"
-msgstr "Monitoração do banco de dados"
+msgstr "Monitoramento de banco de dados"
 
 #: include/setup.inc.php:303 include/setup.inc.php:422 setup.php:44
 msgid "Database name"
@@ -4829,7 +4829,7 @@ msgstr "Habilitar DEBUG"
 
 #: include/views/administration.script.edit.php:97
 msgid "Enable confirmation"
-msgstr "Habilitar configuração"
+msgstr "Confirmar antes da execução?"
 
 #: include/views/administration.usergroups.list.php:146
 msgid "Enable debug mode in selected groups?"
@@ -8955,7 +8955,7 @@ msgstr "Mídia atualizada"
 #: include/menu.inc.php:256
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
-msgstr "Tipos de mídias"
+msgstr "Tipos de mídia"
 
 #: api/classes/CMediatype.php:346
 #, c-format
@@ -11775,7 +11775,7 @@ msgstr "Confirmação de restauração"
 #: include/views/js/administration.general.triggerDisplayOptions.js.php:17
 #: include/views/js/administration.general.triggerSeverity.js.php:17
 msgid "Reset defaults"
-msgstr "Restaurar defaults"
+msgstr "Restaurar padrões"
 
 #: jsrpc.php:113
 msgid "Resolved"
@@ -12644,7 +12644,7 @@ msgstr "Sessão terminada, conecte-se novamente por favor."
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:702
 #: report5.php:61 tr_logform.php:370 tr_status.php:369
 msgid "Severity"
-msgstr "Risco"
+msgstr "Severidade"
 
 #: include/views/configuration.screen.constructor.edit.php:345
 msgid "Severity (descending)"
@@ -13426,7 +13426,7 @@ msgstr "Testar dados"
 
 #: include/views/administration.general.regularexpressions.edit.php:69
 msgid "Test expressions"
-msgstr "Expressões de teste"
+msgstr "Testar expressões"
 
 #: adm.regexps.php:38
 #: include/views/administration.general.regularexpressions.edit.php:66
@@ -14231,7 +14231,7 @@ msgstr "Algoritmo de cálculo de status de serviço desconhecido"
 
 #: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
-msgstr ""
+msgstr "Erro desconhecido"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14256,7 +14256,7 @@ msgstr "Recurso desconhecido"
 #: httpmon.php:157
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "Passo desconhecido falhou: %1$s"
 
 #: include/items.inc.php:893
 msgid "Unknown value type"
@@ -14487,7 +14487,7 @@ msgstr "Usar multiplicador customizado"
 
 #: popup_media.php:133
 msgid "Use if severity"
-msgstr "Usar se risco"
+msgstr "Usar se severidade"
 
 #: include/views/administration.mediatypes.list.php:43
 msgid "Used in actions"
@@ -14592,7 +14592,7 @@ msgstr "Grupo para mensagens de incidentes com o banco de dados \"%1$s\"."
 #: include/views/administration.users.list.php:28 popup.php:48
 #: popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "User groups"
-msgstr "Grupos de usuários"
+msgstr "Grupo de usuários"
 
 #: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
