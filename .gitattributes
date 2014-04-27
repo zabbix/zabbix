@@ -213,6 +213,7 @@ frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
+frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
