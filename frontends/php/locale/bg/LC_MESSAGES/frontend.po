@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:41+0300\n"
+"POT-Creation-Date: 2014-04-27 22:17+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -382,7 +382,7 @@ msgid "Action updated"
 msgstr "Действие актуализирано"
 
 #: events.php:481 include/blocks.inc.php:1000 include/blocks.inc.php:1296
-#: include/events.inc.php:198 include/menu.inc.php:191
+#: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
 msgstr "Действия"
@@ -527,7 +527,7 @@ msgstr "Добавено"
 msgid "Admin"
 msgstr "Администратор"
 
-#: include/menu.inc.php:218
+#: include/menu.inc.php:212
 msgid "Administration"
 msgstr "Администрация"
 
@@ -795,7 +795,7 @@ msgstr "Трябва да бъдат създаден най-малко един
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 msgstr ""
 
-#: include/menu.inc.php:263
+#: include/menu.inc.php:255
 #: include/views/administration.general.housekeeper.edit.php:100
 msgid "Audit"
 msgstr "Одит"
@@ -824,7 +824,7 @@ msgstr "Авг"
 msgid "August"
 msgstr "Август"
 
-#: include/menu.inc.php:246 include/views/configuration.httpconf.edit.php:80
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
 msgstr "Автентификация"
 
@@ -913,7 +913,7 @@ msgstr "Автоматичен избор на икона"
 msgid "Availability"
 msgstr "Наличност"
 
-#: include/menu.inc.php:129 report2.php:26
+#: include/menu.inc.php:125 report2.php:26
 msgid "Availability report"
 msgstr "Доклад за наличност"
 
@@ -964,7 +964,7 @@ msgstr "Фон"
 msgid "Background image"
 msgstr "Фоново изображение"
 
-#: include/menu.inc.php:137 report6.php:25 report6.php:231
+#: include/menu.inc.php:133 report6.php:25 report6.php:231
 msgid "Bar reports"
 msgstr "Бар доклади"
 
@@ -2930,7 +2930,7 @@ msgstr ""
 msgid "Conditions"
 msgstr "Условия"
 
-#: include/menu.inc.php:149 include/views/inventory.host.view.php:234
+#: include/menu.inc.php:145 include/views/inventory.host.view.php:234
 #: jsLoader.php:181
 msgid "Configuration"
 msgstr "Конфигурация"
@@ -3550,7 +3550,7 @@ msgstr "Тъмно оранжево"
 msgid "Darken"
 msgstr "Тъмен"
 
-#: dashboard.php:25 include/menu.inc.php:33 include/profiles.inc.php:426
+#: dashboard.php:25 include/menu.inc.php:32 include/profiles.inc.php:426
 msgid "Dashboard"
 msgstr "Табло"
 
@@ -4434,7 +4434,7 @@ msgid "Discovered device"
 msgstr "Открито устройство"
 
 #: events.php:338 hosts.php:840 hosts.php:936 include/html.inc.php:345
-#: include/menu.inc.php:77 include/menu.inc.php:209
+#: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:220
 #: include/views/inventory.host.view.php:230 search.php:144 search.php:185
@@ -5062,7 +5062,7 @@ msgstr "Детайли за източник на събитието"
 msgid "Event type"
 msgstr ""
 
-#: events.php:342 include/menu.inc.php:57
+#: events.php:342 include/menu.inc.php:56
 #: include/views/inventory.host.view.php:202 jsLoader.php:188 search.php:136
 #: search.php:222 search.php:276 search.php:329 tr_status.php:277
 msgid "Events"
@@ -5523,7 +5523,7 @@ msgstr "Графичен потребителски интерфейс (GUI)"
 msgid "GUI access disabled."
 msgstr "GUI достъп забранен."
 
-#: include/menu.inc.php:226
+#: include/menu.inc.php:218
 msgid "General"
 msgstr "Общ"
 
@@ -5774,7 +5774,7 @@ msgid "Graph with same name but other type exist."
 msgstr "Графика със същото име, но различен тип вече съществува."
 
 #: dashboard.php:317 hosts.php:839 hosts.php:934 include/html.inc.php:429
-#: include/html.inc.php:433 include/menu.inc.php:62
+#: include/html.inc.php:433 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:522
@@ -6235,7 +6235,7 @@ msgstr "Тип етикет на хост група"
 msgid "Host group name cannot be empty."
 msgstr ""
 
-#: include/forms.inc.php:176 include/menu.inc.php:160
+#: include/forms.inc.php:176 include/menu.inc.php:154
 #: include/views/configuration.copy.elements.php:48
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/monitoring.dashconf.php:53 search.php:339
@@ -6417,7 +6417,7 @@ msgstr "Хост със същото видимо име \"%s\" вече същ�
 
 #: hostinventoriesoverview.php:85 hosts.php:797 include/forms.inc.php:199
 #: include/forms.inc.php:870 include/items.inc.php:723
-#: include/menu.inc.php:112 include/menu.inc.php:168
+#: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:364 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:46
 #: include/views/configuration.copy.elements.php:46
@@ -6607,7 +6607,7 @@ msgstr "Зависимости на IT услуга"
 msgid "IT service parent"
 msgstr "Главна IT услуга"
 
-#: include/menu.inc.php:82 include/menu.inc.php:213
+#: include/menu.inc.php:81 include/menu.inc.php:207
 #: include/views/administration.general.housekeeper.edit.php:81
 #: include/views/configuration.services.list.php:24 srv_status.php:26
 #: srv_status.php:163
@@ -7618,7 +7618,7 @@ msgstr "Вмъкване"
 msgid "Insert macro"
 msgstr "Вмъкване макро"
 
-#: include/menu.inc.php:276 include/profiles.inc.php:299 setup.php:103
+#: include/menu.inc.php:268 include/profiles.inc.php:299 setup.php:103
 msgid "Installation"
 msgstr "Инсталация"
 
@@ -7813,8 +7813,7 @@ msgstr "Невалиден период на време"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Невалидно име за преглед дава \"%s\". Позволени символи: \"a-z\" and \".\"."
 
-#: include/menu.inc.php:101
-#: include/views/configuration.host.massupdate.php:306
+#: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:306
 msgid "Inventory"
 msgstr "Инвентаризация"
 
@@ -8346,7 +8345,7 @@ msgstr "Последна стойност"
 msgid "Last week graph"
 msgstr "Графика за последната седмица"
 
-#: include/menu.inc.php:47 include/views/inventory.host.view.php:195
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
 #: include/views/inventory.host.view.php:197 jsLoader.php:201 latest.php:26
 #: search.php:134 search.php:220 search.php:274 search.php:327
 msgid "Latest data"
@@ -8552,7 +8551,7 @@ msgid "Logged in as"
 msgstr "Влезли сте като"
 
 #: auditlogs.php:137 include/func.inc.php:1921 include/func.inc.php:1938
-#: include/menu.inc.php:281 include/page_header.php:216
+#: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
@@ -8702,7 +8701,7 @@ msgid "Macros updated"
 msgstr "Макроси актуализирани"
 
 #: include/audit.inc.php:47 include/maps.inc.php:604 include/maps.inc.php:694
-#: include/menu.inc.php:187
+#: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "Maintenance"
@@ -8834,7 +8833,7 @@ msgstr "Съпоставяне на стойност \"%1$s\" не е уника
 msgid "Mappings"
 msgstr "Съответствия"
 
-#: dashboard.php:331 include/menu.inc.php:72 include/menu.inc.php:204
+#: dashboard.php:331 include/menu.inc.php:71 include/menu.inc.php:198
 #: include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:79
@@ -9012,7 +9011,7 @@ msgstr[1] "Метод на уведомление включено"
 msgid "Media type updated"
 msgstr "Метод на уведомление актуализирано"
 
-#: include/menu.inc.php:255
+#: include/menu.inc.php:247
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
 msgstr "Методи на уведомление"
@@ -10259,7 +10258,7 @@ msgstr "Нищо общо."
 msgid "Notification report"
 msgstr "Доклад за нотификациите"
 
-#: include/menu.inc.php:272 report4.php:68 report4.php:119
+#: include/menu.inc.php:264 report4.php:68 report4.php:119
 msgid "Notifications"
 msgstr "Нотификации"
 
@@ -10799,7 +10798,7 @@ msgstr ""
 msgid "Overriden by global housekeeping settings"
 msgstr ""
 
-#: include/menu.inc.php:38 include/menu.inc.php:108
+#: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
 #: include/views/monitoring.overview.php:35 overview.php:27 queue.php:69
 msgid "Overview"
@@ -11351,7 +11350,7 @@ msgstr "Профил"
 msgid "Prototypes"
 msgstr "Прототипи"
 
-#: include/menu.inc.php:242 include/views/administration.proxy.list.php:29
+#: include/menu.inc.php:234 include/views/administration.proxy.list.php:29
 #: popup.php:35
 msgid "Proxies"
 msgstr "Проксита"
@@ -11426,7 +11425,7 @@ msgstr "Файл с обществен ключ"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "ПРЕХВЪРЛЯНЕ ЕЛЕМЕНТИ НА ДАННИТЕ, ЧАКАЩИ АКТУАЛИЗИРАНЕ"
 
-#: include/menu.inc.php:268 queue.php:25
+#: include/menu.inc.php:260 queue.php:25
 msgid "Queue"
 msgstr "Опашка"
 
@@ -11690,7 +11689,7 @@ msgstr "Отчет 2"
 msgid "Report 3"
 msgstr "Отчет 3"
 
-#: include/menu.inc.php:117 report6.php:229
+#: include/menu.inc.php:114 report6.php:229
 msgid "Reports"
 msgstr "Отчети"
 
@@ -12288,7 +12287,7 @@ msgid "Screen updated"
 msgstr "Екран актуализиран"
 
 #: dashboard.php:347 include/html.inc.php:454 include/html.inc.php:458
-#: include/menu.inc.php:67 include/menu.inc.php:195
+#: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:375
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:207
@@ -12351,7 +12350,7 @@ msgstr "Скрипт актуализиран"
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: include/menu.inc.php:259 include/views/administration.script.list.php:28
+#: include/menu.inc.php:251 include/views/administration.script.list.php:28
 #: jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Скриптове"
@@ -12861,7 +12860,7 @@ msgstr "Слайдшоу трябва да съдържа слайдове."
 msgid "Slide show updated"
 msgstr "Слайдшоу актуализирано"
 
-#: dashboard.php:351 include/menu.inc.php:200
+#: dashboard.php:351 include/menu.inc.php:194
 #: include/views/configuration.slideconf.list.php:29
 #: include/views/monitoring.screen.php:28
 #: include/views/monitoring.slides.php:34 popup.php:71
@@ -13037,7 +13036,7 @@ msgid "Status of Web monitoring"
 msgstr "Състояние на уеб мониторинг"
 
 #: dashboard.php:369 include/classes/screens/CScreenSystemStatus.php:46
-#: include/menu.inc.php:124 report1.php:25
+#: include/menu.inc.php:120 report1.php:25
 msgid "Status of Zabbix"
 msgstr "Състояние на Zabbix"
 
@@ -13369,7 +13368,7 @@ msgstr "Шаблон със същото видимо име \"%s\" вече с�
 msgid "Templated items"
 msgstr "Шаблонни елементи на данните"
 
-#: hosts.php:843 include/menu.inc.php:164
+#: hosts.php:843 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:716
 #: include/views/configuration.hostgroups.list.php:144
@@ -13916,7 +13915,7 @@ msgid "Trigger value"
 msgstr "Стойност на тригер"
 
 #: hosts.php:838 hosts.php:932 include/forms.inc.php:568
-#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:52
+#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:51
 #: include/triggers.inc.php:1259
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
@@ -13960,7 +13959,7 @@ msgstr "Преглед на тригери"
 msgid "Triggers status"
 msgstr "Състояние на тригери"
 
-#: include/menu.inc.php:133
+#: include/menu.inc.php:129
 msgid "Triggers top 100"
 msgstr "Топ 100 на тригерите"
 
@@ -14661,7 +14660,7 @@ msgstr "Потребител с псевдоним \"%s\" вече същест�
 msgid "Username"
 msgstr "Потребителско име"
 
-#: include/menu.inc.php:250
+#: include/menu.inc.php:242
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/administration.usergroups.list.php:29
 #: include/views/administration.usergroups.list.php:121
@@ -15009,6 +15008,10 @@ msgstr "Вертикален"
 msgid "Vertical align"
 msgstr "Вертикално подравняване"
 
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
+
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
 msgstr "Прегледа не се показва."
@@ -15048,7 +15051,7 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Съжаляваме, достигнат е максималния възможен брой от елементи."
 
-#: hosts.php:841 hosts.php:938 include/menu.inc.php:42
+#: hosts.php:841 hosts.php:938 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:222
 #: include/views/inventory.host.view.php:231 search.php:139 search.php:145
