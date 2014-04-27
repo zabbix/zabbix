@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:41+0300\n"
+"POT-Creation-Date: 2014-04-27 22:17+0300\n"
 "PO-Revision-Date: 2014-02-04 10:36+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -381,7 +381,7 @@ msgid "Action updated"
 msgstr "Action updated"
 
 #: events.php:481 include/blocks.inc.php:1000 include/blocks.inc.php:1296
-#: include/events.inc.php:198 include/menu.inc.php:191
+#: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
 msgstr "Actions"
@@ -526,7 +526,7 @@ msgstr "Added"
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:218
+#: include/menu.inc.php:212
 msgid "Administration"
 msgstr "Administration"
 
@@ -794,7 +794,7 @@ msgstr "At least one maintenance period must be created."
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 msgstr ""
 
-#: include/menu.inc.php:263
+#: include/menu.inc.php:255
 #: include/views/administration.general.housekeeper.edit.php:100
 msgid "Audit"
 msgstr "Audit"
@@ -823,7 +823,7 @@ msgstr "Aug"
 msgid "August"
 msgstr "August"
 
-#: include/menu.inc.php:246 include/views/configuration.httpconf.edit.php:80
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
 msgstr "Authentication"
 
@@ -911,7 +911,7 @@ msgstr "Automatic icon selection"
 msgid "Availability"
 msgstr "Availability"
 
-#: include/menu.inc.php:129 report2.php:26
+#: include/menu.inc.php:125 report2.php:26
 msgid "Availability report"
 msgstr "Availability report"
 
@@ -962,7 +962,7 @@ msgstr "Background"
 msgid "Background image"
 msgstr "Background image"
 
-#: include/menu.inc.php:137 report6.php:25 report6.php:231
+#: include/menu.inc.php:133 report6.php:25 report6.php:231
 msgid "Bar reports"
 msgstr "Bar reports"
 
@@ -2923,7 +2923,7 @@ msgstr ""
 msgid "Conditions"
 msgstr "Conditions"
 
-#: include/menu.inc.php:149 include/views/inventory.host.view.php:234
+#: include/menu.inc.php:145 include/views/inventory.host.view.php:234
 #: jsLoader.php:181
 msgid "Configuration"
 msgstr "Configuration"
@@ -3541,7 +3541,7 @@ msgstr "Dark orange"
 msgid "Darken"
 msgstr "Darken"
 
-#: dashboard.php:25 include/menu.inc.php:33 include/profiles.inc.php:426
+#: dashboard.php:25 include/menu.inc.php:32 include/profiles.inc.php:426
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -4424,7 +4424,7 @@ msgid "Discovered device"
 msgstr "Discovered device"
 
 #: events.php:338 hosts.php:840 hosts.php:936 include/html.inc.php:345
-#: include/menu.inc.php:77 include/menu.inc.php:209
+#: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:220
 #: include/views/inventory.host.view.php:230 search.php:144 search.php:185
@@ -5052,7 +5052,7 @@ msgstr "Event source details"
 msgid "Event type"
 msgstr "Event type"
 
-#: events.php:342 include/menu.inc.php:57
+#: events.php:342 include/menu.inc.php:56
 #: include/views/inventory.host.view.php:202 jsLoader.php:188 search.php:136
 #: search.php:222 search.php:276 search.php:329 tr_status.php:277
 msgid "Events"
@@ -5513,7 +5513,7 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "GUI access disabled."
 
-#: include/menu.inc.php:226
+#: include/menu.inc.php:218
 msgid "General"
 msgstr "General"
 
@@ -5764,7 +5764,7 @@ msgid "Graph with same name but other type exist."
 msgstr "Graph with same name but other type exist."
 
 #: dashboard.php:317 hosts.php:839 hosts.php:934 include/html.inc.php:429
-#: include/html.inc.php:433 include/menu.inc.php:62
+#: include/html.inc.php:433 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:522
@@ -6226,7 +6226,7 @@ msgstr "Host group label type"
 msgid "Host group name cannot be empty."
 msgstr "Host group name cannot be empty."
 
-#: include/forms.inc.php:176 include/menu.inc.php:160
+#: include/forms.inc.php:176 include/menu.inc.php:154
 #: include/views/configuration.copy.elements.php:48
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/monitoring.dashconf.php:53 search.php:339
@@ -6408,7 +6408,7 @@ msgstr "Host with the same visible name \"%s\" already exists."
 
 #: hostinventoriesoverview.php:85 hosts.php:797 include/forms.inc.php:199
 #: include/forms.inc.php:870 include/items.inc.php:723
-#: include/menu.inc.php:112 include/menu.inc.php:168
+#: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:364 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:46
 #: include/views/configuration.copy.elements.php:46
@@ -6598,7 +6598,7 @@ msgstr "IT service dependencies"
 msgid "IT service parent"
 msgstr "IT service parent"
 
-#: include/menu.inc.php:82 include/menu.inc.php:213
+#: include/menu.inc.php:81 include/menu.inc.php:207
 #: include/views/administration.general.housekeeper.edit.php:81
 #: include/views/configuration.services.list.php:24 srv_status.php:26
 #: srv_status.php:163
@@ -7602,7 +7602,7 @@ msgstr "Insert"
 msgid "Insert macro"
 msgstr "Insert macro"
 
-#: include/menu.inc.php:276 include/profiles.inc.php:299 setup.php:103
+#: include/menu.inc.php:268 include/profiles.inc.php:299 setup.php:103
 msgid "Installation"
 msgstr "Installation"
 
@@ -7797,8 +7797,7 @@ msgstr "Invalid time period"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 
-#: include/menu.inc.php:101
-#: include/views/configuration.host.massupdate.php:306
+#: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:306
 msgid "Inventory"
 msgstr "Inventory"
 
@@ -8330,7 +8329,7 @@ msgstr "Last value"
 msgid "Last week graph"
 msgstr "Last week graph"
 
-#: include/menu.inc.php:47 include/views/inventory.host.view.php:195
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
 #: include/views/inventory.host.view.php:197 jsLoader.php:201 latest.php:26
 #: search.php:134 search.php:220 search.php:274 search.php:327
 msgid "Latest data"
@@ -8536,7 +8535,7 @@ msgid "Logged in as"
 msgstr "Logged in as"
 
 #: auditlogs.php:137 include/func.inc.php:1921 include/func.inc.php:1938
-#: include/menu.inc.php:281 include/page_header.php:216
+#: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
@@ -8686,7 +8685,7 @@ msgid "Macros updated"
 msgstr "Macros updated"
 
 #: include/audit.inc.php:47 include/maps.inc.php:604 include/maps.inc.php:694
-#: include/menu.inc.php:187
+#: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "Maintenance"
@@ -8818,7 +8817,7 @@ msgstr "Mapping value \"%1$s\" is not unique."
 msgid "Mappings"
 msgstr "Mappings"
 
-#: dashboard.php:331 include/menu.inc.php:72 include/menu.inc.php:204
+#: dashboard.php:331 include/menu.inc.php:71 include/menu.inc.php:198
 #: include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:79
@@ -8996,7 +8995,7 @@ msgstr[1] "Media type enabled"
 msgid "Media type updated"
 msgstr "Media type updated"
 
-#: include/menu.inc.php:255
+#: include/menu.inc.php:247
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
 msgstr "Media types"
@@ -10241,7 +10240,7 @@ msgstr "Nothing to do."
 msgid "Notification report"
 msgstr "Notification report"
 
-#: include/menu.inc.php:272 report4.php:68 report4.php:119
+#: include/menu.inc.php:264 report4.php:68 report4.php:119
 msgid "Notifications"
 msgstr "Notifications"
 
@@ -10779,7 +10778,7 @@ msgstr "Override item trend period"
 msgid "Overriden by global housekeeping settings"
 msgstr ""
 
-#: include/menu.inc.php:38 include/menu.inc.php:108
+#: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
 #: include/views/monitoring.overview.php:35 overview.php:27 queue.php:69
 msgid "Overview"
@@ -11330,7 +11329,7 @@ msgstr "Profile"
 msgid "Prototypes"
 msgstr "Prototypes"
 
-#: include/menu.inc.php:242 include/views/administration.proxy.list.php:29
+#: include/menu.inc.php:234 include/views/administration.proxy.list.php:29
 #: popup.php:35
 msgid "Proxies"
 msgstr "Proxies"
@@ -11405,7 +11404,7 @@ msgstr "Public key file"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "QUEUE OF ITEMS TO BE UPDATED"
 
-#: include/menu.inc.php:268 queue.php:25
+#: include/menu.inc.php:260 queue.php:25
 msgid "Queue"
 msgstr "Queue"
 
@@ -11669,7 +11668,7 @@ msgstr "Report 2"
 msgid "Report 3"
 msgstr "Report 3"
 
-#: include/menu.inc.php:117 report6.php:229
+#: include/menu.inc.php:114 report6.php:229
 msgid "Reports"
 msgstr "Reports"
 
@@ -12264,7 +12263,7 @@ msgid "Screen updated"
 msgstr "Screen updated"
 
 #: dashboard.php:347 include/html.inc.php:454 include/html.inc.php:458
-#: include/menu.inc.php:67 include/menu.inc.php:195
+#: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:375
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:207
@@ -12327,7 +12326,7 @@ msgstr "Script updated"
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "Script with scriptid \"%1$s\" does not exist."
 
-#: include/menu.inc.php:259 include/views/administration.script.list.php:28
+#: include/menu.inc.php:251 include/views/administration.script.list.php:28
 #: jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Scripts"
@@ -12837,7 +12836,7 @@ msgstr "Slide show must contain slides."
 msgid "Slide show updated"
 msgstr "Slide show updated"
 
-#: dashboard.php:351 include/menu.inc.php:200
+#: dashboard.php:351 include/menu.inc.php:194
 #: include/views/configuration.slideconf.list.php:29
 #: include/views/monitoring.screen.php:28
 #: include/views/monitoring.slides.php:34 popup.php:71
@@ -13013,7 +13012,7 @@ msgid "Status of Web monitoring"
 msgstr "Status of Web monitoring"
 
 #: dashboard.php:369 include/classes/screens/CScreenSystemStatus.php:46
-#: include/menu.inc.php:124 report1.php:25
+#: include/menu.inc.php:120 report1.php:25
 msgid "Status of Zabbix"
 msgstr "Status of Zabbix"
 
@@ -13345,7 +13344,7 @@ msgstr "Template with the same visible name \"%s\" already exists."
 msgid "Templated items"
 msgstr "Templated items"
 
-#: hosts.php:843 include/menu.inc.php:164
+#: hosts.php:843 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:716
 #: include/views/configuration.hostgroups.list.php:144
@@ -13891,7 +13890,7 @@ msgid "Trigger value"
 msgstr "Trigger value"
 
 #: hosts.php:838 hosts.php:932 include/forms.inc.php:568
-#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:52
+#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:51
 #: include/triggers.inc.php:1259
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
@@ -13935,7 +13934,7 @@ msgstr "Triggers overview"
 msgid "Triggers status"
 msgstr "Triggers status"
 
-#: include/menu.inc.php:133
+#: include/menu.inc.php:129
 msgid "Triggers top 100"
 msgstr "Triggers top 100"
 
@@ -14635,7 +14634,7 @@ msgstr "User with alias \"%s\" already exists."
 msgid "Username"
 msgstr "Username"
 
-#: include/menu.inc.php:250
+#: include/menu.inc.php:242
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/administration.usergroups.list.php:29
 #: include/views/administration.usergroups.list.php:121
@@ -14983,6 +14982,10 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Vertical align"
 
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
+
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
 msgstr "View is not rendered."
@@ -15022,7 +15025,7 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "We are sorry, the maximum possible number of elements to remember has been reached."
 
-#: hosts.php:841 hosts.php:938 include/menu.inc.php:42
+#: hosts.php:841 hosts.php:938 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:222
 #: include/views/inventory.host.view.php:231 search.php:139 search.php:145
