@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:57+0300\n"
+"POT-Creation-Date: 2014-04-27 22:17+0300\n"
 "PO-Revision-Date: 2014-04-23 06:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -371,7 +371,7 @@ msgid "Action updated"
 msgstr "アクションを更新しました"
 
 #: events.php:481 include/blocks.inc.php:1000 include/blocks.inc.php:1296
-#: include/events.inc.php:198 include/menu.inc.php:191
+#: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
 msgstr "アクション"
@@ -516,7 +516,7 @@ msgstr "追加"
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:218
+#: include/menu.inc.php:212
 msgid "Administration"
 msgstr "管理"
 
@@ -780,7 +780,7 @@ msgstr "少なくとも1つ以上のメンテナンス期間を作成する必�
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
 msgstr "少なくともMySQL、PostgreSQL、Oracle、SQLite3、IBM DB2のうち1つがサポートされている必要があります。"
 
-#: include/menu.inc.php:263
+#: include/menu.inc.php:255
 #: include/views/administration.general.housekeeper.edit.php:100
 msgid "Audit"
 msgstr "監査"
@@ -809,7 +809,7 @@ msgstr "8月"
 msgid "August"
 msgstr "8月"
 
-#: include/menu.inc.php:246 include/views/configuration.httpconf.edit.php:80
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:80
 msgid "Authentication"
 msgstr "認証"
 
@@ -897,7 +897,7 @@ msgstr "アイコンの自動選択"
 msgid "Availability"
 msgstr "エージェントの状態"
 
-#: include/menu.inc.php:129 report2.php:26
+#: include/menu.inc.php:125 report2.php:26
 msgid "Availability report"
 msgstr "稼働レポート"
 
@@ -948,7 +948,7 @@ msgstr "背景"
 msgid "Background image"
 msgstr "背景のイメージ"
 
-#: include/menu.inc.php:137 report6.php:25 report6.php:231
+#: include/menu.inc.php:133 report6.php:25 report6.php:231
 msgid "Bar reports"
 msgstr "バーレポート"
 
@@ -2877,7 +2877,7 @@ msgstr ""
 msgid "Conditions"
 msgstr "アクションの実行条件"
 
-#: include/menu.inc.php:149 include/views/inventory.host.view.php:234
+#: include/menu.inc.php:145 include/views/inventory.host.view.php:234
 #: jsLoader.php:181
 msgid "Configuration"
 msgstr "設定"
@@ -3495,7 +3495,7 @@ msgstr "Dark orange"
 msgid "Darken"
 msgstr "暗く"
 
-#: dashboard.php:25 include/menu.inc.php:33 include/profiles.inc.php:426
+#: dashboard.php:25 include/menu.inc.php:32 include/profiles.inc.php:426
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
@@ -4377,7 +4377,7 @@ msgid "Discovered device"
 msgstr "発見されたホスト"
 
 #: events.php:338 hosts.php:840 hosts.php:936 include/html.inc.php:345
-#: include/menu.inc.php:77 include/menu.inc.php:209
+#: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:220
 #: include/views/inventory.host.view.php:230 search.php:144 search.php:185
@@ -5003,7 +5003,7 @@ msgstr "イベントソースの詳細"
 msgid "Event type"
 msgstr "イベントタイプ"
 
-#: events.php:342 include/menu.inc.php:57
+#: events.php:342 include/menu.inc.php:56
 #: include/views/inventory.host.view.php:202 jsLoader.php:188 search.php:136
 #: search.php:222 search.php:276 search.php:329 tr_status.php:277
 msgid "Events"
@@ -5464,7 +5464,7 @@ msgstr "表示設定"
 msgid "GUI access disabled."
 msgstr "GUIアクセスを無効にしました"
 
-#: include/menu.inc.php:226
+#: include/menu.inc.php:218
 msgid "General"
 msgstr "一般設定"
 
@@ -5715,7 +5715,7 @@ msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
 #: dashboard.php:317 hosts.php:839 hosts.php:934 include/html.inc.php:429
-#: include/html.inc.php:433 include/menu.inc.php:62
+#: include/html.inc.php:433 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:522
@@ -6173,7 +6173,7 @@ msgstr "ホストグループのラベルタイプ"
 msgid "Host group name cannot be empty."
 msgstr "ホストグループ名が設定されていません。"
 
-#: include/forms.inc.php:176 include/menu.inc.php:160
+#: include/forms.inc.php:176 include/menu.inc.php:154
 #: include/views/configuration.copy.elements.php:48
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/monitoring.dashconf.php:53 search.php:339
@@ -6353,7 +6353,7 @@ msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在し
 
 #: hostinventoriesoverview.php:85 hosts.php:797 include/forms.inc.php:199
 #: include/forms.inc.php:870 include/items.inc.php:723
-#: include/menu.inc.php:112 include/menu.inc.php:168
+#: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:364 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:46
 #: include/views/configuration.copy.elements.php:46
@@ -6543,7 +6543,7 @@ msgstr "ITサービスの依存関係"
 msgid "IT service parent"
 msgstr "ITサービスの親"
 
-#: include/menu.inc.php:82 include/menu.inc.php:213
+#: include/menu.inc.php:81 include/menu.inc.php:207
 #: include/views/administration.general.housekeeper.edit.php:81
 #: include/views/configuration.services.list.php:24 srv_status.php:26
 #: srv_status.php:163
@@ -7547,7 +7547,7 @@ msgstr "挿入"
 msgid "Insert macro"
 msgstr "マクロの挿入"
 
-#: include/menu.inc.php:276 include/profiles.inc.php:299 setup.php:103
+#: include/menu.inc.php:268 include/profiles.inc.php:299 setup.php:103
 msgid "Installation"
 msgstr "インストール"
 
@@ -7742,8 +7742,7 @@ msgstr "時間の指定が正しくありません。"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "表示名\"%s\"が正しくありません。利用できる文字: \"a-z\"および\".\"。"
 
-#: include/menu.inc.php:101
-#: include/views/configuration.host.massupdate.php:306
+#: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:306
 msgid "Inventory"
 msgstr "インベントリ"
 
@@ -8270,7 +8269,7 @@ msgstr "最新の値"
 msgid "Last week graph"
 msgstr "最新1週間のグラフ"
 
-#: include/menu.inc.php:47 include/views/inventory.host.view.php:195
+#: include/menu.inc.php:46 include/views/inventory.host.view.php:195
 #: include/views/inventory.host.view.php:197 jsLoader.php:201 latest.php:26
 #: search.php:134 search.php:220 search.php:274 search.php:327
 msgid "Latest data"
@@ -8476,7 +8475,7 @@ msgid "Logged in as"
 msgstr "次のユーザーでログイン"
 
 #: auditlogs.php:137 include/func.inc.php:1921 include/func.inc.php:1938
-#: include/menu.inc.php:281 include/page_header.php:216
+#: include/menu.inc.php:273 include/page_header.php:216
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
@@ -8626,7 +8625,7 @@ msgid "Macros updated"
 msgstr "マクロを更新しました"
 
 #: include/audit.inc.php:47 include/maps.inc.php:604 include/maps.inc.php:694
-#: include/menu.inc.php:187
+#: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "Maintenance"
@@ -8758,7 +8757,7 @@ msgstr "値のマッピング\"%1$s\"はユニークではありません。"
 msgid "Mappings"
 msgstr "マッピング"
 
-#: dashboard.php:331 include/menu.inc.php:72 include/menu.inc.php:204
+#: dashboard.php:331 include/menu.inc.php:71 include/menu.inc.php:198
 #: include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:79
@@ -8927,7 +8926,7 @@ msgstr[0] "メディアタイプを有効にしました"
 msgid "Media type updated"
 msgstr "メディアタイプを更新しました"
 
-#: include/menu.inc.php:255
+#: include/menu.inc.php:247
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
 msgstr "メディアタイプ"
@@ -10171,7 +10170,7 @@ msgstr "実行するものがありません"
 msgid "Notification report"
 msgstr "通知レポート"
 
-#: include/menu.inc.php:272 report4.php:68 report4.php:119
+#: include/menu.inc.php:264 report4.php:68 report4.php:119
 msgid "Notifications"
 msgstr "通知レポート"
 
@@ -10709,7 +10708,7 @@ msgstr "アイテムのトレンドの保存期間を上書き"
 msgid "Overriden by global housekeeping settings"
 msgstr "グローバルなデータの保存期間設定を上書き"
 
-#: include/menu.inc.php:38 include/menu.inc.php:108
+#: include/menu.inc.php:37 include/menu.inc.php:105
 #: include/views/inventory.host.view.php:246
 #: include/views/monitoring.overview.php:35 overview.php:27 queue.php:69
 msgid "Overview"
@@ -11260,7 +11259,7 @@ msgstr "プロファイル"
 msgid "Prototypes"
 msgstr "プロトタイプ"
 
-#: include/menu.inc.php:242 include/views/administration.proxy.list.php:29
+#: include/menu.inc.php:234 include/views/administration.proxy.list.php:29
 #: popup.php:35
 msgid "Proxies"
 msgstr "プロキシ"
@@ -11335,7 +11334,7 @@ msgstr "公開鍵ファイル"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "更新待ちアイテムのキュー"
 
-#: include/menu.inc.php:268 queue.php:25
+#: include/menu.inc.php:260 queue.php:25
 msgid "Queue"
 msgstr "キュー"
 
@@ -11598,7 +11597,7 @@ msgstr "レポート2"
 msgid "Report 3"
 msgstr "レポート3"
 
-#: include/menu.inc.php:117 report6.php:229
+#: include/menu.inc.php:114 report6.php:229
 msgid "Reports"
 msgstr "レポート"
 
@@ -12193,7 +12192,7 @@ msgid "Screen updated"
 msgstr "スクリーンを更新しました"
 
 #: dashboard.php:347 include/html.inc.php:454 include/html.inc.php:458
-#: include/menu.inc.php:67 include/menu.inc.php:195
+#: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:375
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:207
@@ -12256,7 +12255,7 @@ msgstr "スクリプトを更新しました"
 msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトID\"%1$s\"は存在しません。"
 
-#: include/menu.inc.php:259 include/views/administration.script.list.php:28
+#: include/menu.inc.php:251 include/views/administration.script.list.php:28
 #: jsLoader.php:211 scripts_exec.php:24
 msgid "Scripts"
 msgstr "スクリプト"
@@ -12766,7 +12765,7 @@ msgstr "スライドショーには必ずスライドを設定してください
 msgid "Slide show updated"
 msgstr "スライドショーを更新しました"
 
-#: dashboard.php:351 include/menu.inc.php:200
+#: dashboard.php:351 include/menu.inc.php:194
 #: include/views/configuration.slideconf.list.php:29
 #: include/views/monitoring.screen.php:28
 #: include/views/monitoring.slides.php:34 popup.php:71
@@ -12942,7 +12941,7 @@ msgid "Status of Web monitoring"
 msgstr "Web監視のステータス"
 
 #: dashboard.php:369 include/classes/screens/CScreenSystemStatus.php:46
-#: include/menu.inc.php:124 report1.php:25
+#: include/menu.inc.php:120 report1.php:25
 msgid "Status of Zabbix"
 msgstr "Zabbixサーバーの状態"
 
@@ -13274,7 +13273,7 @@ msgstr "同じ表示名\"%s\"を持つテンプレートがすでに存在しま
 msgid "Templated items"
 msgstr "テンプレートのアイテム"
 
-#: hosts.php:843 include/menu.inc.php:164
+#: hosts.php:843 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:716
 #: include/views/configuration.hostgroups.list.php:144
@@ -13813,7 +13812,7 @@ msgid "Trigger value"
 msgstr "トリガーの値"
 
 #: hosts.php:838 hosts.php:932 include/forms.inc.php:568
-#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:52
+#: include/html.inc.php:404 include/html.inc.php:408 include/menu.inc.php:51
 #: include/triggers.inc.php:1259
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
@@ -13857,7 +13856,7 @@ msgstr "トリガーの概要"
 msgid "Triggers status"
 msgstr "トリガーのステータス"
 
-#: include/menu.inc.php:133
+#: include/menu.inc.php:129
 msgid "Triggers top 100"
 msgstr "障害発生数上位100項目"
 
@@ -14555,7 +14554,7 @@ msgstr "アカウント名\"%s\"を持つユーザーがすでに存在します
 msgid "Username"
 msgstr "ユーザー名"
 
-#: include/menu.inc.php:250
+#: include/menu.inc.php:242
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/administration.usergroups.list.php:29
 #: include/views/administration.usergroups.list.php:121
@@ -14903,6 +14902,10 @@ msgstr "縦"
 msgid "Vertical align"
 msgstr "縦位置"
 
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
+
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
 msgstr "ビューは描画されませんでした。"
@@ -14942,7 +14945,7 @@ msgstr "警告"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "要素を保存できる最大値に達しました"
 
-#: hosts.php:841 hosts.php:938 include/menu.inc.php:42
+#: hosts.php:841 hosts.php:938 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:222
 #: include/views/inventory.host.view.php:231 search.php:139 search.php:145
