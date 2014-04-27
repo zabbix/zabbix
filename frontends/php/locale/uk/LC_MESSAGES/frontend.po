@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:35+0300\n"
+"POT-Creation-Date: 2014-04-27 22:19+0300\n"
 "PO-Revision-Date: 2014-01-05 18:51+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -15114,6 +15114,10 @@ msgstr "Вертикальний"
 #: include/views/configuration.screen.constructor.edit.php:608
 msgid "Vertical align"
 msgstr "Вирівнювання по вертикалі"
+
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."

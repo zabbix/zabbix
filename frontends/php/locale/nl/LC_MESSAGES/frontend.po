@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:35+0300\n"
+"POT-Creation-Date: 2014-04-27 22:19+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -14990,6 +14990,10 @@ msgstr "Verticaal"
 #: include/views/configuration.screen.constructor.edit.php:608
 msgid "Vertical align"
 msgstr "Verticale uitlijning"
+
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."

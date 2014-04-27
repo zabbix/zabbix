@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 13:35+0300\n"
+"POT-Creation-Date: 2014-04-27 22:19+0300\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -15043,6 +15043,10 @@ msgstr ""
 
 #: include/views/configuration.screen.constructor.edit.php:608
 msgid "Vertical align"
+msgstr ""
+
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
 msgstr ""
 
 #: include/classes/class.cview.php:129
