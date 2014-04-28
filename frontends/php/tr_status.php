@@ -392,14 +392,13 @@ $triggerTable->setHeader(array(
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description'),
-	_('Comments')
+	_('Description')
 ));
 
 // get triggers
 $sortfield = getPageSortField('description');
 $sortorder = getPageSortOrder();
 $options = array(
-	'output' => array('triggerid', $sortfield),
 	'output' => array('triggerid', $sortfield),
 	'monitored' => true,
 	'skipDependent' => true,
