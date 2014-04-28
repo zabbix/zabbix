@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Trigger comments');
+$page['title'] = _('Trigger description');
 $page['file'] = 'tr_comments.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -78,7 +78,7 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($result);
-	show_messages($result, _('Comment updated'), _('Cannot update comment'));
+	show_messages($result, _('Description updated'), _('Cannot update description'));
 }
 elseif (isset($_REQUEST['cancel'])) {
 	jsRedirect('tr_status.php');
