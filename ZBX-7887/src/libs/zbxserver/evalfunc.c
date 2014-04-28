@@ -2195,7 +2195,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	zbx_host_key_t	host_key = {host, key};
 	DC_ITEM		item;
-	int		ret, errcode;
+	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
 
@@ -2203,10 +2203,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate function [%s(%s)]:"
-				" item [%s:%s] does not exist, is disabled or belongs to a disabled host",
-				function, parameter, host, key);
-		return FAIL;
+		zabbix_log(LOG_LEVEL_DEBUG, "item for function [%s:%s.%s(%s)] not found", host, key, function, parameter);
+		goto out;
 	}
 
 	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
@@ -2228,7 +2226,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 			}
 		}
 	}
-
+out:
 	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);

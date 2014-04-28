@@ -234,7 +234,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 	}
 
 	DCconfig_clean_items(items, errcodes, exp->functions_num);
-
 out:
 	zbx_free(errcodes);
 	zbx_free(items);
