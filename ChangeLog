@@ -101,6 +101,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translat
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-7887] fixed calculated item becoming not found if referenced item becomes not supported (igors)
 ..F....... [ZBX-8100] fixed map mass deletion using Oracle (Eduard)
 ..F....... [ZBX-8148] fixed maintenance warning message on php < 5.4 versions (Eduard)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
