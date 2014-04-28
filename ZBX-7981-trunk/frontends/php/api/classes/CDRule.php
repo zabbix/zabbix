@@ -487,11 +487,17 @@ class CDRule extends CApiService {
 			}
 
 			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
-				$dRuleNamesChanged[] = $dRule['name'];
+				$dRuleNamesChanged[$dRule['druleid']]['name'] = $dRule['name'];
 			}
 		}
 
 		if ($dRuleNamesChanged) {
+			$collectionValidator = new CCollectionValidator(array(
+				'uniqueField' => 'name',
+				'messageDuplicate' => _('Discovery rule "%1$s" already exists.')
+			));
+			$this->checkValidator($dRuleNamesChanged, $collectionValidator);
+
 			$dbDRules = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
 				'filter' => array('name' => $dRuleNamesChanged)
