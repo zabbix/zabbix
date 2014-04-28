@@ -1666,7 +1666,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		timestamp = ZBX_VC_TIME() - item->range;
 
 		/* try to remove chunks with all history values older than maximum request range */
-		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp)
+		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
+				chunk->slots[chunk->last_value].timestamp.sec !=
+						item->head->slots[item->head->last_value].timestamp.sec)
 		{
 			/* don't remove the head chunk */
 			if (NULL == (next = chunk->next))
@@ -2097,7 +2099,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  *           updates cache from database if necessary.                        *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_cache_value(zbx_vc_item_t *item, zbx_timespec_t *ts)
+static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 {
 	int	ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0;
 	int	start = ts->sec - 1;
@@ -2949,6 +2951,63 @@ finish:
 	return ret;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_check_value                                               *
+ *                                                                            *
+ * Purpose: check if the item has cached values and adds item to the cache    *
+ *          if necessary                                                      *
+ *                                                                            *
+ * Parameters: itemid     - [IN] the item id                                  *
+ *             value_type - [IN] the item value type                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the item cached values                            *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vc_check_value(zbx_uint64_t itemid, int value_type)
+{
+	const char	*__function_name = "zbx_vc_check_value";
+	zbx_vc_item_t	*item = NULL;
+	int 		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d", __function_name, itemid,
+			value_type);
+
+	if (NULL == vc_cache)
+		goto out;
+
+	vc_try_lock();
+
+	if (NULL != (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	{
+		if (NULL != item->head && item->head->first_value != item->head->last_value)
+			ret = SUCCEED;
+
+		goto clean;
+	}
+
+	if (0 == vc_cache->low_memory)
+	{
+		zbx_vc_item_t   new_item = {itemid, value_type};
+
+		item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t));
+
+		/* set the minimal range */
+		item->range = 1;
+		item->last_accessed = time(NULL);
+	}
+
+clean:
+	vc_try_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vc_get_statistics                                            *
@@ -3089,3 +3148,4 @@ void	zbx_vc_unlock(void)
 	vc_locked = 0;
 	zbx_mutex_unlock(&vc_lock);
 }
+

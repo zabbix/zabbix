@@ -94,6 +94,8 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value,
 		int *found);
 
+int	zbx_vc_check_value(zbx_uint64_t itemid, int value_type);
+
 int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp, history_value_t *value);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
