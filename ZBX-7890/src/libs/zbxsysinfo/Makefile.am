@@ -48,7 +48,8 @@ libzbxagentsysinfo_a_CFLAGS = \
 	-DWITH_HOSTNAME_METRIC
 
 libzbxagentsysinfo_a_SOURCES = \
-	sysinfo.c
+	sysinfo.c \
+	specsysinfo.h
 
 # SERVER version of sysinfo library
 libzbxserversysinfo_a_CFLAGS = \
