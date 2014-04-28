@@ -478,7 +478,15 @@ $paging = getPagingLine($triggers);
 $triggers = API::Trigger()->get(array(
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
-	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
+	'selectHosts' => array(
+		'hostid',
+		'name',
+		'description',
+		'status',
+		'maintenanceid',
+		'maintenance_status',
+		'maintenance_type'
+	),
 	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
@@ -592,7 +600,7 @@ foreach ($triggers as $tnum => $trigger) {
 
 // get hosts
 $hosts = API::Host()->get(array(
-	'output' => array('hostid'),
+	'output' => array('hostid', 'status'),
 	'hostids' => $hostIds,
 	'preservekeys' => true,
 	'selectGraphs' => API_OUTPUT_COUNT,

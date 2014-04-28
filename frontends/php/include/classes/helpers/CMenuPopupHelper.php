@@ -234,6 +234,7 @@ class CMenuPopupHelper {
 			'hostid' => $host['hostid'],
 			'hasGraphs' => (isset($host['graphs']) && $host['graphs']),
 			'hasScreens' => (isset($host['screens']) && $host['screens']),
+			'hasTriggers' => (isset($host['triggers']) && $host['triggers']),
 			'hasGoTo' => $hasGoTo
 		);
 
@@ -380,12 +381,14 @@ class CMenuPopupHelper {
 			'url' => resolveTriggerUrl($trigger)
 		);
 
+		$host = reset($trigger['hosts']);
+
 		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$host = reset($trigger['hosts']);
-
 			$data['configuration'] = array('hostid' => $host['hostid']);
 		}
+
+		$data['showEvents'] = ($host['status'] == HOST_STATUS_MONITORED);
 
 		return $data;
 	}
