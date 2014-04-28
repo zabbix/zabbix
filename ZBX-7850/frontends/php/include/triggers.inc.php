@@ -1196,7 +1196,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
+		'selectHosts' => array('hostid', 'name', 'status'),
 		'sortfield' => 'description'
 	));
 

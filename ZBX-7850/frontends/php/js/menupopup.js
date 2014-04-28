@@ -240,10 +240,12 @@ function getMenuPopupHost(options) {
 		};
 
 		// trigger status
-		gotos[gotos.length] = {
-			label: t('Triggers'),
-			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
-		};
+		if (options.hasTriggers) {
+			gotos[gotos.length] = {
+				label: t('Triggers'),
+				url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
+			};
+		}
 
 		// graphs
 		if (options.hasGraphs) {
@@ -579,15 +581,17 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
-	if (typeof options.eventTime !== 'undefined') {
-		url.setArgument('nav_time', options.eventTime);
-	}
+	if (options.showEvents) {
+		var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
+		if (typeof options.eventTime !== 'undefined') {
+			url.setArgument('nav_time', options.eventTime);
+		}
 
-	items[items.length] = {
-		label: t('Events'),
-		url: url.getUrl()
-	};
+		items[items.length] = {
+			label: t('Events'),
+			url: url.getUrl()
+		};
+	}
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
