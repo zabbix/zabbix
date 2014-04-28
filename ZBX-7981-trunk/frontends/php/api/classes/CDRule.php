@@ -400,7 +400,6 @@ class CDRule extends CApiService {
 		// check host name duplicates
 		$collectionValidator = new CCollectionValidator(array(
 			'uniqueField' => 'name',
-			'uniqueField2' => 'druleid',
 			'messageDuplicate' => _('Discovery rule "%1$s" already exists.')
 		));
 		$this->checkValidator($dRules, $collectionValidator);
@@ -408,7 +407,8 @@ class CDRule extends CApiService {
 		// checking to the duplicate names
 		$dbDRules = API::getApiService()->select($this->tableName(), array(
 			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($dRules, 'name'))
+			'filter' => array('name' => zbx_objectValues($dRules, 'name')),
+			'limit' => 1
 		));
 
 		if ($dbDRules) {
@@ -500,7 +500,8 @@ class CDRule extends CApiService {
 
 			$dbDRules = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => $dRuleNamesChanged)
+				'filter' => array('name' => $dRuleNamesChanged),
+				'limit' => 1
 			));
 
 			if ($dbDRules) {
