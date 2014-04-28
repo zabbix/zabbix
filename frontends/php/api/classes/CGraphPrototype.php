@@ -403,7 +403,7 @@ class CGraphPrototype extends CGraphGeneral {
 			));
 
 			if ($chdGraph = reset($chdGraphs)) {
-				if ($tmpGraph['name'] != $chdGraph['name']) {
+				if ($tmpGraph['name'] !== $chdGraph['name']) {
 					$graphExists = $this->get(array(
 						'output' => array('graphid'),
 						'hostids' => $chdHost['hostid'],
