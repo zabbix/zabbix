@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translat
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......PS. [ZBX-8115] added workaround for 64 bit integer binding not working with Oracle versions less than 11.2 (wiper)
 ..F....... [ZBX-8140] added net.udp.listen key to item popup (Eduard)
 ..F....... [ZBX-8123] fixed form fields show/hide switching in IE9 (Eduard)
@@ -927,6 +928,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-4675] added error checks to avoid partial configuration loading (dimir)
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
