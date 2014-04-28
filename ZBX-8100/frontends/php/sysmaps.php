@@ -186,16 +186,16 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 
 	DBstart();
 
+	$maps = API::Map()->get(array(
+		'sysmapids' => $sysmapIds,
+		'output' => array('sysmapid', 'name'),
+		'editable' => true
+	));
+
 	$result = API::Map()->delete($sysmapIds);
 
 	if ($result) {
 		unset($_REQUEST['form']);
-
-		$maps = API::Map()->get(array(
-			'sysmapids' => $sysmapIds,
-			'output' => array('name'),
-			'editable' => true
-		));
 
 		foreach ($maps as $map) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
