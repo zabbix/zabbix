@@ -278,9 +278,10 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Add maintenances
+	 * Add maintenances.
 	 *
 	 * @param array $maintenances
+	 *
 	 * @return boolean
 	 */
 	public function create(array $maintenances) {
@@ -349,6 +350,13 @@ class CMaintenance extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
 		}
+
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'maintenanceid',
+			'messageDuplicate' => _('Maintenance "%1$s" already exists.')
+		));
+		$this->checkValidator($maintenances, $collectionValidator);
 
 		// validate if maintenance name already exists
 		$dbMaintenances = $this->get(array(
@@ -433,9 +441,10 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Update maintenances
+	 * Update maintenances.
 	 *
 	 * @param array $maintenances
+	 *
 	 * @return boolean
 	 */
 	public function update(array $maintenances) {
@@ -457,7 +466,7 @@ class CMaintenance extends CApiService {
 			'preservekeys' => true
 		));
 
-		$maintenanceNames = array();
+		$maintenanceNamesChanged = array();
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
@@ -465,26 +474,35 @@ class CMaintenance extends CApiService {
 				));
 			}
 
-			if (isset($maintenance['name']) && !zbx_empty($maintenance['name'])) {
-				$maintenanceNames[] = $maintenance['name'];
+			if (isset($maintenance['name']) && !zbx_empty($maintenance['name'])
+					&& strcmp($updMaintenances[$maintenance['maintenanceid']]['name'], $maintenance['name']) != 0) {
+				$maintenanceNamesChanged[$maintenance['maintenanceid']]['name'] = $maintenance['name'];
 			}
 		}
 
 		// check if maintenance already exists
-		if ($maintenanceNames) {
+		if ($maintenanceNamesChanged) {
+			$collectionValidator = new CCollectionValidator(array(
+				'uniqueField' => 'name',
+				'messageDuplicate' => _('Maintenance "%1$s" already exists.')
+			));
+			$this->checkValidator($maintenanceNamesChanged, $collectionValidator);
+
 			$dbMaintenances = $this->get(array(
 				'output' => array('maintenanceid', 'name'),
-				'filter' => array('name' => zbx_objectValues($maintenances, 'name')),
+				'filter' => array('name' => $maintenanceNamesChanged),
 				'preservekeys' => true,
 				'nopermissions' => true
 			));
+			$dbMaintenances = zbx_toHash($dbMaintenances, 'name');
 
 			if ($dbMaintenances) {
 				foreach ($maintenances as $maintenance) {
-					if (!isset($dbMaintenances[$maintenance['maintenanceid']]['maintenanceid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Maintenance "%1$s" already exists.', $maintenance['name']
-						));
+					$name = $maintenance['name'];
+
+					if (isset($dbMaintenances[$name])
+							&& !idcmp($dbMaintenances[$name]['maintenanceid'], $maintenance['maintenanceid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $name));
 					}
 				}
 			}
