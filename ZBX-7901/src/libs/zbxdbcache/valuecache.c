@@ -2982,7 +2982,7 @@ int	zbx_vc_check_value(zbx_uint64_t itemid, int value_type)
 
 	if (NULL != (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		if (NULL != item->head && item->head->first_value != item->head->last_value)
+		if (NULL != item->head)
 			ret = SUCCEED;
 
 		goto clean;
