@@ -497,7 +497,6 @@ class CImage extends CApiService {
 		// check host name duplicates
 		$collectionValidator = new CCollectionValidator(array(
 			'uniqueField' => 'name',
-			'uniqueField2' => 'imageid',
 			'messageDuplicate' => _('Image "%1$s" already exists.')
 		));
 		$this->checkValidator($images, $collectionValidator);
@@ -505,7 +504,8 @@ class CImage extends CApiService {
 		// check existing names
 		$dbImages = API::getApiService()->select($this->tableName(), array(
 			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($images, 'name'))
+			'filter' => array('name' => zbx_objectValues($images, 'name')),
+			'limit' => 1
 		));
 
 		if ($dbImages) {
@@ -563,19 +563,14 @@ class CImage extends CApiService {
 			$this->checkValidator($imageNamesChaged, $collectionValidator);
 
 			$dbImages = API::getApiService()->select($this->tableName(), array(
-				'output' => array('imageid', 'name'),
-				'filter' => array('name' => $imageNamesChaged),
-				'preservekeys' => true
+				'output' => array('name'),
+				'filter' => array('name' => zbx_objectValues($imageNamesChaged, 'name')),
+				'limit' => 1
 			));
-			$dbImages = zbx_toHash($dbImages, 'name');
 
 			if ($dbImages) {
-				foreach ($images as $image) {
-					if (isset($dbImages[$image['name']])
-							&& !idcmp($dbImages[$image['name']]['imageid'], $image['imageid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
-					}
-				}
+				$dbImage = reset($dbImages);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $dbImage['name']));
 			}
 		}
 	}
