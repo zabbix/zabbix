@@ -3,9 +3,9 @@
 # 20120720T0924
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 2.1\n"
+"Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-08 17:23+0300\n"
+"POT-Creation-Date: 2014-04-27 22:19+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -92,11 +92,11 @@ msgstr "(0 -無限地)"
 msgid "(Only super admins can create groups)"
 msgstr ""
 
-#: include/forms.inc.php:591 include/forms.inc.php:606
+#: include/forms.inc.php:596 include/forms.inc.php:611
 msgid "(in days)"
 msgstr "(日計)"
 
-#: include/forms.inc.php:451
+#: include/forms.inc.php:456
 msgid "(in sec)"
 msgstr "(秒計)"
 
@@ -393,8 +393,8 @@ msgstr "作用中直到"
 #: include/views/administration.usergroups.edit.php:107
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:115
-#: include/views/administration.users.edit.php:90
-#: include/views/administration.users.edit.php:201
+#: include/views/administration.users.edit.php:70
+#: include/views/administration.users.edit.php:212
 #: include/views/common.macros.php:66
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:523
@@ -456,7 +456,7 @@ msgstr "新增連結"
 msgid "Add missing"
 msgstr "新增缺少的"
 
-#: include/views/configuration.item.massupdate.php:537
+#: include/views/configuration.item.massupdate.php:534
 msgid "Add new or existing applications"
 msgstr ""
 
@@ -526,7 +526,7 @@ msgid "Agent"
 msgstr "端點代理程式"
 
 #: include/classes/items/CHelpItems.php:65
-#: include/classes/items/CHelpItems.php:307
+#: include/classes/items/CHelpItems.php:311
 msgid "Agent host name defined in the configuration file. String value."
 msgstr ""
 
@@ -541,7 +541,7 @@ msgstr "端點代理程式的介面"
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "端點代理程式或SNMP或JMX或IPMI的介面"
 
-#: include/classes/items/CHelpItems.php:561
+#: include/classes/items/CHelpItems.php:569
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr ""
 
@@ -594,8 +594,8 @@ msgstr "所有節點"
 msgid "Allowed hosts"
 msgstr "容許的主機"
 
-#: include/classes/items/CHelpItems.php:289
-#: include/classes/items/CHelpItems.php:543
+#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:551
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr ""
 
@@ -608,7 +608,7 @@ msgid "Any character string included"
 msgstr "包括任何字元字串"
 
 #: applications.php:118 httpconf.php:42 include/actions.inc.php:90
-#: include/audit.inc.php:32 include/forms.inc.php:577
+#: include/audit.inc.php:32 include/forms.inc.php:582
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.httpconf.edit.php:64
@@ -645,7 +645,7 @@ msgstr "應用集已更新"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
 
-#: hosts.php:808 hosts.php:898 include/forms.inc.php:902
+#: hosts.php:808 hosts.php:898 include/forms.inc.php:907
 #: include/html.inc.php:401 include/html.inc.php:405
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:433
@@ -674,7 +674,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1693 include/func.inc.php:132
+#: include/forms.inc.php:1698 include/func.inc.php:132
 #: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "四月"
@@ -738,7 +738,7 @@ msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 
-#: include/forms.inc.php:1774
+#: include/forms.inc.php:1779
 msgid "At (hour:minute)"
 msgstr "於(時:分)"
 
@@ -780,7 +780,7 @@ msgstr "審計紀錄"
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1685 include/func.inc.php:136
+#: include/forms.inc.php:1690 include/func.inc.php:136
 #: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "八月"
@@ -830,11 +830,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr "自動註冊"
 
-#: include/views/administration.users.edit.php:149
+#: include/views/administration.users.edit.php:160
 msgid "Auto-login"
 msgstr "自動登入"
 
-#: include/views/administration.users.edit.php:150 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:161 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "自動退出(90秒)"
 
@@ -1173,23 +1173,23 @@ msgstr "工作時間的組態"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "Zabbix的組態"
 
-#: include/classes/items/CHelpItems.php:181
-#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:185
+#: include/classes/items/CHelpItems.php:443
 msgid "CPU info - lists full info for all CPUs by default"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:411
+#: include/classes/items/CHelpItems.php:161
+#: include/classes/items/CHelpItems.php:419
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:169
-#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:173
+#: include/classes/items/CHelpItems.php:431
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:261
-#: include/classes/items/CHelpItems.php:515
+#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:523
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 msgstr ""
 
@@ -1197,13 +1197,13 @@ msgstr ""
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "計算SLA, 可接受的SAL(%計)"
 
-#: include/classes/items/CHelpItems.php:249
-#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:511
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:285
-#: include/classes/items/CHelpItems.php:539
+#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:547
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 msgstr ""
 
@@ -1417,11 +1417,11 @@ msgstr "無法新增觸發器"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: users.php:218
+#: users.php:248
 msgid "Cannot add user"
 msgstr "無法新增用户"
 
-#: users.php:164
+#: users.php:188
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "無法新增用户. 兩次輸入的密碼必須一致."
 
@@ -1764,7 +1764,7 @@ msgstr "無法删除觸發器"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "無法刪除由低階層發現所創建的觸發器."
 
-#: users.php:247 users.php:355
+#: users.php:277 users.php:385
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
@@ -2206,7 +2206,7 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "無法為介面切換主機."
 
-#: users.php:323
+#: users.php:353
 msgid "Cannot unblock users"
 msgstr "無法解除阻擋用戶"
 
@@ -2499,7 +2499,7 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: profile.php:176 users.php:211 users.php:269 users.php:293
+#: profile.php:176 users.php:241 users.php:299 users.php:323
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
@@ -2507,7 +2507,7 @@ msgstr "無法更新用户"
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
-#: profile.php:113 users.php:161
+#: profile.php:113 users.php:185
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "無法更新用户. 兩次輸入的密碼必須一致."
 
@@ -2532,11 +2532,11 @@ msgstr "提示"
 msgid "Case sensitive"
 msgstr "區分大小寫"
 
-#: include/classes/items/CHelpItems.php:781
+#: include/classes/items/CHelpItems.php:789
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:777
+#: include/classes/items/CHelpItems.php:785
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
@@ -2558,11 +2558,11 @@ msgstr "更改"
 
 #: include/views/administration.authentication.edit.php:106
 #: include/views/administration.mediatypes.edit.php:70
-#: include/views/administration.users.edit.php:68
+#: include/views/administration.users.edit.php:97
 msgid "Change password"
 msgstr "修改密碼"
 
-#: include/forms.inc.php:426 include/items.inc.php:125
+#: include/forms.inc.php:431 include/items.inc.php:125
 #: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
@@ -2580,8 +2580,8 @@ msgstr "字元字串未包含"
 msgid "Chassis"
 msgstr "機殼"
 
-#: include/classes/items/CHelpItems.php:177
-#: include/classes/items/CHelpItems.php:431
+#: include/classes/items/CHelpItems.php:181
+#: include/classes/items/CHelpItems.php:439
 msgid "Chassis info - returns full info by default"
 msgstr ""
 
@@ -2594,31 +2594,31 @@ msgstr "檢查已存在."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "檢查開始於\"%1$s\"的表示式部份."
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:511
+#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:519
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:583
+#: include/classes/items/CHelpItems.php:591
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:379
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:375
+#: include/classes/items/CHelpItems.php:379
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:579
+#: include/classes/items/CHelpItems.php:587
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:69
-#: include/classes/items/CHelpItems.php:311
+#: include/classes/items/CHelpItems.php:315
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
@@ -2631,7 +2631,7 @@ msgid "Check type"
 msgstr "檢查類型"
 
 #: include/classes/items/CHelpItems.php:117
-#: include/classes/items/CHelpItems.php:371
+#: include/classes/items/CHelpItems.php:375
 msgid "Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]"
 msgstr ""
 
@@ -2641,16 +2641,18 @@ msgid "Checks"
 msgstr "檢查 "
 
 #: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:343
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:567
+#: include/classes/items/CHelpItems.php:575
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:113
-#: include/classes/items/CHelpItems.php:367
+#: include/classes/items/CHelpItems.php:129
+#: include/classes/items/CHelpItems.php:371
+#: include/classes/items/CHelpItems.php:387
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr ""
 
@@ -2851,7 +2853,7 @@ msgstr "條件"
 msgid "Configuration"
 msgstr "組態"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3096,8 +3098,8 @@ msgstr "聯絡"
 msgid "Context name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:165
-#: include/classes/items/CHelpItems.php:419
+#: include/classes/items/CHelpItems.php:169
+#: include/classes/items/CHelpItems.php:427
 msgid "Context switches."
 msgstr ""
 
@@ -3311,8 +3313,8 @@ msgstr ""
 msgid "Critical"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:209
-#: include/classes/items/CHelpItems.php:463
+#: include/classes/items/CHelpItems.php:213
+#: include/classes/items/CHelpItems.php:471
 msgid "Current OS - returns full info by default"
 msgstr ""
 
@@ -3467,7 +3469,7 @@ msgstr "DNS名稱"
 msgid "DOWN"
 msgstr "斷線"
 
-#: include/forms.inc.php:1642 include/maintenances.inc.php:36
+#: include/forms.inc.php:1647 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3502,7 +3504,7 @@ msgstr "虛線"
 msgid "Data"
 msgstr "資料"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:891
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3524,7 +3526,7 @@ msgstr "資料概覽"
 msgid "Data storage period (in days)"
 msgstr ""
 
-#: include/forms.inc.php:458 include/views/configuration.item.edit.php:239
+#: include/forms.inc.php:463 include/views/configuration.item.edit.php:239
 #: include/views/configuration.item.massupdate.php:227
 msgid "Data type"
 msgstr "資料類型"
@@ -3569,7 +3571,7 @@ msgstr "資料庫類型"
 msgid "Database user"
 msgstr "資料庫用戶"
 
-#: include/forms.inc.php:1709 include/forms.inc.php:1770 jsrpc.php:137
+#: include/forms.inc.php:1714 include/forms.inc.php:1775 jsrpc.php:137
 msgid "Date"
 msgstr "日期"
 
@@ -3589,12 +3591,12 @@ msgstr "硬體維修過期日期"
 msgid "Date HW purchased"
 msgstr "硬體購買日期"
 
-#: include/forms.inc.php:1711 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1716 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:295 tr_status.php:297
 msgid "Day"
 msgstr "日"
 
-#: include/forms.inc.php:1743
+#: include/forms.inc.php:1748
 msgid "Day of month"
 msgstr "月中第幾日"
 
@@ -3614,8 +3616,8 @@ msgstr "月中第幾日是 > N"
 msgid "Day of month is NOT N"
 msgstr "月中第幾日不是 N"
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1714
-#: include/forms.inc.php:1739
+#: include/forms.inc.php:1676 include/forms.inc.php:1719
+#: include/forms.inc.php:1744
 msgid "Day of week"
 msgstr "週中第幾日"
 
@@ -3635,7 +3637,7 @@ msgstr "週中第幾日是 > N"
 msgid "Day of week is NOT N"
 msgstr "週中第幾日不是 N"
 
-#: include/forms.inc.php:1787 tr_status.php:295 tr_status.php:297
+#: include/forms.inc.php:1792 tr_status.php:295 tr_status.php:297
 msgid "Days"
 msgstr "日數"
 
@@ -3657,7 +3659,7 @@ msgstr "調試模式已更新"
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1705 include/func.inc.php:140
+#: include/forms.inc.php:1710 include/func.inc.php:140
 #: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "十二"
@@ -3835,8 +3837,8 @@ msgstr "删除脚本?"
 #: include/views/administration.usergroups.edit.php:112
 #: include/views/administration.usergroups.edit.php:116
 #: include/views/administration.usergroups.list.php:153
-#: include/views/administration.users.edit.php:94
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:74
+#: include/views/administration.users.edit.php:215
 #: include/views/administration.users.list.php:138
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:120
@@ -3978,7 +3980,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr "删除所選的觸發器?"
 
-#: include/views/administration.users.edit.php:372
+#: include/views/administration.users.edit.php:383
 msgid "Delete selected user?"
 msgstr "删除所選的用戶?"
 
@@ -4102,7 +4104,7 @@ msgstr "差量 (單純變化)"
 msgid "Delta (speed per second)"
 msgstr "差量 (每秒速率)"
 
-#: include/forms.inc.php:264 include/perm.inc.php:33
+#: include/forms.inc.php:269 include/perm.inc.php:33
 #: include/views/administration.usergroups.edit.php:82
 msgid "Deny"
 msgstr "禁止"
@@ -4133,7 +4135,7 @@ msgstr "佈署狀態"
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
 #: include/views/configuration.item.edit.php:483
-#: include/views/configuration.item.massupdate.php:550
+#: include/views/configuration.item.massupdate.php:546
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:48
 #: include/views/configuration.triggers.edit.php:245 popup.php:1076
@@ -4159,18 +4161,18 @@ msgstr "方案的細節"
 msgid "Device"
 msgstr "裝置"
 
-#: include/classes/items/CHelpItems.php:153
-#: include/classes/items/CHelpItems.php:407
+#: include/classes/items/CHelpItems.php:157
+#: include/classes/items/CHelpItems.php:415
 msgid "Device interrupts."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:185
-#: include/classes/items/CHelpItems.php:439
+#: include/classes/items/CHelpItems.php:189
+#: include/classes/items/CHelpItems.php:447
 msgid "Device list - lists PCI devices by default"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:241
-#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:245
+#: include/classes/items/CHelpItems.php:503
 msgid "Device read statistics."
 msgstr ""
 
@@ -4178,8 +4180,8 @@ msgstr ""
 msgid "Device uniqueness criteria"
 msgstr "裝置唯一性準則"
 
-#: include/classes/items/CHelpItems.php:245
-#: include/classes/items/CHelpItems.php:499
+#: include/classes/items/CHelpItems.php:249
+#: include/classes/items/CHelpItems.php:507
 msgid "Device write statistics."
 msgstr ""
 
@@ -4223,8 +4225,8 @@ msgstr "在最後與前一個值之間的差異是 >  N"
 msgid "Difference between last and previous value is NOT N"
 msgstr "在最後與前一個值之間的差異不是 N"
 
-#: include/classes/items/CHelpItems.php:141
-#: include/classes/items/CHelpItems.php:395
+#: include/classes/items/CHelpItems.php:145
+#: include/classes/items/CHelpItems.php:403
 msgid "Different information about specific process(es)"
 msgstr ""
 
@@ -4333,7 +4335,7 @@ msgstr "停用所選的觸發器?"
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:170
+#: include/views/administration.users.edit.php:181
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
@@ -4401,7 +4403,7 @@ msgid "Discovery object"
 msgstr "探索物件"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1190 include/forms.inc.php:1131
+#: include/blocks.inc.php:1190 include/forms.inc.php:1136
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4635,7 +4637,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每個URL必須是唯一的. 請確保僅有一個URL為名."
 
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:207
 #: include/views/configuration.action.edit.php:385
 #: include/views/configuration.action.edit.php:398
 #: include/views/configuration.maintenance.edit.php:112
@@ -4891,7 +4893,7 @@ msgstr "啟用所選的觸發器?"
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:88
-#: include/views/administration.users.edit.php:166
+#: include/views/administration.users.edit.php:177
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.edit.php:61
@@ -4996,11 +4998,11 @@ msgstr "事件"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1654
+#: include/forms.inc.php:1659
 msgid "Every day(s)"
 msgstr "每日"
 
-#: include/forms.inc.php:1661
+#: include/forms.inc.php:1666
 msgid "Every week(s)"
 msgstr "每週"
 
@@ -5082,8 +5084,8 @@ msgstr "匯出到CSV"
 msgid "Expression"
 msgstr "表示式"
 
-#: include/forms.inc.php:1480 include/forms.inc.php:1485
-#: include/forms.inc.php:1498
+#: include/forms.inc.php:1485 include/forms.inc.php:1490
+#: include/forms.inc.php:1503
 msgid "Expression Syntax Error."
 msgstr "表示式語法錯誤."
 
@@ -5172,7 +5174,7 @@ msgstr "常用的"
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1683 include/func.inc.php:130
+#: include/forms.inc.php:1688 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "二月"
@@ -5247,8 +5249,8 @@ msgstr "檔案太大, 最大的上傳大小是%1$s位元組."
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
 msgstr "檔案用於一個viwq不存在. 試著找\"%s\"."
 
-#: include/classes/items/CHelpItems.php:277
-#: include/classes/items/CHelpItems.php:531
+#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:539
 msgid "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
 msgstr ""
 
@@ -5257,7 +5259,7 @@ msgid "Filled region"
 msgstr "填滿的區域"
 
 #: events.php:362 hosts.php:779 include/classes/class.cwidget.php:130
-#: include/forms.inc.php:627
+#: include/forms.inc.php:632
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.item.edit.php:340
@@ -5284,13 +5286,13 @@ msgstr "於最新的值中找字串V. N = 1 - 如果找到, 0 - 其它情況."
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
 msgstr "於最新的值中找字串V. N 非 1 - 如果找到, 0 - 其它情況."
 
-#: include/classes/items/CHelpItems.php:269
-#: include/classes/items/CHelpItems.php:523
+#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:531
 msgid "Find string in a file. 0 - expression not found, 1 - found"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:265
-#: include/classes/items/CHelpItems.php:519
+#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:527
 msgid "Find string in a file. Matched string"
 msgstr ""
 
@@ -5302,7 +5304,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
-#: include/forms.inc.php:1721 include/maintenances.inc.php:118
+#: include/forms.inc.php:1726 include/maintenances.inc.php:118
 msgid "First"
 msgstr "首"
 
@@ -5325,7 +5327,7 @@ msgstr "固定的"
 msgid "Flexible intervals"
 msgstr "彈性區間"
 
-#: profile.php:116 users.php:168
+#: profile.php:116 users.php:194
 msgid "For guest, password must be empty"
 msgstr "訪客的密碼必須為空"
 
@@ -5333,7 +5335,7 @@ msgstr "訪客的密碼必須為空"
 msgid "Formula"
 msgstr "公式"
 
-#: include/forms.inc.php:1724 include/maintenances.inc.php:121
+#: include/forms.inc.php:1729 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "第四"
 
@@ -5345,7 +5347,7 @@ msgstr "法語 (fr_FR)"
 msgid "Fri"
 msgstr "週五"
 
-#: include/forms.inc.php:1668 include/forms.inc.php:1736
+#: include/forms.inc.php:1673 include/forms.inc.php:1741
 #: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "週五"
@@ -5371,7 +5373,7 @@ msgstr "前端存取"
 msgid "Frontend access updated"
 msgstr "前端存取已更新"
 
-#: include/views/administration.users.edit.php:215
+#: include/views/administration.users.edit.php:226
 msgid "Frontend messaging"
 msgstr "前端訊息中"
 
@@ -5435,18 +5437,18 @@ msgstr "產生於%s秒"
 msgid "German (de_DE)"
 msgstr "德語 (de_DE)"
 
-#: include/classes/items/CHelpItems.php:293
-#: include/classes/items/CHelpItems.php:547
+#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:555
 msgid "Get content of WEB page. Default path is /"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:253
-#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:257
+#: include/classes/items/CHelpItems.php:515
 msgid "Get contents of a given file."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:301
-#: include/classes/items/CHelpItems.php:555
+#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:563
 msgid "Get first occurence of regexp in WEB page. Default path is /"
 msgstr ""
 
@@ -5454,8 +5456,8 @@ msgstr ""
 msgid "Get support"
 msgstr "獲取支援"
 
-#: include/classes/items/CHelpItems.php:297
-#: include/classes/items/CHelpItems.php:551
+#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:559
 msgid "Get timing of loading full WEB page. Default path is /"
 msgstr ""
 
@@ -5789,7 +5791,7 @@ msgstr "群組已更新"
 msgid "Grouping by"
 msgstr "群組化之於"
 
-#: include/reports.inc.php:342 include/views/administration.users.edit.php:87
+#: include/reports.inc.php:342 include/views/administration.users.edit.php:67
 #: include/views/administration.users.list.php:59
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.host.edit.php:213
@@ -5850,7 +5852,7 @@ msgstr ""
 msgid "HTTP"
 msgstr "HTTP"
 
-#: authentication.php:222
+#: include/perm.inc.php:50
 msgid "HTTP authentication"
 msgstr "HTTP認證"
 
@@ -5931,7 +5933,7 @@ msgstr ""
 msgid "High"
 msgstr "嚴重"
 
-#: history.php:27 include/forms.inc.php:591 include/forms.inc.php:937
+#: history.php:27 include/forms.inc.php:596 include/forms.inc.php:942
 #: include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:139
 #: include/views/configuration.item.list.php:68
@@ -5995,7 +5997,7 @@ msgstr "横向對齊"
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
-#: include/forms.inc.php:555 include/html.inc.php:383 include/maps.inc.php:24
+#: include/forms.inc.php:560 include/html.inc.php:383 include/maps.inc.php:24
 #: include/setup.inc.php:365 include/triggers.inc.php:1287
 #: include/triggers.inc.php:1639
 #: include/views/configuration.application.list.php:45
@@ -6085,8 +6087,9 @@ msgstr[0] ""
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:196 include/blocks.inc.php:386
-#: include/blocks.inc.php:1093 include/forms.inc.php:517
-#: include/maps.inc.php:25 include/views/administration.script.list.php:44
+#: include/blocks.inc.php:1093 include/forms.inc.php:522
+#: include/maps.inc.php:25 include/views/administration.script.edit.php:84
+#: include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:89
 #: include/views/js/configuration.action.edit.js.php:197
@@ -6133,8 +6136,7 @@ msgstr "主機群組標示類型"
 msgid "Host group name cannot be empty."
 msgstr ""
 
-#: include/forms.inc.php:197 include/menu.inc.php:160
-#: include/views/administration.script.edit.php:84
+#: include/forms.inc.php:202 include/menu.inc.php:160
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/configuration.item.copy.php:43
@@ -6316,8 +6318,8 @@ msgstr ""
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 
-#: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:220
-#: include/forms.inc.php:897 include/items.inc.php:728
+#: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:225
+#: include/forms.inc.php:902 include/items.inc.php:728
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -6371,7 +6373,7 @@ msgstr "主機已更新"
 msgid "Hourly"
 msgstr "每小時"
 
-#: include/forms.inc.php:1789
+#: include/forms.inc.php:1794
 msgid "Hours"
 msgstr "時"
 
@@ -7143,7 +7145,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr "不正確的鍵值."
 
-#: include/forms.inc.php:1302 items.php:888
+#: include/forms.inc.php:1307 items.php:913
 msgid "Incorrect list of items."
 msgstr "不正確的項目清單"
 
@@ -7392,11 +7394,11 @@ msgstr "用了不正確的觸發器方程式\"%1$s\"於表示式中."
 msgid "Incorrect type of asort_by_key."
 msgstr "不正確的asort_by_key類型."
 
-#: include/perm.inc.php:157
+#: include/perm.inc.php:198
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
 msgstr "於\"get_accessible_groups_by_user\"中不正確的用戶資料."
 
-#: include/perm.inc.php:245
+#: include/perm.inc.php:286
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
 msgstr "於\"get_accessible_nodes_by_user\"中不正確的用戶資料."
 
@@ -7482,7 +7484,7 @@ msgstr "資訊"
 msgid "Insert"
 msgstr "插入"
 
-#: include/forms.inc.php:1492 jsLoader.php:109
+#: include/forms.inc.php:1497 jsLoader.php:109
 msgid "Insert macro"
 msgstr "插入巨集"
 
@@ -7563,7 +7565,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr "IE瀏覽器"
 
-#: include/forms.inc.php:947
+#: include/forms.inc.php:952
 #: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.list.php:67
@@ -7723,7 +7725,7 @@ msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:165
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1134
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1139
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
 #: include/views/configuration.triggers.expression.php:57 items.php:498
@@ -7806,7 +7808,7 @@ msgstr ""
 msgid "Item not selected"
 msgstr ""
 
-#: include/forms.inc.php:1134
+#: include/forms.inc.php:1139
 msgid "Item prototype"
 msgstr "項目原型"
 
@@ -7992,7 +7994,7 @@ msgstr "Jabber Identifier"
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1678 include/func.inc.php:129
+#: include/forms.inc.php:1683 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "一月"
@@ -8005,7 +8007,7 @@ msgstr "日語 (ja_JP)"
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1680 include/func.inc.php:135
+#: include/forms.inc.php:1685 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "七月"
@@ -8014,7 +8016,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1703 include/func.inc.php:134
+#: include/forms.inc.php:1708 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "六月"
@@ -8028,7 +8030,7 @@ msgstr "K"
 msgid "Keep lost resources period (in days)"
 msgstr "保留失去的資源期間(日記)"
 
-#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:617
+#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:622
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.item.edit.php:78
 #: include/views/configuration.item.list.php:66
@@ -8070,7 +8072,7 @@ msgstr "最新數據"
 msgid "LDAP"
 msgstr "LDAP"
 
-#: authentication.php:219
+#: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP認證"
 
@@ -8112,11 +8114,11 @@ msgstr "標示"
 msgid "Label location"
 msgstr "標示位置"
 
-#: include/views/administration.users.edit.php:134
+#: include/views/administration.users.edit.php:145
 msgid "Language"
 msgstr "語言"
 
-#: include/forms.inc.php:1725 include/maintenances.inc.php:122
+#: include/forms.inc.php:1730 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "末"
 
@@ -8332,7 +8334,7 @@ msgid "List is empty"
 msgstr "清單是空的"
 
 #: include/classes/items/CHelpItems.php:101
-#: include/classes/items/CHelpItems.php:355
+#: include/classes/items/CHelpItems.php:359
 msgid "List of network interfaces. Text value."
 msgstr ""
 
@@ -8366,7 +8368,7 @@ msgstr "位置緯度"
 msgid "Location longitude"
 msgstr "位置經度"
 
-#: include/forms.inc.php:427 include/items.inc.php:127
+#: include/forms.inc.php:432 include/items.inc.php:127
 #: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
@@ -8477,8 +8479,8 @@ msgstr "M"
 msgid "M Y"
 msgstr "M Y"
 
-#: include/classes/items/CHelpItems.php:189
-#: include/classes/items/CHelpItems.php:443
+#: include/classes/items/CHelpItems.php:193
+#: include/classes/items/CHelpItems.php:451
 msgid "MAC address - lists all MAC addresses with interface names by default"
 msgstr ""
 
@@ -8595,7 +8597,7 @@ msgstr "維修已刪除"
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1784
+#: include/forms.inc.php:1789
 msgid "Maintenance period length"
 msgstr "維修期間長度"
 
@@ -8708,7 +8710,7 @@ msgstr "拓墣圖"
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1688 include/func.inc.php:131
+#: include/forms.inc.php:1693 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "三月"
@@ -8730,7 +8732,7 @@ msgid "Mask"
 msgstr ""
 
 #: hosts.php:1011 include/views/configuration.item.list.php:281
-#: include/views/configuration.item.massupdate.php:558
+#: include/views/configuration.item.massupdate.php:554
 #: include/views/configuration.triggers.list.php:278
 msgid "Mass update"
 msgstr "批量更新"
@@ -8797,12 +8799,12 @@ msgid "Maximum number of flexible intervals added"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:77
-#: include/classes/items/CHelpItems.php:323
+#: include/classes/items/CHelpItems.php:327
 msgid "Maximum number of opened files supported by OS."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:81
-#: include/classes/items/CHelpItems.php:327
+#: include/classes/items/CHelpItems.php:331
 msgid "Maximum number of processes supported by OS."
 msgstr ""
 
@@ -8834,7 +8836,7 @@ msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d cha
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
 msgstr[0] ""
 
-#: include/forms.inc.php:1698 include/func.inc.php:133
+#: include/forms.inc.php:1703 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "五月"
@@ -8844,8 +8846,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "五月"
 
-#: include/views/administration.users.edit.php:200
-#: include/views/administration.users.edit.php:328 popup_media.php:27
+#: include/views/administration.users.edit.php:211
+#: include/views/administration.users.edit.php:339 popup_media.php:27
 msgid "Media"
 msgstr "示警媒介"
 
@@ -8907,8 +8909,8 @@ msgstr "成員"
 msgid "Memory limit: %s"
 msgstr "記憶體限制: %s"
 
-#: include/classes/items/CHelpItems.php:133
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:137
+#: include/classes/items/CHelpItems.php:395
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
 msgstr ""
 
@@ -8935,11 +8937,11 @@ msgstr "訊息動作"
 msgid "Message text limit"
 msgstr "訊息文字限制"
 
-#: include/views/administration.users.edit.php:221
+#: include/views/administration.users.edit.php:232
 msgid "Message timeout"
 msgstr "訊息逾時"
 
-#: include/views/administration.users.edit.php:216
+#: include/views/administration.users.edit.php:227
 msgid "Message timeout (seconds)"
 msgstr "訊息逾時(秒)"
 
@@ -8947,7 +8949,7 @@ msgstr "訊息逾時(秒)"
 msgid "Messages"
 msgstr "訊息"
 
-#: include/views/administration.users.edit.php:357
+#: include/views/administration.users.edit.php:368
 msgid "Messaging"
 msgstr "訊息中"
 
@@ -9025,7 +9027,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1791
+#: include/forms.inc.php:1796
 msgid "Minutes"
 msgstr "分"
 
@@ -9097,7 +9099,7 @@ msgstr "模型"
 msgid "Mon"
 msgstr "一"
 
-#: include/forms.inc.php:1664 include/forms.inc.php:1732
+#: include/forms.inc.php:1669 include/forms.inc.php:1737
 #: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "週一"
@@ -9123,23 +9125,23 @@ msgstr "已監測的主機"
 msgid "Monitoring"
 msgstr "監測中"
 
-#: include/classes/items/CHelpItems.php:319
+#: include/classes/items/CHelpItems.php:323
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:335
+#: include/classes/items/CHelpItems.php:339
 msgid "Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:331
+#: include/classes/items/CHelpItems.php:335
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr ""
 
-#: include/forms.inc.php:1707 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1712 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "月"
 
-#: include/forms.inc.php:1644 include/maintenances.inc.php:40
+#: include/forms.inc.php:1649 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:405
 #: include/reports.inc.php:413 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9202,7 +9204,7 @@ msgstr "NTLM認證"
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
-#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:602
+#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
 #: include/hosts.inc.php:115 include/reports.inc.php:174
 #: include/setup.inc.php:384
 #: include/views/administration.general.iconmap.edit.php:29
@@ -9294,12 +9296,12 @@ msgid "Network discovery event and alert data storage period (in days) \"%1$s\".
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:97
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:355
 msgid "Network interface input statistic. Integer value. If mode is missing bytes is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:105
-#: include/classes/items/CHelpItems.php:359
+#: include/classes/items/CHelpItems.php:363
 msgid "Network interface output statistic. Integer value. If mode is missing bytes is used."
 msgstr ""
 
@@ -9471,7 +9473,7 @@ msgstr "沒有提供URL給篩選組件"
 msgid "No URLs defined."
 msgstr "沒有已定義的URLs"
 
-#: include/forms.inc.php:262
+#: include/forms.inc.php:267
 msgid "No accessible resources"
 msgstr "没有可存取的資源"
 
@@ -9798,7 +9800,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:162
+#: include/views/administration.users.edit.php:173
 msgid "No media found."
 msgstr ""
 
@@ -10113,7 +10115,7 @@ msgstr "具有相同ID的節點已存在."
 
 #: include/actions.inc.php:827 include/actions.inc.php:906
 #: include/actions.inc.php:964 include/classes/screens/CScreenActions.php:123
-#: include/forms.inc.php:174
+#: include/forms.inc.php:179
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
 #: include/views/administration.node.list.php:32
@@ -10144,7 +10146,7 @@ msgstr "正常檢視"
 msgid "Not Ack"
 msgstr "非知悉"
 
-#: include/forms.inc.php:612 include/forms.inc.php:795
+#: include/forms.inc.php:617 include/forms.inc.php:800
 msgid "Not Templated items"
 msgstr "非模板項目"
 
@@ -10215,7 +10217,7 @@ msgstr "警報"
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1700 include/func.inc.php:139
+#: include/forms.inc.php:1705 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "十一月"
@@ -10224,8 +10226,8 @@ msgstr "十一月"
 msgid "Now"
 msgstr "現在"
 
-#: include/classes/items/CHelpItems.php:161
-#: include/classes/items/CHelpItems.php:415
+#: include/classes/items/CHelpItems.php:165
+#: include/classes/items/CHelpItems.php:423
 msgid "Number of available proccessors."
 msgstr ""
 
@@ -10233,8 +10235,8 @@ msgstr ""
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "主機數量 (監控/未監控/模板)"
 
-#: include/classes/items/CHelpItems.php:281
-#: include/classes/items/CHelpItems.php:535
+#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:543
 msgid "Number of inodes for a given volume. If mode is missing total is used."
 msgstr ""
 
@@ -10242,36 +10244,36 @@ msgstr ""
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "監控項數量 (監控/停用/不支持)"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:827
 msgid "Number of items in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of monitored hosts"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:137
-#: include/classes/items/CHelpItems.php:391
+#: include/classes/items/CHelpItems.php:141
+#: include/classes/items/CHelpItems.php:399
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:639
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:699
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -10319,11 +10321,11 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:871
 msgid "Number of triggers in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of unsupported items in Zabbix database."
 msgstr ""
 
@@ -10331,44 +10333,44 @@ msgstr ""
 msgid "Number of users (online)"
 msgstr "用戶數(線上)"
 
-#: include/classes/items/CHelpItems.php:237
-#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:241
+#: include/classes/items/CHelpItems.php:499
 msgid "Number of users connected. Command who is used on agent side."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:799
 msgid "Number of values stored in table HISTORY."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:803
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY_STR."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:811
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of values stored in table TRENDS."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:867
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:691
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/forms.inc.php:425 include/items.inc.php:123
+#: include/forms.inc.php:430 include/items.inc.php:123
 #: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
@@ -10380,7 +10382,7 @@ msgstr "數字的 (浮點)"
 msgid "Numeric (integer 64bit)"
 msgstr "數字的(64位元整數)"
 
-#: include/forms.inc.php:424 include/items.inc.php:121
+#: include/forms.inc.php:429 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:222
 #: include/views/configuration.item.massupdate.php:208
 msgid "Numeric (unsigned)"
@@ -10451,7 +10453,7 @@ msgstr "十月"
 msgid "Octal"
 msgstr "八進位"
 
-#: include/forms.inc.php:1695 include/func.inc.php:138
+#: include/forms.inc.php:1700 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "十月"
@@ -10477,7 +10479,7 @@ msgstr "開"
 msgid "On status change triggers blink for"
 msgstr "於狀態改變時, 觸發器因此閃爍於"
 
-#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:230
 msgid "Once"
 msgstr "一次"
 
@@ -10485,7 +10487,7 @@ msgstr "一次"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1641 include/maintenances.inc.php:34
+#: include/forms.inc.php:1646 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "一次性"
 
@@ -10661,9 +10663,9 @@ msgstr "操作者"
 #: include/views/configuration.item.massupdate.php:431
 #: include/views/configuration.item.massupdate.php:449
 #: include/views/configuration.item.massupdate.php:459
-#: include/views/configuration.item.massupdate.php:492
-#: include/views/configuration.item.massupdate.php:539
-#: include/views/configuration.item.massupdate.php:552
+#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.massupdate.php:535
+#: include/views/configuration.item.massupdate.php:548
 #: include/views/configuration.triggers.massupdate.php:76
 #: include/views/configuration.triggers.massupdate.php:138
 msgid "Original"
@@ -10717,7 +10719,7 @@ msgid "Others"
 msgstr "其它"
 
 #: include/classes/items/CHelpItems.php:93
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:351
 msgid "Out-of-window collision. Collisions count."
 msgstr ""
 
@@ -10979,8 +10981,9 @@ msgstr "被動式"
 #: httpconf.php:55 include/setup.inc.php:326
 #: include/views/administration.mediatypes.edit.php:82
 #: include/views/administration.mediatypes.edit.php:86
-#: include/views/administration.users.edit.php:60
-#: include/views/administration.users.edit.php:73
+#: include/views/administration.users.edit.php:84
+#: include/views/administration.users.edit.php:102
+#: include/views/administration.users.edit.php:106
 #: include/views/configuration.action.edit.php:721
 #: include/views/configuration.action.edit.php:754
 #: include/views/configuration.host.edit.php:736
@@ -10995,15 +10998,20 @@ msgstr "被動式"
 msgid "Password"
 msgstr "密碼"
 
-#: include/views/administration.users.edit.php:61
+#: include/views/administration.users.edit.php:88
 msgid "Password (once again)"
 msgstr "確認密碼"
+
+#: users.php:163
+#, c-format
+msgid "Password is unavailable for users with %1$s."
+msgstr ""
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
 msgstr "示警媒介類型所需的密碼."
 
-#: profile.php:119 users.php:171
+#: profile.php:119 users.php:199
 msgid "Password should not be empty"
 msgstr "密碼不能為空"
 
@@ -11021,7 +11029,7 @@ msgid "Percentile line (right)"
 msgstr "百分比線(右)"
 
 #: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:339
+#: include/classes/items/CHelpItems.php:343
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
@@ -11036,7 +11044,7 @@ msgstr ""
 msgid "Period"
 msgstr "期間"
 
-#: include/forms.inc.php:1646
+#: include/forms.inc.php:1651
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "期間類型"
@@ -11047,11 +11055,11 @@ msgid "Periods"
 msgstr "期間"
 
 #: include/views/administration.usergroups.edit.php:129
-#: include/views/administration.users.edit.php:354
+#: include/views/administration.users.edit.php:365
 msgid "Permissions"
 msgstr "許可權"
 
-#: include/views/administration.users.edit.php:352
+#: include/views/administration.users.edit.php:363
 msgid "Permissions can be assigned for user groups only."
 msgstr "許可權只能被指派予用戶群組"
 
@@ -11075,12 +11083,12 @@ msgstr "置入演算法"
 msgid "Plain text"
 msgstr "文本"
 
-#: include/views/administration.users.edit.php:234
-#: include/views/administration.users.edit.php:271
+#: include/views/administration.users.edit.php:245
+#: include/views/administration.users.edit.php:282
 msgid "Play"
 msgstr "播放"
 
-#: include/views/administration.users.edit.php:222
+#: include/views/administration.users.edit.php:233
 msgid "Play sound"
 msgstr "播放聲音"
 
@@ -11109,7 +11117,7 @@ msgid "Populates host inventory field"
 msgstr "填入主機資產紀錄欄位"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:776 include/forms.inc.php:493 include/setup.inc.php:379
+#: hosts.php:776 include/forms.inc.php:498 include/setup.inc.php:379
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
@@ -11369,12 +11377,12 @@ msgstr "RMCP+"
 msgid "Read"
 msgstr "讀"
 
-#: include/forms.inc.php:264 include/perm.inc.php:32
+#: include/forms.inc.php:269 include/perm.inc.php:32
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read only"
 msgstr "唯讀"
 
-#: include/forms.inc.php:264 include/perm.inc.php:31
+#: include/forms.inc.php:269 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:82
 msgid "Read-write"
 msgstr "讀寫"
@@ -11406,7 +11414,7 @@ msgstr "接收者(降冪)"
 msgid "Recipient(s)"
 msgstr "收件人"
 
-#: include/views/administration.users.edit.php:231
+#: include/views/administration.users.edit.php:242
 msgid "Recovery"
 msgstr "恢復"
 
@@ -11419,7 +11427,7 @@ msgstr "恢復訊息"
 msgid "Recovery subject"
 msgstr "恢復主旨"
 
-#: include/views/administration.users.edit.php:151 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:162 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
 msgstr "刷新(秒計)"
 
@@ -11585,7 +11593,7 @@ msgstr "移除所選的"
 msgid "Replace"
 msgstr "取代"
 
-#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.massupdate.php:489
 msgid "Replace applications"
 msgstr ""
 
@@ -11641,7 +11649,7 @@ msgstr "要求的主機許可權"
 msgid "Required performance (vps)"
 msgstr "要求的效能(vps)"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
@@ -11657,7 +11665,7 @@ msgstr "要求的狀態碼"
 msgid "Required string"
 msgstr "要求的字串"
 
-#: events.php:363 hosts.php:784 include/forms.inc.php:632
+#: events.php:363 hosts.php:784 include/forms.inc.php:637
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -11757,29 +11765,29 @@ msgstr "剩餘可試數(降冪)"
 msgid "Retry"
 msgstr "再試"
 
-#: include/classes/items/CHelpItems.php:575
+#: include/classes/items/CHelpItems.php:583
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:819
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:229
-#: include/classes/items/CHelpItems.php:483
+#: include/classes/items/CHelpItems.php:233
+#: include/classes/items/CHelpItems.php:491
 msgid "Returns detailed host information. String value"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:173
-#: include/classes/items/CHelpItems.php:427
+#: include/classes/items/CHelpItems.php:177
+#: include/classes/items/CHelpItems.php:435
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:835
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:571
+#: include/classes/items/CHelpItems.php:579
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr ""
 
@@ -11805,7 +11813,7 @@ msgstr "行寬度"
 msgid "Rows"
 msgstr "行"
 
-#: include/views/administration.users.edit.php:152 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:163 profile.php:53 users.php:64
 msgid "Rows per page"
 msgstr "每頁行數"
 
@@ -11853,8 +11861,8 @@ msgstr "於主機群組上執行遠程命令"
 msgid "Run remote commands on hosts"
 msgstr "於主機上執行遠程命令"
 
-#: include/classes/items/CHelpItems.php:197
-#: include/classes/items/CHelpItems.php:451
+#: include/classes/items/CHelpItems.php:201
+#: include/classes/items/CHelpItems.php:459
 msgid "Run specified command on the host."
 msgstr ""
 
@@ -11935,13 +11943,13 @@ msgstr "SNMP"
 msgid "SNMP Key"
 msgstr "SNMP Key"
 
-#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:486
+#: disc_prototypes.php:79 host_discovery.php:76 include/forms.inc.php:491
 #: include/views/configuration.item.edit.php:119
 #: include/views/js/configuration.discovery.edit.js.php:427 items.php:87
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:472
+#: disc_prototypes.php:76 host_discovery.php:73 include/forms.inc.php:477
 #: include/views/configuration.item.edit.php:127
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/js/configuration.discovery.edit.js.php:39 items.php:85
@@ -12032,7 +12040,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "六"
 
-#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/forms.inc.php:1674 include/forms.inc.php:1742
 #: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "週六"
@@ -12059,9 +12067,9 @@ msgstr "週六"
 #: include/views/administration.script.edit.php:119
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
-#: include/views/administration.users.edit.php:365
-#: include/views/administration.users.edit.php:369
-#: include/views/administration.users.edit.php:379
+#: include/views/administration.users.edit.php:376
+#: include/views/administration.users.edit.php:380
+#: include/views/administration.users.edit.php:390
 #: include/views/configuration.action.edit.php:1053
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
@@ -12291,7 +12299,7 @@ msgstr "搜尋式樣是空白"
 msgid "Search/Filter elements limit"
 msgstr "搜尋/過濾組件限制"
 
-#: include/forms.inc.php:1722 include/maintenances.inc.php:119
+#: include/forms.inc.php:1727 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "秒"
 
@@ -12323,7 +12331,7 @@ msgstr "第二個POC電話B"
 msgid "Secondary POC screen name"
 msgstr "第二個POC篩選名稱"
 
-#: include/views/administration.users.edit.php:220
+#: include/views/administration.users.edit.php:231
 msgid "Seconds"
 msgstr "秒"
 
@@ -12333,14 +12341,14 @@ msgstr "秒"
 msgid "Security level"
 msgstr ""
 
-#: include/forms.inc.php:479 include/views/configuration.item.edit.php:131
+#: include/forms.inc.php:484 include/views/configuration.item.edit.php:131
 #: include/views/configuration.item.massupdate.php:115
 #: include/views/js/configuration.discovery.edit.js.php:56
 msgid "Security name"
 msgstr ""
 
 #: events.php:344 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:580 include/page_header.php:328
+#: include/forms.inc.php:585 include/page_header.php:328
 #: include/reports.inc.php:431
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
@@ -12450,7 +12458,7 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分開的"
 
-#: include/forms.inc.php:1690 include/func.inc.php:137
+#: include/forms.inc.php:1695 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "九月"
@@ -12728,8 +12736,8 @@ msgstr "場所機架位置"
 msgid "Site state / province"
 msgstr "場所州/省"
 
-#: include/classes/items/CHelpItems.php:273
-#: include/classes/items/CHelpItems.php:527
+#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:535
 msgid "Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]"
 msgstr ""
 
@@ -12829,13 +12837,13 @@ msgstr "軟體應用程式D"
 msgid "Software application E"
 msgstr "軟體應用程式E"
 
-#: include/classes/items/CHelpItems.php:205
-#: include/classes/items/CHelpItems.php:459
+#: include/classes/items/CHelpItems.php:209
+#: include/classes/items/CHelpItems.php:467
 msgid "Software architecture"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:213
-#: include/classes/items/CHelpItems.php:467
+#: include/classes/items/CHelpItems.php:217
+#: include/classes/items/CHelpItems.php:475
 msgid "Software package list - lists all packages for all supported package managers by default"
 msgstr ""
 
@@ -12885,17 +12893,17 @@ msgstr "標準項目"
 msgid "Start in"
 msgstr "開始於"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:795
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr ""
 
-#: include/forms.inc.php:533 include/forms.inc.php:922
+#: include/forms.inc.php:538 include/forms.inc.php:927
 #: include/views/configuration.maintenance.list.php:47
 msgid "State"
 msgstr "州"
 
-#: include/classes/items/CHelpItems.php:145
-#: include/classes/items/CHelpItems.php:399
+#: include/classes/items/CHelpItems.php:149
+#: include/classes/items/CHelpItems.php:407
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
@@ -12906,7 +12914,7 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:126 include/events.inc.php:201
 #: include/events.inc.php:279 include/events.inc.php:282
-#: include/forms.inc.php:572 include/forms.inc.php:917
+#: include/forms.inc.php:577 include/forms.inc.php:922
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:42
 #: include/views/administration.usergroups.list.php:49
@@ -13001,8 +13009,8 @@ msgstr ""
 msgid "Steps"
 msgstr "步驟"
 
-#: include/views/administration.users.edit.php:235
-#: include/views/administration.users.edit.php:272
+#: include/views/administration.users.edit.php:246
+#: include/views/administration.users.edit.php:283
 msgid "Stop"
 msgstr "停止"
 
@@ -13019,7 +13027,7 @@ msgstr "Straight"
 msgid "Style"
 msgstr "風格"
 
-#: include/forms.inc.php:950
+#: include/forms.inc.php:955
 msgid "Subfilter [affects only filtered data!]"
 msgstr "次過濾[僅影響已過濾的資料!]"
 
@@ -13040,7 +13048,7 @@ msgid "Success Audit"
 msgstr "成功審計"
 
 #: include/classes/items/CHelpItems.php:109
-#: include/classes/items/CHelpItems.php:363
+#: include/classes/items/CHelpItems.php:367
 msgid "Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped"
 msgstr ""
 
@@ -13064,7 +13072,7 @@ msgstr ""
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/forms.inc.php:1675 include/forms.inc.php:1743
 #: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "日"
@@ -13078,18 +13086,18 @@ msgstr "支援"
 msgid "Surname"
 msgstr "姓氏"
 
-#: include/classes/items/CHelpItems.php:217
-#: include/classes/items/CHelpItems.php:471
+#: include/classes/items/CHelpItems.php:221
+#: include/classes/items/CHelpItems.php:479
 msgid "Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:221
-#: include/classes/items/CHelpItems.php:475
+#: include/classes/items/CHelpItems.php:225
+#: include/classes/items/CHelpItems.php:483
 msgid "Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:225
-#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:229
+#: include/classes/items/CHelpItems.php:487
 msgid "Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used."
 msgstr ""
 
@@ -13101,7 +13109,7 @@ msgstr "瑞士(sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:139
+#: include/users.inc.php:83 include/views/administration.users.edit.php:150
 msgid "System default"
 msgstr "系統預設"
 
@@ -13109,8 +13117,8 @@ msgstr "系統預設"
 msgid "System error."
 msgstr "系統錯誤."
 
-#: include/classes/items/CHelpItems.php:193
-#: include/classes/items/CHelpItems.php:447
+#: include/classes/items/CHelpItems.php:197
+#: include/classes/items/CHelpItems.php:455
 msgid "System local time. Time in seconds."
 msgstr ""
 
@@ -13118,8 +13126,8 @@ msgstr ""
 msgid "System status"
 msgstr "系統狀態"
 
-#: include/classes/items/CHelpItems.php:233
-#: include/classes/items/CHelpItems.php:487
+#: include/classes/items/CHelpItems.php:237
+#: include/classes/items/CHelpItems.php:495
 msgid "System uptime in seconds."
 msgstr ""
 
@@ -13198,7 +13206,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
-#: include/forms.inc.php:608 include/forms.inc.php:927
+#: include/forms.inc.php:613 include/forms.inc.php:932
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:376
 #: include/views/configuration.triggers.list.php:126 report2.php:259
@@ -13290,7 +13298,7 @@ msgstr ""
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "含有相同可視名稱\"%1$s\"的模板已連結到主機."
 
-#: include/forms.inc.php:611 include/forms.inc.php:798
+#: include/forms.inc.php:616 include/forms.inc.php:803
 msgid "Templated items"
 msgstr "模板的項目"
 
@@ -13343,7 +13351,7 @@ msgstr ""
 msgid "Test string"
 msgstr "測試字串"
 
-#: include/forms.inc.php:428 include/items.inc.php:129
+#: include/forms.inc.php:433 include/items.inc.php:129
 #: include/triggers.inc.php:2240 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
@@ -13415,7 +13423,7 @@ msgstr "請求的遠程程序不存在/不可用"
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:141
+#: include/views/administration.users.edit.php:152
 msgid "Theme"
 msgstr "背景主題"
 
@@ -13425,7 +13433,7 @@ msgid "There is \"%1$d\" group with Internal GUI access."
 msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] "有內部GUI存取的群組\"%1$d\"."
 
-#: include/forms.inc.php:1723 include/maintenances.inc.php:120
+#: include/forms.inc.php:1728 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "第三的"
 
@@ -13458,7 +13466,7 @@ msgstr "本年"
 msgid "Thu"
 msgstr "四"
 
-#: include/forms.inc.php:1667 include/forms.inc.php:1735
+#: include/forms.inc.php:1672 include/forms.inc.php:1740
 #: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "週四"
@@ -13501,11 +13509,11 @@ msgstr "時間(升冪)"
 msgid "Time (descending)"
 msgstr "時間(降冪)"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:839
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:843
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr ""
 
@@ -13545,8 +13553,8 @@ msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N = 1, 0 - 除
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
 msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N 非 1, 0 - 除外"
 
-#: include/classes/items/CHelpItems.php:149
-#: include/classes/items/CHelpItems.php:403
+#: include/classes/items/CHelpItems.php:153
+#: include/classes/items/CHelpItems.php:411
 msgid "Timestamp of system boot."
 msgstr ""
 
@@ -13618,7 +13626,7 @@ msgstr ""
 msgid "Trend storage period (in days)"
 msgstr ""
 
-#: include/forms.inc.php:606 include/forms.inc.php:942
+#: include/forms.inc.php:611 include/forms.inc.php:947
 #: include/views/administration.general.housekeeper.edit.php:160
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.prototype.list.php:55 items.php:157
@@ -13815,7 +13823,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "觸發器嚴重性"
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:279
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:290
 msgid "Trigger severity"
 msgstr "觸發器示警度"
 
@@ -13827,7 +13835,7 @@ msgstr "觸發器已更新"
 msgid "Trigger value"
 msgstr "觸發器值"
 
-#: hosts.php:810 hosts.php:902 include/forms.inc.php:593
+#: hosts.php:810 hosts.php:902 include/forms.inc.php:598
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
 #: include/triggers.inc.php:1262
 #: include/views/configuration.action.list.php:33
@@ -13893,7 +13901,7 @@ msgstr "嘗試讀取不能存取的屬性\"%s\"."
 msgid "Tue"
 msgstr "二"
 
-#: include/forms.inc.php:1665 include/forms.inc.php:1733
+#: include/forms.inc.php:1670 include/forms.inc.php:1738
 #: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "週二"
@@ -13913,7 +13921,7 @@ msgstr "兩個項目 (\"%1$s\"和\"%2$s\")不能填入一個主機資產紀錄�
 
 #: include/actions.inc.php:829 include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
-#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:529
+#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:534
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:36
@@ -13964,7 +13972,7 @@ msgstr "類型(降冪)"
 msgid "Type of calculation"
 msgstr "計算方式"
 
-#: include/forms.inc.php:531 include/forms.inc.php:912
+#: include/forms.inc.php:536 include/forms.inc.php:917
 #: include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.edit.php:227
 #: include/views/configuration.item.massupdate.php:215 popup.php:818
@@ -13980,7 +13988,7 @@ msgstr "日誌鍵值的資訊類型必須是\"Log\" ."
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "整合性項目的資訊的類型必須是\"Numeric (float)\"."
 
-#: include/forms.inc.php:907
+#: include/forms.inc.php:912
 msgid "Types"
 msgstr "類型 "
 
@@ -14001,7 +14009,7 @@ msgstr "上線"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:153
+#: include/views/administration.users.edit.php:164
 msgid "URL (after login)"
 msgstr "登錄後定向到"
 
@@ -14075,6 +14083,11 @@ msgstr "未知悉的Problem事件"
 msgid "Unacknowledged only"
 msgstr "僅未知悉的"
 
+#: include/views/administration.users.edit.php:107
+#, c-format
+msgid "Unavailable for users with %1$s."
+msgstr ""
+
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
 msgstr "解除封鎖所選的"
@@ -14108,11 +14121,11 @@ msgstr "單位"
 #: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
 #: include/media.inc.php:40 include/nodes.inc.php:278 include/perm.inc.php:36
-#: include/regexp.inc.php:206 include/screens.inc.php:55
-#: include/triggers.inc.php:62 include/triggers.inc.php:177
-#: include/triggers.inc.php:196 include/triggers.inc.php:2491
-#: include/triggers.inc.php:2497 include/users.inc.php:66
-#: include/users.inc.php:88
+#: include/perm.inc.php:53 include/regexp.inc.php:206
+#: include/screens.inc.php:55 include/triggers.inc.php:62
+#: include/triggers.inc.php:177 include/triggers.inc.php:196
+#: include/triggers.inc.php:2491 include/triggers.inc.php:2497
+#: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
 msgstr "未知的"
@@ -14270,7 +14283,7 @@ msgstr "上"
 #: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.host.massupdate.php:299
 #: include/views/configuration.httpconf.popup.php:93
-#: include/views/configuration.item.massupdate.php:562
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/js/adm.regexprs.edit.js.php:255
 #: include/views/js/configuration.discovery.edit.js.php:348
 #: popup_period.php:134
@@ -14281,7 +14294,7 @@ msgstr "更新"
 msgid "Update existing"
 msgstr "更新現有的"
 
-#: include/forms.inc.php:451 include/views/configuration.httpconf.list.php:65
+#: include/forms.inc.php:456 include/views/configuration.httpconf.list.php:65
 #: items.php:155
 msgid "Update interval"
 msgstr "更新間隔"
@@ -14364,7 +14377,7 @@ msgstr "上層拓墣圖"
 msgid "Uptime"
 msgstr "在線時間"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:875
 msgid "Uptime of Zabbix server process in seconds."
 msgstr ""
 
@@ -14393,7 +14406,7 @@ msgstr "用於動作中"
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
-#: include/views/administration.users.edit.php:326
+#: include/views/administration.users.edit.php:337
 #: include/views/configuration.action.edit.php:528
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
@@ -14404,11 +14417,11 @@ msgstr "用户"
 msgid "User \"%s\" cannot be without user group."
 msgstr "用戶\"%s\"不能沒有用戶群組."
 
-#: users.php:218
+#: users.php:248
 msgid "User added"
 msgstr "新增用户"
 
-#: include/views/administration.users.edit.php:344
+#: include/views/administration.users.edit.php:355
 msgid "User can't change type for himself"
 msgstr "用戶不能自行改變類型"
 
@@ -14429,11 +14442,12 @@ msgstr "用戶不能改變自己的狀態"
 msgid "User cannot change status of himself."
 msgstr "用戶不能改變自己的狀態"
 
-#: users.php:247 users.php:355
+#: users.php:277 users.php:385
 msgid "User deleted"
 msgstr "用户已删除"
 
 #: api/classes/CUserGroup.php:252 include/audit.inc.php:31
+#: include/views/administration.script.edit.php:78
 #: include/views/administration.script.list.php:43
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.users.list.php:41
@@ -14480,7 +14494,6 @@ msgstr "用於資料庫斷線訊息的用戶群組"
 msgid "User group for database down message \"%1$s\"."
 msgstr ""
 
-#: include/views/administration.script.edit.php:78
 #: include/views/administration.usergroups.list.php:28
 #: include/views/administration.usergroups.list.php:34
 #: include/views/administration.users.list.php:28 popup.php:48
@@ -14535,13 +14548,13 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:344
-#: include/views/administration.users.edit.php:348
+#: include/views/administration.users.edit.php:355
+#: include/views/administration.users.edit.php:359
 #: include/views/administration.users.list.php:58
 msgid "User type"
 msgstr "用戶類型"
 
-#: profile.php:176 users.php:211 users.php:269 users.php:293
+#: profile.php:176 users.php:241 users.php:299 users.php:323
 msgid "User updated"
 msgstr "用户已更新"
 
@@ -14571,183 +14584,183 @@ msgstr "用户"
 msgid "Users (online)"
 msgstr "用戶(線上)"
 
-#: users.php:323
+#: users.php:353
 msgid "Users unblocked"
 msgstr "未被封鎖的用戶"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:587
+#: include/classes/items/CHelpItems.php:595
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:591
+#: include/classes/items/CHelpItems.php:599
 msgid "VMware event log, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:611
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:647
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:603
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:607
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -14786,31 +14799,31 @@ msgstr "欄位\"%2$s\"的值\"%1$s\"太長 - %3$d字元. 容許的長度是%4$d�
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "欄位\"%2$s\"的值\"%1$s\"太長 - %3$d 字元. 容許的長度是2048字元."
 
-#: include/validate.inc.php:334 include/validate.inc.php:358
+#: include/validate.inc.php:333 include/validate.inc.php:357
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has incorrect decimal format."
+msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
 
-#: include/validate.inc.php:344 include/validate.inc.php:360
+#: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
+msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:340
+#: include/validate.inc.php:339
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
+msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:336
+#: include/validate.inc.php:335
 #, c-format
-msgid "Value \"%1$s\" of \"%2$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
+msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:879
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -14867,8 +14880,8 @@ msgstr "值對應"
 msgid "Value mapping must have at least one mapping."
 msgstr "值對應必需至少有一個對應."
 
-#: include/classes/items/CHelpItems.php:129
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:133
+#: include/classes/items/CHelpItems.php:391
 msgid "Value of any performance counter, where \"counter\" parameter is the counter path and \"interval\" parameter is a number of last seconds, for which the agent returns an average value."
 msgstr ""
 
@@ -14895,7 +14908,7 @@ msgid "Verbose"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:73
-#: include/classes/items/CHelpItems.php:315
+#: include/classes/items/CHelpItems.php:319
 msgid "Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1"
 msgstr ""
 
@@ -14907,12 +14920,16 @@ msgstr "垂直的"
 msgid "Vertical align"
 msgstr "縱向對齊"
 
+#: include/locales.inc.php:79
+msgid "Vietnamese (vi_VN)"
+msgstr ""
+
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
 msgstr "檢視未能形成."
 
-#: include/classes/items/CHelpItems.php:201
-#: include/classes/items/CHelpItems.php:455
+#: include/classes/items/CHelpItems.php:205
+#: include/classes/items/CHelpItems.php:463
 msgid "Virtual memory statistics."
 msgstr ""
 
@@ -15015,7 +15032,7 @@ msgstr ""
 msgid "Wed"
 msgstr "三"
 
-#: include/forms.inc.php:1666 include/forms.inc.php:1734
+#: include/forms.inc.php:1671 include/forms.inc.php:1739
 #: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "週三"
@@ -15024,7 +15041,7 @@ msgstr "週三"
 msgid "Week"
 msgstr "週"
 
-#: include/forms.inc.php:1643 include/maintenances.inc.php:38
+#: include/forms.inc.php:1648 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:404
 #: include/reports.inc.php:412 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15057,8 +15074,8 @@ msgstr "有最新知悉的事件"
 msgid "With problems"
 msgstr "有問題"
 
-#: include/forms.inc.php:596 include/forms.inc.php:823
-#: include/forms.inc.php:932
+#: include/forms.inc.php:601 include/forms.inc.php:828
+#: include/forms.inc.php:937
 msgid "With triggers"
 msgstr "有觸發器"
 
@@ -15070,7 +15087,7 @@ msgstr "有未知悉的事件"
 msgid "Without problems"
 msgstr "無問題"
 
-#: include/forms.inc.php:597 include/forms.inc.php:820
+#: include/forms.inc.php:602 include/forms.inc.php:825
 msgid "Without triggers"
 msgstr "無觸發器"
 
@@ -15291,7 +15308,7 @@ msgstr "是"
 msgid "Yotta"
 msgstr "Yotta"
 
-#: include/views/administration.users.edit.php:130
+#: include/views/administration.users.edit.php:141
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您無法選擇某些語言, 因為這些語系並未安裝於web伺服器上."
 
@@ -15422,7 +15439,7 @@ msgstr "Zabbix已接收到一個不正確的請求."
 msgid "Zabbix internal"
 msgstr "Zabbix自身"
 
-#: authentication.php:216
+#: include/perm.inc.php:48
 msgid "Zabbix internal authentication"
 msgstr "Zabbix內部認證"
 
@@ -15515,10 +15532,10 @@ msgstr "端點代理程式"
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:116
-#: include/forms.inc.php:380 include/forms.inc.php:423
-#: include/forms.inc.php:438 include/forms.inc.php:445
-#: include/forms.inc.php:462 include/forms.inc.php:595
-#: include/forms.inc.php:610 include/graphs.inc.php:86
+#: include/forms.inc.php:385 include/forms.inc.php:428
+#: include/forms.inc.php:443 include/forms.inc.php:450
+#: include/forms.inc.php:467 include/forms.inc.php:600
+#: include/forms.inc.php:615 include/graphs.inc.php:86
 #: include/views/js/configuration.graph.edit.js.php:46 report2.php:222
 #: report2.php:241 report2.php:263 report2.php:300 report2.php:328
 #: report2.php:347 report4.php:94 report4.php:270
@@ -15751,9 +15768,9 @@ msgid "last"
 msgstr "最新"
 
 #: hosts.php:773 hosts.php:774 hosts.php:775 include/actions.inc.php:29
-#: include/forms.inc.php:472 include/forms.inc.php:479
-#: include/forms.inc.php:486 include/forms.inc.php:493
-#: include/forms.inc.php:602 include/forms.inc.php:617
+#: include/forms.inc.php:477 include/forms.inc.php:484
+#: include/forms.inc.php:491 include/forms.inc.php:498
+#: include/forms.inc.php:607 include/forms.inc.php:622
 #: include/views/inventory.host.list.php:40
 msgid "like"
 msgstr "似"
@@ -15823,6 +15840,12 @@ msgstr "必需為一個正確的LDAP用戶"
 msgid "new"
 msgstr ""
 
+#: include/views/configuration.host.massupdate.php:74
+#: include/views/configuration.item.massupdate.php:502
+msgctxt "new element in multiselect"
+msgid "new"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
@@ -15842,7 +15865,7 @@ msgid "not running"
 msgstr "非運行中"
 
 #: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:807
-#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1149
+#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1154
 msgid "not selected"
 msgstr "非所選的"
 
