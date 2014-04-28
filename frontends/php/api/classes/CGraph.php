@@ -391,7 +391,7 @@ class CGraph extends CGraphGeneral {
 				'hostids' => $chdHost['hostid']
 			));
 			if ($chdGraph = reset($chdGraphs)) {
-				if (zbx_strtolower($tmpGraph['name']) != zbx_strtolower($chdGraph['name'])) {
+				if ($tmpGraph['name'] != $chdGraph['name']) {
 					$graphExists = $this->get(array(
 						'output' => array('graphid'),
 						'hostids' => $chdHost['hostid'],
