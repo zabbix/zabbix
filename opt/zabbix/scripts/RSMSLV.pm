@@ -28,7 +28,6 @@ use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 use constant TRIGGER_VALUE_CHANGED_YES => 1;
 use constant EVENT_OBJECT_TRIGGER => 0;
 use constant EVENT_SOURCE_TRIGGERS => 0;
-use constant API_OUTPUT_REFER => 'refer'; # TODO: OBSOLETE AFTER API
 use constant TRIGGER_VALUE_TRUE => 1;
 use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
 
@@ -1051,7 +1050,11 @@ sub get_down_count
 
 	my $res = db_select("select count(*) from history_uint where itemid=$itemid and clock between $event_from and $event_till and value=" . DOWN);
 
-	$count += ($res->fetchrow_array)[0];
+	my $n = ($res->fetchrow_array)[0];
+
+	info("  $n down between $event_from and $event_till");
+
+	$count += $n;
     }
 
     return $count;
@@ -1452,7 +1455,7 @@ sub __get_eventtimes
 
     my $rows = scalar(@$arr_ref);
 
-    fail("item $itemid must have one not classified trigger") unless ($rows == 1);
+    fail("item $itemid must have one not classified trigger (found: $rows)") unless ($rows == 1);
 
     my $triggerid = $arr_ref->[0]->[0];
 
@@ -1482,7 +1485,8 @@ sub __get_eventtimes
     }
 
     $res = db_select(
-	"select clock,value,false_positive from events".
+	"select clock,value,false_positive".
+	" from events".
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
