@@ -19,4 +19,7 @@ libspecsysinfo_a_SOURCES = \
 	software.c software.h \
 	system.c \
 	swap.c \
-	uptime.c
+	uptime.c \
+	linux.c \
+	specsysinfo.h \
+	hostname.c
