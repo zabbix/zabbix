@@ -432,14 +432,14 @@ class CHostGroup extends CApiService {
 		// check host name duplicates
 		$collectionValidator = new CCollectionValidator(array(
 			'uniqueField' => 'name',
-			'uniqueField2' => 'groupid',
 			'messageDuplicate' => _('Host group "%1$s" already exists.')
 		));
 		$this->checkValidator($groups, $collectionValidator);
 
 		$dbHostGroups = API::getApiService()->select($this->tableName(), array(
 			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($groups, 'name'))
+			'filter' => array('name' => zbx_objectValues($groups, 'name')),
+			'limit' => 1
 		));
 
 		if ($dbHostGroups) {
