@@ -407,4 +407,22 @@
 		jQuery('#template_row_' + templateid).remove();
 	}
 
+	function addPopupValues(list) {
+		if (!isset('object', list)) {
+			throw("Error hash attribute 'list' doesn't contain 'object' index");
+			return false;
+		}
+
+		if (list.object == 'hostid') {
+			for (var i = 0; i < list.values.length; i++) {
+				if (list.values[i].existedTemplate == undefined) {
+					var item = {
+						'id': list.values[i].templateid,
+						'name': list.values[i].host
+					};
+					jQuery('#add_templates_').multiSelect.addData(item);
+				}
+			}
+		}
+	}
 </script>

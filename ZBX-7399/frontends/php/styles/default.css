@@ -553,6 +553,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
+.selectPopup { float: right; }
+
 /* menu popup */
 .menuPopup {
 	width: 170px; border: 1px solid #7E9AB4; text-align: left; position: absolute; z-index: 1000; display: none; white-space: pre-wrap;

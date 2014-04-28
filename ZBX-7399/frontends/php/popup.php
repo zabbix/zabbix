@@ -32,6 +32,10 @@ $srctbl = get_request('srctbl', ''); // source table name
 
 // set page title
 switch ($srctbl) {
+	case 'templates':
+		$page['title'] = _('Templates');
+		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		break;
 	case 'proxies':
 		$page['title'] = _('Proxies');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -139,7 +143,8 @@ $allowedSrcFields = array(
 	'proxies'				=> '"hostid", "host"',
 	'usrgrp'				=> '"usrgrpid", "name"',
 	'applications'			=> '"name"',
-	'scripts'				=> '"scriptid", "name"'
+	'scripts'				=> '"scriptid", "name"',
+	'templates'				=> '"hostid", "host"'
 );
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -505,7 +510,7 @@ if (isset($onlyHostid)) {
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
 else {
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs'))) {
+	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'templates'))) {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
 	}
 	if (str_in_array($srctbl, array('help_items'))) {
@@ -670,6 +675,77 @@ elseif ($srctbl == 'users') {
 	$form->addItem($table);
 	$form->show();
 }
+
+/*
+ * Templates
+ */
+elseif ($srctbl == 'templates') {
+	$form = new CForm();
+	$form->setName('templateform');
+	$form->setAttribute('id', 'templates');
+
+	$table = new CTableInfo(_('No templates found.'));
+	$table->setHeader(array(($multiselect ? new CCheckBox('all_templates', null,
+		"javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');") : null), _('Name')
+	));
+
+	$options = array(
+		'output' => array('templateid', 'name', 'host'),
+		'nodeids' => $nodeId,
+		'groupids' => $groupid,
+		'sortfield' => 'name',
+		'preservekeys' => true
+	);
+
+	if (!is_null($writeonly)) {
+		$options['editable'] = true;
+	}
+
+	$templates = API::Template()->get($options);
+	order_result($templates, 'name');
+
+	foreach ($templates as &$template) {
+		$name = new CSpan($template['name'], 'link');
+		$name->attr('id', 'spanid'.$template['templateid']);
+
+		if ($multiselect) {
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).');';
+			$checkBox = new CCheckBox('templates['.zbx_jsValue('templateid').']', null, null, $template['templateid']);
+		}
+		else {
+			$jsAction = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.
+				zbx_jsvalue($values).'); close_window(); return false;';
+		}
+
+		// check for existing
+		if (in_array($template['name'], $existedTemplates)) {
+			$checkBox->setChecked(1);
+			$checkBox->setEnabled('disabled');
+			$name->removeAttr('class');
+			$template['existedTemplate'] = true;
+		}
+		else {
+			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+		}
+
+		$table->addRow(array($multiselect ? $checkBox : null, $name));
+	}
+	unset($template);
+
+	if ($multiselect) {
+		$button = new CButton('select', _('Select'),
+			"javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).');'
+		);
+		$table->setFooter(new CCol($button, 'right'));
+
+		insert_js('var popupReference = '.zbx_jsvalue($templates, true).';');
+	}
+	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
+
+	$form->addItem($table);
+	$form->show();
+}
+
 /*
  * Help items
  */
@@ -799,6 +875,7 @@ elseif ($srctbl == 'triggers') {
 	$form->addItem($table);
 	$form->show();
 }
+
 /*
  * Items
  */
@@ -1389,6 +1466,7 @@ elseif ($srctbl == 'screens2') {
 	}
 	$table->show();
 }
+
 /*
  * Discovery rules
  */

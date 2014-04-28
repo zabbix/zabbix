@@ -73,6 +73,11 @@ jQuery(function($) {
 	 * @param bool   options['addNew']			allow user to create new names
 	 * @param int    options['selectedLimit']	how many items can be selected
 	 * @param int    options['limit']			how many available items can be received from backend
+	 * @param object options['popup']			popup data {create, parameters, width, height}
+	 * @param bool   options['create']
+	 * @param string options['parameters']
+	 * @param int    options['width']
+	 * @param int    options['height']
 	 *
 	 * @return object
 	 */
@@ -93,7 +98,10 @@ jQuery(function($) {
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
-			limit: 20
+			limit: 20,
+			popup: {
+				'create': false
+			}
 		};
 		options = $.extend({}, defaults, options);
 
@@ -140,6 +148,13 @@ jQuery(function($) {
 				}
 
 				return data;
+			};
+
+			/**
+			 * Insert outside data
+			 */
+			$.fn.multiSelect.addData = function(item) {
+				addSelected(item, obj, values, options);
 			};
 
 			/**
@@ -426,6 +441,32 @@ jQuery(function($) {
 
 			// resize
 			resize(obj, values, options);
+
+			// draw popup link
+			if (options.popup.create == true) {
+				var popupBlock = $('<div>', {
+					class: 'selectPopup'
+				});
+
+				var existedTemplates = options.popup.parameters;
+
+				if (options.ignored != '') {
+					$.each(options.ignored, function(i, value) {
+						existedTemplates = existedTemplates + '&existed_templates[' + i + ']=' + value;
+					});
+				}
+
+				var popupButton = $('<input>', {
+					type: 'button',
+					class: 'input link_menu',
+					name: 'popupAdd',
+					value: 'Select',
+					onClick: 'PopUp("popup.php?' + existedTemplates + '", ' + options.popup.width + ', '
+						+ options.popup.height + ')'
+				});
+
+				obj.parent().prepend(popupBlock.append(popupButton));
+			}
 		});
 	};
 
