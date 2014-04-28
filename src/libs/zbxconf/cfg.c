@@ -54,7 +54,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*path = NULL, *file_name;
-	wchar_t			*wpath;
+	wchar_t			*wpath = NULL;
 	zbx_stat_t		sb;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
