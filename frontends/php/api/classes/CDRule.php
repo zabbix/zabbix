@@ -397,6 +397,14 @@ class CDRule extends CApiService {
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
+		// check host name duplicates
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'druleid',
+			'messageDuplicate' => _('Discovery rule "%1$s" already exists.')
+		));
+		$this->checkValidator($dRules, $collectionValidator);
+
 		// checking to the duplicate names
 		$dbDRules = API::getApiService()->select($this->tableName(), array(
 			'output' => array('name'),
