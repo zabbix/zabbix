@@ -482,6 +482,10 @@ class CDRule extends CApiService {
 
 		// validate drule duplicate names
 		foreach ($dRules as $dRule) {
+			if (!isset($dRulesDb[$dRule['druleid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
 			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
 				$dRuleNamesChanged[] = $dRule['name'];
 			}
