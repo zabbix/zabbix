@@ -622,30 +622,25 @@ class CPageFilter {
 	private function _initApplications($application, array $options) {
 		$this->data['applications'] = array();
 
-		if (!$this->groupsSelected) {
-			$application = '';
+		$def_options = array(
+			'output' => array('name'),
+			'groupids' => ($this->groupid > 0) ? $this->groupid : null
+		);
+		$options = zbx_array_merge($def_options, $options);
+		$applications = API::Application()->get($options);
+
+		foreach ($applications as $app) {
+			$this->data['applications'][$app['name']] = $app;
 		}
-		else {
-			$def_options = array(
-				'output' => array('name'),
-				'groupids' => ($this->groupid > 0) ? $this->groupid : null
-			);
-			$options = zbx_array_merge($def_options, $options);
-			$applications = API::Application()->get($options);
 
-			foreach ($applications as $app) {
-				$this->data['applications'][$app['name']] = $app;
-			}
+		// select remembered selection
+		if (is_null($application) && $this->_profileIds['application']) {
+			$application = $this->_profileIds['application'];
+		}
 
-			// select remembered selection
-			if (is_null($application) && $this->_profileIds['application']) {
-				$application = $this->_profileIds['application'];
-			}
-
-			// nonexisting or unset application
-			if ((!isset($this->data['applications'][$application]) && $application !== '') || is_null($application)) {
-				$application = '';
-			}
+		// nonexisting or unset application
+		if ((!isset($this->data['applications'][$application]) && $application !== '') || is_null($application)) {
+			$application = '';
 		}
 
 		if (!is_null($this->_requestIds['application'])) {
@@ -795,21 +790,19 @@ class CPageFilter {
 
 		natcasesort($items);
 
-		// add drop down first item
+		// add first item  to drop down
 		if (!$this->config['popupDD']) {
 			if (isset($this->config['DDFirstLabels'][$options['objectName']])) {
 				$firstLabel = $this->config['DDFirstLabels'][$options['objectName']];
 			}
-			else {
+			elseif ($name !== 'application') {
 				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
 			}
-
-			if ($name === 'application') {
-				$items = array('' => $firstLabel) + $items;
-			}
 			else {
-				$items = array($firstLabel) + $items;
+				$firstLabel = _('all');
 			}
+
+			$items = array($firstLabel) + $items;
 		}
 
 		foreach ($items as $id => $name) {
