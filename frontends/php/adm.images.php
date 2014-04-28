@@ -148,7 +148,7 @@ if (!isset($_REQUEST['form'])) {
 	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
 
 	$form->addVar('imagetype', $imageType);
-	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Upload icon') : _('Upload background image')));
+	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
 }
 
 $imageWidget = new CWidget();
