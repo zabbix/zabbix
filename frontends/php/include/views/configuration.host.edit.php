@@ -44,11 +44,12 @@ else {
 }
 
 
-$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && (getRequest('form_refresh') == 1));
-$cloneFromOpenedDiscovered = ($cloneFormOpened && ($dbHost['flags'] & ZBX_FLAG_DISCOVERY_CREATED));
+$cloningDiscoveredHost = (in_array(getRequest('form'), array('clone', 'full_clone'))
+	&& (getRequest('form_refresh') == 1) && ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+);
 
 // Use data from database when host is opened and form is shown for first time or discovered host is being cloned.
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFromOpenedDiscovered)) {
+if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) {
 	$proxyHostId = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visibleName = $dbHost['name'];
@@ -57,10 +58,6 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFromOpenedDisc
 	if ($visibleName === $host) {
 		$visibleName = '';
 	}
-
-	$status = $cloneFromOpenedDiscovered
-		? getRequest('status', HOST_STATUS_NOT_MONITORED)
-		: $dbHost['status'];
 
 	$ipmiAuthtype = $dbHost['ipmi_authtype'];
 	$ipmiPrivilege = $dbHost['ipmi_privilege'];
@@ -98,6 +95,15 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFromOpenedDisc
 	$clearTemplates = array();
 
 	$newGroupName = '';
+
+	if ($cloningDiscoveredHost) {
+		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
+		$description = getRequest('description', '');
+	}
+	else {
+		$status = $dbHost['status'];
+		$description = $dbHost['description'];
+	}
 }
 else {
 	$hostGroups = getRequest('groups', array());
@@ -120,6 +126,7 @@ else {
 	$interfaces = getRequest('interfaces', array());
 	$templateIds = getRequest('templates', array());
 	$clearTemplates = getRequest('clear_templates', array());
+	$description = getRequest('description', '');
 
 	if ((getRequest('hostid', 0) == 0) && !hasRequest('form_refresh')) {
 		$status = HOST_STATUS_MONITORED;
@@ -388,11 +395,7 @@ else {
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
 }
 
-$hostList->addRow(_('Description'), new CTextArea('description',
-	(getRequest('hostid') > 0 && !hasRequest('form_refresh'))
-		? $this->data['dbHost']['description']
-		: getRequest('description')
-));
+$hostList->addRow(_('Description'), new CTextArea('description', $description));
 
 // Proxy
 if (!$isDiscovered) {
@@ -423,7 +426,7 @@ else {
 }
 $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
-$hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED == $status), null, HOST_STATUS_MONITORED));
+$hostList->addRow(_('Enabled'), new CCheckBox('status', ($status == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED));
 
 if (getRequest('form') == 'full_clone') {
 	// host applications
