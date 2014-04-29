@@ -2858,7 +2858,7 @@ static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
 	int	wide_size;
 
 	wide_size = MultiByteToWideChar(codepage, 0, cp_string, -1, NULL, 0);
-	wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size);
+	wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 
 	/* convert from cp_string to wide_string */
 	MultiByteToWideChar(codepage, 0, cp_string, -1, wide_string, wide_size);
@@ -2957,7 +2957,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	{
 		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
 		if (wide_size > STATIC_SIZE)
-			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size);
+			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 		else
 			wide_string = wide_string_static;
 
