@@ -36,17 +36,17 @@ class Curl {
 			$this->url = $url;
 
 			// parse reference
-			$tmp_pos = zbx_strpos($this->url, '#');
-			if ($tmp_pos !== false) {
-				$this->reference = zbx_substring($this->url, $tmp_pos + 1);
-				$this->url = zbx_substring($this->url, 0, $tmp_pos);
+			$pos = strpos($url, '#');
+			if ($pos !== false) {
+				$this->reference = substr($url, $pos + 1);
+				$this->url = substr($url, 0, $pos);
 			}
 
-			$tmp_pos = zbx_strpos($url, '?');
 			// parse query
-			if ($tmp_pos !== false) {
-				$this->query = zbx_substring($url, $tmp_pos + 1);
-				$this->url = $url = zbx_substring($url, 0, $tmp_pos);
+			$pos = strpos($url, '?');
+			if ($pos !== false) {
+				$this->query = substr($url, $pos + 1);
+				$this->url = substr($url, 0, $pos);
 			}
 
 			$this->formatArguments();
