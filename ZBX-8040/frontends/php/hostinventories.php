@@ -211,13 +211,10 @@ else {
 				// if we are filtering by inventory field
 				if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
 					// must we filter exactly or using a substring (both are case insensitive)
-					$match = $data['filterExact']
-						? (zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]) === zbx_strtolower($data['filterFieldValue']))
-						: (zbx_strpos(
-							zbx_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]),
-							zbx_strtolower($data['filterFieldValue'])
-							) !== false);
+					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
+					$needle = mb_strtolower($data['filterFieldValue']);
 
+					$match = $data['filterExact'] ? ($haystack === $needle) : (mb_strpos($haystack, $needle) !== false);
 					if (!$match) {
 						unset($data['hosts'][$num]);
 					}
