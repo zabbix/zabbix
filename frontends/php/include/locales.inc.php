@@ -77,7 +77,8 @@ function getLocales() {
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
 		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true)
+		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true),
+		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
 	);
 }
 
@@ -174,7 +175,8 @@ function zbx_locale_variants_win($language) {
 		'es_es' => array('Spanish_Spain.1252', 'spanish'),
 		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
 		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian')
+		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
+		'vi_vn' => array('Vietnamese_Viet Nam.1258', 'vietnamese')
 	);
 	return $winLanguageName[strtolower($language)];
 }

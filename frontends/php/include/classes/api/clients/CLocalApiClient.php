@@ -47,17 +47,48 @@ class CLocalApiClient extends CApiClient {
 		$this->serviceFactory = $factory;
 	}
 
-	public function callMethod($api, $method, array $params, $auth) {
+	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
 		global $DB;
 
+		$api = strtolower($requestApi);
+		$method = strtolower($requestMethod);
+
 		$response = new CApiClientResponse();
+
+		// check API
+		if (!$this->isValidApi($api)) {
+			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorMessage = _s('Incorrect API "%1$s".', $requestApi);
+
+			return $response;
+		}
+
+		// check method
+		if (!$this->isValidMethod($api, $method)) {
+			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorMessage = _s('Incorrect method "%1$s.%2$s".', $requestApi, $requestMethod);
+
+			return $response;
+		}
+
+		$requiresAuthentication = $this->requiresAuthentication($api, $method);
+
+		// check that no authentication token is passed to methods that don't require it
+		if (!$requiresAuthentication && $auth !== null) {
+			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
+				$requestApi, $requestMethod
+			);
+
+			return $response;
+		}
+
 		$newTransaction = false;
 		try {
-			// check method
-			$this->checkMethod($api, $method);
-
 			// authenticate
-			$this->authenticate($api, $method, $auth);
+			if ($requiresAuthentication) {
+				$this->authenticate($auth);
+			}
 
 			// the nopermission parameter must not be available for external API calls.
 			unset($params['nopermissions']);
@@ -104,53 +135,51 @@ class CLocalApiClient extends CApiClient {
 	}
 
 	/**
-	 * Checks the authentication token if the given method requires authentication.
+	 * Checks if the authentication token is valid.
 	 *
-	 * @param string $api
-	 * @param string $method
 	 * @param string $auth
 	 *
 	 * @throws APIException
 	 */
-	protected function authenticate($api, $method, $auth) {
-		// authenticate
-		if ($this->requiresAuthentication($api, $method)) {
-			if (zbx_empty($auth)) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
-			}
+	protected function authenticate($auth) {
+		if (zbx_empty($auth)) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+		}
 
-			$user = $this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
-			$this->debug = $user['debug_mode'];
-		}
-		elseif ($auth !== null) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS,
-				_s('The "%1$s.%2$s" method must be called without the "auth" parameter.', $api, $method)
-			);
-		}
+		$user = $this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
+		$this->debug = $user['debug_mode'];
 	}
 
 	/**
-	 * Checks if the given API and method are valid.
+	 * Returns true if the given API is valid.
 	 *
-	 * @param $api
-	 * @param $method
+	 * @param string $api
 	 *
-	 * @throws APIException
+	 * @return bool
 	 */
-	protected function checkMethod($api, $method) {
-		// validate the API
-		if (!$this->serviceFactory->hasObject($api)) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Incorrect API "%1$s".', $api));
-		}
+	protected function isValidApi($api) {
+		return $this->serviceFactory->hasObject($api);
+	}
 
+	/**
+	 * Returns true if the given method is valid.
+	 *
+	 * @param string $api
+	 * @param string $method
+	 *
+	 * @return bool
+	 */
+	protected function isValidMethod($api, $method) {
 		$apiService = $this->serviceFactory->getObject($api);
 
 		// validate the method
-		if (!in_array($method, get_class_methods($apiService))) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', $api, $method)
-			);
+		$availableMethods = array();
+		foreach (get_class_methods($apiService) as $serviceMethod) {
+			// the comparison must be case insensitive
+			$availableMethods[strtolower($serviceMethod)] = true;
 		}
+
+		return isset($availableMethods[$method]);
 	}
 
 	/**
@@ -163,7 +192,7 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
-			|| ($api === 'user' && $method === 'checkAuthentication')
+			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version'));
 	}
 }
