@@ -2291,11 +2291,7 @@ function get_item_function_info($expr) {
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'strlen' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-		'time' =>		array(
-			'value_type' => 'HHMMSS',
-			'type' => T_ZBX_INT,
-			'validation' => 'strlen({})==6'
-		)
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6')
 	);
 
 	$expressionData = new CTriggerExpression();
