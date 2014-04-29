@@ -239,13 +239,12 @@ function getMenuPopupHost(options) {
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// trigger status
-		if (options.hasTriggers) {
-			gotos[gotos.length] = {
-				label: t('Triggers'),
-				url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		// trigger status. If host is disabled, show disabled link for triggers
+		gotos[gotos.length] = {
+			label: t('Triggers'),
+			css: options.hasTriggers ? '' : 'ui-state-disabled',
+			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// graphs
 		if (options.hasGraphs) {
@@ -405,6 +404,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Latest events'),
+				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -581,17 +581,16 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	if (options.showEvents) {
-		var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
-		if (typeof options.eventTime !== 'undefined') {
-			url.setArgument('nav_time', options.eventTime);
-		}
-
-		items[items.length] = {
-			label: t('Events'),
-			url: url.getUrl()
-		};
+	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
+	if (typeof options.eventTime !== 'undefined') {
+		url.setArgument('nav_time', options.eventTime);
 	}
+
+	items[items.length] = {
+		label: t('Events'),
+		css: options.showEvents ? '' : 'ui-state-disabled',
+		url: url.getUrl()
+	};
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
