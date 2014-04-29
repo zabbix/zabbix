@@ -40,7 +40,7 @@ $commentFormList->addRow(_('Description'), $commentTextArea);
 
 // append tabs to form
 $commentTab = new CTabView();
-$commentTab->addTab('commentTab', _s('Description    for "%s".', $this->data['trigger']['description']), $commentFormList);
+$commentTab->addTab('commentTab', _s('Description for "%s".', $this->data['trigger']['description']), $commentFormList);
 $commentForm->addItem($commentTab);
 
 // append buttons to form
