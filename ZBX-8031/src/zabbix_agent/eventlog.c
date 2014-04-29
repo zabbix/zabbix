@@ -23,7 +23,7 @@
 
 #define	DEFAULT_EVENT_CONTENT_SIZE 256
 
-static	const wchar_t *RENDER_ITEMS[] = {
+static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",
 	L"/Event/System/Provider/@EventSourceName",
 	L"/Event/System/EventRecordID",
@@ -34,7 +34,7 @@ static	const wchar_t *RENDER_ITEMS[] = {
 	L"Event/EventData/Data"
 };
 
-#define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(void *))
+#define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
 
 #define	VAR_PROVIDER_NAME(p) (p[0].StringVal)
 #define	VAR_SOURCE_NAME(p) (p[1].StringVal)

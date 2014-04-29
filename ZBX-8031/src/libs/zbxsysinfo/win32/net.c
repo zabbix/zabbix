@@ -25,7 +25,7 @@
 /*
  * returns interface description encoded in UTF-8 format
  */
-static char *get_if_description(MIB_IFROW *pIfRow)
+static char	*get_if_description(MIB_IFROW *pIfRow)
 {
 	static wchar_t *(*mb_to_unicode)(const char *) = NULL;
 	wchar_t 	*wdescr;
@@ -99,7 +99,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		char *utf8_descr;
+		char	*utf8_descr;
 
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
 		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
