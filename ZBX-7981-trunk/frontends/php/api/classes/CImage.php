@@ -542,7 +542,7 @@ class CImage extends CApiService {
 			'preservekeys' => true
 		));
 
-		$imageNamesChaged = array();
+		$imageNamesChanged = array();
 		foreach ($images as $image) {
 			if (!isset($dbImages[$image['imageid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -550,20 +550,20 @@ class CImage extends CApiService {
 
 			if (isset($image['name']) && !zbx_empty($image['name'])
 					&& $dbImages[$image['imageid']]['name'] !== $image['name']) {
-				if (isset($imageNamesChaged[$image['name']])) {
+				if (isset($imageNamesChanged[$image['name']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
 				else {
-					$imageNamesChaged[$image['name']] = $image['name'];
+					$imageNamesChanged[$image['name']] = $image['name'];
 				}
 			}
 		}
 
 		// check for exising image names
-		if ($imageNamesChaged) {
+		if ($imageNamesChanged) {
 			$dbImages = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => $imageNamesChaged),
+				'filter' => array('name' => $imageNamesChanged),
 				'limit' => 1
 			));
 
