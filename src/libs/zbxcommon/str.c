@@ -2852,7 +2852,7 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 }
 
 /* convert from selected code page to unicode */
-static wchar_t *zbx_to_unicode(unsigned int codepage, const char *cp_string)
+static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
 {
 	wchar_t	*wide_string = NULL;
 	int	wide_size;
@@ -2867,13 +2867,13 @@ static wchar_t *zbx_to_unicode(unsigned int codepage, const char *cp_string)
 }
 
 /* convert from Windows ANSI code page to unicode */
-wchar_t *zbx_acp_to_unicode(const char *acp_string)
+wchar_t	*zbx_acp_to_unicode(const char *acp_string)
 {
 	return zbx_to_unicode(CP_ACP, acp_string);
 }
 
 /* convert from Windows OEM code page to unicode */
-wchar_t *zbx_oemcp_to_unicode(const char *oemcp_string)
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string)
 {
 	return zbx_to_unicode(CP_OEMCP, oemcp_string);
 }
@@ -2888,13 +2888,13 @@ int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int 
 }
 
 /* convert from UTF-8 to unicode */
-wchar_t *zbx_utf8_to_unicode(const char *utf8_string)
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string)
 {
 	return zbx_to_unicode(CP_UTF8, utf8_string);
 }
 
 /* convert from unicode to utf8 */
-char *zbx_unicode_to_utf8(const wchar_t *wide_string)
+char	*zbx_unicode_to_utf8(const wchar_t *wide_string)
 {
 	char	*utf8_string = NULL;
 	int	utf8_size;
@@ -2909,7 +2909,7 @@ char *zbx_unicode_to_utf8(const wchar_t *wide_string)
 }
 
 /* convert from unicode to utf8 */
-char *zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size)
+char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size)
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))

@@ -30,7 +30,7 @@ PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENT
 	wchar_t		*wcounterPath = NULL;
 	PDH_STATUS	pdh_status;
 
-	wcounterPath = zbx_calloc(wcounterPath, PDH_MAX_COUNTER_PATH, sizeof(wchar_t));
+	wcounterPath = zbx_malloc(wcounterPath, sizeof(wchar_t) * PDH_MAX_COUNTER_PATH);
 
 	if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, wcounterPath, &dwSize, 0)))
 	{
@@ -196,7 +196,7 @@ close_query:
 	return pdh_status;
 }
 
-wchar_t *get_counter_name(DWORD pdhIndex)
+wchar_t	*get_counter_name(DWORD pdhIndex)
 {
 	const char	*__function_name = "get_counter_name";
 	PERF_COUNTER_ID	*counterName;

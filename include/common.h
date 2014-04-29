@@ -997,8 +997,8 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-wchar_t *zbx_acp_to_unicode(const char *acp_string);
-wchar_t *zbx_oemcp_to_unicode(const char *oemcp_string);
+wchar_t	*zbx_acp_to_unicode(const char *acp_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
 wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
 char	*zbx_unicode_to_utf8(const wchar_t *wide_string);

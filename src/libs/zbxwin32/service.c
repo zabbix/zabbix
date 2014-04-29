@@ -280,7 +280,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 static int	svc_RemoveEventSource()
 {
 	wchar_t	regkey[256];
-	wchar_t *wevent_source;
+	wchar_t	*wevent_source;
 	int	ret = FAIL;
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);

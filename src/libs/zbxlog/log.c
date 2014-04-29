@@ -81,7 +81,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE	*log_file = NULL;
 #ifdef _WINDOWS
-	wchar_t *wevent_source;
+	wchar_t	*wevent_source;
 #endif
 
 	log_level = level;
@@ -440,7 +440,7 @@ char *zbx_strerror(int errnum)
 	return utf8_string;
 }
 
-char *strerror_from_system(unsigned long error)
+char	*strerror_from_system(unsigned long error)
 {
 #ifdef _WINDOWS
 	size_t		offset = 0;
