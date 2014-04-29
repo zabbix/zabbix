@@ -309,11 +309,8 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 			zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
 			goto out;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "OK_220 turning around |%s|", cmd);
 	}
 	while (' ' != *(cmd + strlen(OK_220)));
-
-	zabbix_log(LOG_LEVEL_DEBUG, "OK_220 + space readed: cmd |%s|, |%s|", cmd + strlen(OK_220), cmd);
 
 	/* send HELO */
 
