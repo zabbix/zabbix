@@ -506,7 +506,7 @@ class CImage extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach($images as $image) {
+		foreach ($images as $image) {
 			if (!check_db_fields(array('imageid'), $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
@@ -532,7 +532,7 @@ class CImage extends CApiService {
 		}
 
 		$imageNames = zbx_objectValues($images, 'name');
-		if (!empty($imageNames)) {
+		if ($imageNames) {
 			$dbImages = API::getApiService()->select($this->tableName(), array(
 				'filter' => array('name' => $imageNames),
 				'output' => array('imageid', 'name'),
@@ -541,7 +541,7 @@ class CImage extends CApiService {
 
 			foreach ($images as $image) {
 				if (isset($image['name']) && isset($dbImages[$image['name']])
-						&& (bccomp($dbImages[$image['name']]['imageid'], $image['imageid']) != 0)) {
+					&& bccomp($dbImages[$image['name']]['imageid'], $image['imageid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
 			}
