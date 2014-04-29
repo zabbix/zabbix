@@ -327,7 +327,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 	char		*curr_range, *next_range, *last_port;
 	int		status;
 	char		*value = NULL;
-	size_t		value_alloc = 64;
+	size_t		value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

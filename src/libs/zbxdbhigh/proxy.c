@@ -2413,7 +2413,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
-	size_t			value_alloc = 64;
+	size_t			value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
