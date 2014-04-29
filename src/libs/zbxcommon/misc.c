@@ -22,6 +22,7 @@
 #include "setproctitle.h"
 
 #ifdef _WINDOWS
+
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
@@ -35,7 +36,7 @@ int	__zbx_stat(const char *path, zbx_stat_t *buf)
 	if (-1 == (ret = _wstat64(wpath, buf)))
 		goto out;
 
-	if (0 != buf->st_size)
+	if (0 != S_ISDIR(buf->st_mode) || 0 != buf->st_size)
 		goto out;
 
 	/* In the case of symlinks _wstat64 returns zero file size.   */
