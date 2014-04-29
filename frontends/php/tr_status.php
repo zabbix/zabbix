@@ -238,7 +238,7 @@ $rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $triggerWidget->addPageHeader(
-	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
+	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $triggerWidget->addHeader(_('Triggers'), $rightForm);
@@ -747,7 +747,7 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
-	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
+	$lastChangeDate = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']);
 	$lastChange = empty($trigger['lastchange'])
 		? $lastChangeDate
 		: new CLink($lastChangeDate,
@@ -864,7 +864,7 @@ foreach ($triggers as $trigger) {
 				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])
 				: SPACE;
 
-			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $event['clock']),
+			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']);
 
 			$nextClock = isset($trigger['events'][$enum - 1]) ? $trigger['events'][$enum - 1]['clock'] : time();
