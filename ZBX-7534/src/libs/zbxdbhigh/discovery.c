@@ -72,8 +72,6 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
  *                                                                            *
  * Parameters: host ip address                                                *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 {
@@ -130,8 +128,6 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
  * Purpose: register host if one does not exist                               *
  *                                                                            *
  * Parameters: host ip address                                                *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
@@ -203,8 +199,6 @@ static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST
  * Purpose: register service if one does not exist                            *
  *                                                                            *
  * Parameters: host ip address                                                *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
@@ -308,8 +302,6 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
  *                                                                            *
  * Purpose: update discovered service details                                 *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int lastup, int lastdown,
 		const char *value)
@@ -396,8 +388,6 @@ static void	discovery_update_service_status(const DB_DSERVICE *dservice, int sta
  *                                                                            *
  * Purpose: update discovered host details                                    *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dhost(DB_DHOST *dhost)
 {
@@ -410,8 +400,6 @@ static void	discovery_update_dhost(DB_DHOST *dhost)
  * Function: discovery_update_host_status                                     *
  *                                                                            *
  * Purpose: update new host status                                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
