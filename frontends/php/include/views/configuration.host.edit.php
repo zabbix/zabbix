@@ -239,7 +239,7 @@ if (!$isDiscovered) {
 	}
 	else {
 		$json = new CJSON();
-		$encodedInterfaces = $json->encode($interfaces);
+		$encodedInterfaces = $json->encode(array_combine(range(1, count($interfaces)), array_values($interfaces)));
 		$script = 'hostInterfacesManager.add('.$encodedInterfaces.');';
 	}
 	zbx_add_post_js($script);
