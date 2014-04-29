@@ -208,26 +208,20 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 {
 	int			ret = FAIL;
 	char			*path = NULL, *pattern = NULL, *file = NULL;
+	zbx_stat_t		sb;
 #ifdef _WINDOWS
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*find_path = NULL, *file_name;
 	wchar_t			*wfind_path = NULL, *wpath = NULL;
-	struct _stat		sb;
 #else
 	DIR			*dir;
 	struct dirent		*d;
-	zbx_stat_t		sb;
 #endif
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
-#ifdef _WINDOWS
-	wpath = zbx_utf8_to_unicode(path);
 
-	if (0 != _wstat(wpath, &sb))
-#else
 	if (0 != zbx_stat(path, &sb))
-#endif
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto clean;
