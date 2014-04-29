@@ -237,11 +237,21 @@ class CApplication extends CApiService {
 		return $result;
 	}
 
+	/**
+	 * Check if application exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('application.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
 			'output' => array('applicationid'),
-			'nopermissions' => 1,
 			'limit' => 1
 		));
 
