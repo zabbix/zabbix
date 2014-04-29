@@ -35,7 +35,7 @@ class CAreaMap extends CTag {
 	}
 
 	public function addItem($value) {
-		if (is_object($value) && zbx_strtolower(get_class($value)) != 'carea') {
+		if (is_object($value) && strtolower(get_class($value)) !== 'carea') {
 			return $this->error('Incorrect value for addItem "'.$value.'".');
 		}
 

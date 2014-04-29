@@ -58,7 +58,7 @@ class CCanvas {
 	}
 
 	public function drawTitle($text, $color) {
-		$x = $this->width / 2 - imagefontwidth(4) * zbx_strlen($text) / 2;
+		$x = $this->width / 2 - imagefontwidth(4) * mb_strlen($text) / 2;
 		imagetext($this->canvas, 10, 0, $x, 25, $this->getColor($color), $text);
 	}
 

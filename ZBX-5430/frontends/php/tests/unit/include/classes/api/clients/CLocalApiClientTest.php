@@ -40,8 +40,8 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	public function incorrectCallProvider() {
 		return array(
 			// incorrect api
-			array('api', 'method', array(), 'token',
-				ZBX_API_ERROR_PARAMETERS, 'Incorrect API "api".'
+			array('Api', 'method', array(), 'token',
+				ZBX_API_ERROR_PARAMETERS, 'Incorrect API "Api".'
 			),
 			// incorrect method
 			array('user', 'incorrectMethod', array(), 'token',
@@ -56,8 +56,8 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
 			),
 			// unnecessary auth token
-			array('apiinfo', 'version', array(), '',
-				ZBX_API_ERROR_PARAMETERS, 'The "apiinfo.version" method must be called without the "auth" parameter.'
+			array('Apiinfo', 'Version', array(), '',
+				ZBX_API_ERROR_PARAMETERS, 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
 			),
 		);
 	}

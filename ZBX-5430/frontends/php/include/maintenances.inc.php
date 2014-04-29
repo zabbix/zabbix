@@ -63,7 +63,7 @@ function shedule2str($timeperiod) {
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$days = '';
 		$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'], true);
-		$length = zbx_strlen($dayofweek);
+		$length = strlen($dayofweek);
 		for ($i = 0; $i < $length; $i++) {
 			if ($dayofweek[$i] == 1) {
 				if (!zbx_empty($days)) {
@@ -84,7 +84,7 @@ function shedule2str($timeperiod) {
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$months = '';
 		$month = zbx_num2bitstr($timeperiod['month'], true);
-		$length = zbx_strlen($month);
+		$length = strlen($month);
 		for ($i = 0; $i < $length; $i++) {
 			if ($month[$i] == 1) {
 				if (!zbx_empty($months)) {
@@ -96,7 +96,7 @@ function shedule2str($timeperiod) {
 		if ($timeperiod['dayofweek'] > 0) {
 			$days = '';
 			$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'], true);
-			$length = zbx_strlen($dayofweek);
+			$length = strlen($dayofweek);
 			for ($i = 0; $i < $length; $i++) {
 				if ($dayofweek[$i] == 1) {
 					if (!zbx_empty($days)) {

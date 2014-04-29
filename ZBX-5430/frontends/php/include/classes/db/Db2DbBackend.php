@@ -32,7 +32,7 @@ class Db2DbBackend extends DbBackend {
 	protected function checkDbVersionTable() {
 		global $DB;
 
-		$tabSchema = zbx_dbstr(!empty($DB['SCHEMA']) ? $DB['SCHEMA'] : zbx_strtoupper($DB['USER']));
+		$tabSchema = zbx_dbstr(!empty($DB['SCHEMA']) ? $DB['SCHEMA'] : strtoupper($DB['USER']));
 		$tableExists = DBfetch(DBselect('SELECT 1 FROM SYSCAT.TABLES'.
 			" WHERE TABNAME='DBVERSION'".
 				" AND TABSCHEMA=".$tabSchema));
