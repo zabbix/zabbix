@@ -43,7 +43,6 @@ else {
 	$originalTemplates = array();
 }
 
-
 $cloningDiscoveredHost = (in_array(getRequest('form'), array('clone', 'full_clone'))
 	&& (getRequest('form_refresh') == 1) && ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 );
@@ -67,8 +66,18 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	$macros = order_macros($dbHost['macros'], 'macro');
 	$hostGroups = zbx_objectValues($dbHost['groups'], 'groupid');
 
-	$hostInventory = $dbHost['inventory'];
-	$inventoryMode = empty($hostInventory) ? HOST_INVENTORY_DISABLED : $dbHost['inventory']['inventory_mode'];
+	if ($cloningDiscoveredHost) {
+		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
+		$description = getRequest('description', '');
+		$inventoryMode = $dbHost['inventory']['inventory_mode'];
+		$hostInventory = getRequest('host_inventory', array());
+	}
+	else {
+		$status = $dbHost['status'];
+		$description = $dbHost['description'];
+		$hostInventory = $dbHost['inventory'];
+		$inventoryMode = empty($hostInventory) ? HOST_INVENTORY_DISABLED : $dbHost['inventory']['inventory_mode'];
+	}
 
 	$templateIds = array();
 	foreach ($originalTemplates as $tpl) {
@@ -95,15 +104,6 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	$clearTemplates = array();
 
 	$newGroupName = '';
-
-	if ($cloningDiscoveredHost) {
-		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
-		$description = getRequest('description', '');
-	}
-	else {
-		$status = $dbHost['status'];
-		$description = $dbHost['description'];
-	}
 }
 else {
 	$hostGroups = getRequest('groups', array());
