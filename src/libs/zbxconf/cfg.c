@@ -110,8 +110,6 @@ static int	match_glob(const char *file, const char *pattern)
 			f++;
 		}
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
