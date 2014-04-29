@@ -390,6 +390,7 @@ class CGraph extends CGraphGeneral {
 				'preservekeys' => true,
 				'hostids' => $chdHost['hostid']
 			));
+
 			if ($chdGraph = reset($chdGraphs)) {
 				if ($tmpGraph['name'] !== $chdGraph['name']) {
 					$graphExists = $this->get(array(
