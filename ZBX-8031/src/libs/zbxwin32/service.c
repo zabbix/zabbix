@@ -219,7 +219,7 @@ static int	svc_install_event_source(const char *path)
 
 	RegSetValueEx(hKey, TEXT("TypesSupported"), 0, REG_DWORD, (BYTE *)&dwTypes, sizeof(DWORD));
 	RegSetValueEx(hKey, TEXT("EventMessageFile"), 0, REG_EXPAND_SZ, (BYTE *)execName,
-			(DWORD)(sizeof(execName)));
+			(DWORD)(wcslen(execName) + 1) * sizeof(wchar_t));
 	RegCloseKey(hKey);
 
 	zbx_error("event source [%s] installed successfully", ZABBIX_EVENT_SOURCE);

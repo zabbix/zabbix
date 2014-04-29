@@ -75,7 +75,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
 		return SYSINFO_RET_FAIL;
 
-	buffer = (wchar_t *)zbx_malloc(buffer, dwSize + 1);
+	buffer = (wchar_t *)zbx_malloc(buffer, (dwSize + 1) * sizeof(wchar_t));
 
 	/* Make a second call to GetLogicalDriveStrings to get
 	   the actual data we require */
