@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+A.F....... [ZBX-7949] improved multibyte string support (Ivo)
 ..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
 ..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
@@ -46,6 +47,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-7949] fixed inherited graph and graph prototype case insensitive name comparison (Ivo)
 .......PS. [ZBX-7534] removed the limit of dservice value (Nikolaj)
 A......... [ZBX-8132] fixed image.get not properly returning all images for sysmaps (Krists)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
