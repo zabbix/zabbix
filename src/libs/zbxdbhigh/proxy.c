@@ -2411,8 +2411,9 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	int			port, status, ret;
 	const char		*p = NULL;
 	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
-				tmp[MAX_STRING_LEN], value[DSERVICE_VALUE_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX];
+				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
+	size_t			value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2428,6 +2429,8 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 	memset(&drule, 0, sizeof(drule));
 	*last_ip = '\0';
+
+	value = zbx_malloc(value, value_alloc);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
@@ -2468,7 +2471,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			port = atoi(tmp);
 
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_));
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value));
+		zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc);
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns));
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
@@ -2514,6 +2517,8 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
+
+	zbx_free(value);
 exit:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
