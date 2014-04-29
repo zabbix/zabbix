@@ -45,8 +45,6 @@ extern int		process_num;
  *                                                                            *
  * Parameters: service - service info                                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, const char *ip,
 		const char *dns, int port, int status, const char *value, int now)
@@ -77,8 +75,6 @@ static void	proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, const char 
  *                                                                            *
  * Parameters: service - service info                                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	proxy_update_host(DB_DRULE *drule, const char *ip, const char *dns, int status, int now)
 {
@@ -103,10 +99,8 @@ static void	proxy_update_host(DB_DRULE *drule, const char *ip, const char *dns, 
  *                                                                            *
  * Parameters: service type, ip address, port number                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
-static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
+static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value, size_t *value_alloc)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
@@ -115,12 +109,13 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
 	AGENT_RESULT 	result;
 	DC_ITEM		item;
 	ZBX_FPING_HOST	host;
+	size_t		value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	init_result(&result);
 
-	*value = zbx_strdup(*value, "");
+	**value = '\0';
 
 	switch (dcheck->type)
 	{
@@ -229,7 +224,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
 				if (SVC_AGENT == dcheck->type)
 				{
 					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
-						*value = zbx_strdup(*value, result.str);
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else
 						ret = FAIL;
 				}
@@ -268,7 +263,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
-						*value = zbx_strdup(*value, result.str);
+						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else
 						ret = FAIL;
 
@@ -323,8 +318,6 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value)
  *                                                                            *
  * Parameters: service - service info                                         *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 		int *host_status, char *ip, const char *dns, int now)
@@ -334,8 +327,11 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 	char		*curr_range, *next_range, *last_port;
 	int		status;
 	char		*value = NULL;
+	size_t		value_alloc = 64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	value = zbx_malloc(value, value_alloc);
 
 	for (curr_range = dcheck->ports; curr_range; curr_range = next_range)
 	{
@@ -362,7 +358,8 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
-			status = (SUCCEED == discover_service(dcheck, ip, port, &value)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+			status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
+					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 
 			/* update host status */
 			if (-1 == *host_status || DOBJECT_STATUS_UP == status)
@@ -375,11 +372,11 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 				proxy_update_service(drule, dcheck, ip, dns, port, status, value, now);
 
-			zbx_free(value);
-
 			DBcommit();
 		}
 	}
+
+	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -387,8 +384,6 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 /******************************************************************************
  *                                                                            *
  * Function: process_checks                                                   *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
@@ -445,8 +440,6 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
  * Function: process_rule                                                     *
  *                                                                            *
  * Purpose: process single discovery rule                                     *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	process_rule(DB_DRULE *drule)
@@ -862,8 +855,6 @@ static int	get_minnextcheck(int now)
  * Function: main_discoverer_loop                                             *
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
