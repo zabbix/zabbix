@@ -468,11 +468,21 @@ class CAction extends CApiService {
 		return $result;
 	}
 
+	/**
+	 * Check if action exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('action.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
 			'output' => array('actionid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 

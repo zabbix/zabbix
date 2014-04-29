@@ -242,17 +242,20 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Check if object exist.
+	 * Check if graph or graph prototype exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists($object) {
+		self::deprecated('graph.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('flags' => null),
 			'output' => array('graphid'),
-			'nopermissions' => true,
 			'limit' => 1
 		);
 
