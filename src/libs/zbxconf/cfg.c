@@ -54,22 +54,19 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*path = NULL, *file_name;
-	wchar_t			*wpath;
-	struct _stat		sb;
+	wchar_t			*wpath = NULL;
+	zbx_stat_t		sb;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	path = zbx_strdup(path, cfg_file);
 	zbx_rtrim(path, "\\");
 
-	wpath = zbx_utf8_to_unicode(path);
-
-	if (0 != _wstat(wpath, &sb))
+	if (0 != zbx_stat(path, &sb))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto out;
 	}
-	zbx_free(wpath);
 
 	if (0 == S_ISDIR(sb.st_mode))
 	{
