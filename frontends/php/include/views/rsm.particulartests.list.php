@@ -30,6 +30,8 @@ if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
 		_('Probe ID'),
 		_('Row result')
 	);
+
+	$noResultProbes = 0;
 }
 elseif ($this->data['type'] == RSM_RDDS) {
 	$headers = array(
@@ -82,31 +84,8 @@ foreach ($this->data['probes'] as $probe) {
 		}
 	}
 	else {
-		if ($this->data['type'] == RSM_DNS) {
-			// DNS
+		if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
 			if (isset($probe['value'])) {
-				if ($probe['value']) {
-					$status = _('Up');
-					$class = 'green';
-				}
-				else {
-					$status = _('Down');
-					$class = 'red';
-				}
-				$link = new CLink(
-					$status,
-					'rsm.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type'],
-					$class
-				);
-			}
-			else {
-				$link = new CSpan(_('Not monitored'), 'red');
-			}
-		}
-		elseif ($this->data['type'] == RSM_DNSSEC) {
-			// DNSSEC
-			if (isset($probe['value']['ok'])) {
 				$values = array();
 				$okResults = false;
 				$failResults = false;
@@ -134,6 +113,10 @@ foreach ($this->data['probes'] as $probe) {
 				}
 				elseif ($noResults && !$okResults && !$failResults) {
 					$class = 'gray';
+
+					if ($this->data['type'] == RSM_DNS) {
+						$noResultProbes++;
+					}
 				}
 				else {
 					$class = null;
@@ -225,7 +208,9 @@ foreach ($this->data['probes'] as $probe) {
 }
 if ($this->data['type'] == RSM_DNS) {
 	if ($this->data['totalAvailProbes'] != 0) {
-		$availProbes = round($this->data['availProbes'] / $this->data['totalAvailProbes'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+		$availProbes = round($this->data['availProbes'] / $this->data['totalAvailProbes'] * 100,
+			ZBX_UNITS_ROUNDOFF_UPPER_LIMIT
+		);
 	}
 	else {
 		$availProbes = 0;
@@ -236,11 +221,17 @@ if ($this->data['type'] == RSM_DNS) {
 		BR(),
 		new CSpan(array(bold(_('Probes offline')), ':', SPACE, $this->data['offlineProbes'])),
 		BR(),
-		new CSpan(array(bold(_('Probes with No Result')), ':', SPACE, $this->data['noResultProbes'])),
+		new CSpan(array(bold(_('Probes with No Result')), ':', SPACE, $noResultProbes)),
 		BR(),
-		new CSpan(array(bold(_('Probes with Result')), ':', SPACE, $this->data['resultProbes'])),
+		new CSpan(array(bold(_('Probes with Result')), ':', SPACE,
+			$this->data['totalProbes'] - $this->data['offlineProbes'] - $noResultProbes
+		)),
 		BR(),
-		new CSpan(array(bold(_('Probes Up')), ':', SPACE, $this->data['availProbes']))
+		new CSpan(array(bold(_('Probes Up')), ':', SPACE,
+			$this->data['totalProbes'] - $this->data['offlineProbes'] - $noResultProbes - $this->data['downProbes']
+		)),
+		BR(),
+		new CSpan(array(bold(_('Probes Down')), ':', SPACE, $this->data['downProbes']))
 	);
 }
 elseif ($this->data['type'] == RSM_DNSSEC) {

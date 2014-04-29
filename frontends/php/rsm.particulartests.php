@@ -76,9 +76,8 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 		if ($data['type'] == 0) {
 			$data['offlineProbes'] = 0;
-			$data['availProbes'] = 0;
+			$data['downProbes'] = 0;
 			$data['resultProbes'] = 0;
-			$data['noResultProbes'] = 0;
 			$data['totalAvailProbes'] = 0;
 			$data['totalProbes'] = 0;
 		}
@@ -463,19 +462,25 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	if ($data['type'] == RSM_DNS) {
 		foreach ($nsArray as $hostId => $nss) {
-			$failNs = 0;
+			$hosts[$hostId]['value']['ok'] = 0;
+			$hosts[$hostId]['value']['fail'] = 0;
+			$hosts[$hostId]['value']['noResult'] = 0;
 
 			foreach ($nss as $nsName => $nsValue) {
-				if (in_array(NS_DOWN, $nsValue['value'])) {
-					$failNs++;
+				if (in_array(NS_UP, $nsValue['value'])) {
+					$hosts[$hostId]['value']['ok']++;
+				}
+				elseif (in_array(NS_DOWN, $nsValue['value'])) {
+					$hosts[$hostId]['value']['fail']++;
+				}
+				else {
+					$hosts[$hostId]['value']['noResult']++;
 				}
 			}
 
-			if (count($nss) - $failNs >= $minDnsCount) {
-				$hosts[$hostId]['value'] = true;
-			}
-			else {
-				$hosts[$hostId]['value'] = false;
+			// calculate Down probes
+			if (count($nss) - $hosts[$hostId]['value']['fail'] < $minDnsCount) {
+				$data['downProbes']++;
 			}
 		}
 	}
@@ -528,20 +533,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		if ($data['type'] == RSM_DNS) {
 			if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
 				$data['offlineProbes']++;
-			}
-			else {
-				if (isset($probe['value'])) {
-					if ($probe['value']) {
-						$data['availProbes']++;
-						$data['resultProbes']++;
-					}
-					else {
-						$data['resultProbes']++;
-					}
-				}
-				else {
-					$data['noResultProbes']++;
-				}
 			}
 		}
 	}
