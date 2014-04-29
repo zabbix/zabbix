@@ -47,6 +47,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7436] changed string "comment" to "description" in trigger list and trigger comments (Krists)
 ..F....... [ZBX-8159] fixed missing history bar when viewing or editing trigger descriptions (Krists)
 A......... [ZBX-7949] fixed inherited graph and graph prototype case insensitive name comparison (Ivo)
 .......PS. [ZBX-7534] removed the limit of dservice value (Nikolaj)
