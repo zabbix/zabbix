@@ -98,13 +98,18 @@ class CImage extends CApiService {
 			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
 			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
 			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
-			$sqlParts['where']['se'] = '('.
-				'se.iconid_off=i.imageid'.
-				' OR se.iconid_on=i.imageid'.
-				' OR se.iconid_disabled=i.imageid'.
-				' OR se.iconid_maintenance=i.imageid'.
-				' OR sm.backgroundid=i.imageid)';
+			$sqlParts['where']['smse_or_bg'] = '('.
+				'sm.backgroundid=i.imageid'.
+				' OR ('.
+					'sm.sysmapid=se.sysmapid'.
+					' AND ('.
+						'se.iconid_off=i.imageid'.
+						' OR se.iconid_on=i.imageid'.
+						' OR se.iconid_disabled=i.imageid'.
+						' OR se.iconid_maintenance=i.imageid'.
+					')'.
+				')'.
+			')';
 		}
 
 		// filter
