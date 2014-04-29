@@ -44,6 +44,11 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 static int	match_glob(const char *file, const char *pattern)
 {
 	const char	*f, *g, *p, *q;
+#ifdef _WINDOWS
+	int(*strcompare_func)(const char *,const char *, size_t) = zbx_strncasecmp;
+#else
+	int(*strcompare_func)(const char *,const char *, size_t) = strncmp;
+#endif
 
 	f = file;
 	p = pattern;
@@ -67,11 +72,7 @@ static int	match_glob(const char *file, const char *pattern)
 
 		if (pattern == p)
 		{
-#ifdef _WINDOWS
-			if (0 != zbx_strncasecmp(f, p, q - p))
-#else
-			if (0 != strncmp(f, p, q - p))
-#endif
+			if (0 != strcompare_func(f, p, q - p))
 				return FAIL;
 
 			f += q - p;
@@ -89,11 +90,7 @@ static int	match_glob(const char *file, const char *pattern)
 
 			if (g - f < q - p)
 				return FAIL;
-#ifdef _WINDOWS
-			return 0 == strcasecmp(g - (q - p), p) ? SUCCEED : FAIL;
-#else
-			return 0 == strcmp(g - (q - p), p) ? SUCCEED : FAIL;
-#endif
+			return 0 == strcompare_func(g - (q - p), p) ? SUCCEED : FAIL;
 		}
 
 		/* if literal characters are in the middle... */
@@ -102,11 +99,7 @@ static int	match_glob(const char *file, const char *pattern)
 		{
 			if ('\0' == *f)
 				return FAIL;
-#ifdef _WINDOWS
-			if (0 == zbx_strncasecmp(f, p, q - p))
-#else
-			if (0 == strncmp(f, p, q - p))
-#endif
+			if (0 == strcompare_func(f, p, q - p))
 			{
 				f += q - p;
 				p = q;
