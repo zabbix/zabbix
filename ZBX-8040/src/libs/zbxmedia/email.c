@@ -295,17 +295,25 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 				smtp_server, zbx_tcp_strerror());
 		goto close;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+
+	do
 	{
-		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
-				zbx_strerror(errno));
-		goto out;
+		if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+		{
+			zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
+					zbx_strerror(errno));
+			goto out;
+		}
+		if (0 != strncmp(cmd, OK_220, strlen(OK_220)))
+		{
+			zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
+			goto out;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "OK_220 turning around |%s|", cmd);
 	}
-	if (0 != strncmp(cmd, OK_220, strlen(OK_220)))
-	{
-		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
-		goto out;
-	}
+	while (' ' != *(cmd + strlen(OK_220)));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "OK_220 + space readed: cmd |%s|, |%s|", cmd + strlen(OK_220), cmd);
 
 	/* send HELO */
 

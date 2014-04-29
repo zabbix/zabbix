@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageQueueDetails extends CWebTest {
 	public function testPageQueueDetails_CheckLayout() {
 		$this->zbxTestLogin('queue.php?config=2');
-		$this->zbxTestCheckTitle('Queue \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('Queue \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('Queue');
 		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
