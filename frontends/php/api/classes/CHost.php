@@ -619,7 +619,7 @@ class CHost extends CHostGeneral {
 
 			if (isset($host['host'])) {
 				// Check if host name isn't longer than 64 chars
-				if (zbx_strlen($host['host']) > 64) {
+				if (mb_strlen($host['host']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -627,7 +627,7 @@ class CHost extends CHostGeneral {
 							'Maximum host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['host'],
-							zbx_strlen($host['host'])
+							mb_strlen($host['host'])
 						)
 					);
 				}
@@ -655,7 +655,7 @@ class CHost extends CHostGeneral {
 				}
 
 				// Check if visible name isn't longer than 64 chars
-				if (zbx_strlen($host['name']) > 64) {
+				if (mb_strlen($host['name']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -663,7 +663,7 @@ class CHost extends CHostGeneral {
 							'Maximum visible host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['name'],
-							zbx_strlen($host['name'])
+							mb_strlen($host['name'])
 						)
 					);
 				}

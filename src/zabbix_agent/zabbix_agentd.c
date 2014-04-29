@@ -595,6 +595,16 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
+
+#ifdef _WINDOWS
+	if (MAXIMUM_WAIT_OBJECTS < threads_num)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
+				" parameter or the number of active servers in ServerActive configuration parameter.");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start the collector thread */

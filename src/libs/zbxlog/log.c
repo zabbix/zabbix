@@ -197,7 +197,7 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
  *                                                                            *
  * Function: zabbix_check_log_level                                           *
  *                                                                            *
- * Purpose: checks if the the specified log level must be logged              *
+ * Purpose: checks if the specified log level must be logged                  *
  *                                                                            *
  * Return value: SUCCEED - the log level must be logged                       *
  *               FAIL    - otherwise                                          *

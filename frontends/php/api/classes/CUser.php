@@ -279,7 +279,7 @@ class CUser extends CApiService {
 					}
 				}
 
-				if (zbx_strlen($user['alias']) > 64) {
+				if (mb_strlen($user['alias']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -287,7 +287,7 @@ class CUser extends CApiService {
 							'Maximum alias length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$user['alias'],
-							zbx_strlen($user['alias'])
+							mb_strlen($user['alias'])
 						)
 					);
 				}
@@ -911,7 +911,7 @@ class CUser extends CApiService {
 		$cnf = array();
 
 		foreach ($config as $id => $value) {
-			if (zbx_strpos($id, 'ldap_') !== false) {
+			if (strpos($id, 'ldap_') !== false) {
 				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}

@@ -45,7 +45,7 @@ $fields = array(
 	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'filter_rst' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
@@ -109,26 +109,22 @@ require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 /*
  * Filter
  */
-$filterSelect = getRequest('select');
-$filterShowWithoutData = getRequest('show_without_data', 0);
-$filterShowDetails = getRequest('show_details', 0);
-
-if (hasRequest('filter_rst')) {
-	$filterSelect = '';
-	$filterShowWithoutData = 1;
-	$filterShowDetails = 0;
+if (hasRequest('filter_set')) {
+	CProfile::update('web.latest.filter.select', getRequest('select', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
+}
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.latest.filter.select');
+	CProfile::delete('web.latest.filter.show_without_data');
+	CProfile::delete('web.latest.filter.show_details');
+	DBend();
 }
 
-if (hasRequest('filter_set') || hasRequest('filter_rst')) {
-	CProfile::update('web.latest.filter.select', $filterSelect, PROFILE_TYPE_STR);
-	CProfile::update('web.latest.filter.show_without_data', $filterShowWithoutData, PROFILE_TYPE_INT);
-	CProfile::update('web.latest.filter.show_details', $filterShowDetails, PROFILE_TYPE_INT);
-}
-else {
-	$filterSelect = CProfile::get('web.latest.filter.select', '');
-	$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
-	$filterShowDetails = CProfile::get('web.latest.filter.show_details', 0);
-}
+$filterSelect = CProfile::get('web.latest.filter.select', '');
+$filterShowWithoutData = CProfile::get('web.latest.filter.show_without_data', 1);
+$filterShowDetails = CProfile::get('web.latest.filter.show_details');
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
@@ -204,8 +200,13 @@ if ($items) {
 
 	// filter items by name
 	foreach ($items as $key => $item) {
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name_expanded'], $filterSelect)) {
-			unset($items[$key]);
+		if (!zbx_empty($filterSelect)) {
+			$haystack = mb_strtolower($item['name_expanded']);
+			$needle = mb_strtolower($filterSelect);
+
+			if (!mb_strpos($haystack, $needle)) {
+				unset($items[$key]);
+			}
 		}
 	}
 
@@ -306,9 +307,7 @@ $filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filt
 $filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $filterShowWithoutData, null, 1));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filterShowDetails, null, 1));
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-$filterForm->addItemToBottomRow(new CButton('filter_rst', _('Reset'),
-	'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();'
-));
+$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
