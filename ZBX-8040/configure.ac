@@ -23,7 +23,6 @@ AC_INIT([Zabbix],[2.3.0])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
-
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
 AC_PROG_MAKE_SET
