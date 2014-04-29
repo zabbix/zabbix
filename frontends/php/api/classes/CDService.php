@@ -203,11 +203,21 @@ class CDService extends CApiService {
 	return $result;
 	}
 
+	/**
+	 * Check if discovered service exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('dservice.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
 			'output' => array('dserviceid'),
-			'nopermissions' => 1,
 			'limit' => 1
 		));
 

@@ -521,11 +521,17 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param $object
+	 * Check if trigger exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
+		self::deprecated('trigger.exists method is deprecated.');
+
 		$keyFields = array(
 			array(
 				'hostid',
@@ -547,8 +553,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggers = $this->get(array(
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
+			'output' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($triggers as $trigger) {

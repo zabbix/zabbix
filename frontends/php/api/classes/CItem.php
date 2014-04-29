@@ -405,16 +405,19 @@ class CItem extends CItemGeneral {
 	/**
 	 * Check if item exists.
 	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
+		self::deprecated('item.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => true,
 			'output' => array('itemid'),
-			'nopermissions' => true,
 			'limit' => 1
 		);
 
