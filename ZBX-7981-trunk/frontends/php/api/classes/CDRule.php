@@ -501,7 +501,7 @@ class CDRule extends CApiService {
 		if ($dRuleNamesChanged) {
 			$dbDRules = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => zbx_objectValues($dRuleNamesChanged, 'name')),
+				'filter' => array('name' => $dRuleNamesChanged),
 				'limit' => 1
 			));
 
