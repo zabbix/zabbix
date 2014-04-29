@@ -470,7 +470,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Overview \[refreshed every 30 sec\]',
+				'title' => 'Overview \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'overview.php?groupid=4&type=0',
@@ -561,7 +561,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Latest data \[refreshed every 30 sec\]',
+				'title' => 'Latest data \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'latest.php?groupid=4&hostid=10084',
@@ -615,7 +615,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Status of triggers \[refreshed every 30 sec\]',
+				'title' => 'Status of triggers \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'tr_status.php?groupid=4&hostid=10084',
@@ -669,7 +669,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Latest events \[refreshed every 30 sec\]',
+				'title' => 'Latest events \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'events.php?triggerid=13491',
@@ -713,7 +713,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Custom graphs \[refreshed every 30 sec\]',
+				'title' => 'Custom graphs \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'charts.php?groupid=4&hostid=10084&graphid=524',
@@ -777,7 +777,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Custom screens \[refreshed every 30 sec\]',
+				'title' => 'Custom screens \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'screens.php?elementid=16',
@@ -821,7 +821,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'Network maps \[refreshed every 30 sec\]',
+				'title' => 'Network maps \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'maps.php?sysmapid=1&severity_min=0',
@@ -927,7 +927,7 @@ class testUrlParameters extends CWebTest {
 				)
 			),
 			array(
-				'title' => 'IT services \[refreshed every 30 sec\]',
+				'title' => 'IT services \[refreshed every 30 sec.\]',
 				'test_cases' => array(
 					array(
 						'url' => 'srv_status.php?period=today',

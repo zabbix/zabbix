@@ -18,22 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageWeb extends CWebTest {
-	public function testPageWeb_CheckLayout() {
-		$this->zbxTestLogin('httpmon.php');
-		$this->zbxTestCheckTitle('Status of Web monitoring \[refreshed every 30 sec.\]');
-		$this->zbxTestTextPresent('STATUS OF WEB MONITORING');
-		$this->zbxTestTextPresent('Web scenarios');
-		$this->zbxTestTextPresent(array('Group', 'Host'));
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
+class CLdapAuthValidatorTest extends CValidatorTest {
+
+	public function validParamProvider() {
+		return array(
+			array(array(
+				'conf' => array()
+			))
+		);
 	}
 
-// Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames() {
-		$this->zbxTestLogin('httpmon.php');
-		$this->zbxTestCheckTitle('Status of Web monitoring \[refreshed every 30 sec.\]');
-		$this->checkNoRealHostnames();
+	public function validValuesProvider() {
+		return array();
+	}
+
+	public function invalidValuesProvider() {
+		return array();
+	}
+
+	public function invalidValuesWithObjectsProvider() {
+		return array();
+	}
+
+	protected function createValidator(array $params = array()) {
+		return new CLdapAuthValidator($params);
 	}
 }
