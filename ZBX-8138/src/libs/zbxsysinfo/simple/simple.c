@@ -99,44 +99,31 @@ lbl_ret:
 
 static int	find_ssh_ident_string(char *buf, size_t siz, char **retbuf, int *remote_major, int *remote_minor)
 {
-	char	buffer[256] = { 0 };		/* Per RFC4253, Section 4.2 - maximum identification string length */
 	char	remote_version[256] = { 0 };	/* Not really returned. Used for storage. */
-	char	*cp = NULL;
-	size_t	i = 0, bufsiz = 0;
+	char	*r = NULL, *l = NULL;
 	int	ret = 0;
 	int	major = 0, minor = 0;
 
 	*retbuf = NULL;
+	l = buf;
 
-	for (;;)
+	while (NULL != (r = strchr(l, '\n')))
 	{
-		if ('\0' == buf[i])
-			break;
-
-		bufsiz = sizeof(buffer);
-		memset(buffer, 0, bufsiz);
-		cp = buffer;
-
-		while (0 != bufsiz-- && '\0' != (*cp = buf[i++]) && '\n' != *cp)
+		if (0 == strncmp(l, "SSH-", 4))
 		{
-			if ('\r' == *cp)
-				*cp = '\n';
-			cp++;
-		}
-
-		*(--cp) = '\0';
-
-		if (0 == zbx_strncasecmp(buffer, "SSH-", 4))
-		{
-			if((sscanf(buffer, "SSH-%d.%d-%[^\n]\n", &major, &minor, &remote_version)) == 3)
+			if (3 == sscanf(l, "SSH-%d.%d-%s", &major, &minor, remote_version))
 			{
-				ret = strlen(buffer);
-				*retbuf = zbx_strdup(NULL, buffer);
+				*r = '\n';
+				*retbuf = zbx_strdup(NULL, l);
 				*remote_major = major;
 				*remote_minor = minor;
+				ret = strlen(*retbuf);
+
 				break;
 			}
 		}
+
+		l = ++r;
 	}
 
 	return ret;
