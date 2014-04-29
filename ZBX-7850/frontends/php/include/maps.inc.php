@@ -167,19 +167,18 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$triggerHosts = API::Host()->get(array(
+				$gotos['showEvents'] = (bool) API::Host()->get(array(
 					'output' => array('hostid'),
 					'triggerids' => array($elem['elementid']),
 					'filter' => array('status' => HOST_STATUS_MONITORED)
 				));
 
-				if ($triggerHosts) {
-					$gotos['events'] = array(
-						'triggerid' => $elem['elementid'],
-						'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
-						'period' => SEC_PER_WEEK
-					);
-				}
+				$gotos['events'] = array(
+					'triggerid' => $elem['elementid'],
+					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
+					'period' => SEC_PER_WEEK
+				);
+
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
