@@ -86,15 +86,18 @@ foreach ($this->data['probes'] as $probe) {
 			// DNS
 			if (isset($probe['value'])) {
 				if ($probe['value']) {
-					$status = $up;
+					$status = _('Up');
+					$class = 'green';
 				}
 				else {
-					$status = $down;
+					$status = _('Down');
+					$class = 'red';
 				}
 				$link = new CLink(
 					$status,
 					'rsm.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type']
+						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type'],
+					$class
 				);
 			}
 			else {
@@ -105,19 +108,42 @@ foreach ($this->data['probes'] as $probe) {
 			// DNSSEC
 			if (isset($probe['value']['ok'])) {
 				$values = array();
+				$okResults = false;
+				$failResults = false;
+				$noResults = false;
+
 				if ($probe['value']['ok']) {
 					$values[] = $probe['value']['ok'].' OK';
+					$okResults = true;
 				}
 				if ($probe['value']['fail']) {
 					$values[] = $probe['value']['fail'].' FAILED';
+					$failResults = true;
 				}
 				if ($probe['value']['noResult']) {
 					$values[] = $probe['value']['noResult'].' NO RESULT';
+					$noResults = true;
 				}
+
+				// get test results color
+				if ($okResults && !$failResults && !$noResults) {
+					$class = 'green';
+				}
+				elseif ($failResults && !$okResults && !$noResults) {
+					$class = 'red';
+				}
+				elseif ($noResults && !$okResults && !$failResults) {
+					$class = 'gray';
+				}
+				else {
+					$class = null;
+				}
+
 				$link = new CLink(
 					implode(', ', $values),
 					'rsm.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type']
+						'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type'],
+					$class
 				);
 			}
 			else {

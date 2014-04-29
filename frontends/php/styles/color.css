@@ -55,6 +55,21 @@ a.orange:visited 	{ color:#EE7000; }
 a.orange:hover 		{ color:#FF9444; }
 a.orange:active 	{ color:#EE7000; }
 
+a.green:link		{ color:#00AA00; }
+a.green:visited		{ color:#00AA00; }
+a.green:hover		{ color:#44CC44; }
+a.green:active		{ color:#00AA00; }
+
+a.red:link			{ color:#DC0000; }
+a.red:visited		{ color:#DC0000; }
+a.red:hover			{ color:#CC4444; }
+a.red:active		{ color:#DC0000; }
+
+a.gray:link			{ color:#808080; }
+a.gray:visited		{ color:#808080; }
+a.gray:hover		{ color:#708090; }
+a.gray:active		{ color:#808080; }
+
 a.off:link		{ color:#00AA00; }
 a.off:visited 	{ color:#00AA00; }
 a.off:hover 	{ color:#44CC44; }
