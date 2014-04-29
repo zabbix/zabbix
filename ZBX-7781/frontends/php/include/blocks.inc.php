@@ -398,9 +398,10 @@ function make_system_status($filter) {
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
-		$name = new CLink($group['name'],
-			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		$name = new CLink($group['name'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].'&hostid=0'.
+			'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 		);
+
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
@@ -651,8 +652,8 @@ function make_hoststat_summary($filter) {
 
 		$group_row = new CRow();
 
-		$name = new CLink($group['name'],
-			'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+		$name = new CLink($group['name'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].'&hostid=0'.
+			'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 		);
 		$group_row->addItem($name);
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
@@ -686,8 +687,8 @@ function make_hoststat_summary($filter) {
 					$host_data = $lastUnack_host_list[$hostid];
 
 					$r = new CRow();
-					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.
-						$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+					$r->addItem(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
+						'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 					));
 
 					foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
@@ -734,8 +735,8 @@ function make_hoststat_summary($filter) {
 				$host_data = $problematic_host_list[$hostid];
 
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.
-					'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
+					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 				));
 
 				foreach ($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
@@ -807,16 +808,16 @@ function make_status_of_zbx() {
 		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? 'off' : 'on')),
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
-	$title = new CSpan(_('Number of hosts (monitored/not monitored/templates)'));
+	$title = new CSpan(_('Number of hosts (enabled/disabled/templates)'));
 	$title->setAttribute('title', 'asdad');
-	$table->addRow(array(_('Number of hosts (monitored/not monitored/templates)'), $status['hosts_count'],
+	$table->addRow(array(_('Number of hosts (enabled/disabled/templates)'), $status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'], 'off'), ' / ',
 			new CSpan($status['hosts_count_not_monitored'], 'on'), ' / ',
 			new CSpan($status['hosts_count_template'], 'unknown')
 		)
 	));
-	$title = new CSpan(_('Number of items (monitored/disabled/not supported)'));
+	$title = new CSpan(_('Number of items (enabled/disabled/not supported)'));
 	$title->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
 	$table->addRow(array($title, $status['items_count'],
 		array(
@@ -1088,8 +1089,8 @@ function make_latest_issues(array $filter = array()) {
 
 		// clock
 		$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.'&show_unknown=1'.
-				'&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
+				'&show_unknown=1&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
 				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
