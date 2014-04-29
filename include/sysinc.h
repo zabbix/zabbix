@@ -224,12 +224,6 @@
 #	include <sys/proc.h>
 #endif
 
-#ifdef HAVE_SYS_PROCFS_H
-/* This is needed to access the correct procfs.h definitions */
-#	define _STRUCTURED_PROC 1
-#	include <sys/procfs.h>
-#endif
-
 #ifdef HAVE_SYS_PSTAT_H
 #	include <sys/pstat.h>
 #endif

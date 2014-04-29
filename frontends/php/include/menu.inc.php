@@ -25,7 +25,6 @@ $ZBX_MENU = array(
 	'view' => array(
 		'label'				=> _('Monitoring'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -80,7 +79,6 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'srv_status.php',
 				'label' => _('IT services'),
-				'force_disable_all_nodes' => true,
 				'sub_pages' => array('report3.php', 'chart5.php')
 			),
 			array(
@@ -100,7 +98,6 @@ $ZBX_MENU = array(
 	'cm' => array(
 		'label'				=> _('Inventory'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -116,7 +113,6 @@ $ZBX_MENU = array(
 	'reports' => array(
 		'label'				=> _('Reports'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -148,9 +144,7 @@ $ZBX_MENU = array(
 	'config' => array(
 		'label'				=> _('Configuration'),
 		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
-		'force_disable_all_nodes' => true,
 		'pages' => array(
 			array(
 				'url' => 'conf.import.php'
@@ -217,9 +211,7 @@ $ZBX_MENU = array(
 	'admin' => array(
 		'label'				=> _('Administration'),
 		'user_type'			=> USER_TYPE_SUPER_ADMIN,
-		'node_perm'			=> PERM_READ_WRITE,
 		'default_page_id'	=> 0,
-		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
 				'url' => 'adm.gui.php',
@@ -281,8 +273,6 @@ $ZBX_MENU = array(
 		'label'					=> _('Login'),
 		'user_type'				=> 0,
 		'default_page_id'		=> 0,
-		'hide_node_selection'	=> 1,
-		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
 				'url' => 'index.php',

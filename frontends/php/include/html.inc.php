@@ -57,11 +57,16 @@ function bold($str) {
 
 function make_decoration($haystack, $needle, $class = null) {
 	$result = $haystack;
-	$pos = zbx_stripos($haystack, $needle);
+
+	$tmpHaystack = mb_strtolower($haystack);
+	$tmpNeedle = mb_strtolower($needle);
+	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
+
 	if ($pos !== false) {
-		$start = CHtml::encode(zbx_substring($haystack, 0, $pos));
-		$end = CHtml::encode(zbx_substring($haystack, $pos + zbx_strlen($needle)));
-		$found = CHtml::encode(zbx_substring($haystack, $pos, $pos + zbx_strlen($needle)));
+		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
+		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
+		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+
 		if (is_null($class)) {
 			$result = array($start, bold($found), $end);
 		}
@@ -69,6 +74,7 @@ function make_decoration($haystack, $needle, $class = null) {
 			$result = array($start, new CSpan($found, $class), $end);
 		}
 	}
+
 	return $result;
 }
 
@@ -323,11 +329,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 					$status = new CSpan(_('In maintenance'), 'orange');
 				}
 				else {
-					$status = new CSpan(_('Monitored'), 'enabled');
+					$status = new CSpan(_('Enabled'), 'enabled');
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Not monitored'), 'on');
+				$status = new CSpan(_('Disabled'), 'on');
 				break;
 			default:
 				$status = _('Unknown');
