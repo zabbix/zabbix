@@ -90,7 +90,7 @@ static int	match_glob(const char *file, const char *pattern)
 
 			if (g - f < q - p)
 				return FAIL;
-			return 0 == strcompare_func(g - (q - p), p) ? SUCCEED : FAIL;
+			return 0 == strcompare_func(g - (q - p), p, q - p) ? SUCCEED : FAIL;
 		}
 
 		/* if literal characters are in the middle... */
