@@ -296,19 +296,6 @@ class CXmlImport18 {
 		return isset($map[$name]) ? $map[$name] : $name;
 	}
 
-	protected static function createDOMDocument() {
-		$doc = new DOMDocument('1.0', 'UTF-8');
-		$doc->preserveWhiteSpace = false;
-		$doc->formatOutput = true;
-
-		$root = $doc->appendChild(new DOMElement('zabbix_export'));
-		$root->setAttributeNode(new DOMAttr('version', '1.0'));
-		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(XML_DATE_DATE_FORMAT)));
-		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(XML_TIME_DATE_FORMAT)));
-
-		return $root;
-	}
-
 	/**
 	 * Converts Simple key from old format to new.
 	 *
@@ -420,14 +407,7 @@ class CXmlImport18 {
 			throw new Exception($text);
 		}
 
-		if ($xml->childNodes->item(0)->nodeName != 'zabbix_export') {
-			$xml2 = self::createDOMDocument();
-			$xml2->appendChild($xml2->ownerDocument->importNode($xml->childNodes->item(0), true));
-			self::$xml = $xml2->ownerDocument;
-		}
-		else {
-			self::$xml = $xml;
-		}
+		self::$xml = $xml;
 
 		return true;
 	}

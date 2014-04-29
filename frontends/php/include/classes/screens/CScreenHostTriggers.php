@@ -128,7 +128,9 @@ class CScreenHostTriggers extends CScreenBase {
 		}
 
 		$output = new CUIWidget('hat_trstatus', make_latest_issues($params));
-		$output->setDoubleHeader(array(_('HOST ISSUES'), SPACE, zbx_date2str(_('[H:i:s]')), SPACE), $item);
+		$output->setDoubleHeader(array(_('HOST ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE),
+			$item
+		);
 
 		return $this->getOutput($output);
 	}
