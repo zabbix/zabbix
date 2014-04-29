@@ -183,6 +183,8 @@ class CScreenHistory extends CScreenBase {
 				$historyData = API::History()->get($options);
 
 				foreach ($historyData as $data) {
+					$data['value'] = trim($data['value'], "\r\n");
+
 					if (empty($this->plaintext)) {
 						$item = $this->items[$data['itemid']];
 						$host = reset($item['hosts']);
@@ -193,10 +195,10 @@ class CScreenHistory extends CScreenBase {
 							$needle = mb_strtolower($this->filter);
 							$pos = mb_strpos($haystack, $needle);
 
-							if ($pos && $this->filterTask == FILTER_TASK_MARK) {
+							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
 								$color = $this->markColor;
 							}
-							if (!$pos && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
 								$color = $this->markColor;
 							}
 
