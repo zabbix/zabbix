@@ -320,32 +320,9 @@ class CImage extends CApiService {
 
 		foreach ($images as $image) {
 			$values = array();
+
 			if (isset($image['name'])) {
-				$imageExists = $this->get(array(
-					'filter' => array('name' => $image['name']),
-					'output' => array('imageid'),
-					'nopermissions' => true
-				));
-				$imageExists = reset($imageExists);
-
-				if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
-				}
-
 				$values['name'] = zbx_dbstr($image['name']);
-			}
-
-			if (array_key_exists('imagetype', $image)) {
-				$imageName = API::getApiService()->select($this->tableName(), array(
-					'filter' => array('imageid' => $image['imageid']),
-					'output' => array('name')
-				));
-				$imageName = reset($imageName);
-
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot update "imagetype" for image "%1$s".', $imageName['name'])
-				);
 			}
 
 			if (isset($image['image'])) {
@@ -520,27 +497,57 @@ class CImage extends CApiService {
 	/**
 	 * Validate image update.
 	 *
-	 * @param array $updateArguments array of parameters given to update() method.
+	 * @param array $images     array of parameters given to update() method.
+	 *
+	 * @throws APIException     throws exception with code ZBX_API_ERROR_PERMISSIONS or ZBX_API_ERROR_PARAMETERS
 	 */
-	protected function validateUpdate(array $updateArguments)
-	{
+	protected function validateUpdate(array $images) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$imageIds = zbx_objectValues($updateArguments, 'imageid');
-
-		if (count($imageIds) !== count($updateArguments)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for image.'));
+		if (!check_db_fields(array('imageid'), $images)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 		}
+
+		$imageIds = array_unique(zbx_objectValues($images, 'imageid'));
 
 		$dbImages = API::getApiService()->select($this->tableName(), array(
 			'filter' => array('imageid' => $imageIds),
-			'output' => array('imageid')
+			'output' => array('imageid', 'name'),
+			'preservekeys' => true
 		));
 
 		if (count($imageIds) !== count($dbImages)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($images as $image) {
+			if (array_key_exists('imagetype', $image)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "imagetype" for image "%1$s".', $dbImages[$image['imageid']]['name'])
+				);
+			}
+		}
+
+		$imageNames = array_unique(zbx_objectValues($images, 'name'));
+		if (!empty($imageNames)) {
+			$imagesByName = $this->get(array(
+				'filter' => array('name' => $imageNames),
+				'output' => array('imageid', 'name'),
+				'nopermissions' => true
+			));
+			$imagesByName = zbx_toHash($imagesByName, 'name');
+
+			foreach ($images as $image) {
+				if (isset($image['name'])
+					&& isset($imagesByName[$image['name']])
+					&& (bccomp($imagesByName[$image['name']]['imageid'], $image['imageid']) != 0)
+				) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
+				}
+			}
 		}
 	}
 }
