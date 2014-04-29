@@ -43,18 +43,18 @@ class testPageHistory extends CWebTest {
 		// also different header for log items (different for eventlog items ?)
 		$itemid = $item['itemid'];
 		$this->zbxTestLogin("history.php?action=showvalues&itemid=$itemid");
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
 		// Header
 		$this->zbxTestTextPresent(array('Timestamp', 'Value'));
 		$this->zbxTestDropdownSelectWait('action', '500 latest values');
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
 		$this->zbxTestClickWait('plaintext');
 
 		// there surely is a better way to get out of the plaintext page than just clicking 'back'...
 		$this->goBack();
 		$this->wait();
 		$this->zbxTestDropdownSelectWait('action', 'Values');
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec\]');
+		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
 		$this->zbxTestClickWait('plaintext');
 	}
 }

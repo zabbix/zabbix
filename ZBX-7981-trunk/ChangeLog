@@ -2,6 +2,9 @@
 Changes for 2.3.0
 
 New features:
+A.F....... [ZBX-7949] improved multibyte string support (Ivo)
+..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
+..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
 ..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
@@ -44,6 +47,16 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-7949] fixed inherited graph and graph prototype case insensitive name comparison (Ivo)
+.......PS. [ZBX-7534] removed the limit of dservice value (Nikolaj)
+A......... [ZBX-8132] fixed image.get not properly returning all images for sysmaps (Krists)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
+...G...... [ZBX-5243] increased the length of program name and command line that proc.mem[] and proc.num[] can match on AIX; thanks to Boris Manojlovic for patch (asaveljevs)
+...G...... [ZBX-7448] fixed Windows agents limit check (Nikolaj, wiper)
+..F....... [ZBX-7335] improved element copy dialog by having hosts, templates and host group in separate target types and empty groups are not shown (Krists)
+.......PS. [ZBX-3336] fixed autodiscovery rule doesn't clear/rescan hosts in dhosts/dservices (Nikolaj)
+..F....... [ZBX-6497] improved frontend filters, Filter and Reset now is submit buttons, removed JS form reset scripts, changed filter data saving process in profiles (Oleg)
+..F....... [ZBX-2840] fixed map configuration with broken images (Eduard)
 ..F....... [ZBX-6596] fixed trigger sorting by hostname (Eduard)
 ..F....... [ZBX-8012] made links to other IT services from the dependency management to open in a new browser tab (Eduard, Oleg)
 ..F....... [ZBX-7624] fixed pie charts legend alignment (Eduard)
@@ -87,10 +100,25 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+.......... [ZBX-7811] added example robots.txt file (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+........S. [ZBX-7887] fixed calculated item becoming not found if referenced item becomes not supported (igors)
+..F....... [ZBX-8100] fixed map mass deletion using Oracle (Eduard)
+..F....... [ZBX-8148] fixed maintenance warning message on php < 5.4 versions (Eduard)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
+.......PS. [ZBX-8115] added workaround for 64 bit integer binding not working with Oracle versions less than 11.2 (wiper)
+..F....... [ZBX-8140] added net.udp.listen key to item popup (Eduard)
+..F....... [ZBX-8123] fixed form fields show/hide switching in IE9 (Eduard)
+..F....... [ZBX-8083] fixed proxy performance query item conditions to be same as in dashboard (Krists)
+..F....... [ZBX-8021] fixed password changing for users with internal authentication (Eduard)
+........S. [ZBX-8133] fixed possible deadlock while updating host_inventory table (Sasha)
+..F....... [ZBX-8104] fixed inverted case sensitivity for regular expressions (Krists)
+...G...... [ZBX-8117] fixed possible crash of agent under Windows after asking the "system.sw.arch" item (Sasha)
+..F....... [ZBX-8093] fixed incorrect plural in global script property host and user group labels (Richlv)
 ..F....... [ZBX-7997] fixed applications not being displayed in template item mass update form (Ivo)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-8035] fixed proxy queue for ICMP, JMX and SNMP items being calculated incorrectly by the server (asaveljevs)
@@ -101,7 +129,7 @@ Bug fixes:
 ..F....... [ZBX-8046] fixed application toggling in Latest data page if same item belongs to several applications (Ivo)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ........S. [ZBX-7534] fixed buffers being too small for long function parameters containing UTF-8 characters (asaveljevs)
-...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+...G...PS. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7630] fixed monitoring event page navigation (Eduard)
 .......PS. [ZBX-7990] fixed marking of unavailable agents; it could cause excess utilisation of "poller" processes (Sasha)
 ....I..... [ZBX-7837] fixed y axis configuration in default proxy template graph (Sasha)
@@ -997,17 +1025,20 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.12rc1
 
 New features:
+.......... [ZBX-7811] added example robots.txt file (Richlv)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-4675] added error checks to avoid partial configuration loading (dimir)
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
 ...G...... [ZBX-7856] added workaround for Windows _wstat64() not working with symlinks (wiper)
 ..F....... [ZBX-8030] fixed {HOSTNAME} macro resolving (Eduard)
-...G....S. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
+...G...PS. [ZBX-7046] fixed get_ip_by_socket returning an empty string for IPv4 addresses when Zabbix is compiled with IPv6 support (Juris)
 ..F....... [ZBX-7966] fixed possibility to copy a templated graph (Ivo)
 ..F....... [ZBX-7930] improved execution time in Maintenance page (Ivo)
 ..F.....S. [ZBX-7872] removed discovery item prototype from calculation of required performace (NVPS) (igors)
@@ -2961,7 +2992,7 @@ Changes for 1.8.6rc1
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
  - [ZBX-3166] fixed application updating in Template linking event. Changed linked Template color in application page. Added param NOEMPTY for popup page witch allows hide Empty button in application and item pages (Eduard)
- - [ZBX-3565] reformating media types in notifications page, adding links to media types (Eduard)
+ - [ZBX-3565] reformatting media types in notifications page, adding links to media types (Eduard)
  - [ZBX-3784] added validation on duplicate discovery rule name (Eduard)
  - [ZBX-3733] make possible to save Device uniqueness criteria status (discovery rule) in cloning event (Eduard)
  - [ZBX-3845] check, if this user group is used in the config, if so it cannot be deleted (Eduard)
