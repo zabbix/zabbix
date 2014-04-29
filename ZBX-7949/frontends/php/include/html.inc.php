@@ -329,11 +329,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 					$status = new CSpan(_('In maintenance'), 'orange');
 				}
 				else {
-					$status = new CSpan(_('Monitored'), 'enabled');
+					$status = new CSpan(_('Enabled'), 'enabled');
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Not monitored'), 'on');
+				$status = new CSpan(_('Disabled'), 'on');
 				break;
 			default:
 				$status = _('Unknown');

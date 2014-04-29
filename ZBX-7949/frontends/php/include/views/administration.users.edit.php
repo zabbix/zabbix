@@ -54,26 +54,6 @@ if (!$data['is_profile']) {
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
-// append password to form list
-if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
-	if (empty($this->data['userid']) || isset($this->data['change_password'])) {
-		$userFormList->addRow(_('Password'), new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE));
-		$userFormList->addRow(_('Password (once again)'), new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE));
-
-		if (isset($this->data['change_password'])) {
-			$userForm->addVar('change_password', $this->data['change_password']);
-		}
-	}
-	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
-		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled', 'disabled');
-		}
-
-		$userFormList->addRow(_('Password'), $passwdButton);
-	}
-}
-
 // append user groups to form list
 if (!$this->data['is_profile']) {
 	$userForm->addVar('user_groups', $this->data['user_groups']);
@@ -95,6 +75,37 @@ if (!$this->data['is_profile']) {
 				: null
 		)
 	);
+}
+
+// append password to form list
+if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
+	if (!$this->data['userid'] || isset($this->data['change_password'])) {
+		$userFormList->addRow(
+			_('Password'),
+			new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE)
+		);
+		$userFormList->addRow(
+			_('Password (once again)'),
+			new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE)
+		);
+
+		if (isset($this->data['change_password'])) {
+			$userForm->addVar('change_password', $this->data['change_password']);
+		}
+	}
+	else {
+		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
+		if ($this->data['alias'] == ZBX_GUEST_USER) {
+			$passwdButton->setAttribute('disabled', 'disabled');
+		}
+
+		$userFormList->addRow(_('Password'), $passwdButton);
+	}
+}
+else {
+	$userFormList->addRow(_('Password'), new CSpan(
+		_s('Unavailable for users with %1$s.', authentication2str($data['auth_type']))
+	));
 }
 
 // append languages to form list
