@@ -475,22 +475,23 @@ class CMaintenance extends CApiService {
 			}
 
 			if (isset($maintenance['name']) && !zbx_empty($maintenance['name'])
-					&& strcmp($updMaintenances[$maintenance['maintenanceid']]['name'], $maintenance['name']) != 0) {
-				$maintenanceNamesChanged[$maintenance['maintenanceid']]['name'] = $maintenance['name'];
+					&& $updMaintenances[$maintenance['maintenanceid']]['name'] !== $maintenance['name']) {
+				if (isset($maintenanceNamesChanged[$maintenance['name']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.',
+						$maintenance['name']
+					));
+				}
+				else {
+					$maintenanceNamesChanged[$maintenance['name']] = $maintenance['name'];
+				}
 			}
 		}
 
 		// check if maintenance already exists
 		if ($maintenanceNamesChanged) {
-			$collectionValidator = new CCollectionValidator(array(
-				'uniqueField' => 'name',
-				'messageDuplicate' => _('Maintenance "%1$s" already exists.')
-			));
-			$this->checkValidator($maintenanceNamesChanged, $collectionValidator);
-
 			$dbMaintenances = $this->get(array(
 				'output' => array('name'),
-				'filter' => array('name' => zbx_objectValues($maintenanceNamesChanged, 'name')),
+				'filter' => array('name' => $maintenanceNamesChanged),
 				'nopermissions' => true,
 				'limit' => 1
 			));

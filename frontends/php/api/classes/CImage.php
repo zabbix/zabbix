@@ -549,22 +549,21 @@ class CImage extends CApiService {
 			}
 
 			if (isset($image['name']) && !zbx_empty($image['name'])
-					&& strcmp($dbImages[$image['imageid']]['name'], $image['name']) != 0) {
-				$imageNamesChaged[$image['imageid']]['name'] = $image['name'];
+					&& $dbImages[$image['imageid']]['name'] !== $image['name']) {
+				if (isset($imageNamesChaged[$image['name']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
+				}
+				else {
+					$imageNamesChaged[$image['name']] = $image['name'];
+				}
 			}
 		}
 
 		// check for exising image names
 		if ($imageNamesChaged) {
-			$collectionValidator = new CCollectionValidator(array(
-				'uniqueField' => 'name',
-				'messageDuplicate' => _('Image "%1$s" already exists.')
-			));
-			$this->checkValidator($imageNamesChaged, $collectionValidator);
-
 			$dbImages = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => zbx_objectValues($imageNamesChaged, 'name')),
+				'filter' => array('name' => $imageNamesChaged),
 				'limit' => 1
 			));
 
