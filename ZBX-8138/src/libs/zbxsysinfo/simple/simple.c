@@ -97,36 +97,19 @@ lbl_ret:
 }
 #endif	/* HAVE_LDAP */
 
-static int	find_ssh_ident_string(char *buf, size_t siz, char **retbuf, int *remote_major, int *remote_minor)
+static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *remote_minor)
 {
-	char	remote_version[256] = { 0 };	/* Not really returned. Used for storage. */
-	char	*r = NULL, *l = NULL;
-	int	ret = 0;
-	int	major = 0, minor = 0;
-
-	*retbuf = NULL;
-	l = buf;
+	const char	*r = NULL, *l = recv_buf;
 
 	while (NULL != (r = strchr(l, '\n')))
 	{
-		if (0 == strncmp(l, "SSH-", 4))
-		{
-			if (3 == sscanf(l, "SSH-%d.%d-%s", &major, &minor, remote_version))
-			{
-				*r = '\n';
-				*retbuf = zbx_strdup(NULL, l);
-				*remote_major = major;
-				*remote_minor = minor;
-				ret = strlen(*retbuf);
-
-				break;
-			}
-		}
+		if (2 == sscanf(l, "SSH-%d.%d-%*s", remote_major, remote_minor))
+			return SUCCEED;
 
 		l = ++r;
 	}
 
-	return ret;
+	return FAIL;
 }
 
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
@@ -134,7 +117,6 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	int		ret;
 	zbx_sock_t	s;
 	char		send_buf[MAX_STRING_LEN], *recv_buf;
-	char		*ssh_ident_str = NULL;
 	int		remote_major = 0, remote_minor = 0;
 
 	*value_int = 0;
@@ -143,16 +125,14 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
 		{
-			if (0 != find_ssh_ident_string(recv_buf, strlen(recv_buf), &ssh_ident_str, &remote_major,
-					&remote_minor))
+			if (SUCCEED == find_ssh_ident_string(recv_buf, &remote_major, &remote_minor))
 			{
-				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-%s\n", remote_major, remote_minor, "zabbix_agent");
+				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-zabbix_agent\r\n",
+						remote_major, remote_minor);
 				*value_int = 1;
-
-				zbx_free(ssh_ident_str);
 			}
 			else
-				zbx_snprintf(send_buf, sizeof(send_buf), "0\n");
+				strscpy(send_buf, "0\n");
 
 			ret = zbx_tcp_send_raw(&s, send_buf);
 		}
