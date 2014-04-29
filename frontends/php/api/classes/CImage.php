@@ -506,23 +506,23 @@ class CImage extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!check_db_fields(array('imageid'), $images)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		foreach($images as $image) {
+			if (!check_db_fields(array('imageid'), $image)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
 		}
 
-		$imageIds = array_unique(zbx_objectValues($images, 'imageid'));
-
 		$dbImages = API::getApiService()->select($this->tableName(), array(
-			'filter' => array('imageid' => $imageIds),
+			'filter' => array('imageid' => zbx_objectValues($images, 'imageid')),
 			'output' => array('imageid', 'name'),
 			'preservekeys' => true
 		));
 
-		if (count($imageIds) !== count($dbImages)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		foreach ($images as $image) {
+			if(!isset($dbImages[$image['imageid']])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+
 			if (array_key_exists('imagetype', $image)) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
@@ -531,20 +531,17 @@ class CImage extends CApiService {
 			}
 		}
 
-		$imageNames = array_unique(zbx_objectValues($images, 'name'));
+		$imageNames = zbx_objectValues($images, 'name');
 		if (!empty($imageNames)) {
-			$imagesByName = $this->get(array(
+			$dbImages = API::getApiService()->select($this->tableName(), array(
 				'filter' => array('name' => $imageNames),
 				'output' => array('imageid', 'name'),
-				'nopermissions' => true
 			));
-			$imagesByName = zbx_toHash($imagesByName, 'name');
+			$dbImages = zbx_toHash($dbImages, 'name');
 
 			foreach ($images as $image) {
-				if (isset($image['name'])
-					&& isset($imagesByName[$image['name']])
-					&& (bccomp($imagesByName[$image['name']]['imageid'], $image['imageid']) != 0)
-				) {
+				if (isset($image['name']) && isset($dbImages[$image['name']])
+						&& (bccomp($dbImages[$image['name']]['imageid'], $image['imageid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
 			}
