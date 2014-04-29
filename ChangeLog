@@ -46,6 +46,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-8132] fixed image.get not properly returning all images for sysmaps (Krists)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 ...G...... [ZBX-5243] increased the length of program name and command line that proc.mem[] and proc.num[] can match on AIX; thanks to Boris Manojlovic for patch (asaveljevs)
 ...G...... [ZBX-7448] fixed Windows agents limit check (Nikolaj, wiper)
