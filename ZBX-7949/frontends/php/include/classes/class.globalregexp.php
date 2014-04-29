@@ -190,10 +190,10 @@ class GlobalRegExp {
 		$result = true;
 
 		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-			$paterns = explode($expression['exp_delimiter'], $expression['expression']);
+			$patterns = explode($expression['exp_delimiter'], $expression['expression']);
 		}
 		else {
-			$paterns = array($expression['expression']);
+			$patterns = array($expression['expression']);
 		}
 
 		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
@@ -202,12 +202,12 @@ class GlobalRegExp {
 			$string = mb_strtolower($string);
 		}
 
-		foreach ($paterns as $patern) {
+		foreach ($patterns as $pattern) {
 			if ($expression['case_sensitive']) {
-				$patern = mb_strtolower($patern);
+				$pattern = mb_strtolower($pattern);
 			}
 
-			$pos = mb_strpos($patern, $string);
+			$pos = mb_strpos($pattern, $string);
 			$tmp = (($pos !== false) == $expectedResult);
 
 			if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED && $tmp) {
