@@ -108,16 +108,18 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	// aggregating data by chosen field value
 	$report = array();
-	foreach($hosts as $host){
-		if($host['inventory'][$_REQUEST['groupby']] !== ''){
-			$lowerValue = zbx_strtolower($host['inventory'][$_REQUEST['groupby']]);
-			if(!isset($report[$lowerValue])){
+	foreach($hosts as $host) {
+		if ($host['inventory'][$_REQUEST['groupby']] !== '') {
+			// same names with different letter casing are considered the same
+			$lowerValue = mb_strtolower($host['inventory'][$_REQUEST['groupby']]);
+
+			if (!isset($report[$lowerValue])) {
 				$report[$lowerValue] = array(
 					'inventory_field' => $host['inventory'][$_REQUEST['groupby']],
 					'host_count' => 1
 				);
 			}
-			else{
+			else {
 				$report[$lowerValue]['host_count'] += 1;
 			}
 		}

@@ -76,7 +76,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 		$this->setHost(PHPUNIT_FRONTEND_HOST);
 		$this->setBrowser('*firefox');
-		if (strstr(PHPUNIT_URL, 'http://')) {
+		if (strpos(PHPUNIT_URL, 'http://') !== false) {
 			$this->setBrowserUrl(PHPUNIT_URL);
 		}
 		else {

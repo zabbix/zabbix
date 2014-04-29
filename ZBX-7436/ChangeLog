@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+A.F....... [ZBX-7949] improved multibyte string support (Ivo)
 ..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
 ..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
@@ -46,6 +47,10 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8159] fixed missing history bar when viewing or editing trigger descriptions (Krists)
+A......... [ZBX-7949] fixed inherited graph and graph prototype case insensitive name comparison (Ivo)
+.......PS. [ZBX-7534] removed the limit of dservice value (Nikolaj)
+A......... [ZBX-8132] fixed image.get not properly returning all images for sysmaps (Krists)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 ...G...... [ZBX-5243] increased the length of program name and command line that proc.mem[] and proc.num[] can match on AIX; thanks to Boris Manojlovic for patch (asaveljevs)
 ...G...... [ZBX-7448] fixed Windows agents limit check (Nikolaj, wiper)
@@ -101,6 +106,10 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translat
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+........S. [ZBX-7887] fixed calculated item becoming not found if referenced item becomes not supported (igors)
+..F....... [ZBX-8100] fixed map mass deletion using Oracle (Eduard)
+..F....... [ZBX-8148] fixed maintenance warning message on php < 5.4 versions (Eduard)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......PS. [ZBX-8115] added workaround for 64 bit integer binding not working with Oracle versions less than 11.2 (wiper)
 ..F....... [ZBX-8140] added net.udp.listen key to item popup (Eduard)

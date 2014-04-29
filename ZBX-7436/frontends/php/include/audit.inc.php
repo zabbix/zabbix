@@ -67,8 +67,8 @@ function add_audit($action, $resourcetype, $details) {
 		return true;
 	}
 
-	if (zbx_strlen($details) > 128) {
-		$details = zbx_substr($details, 0, 125).'...';
+	if (mb_strlen($details) > 128) {
+		$details = mb_substr($details, 0, 125).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -109,8 +109,8 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		}
 	}
 
-	if (zbx_strlen($resourcename) > 255) {
-		$resourcename = zbx_substr($resourcename, 0, 252).'...';
+	if (mb_strlen($resourcename) > 255) {
+		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -150,8 +150,8 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 }
 
 function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null) {
-	if (zbx_strlen($resourcename) > 255) {
-		$resourcename = zbx_substr($resourcename, 0, 252).'...';
+	if (mb_strlen($resourcename) > 255) {
+		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
