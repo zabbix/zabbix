@@ -60,7 +60,6 @@ class CMultiSelect extends CTag {
 			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
 			'addNew' => isset($options['addNew']) ? $options['addNew'] : false,
 			'popup' => array(
-				'create' => isset($options['popup']['create']) ? $options['popup']['create'] : false,
 				'parameters' => isset($options['popup']['parameters']) ? $options['popup']['parameters'] : null,
 				'width' => isset($options['popup']['width']) ? $options['popup']['width'] : null,
 				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null

@@ -685,7 +685,6 @@ if (!$isDiscovered) {
 		'objectName' => 'templates',
 		'ignored' => $ignoredTemplates,
 		'popup' => array(
-			'create' => true,
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1&multiselect=1',
 			'width' => 450,
 			'height' => 450

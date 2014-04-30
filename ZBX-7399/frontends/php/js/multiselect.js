@@ -74,7 +74,6 @@ jQuery(function($) {
 	 * @param int    options['selectedLimit']	how many items can be selected
 	 * @param int    options['limit']			how many available items can be received from backend
 	 * @param object options['popup']			popup data {create, parameters, width, height}
-	 * @param bool   options['create']
 	 * @param string options['parameters']
 	 * @param int    options['width']
 	 * @param int    options['height']
@@ -99,9 +98,7 @@ jQuery(function($) {
 			disabled: false,
 			selectedLimit: null,
 			limit: 20,
-			popup: {
-				'create': false
-			}
+			popup: []
 		};
 		options = $.extend({}, defaults, options);
 
@@ -443,16 +440,16 @@ jQuery(function($) {
 			resize(obj, values, options);
 
 			// draw popup link
-			if (options.popup.create == true) {
+			if (options.popup.parameters != null) {
 				var popupBlock = $('<div>', {
 					class: 'selectPopup'
 				});
 
-				var existedTemplates = options.popup.parameters;
+				var urlParameters = options.popup.parameters;
 
 				if (options.ignored != '') {
 					$.each(options.ignored, function(i, value) {
-						existedTemplates = existedTemplates + '&existed_templates[' + i + ']=' + value;
+						urlParameters = urlParameters + '&existed_templates[' + i + ']=' + i;
 					});
 				}
 
@@ -461,7 +458,7 @@ jQuery(function($) {
 					class: 'input link_menu',
 					name: 'popupAdd',
 					value: 'Select',
-					onClick: 'PopUp("popup.php?' + existedTemplates + '", ' + options.popup.width + ', '
+					onClick: 'PopUp("popup.php?' + urlParameters + '", ' + options.popup.width + ', '
 						+ options.popup.height + ')'
 				});
 

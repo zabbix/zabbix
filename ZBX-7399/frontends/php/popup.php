@@ -704,6 +704,7 @@ elseif ($srctbl == 'templates') {
 	$templates = API::Template()->get($options);
 	order_result($templates, 'name');
 
+	$ignoredItems = array();
 	foreach ($templates as &$template) {
 		$name = new CSpan($template['name'], 'link');
 		$name->attr('id', 'spanid'.$template['templateid']);
@@ -718,11 +719,11 @@ elseif ($srctbl == 'templates') {
 		}
 
 		// check for existing
-		if (in_array($template['name'], $existedTemplates)) {
+		if (in_array($template['templateid'], $existedTemplates)) {
 			$checkBox->setChecked(1);
 			$checkBox->setEnabled('disabled');
 			$name->removeAttr('class');
-			$template['existedTemplate'] = true;
+			$ignoredItems[] = $template['templateid'];
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
@@ -731,6 +732,10 @@ elseif ($srctbl == 'templates') {
 		$table->addRow(array($multiselect ? $checkBox : null, $name));
 	}
 	unset($template);
+
+	foreach ($ignoredItems as $ignoredItem) {
+		unset($templates[$ignoredItem]);
+	}
 
 	if ($multiselect) {
 		$button = new CButton('select', _('Select'),
