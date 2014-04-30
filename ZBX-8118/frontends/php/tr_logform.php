@@ -214,7 +214,9 @@ if(isset($_REQUEST['sform'])){
 			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
 
 			$expressions[$id]['value'] = trim($value);
-			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
+			$expressions[$id]['type'] = (strpos($expr, '#0', mb_strlen($expr) - 3) === false)
+				? REGEXP_EXCLUDE
+				: REGEXP_INCLUDE;
 		}
 
 		foreach($expr_v as $id => $expr) {
@@ -222,7 +224,7 @@ if(isset($_REQUEST['sform'])){
 			$value = preg_replace('/\((.*)\)[=|#]0/U','$1',$expr);
 			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
 
-			if (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false) {
+			if (strpos($expr, '#0', mb_strlen($expr) - 3) === false) {
 //REGEXP_EXCLUDE
 				$value = str_replace('&', ' OR ', $value);
 				$value = str_replace('|', ' AND ', $value);

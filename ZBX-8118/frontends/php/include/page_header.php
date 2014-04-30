@@ -111,7 +111,7 @@ switch ($page['type']) {
 		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
-			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
+			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::$data['refresh']).']';
 		}
 		break;
 }
@@ -344,8 +344,8 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 		'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 		$attempip,
-		zbx_date2str(_('d M Y'), $attempdate),
-		zbx_date2str(_('H:i'), $attempdate),
+		zbx_date2str(DATE_FORMAT, $attempdate),
+		zbx_date2str(TIME_FORMAT, $attempdate),
 		$failedAttempts
 	);
 	error($error_msg);

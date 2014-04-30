@@ -215,7 +215,7 @@ else {
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow(array(
 				new CCol(getUserFullname($acknowledge), 'user'),
-				new CCol(zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']), 'time')),
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']), 'time')),
 				'title'
 			);
 			$acknowledgesTable->addRow(new CCol(zbx_nl2br($acknowledge['message']), null, 2), 'msg');

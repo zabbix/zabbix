@@ -98,13 +98,18 @@ class CImage extends CApiService {
 			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
 			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
 			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
-			$sqlParts['where']['se'] = '('.
-				'se.iconid_off=i.imageid'.
-				' OR se.iconid_on=i.imageid'.
-				' OR se.iconid_disabled=i.imageid'.
-				' OR se.iconid_maintenance=i.imageid'.
-				' OR sm.backgroundid=i.imageid)';
+			$sqlParts['where']['smse_or_bg'] = '('.
+				'sm.backgroundid=i.imageid'.
+				' OR ('.
+					'sm.sysmapid=se.sysmapid'.
+					' AND ('.
+						'se.iconid_off=i.imageid'.
+						' OR se.iconid_on=i.imageid'.
+						' OR se.iconid_disabled=i.imageid'.
+						' OR se.iconid_maintenance=i.imageid'.
+					')'.
+				')'.
+			')';
 		}
 
 		// filter
@@ -171,18 +176,20 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Check image existence.
+	 * Check if image exists.
 	 *
-	 * @param array $images
-	 * @param array $images['name']
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
-	 * @return boolean
+	 * @param array	$object
+	 *
+	 * @return bool
 	 */
 	public function exists($object) {
+		self::deprecated('image.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
 			'output' => array('imageid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -200,30 +207,15 @@ class CImage extends CApiService {
 		global $DB;
 
 		$images = zbx_toArray($images);
+
+		$this->validateCreate($images);
+
 		$imageids = array();
-
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		foreach ($images as $image) {
-			$imageDbFields = array(
-				'name' => null,
-				'image' => null,
-				'imagetype' => 1
-			);
-
-			if (!check_db_fields($imageDbFields, $image)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
-			}
-			if ($this->exists(array('name' => $image['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
-			}
-
 			// decode BASE64
 			$image['image'] = base64_decode($image['image']);
 
-			// validate image
+			// validate image (size and format)
 			$this->checkImage($image['image']);
 
 			$imageid = get_dbid('images', 'imageid');
@@ -386,15 +378,17 @@ class CImage extends CApiService {
 				}
 			}
 
-			$sqlUpd = array();
-			foreach ($values as $field => $value) {
-				$sqlUpd[] = $field.'='.$value;
-			}
-			$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.zbx_dbstr($image['imageid']);
-			$result = DBexecute($sql);
+			if ($values) {
+				$sqlUpd = array();
+				foreach ($values as $field => $value) {
+					$sqlUpd[] = $field.'='.$value;
+				}
+				$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.zbx_dbstr($image['imageid']);
+				$result = DBexecute($sql);
 
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Could not save image!'));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Could not save image!'));
+				}
 			}
 		}
 
@@ -475,31 +469,61 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Validate image.
+	 * Validate create.
 	 *
-	 * @param string $image string representing image, for example, result of base64_decode()
+	 * @param array $images
 	 *
-	 * @throws APIException if image size is 1MB or greater.
-	 * @throws APIException if file format is unsupported, GD can not create image from given string
+	 * @throws APIException if user has no permissions.
+	 * @throws APIException if wrong fields are passed.
+	 * @throws APIException if image with same name already exists.
 	 */
-	protected function checkImage($image) {
-		// check size
-		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
+	protected function validateCreate(array $images) {
+		// validate permissions
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		// check file format
-		if (@imageCreateFromString($image) === false) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
+		// check fields
+		foreach ($images as $image) {
+			$imageDbFields = array(
+				'name' => null,
+				'image' => null,
+				'imagetype' => 1
+			);
+
+			if (!check_db_fields($imageDbFields, $image)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
+			}
+		}
+
+		// check host name duplicates
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'messageDuplicate' => _('Image "%1$s" already exists.')
+		));
+		$this->checkValidator($images, $collectionValidator);
+
+		// check existing names
+		$dbImages = API::getApiService()->select($this->tableName(), array(
+			'output' => array('name'),
+			'filter' => array('name' => zbx_objectValues($images, 'name')),
+			'limit' => 1
+		));
+
+		if ($dbImages) {
+			$dbImage = reset($dbImages);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $dbImage['name']));
 		}
 	}
 
 	/**
-	 * Validate image update.
+	 * Validate update.
 	 *
-	 * @param array $images     array of parameters given to update() method.
+	 * @param array $images
 	 *
-	 * @throws APIException     throws exception with code ZBX_API_ERROR_PERMISSIONS or ZBX_API_ERROR_PARAMETERS
+	 * @throws APIException if user has no permissions.
+	 * @throws APIException if wrong fields are passed.
+	 * @throws APIException if image with same name already exists.
 	 */
 	protected function validateUpdate(array $images) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
@@ -518,9 +542,10 @@ class CImage extends CApiService {
 			'preservekeys' => true
 		));
 
+		$changedImageNames = array();
 		foreach ($images as $image) {
-			if(!isset($dbImages[$image['imageid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			if (!isset($dbImages[$image['imageid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			if (array_key_exists('imagetype', $image)) {
@@ -529,22 +554,50 @@ class CImage extends CApiService {
 					_s('Cannot update "imagetype" for image "%1$s".', $dbImages[$image['imageid']]['name'])
 				);
 			}
-		}
 
-		$imageNames = zbx_objectValues($images, 'name');
-		if ($imageNames) {
-			$dbImages = API::getApiService()->select($this->tableName(), array(
-				'filter' => array('name' => $imageNames),
-				'output' => array('imageid', 'name'),
-			));
-			$dbImages = zbx_toHash($dbImages, 'name');
-
-			foreach ($images as $image) {
-				if (isset($image['name']) && isset($dbImages[$image['name']])
-					&& bccomp($dbImages[$image['name']]['imageid'], $image['imageid']) != 0) {
+			if (isset($image['name']) && !zbx_empty($image['name'])
+					&& $dbImages[$image['imageid']]['name'] !== $image['name']) {
+				if (isset($changedImageNames[$image['name']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
+				else {
+					$changedImageNames[$image['name']] = $image['name'];
+				}
 			}
+		}
+
+		// check for existing image names
+		if ($changedImageNames) {
+			$dbImages = API::getApiService()->select($this->tableName(), array(
+				'output' => array('name'),
+				'filter' => array('name' => $changedImageNames),
+				'limit' => 1
+			));
+
+			if ($dbImages) {
+				$dbImage = reset($dbImages);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $dbImage['name']));
+			}
+		}
+	}
+
+	/**
+	 * Validate image.
+	 *
+	 * @param string $image string representing image, for example, result of base64_decode()
+	 *
+	 * @throws APIException if image size is 1MB or greater.
+	 * @throws APIException if file format is unsupported, GD can not create image from given string
+	 */
+	protected function checkImage($image) {
+		// check size
+		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
+		}
+
+		// check file format
+		if (@imageCreateFromString($image) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
 		}
 	}
 }

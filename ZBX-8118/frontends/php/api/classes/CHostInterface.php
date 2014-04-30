@@ -190,17 +190,20 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Is interface exist.
+	 * Check if host interface exists.
 	 *
-	 * @param array $object
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
 	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
+		self::deprecated('hostinterface.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
 			'output' => array('interfaceid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -568,7 +571,7 @@ class CHostInterface extends CApiService {
 	 * @param array $interface
 	 */
 	protected function checkDns(array $interface) {
-		if (zbx_strlen($interface['dns']) > 64) {
+		if (mb_strlen($interface['dns']) > 64) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_n(
@@ -576,7 +579,7 @@ class CHostInterface extends CApiService {
 					'Maximum DNS name length is %1$d characters, "%2$s" is %3$d characters.',
 					64,
 					$interface['dns'],
-					zbx_strlen($interface['dns'])
+					mb_strlen($interface['dns'])
 				)
 			);
 		}

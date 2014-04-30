@@ -124,7 +124,7 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
-		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
+		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
 		new CCol($recipient, 'top'),

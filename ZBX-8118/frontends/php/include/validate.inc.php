@@ -183,7 +183,7 @@ function validate_ip_range_range($ip_range) {
 
 function validate_ip_range($str) {
 	foreach (explode(',', $str) as $ip_range) {
-		if (zbx_strpos($ip_range, '/') !== false) {
+		if (strpos($ip_range, '/') !== false) {
 			if (!validate_ip_range_mask($ip_range)) {
 				return false;
 			}
@@ -213,7 +213,7 @@ function validate_port_list($str) {
 }
 
 function calc_exp($fields, $field, $expression) {
-	if (zbx_strstr($expression, '{}')) {
+	if (strpos($expression, '{}') !== false) {
 		if (!isset($_REQUEST[$field])) {
 			return false;
 		}
