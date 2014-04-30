@@ -304,7 +304,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	int		err;
 	char		*auth = NULL;
 	size_t		auth_alloc_len = 0, auth_offset;
-
 	CURL            *easyhandle = NULL;
 #endif
 
