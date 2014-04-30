@@ -49,6 +49,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
 ....I..... [ZBX-7890] fixed broken make distclean (Nikolaj)
 A......... [ZBX-7981] fixed validation when renaming host to an existing template in host.massupdate; fixed validation when renaming template to an existing host in template.massupdate (Ivo)
 ..F....... [ZBX-7436] changed string "comment" to "description" in trigger list and trigger comments (Krists)
@@ -111,6 +112,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translat
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
+..F....... [ZBX-8075] fixed triggers/data without application not showing in overview (Krists)
 ..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
 ........S. [ZBX-7887] fixed calculated item becoming not found if referenced item becomes not supported (igors)
 ..F....... [ZBX-8100] fixed map mass deletion using Oracle (Eduard)
