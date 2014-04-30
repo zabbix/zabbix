@@ -1029,7 +1029,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	{
 		/* do not move if there are no logfiles or we are appending the logfile */
 		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
-				((size_t)(*logfiles_num - i) * sizeof(struct st_logfile)));
+				(size_t)(*logfiles_num - i) * sizeof(struct st_logfile));
 	}
 
 	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
