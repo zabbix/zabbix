@@ -28,6 +28,8 @@ struct st_logfile
 	int		mtime;		/* st_mtime from stat() */
 	int		md5size;	/* size of the initial part for which the md5 sum is calculated */
 	int		seq;		/* number in processing order */
+	int		incomplete;	/* 0 - the last record ends with a newline, 1 - the last record contains */
+					/* no newline at the end */
 	zbx_uint64_t	dev;		/* ID of device containing file */
 	zbx_uint64_t	ino_lo;		/* UNIX: inode number. Microsoft Windows: nFileIndexLow or FileId.LowPart */
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
@@ -37,9 +39,9 @@ struct st_logfile
 };
 
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
-		const char *hostname, const char *key);
+		int *incomplete, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key);
 
 int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
 		int *big_rec, int *use_ino, int *error_count, struct st_logfile **logfiles_old, int *logfiles_num_old,

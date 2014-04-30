@@ -216,7 +216,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const char *encoding,
+int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, const char *encoding,
 		ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port,
 		const char *hostname, const char *key)
@@ -279,6 +279,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
+			*incomplete = 1;
+
 			if (BUF_SIZE > nbytes)
 			{
 				/* Buffer is not full (no more data available) and there is no "newline" in it. */
@@ -348,6 +350,7 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 		{
 			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
+			*incomplete = 0;
 
 			for (;;)
 			{
@@ -403,6 +406,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
+					*incomplete = 1;
+
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
 						ret = FAIL;
@@ -411,6 +416,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, const
 					else
 						break;
 				}
+				else
+					*incomplete = 0;
 			}
 		}
 	}

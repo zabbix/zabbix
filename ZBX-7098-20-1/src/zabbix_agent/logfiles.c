@@ -420,16 +420,17 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
 	for (i = 0; i < logfiles_num; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
-				ZBX_FS_UI64 " seq:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:" ZBX_FS_UI64
+				ZBX_FS_UI64 " seq:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:"
+				ZBX_FS_UI64
 				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].dev, logfiles[i].ino_hi,
-				logfiles[i].ino_lo, logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
-				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
-				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
-				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
-				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
-				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].incomplete, logfiles[i].dev,
+				logfiles[i].ino_hi, logfiles[i].ino_lo, logfiles[i].md5size, logfiles[i].md5buf[0],
+				logfiles[i].md5buf[1], logfiles[i].md5buf[2], logfiles[i].md5buf[3],
+				logfiles[i].md5buf[4], logfiles[i].md5buf[5], logfiles[i].md5buf[6],
+				logfiles[i].md5buf[7], logfiles[i].md5buf[8], logfiles[i].md5buf[9],
+				logfiles[i].md5buf[10], logfiles[i].md5buf[11], logfiles[i].md5buf[12],
+				logfiles[i].md5buf[13], logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
 	}
 }
 
@@ -1036,6 +1037,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
 	(*logfiles)[i].seq = 0;
+	(*logfiles)[i].incomplete = 0;
 
 #ifndef _WINDOWS
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
@@ -1329,7 +1331,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 0;
+				max_old_seq = 0, old_last, from_first_file = 1;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
@@ -1452,20 +1454,43 @@ out1:
 		if (1 < *logfiles_num_old || 1 < logfiles_num)
 			resolve_old2new(old2new, *logfiles_num_old, logfiles_num);
 
-		/* Find and mark for skipping files processed during the previous check. Such files can get into the */
-		/* new file list if several files had the same 'mtime' but their processing was not finished because */
-		/* of an error or 'maxlines' limit. */
+		/* Transfer data about fully and partially processed files from the old file list to the new list. */
 		for (i = 0; i < *logfiles_num_old; i++)
 		{
-			if ((*logfiles_old)[i].processed_size == (*logfiles_old)[i].size
-					&& -1 != (j = find_old2new(old2new, logfiles_num, i))
-					&& logfiles[j].size == (*logfiles_old)[i].size)
+			if (0 < (*logfiles_old)[i].processed_size && 0 == (*logfiles_old)[i].incomplete &&
+					-1 != (j = find_old2new(old2new, logfiles_num, i)))
 			{
-				logfiles[j].processed_size = logfiles[j].size;
-				logfiles[j].seq = seq++;
+				if ((*logfiles_old)[i].size == (*logfiles_old)[i].processed_size
+						&& (*logfiles_old)[i].size == logfiles[j].size)
+				{
+					/* the file was fully processed during the previous check and must be ignored */
+					/* during this check */
+					logfiles[j].processed_size = logfiles[j].size;
+					logfiles[j].seq = seq++;
+				}
+				else if ((*logfiles_old)[i].size != (*logfiles_old)[i].processed_size
+						|| (*logfiles_old)[i].size != logfiles[j].size)
+				{
+					/* the file was not fully processed during the previous check or has grown */
+					logfiles[j].processed_size = (*logfiles_old)[i].processed_size;
+				}
+			}
+			else if (1 == (*logfiles_old)[i].incomplete &&
+					-1 != (j = find_old2new(old2new, logfiles_num, i)))
+			{
+				if ((*logfiles_old)[i].size < logfiles[j].size)
+				{
+					/* The file was not fully processed because of incomplete last record */
+					/* but it has grown. Try to process it further. */
+					logfiles[j].incomplete = 0;
+				}
+				else
+					logfiles[j].incomplete = 1;
+
+				logfiles[j].processed_size = (*logfiles_old)[i].processed_size;
 			}
 
-			/* find the last file processed (wholly or partially) in the previous check */
+			/* find the last file processed (fully or partially) in the previous check */
 			if (max_old_seq < (*logfiles_old)[i].seq)
 			{
 				max_old_seq = (*logfiles_old)[i].seq;
@@ -1474,17 +1499,12 @@ out1:
 		}
 
 		/* find the first file to continue from in the new file list */
-		if (0 < max_old_seq)
+		if (0 < max_old_seq && -1 == (start_idx = find_old2new(old2new, logfiles_num, old_last)))
 		{
-			if (-1 == (start_idx = find_old2new(old2new, logfiles_num, old_last)))
-			{
-				/* Cannot find the successor of the last processed file from the previous check. */
-				/* 'lastlogsize' does not apply in this case. */
-				*lastlogsize = 0;
-				start_idx = 0;
-			}
-			else
-				from_first_file = 1;
+			/* Cannot find the successor of the last processed file from the previous check. */
+			/* 'lastlogsize' does not apply in this case. */
+			*lastlogsize = 0;
+			start_idx = 0;
 		}
 	}
 
@@ -1521,13 +1541,23 @@ out1:
 
 	while (i < logfiles_num)
 	{
-		if (logfiles[i].size != logfiles[i].processed_size)
+		if (0 == logfiles[i].incomplete && (0 != from_first_file ||
+				logfiles[i].size != logfiles[i].processed_size || 0 == logfiles[i].seq))
 		{
-			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
-					skip_old_data, big_rec, encoding, regexps, regexps_num, pattern, p_count,
-					s_count, process_value, server, port, hostname, key);
+			if (start_idx != i)
+				*lastlogsize = logfiles[i].processed_size;
 
+			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
+					skip_old_data, big_rec, &logfiles[i].incomplete, encoding, regexps, regexps_num,
+					pattern, p_count, s_count, process_value, server, port, hostname, key);
+
+			/* process_log() advances 'lastlogsize' only on success therefore */
+			/* we do not check for errors here */
 			logfiles[i].processed_size = *lastlogsize;
+
+			/* Mark file as processed (at least partially). In case if process_log() failed we will stop */
+			/* the current checking. In the next check the file will be marked in the list of old files */
+			/* and we will know where we left off. */
 			logfiles[i].seq = seq++;
 
 			if (SUCCEED != ret)
@@ -1542,25 +1572,12 @@ out1:
 				ret = SUCCEED;
 				break;
 			}
-
-			if (i != logfiles_num - 1)
-				*lastlogsize = 0;
 		}
 
 		if (0 != from_first_file)
 		{
 			/* We have processed the file where we left off in the previous check. */
 			from_first_file = 0;
-
-			/* If there are more files to process they must be processed from start (lastlogsize = 0). */
-			for (j = 0; j < logfiles_num; j++)
-			{
-				if (logfiles[j].size != logfiles[j].processed_size)
-				{
-					*lastlogsize = 0;
-					break;
-				}
-			}
 
 			/* Now proceed from the beginning of the new file list to process the remaining files. */
 			i = 0;
@@ -1596,6 +1613,9 @@ out:
  *                      jump to the end                                       *
  *     big_rec        - [IN/OUT] state variable to remember whether a long    *
  *                      record is being processed                             *
+ *     incomplete     - [OUT] 0 - the last record ended with a newline,       *
+ *                      1 - there was no newline at the end of the last       *
+ *                      record.                                               *
  *     encoding       - [IN] text string describing encoding.                 *
  *                        The following encodings are recognized:             *
  *                          "UNICODE"                                         *
@@ -1630,9 +1650,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value, const char *server, unsigned short port,
-		const char *hostname, const char *key)
+		int *incomplete, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char	*__function_name = "process_log";
 
@@ -1683,8 +1703,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 		if (NULL != mtime)
 			*mtime = (int)buf.st_mtime;
 
-		ret = zbx_read2(f, lastlogsize, mtime, big_rec, encoding, regexps, regexps_num, pattern, p_count,
-				s_count, process_value, server, port, hostname, key);
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, regexps_num, pattern,
+				p_count, s_count, process_value, server, port, hostname, key);
 	}
 	else
 	{
