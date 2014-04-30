@@ -279,7 +279,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *
 
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
-			*incomplete = 1;
+			if (p_end > p)
+				*incomplete = 1;
 
 			if (BUF_SIZE > nbytes)
 			{
@@ -341,7 +342,6 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *
 				{
 					/* It is a middle part of a long record. Ignore it. We have already */
 					/* checked the first part against the regexp. */
-
 					*lastlogsize = (size_t)offset + (size_t)nbytes;
 				}
 			}
@@ -406,7 +406,8 @@ int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
-					*incomplete = 1;
+					if (p_end > p)
+						*incomplete = 1;
 
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{

@@ -1541,8 +1541,8 @@ out1:
 
 	while (i < logfiles_num)
 	{
-		if (0 == logfiles[i].incomplete && (0 != from_first_file ||
-				logfiles[i].size != logfiles[i].processed_size || 0 == logfiles[i].seq))
+		if (0 == logfiles[i].incomplete && (logfiles[i].size != logfiles[i].processed_size ||
+				0 == logfiles[i].seq))
 		{
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
