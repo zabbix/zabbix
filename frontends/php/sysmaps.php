@@ -196,7 +196,7 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 
 	$maps = API::Map()->get(array(
 		'sysmapids' => $sysmapIds,
-		'output' => array('name'),
+		'output' => array('sysmapid', 'name'),
 		'editable' => true
 	));
 	$result = API::Map()->delete($sysmapIds);

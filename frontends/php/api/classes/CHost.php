@@ -477,11 +477,21 @@ class CHost extends CHostGeneral {
 		));
 	}
 
+	/**
+	 * Check if host exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('host.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'output' => array('hostid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -609,7 +619,7 @@ class CHost extends CHostGeneral {
 
 			if (isset($host['host'])) {
 				// Check if host name isn't longer than 64 chars
-				if (zbx_strlen($host['host']) > 64) {
+				if (mb_strlen($host['host']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -617,7 +627,7 @@ class CHost extends CHostGeneral {
 							'Maximum host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['host'],
-							zbx_strlen($host['host'])
+							mb_strlen($host['host'])
 						)
 					);
 				}
@@ -645,7 +655,7 @@ class CHost extends CHostGeneral {
 				}
 
 				// Check if visible name isn't longer than 64 chars
-				if (zbx_strlen($host['name']) > 64) {
+				if (mb_strlen($host['name']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -653,7 +663,7 @@ class CHost extends CHostGeneral {
 							'Maximum visible host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['name'],
-							zbx_strlen($host['name'])
+							mb_strlen($host['name'])
 						)
 					);
 				}
@@ -980,10 +990,10 @@ class CHost extends CHostGeneral {
 			$curHost = reset($hosts);
 
 			$hostExists = $this->get(array(
-				'filter' => array('host' => $curHost['host']),
 				'output' => array('hostid'),
-				'editable' => true,
-				'nopermissions' => true
+				'filter' => array('host' => $data['host']),
+				'nopermissions' => true,
+				'limit' => 1
 			));
 			$hostExist = reset($hostExists);
 			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
@@ -991,8 +1001,14 @@ class CHost extends CHostGeneral {
 			}
 
 			// can't add host with the same name as existing template
-			if (API::Template()->exists(array('host' => $curHost['host']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $curHost['host']));
+			$templateExists = API::Template()->get(array(
+				'output' => array('templateid'),
+				'filter' => array('host' => $data['host']),
+				'nopermissions' => true,
+				'limit' => 1
+			));
+			if ($templateExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
 		}
 

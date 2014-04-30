@@ -304,11 +304,21 @@ class CMap extends CMapElement {
 		));
 	}
 
+	/**
+	 * Check if map exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('map.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
 			'output' => array('sysmapid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 

@@ -178,7 +178,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
 	$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
 
-	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+	$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY);
 
 	foreach ($groups as $group) {
 		switch($group['permission']) {
@@ -201,7 +201,7 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
 	$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
 
-	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+	$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY);
 
 	foreach ($hosts as $host) {
 		switch($host['permission']) {
@@ -1609,8 +1609,8 @@ function get_timeperiod_form() {
 	$new_timeperiod['month_nov'] = $month[10];
 	$new_timeperiod['month_dec'] = $month[11];
 
-	$bit_dayofweek = zbx_str_revert($dayofweek);
-	$bit_month = zbx_str_revert($month);
+	$bit_dayofweek = strrev($dayofweek);
+	$bit_month = strrev($month);
 
 	$cmbType = new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'], 'submit()');
 	$cmbType->addItem(TIMEPERIOD_TYPE_ONETIME, _('One time only'));

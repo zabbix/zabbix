@@ -307,11 +307,21 @@ class CTemplate extends CHostGeneral {
 		));
 	}
 
+	/**
+	 * Check if template exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('template.exists method is deprecated.');
+
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
 			'output' => array('templateid'),
-			'nopermissions' => true,
 			'limit' => 1
 		));
 
@@ -437,24 +447,48 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if (isset($template['host'])) {
-				if ($this->exists(array('host' => $template['host']))) {
+				$templateExists = API::Template()->get(array(
+					'output' => array('templateid'),
+					'filter' => array('host' => $template['host']),
+					'nopermissions' => true,
+					'limit' => 1
+				));
+				if ($templateExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $template['host']));
 				}
 
-				if (API::Host()->exists(array('host' => $template['host']))) {
+				$hostExists = API::Host()->get(array(
+					'output' => array('hostid'),
+					'filter' => array('host' => $template['host']),
+					'nopermissions' => true,
+					'limit' => 1
+				));
+				if ($hostExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $template['host']));
 				}
 			}
 
 			if (isset($template['name'])) {
-				if ($this->exists(array('name' => $template['name']))) {
+				$templateExists = API::Template()->get(array(
+					'output' => array('templateid'),
+					'filter' => array('name' => $template['name']),
+					'nopermissions' => true,
+					'limit' => 1
+				));
+				if ($templateExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Template with the same visible name "%1$s" already exists.',
 						$template['name']
 					));
 				}
 
-				if (API::Host()->exists(array('name' => $template['name']))) {
+				$hostExists = API::Host()->get(array(
+					'output' => array('hostid'),
+					'filter' => array('name' => $template['name']),
+					'nopermissions' => true,
+					'limit' => 1
+				));
+				if ($hostExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Host with the same visible name "%1$s" already exists.',
 						$template['name']
@@ -955,24 +989,27 @@ class CTemplate extends CHostGeneral {
 
 			$templateExists = $this->get(array(
 				'output' => array('templateid'),
-				'filter' => array('name' => $template['name']),
-				'editable' => true,
+				'filter' => array('name' => $data['name']),
 				'nopermissions' => true
 			));
 			$templateExist = reset($templateExists);
-
 			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Template with the same visible name "%1$s" already exists.',
-					$template['name']
+					$data['name']
 				));
 			}
 
 			// can't set the same name as existing host
-			if (API::Host()->exists(array('name' => $template['name']))) {
+			$hostExists = API::Host()->get(array(
+				'output' => array('hostid'),
+				'filter' => array('name' => $data['name']),
+				'nopermissions' => true
+			));
+			if ($hostExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Host with the same visible name "%1$s" already exists.',
-					$template['name']
+					$data['name']
 				));
 			}
 		}
@@ -987,12 +1024,10 @@ class CTemplate extends CHostGeneral {
 
 			$templateExists = $this->get(array(
 				'output' => array('templateid'),
-				'filter' => array('host' => $template['host']),
-				'editable' => true,
+				'filter' => array('host' => $data['host']),
 				'nopermissions' => true
 			));
 			$templateExist = reset($templateExists);
-
 			if ($templateExist && bccomp($templateExist['templateid'], $template['templateid']) != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Template with the same name "%1$s" already exists.',
@@ -1001,7 +1036,12 @@ class CTemplate extends CHostGeneral {
 			}
 
 			// can't set the same name as existing host
-			if (API::Host()->exists(array('host' => $template['host']))) {
+			$hostExists = API::Host()->get(array(
+				'output' => array('hostid'),
+				'filter' => array('host' => $template['host']),
+				'nopermissions' => true
+			));
+			if ($hostExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Host with the same name "%1$s" already exists.',
 					$template['host']

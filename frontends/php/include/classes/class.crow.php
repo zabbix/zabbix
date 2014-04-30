@@ -33,12 +33,12 @@ class CRow extends CTag {
 	}
 
 	public function addItem($item) {
-		if (is_object($item) && zbx_strtolower(get_class($item)) == 'ccol') {
+		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
 			parent::addItem($item);
 		}
 		elseif (is_array($item)) {
 			foreach ($item as $el) {
-				if (is_object($el) && zbx_strtolower(get_class($el)) == 'ccol') {
+				if (is_object($el) && strtolower(get_class($el)) === 'ccol') {
 					parent::addItem($el);
 				}
 				elseif (!is_null($el)) {
