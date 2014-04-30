@@ -25,14 +25,13 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_srcdir)/src/zabbix_server/nodewatcher/libzbxnodewatcher.a \
 	datasender/libzbxdatasender.a \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \

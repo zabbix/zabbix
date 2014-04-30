@@ -31,78 +31,11 @@
 #if HAVE_POSTGRESQL
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
-/***************************************************************/
-/* ID structure: NNNSSSDDDDDDDDDDD, where                      */
-/*      NNN - nodeid (to which node the ID belongs to)         */
-/*      SSS - source nodeid (in which node was the ID created) */
-/*      DDDDDDDDDDD - the ID itself                            */
-/***************************************************************/
 
 extern int	txn_level;
 extern int	txn_error;
 
 static int	connection_failure;
-
-/******************************************************************************
- *                                                                            *
- * Function: __DBnode                                                         *
- *                                                                            *
- * Purpose: prepare a SQL statement to select records from a specific node    *
- *                                                                            *
- * Parameters: field_name - [IN] the name of the field                        *
- *             nodeid     - [IN] node identificator from database             *
- *             op         - [IN] 0 - and; 1 - where                           *
- *                                                                            *
- * Return value:                                                              *
- *  An SQL condition like:                                                    *
- *   " and hostid between 100000000000000 and 199999999999999"                *
- *  or                                                                        *
- *   " where hostid between 100000000000000 and 199999999999999"              *
- *  or an empty string for a standalone setup (nodeid = 0)                    *
- *                                                                            *
- ******************************************************************************/
-const char	*__DBnode(const char *field_name, int nodeid, int op)
-{
-	static char	dbnode[62 + ZBX_FIELDNAME_LEN];
-	const char	*operators[] = {"and", "where"};
-
-	if (0 != nodeid)
-	{
-		zbx_uint64_t	min, max;
-
-		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
-		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
-
-		zbx_snprintf(dbnode, sizeof(dbnode), " %s %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-				operators[op], field_name, min, max);
-	}
-	else
-		*dbnode = '\0';
-
-	return dbnode;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBis_node_id                                                     *
- *                                                                            *
- * Purpose: checks belonging of an identifier to a certain node               *
- *                                                                            *
- * Parameters: id     - [IN] the checked identifier                           *
- *             nodeid - [IN] node identificator from database                 *
- *                                                                            *
- * Return value: SUCCEED if identifier is belonging to a node, FAIL otherwise *
- *                                                                            *
- ******************************************************************************/
-int	DBis_node_id(zbx_uint64_t id, int nodeid)
-{
-	zbx_uint64_t	min, max;
-
-	min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)nodeid;
-	max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
-
-	return min <= id && id <= max ? SUCCEED : FAIL;
-}
 
 void	DBclose()
 {
@@ -911,30 +844,13 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
-	zbx_uint64_t	min, max;
+	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID;
 	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-
-	if (0 == CONFIG_NODEID)
-	{
-		min = 0;
-		max = ZBX_STANDALONE_MAX_IDS;
-	}
-	else if (0 != (table->flags & ZBX_SYNC))
-	{
-		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID +
-			ZBX_DM_MAX_CONFIG_IDS * (zbx_uint64_t)CONFIG_NODEID;
-		max = min + ZBX_DM_MAX_CONFIG_IDS - 1;
-	}
-	else
-	{
-		min = ZBX_DM_MAX_HISTORY_IDS * (zbx_uint64_t)CONFIG_NODEID;
-		max = min + ZBX_DM_MAX_HISTORY_IDS - 1;
-	}
 
 	while (FAIL == found)
 	{
@@ -945,8 +861,8 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			return 0;
 		}
 
-		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				CONFIG_NODEID, table->table, table->recid);
+		result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+				table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
@@ -972,16 +888,15 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			}
 			DBfree_result(result);
 
-			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
-					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
-					CONFIG_NODEID, table->table, table->recid, ret1);
+			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
+					" values ('%s','%s'," ZBX_FS_UI64 ")",
+					table->table, table->recid, ret1);
 
 			if (ZBX_DB_OK > dbres)
 			{
 				/* solving the problem of an invisible record created in a parallel transaction */
-				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
-						" and field_name='%s'",
-						CONFIG_NODEID, table->table, table->recid);
+				DBexecute("update ids set nextid=nextid+1 where table_name='%s' and field_name='%s'",
+						table->table, table->recid);
 			}
 
 			continue;
@@ -993,16 +908,16 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 			if (ret1 < min || ret1 >= max)
 			{
-				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-						CONFIG_NODEID, table->table, table->recid);
+				DBexecute("delete from ids where table_name='%s' and field_name='%s'",
+						table->table, table->recid);
 				continue;
 			}
 
-			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
-					num, CONFIG_NODEID, table->table, table->recid);
+			DBexecute("update ids set nextid=nextid+%d where table_name='%s' and field_name='%s'",
+					num, table->table, table->recid);
 
-			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					CONFIG_NODEID, table->table, table->recid);
+			result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+					table->table, table->recid);
 
 			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
@@ -1233,22 +1148,6 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_host_key_string_by_item                                      *
- *                                                                            *
- * Return value: <host>:<key>                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_host_key_string_by_item(DB_ITEM *item)
-{
-	zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", item->host_name, item->key);
-
-	return buf_string;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_user_string                                                  *
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
@@ -1333,10 +1232,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				"select hostid"
 				" from hosts"
 				" where proxy_hostid=" ZBX_FS_UI64
-					" and host='%s'"
-					ZBX_SQL_NODE,
-				proxy_hostid, host_esc,
-				DBand_node_local("hostid"));
+					" and host='%s'",
+				proxy_hostid, host_esc);
 
 		if (NULL != DBfetch(result))
 			res = FAIL;
@@ -1353,10 +1250,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				"select autoreg_hostid"
 				" from autoreg_host"
 				" where proxy_hostid%s"
-					" and host='%s'"
-					ZBX_SQL_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
-				DBand_node_local("autoreg_hostid"));
+					" and host='%s'",
+				DBsql_id_cmp(proxy_hostid), host_esc);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -1503,12 +1398,10 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
 				" and flags<>%d"
-				" and status in (%d,%d,%d)"
-				ZBX_SQL_NODE,
+				" and status in (%d,%d,%d)",
 			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
-			DBand_node_local("hostid"));
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
 
 	zbx_free(host_name_sample_esc);
 
@@ -1866,22 +1759,6 @@ void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
 	DBfree_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_nodeid_by_id                                                 *
- *                                                                            *
- * Purpose: Get Node ID by resource ID                                        *
- *                                                                            *
- * Return value: Node ID                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	get_nodeid_by_id(zbx_uint64_t id)
-{
-	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
 }
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)

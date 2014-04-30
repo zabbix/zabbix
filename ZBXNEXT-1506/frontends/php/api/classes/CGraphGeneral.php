@@ -242,19 +242,23 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Check if object exist.
+	 * Check if graph or graph prototype exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
 	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists($object) {
+		self::deprecated('graph.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('flags' => null),
 			'output' => array('graphid'),
-			'nopermissions' => true,
 			'limit' => 1
 		);
+
 		if (isset($object['name'])) {
 			$options['filter']['name'] = $object['name'];
 		}
@@ -263,13 +267,6 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		if (isset($object['hostids'])) {
 			$options['hostids'] = zbx_toArray($object['hostids']);
-		}
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
 		}
 
 		$objs = $this->get($options);
@@ -287,18 +284,10 @@ abstract class CGraphGeneral extends CApiService {
 	 * @return array
 	 */
 	public function getObjects($graphData) {
-		$options = array(
+		return $this->get(array(
 			'filter' => $graphData,
 			'output' => API_OUTPUT_EXTEND
-		);
-		if (isset($graphData['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($graphData['node']);
-		}
-		elseif (isset($graphData['nodeids'])) {
-			$options['nodeids'] = $graphData['nodeids'];
-		}
-
-		return $this->get($options);
+		));
 	}
 
 	/**
@@ -355,9 +344,9 @@ abstract class CGraphGeneral extends CApiService {
 
 		// Y axis MIN value < Y axis MAX value
 		if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
-				&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
-				&& $graph['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED
-				&& $graph['yaxismin'] >= $graph['yaxismax']) {
+			&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
+			&& $graph['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED
+			&& $graph['yaxismin'] >= $graph['yaxismax']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
 		}
 	}
@@ -370,7 +359,6 @@ abstract class CGraphGeneral extends CApiService {
 		// adding GraphItems
 		if ($options['selectGraphItems'] !== null && $options['selectGraphItems'] !== API_OUTPUT_COUNT) {
 			$gitems = API::GraphItem()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $this->outputExtend($options['selectGraphItems'], array('graphid', 'gitemid')),
 				'graphids' => $graphids,
 				'nopermissions' => true,
@@ -390,15 +378,14 @@ abstract class CGraphGeneral extends CApiService {
 				'SELECT gi.graphid,hg.groupid'.
 				' FROM graphs_items gi,items i,hosts_groups hg'.
 				' WHERE '.dbConditionInt('gi.graphid', $graphids).
-					' AND gi.itemid=i.itemid'.
-					' AND i.hostid=hg.hostid'
+				' AND gi.itemid=i.itemid'.
+				' AND i.hostid=hg.hostid'
 			);
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['graphid'], $relation['groupid']);
 			}
 
 			$groups = API::HostGroup()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
 				'groupids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
@@ -415,14 +402,13 @@ abstract class CGraphGeneral extends CApiService {
 				'SELECT gi.graphid,i.hostid'.
 				' FROM graphs_items gi,items i'.
 				' WHERE '.dbConditionInt('gi.graphid', $graphids).
-					' AND gi.itemid=i.itemid'
+				' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
 
 			$hosts = API::Host()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
@@ -440,14 +426,13 @@ abstract class CGraphGeneral extends CApiService {
 				'SELECT gi.graphid,i.hostid'.
 				' FROM graphs_items gi,items i'.
 				' WHERE '.dbConditionInt('gi.graphid', $graphids).
-					' AND gi.itemid=i.itemid'
+				' AND gi.itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
 
 			$templates = API::Template()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectTemplates'],
 				'templateids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,

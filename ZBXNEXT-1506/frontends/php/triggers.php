@@ -35,7 +35,7 @@ $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
+	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN(array(COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP)), 'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
@@ -51,7 +51,7 @@ $fields = array(
 	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -118,7 +118,7 @@ elseif (isset($_REQUEST['or_expression'])) {
 elseif (isset($_REQUEST['replace_expression'])) {
 	$_REQUEST['expr_action'] = 'r';
 }
-elseif (isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])) {
+elseif (getRequest('remove_expression')) {
 	$_REQUEST['expr_action'] = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
@@ -278,14 +278,16 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result, getRequest('hostid'));
 }
-elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
-	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
-		if ($_REQUEST['copy_type'] == 0) { // hosts
-			$hosts_ids = $_REQUEST['copy_targetid'];
+elseif (getRequest('go') == 'copy_to' && hasRequest('copy') && hasRequest('g_triggerid')) {
+	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+		// hosts or templates
+		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
+			$hosts_ids = getRequest('copy_targetid');
 		}
-		else { // groups
+		// host groups
+		else {
 			$hosts_ids = array();
-			$group_ids = $_REQUEST['copy_targetid'];
+			$group_ids = getRequest('copy_targetid');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -300,11 +302,11 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 		DBstart();
 
-		$goResult = copyTriggersToHosts($_REQUEST['g_triggerid'], $hosts_ids, get_request('hostid'));
+		$goResult = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Trigger added'), _('Cannot add trigger'));
-		clearCookies($goResult, $_REQUEST['hostid']);
+		clearCookies($goResult, getRequest('hostid'));
 
 		$_REQUEST['go'] = 'none2';
 	}
@@ -341,9 +343,9 @@ else {
 	$data = array(
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
-		'triggers' => array(),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
+		'triggers' => array()
 	);
+
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
@@ -351,12 +353,8 @@ else {
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null),
-		'triggerid' => get_request('triggerid', null)
+		'hostid' => get_request('hostid', null)
 	));
-	if ($data['pageFilter']->triggerid > 0) {
-		$data['triggerid'] = $data['pageFilter']->triggerid;
-	}
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
@@ -454,14 +452,6 @@ else {
 	}
 	else {
 		$data['showInfoColumn'] = true;
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['triggers'] as &$trigger) {
-			$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true);
-		}
-		unset($trigger);
 	}
 
 	// render view

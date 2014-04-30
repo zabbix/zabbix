@@ -136,7 +136,7 @@ elseif (isset($_REQUEST['or_expression'])) {
 elseif (isset($_REQUEST['replace_expression'])) {
 	$_REQUEST['expr_action'] = 'r';
 }
-elseif (isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])) {
+elseif (hasRequest('remove_expression')) {
 	$_REQUEST['expr_action'] = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
@@ -277,8 +277,7 @@ else {
 		'discovery_rule' => $discovery_rule,
 		'hostid' => get_request('hostid'),
 		'showdisabled' => get_request('showdisabled', 1),
-		'triggers' => array(),
-		'displayNodes' => false
+		'triggers' => array()
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 

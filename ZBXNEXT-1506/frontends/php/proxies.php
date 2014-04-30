@@ -155,11 +155,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$updated = 0;
 	foreach ($hosts as $hostId) {
 		$dbHosts = DBselect(
-			'SELECT h.hostid,h.status'.
-			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.zbx_dbstr($hostId).
-				andDbNode('h.hostid')
+			'SELECT h.hostid,h.status FROM hosts h WHERE h.proxy_hostid='.zbx_dbstr($hostId)
 		);
+
 		while ($dbHost = DBfetch($dbHosts)) {
 			$oldStatus = $dbHost['status'];
 			$updated++;
@@ -241,7 +239,6 @@ if (isset($_REQUEST['form'])) {
 		'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			andDbNode('h.hostid').
 			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	order_result($data['dbHosts'], 'name');
@@ -253,7 +250,6 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
 		'config' => select_config()
 	);
 
@@ -274,12 +270,6 @@ else {
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['proxies'], array('proxyid'));
 
-	// nodes
-	foreach ($data['proxies'] as &$proxy) {
-		$proxy['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($proxy['proxyid'], true) : '';
-	}
-	unset($proxy);
-
 	// calculate performance
 	$dbPerformance = DBselect(
 		'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
@@ -288,6 +278,7 @@ else {
 			' AND i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
+			' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
 			' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
 		' GROUP BY h.proxy_hostid'
 	);

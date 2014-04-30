@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2014 Zabbix SIA
@@ -17,9 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_NODEWATCHER_HISTORY_H
-#define ZABBIX_NODEWATCHER_HISTORY_H
 
-void main_historysender(void);
+class CLdapAuthValidatorTest extends CValidatorTest {
 
-#endif
+	public function validParamProvider() {
+		return array(
+			array(array(
+				'conf' => array()
+			))
+		);
+	}
+
+	public function validValuesProvider() {
+		return array();
+	}
+
+	public function invalidValuesProvider() {
+		return array();
+	}
+
+	public function invalidValuesWithObjectsProvider() {
+		return array();
+	}
+
+	protected function createValidator(array $params = array()) {
+		return new CLdapAuthValidator($params);
+	}
+}
