@@ -323,17 +323,22 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 					zbx_strerror(errno));
 			goto out;
 		}
-		if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+
+		do
 		{
-			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
-					zbx_strerror(errno));
-			goto out;
+			if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+			{
+				zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
+						zbx_strerror(errno));
+				goto out;
+			}
+			if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
+			{
+				zbx_snprintf(error, max_error_len, "wrong answer on HELO [%s]", cmd);
+				goto out;
+			}
 		}
-		if (0 != strncmp(cmd, OK_250, strlen(OK_250)))
-		{
-			zbx_snprintf(error, max_error_len, "wrong answer on HELO [%s]", cmd);
-			goto out;
-		}
+		while ('-' == *(cmd + 3));
 	}
 
 	/* send MAIL FROM */
