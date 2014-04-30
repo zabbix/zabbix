@@ -414,8 +414,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					break;
 			}
 
-			auth = zbx_malloc(NULL, auth_alloc_len);
-
 			zbx_snprintf_alloc(&auth, &auth_alloc_len, &auth_offset, "%s:%s", httptest->httptest.http_user,
 					httptest->httptest.http_password);
 
