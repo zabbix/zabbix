@@ -246,7 +246,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => array('eventid', 'acknowledged', 'clock', 'value', 'objectid'),
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
