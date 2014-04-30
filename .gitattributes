@@ -534,9 +534,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-src/libs/zbxdbhigh/itservices.c -text
-src/libs/zbxdbhigh/template.h -text
-src/libs/zbxdbhigh/template_item.c -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
