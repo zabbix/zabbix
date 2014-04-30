@@ -303,7 +303,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 #ifdef HAVE_LIBCURL
 	int		err;
 	char		*auth = NULL;
-	size_t		auth_alloc_len = 0, auth_offset;
+	size_t		auth_offset, auth_alloc_len = 130; /* where 130 = 128 + ':' + '\0' */
 	CURL            *easyhandle = NULL;
 #endif
 
@@ -338,6 +338,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
 	}
+
+	auth = zbx_malloc(NULL, auth_alloc_len);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -412,7 +414,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					break;
 			}
 
-			auth_alloc_len = strlen(httptest->httptest.http_user) + strlen(httptest->httptest.http_password) + 2;
+			auth = zbx_malloc(NULL, auth_alloc_len);
 
 			zbx_snprintf_alloc(&auth, &auth_alloc_len, &auth_offset, "%s:%s", httptest->httptest.http_user,
 					httptest->httptest.http_password);
@@ -529,6 +531,7 @@ httpstep_error:
 		}
 	}
 clean:
+	zbx_free(auth);
 	curl_easy_cleanup(easyhandle);
 #else
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
