@@ -170,7 +170,8 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 	*pattern = zbx_strdup(NULL, p + 1);
 trim:
 #ifdef _WINDOWS
-	zbx_rtrim(*path, "\\");
+	if (0 != zbx_rtrim(*path, "\\") && NULL == *pattern)
+		*pattern = zbx_strdup(NULL, "*");			/* make sure path is a directory */
 
 	if (':' == (*path)[1] && '\0' == (*path)[2] && '\\' == glob[2])	/* retain backslash for "C:\" */
 	{
@@ -178,7 +179,8 @@ trim:
 		(*path)[3] = '\0';
 	}
 #else
-	zbx_rtrim(*path, "/");
+	if (0 != zbx_rtrim(*path, "/") && NULL == *pattern)
+		*pattern = zbx_strdup(NULL, "*");			/* make sure path is a directory */
 
 	if ('\0' == (*path)[0] && '/' == glob[0])			/* retain forward slash for "/" */
 	{
@@ -332,7 +334,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			goto clean;
 		}
 
-		zbx_error("%s: path before pattern is not a directory\n", cfg_file);
+		zbx_error("%s: base path is not a directory\n", cfg_file);
 		goto clean;
 	}
 
