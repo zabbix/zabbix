@@ -264,11 +264,21 @@ class CItemPrototype extends CItemGeneral {
 		return $result;
 	}
 
+	/**
+	 * Check if item prototype exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array $object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('itemprototype.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 

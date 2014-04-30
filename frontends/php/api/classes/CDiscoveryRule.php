@@ -272,11 +272,21 @@ class CDiscoveryRule extends CItemGeneral {
 		return $result;
 	}
 
+	/**
+	 * Check if low-level discovery rule exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('discoveryrule.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
-			'nopermissions' => true,
 			'limit' => 1
 		);
 

@@ -392,9 +392,24 @@ class CGraph extends CGraphGeneral {
 			));
 
 			if ($chdGraph = reset($chdGraphs)) {
-				if ($tmpGraph['name'] !== $chdGraph['name']
-						&& $this->exists(array('name' => $tmpGraph['name'], 'hostids' => $chdHost['hostid']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" already exists on "%2$s".', $tmpGraph['name'], $chdHost['host']));
+				if ($tmpGraph['name'] !== $chdGraph['name']) {
+					$graphExists = $this->get(array(
+						'output' => array('graphid'),
+						'hostids' => $chdHost['hostid'],
+						'filter' => array(
+							'name' => $tmpGraph['name'],
+							'flags' => null
+						),
+						'nopermissions' => true,
+						'limit' => 1
+					));
+					if ($graphExists) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Graph "%1$s" already exists on "%2$s".',
+							$tmpGraph['name'],
+							$chdHost['host']
+						));
+					}
 				}
 				elseif ($chdGraph['flags'] != $tmpGraph['flags']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph with same name but other type exist.'));

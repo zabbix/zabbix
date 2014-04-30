@@ -44,7 +44,7 @@ class CScreenSystemStatus extends CScreenBase {
 			'screenid' => $this->screenid
 		)));
 		$item->setHeader(_('Status of Zabbix'), SPACE);
-		$item->setFooter(_s('Updated: %s', zbx_date2str(_('H:i:s'))));
+		$item->setFooter(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)));
 
 		return $this->getOutput($item);
 	}
