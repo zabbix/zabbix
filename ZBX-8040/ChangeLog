@@ -3,7 +3,7 @@ Changes for 2.3.0
 
 New features:
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
-A......... [ZBX-7981] API "exists" methods are now deprecated (Ivo)
+A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
 ..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
 ..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
