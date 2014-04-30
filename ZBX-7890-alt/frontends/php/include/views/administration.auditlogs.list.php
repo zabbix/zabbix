@@ -103,7 +103,7 @@ foreach ($this->data['actions'] as $action) {
 	}
 
 	$auditTable->addRow(array(
-		zbx_date2str(_('d M Y H:i:s'), $action['clock']),
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 		$action['alias'],
 		$action['ip'],
 		$action['resourcetype'],
