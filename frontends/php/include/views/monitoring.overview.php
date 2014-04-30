@@ -91,7 +91,9 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
+if ($config['dropdown_first_entry']
+		|| $this->data['pageFilter']->applicationsSelected
+		|| $this->data['pageFilter']->groupsSelected) {
 	if ($this->data['type'] == SHOW_DATA) {
 		$dataTable = getItemsDataOverview(
 			array_keys($this->data['pageFilter']->hosts),
