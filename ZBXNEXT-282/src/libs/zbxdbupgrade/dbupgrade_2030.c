@@ -870,6 +870,77 @@ static int	DBpatch_2030091(void)
 
 	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
+
+static int	DBpatch_2030092(void)
+{
+	const ZBX_FIELD	field = {"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030093(void)
+{
+	const ZBX_FIELD	field = {"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030094(void)
+{
+	const ZBX_FIELD	field = {"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030095(void)
+{
+	const ZBX_FIELD	field = {"verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030096(void)
+{
+	const ZBX_FIELD	field = {"verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_2030097(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httptest", &field);
+}
+
+static int      DBpatch_2030098(void)
+{
+	const ZBX_FIELD field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("httpstep", &field);
+}
+
+static int	DBpatch_2030099(void)
+{
+	const ZBX_FIELD	field = {"follow_redirects", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2030100(void)
+{
+	const ZBX_FIELD	field = {"retrieve_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2030101(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
 #endif
 
 DBPATCH_START(2030)
@@ -967,5 +1038,15 @@ DBPATCH_ADD(2030088, 0, 1)
 DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
+DBPATCH_ADD(2030092, 0, 1)
+DBPATCH_ADD(2030093, 0, 1)
+DBPATCH_ADD(2030094, 0, 1)
+DBPATCH_ADD(2030095, 0, 1)
+DBPATCH_ADD(2030096, 0, 1)
+DBPATCH_ADD(2030097, 0, 1)
+DBPATCH_ADD(2030098, 0, 1)
+DBPATCH_ADD(2030099, 0, 1)
+DBPATCH_ADD(2030100, 0, 1)
+DBPATCH_ADD(2030101, 0, 1)
 
 DBPATCH_END()
