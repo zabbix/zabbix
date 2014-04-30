@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
