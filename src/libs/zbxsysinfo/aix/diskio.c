@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 
 #define ZBX_DEV_PFX	"/dev/"
+#define ZBX_DEV_PFX_LEN	5
 
 typedef struct
 {
@@ -129,7 +130,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char	*devname, *mode;
+	const char	*devname, *type;
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
@@ -139,14 +140,14 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
-	else if (0 == strncmp(ZBX_DEV_PFX, devname, 5))
-		devname += 5;
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, ZBX_DEV_PFX_LEN))
+		devname += ZBX_DEV_PFX_LEN;
 
-	mode = get_rparam(request, 1);
+	type = get_rparam(request, 1);
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "operations"))
 		ret = VFS_DEV_READ_OPERATIONS(devname, result);
-	else if (0 == strcmp(mode, "bytes"))
+	else if (0 == strcmp(type, "bytes"))
 		ret = VFS_DEV_READ_BYTES(devname, result);
 	else
 		ret = SYSINFO_RET_FAIL;
@@ -156,7 +157,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char	*devname, *mode;
+	const char	*devname, *type;
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
@@ -166,14 +167,14 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
-	else if (0 == strncmp(ZBX_DEV_PFX, devname, 5))
-		devname += 5;
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, ZBX_DEV_PFX_LEN))
+		devname += ZBX_DEV_PFX_LEN;
 
-	mode = get_rparam(request, 1);
+	type = get_rparam(request, 1);
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "operations"))
 		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
-	else if (0 == strcmp(mode, "bytes"))
+	else if (0 == strcmp(type, "bytes"))
 		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
 		ret = SYSINFO_RET_FAIL;
