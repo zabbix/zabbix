@@ -310,7 +310,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 			goto out;
 		}
 	}
-	while (' ' != *(cmd + strlen(OK_220)));
+	while ('-' == *(cmd + 3));
 
 	/* send HELO */
 

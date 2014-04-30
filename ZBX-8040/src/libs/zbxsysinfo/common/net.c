@@ -51,11 +51,17 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 		if (NULL != expect && SUCCEED == net)
 		{
+		wait_for_220sp:
 			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
 			{
 				if (0 != strncmp(buf, expect, strlen(expect)))
 				{
 					val = FAIL;
+				}
+				if (0 == strncmp(buf, "220", 3))
+				{
+					if ('-' == *(buf + 3))
+						goto wait_for_220sp;
 				}
 			}
 		}
