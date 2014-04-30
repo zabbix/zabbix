@@ -230,7 +230,7 @@ elseif (isset($_REQUEST['save'])) {
 	$conditions = array_values($conditions);
 	foreach ($conditions as $condition) {
 		if (!zbx_empty($condition['macro'])) {
-			$condition['macro'] = zbx_strtoupper($condition['macro']);
+			$condition['macro'] = mb_strtoupper($condition['macro']);
 
 			$filter['conditions'][] = $condition;
 		}

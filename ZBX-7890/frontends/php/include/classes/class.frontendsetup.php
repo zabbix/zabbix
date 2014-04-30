@@ -67,6 +67,9 @@ class FrontendSetup {
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
+		if (mbstrings_available()) {
+			$result[] = $this->checkPhpMbstringFuncOverload();
+		}
 		$result[] = $this->checkPhpSockets();
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
@@ -302,6 +305,27 @@ class FrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP mbstring extension missing (PHP configuration parameter --enable-mbstring).')
+		);
+	}
+
+	/**
+	 * Checks for PHP mbstring.func_overload value.
+	 *
+	 * Note: disabling mbstring functions completely, mbstring.func_overload returns false.
+	 * checkPhpMbstringFuncOverload() will be called after successful checkPhpMbstring(), to avoid duplicate
+	 * error messages. mbstring.func_overload value in php.ini file represents a combination of bitmasks.
+	 *
+	 * @return array
+	 */
+	public function checkPhpMbstringFuncOverload() {
+		$current = ini_get('mbstring.func_overload');
+
+		return array(
+			'name' => _('PHP mbstring.func_overload'),
+			'current' => ($current & 2) ? _('on') : _('off'),
+			'required' => _('off'),
+			'result' => ($current & 2) ? self::CHECK_FATAL : self::CHECK_OK,
+			'error' => _('PHP string function overloading must be disabled.')
 		);
 	}
 
