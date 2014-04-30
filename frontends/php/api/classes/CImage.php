@@ -312,12 +312,9 @@ class CImage extends CApiService {
 
 		foreach ($images as $image) {
 			$values = array();
+
 			if (isset($image['name'])) {
 				$values['name'] = zbx_dbstr($image['name']);
-			}
-
-			if (isset($image['imagetype'])) {
-				$values['imagetype'] = $image['imagetype'];
 			}
 
 			if (isset($image['image'])) {
@@ -534,41 +531,46 @@ class CImage extends CApiService {
 		}
 
 		foreach ($images as $image) {
-			// check fields
-			if (!isset($image['imageid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for image.'));
+			if (!check_db_fields(array('imageid'), $image)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 
-		$dbImages = $this->get(array(
+		$dbImages = API::getApiService()->select($this->tableName(), array(
+			'filter' => array('imageid' => zbx_objectValues($images, 'imageid')),
 			'output' => array('imageid', 'name'),
-			'imageids' => zbx_objectValues($images, 'imageid'),
-			'editable' => true,
 			'preservekeys' => true
 		));
 
-		$imageNamesChanged = array();
+		$changedImageNames = array();
 		foreach ($images as $image) {
 			if (!isset($dbImages[$image['imageid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			if (array_key_exists('imagetype', $image)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "imagetype" for image "%1$s".', $dbImages[$image['imageid']]['name'])
+				);
+			}
+
 			if (isset($image['name']) && !zbx_empty($image['name'])
 					&& $dbImages[$image['imageid']]['name'] !== $image['name']) {
-				if (isset($imageNamesChanged[$image['name']])) {
+				if (isset($changedImageNames[$image['name']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
 				else {
-					$imageNamesChanged[$image['name']] = $image['name'];
+					$changedImageNames[$image['name']] = $image['name'];
 				}
 			}
 		}
 
-		// check for exising image names
-		if ($imageNamesChanged) {
+		// check for existing image names
+		if ($changedImageNames) {
 			$dbImages = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => $imageNamesChanged),
+				'filter' => array('name' => $changedImageNames),
 				'limit' => 1
 			));
 
