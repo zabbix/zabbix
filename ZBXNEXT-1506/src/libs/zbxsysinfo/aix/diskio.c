@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 
 #define ZBX_DEV_PFX	"/dev/"
-#define ZBX_DEV_PFX_LEN	5
 
 typedef struct
 {
@@ -140,8 +139,8 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
-	else if (0 == strncmp(ZBX_DEV_PFX, devname, ZBX_DEV_PFX_LEN))
-		devname += ZBX_DEV_PFX_LEN;
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, sizeof(ZBX_DEV_PFX) - 1))
+		devname += sizeof(ZBX_DEV_PFX) - 1;
 
 	type = get_rparam(request, 1);
 
@@ -167,8 +166,8 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == devname || 0 == strcmp("all", devname))
 		devname = "";
-	else if (0 == strncmp(ZBX_DEV_PFX, devname, ZBX_DEV_PFX_LEN))
-		devname += ZBX_DEV_PFX_LEN;
+	else if (0 == strncmp(ZBX_DEV_PFX, devname, sizeof(ZBX_DEV_PFX) - 1))
+		devname += sizeof(ZBX_DEV_PFX) - 1;
 
 	type = get_rparam(request, 1);
 
