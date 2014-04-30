@@ -1830,7 +1830,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$dbEvents = DBselect(
-				'SELECT '.$outputFields.
+				'SELECT e.objectid,'.$outputFields.
 				' FROM ('.
 					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
 					' FROM events e2'.
@@ -1845,7 +1845,13 @@ class CTrigger extends CTriggerGeneral {
 			);
 
 			while ($dbEvent = DBfetch($dbEvents)) {
-				$result[$dbEvent['objectid']]['lastEvent'] = $dbEvent;
+				$triggerId = $dbEvent['objectid'];
+
+				if (is_array($options['selectLastEvent']) && !in_array('objectid', $options['selectLastEvent'])) {
+					unset($dbEvent['objectid']);
+				}
+
+				$result[$triggerId]['lastEvent'] = $dbEvent;
 			}
 		}
 
