@@ -58,7 +58,6 @@ class CItemPrototype extends CItemGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -235,7 +234,6 @@ class CItemPrototype extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -266,21 +264,26 @@ class CItemPrototype extends CItemGeneral {
 		return $result;
 	}
 
+	/**
+	 * Check if item prototype exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array $object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
+		self::deprecated('itemprototype.exists method is deprecated.');
+
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'output' => array('itemid'),
-			'nopermissions' => 1,
 			'limit' => 1
 		);
 
 		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
 		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
-
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
 
@@ -653,7 +656,6 @@ class CItemPrototype extends CItemGeneral {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
 			$applications = API::Application()->get(array(
 				'output' => $options['selectApplications'],
-				'nodeids' => $options['nodeids'],
 				'applicationids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -666,7 +668,6 @@ class CItemPrototype extends CItemGeneral {
 				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
 				$triggers = API::TriggerPrototype()->get(array(
 					'output' => $options['selectTriggers'],
-					'nodeids' => $options['nodeids'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -680,7 +681,6 @@ class CItemPrototype extends CItemGeneral {
 				$triggers = API::TriggerPrototype()->get(array(
 					'countOutput' => true,
 					'groupCount' => true,
-					'nodeids' => $options['nodeids'],
 					'itemids' => $itemids
 				));
 				$triggers = zbx_toHash($triggers, 'itemid');
@@ -702,7 +702,6 @@ class CItemPrototype extends CItemGeneral {
 				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
-					'nodeids' => $options['nodeids'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -716,7 +715,6 @@ class CItemPrototype extends CItemGeneral {
 				$graphs = API::GraphPrototype()->get(array(
 					'countOutput' => true,
 					'groupCount' => true,
-					'nodeids' => $options['nodeids'],
 					'itemids' => $itemids
 				));
 				$graphs = zbx_toHash($graphs, 'itemid');
@@ -737,7 +735,6 @@ class CItemPrototype extends CItemGeneral {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
-				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,

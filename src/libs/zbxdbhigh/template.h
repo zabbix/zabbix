@@ -17,19 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_NODESENDER_H
-#define ZABBIX_NODESENDER_H
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 
-#include "mutexs.h"
-
-extern ZBX_MUTEX	node_sync_access;
-
-int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id);
-char	*DMget_config_data(int nodeid, unsigned char dest_nodetype);
-int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename,
-		const zbx_uint64_t id, const char *fields);
-void	node_sync_lock(int nodeid);
-void	node_sync_unlock(int nodeid);
-void	process_nodes(void);
-
-#endif
+void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);

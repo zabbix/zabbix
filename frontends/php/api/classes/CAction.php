@@ -63,7 +63,6 @@ class CAction extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'actionids'					=> null,
@@ -253,7 +252,6 @@ class CAction extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($action = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
@@ -470,24 +468,24 @@ class CAction extends CApiService {
 		return $result;
 	}
 
+	/**
+	 * Check if action exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
-		$keyFields = array(array('actionid', 'name'));
+		self::deprecated('action.exists method is deprecated.');
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
 			'output' => array('actionid'),
-			'nopermissions' => true,
 			'limit' => 1
-		);
+		));
 
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$objs = $this->get($options);
 		return !empty($objs);
 	}
 
@@ -1656,7 +1654,6 @@ class CAction extends CApiService {
 					break;
 
 					case CONDITION_TYPE_TRIGGER_NAME:
-					case CONDITION_TYPE_NODE:
 					case CONDITION_TYPE_DUPTIME:
 					case CONDITION_TYPE_DVALUE:
 					case CONDITION_TYPE_APPLICATION:
@@ -1740,8 +1737,7 @@ class CAction extends CApiService {
 			$conditions = API::getApiService()->select('conditions', array(
 				'output' => $this->outputExtend($options['selectConditions'], array('actionid', 'conditionid')),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 
@@ -1756,8 +1752,7 @@ class CAction extends CApiService {
 					array('operationid', 'actionid', 'operationtype')
 				),
 				'filter' => array('actionid' => $actionIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($operations, 'actionid', 'operationid');
 			$operationIds = $relationMap->getRelatedIds();

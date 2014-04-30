@@ -56,10 +56,6 @@
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID	207
 
-/* DBget_node_value() */
-#define ZBX_REQUEST_NODE_ID		301
-#define ZBX_REQUEST_NODE_NAME		302
-
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -1761,69 +1757,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_node_value                                                 *
- *                                                                            *
- * Purpose: request node value by object identificator                        *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_node_value(zbx_uint64_t objectid, char **replace_to, int request)
-{
-	const char	*__function_name = "DBget_node_value";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		nodeid, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	nodeid = get_nodeid_by_id(objectid);
-
-	switch (request)
-	{
-		case ZBX_REQUEST_NODE_ID:
-			*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
-			ret = SUCCEED;
-			break;
-		case ZBX_REQUEST_NODE_NAME:
-			result = DBselect("select name from nodes where nodeid=%d", nodeid);
-
-			if (NULL != (row = DBfetch(result)))
-			{
-				*replace_to = zbx_strdup(*replace_to, row[0]);
-				ret = SUCCEED;
-			}
-			DBfree_result(result);
-			break;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_node_value                                                   *
- *                                                                            *
- * Purpose: request node value by trigger expression and number of function   *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
- *                                                                            *
- ******************************************************************************/
-static int	get_node_value(const char *expression, char **replace_to, int N_functionid, int request)
-{
-	zbx_uint64_t	functionid;
-
-	if (FAIL == get_N_functionid(expression, N_functionid, &functionid, NULL))
-		return FAIL;
-
-	return DBget_node_value(functionid, replace_to, request);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_autoreg_value_by_event                                       *
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
@@ -2030,9 +1963,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_PROFILE_LOCATION		MVAR_PROFILE "LOCATION}"
 #define MVAR_PROFILE_NOTES		MVAR_PROFILE "NOTES}"
 
-#define MVAR_NODE_ID			"{NODE.ID}"
-#define MVAR_NODE_NAME			"{NODE.NAME}"
-
 #define MVAR_DISCOVERY_RULE_NAME	"{DISCOVERY.RULE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_NAME	"{DISCOVERY.SERVICE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_PORT	"{DISCOVERY.SERVICE.PORT}"
@@ -2081,7 +2011,6 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-	MVAR_NODE_ID, MVAR_NODE_NAME,
 	NULL
 };
 
@@ -2745,16 +2674,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns);
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -2948,16 +2867,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3108,14 +3017,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 								zbx_age2str(time(NULL) - atoi(replace_to)));
 					}
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
@@ -3185,14 +3086,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = get_autoreg_value_by_event(c_event, &replace_to, "listen_ip");
-				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_PORT))
 				{
@@ -3331,14 +3224,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
@@ -3445,14 +3330,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_LLDRULE_STATE))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
-				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -3876,87 +3753,65 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	char		*sql = NULL, value[MAX_BUFFER_LEN];
-	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
+	DC_ITEM		*items = NULL;
+	char		value[MAX_BUFFER_LEN];
+	int		i, k;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	host_status, item_status;
+	int		*errcodes = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select %s,h.status,i.status"
-			" from %s"
-			" where i.hostid=h.hostid"
-				" and",
-			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->values_num);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->values_num);
 
 	zbx_free(itemids);
 
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < ifuncs->values_num; i++)
 	{
-		DBget_item_from_db(&item, row);
-
-		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
-		item_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 1]);
-
-		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (i = 0; i < ifunc->functions.values_num; i++)
+		for (k = 0; k < ifunc->functions.values_num; k++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[i];
+			func = (zbx_func_t *)ifunc->functions.values[k];
 
-			if (ITEM_STATUS_DISABLED == item_status)
+			if (SUCCEED != errcodes[i])
 			{
-				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (ITEM_STATE_NOTSUPPORTED == item.state)
-			{
-				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (HOST_STATUS_NOT_MONITORED == host_status)
-			{
-				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-
-			if (NULL != func->error)
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]:"
+						" item does not exist, is disabled or belongs to a disabled host.",
+						func->function, func->parameter);
 				continue;
+			}
 
-			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec))
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
 			{
-				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
+				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter, func->timespec.sec))
+			{
+				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
 	}
-	DBfree_result(result);
+
+	DCconfig_clean_items(items, errcodes, ifuncs->values_num);
+
+	zbx_free(errcodes);
+	zbx_free(items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
