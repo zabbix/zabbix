@@ -70,7 +70,7 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 		goto out;
 	}
 
-	part1_length = del - str + 1;
+	part1_length = (size_t)(del - str + 1);
 	part2_length = str_length - part1_length;
 
 	*part1 = zbx_malloc(*part1, part1_length + 1);
@@ -1029,7 +1029,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	{
 		/* do not move if there are no logfiles or we are appending the logfile */
 		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
-				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
+				((size_t)(*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
 
 	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
