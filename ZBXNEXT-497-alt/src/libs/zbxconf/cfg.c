@@ -191,54 +191,29 @@ trim:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_object                                                 *
+ * Function: parse_cfg_dir                                                    *
  *                                                                            *
- * Purpose: parse "Include=..." line in configuration file                    *
+ * Purpose: parse directory with configuration files                          *
  *                                                                            *
- * Parameters: cfg_file - full name of config file                            *
- *             cfg      - pointer to configuration parameter structure        *
- *             level    - a level of included file                            *
- *             strict   - treat unknown parameters as error                   *
+ * Parameters: path    - full path to directory                               *
+ *             pattern - pattern that files in the directory should match     *
+ *             cfg     - pointer to configuration parameter structure         *
+ *             level   - a level of included file                             *
+ *             strict  - treat unknown parameters as error                    *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
- *               FAIL - error processing object                               *
+ *               FAIL - error processing directory                            *
  *                                                                            *
  ******************************************************************************/
-static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
-{
-	int			ret = FAIL;
-	char			*path = NULL, *pattern = NULL, *file = NULL;
-	zbx_stat_t		sb;
 #ifdef _WINDOWS
+static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict)
+{
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*find_path = NULL, *file_name;
-	wchar_t			*wfind_path = NULL, *wpath = NULL;
-#else
-	DIR			*dir;
-	struct dirent		*d;
-#endif
-	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
-		goto clean;
+	char 			*find_path = NULL, *file = NULL, *file_name;
+	wchar_t			*wfind_path = NULL;
+	int			ret = FAIL;
 
-	if (0 != zbx_stat(path, &sb))
-	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
-		goto clean;
-	}
-
-	if (0 == S_ISDIR(sb.st_mode))
-	{
-		if (NULL == pattern)
-		{
-			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
-			goto clean;
-		}
-
-		zbx_error("%s: path before pattern is not a directory\n", cfg_file);
-		goto clean;
-	}
-#ifdef _WINDOWS
 	find_path = zbx_dsprintf(find_path, "%s\\*", path);
 	wfind_path = zbx_utf8_to_unicode(find_path);
 
@@ -265,7 +240,26 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto close;
 	}
+
+	ret = SUCCEED;
+close:
+	FindClose(h_find);
+clean:
+	zbx_free(wfind_path);
+	zbx_free(find_path);
+	zbx_free(file);
+
+	return ret;
+}
 #else
+static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict)
+{
+	DIR		*dir;
+	struct dirent	*d;
+	zbx_stat_t	sb;
+	char		*file = NULL;
+	int		ret = FAIL;
+
 	if (NULL == (dir = opendir(path)))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
@@ -285,25 +279,65 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
 			goto close;
 	}
-#endif
+
 	ret = SUCCEED;
 close:
-#ifdef _WINDOWS
-	FindClose(h_find);
-#else
 	if (0 != closedir(dir))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		ret = FAIL;
 	}
-#endif
 clean:
-#ifdef _WINDOWS
-	zbx_free(wfind_path);
-	zbx_free(find_path);
-	zbx_free(wpath);
-#endif
 	zbx_free(file);
+
+	return ret;
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_cfg_object                                                 *
+ *                                                                            *
+ * Purpose: parse "Include=..." line in configuration file                    *
+ *                                                                            *
+ * Parameters: cfg_file - full name of config file                            *
+ *             cfg      - pointer to configuration parameter structure        *
+ *             level    - a level of included file                            *
+ *             strict   - treat unknown parameters as error                   *
+ *                                                                            *
+ * Return value: SUCCEED - parsed successfully                                *
+ *               FAIL - error processing object                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
+{
+	int		ret = FAIL;
+	char		*path = NULL, *pattern = NULL;
+	zbx_stat_t	sb;
+
+	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
+		goto clean;
+
+	if (0 != zbx_stat(path, &sb))
+	{
+		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		goto clean;
+	}
+
+	if (0 == S_ISDIR(sb.st_mode))
+	{
+		if (NULL == pattern)
+		{
+			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+			goto clean;
+		}
+
+		zbx_error("%s: path before pattern is not a directory\n", cfg_file);
+		goto clean;
+	}
+
+	ret = parse_cfg_dir(path, pattern, cfg, level, strict);
+clean:
 	zbx_free(pattern);
 	zbx_free(path);
 
