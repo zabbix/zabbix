@@ -303,7 +303,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 #ifdef HAVE_LIBCURL
 	int		err;
 	char		*auth = NULL;
-	size_t		auth_offset = 0, auth_alloc_len = 130;
+	size_t		auth_offset, auth_alloc_len = 130;
 	CURL            *easyhandle = NULL;
 #endif
 
@@ -413,6 +413,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					THIS_SHOULD_NEVER_HAPPEN;
 					break;
 			}
+
+			auth_offset = 0;
 
 			zbx_snprintf_alloc(&auth, &auth_alloc_len, &auth_offset, "%s:%s", httptest->httptest.http_user,
 					httptest->httptest.http_password);
