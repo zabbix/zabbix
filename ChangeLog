@@ -49,6 +49,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A.F....... [ZBX-8118] changed image update so that image type can not be changed after create (Krists)
 ..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
 ....I..... [ZBX-7890] fixed broken make distclean (Nikolaj)
 A......... [ZBX-7981] fixed validation when renaming host to an existing template in host.massupdate; fixed validation when renaming template to an existing host in template.massupdate (Ivo)
