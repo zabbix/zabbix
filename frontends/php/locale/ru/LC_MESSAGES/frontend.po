@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 13:31+0300\n"
-"PO-Revision-Date: 2014-01-26 15:22+0300\n"
+"POT-Creation-Date: 2014-05-01 13:32+0300\n"
+"PO-Revision-Date: 2014-04-27 20:15+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1390742531.0\n"
+"X-POOTLE-MTIME: 1398622544.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2159,7 +2159,7 @@ msgstr "Не удалось подключить \"view file\" \"%s\"."
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Не удалось вставить выражение триггера"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -2171,7 +2171,7 @@ msgstr "Не удалось присоединить шаблон"
 
 #: api/classes/CUser.php:1099
 msgid "Cannot login."
-msgstr ""
+msgstr "Не удалось войти в систему."
 
 #: api/classes/CUser.php:1021
 msgid "Cannot logout."
@@ -4843,11 +4843,11 @@ msgstr "Получен пустой ответ от Zabbix сервера \"%1$s
 
 #: api/classes/CScreen.php:488
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "Пустой ID комплексного экрана."
 
 #: api/classes/CTemplateScreen.php:602
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "Пусто ID комплексного экрана для шаблонного комплексного экрана."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5470,7 +5470,7 @@ msgstr "Функция"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "Функция \"%1$s\" не может быть использована с выбранным элементом данных \"%2$s\""
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -5682,12 +5682,12 @@ msgstr "Прототип графиков"
 #: api/classes/CGraphPrototype.php:799
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип графика \"%1$s\" содержит прототипы элементов данных из нескольких правил обнаружения."
 
 #: api/classes/CGraphPrototype.php:805
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Прототип графика \"%1$s\" должен содержать по крайней мере один прототип элемента данных."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7372,7 +7372,7 @@ msgstr "Указан некорректный ID комплексного экр
 
 #: api/classes/CScreen.php:489
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "Некорректный ID комплексного экрана."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7415,7 +7415,7 @@ msgstr "Некорректное состояние."
 
 #: api/classes/CTemplateScreen.php:603
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "Некорректный ID шаблонного комплексоного экрана."
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -7894,7 +7894,7 @@ msgstr "Элемент данных в \"неподдерживаемом\" со
 
 #: popup_trexpr.php:781
 msgid "Item not selected"
-msgstr ""
+msgstr "Элемент данных не выбран"
 
 #: include/forms.inc.php:1139
 msgid "Item prototype"
@@ -8526,7 +8526,7 @@ msgstr "Ошибка входа \"%s\"."
 #: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Имя пользователя \"%1$s\" не совпадает с именем \"%2$s\", используемом в HTTP аутентификации."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
@@ -9525,12 +9525,12 @@ msgstr "Не задано \"%1$s\" для прототипа узла сети."
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Не задан \"%1$s\" для комплексного экрана."
 
 #: api/classes/CTemplateScreen.php:601
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Не задан \"%1$s\" для шаблонного комплексного экрана."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -11114,7 +11114,7 @@ msgstr "Пароль (подтверждение)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "Пароль недоступен для пользователей с %1$s."
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
@@ -13889,12 +13889,12 @@ msgstr "Прототип триггера"
 #: api/classes/CTriggerPrototype.php:927
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Прототип триггера \"%1$s\" содержит прототипы триггеров из нескольких правил обнаружения."
 
 #: api/classes/CTriggerPrototype.php:933
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Прототип триггера \"%1$s\" должен содержать по крайней мере один прототип элемента данных."
 
 #: trigger_prototypes.php:168
 msgid "Trigger prototype added"
@@ -14212,7 +14212,7 @@ msgstr "Только неподтвержденные"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "Недоступно для пользователей с %1$s."
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
@@ -14266,7 +14266,7 @@ msgstr "Неизвестный алгоритм вычисления состо�
 
 #: httpdetails.php:162 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
-msgstr ""
+msgstr "Неизвестная ошибка"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14291,7 +14291,7 @@ msgstr "Неизвестный ресурс"
 #: httpmon.php:157
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "Ошибка при неизвестном шаге: %1$s"
 
 #: include/items.inc.php:893
 msgid "Unknown value type"
@@ -15052,7 +15052,7 @@ msgstr "Выравнивание по вертикали"
 
 #: include/locales.inc.php:79
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "Вьетнамский (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15979,7 +15979,7 @@ msgstr "новый"
 #: include/views/configuration.item.massupdate.php:502
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "новый"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:343
