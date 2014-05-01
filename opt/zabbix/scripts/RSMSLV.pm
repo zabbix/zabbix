@@ -51,8 +51,8 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_item_values check_lastclock get_down_count
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts);
+		get_item_values check_lastclock get_down_count avail_result_msg
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str);
 
 my $probe_group_name = 'Probes';
 my $probe_key_manual = 'probe.status[manual]';
@@ -923,7 +923,7 @@ sub process_slv_ns_avail
     my $count = scalar(@$online_probes_ref);
     if ($count < $cfg_minonline)
     {
-	info("success ($count probes are online, min - $cfg_minonline)");
+	info("Up (not enough probes online, $count while $cfg_minonline required)");
 	push_value($tld, $_, $value_ts, UP) foreach (@out_keys);
 	return;
     }
@@ -941,26 +941,27 @@ sub process_slv_ns_avail
     foreach my $ns (keys(%$values_ref))
     {
 	my $item_values_ref = $values_ref->{$ns};
-	my $count = scalar(@$item_values_ref);
+	my $total_values = scalar(@$item_values_ref);
 	my $out_key = $cfg_key_out . $ns . ']';
 
-	if ($count < $cfg_minonline)
+	if ($total_values < $cfg_minonline)
 	{
-	    info("$ns success ($count online probes have results, min - $cfg_minonline)");
+	    info("$ns Up (not enough probes with reults, $total_values while $cfg_minonline required)");
 	    push_value($tld, $out_key, $value_ts, UP);
 	    next;
 	}
 
-	my $success_results = 0;
+	my $success_values = 0;
 	foreach (@$item_values_ref)
 	{
 	    info("  ", $_);
-	    $success_results++ if ($check_value_ref->($_) == SUCCESS);
+	    $success_values++ if ($check_value_ref->($_) == SUCCESS);
 	}
 
-	my $success_perc = $success_results * 100 / $count;
-	my $test_result = $success_perc > $unavail_limit ? UP : DOWN;
-	info("$ns ", $test_result == UP ? "success" : "fail", " (", sprintf("%.3f", $success_perc), "% success)");
+	my $perc = $success_values * 100 / $total_values;
+	my $test_result = $perc > $unavail_limit ? UP : DOWN;
+
+	info($ns, ": ", avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 	push_value($tld, $out_key, $value_ts, $test_result);
     }
 }
@@ -1060,6 +1061,19 @@ sub get_down_count
     return $count;
 }
 
+sub avail_result_msg
+{
+    my $test_result = shift;
+    my $success_values = shift;
+    my $total_results = shift;
+    my $perc = shift;
+    my $value_ts = shift;
+
+    my $result_str = ($test_result == UP ? "Up" : "Down");
+
+    return sprintf("$result_str (%d/%d positive, %.3f%%, %s)", $success_values, $total_results, $perc, ts_str($value_ts));
+}
+
 sub slv_exit
 {
     my $rv = shift;
@@ -1105,28 +1119,28 @@ sub dbg
 {
     return unless (defined($OPTS{'debug'}));
 
-    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [DBG] ', @_, "\n"));
+    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [DBG] ', @_, "\n"));
 }
 
 sub info
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
+    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
 }
 
 sub wrn
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
+    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
 }
 
 sub fail
 {
     my $msg = join('', @_);
 
-    __log(join('', __ts(), ' [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
+    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
 
     exit(FAIL);
 }
@@ -1145,6 +1159,18 @@ sub parse_opts
 {
     usage() unless (GetOptions(\%OPTS, "debug!", "stdout!", "test!"));
     $tld = $ARGV[0] if (defined($ARGV[0]));
+}
+
+sub ts_str
+{
+    my $ts = shift;
+    $ts = time() unless ($ts);
+
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ts);
+
+    $year += 1900;
+    $mon++;
+    return sprintf("%4.2d/%2.2d/%2.2d-%2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
 }
 
 sub usage
@@ -1418,15 +1444,6 @@ sub __script
 sub __get_pidfile
 {
     return $pid_dir . '/' . __script() . '.pid';
-}
-
-sub __ts
-{
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
-
-    $year += 1900;
-    $mon++;
-    return sprintf("[%4.2d%2.2d%2.2d:%2.2d%2.2d%2.2d]", $year, $mon, $mday, $hour, $min, $sec);
 }
 
 # return incidents (start and end times) in array:

@@ -39,7 +39,7 @@ foreach (@$tlds_ref)
 
     if ($online_probes < $cfg_minonline)
     {
-	info("success ($online_probes probes are online, min - $cfg_minonline)");
+	info("Up (not enough probes online, $online_probes while $cfg_minonline required)");
 	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
@@ -59,20 +59,20 @@ foreach (@$tlds_ref)
     }
 
     my $values_ref = get_item_values($items_ref, $from, $till);
-    my $probes_with_values = scalar(keys(%$values_ref));
-    if ($probes_with_values < $cfg_minonline)
+    my $total_values = scalar(keys(%$values_ref));
+    if ($total_values < $cfg_minonline)
     {
-	info("success ($probes_with_values online probes have results, min - $cfg_minonline)");
+	info("Up (not enough probes with reults, $total_values while $cfg_minonline required)");
 	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
 
-    my $success_probes = 0;
+    my $success_values = 0;
     foreach my $itemid (keys(%$values_ref))
     {
 	my $probe_result = check_item_values($values_ref->{$itemid});
 
-	$success_probes++ if (SUCCESS == $probe_result);
+	$success_values++ if (SUCCESS == $probe_result);
 
 	my $hostid = -1;
 	foreach (@$items_ref)
@@ -80,6 +80,7 @@ foreach (@$tlds_ref)
 	    if ($_->{'itemid'} == $itemid)
 	    {
 		$hostid = $_->{'hostid'};
+		last;
 	    }
 	}
 
@@ -87,10 +88,10 @@ foreach (@$tlds_ref)
     }
 
     my $test_result = DOWN;
-    my $perc = $success_probes * 100 / scalar(@$items_ref);
+    my $perc = $success_values * 100 / $total_values;
     $test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
 
-    info(($test_result == UP ? "success" : "fail"), " ($perc% UP)");
+    info(avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
     push_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
 

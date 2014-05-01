@@ -40,7 +40,7 @@ foreach (@$tlds_ref)
 
     if ($online_probes < $cfg_minonline)
     {
-	info("success ($online_probes probes are online, min - $cfg_minonline)");
+	info("Up (not enough probes online, $online_probes while $cfg_minonline required)");
 	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
@@ -71,7 +71,7 @@ foreach (@$tlds_ref)
     my $probes_with_values = get_probes_count($items_ref, $values_ref);
     if ($probes_with_values < $cfg_minonline)
     {
-	info("success ($probes_with_values online probes have results, min - $cfg_minonline)");
+	info("Up (not enough probes with reults, $probes_with_values while $cfg_minonline required)");
 	push_value($tld, $cfg_key_out, $value_ts, UP);
 	next;
     }
@@ -83,9 +83,11 @@ foreach (@$tlds_ref)
     }
 
     my $test_result = DOWN;
-    $test_result = UP if ($success_values * 100 / scalar(@$values_ref) > SLV_UNAVAILABILITY_LIMIT);
+    my $total_values = scalar(@$values_ref);
+    my $perc = $success_values * 100 / $total_values;
+    $test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
 
-    info(($test_result == UP ? "success" : "fail"), " (dnssec success: $success_values)");
+    info(avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
     push_value($tld, $cfg_key_out, $value_ts, $test_result);
 }
 
