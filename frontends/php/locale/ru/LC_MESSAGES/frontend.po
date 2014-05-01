@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-27 22:19+0300\n"
+"POT-Creation-Date: 2014-05-01 13:31+0300\n"
 "PO-Revision-Date: 2014-01-26 15:22+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -307,8 +307,8 @@ msgstr "Подтверждение отключено"
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
-#: include/views/configuration.services.edit.php:93
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:92
+#: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
 #: include/views/configuration.template.edit.php:388
 #: include/views/configuration.triggers.edit.php:149
@@ -430,8 +430,8 @@ msgstr "Активно до"
 #: include/views/configuration.item.edit.php:315
 #: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
-#: include/views/configuration.services.edit.php:118
-#: include/views/configuration.services.edit.php:266
+#: include/views/configuration.services.edit.php:117
+#: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
 #: include/views/configuration.template.edit.php:427
@@ -1669,7 +1669,7 @@ msgstr "Не удалось удалить обслуживание"
 msgid "Cannot delete media type"
 msgstr "Не удалось удалить способ оповещения"
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Cannot delete network map"
 msgstr "Не удалось удалить карту сети"
 
@@ -4181,7 +4181,7 @@ msgstr "Дельта (скорость в секунду)"
 msgid "Deny"
 msgstr "Запрещено"
 
-#: include/views/configuration.services.edit.php:279
+#: include/views/configuration.services.edit.php:278
 #: include/views/configuration.triggers.edit.php:289
 #: include/views/configuration.triggers.edit.php:306
 msgid "Dependencies"
@@ -4192,7 +4192,7 @@ msgid "Dependent"
 msgstr "Зависимость"
 
 #: include/triggers.inc.php:1398
-#: include/views/configuration.services.edit.php:115
+#: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:759
 #: tr_status.php:596
 msgid "Depends on"
@@ -4593,8 +4593,8 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Недоступен"
 
-#: include/views/configuration.services.edit.php:140
-#: include/views/configuration.services.edit.php:259
+#: include/views/configuration.services.edit.php:139
+#: include/views/configuration.services.edit.php:258
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:166 report3.php:83
 msgid "Downtime"
@@ -5430,8 +5430,8 @@ msgstr "Пятница"
 
 #: include/reports.inc.php:70 include/reports.inc.php:392
 #: include/views/configuration.action.edit.php:446
-#: include/views/configuration.services.edit.php:226
-#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:251
 #: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:119
 #: report2.php:377 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
@@ -7655,7 +7655,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/configuration.services.edit.php:129 latest.php:353
+#: include/views/configuration.services.edit.php:128 latest.php:353
 #: latest.php:354
 msgid "Interval"
 msgstr "Интервал"
@@ -9418,7 +9418,7 @@ msgstr "Исходящая статистика по сетевому интер
 msgid "Network map added"
 msgstr "Карта сети добавлена"
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Network map deleted"
 msgstr "Карта сети удалена"
 
@@ -9486,7 +9486,7 @@ msgstr "Новое оповещение"
 msgid "New regular expression"
 msgstr "Новое регулярное выражение"
 
-#: include/views/configuration.services.edit.php:262
+#: include/views/configuration.services.edit.php:261
 msgid "New service time"
 msgstr "Новый интервал времени услуги"
 
@@ -9661,7 +9661,7 @@ msgstr "Не получено данных в течении T периода в
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Нет интерфейса по умолчанию для \"%1$s\" типа у \"%2$s\"."
 
-#: include/views/configuration.services.edit.php:90
+#: include/views/configuration.services.edit.php:89
 #: include/views/configuration.triggers.edit.php:273
 #: include/views/configuration.triggers.massupdate.php:84
 msgid "No dependencies defined."
@@ -9876,7 +9876,7 @@ msgid "No items defined."
 msgstr "Элементы данных не заданы."
 
 #: include/items.inc.php:702 include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:114 popup.php:810
+#: include/views/monitoring.overview.php:116 popup.php:810
 msgid "No items found."
 msgstr "Элементы данных не найдены."
 
@@ -10118,7 +10118,7 @@ msgstr "Шаблоны не найдены."
 msgid "No templates linked."
 msgstr "Нет присоединенных шаблонов."
 
-#: include/views/configuration.services.edit.php:127
+#: include/views/configuration.services.edit.php:126
 msgid "No times defined. Work 24x7."
 msgstr "Интервалы не заданы. Работа 24x7."
 
@@ -10296,8 +10296,8 @@ msgstr "Без наблюдения"
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: include/views/configuration.services.edit.php:129
-#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:128
+#: include/views/configuration.services.edit.php:224
 #: include/views/configuration.services.parent.list.php:48
 msgid "Note"
 msgstr "Заметка"
@@ -10600,8 +10600,8 @@ msgstr "Один из объектов остался без группы узл
 msgid "One time only"
 msgstr "Единовременно"
 
-#: include/views/configuration.services.edit.php:145
-#: include/views/configuration.services.edit.php:260
+#: include/views/configuration.services.edit.php:144
+#: include/views/configuration.services.edit.php:259
 msgid "One-time downtime"
 msgstr "Однократная недоступность"
 
@@ -10776,7 +10776,7 @@ msgstr "Оператор"
 #: include/views/configuration.item.massupdate.php:535
 #: include/views/configuration.item.massupdate.php:548
 #: include/views/configuration.triggers.massupdate.php:76
-#: include/views/configuration.triggers.massupdate.php:138
+#: include/views/configuration.triggers.massupdate.php:137
 msgid "Original"
 msgstr "Оригинальное"
 
@@ -11637,8 +11637,8 @@ msgstr "Удаленная команда"
 #: include/views/configuration.item.edit.php:289
 #: include/views/configuration.item.massupdate.php:334
 #: include/views/configuration.maintenance.edit.php:114
-#: include/views/configuration.services.edit.php:108
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:107
+#: include/views/configuration.services.edit.php:159
 #: include/views/configuration.slideconf.edit.php:68
 #: include/views/configuration.sysmap.edit.php:147
 #: include/views/configuration.sysmap.edit.php:165
@@ -11709,7 +11709,7 @@ msgstr "Заменить"
 msgid "Replace applications"
 msgstr "Заменить группы элементов данных"
 
-#: include/views/configuration.triggers.massupdate.php:132
+#: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace depenencies"
 msgstr "Заменить зависимости"
 
@@ -11873,7 +11873,7 @@ msgid "Retries left (descending)"
 msgstr "Количество попыток (в порядке убывания)"
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
-#: include/views/general.warning.php:42
+#: include/views/general.warning.php:40
 msgid "Retry"
 msgstr "Повтор"
 
@@ -12199,14 +12199,14 @@ msgstr "Суббота"
 #: include/views/configuration.maintenance.edit.php:199
 #: include/views/configuration.screen.constructor.edit.php:630
 #: include/views/configuration.screen.edit.php:52
-#: include/views/configuration.services.edit.php:291
+#: include/views/configuration.services.edit.php:290
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
 #: include/views/configuration.template.edit.php:457
 #: include/views/configuration.triggers.edit.php:328
-#: include/views/configuration.triggers.massupdate.php:152
+#: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:107
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
 #: popup_media.php:141 tr_logform.php:374
@@ -12598,7 +12598,7 @@ msgstr "Время на сервере"
 
 #: events.php:548 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:277
 #: include/views/configuration.services.parent.list.php:36 services.php:466
 #: srv_status.php:138
 msgid "Service"
@@ -12644,7 +12644,7 @@ msgstr "Порт сервиса"
 msgid "Service start time must be less than end time."
 msgstr "Время начала услуги должно быть меньше чем время окончания."
 
-#: include/views/configuration.services.edit.php:167
+#: include/views/configuration.services.edit.php:166
 msgid "Service times"
 msgstr "Интервалы времени услуги"
 
@@ -12656,7 +12656,7 @@ msgstr "Тип сервиса"
 msgid "Service updated"
 msgstr "Услуга обновлена"
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Services"
 msgstr "Услуги"
 
@@ -12917,7 +12917,7 @@ msgstr "Slovak (sk_SK)"
 msgid "Snooze"
 msgstr "Заснуть"
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Soft"
 msgstr "Нежесткая"
 
@@ -12963,7 +12963,7 @@ msgstr "Список пакетов приложений - по умолчани
 msgid "Sort by"
 msgstr "Сортировать по"
 
-#: include/views/configuration.services.edit.php:85 services.php:45
+#: include/views/configuration.services.edit.php:84 services.php:45
 msgid "Sort order (0->999)"
 msgstr "Порядок сортировки (0->999)"
 
@@ -13590,8 +13590,8 @@ msgid "Thursday"
 msgstr "Четверг"
 
 #: include/reports.inc.php:74 include/reports.inc.php:396
-#: include/views/configuration.services.edit.php:227
-#: include/views/configuration.services.edit.php:253 popup_period.php:123
+#: include/views/configuration.services.edit.php:226
+#: include/views/configuration.services.edit.php:252 popup_period.php:123
 #: report2.php:379 report3.php:143 report4.php:184 services.php:192
 #: services.php:198
 msgid "Till"
@@ -13610,9 +13610,9 @@ msgstr "До"
 #: include/events.inc.php:282
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
+#: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:252
-#: include/views/configuration.services.edit.php:253
-#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:279
 #: include/views/configuration.triggers.expression.php:86
 #: include/views/configuration.triggers.expression.php:94 jsLoader.php:139
 #: popup_trexpr.php:43
@@ -13757,7 +13757,7 @@ msgstr "Динамика изменений"
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
@@ -13994,7 +13994,7 @@ msgstr "Триггеры удалены"
 msgid "Triggers info"
 msgstr "Информация о триггерах"
 
-#: include/views/configuration.triggers.massupdate.php:147
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Triggers massupdate"
 msgstr "Массовое обновление триггеров"
 
@@ -14067,7 +14067,7 @@ msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не мог�
 #: include/views/configuration.item.massupdate.php:45
 #: include/views/configuration.item.prototype.list.php:56
 #: include/views/configuration.maintenance.list.php:46
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:128
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
 #: include/views/js/configuration.sysmaps.js.php:393
@@ -14496,8 +14496,8 @@ msgstr "Загрузить"
 msgid "Upper level maps"
 msgstr "Карты верхнего уровня"
 
-#: include/views/configuration.services.edit.php:135
-#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:134
+#: include/views/configuration.services.edit.php:257
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:163
 msgid "Uptime"
@@ -15081,6 +15081,7 @@ msgstr "Ср"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
+#: include/views/general.warning.php:22
 msgid "Warning"
 msgstr "Предупреждение"
 
@@ -15733,8 +15734,8 @@ msgid "d M Y"
 msgstr "d M Y"
 
 #: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
-#: include/views/configuration.services.edit.php:146
-#: include/views/configuration.services.edit.php:147 report3.php:159
+#: include/views/configuration.services.edit.php:145
+#: include/views/configuration.services.edit.php:146 report3.php:159
 msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
@@ -15848,8 +15849,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr "ч"
 
-#: include/html.inc.php:647 include/views/configuration.services.edit.php:241
-#: include/views/configuration.services.edit.php:247
+#: include/html.inc.php:647 include/views/configuration.services.edit.php:240
+#: include/views/configuration.services.edit.php:246
 msgid "hh"
 msgstr "чч"
 
@@ -15956,8 +15957,8 @@ msgid "minimum 60 seconds"
 msgstr "минимум 60 секунд"
 
 #: include/html.inc.php:643 include/html.inc.php:649
-#: include/views/configuration.services.edit.php:244
-#: include/views/configuration.services.edit.php:250
+#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:249
 msgid "mm"
 msgstr "мм"
 
@@ -16063,9 +16064,10 @@ msgstr "или"
 msgid "other"
 msgstr "другое"
 
-#: include/page_header.php:125
-msgid "refreshed every"
-msgstr "обновление каждые"
+#: include/page_header.php:125 include/views/general.warning.php:22
+#, c-format
+msgid "refreshed every %1$s sec."
+msgstr ""
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
@@ -16088,7 +16090,6 @@ msgctxt "second short"
 msgid "s"
 msgstr "с"
 
-#: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220
 msgid "sec"
 msgstr "сек"
@@ -16103,7 +16104,7 @@ msgstr "секунд"
 msgid "sent"
 msgstr "отправлено"
 
-#: include/views/configuration.services.edit.php:224
+#: include/views/configuration.services.edit.php:223
 msgid "short description"
 msgstr "краткое описание"
 

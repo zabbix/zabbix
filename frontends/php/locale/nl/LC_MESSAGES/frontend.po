@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-27 22:19+0300\n"
+"POT-Creation-Date: 2014-05-01 13:31+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -303,8 +303,8 @@ msgstr "Bevestigen is uitgeschakeld"
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
-#: include/views/configuration.services.edit.php:93
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:92
+#: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
 #: include/views/configuration.template.edit.php:388
 #: include/views/configuration.triggers.edit.php:149
@@ -424,8 +424,8 @@ msgstr "Actief tot"
 #: include/views/configuration.item.edit.php:315
 #: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
-#: include/views/configuration.services.edit.php:118
-#: include/views/configuration.services.edit.php:266
+#: include/views/configuration.services.edit.php:117
+#: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
 #: include/views/configuration.template.edit.php:427
@@ -1661,7 +1661,7 @@ msgstr "Kan onderhoud niet verwijderen"
 msgid "Cannot delete media type"
 msgstr "Kan het mediatype niet verwijderen"
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Cannot delete network map"
 msgstr "Kan netwerk kaart niet verwijderen"
 
@@ -4148,7 +4148,7 @@ msgstr "Delta (snelheid per seconde)"
 msgid "Deny"
 msgstr "Weiger"
 
-#: include/views/configuration.services.edit.php:279
+#: include/views/configuration.services.edit.php:278
 #: include/views/configuration.triggers.edit.php:289
 #: include/views/configuration.triggers.edit.php:306
 msgid "Dependencies"
@@ -4159,7 +4159,7 @@ msgid "Dependent"
 msgstr "Afhankelijk"
 
 #: include/triggers.inc.php:1398
-#: include/views/configuration.services.edit.php:115
+#: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:759
 #: tr_status.php:596
 msgid "Depends on"
@@ -4558,8 +4558,8 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Uit"
 
-#: include/views/configuration.services.edit.php:140
-#: include/views/configuration.services.edit.php:259
+#: include/views/configuration.services.edit.php:139
+#: include/views/configuration.services.edit.php:258
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:166 report3.php:83
 msgid "Downtime"
@@ -5395,8 +5395,8 @@ msgstr "Vrijdag"
 
 #: include/reports.inc.php:70 include/reports.inc.php:392
 #: include/views/configuration.action.edit.php:446
-#: include/views/configuration.services.edit.php:226
-#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:251
 #: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:119
 #: report2.php:377 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
@@ -7617,7 +7617,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/configuration.services.edit.php:129 latest.php:353
+#: include/views/configuration.services.edit.php:128 latest.php:353
 #: latest.php:354
 msgid "Interval"
 msgstr "Interval"
@@ -9370,7 +9370,7 @@ msgstr ""
 msgid "Network map added"
 msgstr ""
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Network map deleted"
 msgstr ""
 
@@ -9438,7 +9438,7 @@ msgstr "Nieuw media"
 msgid "New regular expression"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:262
+#: include/views/configuration.services.edit.php:261
 msgid "New service time"
 msgstr ""
 
@@ -9613,7 +9613,7 @@ msgstr ""
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr ""
 
-#: include/views/configuration.services.edit.php:90
+#: include/views/configuration.services.edit.php:89
 #: include/views/configuration.triggers.edit.php:273
 #: include/views/configuration.triggers.massupdate.php:84
 msgid "No dependencies defined."
@@ -9828,7 +9828,7 @@ msgid "No items defined."
 msgstr ""
 
 #: include/items.inc.php:702 include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:114 popup.php:810
+#: include/views/monitoring.overview.php:116 popup.php:810
 msgid "No items found."
 msgstr ""
 
@@ -10070,7 +10070,7 @@ msgstr ""
 msgid "No templates linked."
 msgstr ""
 
-#: include/views/configuration.services.edit.php:127
+#: include/views/configuration.services.edit.php:126
 msgid "No times defined. Work 24x7."
 msgstr ""
 
@@ -10248,8 +10248,8 @@ msgstr "Niet gemonitord"
 msgid "Not supported"
 msgstr "Niet ondersteund"
 
-#: include/views/configuration.services.edit.php:129
-#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:128
+#: include/views/configuration.services.edit.php:224
 #: include/views/configuration.services.parent.list.php:48
 msgid "Note"
 msgstr ""
@@ -10552,8 +10552,8 @@ msgstr ""
 msgid "One time only"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:145
-#: include/views/configuration.services.edit.php:260
+#: include/views/configuration.services.edit.php:144
+#: include/views/configuration.services.edit.php:259
 msgid "One-time downtime"
 msgstr ""
 
@@ -10728,7 +10728,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:535
 #: include/views/configuration.item.massupdate.php:548
 #: include/views/configuration.triggers.massupdate.php:76
-#: include/views/configuration.triggers.massupdate.php:138
+#: include/views/configuration.triggers.massupdate.php:137
 msgid "Original"
 msgstr ""
 
@@ -11587,8 +11587,8 @@ msgstr "Remote commando"
 #: include/views/configuration.item.edit.php:289
 #: include/views/configuration.item.massupdate.php:334
 #: include/views/configuration.maintenance.edit.php:114
-#: include/views/configuration.services.edit.php:108
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:107
+#: include/views/configuration.services.edit.php:159
 #: include/views/configuration.slideconf.edit.php:68
 #: include/views/configuration.sysmap.edit.php:147
 #: include/views/configuration.sysmap.edit.php:165
@@ -11659,7 +11659,7 @@ msgstr ""
 msgid "Replace applications"
 msgstr ""
 
-#: include/views/configuration.triggers.massupdate.php:132
+#: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace depenencies"
 msgstr ""
 
@@ -11823,7 +11823,7 @@ msgid "Retries left (descending)"
 msgstr ""
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
-#: include/views/general.warning.php:42
+#: include/views/general.warning.php:40
 msgid "Retry"
 msgstr ""
 
@@ -12149,14 +12149,14 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:199
 #: include/views/configuration.screen.constructor.edit.php:630
 #: include/views/configuration.screen.edit.php:52
-#: include/views/configuration.services.edit.php:291
+#: include/views/configuration.services.edit.php:290
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
 #: include/views/configuration.template.edit.php:457
 #: include/views/configuration.triggers.edit.php:328
-#: include/views/configuration.triggers.massupdate.php:152
+#: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:107
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
 #: popup_media.php:141 tr_logform.php:374
@@ -12548,7 +12548,7 @@ msgstr "Server time"
 
 #: events.php:548 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:277
 #: include/views/configuration.services.parent.list.php:36 services.php:466
 #: srv_status.php:138
 msgid "Service"
@@ -12594,7 +12594,7 @@ msgstr ""
 msgid "Service start time must be less than end time."
 msgstr ""
 
-#: include/views/configuration.services.edit.php:167
+#: include/views/configuration.services.edit.php:166
 msgid "Service times"
 msgstr ""
 
@@ -12606,7 +12606,7 @@ msgstr ""
 msgid "Service updated"
 msgstr "Service bijgewerkt"
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Services"
 msgstr ""
 
@@ -12867,7 +12867,7 @@ msgstr ""
 msgid "Snooze"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Soft"
 msgstr "Soft"
 
@@ -12913,7 +12913,7 @@ msgstr ""
 msgid "Sort by"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:85 services.php:45
+#: include/views/configuration.services.edit.php:84 services.php:45
 msgid "Sort order (0->999)"
 msgstr "Sorteer orde (0->999)"
 
@@ -13537,8 +13537,8 @@ msgid "Thursday"
 msgstr ""
 
 #: include/reports.inc.php:74 include/reports.inc.php:396
-#: include/views/configuration.services.edit.php:227
-#: include/views/configuration.services.edit.php:253 popup_period.php:123
+#: include/views/configuration.services.edit.php:226
+#: include/views/configuration.services.edit.php:252 popup_period.php:123
 #: report2.php:379 report3.php:143 report4.php:184 services.php:192
 #: services.php:198
 msgid "Till"
@@ -13557,9 +13557,9 @@ msgstr "Tot"
 #: include/events.inc.php:282
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
+#: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:252
-#: include/views/configuration.services.edit.php:253
-#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:279
 #: include/views/configuration.triggers.expression.php:86
 #: include/views/configuration.triggers.expression.php:94 jsLoader.php:139
 #: popup_trexpr.php:43
@@ -13704,7 +13704,7 @@ msgstr "Trends"
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
@@ -13937,7 +13937,7 @@ msgstr "Triggers verwijderd"
 msgid "Triggers info"
 msgstr "Triggers info"
 
-#: include/views/configuration.triggers.massupdate.php:147
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Triggers massupdate"
 msgstr "Triggers massa update"
 
@@ -14010,7 +14010,7 @@ msgstr "Twee items (\"%1$s\" en \"%2$s\") kunnen niet beiden het host inventory 
 #: include/views/configuration.item.massupdate.php:45
 #: include/views/configuration.item.prototype.list.php:56
 #: include/views/configuration.maintenance.list.php:46
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:128
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
 #: include/views/js/configuration.sysmaps.js.php:393
@@ -14439,8 +14439,8 @@ msgstr "Upload"
 msgid "Upper level maps"
 msgstr "Kaarten op hoger liggend niveau"
 
-#: include/views/configuration.services.edit.php:135
-#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:134
+#: include/views/configuration.services.edit.php:257
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:163
 msgid "Uptime"
@@ -15022,6 +15022,7 @@ msgstr ""
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
+#: include/views/general.warning.php:22
 msgid "Warning"
 msgstr "Waarschuwing"
 
@@ -15669,8 +15670,8 @@ msgid "d M Y"
 msgstr "d M Y"
 
 #: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
-#: include/views/configuration.services.edit.php:146
-#: include/views/configuration.services.edit.php:147 report3.php:159
+#: include/views/configuration.services.edit.php:145
+#: include/views/configuration.services.edit.php:146 report3.php:159
 msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
@@ -15785,8 +15786,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr ""
 
-#: include/html.inc.php:647 include/views/configuration.services.edit.php:241
-#: include/views/configuration.services.edit.php:247
+#: include/html.inc.php:647 include/views/configuration.services.edit.php:240
+#: include/views/configuration.services.edit.php:246
 msgid "hh"
 msgstr ""
 
@@ -15895,8 +15896,8 @@ msgid "minimum 60 seconds"
 msgstr ""
 
 #: include/html.inc.php:643 include/html.inc.php:649
-#: include/views/configuration.services.edit.php:244
-#: include/views/configuration.services.edit.php:250
+#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:249
 msgid "mm"
 msgstr ""
 
@@ -16002,9 +16003,10 @@ msgstr "of"
 msgid "other"
 msgstr "andere"
 
-#: include/page_header.php:125
-msgid "refreshed every"
-msgstr "ververs elke"
+#: include/page_header.php:125 include/views/general.warning.php:22
+#, c-format
+msgid "refreshed every %1$s sec."
+msgstr ""
 
 #: include/views/administration.general.gui.edit.php:35
 #, fuzzy
@@ -16029,7 +16031,6 @@ msgctxt "second short"
 msgid "s"
 msgstr ""
 
-#: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220
 msgid "sec"
 msgstr "sec"
@@ -16044,7 +16045,7 @@ msgstr "seconden"
 msgid "sent"
 msgstr "Verzonden"
 
-#: include/views/configuration.services.edit.php:224
+#: include/views/configuration.services.edit.php:223
 msgid "short description"
 msgstr "korte beschrijving"
 
