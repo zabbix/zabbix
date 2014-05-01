@@ -4,7 +4,7 @@ New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
