@@ -1408,7 +1408,7 @@ sub create_main_template {
 	if ($OPTS{'epp-commands'}) {
 	    create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, 1);
 	} else {
-	    create_macro('{$RSM.EPP.COMMANDS}', '/opt/epp/'.$tld.'/commands', $templateid);
+	    create_macro('{$RSM.EPP.COMMANDS}', '/opt/test-sla/epp-commands/'.$tld, $templateid);
 	}
 	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, 1);
 	create_macro('{$RSM.EPP.CERT}', encode_base64(read_file($OPTS{'epp-cert'}), ''),  $templateid, 1);
@@ -1901,6 +1901,7 @@ Other options
                 this string represents DOMAIN (in DOMAIN.TLD) to use in EPP commands
 	--epp-commands
                 path to a directory on the Probe Node containing EPP command templates
+		(default: /opt/test-sla/epp-commands/TLD)
         --rdds-ns-string=STRING
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
