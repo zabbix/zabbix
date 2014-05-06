@@ -57,6 +57,12 @@ $fields = array(
 	'new_application'	=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'hostname'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'templated'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'verify_host'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'verify_peer'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'headers'			=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
+	'ssl_cert_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
+	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
+	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, null, null,					'isset({save})'),
 	// actions
 	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
@@ -72,7 +78,7 @@ $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpc
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-$showDisabled = get_request('showdisabled', 1);
+$showDisabled = getRequest('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_INT);
 
 if (!empty($_REQUEST['steps'])) {
@@ -103,7 +109,7 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 // add new steps
 if (isset($_REQUEST['new_httpstep'])) {
-	$_REQUEST['steps'] = get_request('steps', array());
+	$_REQUEST['steps'] = getRequest('steps', array());
 	$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
 	array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
 
@@ -172,30 +178,34 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	clearCookies($dbResult, getRequest('hostid'));
 }
 elseif (isset($_REQUEST['save'])) {
+
+	if (hasRequest('httptestid')) {
+		$action = AUDIT_ACTION_UPDATE;
+		$messageTrue = _('Scenario updated');
+		$messageFalse = _('Cannot update web scenario');
+	}
+	else {
+		$action = AUDIT_ACTION_ADD;
+		$messageTrue = _('Scenario added');
+		$messageFalse = _('Cannot add web scenario');
+	}
+
 	try {
 		DBstart();
-
-		if (isset($_REQUEST['httptestid'])) {
-			$action = AUDIT_ACTION_UPDATE;
-			$message_true = _('Scenario updated');
-			$message_false = _('Cannot update web scenario');
-		}
-		else {
-			$action = AUDIT_ACTION_ADD;
-			$message_true = _('Scenario added');
-			$message_false = _('Cannot add web scenario');
-		}
 
 		if (!empty($_REQUEST['applicationid']) && !empty($_REQUEST['new_application'])) {
 			throw new Exception(_('Cannot create new application, web scenario is already assigned to application.'));
 		}
 
-		$steps = get_request('steps', array());
+		$steps = getRequest('steps', array());
 		if (!empty($steps)) {
 			$i = 1;
-			foreach ($steps as $snum => $step) {
-				$steps[$snum]['no'] = $i++;
+			foreach ($steps as $stepNumber => &$step) {
+				$step['no'] = $i++;
+				$step['follow_redirects'] = $step['follow_redirects'] ? 1 : 0;
+				$step['retrieve_mode'] = $step['retrieve_mode'] ? 1 : 0;
 			}
+			unset($step);
 		}
 
 		$httpTest = array(
@@ -209,7 +219,13 @@ elseif (isset($_REQUEST['save'])) {
 			'agent' => $_REQUEST['agent'],
 			'variables' => $_REQUEST['variables'],
 			'http_proxy' => $_REQUEST['http_proxy'],
-			'steps' => $steps
+			'steps' => $steps,
+			'verify_peer' => hasRequest('verify_peer') ? 1 : 0,
+			'verify_host' => hasRequest('verify_host') ? 1 : 0,
+			'ssl_cert_file' => getRequest('ssl_cert_file'),
+			'ssl_key_file' => getRequest('ssl_key_file'),
+			'ssl_key_password' => getRequest('ssl_key_password'),
+			'headers' => getRequest('headers')
 		);
 
 		if (!empty($_REQUEST['new_application'])) {
@@ -279,14 +295,14 @@ elseif (isset($_REQUEST['save'])) {
 			else {
 				clearCookies($result, $_REQUEST['hostid']);
 			}
-			$httptestid = reset($result['httptestids']);
+			$httpTestId = reset($result['httptestids']);
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit($action, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$_REQUEST['name'].'] ['.$httptestid.'] Host ['.$host['host'].']');
 
 		unset($_REQUEST['httptestid'], $_REQUEST['form']);
-		show_messages(true, $message_true);
+		show_messages(true, $messageTrue);
 		DBend(true);
 	}
 	catch (Exception $e) {
@@ -296,7 +312,7 @@ elseif (isset($_REQUEST['save'])) {
 		if (!empty($msg)) {
 			error($msg);
 		}
-		show_messages(false, null, $message_false);
+		show_messages(false, null, $messageFalse);
 	}
 }
 elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasRequest('group_httptestid')) {
@@ -386,10 +402,10 @@ show_messages();
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'hostid' => get_request('hostid', 0),
-		'httptestid' => get_request('httptestid', null),
-		'form' => get_request('form'),
-		'form_refresh' => get_request('form_refresh'),
+		'hostid' => getRequest('hostid', 0),
+		'httptestid' => getRequest('httptestid', null),
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh'),
 		'templates' => array()
 	);
 
@@ -441,6 +457,12 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $dbHttpTest['http_password'];
 		$data['http_proxy'] = $dbHttpTest['http_proxy'];
 		$data['templated'] = (bool) $dbHttpTest['templateid'];
+		$data['headers'] = $dbHttpTest['headers'];
+		$data['verify_peer'] = $dbHttpTest['verify_peer'];
+		$data['verify_host'] = $dbHttpTest['verify_host'];
+		$data['ssl_cert_file'] = $dbHttpTest['ssl_cert_file'];
+		$data['ssl_key_file'] = $dbHttpTest['ssl_key_file'];
+		$data['ssl_key_password'] = $dbHttpTest['ssl_key_password'];
 		$data['steps'] = DBfetchArray(DBselect('SELECT h.* FROM httpstep h WHERE h.httptestid='.zbx_dbstr($_REQUEST['httptestid']).' ORDER BY h.no'));
 	}
 	else {
@@ -451,19 +473,25 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = HTTPTEST_STATUS_ACTIVE;
 		}
 
-		$data['name'] = get_request('name', '');
-		$data['applicationid'] = get_request('applicationid');
-		$data['new_application'] = get_request('new_application', '');
-		$data['delay'] = get_request('delay', 60);
-		$data['retries'] = get_request('retries', 1);
-		$data['agent'] = get_request('agent', '');
-		$data['variables'] = get_request('variables', array());
-		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
-		$data['http_user'] = get_request('http_user', '');
-		$data['http_password'] = get_request('http_password', '');
-		$data['http_proxy'] = get_request('http_proxy', '');
-		$data['templated'] = get_request('templated');
-		$data['steps'] = get_request('steps', array());
+		$data['name'] = getRequest('name', '');
+		$data['applicationid'] = getRequest('applicationid');
+		$data['new_application'] = getRequest('new_application', '');
+		$data['delay'] = getRequest('delay', 60);
+		$data['retries'] = getRequest('retries', 1);
+		$data['agent'] = getRequest('agent', '');
+		$data['variables'] = getRequest('variables', array());
+		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
+		$data['http_user'] = getRequest('http_user', '');
+		$data['http_password'] = getRequest('http_password', '');
+		$data['http_proxy'] = getRequest('http_proxy', '');
+		$data['templated'] = getRequest('templated');
+		$data['steps'] = getRequest('steps', array());
+		$data['headers'] = getRequest('headers');
+		$data['verify_peer'] = getRequest('verify_peer');
+		$data['verify_host'] = getRequest('verify_host');
+		$data['ssl_cert_file'] = getRequest('ssl_cert_file');
+		$data['ssl_key_file'] = getRequest('ssl_key_file');
+		$data['ssl_key_password'] = getRequest('ssl_key_password');
 	}
 
 	$data['application_list'] = array();
@@ -488,8 +516,8 @@ else {
 			'editable' => true,
 			'templated_hosts' => true
 		),
-		'hostid' => get_request('hostid'),
-		'groupid' => get_request('groupid')
+		'hostid' => getRequest('hostid'),
+		'groupid' => getRequest('groupid')
 	));
 
 	$data = array(
@@ -501,7 +529,7 @@ else {
 	);
 
 	if ($data['pageFilter']->hostsSelected) {
-		$sortfield = getPageSortField('hostname');
+		$sortField = getPageSortField('hostname');
 
 		$options = array(
 			'editable' => true,
@@ -519,19 +547,42 @@ else {
 		}
 		$httpTests = API::HttpTest()->get($options);
 
-		order_result($httpTests, $sortfield, getPageSortOrder());
+		order_result($httpTests, $sortField, getPageSortOrder());
 
 		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
 
+		$selectFields = array(
+			'ht.httptestid',
+			'ht.name',
+			'ht.delay',
+			'ht.status',
+			'ht.hostid',
+			'ht.templateid',
+			'h.name AS hostname',
+			'ht.retries',
+			'ht.authentication',
+			'ht.http_proxy',
+			'a.name AS application_name'
+		);
+
 		$dbHttpTests = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.
+			'SELECT '.join(',', $selectFields).
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
+				' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
 				' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
 		);
-		$httpTests = array();
+			$httpTests = array();
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
+
+		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
+
+		foreach ($httpTestsLastData as $httpTestId => &$lastData) {
+			if($lastData['lastfailedstep'] !== null) {
+				$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
+			}
 		}
 
 		$dbHttpSteps = DBselect(
@@ -544,12 +595,21 @@ else {
 			$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
 		}
 
-		order_result($httpTests, $sortfield, getPageSortOrder());
+		order_result($httpTests, $sortField, getPageSortOrder());
 
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
+		$data['httpTestsLastData'] = $httpTestsLastData;
 	}
+
+	$host = API::Host()->get(array(
+		'output' => array('hostid', 'status'),
+		'hostids' => getRequest('hostid'),
+	));
+	$host = reset($host);
+
+	$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 
 	// render view
 	$httpView = new CView('configuration.httpconf.list', $data);

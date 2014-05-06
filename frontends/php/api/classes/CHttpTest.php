@@ -451,6 +451,12 @@ class CHttpTest extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 			}
 
+			if (isset($httpTest['headers']) && strlen($httpTest['headers']) > 2048) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maximum length of web scenario headers (2048 characters) exceeded.'));
+			}
+
+			$this->checkSslParameters($httpTest);
+
 			if (empty($httpTest['steps'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 			}
@@ -484,6 +490,10 @@ class CHttpTest extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
 
+			if (isset($httpTest['headers']) && strlen($httpTest['headers']) > 2048) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maximum length of web scenario headers (2048 characters) exceeded.'));
+			}
+
 			if (isset($httpTest['name'])) {
 				// get hostid from db if it's not provided
 				if (isset($httpTest['hostid'])) {
@@ -507,6 +517,8 @@ class CHttpTest extends CApiService {
 			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
+
+			$this->checkSslParameters($httpTest);
 
 			if (isset($httpTest['steps'])) {
 				$this->checkSteps($httpTest);
@@ -568,6 +580,31 @@ class CHttpTest extends CApiService {
 			}
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
+			}
+
+			if (isset($step['headers']) && strlen($step['headers']) > 2048) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Maximum length of web scenario headers (2048 characters) exceeded for step "%1$s".', $step['name'])
+				);
+			}
+
+			if (isset($step['follow_redirects'])) {
+				if (!in_array($step['follow_redirects'], array(0, 1))) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_('Bad value for "follow_redirects" parameter for step "%1$s".', $step['name'])
+					);
+				}
+			}
+
+			if (isset($step['retrieve_mode'])) {
+				if (!in_array($step['retrieve_mode'], array(0, 1))) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Bad value for "retrieve_mode" parameter for step "%1$s".', $step['name'])
+					);
+				}
 			}
 		}
 	}
@@ -735,5 +772,33 @@ class CHttpTest extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param $httpTest
+	 *
+	 * @throws APIException if bad value for "verify_peer" parameter.
+	 * @throws APIException if bad value for "verify_host" parameter.
+	 * @throws APIException if image with same name already exists.
+	 */
+	protected function checkSslParameters($httpTest) {
+		if (isset($httpTest['verify_peer'])) {
+			if (!in_array($httpTest['verify_peer'], array(0, 1))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Bad value for "verify_peer" parameter.'));
+			}
+		}
+
+		if (isset($httpTest['verify_host'])) {
+			if (!in_array($httpTest['verify_host'], array(0, 1))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Bad value for "verify_host" parameter.'));
+			}
+		}
+
+		$sslCertFile = isset($httpTest['ssl_cert_file']) ? $httpTest['ssl_cert_file'] : '';
+		$sslKeyFile = isset($httpTest['ssl_key_file']) ? $httpTest['ssl_key_file'] : '';
+
+		if (($sslCertFile !== '') && ($sslKeyFile === '')) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('SSL key file is required for SSL cert file.'));
+		}
 	}
 }
