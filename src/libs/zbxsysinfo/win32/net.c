@@ -25,11 +25,11 @@
 /*
  * returns interface description encoded in UTF-8 format
  */
-static LPSTR	get_if_description(MIB_IFROW *pIfRow)
+static char	*get_if_description(MIB_IFROW *pIfRow)
 {
-	static LPTSTR	(*mb_to_unicode)(LPCSTR) = NULL;
-	LPTSTR		wdescr;
-	LPSTR		utf8_descr;
+	static wchar_t *(*mb_to_unicode)(const char *) = NULL;
+	wchar_t 	*wdescr;
+	char		*utf8_descr;
 
 	if (NULL == mb_to_unicode)
 	{
@@ -99,7 +99,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		LPSTR	utf8_descr;
+		char	*utf8_descr;
 
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
 		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
@@ -244,7 +244,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
-	LPSTR		utf8_descr;
+	char 		*utf8_descr;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -378,7 +378,7 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			LPSTR	utf8_descr;
+			char	*utf8_descr;
 
 			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
 			if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))

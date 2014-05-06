@@ -27,7 +27,7 @@ BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;
 BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD) = NULL;
 BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
 
-static FARPROC	GetProcAddressAndLog(HMODULE hModule, LPCSTR procName)
+static FARPROC	GetProcAddressAndLog(HMODULE hModule, const char *procName)
 {
 	FARPROC	ptr;
 
