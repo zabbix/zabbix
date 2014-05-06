@@ -74,11 +74,21 @@ use constant ZBX_EC_EPP_UPDATEINVAL   => -208; # invalid reply to UPDATE command
 use constant ZBX_EC_EPP_INFOTO        => -209; # INFO command timeout
 use constant ZBX_EC_EPP_INFOINVAL     => -210; # invalid reply to INFO command
 
+use constant RSM_ROLLWEEK_THRESHOLDS => '0,5,10,25,50,75,100';
+
 use constant cfg_probe_status_delay => 60;
 use constant cfg_default_rdds_ns_string => 'Name Server:';
 
 use constant rsm_host => 'rsm'; # global config history
 use constant rsm_group => 'rsm';
+
+my $trigger_rollweek_thresholds = { '1' => {'threshold' => '10', 'priority' => 2},
+				    '2' => {'threshold' => '25', 'priority' => 3},
+				    '3' => {'threshold' => '50', 'priority' => 3},
+				    '4' => {'threshold' => '75', 'priority' => 4},
+				    '5' => {'threshold' => '90', 'priority' => 4},
+				    '6' => {'threshold' => '100', 'priority' => 5}
+				  };
 
 my %OPTS;
 my $rv = GetOptions(\%OPTS,
@@ -207,7 +217,7 @@ create_macro('{$RSM.SLV.EPP.LOGIN}', 99, undef);
 create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
 create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
 
-create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', '0,5,10,25,50,75,100', undef);
+create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', RSM_ROLLWEEK_THRESHOLDS, undef);
 create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef);
 
 my $result;
@@ -1488,58 +1498,31 @@ sub create_slv_items {
 
     create_slv_item('DNS weekly unavailability', 'rsm.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=10|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>10)&'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<25',
-                        'priority' => '2',
+    my $depend_down;
+                                
+    foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
+	my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+	my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+        next if ($threshold eq 0);
+
+        $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > '.$threshold.'%',
+                         'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}='.$threshold.'|'.
+                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>'.$threshold,
+                        'priority' =>  $priority,
                 };
 
-    create_trigger($options);
+        my $triggerid = create_trigger($options);
 
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=25|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>25)&'.
-                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<50',
-                        'priority' => '3',
-                };
+	$triggerid = $triggerid->{'triggerids'}[0];
 
-    create_trigger($options);
+        if (defined($depend_down)) {
+            my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+        }
+        
+        $depend_down = $triggerid;
+    }
 
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=50|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>50)&'.
-                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<75',
-                        'priority' => '3',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}>75|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>75)&'.
-                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<90',
-                        'priority' => '4',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-                         'expression' => '({'.$host_name.':rsm.slv.dns.rollweek.last(0)}=90|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>90)&'.
-                                        '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}<100',
-                        'priority' => '4',
-                };
-
-    create_trigger($options);
-
-    $options = { 'description' => 'DNS-ROLLWEEK {HOST.NAME}: 5.2.5 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-                         'expression' => '{'.$host_name.':rsm.slv.dns.rollweek.last(0)}=100|'.
-					'{'.$host_name.':rsm.slv.dns.rollweek.last(0)}>100',
-                        'priority' => '5',
-                };
-
-    create_trigger($options);
+    undef($depend_down);
 
     if (defined($OPTS{'dnssec'})) {
 	create_slv_item('DNSSEC availability', 'rsm.slv.dnssec.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
@@ -1558,53 +1541,33 @@ sub create_slv_items {
 
 	create_slv_item('DNSSEC weekly unavailability', 'rsm.slv.dnssec.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 10%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>10&'.
-			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<25',
-			 'priority' => '2',
-	};
+        my $depend_down;
 
-	create_trigger($options);
+	foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
+    	    my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+    	    my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+    	    next if ($threshold eq 0);
 
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 25%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>25&'.
-			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<50',
-			 'priority' => '3',
-	};
+            $options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+                         'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>'.$threshold.'|'.
+					    '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}='.$threshold,
+                        'priority' =>  $priority,
+                };
 
-	create_trigger($options);
+	    my $triggerid = create_trigger($options);
 
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 50%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>50&'.
-			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<75',
-			 'priority' => '3',
-	};
+    	    $triggerid = $triggerid->{'triggerids'}[0];
 
-	create_trigger($options);
+	    if (defined($depend_down)) {
+    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	    }
 
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 75%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>75&'.
-			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<90',
-			 'priority' => '4',
-	};
+    	    $depend_down = $triggerid;
+        }
 
-	create_trigger($options);
-
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 90%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>90&'.
-			 '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}<100',
-			 'priority' => '4',
-	};
-
-	create_trigger($options);
-
-	$options = { 'description' => 'DNSSEC-ROLLWEEK {HOST.NAME}: 5.3.4 - Proper resolution [{ITEM.LASTVALUE1}] > 100%',
-		     'expression' => '{'.$host_name.':rsm.slv.dnssec.rollweek.last(0)}>100',
-		     'priority' => '5',
-	};
-
-	create_trigger($options);
+	undef($depend_down);
     }
+
 
     if (defined($OPTS{'rdds43-servers'})) {
 	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
@@ -1623,52 +1586,32 @@ sub create_slv_items {
 
 	create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-        $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>10&'.
-			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<25',
-			 'priority' => '2',
-	};
+        my $depend_down;
 
-	create_trigger($options);
+	foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
+    	    my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+    	    my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+    	    next if ($threshold eq 0);
 
-	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>25&'.
-			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<50',
-			 'priority' => '3',
-	};
+            $options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+                         'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>'.$threshold.'|'.
+					    '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}='.$threshold,
+                        'priority' => $priority,
+                };
 
-	create_trigger($options);
+	    my $triggerid = create_trigger($options);
 
-	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>50&'.
-			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<75',
-			 'priority' => '3',
-	};
+    	    $triggerid = $triggerid->{'triggerids'}[0];
 
-	create_trigger($options);
+	    if (defined($depend_down)) {
+    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	    }
 
-	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>75&'.
-			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<90',
-			 'priority' => '4',
-	};
+    	    $depend_down = $triggerid;
+        }
 
-	create_trigger($options);
+	undef($depend_down);
 
-	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>90&'.
-			 '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}<100',
-			 'priority' => '4',
-	};
-
-	create_trigger($options);
-
-	$options = { 'description' => 'RDDS-ROLLWEEK {HOST.NAME}: 6.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-		     'expression' => '{'.$host_name.':rsm.slv.rdds.rollweek.last(0)}>100',
-		     'priority' => '5',
-	};
-
-	create_trigger($options);
 
 	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'rsm.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'rsm.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
@@ -1695,59 +1638,31 @@ sub create_slv_items {
 
 	create_trigger($options);
 
-        $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 10%',
-                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=10|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>10)&'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<25',
-                        'priority' => '2',
+        my $depend_down;
+
+	foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
+    	    my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+    	    my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+    	    next if ($threshold eq 0);
+
+            $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
+					    '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
+                        'priority' =>  $priority,
                 };
 
-	create_trigger($options);
+	    my $triggerid = create_trigger($options);
 
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 25%',
-                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=25|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>25)&'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<50',
-                        'priority' => '3',
-                };
+    	    $triggerid = $triggerid->{'triggerids'}[0];
 
-	create_trigger($options);
+	    if (defined($depend_down)) {
+    	        my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
+    	    }
 
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 50%',
-                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=50|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>50)&'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<75',
-                        'priority' => '3',
-                };
+    	    $depend_down = $triggerid;
+        }
 
-	create_trigger($options);
-
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 75%',
-                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}>75|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>75)&'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<90',
-                        'priority' => '4',
-                };
-
-	create_trigger($options);
-
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 90%',
-                         'expression' => '({'.$host_name.':rsm.slv.epp.rollweek.last(0)}=90|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>90)&'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}<100',
-                        'priority' => '4',
-                };
-
-	create_trigger($options);
-
-        $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] > 100%',
-                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}=100|'.
-                                        '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>100',
-                        'priority' => '5',
-                };
-
-	create_trigger($options);
-
+	undef($depend_down);
     }
 }
 
