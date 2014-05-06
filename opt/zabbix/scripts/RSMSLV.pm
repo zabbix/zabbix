@@ -386,12 +386,22 @@ sub get_tld_items
     return \@items;
 }
 
+sub handle_db_error
+{
+    my $msg = shift;
+
+    fail("cannot connect to database: $msg");
+}
+
 sub db_connect
 {
-    fail("cannot connect to database")
-	unless(defined($dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
-					   $config->{'db'}->{'user'},
-					   $config->{'db'}->{'password'})));
+    $dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
+			$config->{'db'}->{'user'},
+			$config->{'db'}->{'password'},
+			{
+			    PrintError  => 0,
+			    HandleError => \&handle_db_error,
+			}) or handle_db_error(DBI->errstr);
 }
 
 sub db_select
