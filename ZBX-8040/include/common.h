@@ -946,13 +946,13 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
-LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
-int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
-LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
-LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
-LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
-int	_wis_uint(LPCTSTR wide_string);
+wchar_t	*zbx_acp_to_unicode(const char *acp_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
+int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
+char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
+char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);
+int	_wis_uint(const wchar_t *wide_string);
 #endif
 void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);

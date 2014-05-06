@@ -218,7 +218,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 #ifdef _WINDOWS
 	PDNS_RECORD	pQueryResults, pDnsRecord;
-	LPTSTR		wzone;
+	wchar_t		*wzone;
 	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 #else
 	char		*name;
