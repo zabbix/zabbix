@@ -295,27 +295,17 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 				smtp_server, zbx_tcp_strerror());
 		goto close;
 	}
-
-	/* '220' response code may be multi-line
-	 * then '220-' (220 + hyphen) stands for new line
-	 * and  '220 ' (220 + space) marks last line.
-	 * Loop thorough SMTP answers while last line of greeting is reached */
-
-	do
+	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
 	{
-		if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
-		{
-			zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
-					zbx_strerror(errno));
-			goto out;
-		}
-		if (0 != strncmp(cmd, OK_220, strlen(OK_220)))
-		{
-			zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
-			goto out;
-		}
+		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
+				zbx_strerror(errno));
+		goto out;
 	}
-	while ('-' == *(cmd + 3));
+	if (0 != strncmp(cmd, OK_220, strlen(OK_220)))
+	{
+		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server [%s]", cmd);
+		goto out;
+	}
 
 	/* send HELO */
 
