@@ -331,7 +331,7 @@ class CScreen extends CApiService {
 	 * @return bool
 	 */
 	public function exists($data) {
-		self::deprecated('screen.exists method is deprecated.');
+		$this->deprecated('screen.exists method is deprecated.');
 
 		$screens = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('screenid', 'name')), $data),

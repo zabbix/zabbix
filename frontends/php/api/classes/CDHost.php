@@ -192,7 +192,7 @@ class CDHost extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('dhost.exists method is deprecated.');
+		$this->deprecated('dhost.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('dhostid')), $object),
