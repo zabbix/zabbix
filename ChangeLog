@@ -50,6 +50,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...... [ZBX-8031] removed pre-processor aliases for Windows string functions; converted all references of Windows types to standard C types (Juris)
 .......PS. [ZBX-7534] removed the limit of authorization string (Nikolaj)
 ..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
 A.F....... [ZBX-8118] changed image update so that image type can not be changed after create (Krists)
