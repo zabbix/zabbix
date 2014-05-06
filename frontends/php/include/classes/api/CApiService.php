@@ -545,13 +545,6 @@ class CApiService {
 				}
 
 				$sqlParts = $this->applyQuerySortField($sortfield, $sortorder, $tableAlias, $sqlParts);
-
-				// add sort field to select if distinct is used
-				if (count($sqlParts['from']) > 1) {
-					if (!str_in_array($tableAlias.'.'.$sortfield, $sqlParts['select']) && !str_in_array($tableAlias.'.*', $sqlParts['select'])) {
-						$sqlParts['select'][$sortfield] = $tableAlias.'.'.$sortfield;
-					}
-				}
 			}
 		}
 
@@ -569,6 +562,13 @@ class CApiService {
 	 * @return array
 	 */
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
+		// add sort field to select if distinct is used
+		if (count($sqlParts['from']) > 1) {
+			if (!str_in_array($alias.'.'.$sortfield, $sqlParts['select']) && !str_in_array($alias.'.*', $sqlParts['select'])) {
+				$sqlParts['select'][$sortfield] = $alias.'.'.$sortfield;
+			}
+		}
+
 		$sqlParts['order'][$alias.'.'.$sortfield] = $alias.'.'.$sortfield.$sortorder;
 
 		return $sqlParts;
