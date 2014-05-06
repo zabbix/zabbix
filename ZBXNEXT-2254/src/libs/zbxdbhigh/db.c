@@ -1582,6 +1582,9 @@ int	DBtxn_ongoing()
 int	DBtable_exists(const char *table_name)
 {
 	char		*table_name_esc;
+#ifdef HAVE_POSTGRESQL
+	char		*table_schema_esc;
+#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -1605,12 +1608,18 @@ int	DBtable_exists(const char *table_name)
 				" and lower(tname)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+			"public" : CONFIG_DBSCHEMA);
+
 	result = DBselect(
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
-				" and table_schema='public'",
-			table_name_esc);
+				" and table_schema='%s'",
+			table_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
+
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
