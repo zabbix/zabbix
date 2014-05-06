@@ -265,37 +265,37 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\r\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "220-", "QUIT\r\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "220-", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "http"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_HTTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, NULL, &value_int);
 	}
 	else if (0 == strcmp(service, "pop"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", NULL, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "nntp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", NULL, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "imap"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", "a1 LOGOUT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", NULL, "a1 LOGOUT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "tcp"))
 	{
@@ -304,7 +304,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Required \"port\" parameter missing"));
 			return ret;
 		}
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, NULL, &value_int);
 	}
 #ifdef HAVE_LIBCURL
 	else if (0 == strcmp(service, "https"))

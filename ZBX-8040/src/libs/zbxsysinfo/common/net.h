@@ -89,7 +89,7 @@
 extern char	*CONFIG_SOURCE_IP;
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int);
+		const char *expect, const char *ignore, const char *sendtoclose, int *value_int);
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);

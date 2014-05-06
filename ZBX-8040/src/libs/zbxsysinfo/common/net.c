@@ -36,7 +36,7 @@
  * 1 - OK
  * */
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int)
+		const char *expect, const char *ignore, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
@@ -58,11 +58,8 @@ wait_for_220sp:
 				{
 					val = FAIL;
 				}
-				if (0 == strncmp(buf, "220", 3))
-				{
-					if ('-' == *(buf + 3))
-						goto wait_for_220sp;
-				}
+				if ((NULL != ignore) && (0 == strncmp(buf, ignore, strlen(ignore))))
+					goto wait_for_220sp;
 			}
 		}
 
@@ -104,7 +101,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;
