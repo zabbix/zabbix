@@ -63,6 +63,17 @@ if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid'])
 
 $itemid = get_request('itemid', 0);
 
+$item = API::Item()->get(array(
+	'output' => array('key_'),
+	'selectHosts' => array('host'),
+	'itemids' => $itemid,
+	'limit' => 1
+));
+$item = reset($item);
+$host = reset($item['hosts']);
+
+$constructor = new CRegexpTriggerConstructor();
+
 /**
  * Save a trigger
  */
@@ -70,7 +81,7 @@ if (isset($_REQUEST['save_trigger'])) {
 	show_messages();
 
 	$exprs = get_request('expressions', false);
-	if($exprs && ($expression = construct_expression($_REQUEST['itemid'], $exprs))){
+	if($exprs && ($expression = $constructor->constructFromExpressions($host['host'], $item['key_'], $exprs))){
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
 
 		$now=time();
@@ -216,7 +227,7 @@ if(isset($_REQUEST['sform'])){
 			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
 
 			$expressions[$id]['value'] = trim($value);
-			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
+			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(CRegexpTriggerConstructor::EXPRESSION_TYPE_EXCLUDE):(CRegexpTriggerConstructor::EXPRESSION_TYPE_INCLUDE);
 		}
 
 		foreach($expr_v as $id => $expr) {
@@ -285,8 +296,8 @@ if(isset($_REQUEST['sform'])){
 
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(REGEXP_INCLUDE,_('Include'));
-		$exp_select->addItem(REGEXP_EXCLUDE,_('Exclude'));
+		$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_INCLUDE,_('Include'));
+		$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_EXCLUDE,_('Exclude'));
 
 
 	$ctb = new CTextBox('expression','',80);
@@ -311,9 +322,10 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
+	$expression = $expressions ? $constructor->constructFromExpressions($host['host'], $item['key_'], $expressions) : '';
 	$expressionData = new CTriggerExpression();
 	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !$expressionData->parse(empty($expressions) ? '' : construct_expression($itemid, $expressions))
+			&& !$expressionData->parse($expression)
 			&& !isset($_REQUEST['form_refresh'])) {
 
 		info($expressionData->error);
@@ -338,7 +350,7 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(_('Delete'),'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==CRegexpTriggerConstructor::EXPRESSION_TYPE_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 

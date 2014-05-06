@@ -750,9 +750,6 @@ define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
 
-define('REGEXP_INCLUDE', 0);
-define('REGEXP_EXCLUDE', 1);
-
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
