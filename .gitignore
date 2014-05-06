@@ -275,10 +275,6 @@ src/zabbix_server/housekeeper/Makefile.in
 src/zabbix_server/httppoller/.deps
 src/zabbix_server/httppoller/Makefile
 src/zabbix_server/httppoller/Makefile.in
-src/zabbix_server/nodewatcher/.deps
-src/zabbix_server/nodewatcher/.dirstamp
-src/zabbix_server/nodewatcher/Makefile
-src/zabbix_server/nodewatcher/Makefile.in
 src/zabbix_server/pinger/.deps
 src/zabbix_server/pinger/Makefile
 src/zabbix_server/pinger/Makefile.in
