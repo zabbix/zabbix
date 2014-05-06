@@ -97,6 +97,24 @@ lbl_ret:
 }
 #endif	/* HAVE_LDAP */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: find_ssh_ident_string                                            *
+ *                                                                            *
+ * Purpose: parse recv_buf for ssh identification string as per               *
+ *          RFC 4253, section 4.2                                             *
+ *                                                                            *
+ * Parameters: recv_buf [IN] - buffer to parse                                *
+ *             remote_major [OUT] - memory pointer where protocol major is    *
+ *                                  to be written to                          *
+ *             remote_minor [OUT] - memory pointer where protocol minor is    *
+ *                                  to be written to                          *
+ *                                                                            *
+ * Returns: SUCCEED - if a string matching the specification is found         *
+ *          FAIL - otherwise                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
 static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *remote_minor)
 {
 	const char	*r = NULL, *l = recv_buf;
