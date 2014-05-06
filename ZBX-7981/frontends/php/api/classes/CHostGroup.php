@@ -397,7 +397,7 @@ class CHostGroup extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('hostgroup.exists method is deprecated.');
+		$this->deprecated('hostgroup.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array('name', 'groupid'), $object),
