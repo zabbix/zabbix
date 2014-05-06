@@ -1815,7 +1815,10 @@ class CTrigger extends CTriggerGeneral {
 
 			if (is_array($options['selectLastEvent'])) {
 				$pkFieldId = $this->pk('events');
-				$outputFields = array($pkFieldId => $this->fieldId($pkFieldId, 'e'));
+				$outputFields = array(
+					'objectid' => $this->fieldId('objectid', 'e'),
+					$pkFieldId => $this->fieldId($pkFieldId, 'e')
+				);
 
 				foreach ($options['selectLastEvent'] as $field) {
 					if ($this->hasField($field, 'events')) {
@@ -1830,18 +1833,18 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$dbEvents = DBselect(
-				'SELECT e.objectid,'.$outputFields.
+				'SELECT '.$outputFields.
 				' FROM ('.
 					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
 					' FROM events e2'.
 					' WHERE e2.object='.EVENT_OBJECT_TRIGGER.
 						' AND e2.source='.EVENT_SOURCE_TRIGGERS.
 						' AND '.dbConditionInt('e2.objectid', $triggerids).
-					' GROUP BY e2.objectid) e2,'.
-					' events e'.
+					' GROUP BY e2.objectid'.
+				') e2, events e'.
 				' WHERE e.objectid=e2.objectid'.
-				' AND e.clock=e2.clock'.
-				' AND e.eventid=e2.eventid'
+					' AND e.clock=e2.clock'.
+					' AND e.eventid=e2.eventid'
 			);
 
 			while ($dbEvent = DBfetch($dbEvents)) {
