@@ -57,10 +57,10 @@ unless ( check_have_partition() ) {
     exit 1;
 }
 
-my $sth = $dbh->prepare(qq{SELECT table_name, partition_name, lower(partition_method) as partition_method, 
-				    rtrim(ltrim(partition_expression)) as partition_expression, 
-			    partition_description, table_rows 
-			    FROM information_schema.partitions 
+my $sth = $dbh->prepare(qq{SELECT table_name, partition_name, lower(partition_method) as partition_method,
+				    rtrim(ltrim(partition_expression)) as partition_expression,
+			    partition_description, table_rows
+			    FROM information_schema.partitions
 			    WHERE partition_name IS NOT NULL AND table_schema = ?});
 $sth->execute($db_schema);
 
@@ -90,7 +90,7 @@ $dbh->disconnect();
 sub check_have_partition {
     my $result = 0;
     my $sth = $dbh->prepare(qq{SELECT variable_value FROM information_schema.global_variables WHERE variable_name = 'have_partitioning'});
-    
+
     $sth->execute();
 
     my $row = $sth->fetchrow_array();
@@ -125,7 +125,7 @@ sub create_next_partition {
 	    syslog(LOG_DEBUG, $query);
 	    $dbh->do($query);
         }
-    }    
+    }
 }
 
 
@@ -157,11 +157,11 @@ sub remove_old_partitions {
     }
 
     foreach my $partition (sort keys %{$table_part}) {
-	if ($table_part->{$partition}->{'partition_description'} <= $curr_date->epoch) {	
+	if ($table_part->{$partition}->{'partition_description'} <= $curr_date->epoch) {
 	    syslog(LOG_INFO, "Removing old $partition partition from $table_name table");
-	    
+
 	    my $query = "ALTER TABLE $db_schema.$table_name DROP PARTITION $partition";
-	    
+
 	    syslog(LOG_DEBUG, $query);
 	    $dbh->do($query);
 	}
@@ -177,18 +177,18 @@ sub name_next_part {
 
     my $curr_date = DateTime->now;
     $curr_date->set_time_zone( $curr_tz );
-    
+
     if ( $period eq 'day' ) {
 	my $curr_date = $curr_date->truncate( to => 'day' );
 	$curr_date->add(days => 1 + $curr_part);
-	
+
 	$name_template = $curr_date->strftime('p%Y_%m_%d');
     }
     elsif ($period eq 'week') {
 	my $curr_date = $curr_date->truncate( to => 'week' );
 	$curr_date->add(days => 7 * $curr_part);
 
-        $name_template = $curr_date->strftime('p%Y_%m_w%W');	
+        $name_template = $curr_date->strftime('p%Y_%m_w%W');
     }
     elsif ($period eq 'month') {
 	my $curr_date = $curr_date->truncate( to => 'month' );

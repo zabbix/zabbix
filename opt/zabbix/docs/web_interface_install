@@ -56,7 +56,7 @@ Actual information about repository can be founded at http://wiki.nginx.org/Inst
     php_admin_value[max_input_time] = 600
     php_admin_value[session.auto_start] = 0
     php_admin_value[max_input_vars]=100000
-    php_admin_value[date.timezone]=Europe/London
+    php_admin_value[date.timezone]=Etc/UTC
 
 11. Add temporary permissions for 'zbx_web' user on database side:
     GRANT CREATE,DROP,SELECT,UPDATE,DELETE,INSERT ON zabbix.* TO 'zbx_web'@'<IP of each frontend server>';
