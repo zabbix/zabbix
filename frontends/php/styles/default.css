@@ -234,10 +234,9 @@ ul.objectlist li.selected { font-weight: bold; font-size: 1.2em; }
 ul.objectlist li a { color: #000000; font-weight: normal; }
 
 /* favorites */
-ul.favorites { padding-left: 5px; vertical-align: top; margin: 8px 4px 8px 0; text-align: left; }
+ul.favorites { padding-left: 5px; margin: 8px 4px 8px 0; }
 ul.favorites li { padding-left: 25px; margin: 9px 0; list-style: none; background: url("../images/general/chart.png") no-repeat left top; }
-ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
-ul.favorites li a { line-height: 18px; }
+ul.favorites li.empty { color: #999; background: none; }
 
 /* frondend messages */
 ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
@@ -574,3 +573,10 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 /* tabs */
 .tabs { visibility: hidden; }
+
+/* modal window */
+.ui-widget-overlay { z-index: 1000; }
+.ui-dialog { z-index: 1001; opacity: 1; }
+
+/* server name */
+.server-name { padding-right: 5px; }

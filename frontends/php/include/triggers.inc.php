@@ -597,15 +597,15 @@ function construct_expression($itemid, $expressions) {
 				$complite_expr.=' | ';
 			}
 			if ($cexpor == 0) {
-				$startpos = zbx_strlen($complite_expr);
+				$startpos = mb_strlen($complite_expr);
 			}
 			$cexpor++;
 			$eq_global = '#0';
 		}
 		else {
 			if (($cexpor > 1) & ($startpos >= 0)) {
-				$head = substr($complite_expr, 0, $startpos);
-				$tail = substr($complite_expr, $startpos);
+				$head = mb_substr($complite_expr, 0, $startpos);
+				$tail = mb_substr($complite_expr, $startpos);
 				$complite_expr = $head.'('.$tail.')';
 			}
 			$cexpor = 0;
@@ -624,13 +624,12 @@ function construct_expression($itemid, $expressions) {
 		$multi = preg_match('/.+(&|\|).+/', $expr);
 
 		while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-			$arr[4] = zbx_strtolower($arr[4]);
 			if (!isset($functions[$arr[4]])) {
 				error(_('Incorrect function is used').'. ['.$expression['value'].']');
 				return false;
 			}
 			$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-			$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
+			$expr_array[$sub_expr_count]['regexp'] = $arr[4].$arr[5];
 
 			$sub_expr_count++;
 			$expr = $arr[1];
@@ -666,8 +665,8 @@ function construct_expression($itemid, $expressions) {
 	}
 
 	if (($cexpor > 1) & ($startpos >= 0)) {
-		$head = substr($complite_expr, 0, $startpos);
-		$tail = substr($complite_expr, $startpos);
+		$head = mb_substr($complite_expr, 0, $startpos);
+		$tail = mb_substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
 
@@ -685,7 +684,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 	$expressionExpanded = $html ? array() : '';
 	$trigger = array();
 
-	for ($i = 0, $state = '', $max = zbx_strlen($expressionCompressed); $i < $max; $i++) {
+	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
 		if ($expressionCompressed[$i] == '{') {
 			if ($expressionCompressed[$i + 1] == '$') {
 				$state = 'USERMACRO';
@@ -799,15 +798,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($functionData['itemid']),
+									$trigger['discoveryRuleid'],
 								$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'].'&switch_node='.
-									id2nodeid($functionData['itemid']),
+								'items.php?form=update&itemid='.$functionData['itemid'],
 								$style
 							);
 						}
@@ -1026,8 +1024,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'.
-					andDbNode('i.itemid')
+					' AND h.hostid=i.hostid'
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];
@@ -1106,8 +1103,7 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
 					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'.
-					andDbNode('i.itemid')
+					' AND h.hostid=i.hostid'
 			);
 			if ($dbItem = DBfetch($dbItems)) {
 				$items[] = $dbItem;
@@ -1225,7 +1221,6 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	foreach ($dbTriggers as $trigger) {
 		$host = reset($trigger['hosts']);
 
-		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 		$hostNames[$host['hostid']] = $host['name'];
 
@@ -1594,7 +1589,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	$config = select_config();
 
 	$options = array(
-		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => array(),
@@ -1650,9 +1644,6 @@ function make_trigger_details($trigger) {
 	array_pop($hostNames);
 
 	$table = new CTableInfo();
-	if (is_show_all_nodes()) {
-		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
-	}
 	$table->addRow(array(
 		new CCol(_n('Host', 'Hosts', count($hosts))),
 		new CCol($hostNames, 'wraptext')
@@ -2268,14 +2259,14 @@ function get_item_function_info($expr) {
 
 	$type_of_value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
 		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 	);
 
 	$function_info = array(
-		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'band' =>		array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2300,7 +2291,7 @@ function get_item_function_info($expr) {
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'strlen' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6')
 	);
 
 	$expressionData = new CTriggerExpression();
@@ -2341,7 +2332,7 @@ function get_item_function_info($expr) {
 				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
-					'key_' => array($exprPart['item']),
+					'key_' => array($exprPart['item'])
 				),
 				'webitems' => true
 			));
@@ -2351,7 +2342,7 @@ function get_item_function_info($expr) {
 					'output' => array('value_type'),
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
 					'filter' => array(
-						'key_' => array($exprPart['item']),
+						'key_' => array($exprPart['item'])
 					)
 				));
 
@@ -2367,7 +2358,7 @@ function get_item_function_info($expr) {
 				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
 				$result['type'] = $result['type'][$itemFound['value_type']];
 
-				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
+				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}

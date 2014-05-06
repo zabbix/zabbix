@@ -83,12 +83,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 	zbx_script_clean(&script);
 fail:
 	if (SUCCEED != ret)
-	{
-		if (0 != CONFIG_NODEID)
-			*result = zbx_dsprintf(*result, "NODE %d: %s", CONFIG_NODEID, error);
-		else
-			*result = zbx_strdup(*result, error);
-	}
+		*result = zbx_strdup(*result, error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -97,102 +92,9 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: send_script                                                      *
- *                                                                            *
- * Purpose: sending command to slave node                                     *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-static int	send_script(int nodeid, const char *data, char **result)
-{
-	DB_RESULT		db_result;
-	DB_ROW			db_row;
-	int			ret = FAIL;
-	zbx_sock_t		sock;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_script(nodeid:%d)", nodeid);
-
-	db_result = DBselect(
-			"select ip,port"
-			" from nodes"
-			" where nodeid=%d",
-			nodeid);
-
-	if (NULL != (db_row = DBfetch(db_result)))
-	{
-		if (SUCCEED == (ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP,
-				db_row[0], atoi(db_row[1]), CONFIG_TRAPPER_TIMEOUT)))
-		{
-			if (FAIL == (ret = zbx_tcp_send(&sock, data)))
-			{
-				*result = zbx_dsprintf(*result, "NODE %d: Error while sending data to Node [%d]: %s.",
-						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
-				goto exit_sock;
-			}
-
-			if (SUCCEED == (ret = zbx_tcp_recv(&sock)))
-				*result = zbx_dsprintf(*result, "%s", sock.buffer);
-			else
-				*result = zbx_dsprintf(*result,
-						"NODE %d: Error while receiving data from Node [%d]: %s.",
-						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
-exit_sock:
-			zbx_tcp_close(&sock);
-		}
-		else
-			*result = zbx_dsprintf(*result, "NODE %d: Unable to connect to Node [%d]: %s.",
-					CONFIG_NODEID, nodeid, zbx_tcp_strerror());
-	}
-	else
-		*result = zbx_dsprintf(*result, "NODE %d: Unknown Node ID [%d].",
-				CONFIG_NODEID, nodeid);
-
-	DBfree_result(db_result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_next_point_to_node                                           *
- *                                                                            *
- * Purpose: find next point to slave node                                     *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
-{
-	DB_RESULT	db_result;
-	DB_ROW		db_row;
-	int		id, res = FAIL;
-
-	db_result = DBselect("select nodeid from nodes where masterid=%d", current_nodeid);
-
-	while (NULL != (db_row = DBfetch(db_result)))
-	{
-		id = atoi(db_row[0]);
-		if (id == slave_nodeid || SUCCEED == get_next_point_to_node(id, slave_nodeid, NULL))
-		{
-			if (NULL != nodeid)
-				*nodeid = id;
-			res = SUCCEED;
-			break;
-		}
-	}
-	DBfree_result(db_result);
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: node_process_command                                             *
  *                                                                            *
- * Purpose: process command received from a master node or php                *
+ * Purpose: process command received from the frontend                        *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -201,20 +103,13 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
 int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
 {
 	char		*result = NULL, *send = NULL, tmp[64];
-	int		nodeid = -1, next_nodeid, ret = FAIL;
+	int		ret = FAIL;
 	zbx_uint64_t	scriptid, hostid;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)) ||
-			FAIL == is_uint31(tmp, &nodeid))
-	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_NODEID);
-		goto finish;
-	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp)) ||
 			FAIL == is_uint64(tmp, &scriptid))
@@ -230,25 +125,12 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 		goto finish;
 	}
 
-	if (nodeid == CONFIG_NODEID)
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, &result)))
 	{
-		if (SUCCEED == (ret = execute_script(scriptid, hostid, &result)))
-		{
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
-			send = j.buffer;
-		}
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
+		send = j.buffer;
 	}
-	else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command for Node %d to Node %d",
-				CONFIG_NODEID, nodeid, next_nodeid);
-
-		if (SUCCEED == (ret = send_script(next_nodeid, data, &result)))
-			send = result;
-	}
-	else
-		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d].", CONFIG_NODEID, nodeid);
 finish:
 	if (SUCCEED != ret)
 	{
@@ -260,16 +142,9 @@ finish:
 
 	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, send))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
-				CONFIG_NODEID, nodeid);
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Sending back command '%s' result '%s'",
-				CONFIG_NODEID, data, send);
-	}
-	alarm(0);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send); alarm(0);
 
 	zbx_json_free(&j);
 	zbx_free(result);

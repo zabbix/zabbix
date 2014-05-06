@@ -23,16 +23,6 @@
 
 #include <sys/sysctl.h>
 
-#define DO_SUM 0
-#define DO_MAX 1
-#define DO_MIN 2
-#define DO_AVG 3
-
-#define ZBX_PROC_STAT_ALL 0
-#define ZBX_PROC_STAT_RUN 1
-#define ZBX_PROC_STAT_SLEEP 2
-#define ZBX_PROC_STAT_ZOMB 3
-
 static kvm_t	*kd = NULL;
 
 static char	*proc_argv(pid_t pid)
@@ -110,13 +100,13 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 2);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
-		do_task = DO_SUM;
+		do_task = ZBX_DO_SUM;
 	else if (0 == strcmp(param, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(param, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(param, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -180,9 +170,9 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				memsize = value;
 			else
 			{
-				if (do_task == DO_MAX)
+				if (ZBX_DO_MAX == do_task)
 					memsize = MAX(memsize, value);
-				else if (do_task == DO_MIN)
+				else if (ZBX_DO_MIN == do_task)
 					memsize = MIN(memsize, value);
 				else
 					memsize += value;
@@ -190,7 +180,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (do_task == DO_AVG)
+	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
 	else
 		SET_UI64_RESULT(result, memsize);

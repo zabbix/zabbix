@@ -301,9 +301,6 @@ src/zabbix_server/trapper/.deps
 src/zabbix_server/trapper/.dirstamp
 src/zabbix_server/trapper/Makefile
 src/zabbix_server/trapper/Makefile.in
-src/zabbix_server/utils/.deps
-src/zabbix_server/utils/Makefile
-src/zabbix_server/utils/Makefile.in
 src/zabbix_server/vmware/.deps
 src/zabbix_server/vmware/Makefile
 src/zabbix_server/vmware/Makefile.in

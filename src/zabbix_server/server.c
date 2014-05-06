@@ -47,9 +47,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "snmptrapper/snmptrapper.h"
-#include "nodewatcher/nodewatcher.h"
 #include "watchdog/watchdog.h"
-#include "utils/nodechange.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
@@ -67,12 +65,11 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix server";
 const char	syslog_app_name[] = "zabbix_server";
-const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
+const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>              Absolute path to the configuration file",
-	"  -n --new-nodeid <nodeid>        Convert database data to new nodeid",
 	"  -R --runtime-control <option>   Perform administrative functions",
 	"",
 	"Runtime control options:",
@@ -90,7 +87,6 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
-	{"new-nodeid",		1,	NULL,	'n'},
 	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
@@ -113,7 +109,6 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
-int	CONFIG_NODEWATCHER_FORKS	= 1;
 int	CONFIG_PINGER_FORKS		= 1;
 int	CONFIG_POLLER_FORKS		= 5;
 int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
@@ -174,11 +169,6 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
-int	CONFIG_NODEID			= 0;
-int	CONFIG_MASTER_NODEID		= 0;
-int	CONFIG_NODE_NOEVENTS		= 0;
-int	CONFIG_NODE_NOHISTORY		= 0;
-
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
 char	*CONFIG_JAVA_GATEWAY		= NULL;
@@ -200,9 +190,6 @@ char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
-
-/* mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -245,9 +232,6 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
-
-	if (0 == CONFIG_NODEID)
-		CONFIG_NODEWATCHER_FORKS = 0;
 
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
@@ -343,7 +327,7 @@ static void	zbx_load_config()
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(8) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_UINT64,
@@ -410,12 +394,6 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"NodeID",			&CONFIG_NODEID,				TYPE_INT,
-			PARM_OPT,	0,			999},
-		{"NodeNoEvents",		&CONFIG_NODE_NOEVENTS,			TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"NodeNoHistory",		&CONFIG_NODE_NOHISTORY,			TYPE_INT,
-			PARM_OPT,	0,			1},
 		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
@@ -496,7 +474,6 @@ int	main(int argc, char **argv)
 {
 	zbx_task_t	task = ZBX_TASK_START;
 	char		ch = '\0';
-	int		nodeid = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -524,10 +501,6 @@ int	main(int argc, char **argv)
 				help();
 				exit(-1);
 				break;
-			case 'n':
-				nodeid = (NULL == zbx_optarg ? 0 : atoi(zbx_optarg));
-				task = ZBX_TASK_CHANGE_NODEID;
-				break;
 			case 'V':
 				version();
 				exit(-1);
@@ -554,22 +527,11 @@ int	main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	switch (task)
-	{
-		case ZBX_TASK_CHANGE_NODEID:
-			exit(SUCCEED == change_nodeid(nodeid) ? EXIT_SUCCESS : EXIT_FAILURE);
-			break;
-		default:
-			break;
-	}
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
 	int		i, server_num = 0, server_count = 0;
@@ -635,12 +597,6 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
-	if (0 != CONFIG_NODEID)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
-		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
-	}
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
@@ -673,15 +629,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (0 != CONFIG_NODEID)
-	{
-		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			CONFIG_MASTER_NODEID = atoi(row[0]);
-		DBfree_result(result);
-	}
-
 	DCload_config();
 
 	/* make initial configuration sync before worker processes are forked */
@@ -689,19 +636,13 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBclose();
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
-	{
-		zbx_error("Unable to create mutex for node syncs");
-		exit(FAIL);
-	}
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
-			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
-			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS
-			+ CONFIG_SELFMON_FORKS + CONFIG_VMWARE_FORKS;
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
+			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
+			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
+			+ CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
@@ -805,12 +746,6 @@ int	MAIN_ZABBIX_ENTRY()
 		INIT_SERVER(ZBX_PROCESS_TYPE_TIMER, CONFIG_TIMER_FORKS);
 
 		main_timer_loop();
-	}
-	else if (server_num <= (server_count += CONFIG_NODEWATCHER_FORKS))
-	{
-		INIT_SERVER(ZBX_PROCESS_TYPE_NODEWATCHER, CONFIG_NODEWATCHER_FORKS);
-
-		main_nodewatcher_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
 	{
@@ -925,8 +860,6 @@ void	zbx_on_exit()
 	zbx_vc_destroy();
 
 	zbx_destroy_itservices_lock();
-
-	zbx_mutex_destroy(&node_sync_access);
 
 #ifdef HAVE_OPENIPMI
 	free_ipmi_handler();

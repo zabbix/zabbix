@@ -39,7 +39,7 @@ $fields = array(
 	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
 	'host' =>		        	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
 	'name' =>	            	array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
-	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
+	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), null),
 	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'add_template' =>			array(T_ZBX_STR, O_OPT, null,		null,	null),
@@ -114,7 +114,7 @@ elseif (get_request('unlink')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 
 	DBstart();
-	$result = API::HostPrototype()->delete(get_request('hostid'));
+	$result = API::HostPrototype()->delete(array(getRequest('hostid')));
 
 	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
 
@@ -136,11 +136,10 @@ elseif (isset($_REQUEST['save'])) {
 	$newHostPrototype = array(
 		'host' => get_request('host'),
 		'name' => get_request('name'),
-		'status' => get_request('status'),
+		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => array(),
 		'groupPrototypes' => array(),
 		'templates' => get_request('templates', array()),
-		'status' => get_request('status'),
 		'inventory' => array(
 			'inventory_mode' => get_request('inventory_mode')
 		)
@@ -257,7 +256,7 @@ if (isset($_REQUEST['form'])) {
 			'templateid' => get_request('templateid'),
 			'host' => get_request('host'),
 			'name' => get_request('name'),
-			'status' => get_request('status', HOST_STATUS_MONITORED),
+			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 			'templates' => array(),
 			'inventory' => array(
 				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)

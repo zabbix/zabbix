@@ -269,7 +269,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	SECURITY_ATTRIBUTES			sa;
 	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
 	char					*cmd = NULL;
-	LPTSTR					wcmd = NULL;
+	wchar_t					*wcmd = NULL;
 	struct _timeb				start_time, current_time;
 #else
 	pid_t					pid;
@@ -466,7 +466,7 @@ int	zbx_execute_nowait(const char *command)
 	char			*full_command;
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
-	LPTSTR			wcommand;
+	wchar_t			*wcommand;
 
 	full_command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
 	wcommand = zbx_utf8_to_unicode(full_command);

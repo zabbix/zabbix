@@ -93,7 +93,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return zbx_date2str(_('Y'), $t);
+			return zbx_date2str('Y', $t);
 		}
 
 		function format_time2($t) {
@@ -111,7 +111,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return zbx_date2str(_('M Y'), $t);
+			return _(zbx_date2str(_x('F', 'Month long name'), $t));
 		}
 
 		function format_time2($t) {
@@ -129,7 +129,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return zbx_date2str(_('d M Y'), $t);
+			return zbx_date2str(DATE_FORMAT, $t);
 		}
 
 		function format_time2($t) {
@@ -156,7 +156,7 @@ switch ($period) {
 		}
 
 		function format_time($t) {
-			return zbx_date2str(_('d M Y H:i'), $t);
+			return zbx_date2str(DATE_TIME_FORMAT, $t);
 		}
 
 		function format_time2($t) {

@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
-require_once dirname(__FILE__).'/include/nodes.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
@@ -84,10 +83,6 @@ switch ($srctbl) {
 		$page['title'] = _('Screens');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
-	case 'nodes':
-		$page['title'] = _('Nodes');
-		$min_user_type = USER_TYPE_ZABBIX_USER;
-		break;
 	case 'drules':
 		$page['title'] = _('Discovery rules');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -133,7 +128,6 @@ $allowedSrcFields = array(
 	'help_items'			=> '"key"',
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
-	'nodes'					=> '"nodeid", "name"',
 	'drules'				=> '"druleid", "name"',
 	'dchecks'				=> '"dcheckid", "name"',
 	'proxies'				=> '"hostid", "host"',
@@ -148,7 +142,6 @@ $fields = array(
 	'dstfld1' =>					array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'srctbl' =>						array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
 	'srcfld1' =>					array(T_ZBX_STR, O_MAND, P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
-	'nodeid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'group' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'hostid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -210,12 +203,6 @@ else {
 			get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
 		access_deny();
 	}
-	if (get_request('nodeid')) {
-		$node = get_node_by_nodeid($_REQUEST['nodeid']);
-		if (!$node) {
-			access_deny();
-		}
-	}
 }
 if (get_request('parent_discoveryid') && !API::DiscoveryRule()->isReadable(array($_REQUEST['parent_discoveryid']))) {
 	access_deny();
@@ -246,13 +233,14 @@ $withTriggers = get_request('with_triggers', 0);
 $withMonitoredTriggers = get_request('with_monitored_triggers', 0);
 $submitParent = get_request('submitParent', 0);
 $normalOnly = get_request('normal_only');
-$nodeId = get_request('nodeid', get_current_nodeid(false));
 $group = get_request('group', '');
 $host = get_request('host', '');
 $onlyHostid = get_request('only_hostid', null);
+
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
-	unset($_REQUEST['groupid'], $_REQUEST['nodeid']);
+
+	unset($_REQUEST['groupid']);
 }
 
 // value types
@@ -262,20 +250,6 @@ if (get_request('value_types')) {
 }
 elseif (get_request('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-}
-
-// choose nodes
-// if an LLD rule is selected, use its node
-if (hasRequest('parent_discoveryid')) {
-	$nodeId = id2nodeid(getRequest('parent_discoveryid'));
-}
-// if a host is selected, use its node
-elseif (hasRequest('only_hostid')) {
-	$nodeId = id2nodeid(getRequest('only_hostid'));
-}
-// if nothing specific is selected, use the chosen node or fall back to the local node
-else {
-	$nodeId = getRequest('nodeid', get_current_nodeid(false));
 }
 
 clearCookies(true);
@@ -312,8 +286,8 @@ if (!empty($host)) {
 
 $options = array(
 	'config' => array('select_latest' => true, 'deny_all' => true, 'popupDD' => true),
-	'groups' => array('nodeids' => $nodeId),
-	'hosts' => array('nodeids' => $nodeId),
+	'groups' => array(),
+	'hosts' => array(),
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 );
@@ -462,31 +436,6 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 }
 
 /*
- * Nodes
- */
-// only display the node dropdown for DM setups
-// don't display it for help item pop ups
-if (ZBX_DISTRIBUTED && $srctbl != 'help_items' && $srctbl != 'nodes') {
-	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit()');
-
-	$dbNodes = DBselect(
-		'SELECT n.*'.
-		' FROM nodes n'.
-		' WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ))
-	);
-	while ($dbNode = DBfetch($dbNodes)) {
-		$nodeComboBox->addItem($dbNode['nodeid'], $dbNode['name']);
-	}
-
-	// disable node selection if we show objects from only one host or LLD rule
-	if (hasRequest('only_hostid') || hasRequest('parent_discoveryid')) {
-		$nodeComboBox->setEnabled('disabled');
-	}
-
-	$frmTitle->addItem(array(SPACE, _('Node'), SPACE, $nodeComboBox, SPACE));
-}
-
-/*
  * Only host id
  */
 if (isset($onlyHostid)) {
@@ -524,9 +473,9 @@ else {
 
 if (str_in_array($srctbl, array('applications', 'triggers'))) {
 	if (zbx_empty($noempty)) {
-		$value1 = isset($_REQUEST['dstfld1']) && zbx_strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
-		$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
-		$value3 = isset($_REQUEST['dstfld3']) && zbx_strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
+		$value1 = isset($_REQUEST['dstfld1']) && strpos($_REQUEST['dstfld1'], 'id') !== false ? 0 : '';
+		$value2 = isset($_REQUEST['dstfld2']) && strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
+		$value3 = isset($_REQUEST['dstfld3']) && strpos($_REQUEST['dstfld3'], 'id') !== false ? 0 : '';
 
 		$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
 		$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
@@ -558,7 +507,6 @@ if ($srctbl == 'usrgrp') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -618,7 +566,6 @@ elseif ($srctbl == 'users') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'output' => array('alias', 'name', 'surname', 'type', 'theme', 'lang'),
 		'preservekeys' => true
 	);
@@ -704,7 +651,6 @@ elseif ($srctbl == 'triggers') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'output' => array('triggerid', 'description', 'expression', 'priority', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name'),
@@ -821,7 +767,6 @@ elseif ($srctbl == 'items') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'webitems' => true,
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'type', 'value_type', 'status', 'state'),
@@ -941,7 +886,6 @@ elseif ($srctbl == 'prototypes') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
@@ -1019,7 +963,6 @@ elseif ($srctbl == 'applications') {
 	));
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
 		'expandData' => true
@@ -1042,22 +985,6 @@ elseif ($srctbl == 'applications') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 
 		$table->addRow(array($hostid > 0 ? null : $app['host'], $name));
-	}
-	$table->show();
-}
-/*
- * Nodes
- */
-elseif ($srctbl == 'nodes') {
-	$table = new CTableInfo();
-	$table->setHeader(_('Name'));
-
-	$result = DBselect('SELECT DISTINCT n.* FROM nodes n WHERE '.dbConditionInt('n.nodeid', get_accessible_nodes_by_user(CWebUser::$data, PERM_READ)));
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['name'], 'link');
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
-		$table->addRow($name);
 	}
 	$table->show();
 }
@@ -1090,7 +1017,6 @@ elseif ($srctbl == 'graphs') {
 		$options = array(
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => $nodeId,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		);
@@ -1185,7 +1111,6 @@ elseif ($srctbl == 'sysmaps') {
 	$excludeids = zbx_toHash($excludeids);
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
@@ -1199,8 +1124,7 @@ elseif ($srctbl == 'sysmaps') {
 		if (isset($excludeids[$sysmap['sysmapid']])) {
 			continue;
 		}
-		$sysmap['node_name'] = isset($sysmap['node_name']) ? '('.$sysmap['node_name'].') ' : '';
-		$name = $sysmap['node_name'].$sysmap['name'];
+
 		$description = new CSpan($sysmap['name'], 'link');
 
 		if ($multiselect) {
@@ -1255,11 +1179,9 @@ elseif ($srctbl == 'slides') {
 	$table->setHeader($header);
 
 	$slideshows = array();
-	$dbSlideshows = DBfetchArray(DBselect(
-		'SELECT s.slideshowid,s.name'.
-		' FROM slideshows s'.
-		whereDbNode('s.slideshowid', $nodeId)
-	));
+
+	$dbSlideshows = DBfetchArray(DBselect('SELECT s.slideshowid,s.name FROM slideshows s'));
+
 	order_result($dbSlideshows, 'name');
 
 	foreach ($dbSlideshows as $dbSlideshow) {
@@ -1321,7 +1243,6 @@ elseif ($srctbl == 'screens') {
 	$table->setHeader($header);
 
 	$screens = API::Screen()->get(array(
-		'nodeids' => $nodeId,
 		'output' => array('screenid', 'name'),
 		'preservekeys' => true,
 		'editable' => ($writeonly === null) ? null: true
@@ -1370,7 +1291,6 @@ elseif ($srctbl == 'screens2') {
 	$table->setHeader(_('Name'));
 
 	$screens = API::Screen()->get(array(
-		'nodeids' => $nodeId,
 		'output' => array('screenid', 'name'),
 		'editable' => ($writeonly === null) ? null: true
 	));
@@ -1392,18 +1312,19 @@ elseif ($srctbl == 'screens2') {
 /*
  * Discovery rules
  */
-elseif ($srctbl == 'drules') {
+elseif ($srctbl === 'drules') {
 	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect(
-			'SELECT d.*'.
-			' FROM drules d'.
-			whereDbNode('d.druleid', $nodeId)
-	);
-	while ($row = DBfetch($result)) {
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CSpan($row['name'], 'link');
+	$dRules = API::DRule()->get(array(
+		'output' => array('druleid', 'name')
+	));
+
+	order_result($dRules, 'name');
+
+	foreach ($dRules as $dRule) {
+		$action = get_window_opener($dstfrm, $dstfld1, $dRule[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
+		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
@@ -1412,15 +1333,17 @@ elseif ($srctbl == 'drules') {
 /*
  * Discovery checks
  */
-elseif ($srctbl == 'dchecks') {
+elseif ($srctbl === 'dchecks') {
 	$table = new CTableInfo(_('No discovery rules found.'));
 	$table->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get(array(
 		'selectDChecks' => array('dcheckid', 'type', 'key_', 'ports'),
-		'output' => array('name'),
-		'nodeids' => $nodeId
+		'output' => array('druleid', 'name')
 	));
+
+	order_result($dRules, 'name');
+
 	foreach ($dRules as $dRule) {
 		foreach ($dRule['dchecks'] as $dCheck) {
 			$name = $dRule['name'].NAME_DELIMITER.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
@@ -1441,12 +1364,12 @@ elseif ($srctbl == 'proxies') {
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
-			'SELECT h.hostid,h.host'.
-			' FROM hosts h'.
-			' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
-				andDbNode('h.hostid', $nodeId).
-			' ORDER BY h.host,h.hostid'
+		'SELECT h.hostid,h.host'.
+		' FROM hosts h'.
+		' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
+		' ORDER BY h.host,h.hostid'
 	);
+
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['host'], 'link');
@@ -1482,7 +1405,6 @@ elseif ($srctbl == 'scripts') {
 	$table->setHeader($header);
 
 	$options = array(
-		'nodeids' => $nodeId,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
