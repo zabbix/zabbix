@@ -26,9 +26,8 @@ typedef struct
 	zbx_uint64_t	nwritten;
 	zbx_uint64_t	reads;
 	zbx_uint64_t	writes;
-} zbx_kstat_t;
-
-static zbx_kstat_t zbx_kstat;
+}
+zbx_kstat_t;
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
@@ -42,12 +41,12 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk)
 	kstat_t		*kt;
 	kstat_io_t	kio;
 
-	if (0 == (kc = kstat_open()))
+	if (NULL == (kc = kstat_open()))
 		return result;
 
 	if ('\0' != *name)
 	{
-		if (0 == (kt = kstat_lookup(kc, NULL, -1, (char *)name)))
+		if (NULL == (kt = kstat_lookup(kc, NULL, -1, (char *)name)))
 			goto clean;
 
 		if (KSTAT_TYPE_IO != kt->ks_type)
@@ -90,40 +89,44 @@ clean:
 
 static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	int		ret;
+	zbx_kstat_t	zk;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.nread);
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zk)))
+		SET_UI64_RESULT(result, zk.nread);
 
 	return ret;
 }
 
 static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	int		ret;
+	zbx_kstat_t	zk;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.reads);
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zk)))
+		SET_UI64_RESULT(result, zk.reads);
 
 	return ret;
 }
 
 static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	int		ret;
+	zbx_kstat_t	zk;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.nwritten);
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zk)))
+		SET_UI64_RESULT(result, zk.nwritten);
 
 	return ret;
 }
 
 static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-	int	ret;
+	int		ret;
+	zbx_kstat_t	zk;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
-		SET_UI64_RESULT(result, zbx_kstat.writes);
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zk)))
+		SET_UI64_RESULT(result, zk.writes);
 
 	return ret;
 }
@@ -160,24 +163,24 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes", 	VFS_DEV_WRITE_BYTES},
-		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
-		{NULL,		NULL}
-	};
-
-	return process_mode_function(request, result, fl);
-}
-
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
+		{NULL,		NULL}
+	};
+
+	return process_mode_function(request, result, fl);
+}
+
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const MODE_FUNCTION	fl[] =
+	{
+		{"bytes", 	VFS_DEV_WRITE_BYTES},
+		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
 		{NULL,		NULL}
 	};
 

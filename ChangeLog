@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
@@ -34,7 +35,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 ..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
 ..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
-........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
+.......PS. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] improved frontend messages mute/unmute (Eduard)
 ..F....... [ZBXNEXT-1291] added clickable links for template names in host, template, host prototype and discovered host property templates tab (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
@@ -110,7 +111,7 @@ Changes for 2.2.4rc1
 
 New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
@@ -179,6 +180,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
 ..F....... [ZBX-7896] fixed translated error messages not being rendered correctly in images (Pavels)
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
 A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
@@ -1040,9 +1042,10 @@ New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
 ..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
