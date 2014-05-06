@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-01 13:31+0300\n"
-"PO-Revision-Date: 2014-04-24 10:59+0300\n"
+"PO-Revision-Date: 2014-05-02 01:44+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1398329949.0\n"
+"X-POOTLE-MTIME: 1398987869.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -675,7 +675,7 @@ msgstr "Aplicar"
 #: include/views/configuration.maintenance.list.php:59
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr "Abordagem"
+msgstr "Próximo do início"
 
 #: include/func.inc.php:252
 msgid "Apr"
@@ -11082,7 +11082,7 @@ msgstr "Senha (novamente)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "A senha está indisponível para usuários com %1$s."
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
@@ -14177,7 +14177,7 @@ msgstr "Somente não reconhecidos"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "Indisponível para usuários com %1$s."
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
@@ -14895,22 +14895,22 @@ msgstr "O valor \"%1$s\" é muito grande para o campo \"%2$s\" - %3$d caracteres
 #: include/validate.inc.php:333 include/validate.inc.php:357
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "O valor \"%2$s\" de \"%1$s\" possui formato decimal inválido."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "O valor \"%2$s\" de \"%1$s\" possui muitos dígitos após o separador decimal: não são aceitos mais que %3$s dígitos."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "O valor \"%2$s\" de \"%1$s\" possui muitos dígitos antes do separador decimal: não são aceitos mais que %3$s dígitos."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "O valor \"%2$s\" de \"%1$s\" é muito grande: não pode possuir mais que %3$s dígitos antes do separador decimal nem %4$s dígitos após."
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15015,7 +15015,7 @@ msgstr "Alinhamento vertical"
 
 #: include/locales.inc.php:79
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "Vietnamita (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15943,7 +15943,7 @@ msgstr "novo"
 #: include/views/configuration.item.massupdate.php:502
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "novo"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:343
@@ -16031,7 +16031,7 @@ msgstr "outro"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "atualizado a cada %1$s segundos."
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-01 13:31+0300\n"
-"PO-Revision-Date: 2014-04-12 18:10+0300\n"
+"PO-Revision-Date: 2014-05-04 08:12+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1397319011.0\n"
+"X-POOTLE-MTIME: 1399183943.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -11115,7 +11115,7 @@ msgstr "Heslo (ešte raz)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "Heslo je nedostupné pre používateľov s %1$s."
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
@@ -14212,7 +14212,7 @@ msgstr "Len nepotvrdené"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "Nedostupné pre používateľov s %1$s."
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
@@ -14932,22 +14932,22 @@ msgstr "Hodnota \"%1$s\" je príliš dlhá pre pole \"%2$s\" - %3$d znakov. Povo
 #: include/validate.inc.php:333 include/validate.inc.php:357
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "Hodnota \"%2$s\" z \"%1$s\" má nesprávny desiatkový formát."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Hodnota \"%2$s\" z \"%1$s\" má príliš veľa číslic po desatinnej čiarke: nemôže mať viac ako %3$s číslic."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Hodnota \"%2$s\" z \"%1$s\" má príliš veľa číslic pred desatinnou čiarkou: nemôže mať viac ako %3$s číslic."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "Hodnota \"%2$s\" z \"%1$s\" má príliš dlhá: nemôže mať viac ako %3$s číslic pred desatinnou čiarkou a viac ako %4$s číslic po desatinnej čiarke."
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15052,7 +15052,7 @@ msgstr "Vertikálne zarovnanie"
 
 #: include/locales.inc.php:79
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "Vietnamsky (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15979,7 +15979,7 @@ msgstr "nový"
 #: include/views/configuration.item.massupdate.php:502
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "nový"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:343
@@ -16067,7 +16067,7 @@ msgstr "iné"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "obnovované každých %1$s sek."
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
