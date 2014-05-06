@@ -589,11 +589,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($strList as $str) {
 			// extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
 			// searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-			preg_match_all('/(?<macros>{'.
-				'(?<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
-				'(?<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
-				'(?<functions>(last|max|min|avg))\('.
-				'(?<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
+			preg_match_all('/(?P<macros>{'.
+				'(?P<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
+				'(?P<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
+				'(?P<functions>(last|max|min|avg))\('.
+				'(?P<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
 			if (!empty($matches['hosts'])) {
@@ -1181,14 +1181,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// for host and trigger items expand macros if they exists
 		if (($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST || $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-				&& (zbx_strpos($label, 'HOST.NAME') !== false
-						|| zbx_strpos($label, 'HOSTNAME') !== false /* deprecated */
-						|| zbx_strpos($label, 'HOST.HOST') !== false
-						|| zbx_strpos($label, 'HOST.DESCRIPTION') !== false
-						|| zbx_strpos($label, 'HOST.DNS') !== false
-						|| zbx_strpos($label, 'HOST.IP') !== false
-						|| zbx_strpos($label, 'IPADDRESS') !== false /* deprecated */
-						|| zbx_strpos($label, 'HOST.CONN') !== false)) {
+				&& (strpos($label, 'HOST.NAME') !== false
+						|| strpos($label, 'HOSTNAME') !== false /* deprecated */
+						|| strpos($label, 'HOST.HOST') !== false
+						|| strpos($label, 'HOST.DESCRIPTION') !== false
+						|| strpos($label, 'HOST.DNS') !== false
+						|| strpos($label, 'HOST.IP') !== false
+						|| strpos($label, 'IPADDRESS') !== false /* deprecated */
+						|| strpos($label, 'HOST.CONN') !== false)) {
 			// priorities of interface types doesn't match interface type ids in DB
 			$priorities = array(
 				INTERFACE_TYPE_AGENT => 4,
@@ -1270,7 +1270,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($hostsByNr as $i => $host) {
 				$replace = array(
 					'{HOST.NAME'.$i.'}' => $host['name'],
-					'{HOSTNAME'.$i.'}' => $host['name'],
+					'{HOSTNAME'.$i.'}' => $host['host'],
 					'{HOST.HOST'.$i.'}' => $host['host'],
 					'{HOST.DESCRIPTION'.$i.'}' => $host['description'],
 					'{HOST.DNS'.$i.'}' => $host['dns'],
@@ -1293,40 +1293,40 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				if (zbx_strpos($label, '{TRIGGERS.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.UNACK}') !== false) {
 					$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}',
 						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
+				if (strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
 					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}',
 						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.ACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.ACK}') !== false) {
 					$label = str_replace('{TRIGGERS.ACK}',
 						get_triggers_unacknowledged($selement, null, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGERS.PROBLEM.ACK}',
 						get_triggers_unacknowledged($selement, true, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.ACK}',
 						get_events_unacknowledged($selement, null, null, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}',
 						get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
 				}
-				if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
+				if (strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
 					$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
 						get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
 				}

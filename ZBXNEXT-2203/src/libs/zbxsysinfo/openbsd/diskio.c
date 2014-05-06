@@ -130,38 +130,6 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	char	*devname, *mode;
-	int	ret = SYSINFO_RET_FAIL;
-
-	if (2 < request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	devname = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
-		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
-	else if (0 == strcmp(mode, "bytes"))
-		ret = VFS_DEV_WRITE_BYTES(devname, result);
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SYSINFO_RET_FAIL == ret)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
-	}
-
-	return ret;
-}
-
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*devname, *mode;
@@ -180,6 +148,38 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VFS_DEV_READ_OPERATIONS(devname, result);
 	else if (0 == strcmp(mode, "bytes"))
 		ret = VFS_DEV_READ_BYTES(devname, result);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+	}
+
+	return ret;
+}
+
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char	*devname, *mode;
+	int	ret = SYSINFO_RET_FAIL;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	devname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
+	else if (0 == strcmp(mode, "bytes"))
+		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

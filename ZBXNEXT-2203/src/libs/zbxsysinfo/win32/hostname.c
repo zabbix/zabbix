@@ -28,7 +28,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	DWORD	dwSize = 256;
-	TCHAR	computerName[256];
+	wchar_t	computerName[256];
 	char	*type, buffer[256];
 	int	netbios, ret;
 	WSADATA sockInfo;

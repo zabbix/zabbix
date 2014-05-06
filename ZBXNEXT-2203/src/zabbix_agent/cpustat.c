@@ -114,7 +114,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	const char			*__function_name = "init_cpu_collector";
 	int				cpu_num, ret = FAIL;
 #ifdef _WINDOWS
-	TCHAR				cpu[8];
+	wchar_t				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -131,9 +131,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
 	{
 		if (0 == cpu_num)
-			zbx_wsnprintf(cpu, sizeof(cpu) / sizeof(TCHAR), TEXT("_Total"));
+			StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
 		else
-			_itow_s(cpu_num - 1, cpu, sizeof(cpu) / sizeof(TCHAR), 10);
+			_itow_s(cpu_num - 1, cpu, ARRSIZE(cpu), 10);
 
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 			goto clean;

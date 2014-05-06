@@ -22,8 +22,39 @@
 #include "setproctitle.h"
 
 #ifdef _WINDOWS
+
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+int	__zbx_stat(const char *path, zbx_stat_t *buf)
+{
+	int	ret, fd;
+	wchar_t	*wpath;
+
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (-1 == (ret = _wstat64(wpath, buf)))
+		goto out;
+
+	if (0 != S_ISDIR(buf->st_mode) || 0 != buf->st_size)
+		goto out;
+
+	/* In the case of symlinks _wstat64 returns zero file size.   */
+	/* Try to work around it by opening the file and using fstat. */
+
+	ret = -1;
+
+	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
+	{
+		ret = _fstat64(fd, buf);
+		_close(fd);
+	}
+out:
+	zbx_free(wpath);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************
@@ -1431,7 +1462,6 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	return SUCCEED;
 }
 
-
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
 {
@@ -2166,21 +2196,30 @@ int	is_macro_char(char c)
  *                                                                            *
  * Function: is_time_function                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - given function is time-based                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_time_function(const char *func)
 {
 	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_snmp_type                                                     *
+ *                                                                            *
+ * Return value:  SUCCEED  - the given type is one of regular SNMP types      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	is_snmp_type(unsigned char type)
+{
+	return ITEM_TYPE_SNMPv1 == type || ITEM_TYPE_SNMPv2c == type || ITEM_TYPE_SNMPv3 == type ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2350,4 +2389,3 @@ fail:
 
 	return res;
 }
-

@@ -32,7 +32,6 @@ class CHost extends CHostGeneral {
 	 * Get host data.
 	 *
 	 * @param array         $options
-	 * @param array         $options['nodeids']                  Node IDs
 	 * @param array         $options['groupids']                 HostGroup IDs
 	 * @param array         $options['hostids']                  Host IDs
 	 * @param boolean       $options['monitored_hosts']          only monitored Hosts
@@ -77,7 +76,6 @@ class CHost extends CHostGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'proxyids'					=> null,
@@ -108,6 +106,7 @@ class CHost extends CHostGeneral {
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
+			'searchInventory'			=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
@@ -398,6 +397,23 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		// search inventory
+		if ($options['searchInventory'] !== null) {
+			$sqlParts['from']['host_inventory'] = 'host_inventory hii';
+			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
+
+			zbx_db_search('host_inventory hii',
+				array(
+					'search' => $options['searchInventory'],
+					'startSearch' => $options['startSearch'],
+					'excludeSearch' => $options['excludeSearch'],
+					'searchWildcardsEnabled' => $options['searchWildcardsEnabled'],
+					'searchByAny' => $options['searchByAny']
+				),
+				$sqlParts
+			);
+		}
+
 		// filter
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
@@ -415,7 +431,6 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -448,55 +463,37 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Get Host ID by Host name
+	 * Get Host ID by Host name.
 	 *
 	 * @param array $host_data
 	 * @param string $host_data['host']
 	 *
-	 * @return int|boolean
+	 * @return array
 	 */
 	public function getObjects($hostData) {
-		$options = array(
+		return $this->get(array(
 			'filter' => $hostData,
 			'output' => API_OUTPUT_EXTEND
-		);
-
-		if (isset($hostData['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
-		}
-		elseif (isset($hostData['nodeids'])) {
-			$options['nodeids'] = $hostData['nodeids'];
-		}
-
-		$result = $this->get($options);
-
-		return $result;
+		));
 	}
 
+	/**
+	 * Check if host exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
-		$keyFields = array(
-			array(
-				'hostid',
-				'host',
-				'name'
-			)
-		);
+		self::deprecated('host.exists method is deprecated.');
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
+		$objs = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
 			'output' => array('hostid'),
-			'nopermissions' => 1,
 			'limit' => 1
-		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$objs = $this->get($options);
+		));
 
 		return !empty($objs);
 	}
@@ -622,7 +619,7 @@ class CHost extends CHostGeneral {
 
 			if (isset($host['host'])) {
 				// Check if host name isn't longer than 64 chars
-				if (zbx_strlen($host['host']) > 64) {
+				if (mb_strlen($host['host']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -630,7 +627,7 @@ class CHost extends CHostGeneral {
 							'Maximum host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['host'],
-							zbx_strlen($host['host'])
+							mb_strlen($host['host'])
 						)
 					);
 				}
@@ -658,7 +655,7 @@ class CHost extends CHostGeneral {
 				}
 
 				// Check if visible name isn't longer than 64 chars
-				if (zbx_strlen($host['name']) > 64) {
+				if (mb_strlen($host['name']) > 64) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_n(
@@ -666,7 +663,7 @@ class CHost extends CHostGeneral {
 							'Maximum visible host name length is %1$d characters, "%2$s" is %3$d characters.',
 							64,
 							$host['name'],
-							zbx_strlen($host['name'])
+							mb_strlen($host['name'])
 						)
 					);
 				}
@@ -993,10 +990,10 @@ class CHost extends CHostGeneral {
 			$curHost = reset($hosts);
 
 			$hostExists = $this->get(array(
-				'filter' => array('host' => $curHost['host']),
 				'output' => array('hostid'),
-				'editable' => true,
-				'nopermissions' => true
+				'filter' => array('host' => $data['host']),
+				'nopermissions' => true,
+				'limit' => 1
 			));
 			$hostExist = reset($hostExists);
 			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
@@ -1004,8 +1001,14 @@ class CHost extends CHostGeneral {
 			}
 
 			// can't add host with the same name as existing template
-			if (API::Template()->exists(array('host' => $curHost['host']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $curHost['host']));
+			$templateExists = API::Template()->get(array(
+				'output' => array('templateid'),
+				'filter' => array('host' => $data['host']),
+				'nopermissions' => true,
+				'limit' => 1
+			));
+			if ($templateExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
 		}
 
@@ -1492,7 +1495,6 @@ class CHost extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
 			'templated_hosts' => true,
 			'countOutput' => true
@@ -1519,7 +1521,6 @@ class CHost extends CHostGeneral {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'hostids' => $ids,
 			'editable' => true,
 			'templated_hosts' => true,
@@ -1527,27 +1528,6 @@ class CHost extends CHostGeneral {
 		));
 
 		return (count($ids) == $count);
-	}
-
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['hostids'] === null &&
-				$options['proxyids'] === null &&
-				$options['templateids'] === null &&
-				$options['interfaceids'] === null &&
-				$options['itemids'] === null &&
-				$options['triggerids'] === null &&
-				$options['maintenanceids'] === null &&
-				$options['graphids'] === null &&
-				$options['applicationids'] === null &&
-				$options['dserviceids'] === null &&
-				$options['httptestids'] === null &&
-				$options['groupids'] === null) {
-
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1558,10 +1538,9 @@ class CHost extends CHostGeneral {
 		// adding inventories
 		if ($options['selectInventory'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = API::getApi()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', array(
 				'output' => $options['selectInventory'],
-				'filter' => array('hostid' => $hostids),
-				'nodeids' => get_current_nodeid(true)
+				'filter' => array('hostid' => $hostids)
 			));
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
@@ -1571,7 +1550,6 @@ class CHost extends CHostGeneral {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
 				$interfaces = API::HostInterface()->get(array(
 					'output' => $this->outputExtend($options['selectInterfaces'], array('hostid', 'interfaceid')),
-					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -1587,7 +1565,6 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$interfaces = API::HostInterface()->get(array(
-					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1606,7 +1583,6 @@ class CHost extends CHostGeneral {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
 				$screens = API::TemplateScreen()->get(array(
 					'output' => $this->outputExtend($options['selectScreens'], array('hostid')),
-					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true
 				));
@@ -1625,7 +1601,6 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$screens = API::TemplateScreen()->get(array(
-					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
@@ -1652,7 +1627,6 @@ class CHost extends CHostGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
-				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -1661,11 +1635,10 @@ class CHost extends CHostGeneral {
 
 		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
-			$hostDiscoveries = API::getApi()->select('host_discovery', array(
+			$hostDiscoveries = API::getApiService()->select('host_discovery', array(
 				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
 				'filter' => array('hostid' => $hostids),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
 

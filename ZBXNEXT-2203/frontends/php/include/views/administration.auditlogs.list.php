@@ -62,9 +62,9 @@ $filterTable->addRow(array(
 	array(bold(_('Action')), SPACE, $actionComboBox),
 	array(bold(_('Resource')), SPACE, $resourceComboBox)
 ));
-$filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+$filterButton = new CSubmit('filter_set', _('Filter'));
 $filterButton->useJQueryStyle('main');
-$resetButton = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();');
+$resetButton = new CSubmit('filter_rst', _('Reset'));
 $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0;');
@@ -103,7 +103,7 @@ foreach ($this->data['actions'] as $action) {
 	}
 
 	$auditTable->addRow(array(
-		zbx_date2str(_('d M Y H:i:s'), $action['clock']),
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 		$action['alias'],
 		$action['ip'],
 		$action['resourcetype'],

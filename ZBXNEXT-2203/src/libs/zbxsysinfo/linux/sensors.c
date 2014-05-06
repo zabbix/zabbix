@@ -20,11 +20,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#define DO_ONE	0
-#define DO_AVG	1
-#define DO_MAX	2
-#define DO_MIN	3
-
 #if defined(KERNEL_2_4)
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
@@ -64,16 +59,16 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 		switch (do_task)
 		{
-			case DO_ONE:
+			case ZBX_DO_ONE:
 				*aggr = value;
 				break;
-			case DO_AVG:
+			case ZBX_DO_AVG:
 				*aggr += value;
 				break;
-			case DO_MAX:
+			case ZBX_DO_MAX:
 				*aggr = (1 == *cnt ? value : MAX(*aggr, value));
 				break;
-			case DO_MIN:
+			case ZBX_DO_MIN:
 				*aggr = (1 == *cnt ? value : MIN(*aggr, value));
 				break;
 		}
@@ -251,7 +246,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	char	sensorname[MAX_STRING_LEN];
 #if defined(KERNEL_2_4)
 
-	if (DO_ONE == do_task)
+	if (ZBX_DO_ONE == do_task)
 	{
 		zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s/%s", DEVICE_DIR, device, name);
 		count_sensor(do_task, sensorname, aggr, cnt);
@@ -337,7 +332,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 
 		if (SUCCEED == err && 0 == strcmp(device_info, device))
 		{
-			if (DO_ONE == do_task)
+			if (ZBX_DO_ONE == do_task)
 			{
 				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s_input", devicepath, name);
 				count_sensor(do_task, sensorname, aggr, cnt);
@@ -399,23 +394,23 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == function || '\0' == *function)
-		do_task = DO_ONE;
+		do_task = ZBX_DO_ONE;
 	else if (0 == strcmp(function, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(function, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(function, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (DO_ONE != do_task && 0 != isdigit(name[strlen(name)-1]))
-		do_task = DO_ONE;
+	if (ZBX_DO_ONE != do_task && 0 != isdigit(name[strlen(name)-1]))
+		do_task = ZBX_DO_ONE;
 
-	if (DO_ONE != do_task && 0 == isalpha(name[strlen(name)-1]))
+	if (ZBX_DO_ONE != do_task && 0 == isalpha(name[strlen(name)-1]))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sensor name must be alphabetic for selected mode."));
 		return SYSINFO_RET_FAIL;
@@ -429,7 +424,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (DO_AVG == do_task)
+	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, aggr / cnt);
 	else
 		SET_DBL_RESULT(result, aggr);

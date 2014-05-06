@@ -303,7 +303,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
 #define CONDITION_TYPE_APPLICATION		15
 #define CONDITION_TYPE_MAINTENANCE		16
-#define CONDITION_TYPE_NODE			17
 #define CONDITION_TYPE_DRULE			18
 #define CONDITION_TYPE_DCHECK			19
 #define CONDITION_TYPE_PROXY			20
@@ -366,40 +365,6 @@ typedef enum
 	GRAPH_YAXIS_TYPE_ITEM_VALUE
 }
 zbx_graph_yaxis_types_t;
-
-typedef enum
-{
-	AUDIT_RESOURCE_USER = 0,
-/*	AUDIT_RESOURCE_ZABBIX,*/
-	AUDIT_RESOURCE_ZABBIX_CONFIG = 2,
-	AUDIT_RESOURCE_MEDIA_TYPE,
-	AUDIT_RESOURCE_HOST,
-	AUDIT_RESOURCE_ACTION,
-	AUDIT_RESOURCE_GRAPH,
-	AUDIT_RESOURCE_GRAPH_ELEMENT,
-/*	AUDIT_RESOURCE_ESCALATION,
-	AUDIT_RESOURCE_ESCALATION_RULE,
-	AUDIT_RESOURCE_AUTOREGISTRATION,*/
-	AUDIT_RESOURCE_USER_GROUP = 11,
-	AUDIT_RESOURCE_APPLICATION,
-	AUDIT_RESOURCE_TRIGGER,
-	AUDIT_RESOURCE_HOST_GROUP,
-	AUDIT_RESOURCE_ITEM,
-	AUDIT_RESOURCE_IMAGE,
-	AUDIT_RESOURCE_VALUE_MAP,
-	AUDIT_RESOURCE_IT_SERVICE,
-	AUDIT_RESOURCE_MAP,
-	AUDIT_RESOURCE_SCREEN,
-	AUDIT_RESOURCE_NODE,
-	AUDIT_RESOURCE_SCENARIO,
-	AUDIT_RESOURCE_DISCOVERY_RULE,
-	AUDIT_RESOURCE_SLIDESHOW,
-	AUDIT_RESOURCE_SCRIPT,
-	AUDIT_RESOURCE_PROXY,
-	AUDIT_RESOURCE_MAINTENANCE,
-	AUDIT_RESOURCE_REGEXP
-}
-zbx_auditlog_resourcetype_t;
 
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
@@ -613,15 +578,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define SERVICE_ALGORITHM_MAX	1
 #define SERVICE_ALGORITHM_MIN	2
 
-/* types of nodes check sums */
-#define	NODE_CKSUM_TYPE_OLD	0
-#define	NODE_CKSUM_TYPE_NEW	1
-
-/* types of operation in config log */
-#define	NODE_CONFIGLOG_OP_UPDATE	0
-#define	NODE_CONFIGLOG_OP_ADD		1
-#define	NODE_CONFIGLOG_OP_DELETE	2
-
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
 #define ZBX_HTTPITEM_TYPE_TIME		1
@@ -647,10 +603,6 @@ typedef enum
 zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);
-
-#define	ZBX_NODE_SLAVE	0
-#define	ZBX_NODE_MASTER	1
-const char	*zbx_nodetype_string(unsigned char nodetype);
 
 typedef struct
 {
@@ -756,7 +708,6 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CHANGE_NODEID,
 	ZBX_TASK_CONFIG_CACHE_RELOAD
 }
 zbx_task_t;
@@ -865,7 +816,6 @@ u_char	zbx_hex2num(char c);
 size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
 size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
-size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
@@ -893,7 +843,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
@@ -983,7 +933,6 @@ char	*zbx_time2str(time_t time);
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_mismatch(const char *s1, const char *s2);
-int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
@@ -997,13 +946,13 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
-LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
-LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
-int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
-LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
-LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
-LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
-int	_wis_uint(LPCTSTR wide_string);
+wchar_t	*zbx_acp_to_unicode(const char *acp_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
+int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
+char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
+char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);
+int	_wis_uint(const wchar_t *wide_string);
 #endif
 void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
@@ -1024,10 +973,13 @@ void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
-#if defined(_WINDOWS) && defined(_UNICODE)
-int	__zbx_stat(const char *path, struct stat *buf);
+#if defined(_WINDOWS)
+typedef struct __stat64	zbx_stat_t;
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#endif	/* _WINDOWS && _UNICODE */
+#else
+typedef struct stat	zbx_stat_t;
+#endif	/* _WINDOWS */
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *, unsigned char state,
 		zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *, unsigned char);
@@ -1049,6 +1001,7 @@ int	is_function_char(char c);
 int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
+int	is_snmp_type(unsigned char type);
 
 int	get_item_key(char **exp, char **key);
 
