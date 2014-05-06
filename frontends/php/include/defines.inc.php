@@ -929,7 +929,7 @@ define('INCIDENT_FALSE_POSITIVE',	2);
 
 // SLA monitoring incident status
 define('DNS_NO_REPLY_ERROR_CODE',	-200);
-define('DNSSEC_FAIL_ERROR_CODE',		-204);
+define('DNSSEC_FAIL_ERROR_CODE',	-204);
 
 define('MIN_PROBE_OK_RESULT_PERCENTAGE',	49);
 

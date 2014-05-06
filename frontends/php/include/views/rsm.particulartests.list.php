@@ -84,7 +84,35 @@ foreach ($this->data['probes'] as $probe) {
 		}
 	}
 	else {
-		if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
+		if ($this->data['type'] == RSM_DNS) {
+			if (isset($probe['value'])) {
+				$values = array();
+
+				if ($probe['result'] === null) {
+					$noResultProbes++;
+					$link = new CSpan(_('No result'), 'gray');
+				}
+				else {
+					if ($probe['result'] !== null && $probe['result'] != 0) {
+						$values[] = _s('%1$s OK', $probe['result']);
+					}
+					if ($probe['value']['fail']) {
+						$values[] = _s('%1$s FAILED', $probe['value']['fail']);
+					}
+
+					$link = new CLink(
+						implode(', ', $values),
+						'rsm.particularproxys.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
+							'&time='.$this->data['time'].'&probe='.$probe['host'].'&type='.$this->data['type'],
+						$probe['class']
+					);
+				}
+			}
+			else {
+				$link = new CSpan(_('Not monitored'), 'red');
+			}
+		}
+		elseif ($this->data['type'] == RSM_DNSSEC) {
 			if (isset($probe['value'])) {
 				$values = array();
 				$okResults = false;
@@ -92,15 +120,15 @@ foreach ($this->data['probes'] as $probe) {
 				$noResults = false;
 
 				if ($probe['value']['ok']) {
-					$values[] = $probe['value']['ok'].' OK';
+					$values[] = _s('%1$s OK', $probe['value']['ok']);
 					$okResults = true;
 				}
 				if ($probe['value']['fail']) {
-					$values[] = $probe['value']['fail'].' FAILED';
+					$values[] = _s('%1$s FAILED', $probe['value']['fail']);
 					$failResults = true;
 				}
 				if ($probe['value']['noResult']) {
-					$values[] = $probe['value']['noResult'].' NO RESULT';
+					$values[] = _s('%1$s NO RESULT', $probe['value']['noResult']);
 					$noResults = true;
 				}
 

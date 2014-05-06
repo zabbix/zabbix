@@ -379,7 +379,10 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 		$itemValue = reset($itemValue);
 
-		if ($data['type'] == RSM_DNS && zbx_substring($item['key_'], 0, 16) == PROBE_DNS_UDP_ITEM_RTT) {
+		if ($data['type'] == RSM_DNS && $item['key_'] === PROBE_DNS_UDP_ITEM) {
+			$hosts[$item['hostid']]['result'] = $itemValue ? $itemValue['value'] : null;
+		}
+		elseif ($data['type'] == RSM_DNS && zbx_substring($item['key_'], 0, 16) == PROBE_DNS_UDP_ITEM_RTT) {
 			preg_match('/^[^\[]+\[([^\]]+)]$/', $item['key_'], $matches);
 			$nsValues = explode(',', $matches[1]);
 
@@ -462,25 +465,21 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	if ($data['type'] == RSM_DNS) {
 		foreach ($nsArray as $hostId => $nss) {
-			$hosts[$hostId]['value']['ok'] = 0;
 			$hosts[$hostId]['value']['fail'] = 0;
-			$hosts[$hostId]['value']['noResult'] = 0;
 
 			foreach ($nss as $nsName => $nsValue) {
-				if (in_array(NS_UP, $nsValue['value'])) {
-					$hosts[$hostId]['value']['ok']++;
-				}
-				elseif (in_array(NS_DOWN, $nsValue['value'])) {
+				if (in_array(NS_DOWN, $nsValue['value'])) {
 					$hosts[$hostId]['value']['fail']++;
-				}
-				else {
-					$hosts[$hostId]['value']['noResult']++;
 				}
 			}
 
 			// calculate Down probes
 			if (count($nss) - $hosts[$hostId]['value']['fail'] < $minDnsCount) {
 				$data['downProbes']++;
+				$hosts[$hostId]['class'] = 'red';
+			}
+			else {
+				$hosts[$hostId]['class'] = 'green';
 			}
 		}
 	}
