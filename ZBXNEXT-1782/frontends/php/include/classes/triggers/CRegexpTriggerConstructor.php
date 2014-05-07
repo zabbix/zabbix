@@ -27,6 +27,20 @@ class CRegexpTriggerConstructor {
 	const EXPRESSION_TYPE_NO_MATCH = 1;
 
 	/**
+	 * Parser used for parsing trigger expressions.
+	 *
+	 * @var CTriggerExpression
+	 */
+	protected $triggerExpression;
+
+	/**
+	 * @param CTriggerExpression $triggerExpression     trigger expression parser
+	 */
+	public function __construct(CTriggerExpression $triggerExpression) {
+		$this->triggerExpression = $triggerExpression;
+	}
+
+	/**
 	 * Create a trigger expression from the given expression parts.
 	 *
 	 * @param string    $host                       host name
@@ -140,6 +154,88 @@ class CRegexpTriggerConstructor {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Break a complete trigger expression into parts used by the wizard.
+	 *
+	 * @param string $expression    trigger expression
+	 *
+	 * @return array    an array of expression parts, see self::getExpressionFromParts() for the structure of the part
+	 *                  array
+	 */
+	public function getPartsFromExpression($expression) {
+		$parseResult = $this->triggerExpression->parse($expression);
+
+		$expressions = array();
+		$splitTokens = $this->splitTokensByFirstLevel($parseResult->getTokens());
+		foreach($splitTokens as $key => $tokens) {
+			$expr = array();
+
+			// replace whole function macros with their functions
+			foreach ($tokens as $token) {
+				$value = $token['value'];
+				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+					$value = $token['data']['function'];
+				}
+
+				$expr[] = $value;
+			}
+
+			// the following code was left unchanged to preserve the current behavior of the constructor
+			// feel free to rewrite and correct it if necessary
+			$expr = implode($expr, ' ');
+			$expr = preg_replace('/^\( (.*) \)$/u', '$1', $expr);
+
+			$value = preg_replace('/ (=|<>) 0/', '', $expr);
+			$value = preg_replace('/^\( (.*) \)$/u', '$1', $value); // removing wrapping parentheses
+
+			$expressions[$key]['value'] = trim($value);
+			$expressions[$key]['type'] = (zbx_strpos($expr, '<> 0', zbx_strlen($expr) - 5) === false)
+				? self::EXPRESSION_TYPE_NO_MATCH
+				: self::EXPRESSION_TYPE_MATCH;
+		}
+
+		return $expressions;
+	}
+
+	/**
+	 * Split the trigger expression tokens into separate arrays.
+	 *
+	 * The tokens are split at the first occurrence of the "and" or "or" operators with respect to parentheses.
+	 *
+	 * @param array $tokens     an array of tokens from the CTriggerExpressionParserResult
+	 *
+	 * @return array    an array of token arrays grouped by expression
+	 */
+	protected function splitTokensByFirstLevel(array $tokens) {
+		$expresions = array();
+		$currentExpression = array();
+
+		$level = 0;
+		foreach ($tokens as $token) {
+			if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE) {
+				$level++;
+			}
+			elseif ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE) {
+				$level--;
+			}
+
+			if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
+					&& $level == 0
+					&& ($token['value'] === 'or' || $token['value'] === 'and')) {
+
+				$expresions[] = $currentExpression;
+				$currentExpression = array();
+			}
+			else {
+				$currentExpression[] = $token;
+			}
+		}
+
+		$expresions[] = $currentExpression;
+
+		return $expresions;
 	}
 
 }
