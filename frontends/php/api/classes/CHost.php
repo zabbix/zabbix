@@ -487,7 +487,7 @@ class CHost extends CHostGeneral {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('host.exists method is deprecated.');
+		$this->deprecated('host.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
