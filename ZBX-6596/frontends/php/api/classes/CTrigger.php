@@ -1780,7 +1780,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		if ($sortfield == 'hostname') {
+		if ($sortfield === 'hostname') {
 			$sqlParts['select']['hostname'] = 'h.name AS hostname';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
