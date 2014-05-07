@@ -134,13 +134,13 @@ else {
 	else {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 	}
+}
 
-	$mainInterfaces = getRequest('mainInterfaces', array());
-	foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $interfaceType) {
-		if (isset($mainInterfaces[INTERFACE_TYPE_AGENT])) {
-			$mainAgentId = $mainInterfaces[INTERFACE_TYPE_AGENT];
-			$interfaces[$mainAgentId]['main'] = '1';
-		}
+$mainInterfaces = getRequest('mainInterfaces', array());
+foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $interfaceType) {
+	if (isset($mainInterfaces[$interfaceType])) {
+		$interfaceId = $mainInterfaces[$interfaceType];
+		$interfaces[$interfaceId]['main'] = '1';
 	}
 }
 
