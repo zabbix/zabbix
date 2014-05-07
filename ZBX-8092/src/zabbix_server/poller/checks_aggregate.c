@@ -378,6 +378,9 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
+			continue;
+
 		if (ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type)
 			continue;
 

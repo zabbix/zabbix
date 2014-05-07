@@ -1939,6 +1939,9 @@ try_again:
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+			continue;
+
 		zbx_json_addobject(j, NULL);
 
 		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, dc_items[i].host.host, ZBX_JSON_TYPE_STRING);
@@ -2113,6 +2116,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 
 		if (proxy_hostid != items[i].host.proxy_hostid)
+			continue;
+
+		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

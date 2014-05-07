@@ -153,6 +153,9 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
+			continue;
+
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
 		{
@@ -233,6 +236,9 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	for (i = 0; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

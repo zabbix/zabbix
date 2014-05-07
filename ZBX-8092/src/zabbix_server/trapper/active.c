@@ -214,6 +214,9 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 				continue;
 			}
 
+			if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+				continue;
+
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
@@ -370,6 +373,9 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 						" server cache. Not sending now.", __function_name, itemids.values[i]);
 				continue;
 			}
+
+			if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+				continue;
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{

@@ -102,6 +102,7 @@ typedef struct
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
 	char		inventory_mode;
+	unsigned char	status;
 }
 DC_HOST;
 

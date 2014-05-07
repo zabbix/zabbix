@@ -1848,7 +1848,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		update_index = 0;
 
-		if (HOST_STATUS_MONITORED == status && (0 == found || 0 != strcmp(host->host, row[2])))
+		if ((HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status) && (0 == found || 0 != strcmp(host->host, row[2])))
 		{
 			if (1 == found)
 			{
@@ -1961,7 +1961,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 	}
 
-	/* remove deleted or disabled hosts from buffer */
+	/* remove deleted hosts from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1999,7 +1999,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* hosts */
 
-		if (HOST_STATUS_MONITORED == host->status)
+		if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
 		{
 			host_h_local.host = host->host;
 			host_h = zbx_hashset_search(&config->hosts_h, &host_h_local);
@@ -2800,10 +2800,10 @@ void	DCsync_configuration(void)
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name"
 			" from hosts"
-			" where status in (%d,%d,%d)"
+			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d"
 				ZBX_SQL_NODE,
-			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("hostid"))))
 	{
@@ -3560,6 +3560,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->jmx_errors_from = src_host->jmx_errors_from;
 	dst_host->jmx_available = src_host->jmx_available;
 	dst_host->jmx_disable_until = src_host->jmx_disable_until;
+	dst_host->status = src_host->status;
 
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
@@ -4602,7 +4603,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
 			continue;
 
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
@@ -4762,7 +4763,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 	if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)))
 		goto unlock;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_interface->hostid)) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 		goto unlock;
 
 	if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
@@ -4906,7 +4907,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	{
 		ZBX_DC_HOST	*dc_host;
 
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 			return;
 
 		dc_item->poller_type = poller_by_item(dc_item->itemid, dc_host->proxy_hostid,
@@ -4922,7 +4923,7 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 		return;
 
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
@@ -5113,7 +5114,7 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)) && HOST_STATUS_NOT_MONITORED != dc_host->status)
 	{
 		DChost_get_availability(dc_host, in->type, in);
 
@@ -5161,7 +5162,7 @@ int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)) && HOST_STATUS_NOT_MONITORED != dc_host->status)
 	{
 		DChost_get_availability(dc_host, in->type, in);
 		*out = *in;
@@ -5225,7 +5226,7 @@ void	DChost_update_availability(const zbx_host_availability_t *availability, int
 
 	for (i = 0; i < availability_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 			continue;
 
 		DChost_set_availability(dc_host, &availability[i]);
@@ -5347,7 +5348,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 
 	for (i = 0; i < hostids_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])))
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostids[i])) || HOST_STATUS_NOT_MONITORED == dc_host->status)
 			continue;
 
 		if (dc_host->maintenance_status != maintenance_status)
@@ -5414,7 +5415,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_config_nextcheck = src_proxy->proxy_config_nextcheck;
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 
-	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
+	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)) && HOST_STATUS_NOT_MONITORED != host->status)
 		strscpy(dst_proxy->host, host->host);
 	else
 		*dst_proxy->host = '\0';
@@ -5788,7 +5789,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		ZBX_DC_HOST	*host;
 
-		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) || HOST_STATUS_NOT_MONITORED == host->status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == host->maintenance_status &&

@@ -1218,6 +1218,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
+			continue;
+
 		for (j = 0; j < history_num; j++)
 		{
 			if (items[i].itemid == history[j].itemid)
