@@ -698,7 +698,13 @@ sub push_value
 #
 sub send_values
 {
-    return if (defined($OPTS{'test'}) or scalar(@_sender_values) == 0);
+    return if (defined($OPTS{'test'}));
+
+    if (scalar(@_sender_values) == 0)
+    {
+	wrn("will not send values, nothing to send");
+	return;
+    }
 
     my $sender = Zabbix::Sender->new({
 	'server' => $config->{'slv'}->{'zserver'},
@@ -708,10 +714,13 @@ sub send_values
     fail("cannot connect to Zabbix server") unless (defined($sender));
 
     my @suba;
+    my $total_values = scalar(@_sender_values);
 
     while (scalar(@_sender_values) > 0)
     {
 	@suba = splice(@_sender_values, 0, SENDER_BATCH_COUNT);
+
+	dbg("sending ", scalar(@suba), "/$total_values values");
 
 	unless (defined($sender->send_arrref(\@suba)))
 	{
@@ -1139,23 +1148,22 @@ sub dbg
 
 sub info
 {
-    my $msg = join('', @_);
-
     __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [INF] ', @_, "\n"));
 }
 
 sub wrn
 {
-    my $msg = join('', @_);
-
     __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [WRN] ', @_, "\n"));
 }
 
 sub fail
 {
-    my $msg = join('', @_);
+    my $msg = join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n");
 
-    __log(join('', '[', ts_str(), '] [', __script(), (defined($tld) ? " $tld" : ''), '] [ERR] ', @_, "\n"));
+    # log failures to the general log (not TLD-specific)
+    $tld = undef;
+
+    __log($msg);
 
     exit(FAIL);
 }
@@ -1227,7 +1235,7 @@ sub __log
 
     print {$OUTFILE} $msg or die("cannot write to $file: $!");
 
-    close $OUTFILE or fail("cannot close $file: $!");
+    close $OUTFILE or die("cannot close $file: $!");
 }
 
 sub __get_macro
@@ -1487,11 +1495,15 @@ sub __get_eventtimes
 
     my $rows = scalar(@$arr_ref);
 
-    fail("item $itemid must have one not classified trigger (found: $rows)") unless ($rows == 1);
+    my @eventtimes;
+
+    unless ($rows == 1)
+    {
+	wrn("item $itemid must have one not classified trigger (found: $rows)");
+	return \@eventtimes;
+    }
 
     my $triggerid = $arr_ref->[0]->[0];
-
-    my @eventtimes;
 
     # select events, where time_from < filter_from and value = TRIGGER_VALUE_TRUE
     $res = db_select(

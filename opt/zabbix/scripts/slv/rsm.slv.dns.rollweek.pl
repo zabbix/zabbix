@@ -38,7 +38,7 @@ foreach (@$tlds_ref)
 
     my $perc = sprintf("%.3f", $fails * 100 / $cfg_sla);
 
-    info("result: $perc % (down: $fails minutes, interval: $interval)");
+    info("result: $perc% (down: $fails minutes, interval: $interval, ", ts_str($value_ts), ")");
     push_value($tld, $cfg_key_out, $value_ts, $perc);
 }
 
