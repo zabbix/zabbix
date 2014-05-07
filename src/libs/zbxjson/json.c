@@ -648,7 +648,7 @@ static size_t	zbx_json_int_size(const char *p)
 
 	while (*p != '\0')	/* this should never happen */
 	{
-		if ((*p < '0' || *p > '9') && (*p != '-') && (*p != '.'))
+		if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) && ('.' != *p) && ('e' != *p) && ('E' != *p))
 			return sz;
 		else
 			sz++;
@@ -664,7 +664,7 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 
 	while ('\0' != *p)	/* this should never happen */
 	{
-		if ((*p < '0' || *p > '9') && (*p != '-') && (*p != '.'))
+		if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) && ('.' != *p) && ('e' != *p) && ('E' != *p))
 		{
 			*o = '\0';
 			return p;
