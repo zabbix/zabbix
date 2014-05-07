@@ -930,6 +930,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.12rc2
 
 Bug fixes:
+...G...... [ZBX-7856] fixed zbx_stat() not working with directories in Windows (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.12rc1
