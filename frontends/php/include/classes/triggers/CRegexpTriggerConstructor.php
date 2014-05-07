@@ -23,11 +23,23 @@
  */
 class CRegexpTriggerConstructor {
 
-	const EXPRESSION_TYPE_INCLUDE = 0;
-	const EXPRESSION_TYPE_EXCLUDE = 1;
+	const EXPRESSION_TYPE_MATCH = 0;
+	const EXPRESSION_TYPE_NO_MATCH = 1;
 
-	public function constructFromExpressions($host, $itemKey, array $expressions) {
-		$complite_expr = '';
+	/**
+	 * Create a trigger expression from the given expression parts.
+	 *
+	 * @param string    $host                       host name
+	 * @param string    $itemKey                    item key
+	 * @param array     $expressions                array of expression parts
+	 * @param string    $expressions[]['value']     expression string
+	 * @param int       $expressions[]['type']      whether the string should match the expression; supported values:
+	 *                                              self::EXPRESSION_TYPE_MATCH and self::EXPRESSION_TYPE_NO_MATCH
+	 *
+	 * @return bool|string
+	 */
+	public function getExpressionFromParts($host, $itemKey, array $expressions) {
+		$result = '';
 		$prefix = $host.':'.$itemKey.'.';
 
 		if (empty($expressions)) {
@@ -35,47 +47,49 @@ class CRegexpTriggerConstructor {
 			return false;
 		}
 
-		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*)([&|]{1})[(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+		// regexp used to split an expressions into tokens
+		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) [(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
 		$functions = array('regexp' => 1, 'iregexp' => 1);
 		$expr_array = array();
 		$cexpor = 0;
 		$startpos = -1;
 
 		foreach ($expressions as $expression) {
-			$expression['value'] = preg_replace('/\s+(AND){1,2}\s+/U', '&', $expression['value']);
-			$expression['value'] = preg_replace('/\s+(OR){1,2}\s+/U', '|', $expression['value']);
-
-			if ($expression['type'] == self::EXPRESSION_TYPE_INCLUDE) {
-				if (!empty($complite_expr)) {
-					$complite_expr.=' | ';
+			if ($expression['type'] == self::EXPRESSION_TYPE_MATCH) {
+				if (!empty($result)) {
+					$result.=' or ';
 				}
 				if ($cexpor == 0) {
-					$startpos = zbx_strlen($complite_expr);
+					$startpos = zbx_strlen($result);
 				}
 				$cexpor++;
-				$eq_global = '#0';
+				$eq_global = '<>0';
 			}
 			else {
 				if (($cexpor > 1) & ($startpos >= 0)) {
-					$head = substr($complite_expr, 0, $startpos);
-					$tail = substr($complite_expr, $startpos);
-					$complite_expr = $head.'('.$tail.')';
+					$head = substr($result, 0, $startpos);
+					$tail = substr($result, $startpos);
+					$result = $head.'('.$tail.')';
 				}
 				$cexpor = 0;
 				$eq_global = '=0';
-				if (!empty($complite_expr)) {
-					$complite_expr.=' & ';
+				if (!empty($result)) {
+					$result.=' and ';
 				}
 			}
 
-			$expr = '&'.$expression['value'];
-			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U', '$1', $expr);
+			$expr = ' and '.$expression['value'];
+
+			// strip extra spaces around "and" and "or" operators
+			$expr = preg_replace('/\s+(and|or)\s+/U', ' $1 ', $expr);
 
 			$expr_array = array();
 			$sub_expr_count=0;
 			$sub_expr = '';
-			$multi = preg_match('/.+(&|\|).+/', $expr);
+			$multi = preg_match('/.+(and|or).+/', $expr);
 
+			// split an expression into separate tokens
+			// start from the first part of the expression, then move to the next one
 			while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
 				$arr[4] = zbx_strtolower($arr[4]);
 				if (!isset($functions[$arr[4]])) {
@@ -102,29 +116,30 @@ class CRegexpTriggerConstructor {
 			}
 
 			foreach ($expr_array as $id => $expr) {
+				$eq = ($expr['eq'] === '') ? '' : ' '.$expr['eq'].' ';
 				if ($multi > 0) {
-					$sub_expr = $expr['eq'].'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
+					$sub_expr = $eq.'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
 				}
 				else {
-					$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
+					$sub_expr = $eq.$expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
 				}
 			}
 
 			if ($multi > 0) {
-				$complite_expr .= '('.$sub_expr.')';
+				$result .= '('.$sub_expr.')';
 			}
 			else {
-				$complite_expr .= '(('.$sub_expr.')'.$eq_global.')';
+				$result .= '(('.$sub_expr.')'.$eq_global.')';
 			}
 		}
 
 		if (($cexpor > 1) & ($startpos >= 0)) {
-			$head = substr($complite_expr, 0, $startpos);
-			$tail = substr($complite_expr, $startpos);
-			$complite_expr = $head.'('.$tail.')';
+			$head = substr($result, 0, $startpos);
+			$tail = substr($result, $startpos);
+			$result = $head.'('.$tail.')';
 		}
 
-		return $complite_expr;
+		return $result;
 	}
 
 }
