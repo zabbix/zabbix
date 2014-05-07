@@ -900,7 +900,7 @@ non_unique:
 			if ('1' == protected_rows[i])
 				continue;
 
-			p = old2new + (i + 1) * num_new - 1;	/* the last element of the current row */
+			p = old2new + i * num_new;	/* the first element of the current row */
 
 			for (j = num_new - 1; j >= 0; j--)
 			{
