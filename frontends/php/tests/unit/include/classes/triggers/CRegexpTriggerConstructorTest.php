@@ -21,6 +21,15 @@
 
 class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 
+	/**
+	 * @var CRegexpTriggerConstructor
+	 */
+	protected $constructor;
+
+	public function setUp() {
+		$this->constructor = new CRegexpTriggerConstructor(new CTriggerExpression());
+	}
+
 	public function testGetExpressionFromPartsValidProvider() {
 		return array(
 			array(
@@ -164,8 +173,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedExpressions
 	 */
 	public function testGetExpressionFromPartsValid($host, $item, array $expressions, $expectedExpressions) {
-		$constructor = new CRegexpTriggerConstructor();
-		$expression = $constructor->getExpressionFromParts($host, $item, $expressions);
+		$expression = $this->constructor->getExpressionFromParts($host, $item, $expressions);
 
 		$this->assertEquals($expectedExpressions, $expression);
 	}
@@ -175,5 +183,127 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetExpressionFromPartsInvalid() {
 		$this->markTestIncomplete();
+	}
+
+	public function testGetPartsFromExpressionProvider() {
+		return array(
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}=0',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}<>0',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
+					)
+				)
+			),
+			array(
+				'({Zabbix server:system.hostname.regexp(a)}=0)',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'(({Zabbix server:system.hostname.regexp(a)})=0)',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}=0 and {Zabbix server:system.hostname.regexp(b)}=0',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			),
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			),
+			array(
+				'({Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0) and {Zabbix server:system.hostname.regexp(c)}=0',
+				array(
+					array(
+						'value' => 'regexp(a) or regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(c)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			),
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}=0 or ({Zabbix server:system.hostname.regexp(b)}=0 and {Zabbix server:system.hostname.regexp(c)}=0)',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(b) and regexp(c)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			),
+			array(
+				'{Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0 and {Zabbix server:system.hostname.regexp(c)}=0',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(c)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider testGetPartsFromExpressionProvider
+	 *
+	 * @param $expression
+	 * @param array $expectedParts
+	 */
+	public function testGetPartsFromExpression($expression, array $expectedParts) {
+		$parts = $this->constructor->getPartsFromExpression($expression);
+
+		$this->assertEquals($expectedParts, $parts);
 	}
 }

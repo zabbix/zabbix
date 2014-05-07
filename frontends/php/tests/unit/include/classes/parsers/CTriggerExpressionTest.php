@@ -3242,4 +3242,83 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			$this->assertEquals($rc, false, "\nError with expression $expression: ".$expressionData->error);
 		}
 	}
+
+
+	public function testTokens() {
+		$exp = '(-1 + {host:item.last(0)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD})';
+		$tokens = array(
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
+				'value' => '(',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => '-',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'value' => '1',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => '+',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+				'value' => '{host:item.last(0)}',
+				'data' => array(
+					'function' => 'last(0)'
+				),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'or',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'value' => '{$USERMACRO}',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'and',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'not',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'value' => '{TRIGGER.VALUE}',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'or',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'value' => '{#LLD}',
+				'data' => array(),
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
+				'value' => ')',
+				'data' => array(),
+			),
+		);
+
+		$parser = new CTriggerExpression();
+		$result = $parser->parse($exp);
+		$this->assertTrue($result instanceof CTriggerExpressionParserResult);
+		$this->assertEquals($tokens, $result->getTokens());
+	}
 }

@@ -72,7 +72,7 @@ $item = API::Item()->get(array(
 $item = reset($item);
 $host = reset($item['hosts']);
 
-$constructor = new CRegexpTriggerConstructor();
+$constructor = new CRegexpTriggerConstructor(new CTriggerExpression());
 
 /**
  * Save a trigger
@@ -185,8 +185,7 @@ if(isset($_REQUEST['sform'])){
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
 		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
-		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
-								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
+		$sql = 'SELECT DISTINCT t.expression, t.description, t.priority, t.comments, t.url, t.status, t.type'.
 					' FROM functions f, triggers t, items i '.
 					' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
 						' AND i.itemid=f.itemid '.
@@ -196,60 +195,22 @@ if(isset($_REQUEST['sform'])){
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
-			$expression = $rows['expression'];
+			$expression = explode_exp($rows['expression']);
 			$type = $rows['type'];
 			$priority = $rows['priority'];
 			$comments = $rows['comments'];
 			$url = $rows['url'];
 			$status = $rows['status'];
-
-			$functionid[] = '/\{'.$rows['functionid'].'\}/Uu';
-			$functions[] = $rows['function'].'('.$rows['parameter'].')';
 		}
 
-		$expr_v = $expression;
-		$expression = preg_replace($functionid,$functions,$expression);
-		$expr_incase = $expression;
-
-		$expression = preg_replace('/\(\(\((.+?)\)\) &/i', '(($1) &', $expression);
+		// strip extra parentheses
+		$expression = preg_replace('/\(\(\((.+?)\)\) and/i', '(($1) and', $expression);
 		$expression = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expression);
 
-		$expr_v = preg_replace('/\(\(\((.+?)\)\) &/i', '(($1) &', $expr_v);
-		$expr_v = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expr_v);
+		$expr_incase = $expression;
 
-		$expression = splitByFirstLevel($expression);
-		$expr_v = splitByFirstLevel($expr_v);
-
-		foreach($expression as $id => $expr){
-			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-
-			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
-
-			$expressions[$id]['value'] = trim($value);
-			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH):(CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH);
-		}
-
-		foreach($expr_v as $id => $expr) {
-			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-			$value = preg_replace('/\((.*)\)[=|#]0/U','$1',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
-
-			if (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false) {
-//REGEXP_EXCLUDE
-				$value = str_replace('&', ' OR ', $value);
-				$value = str_replace('|', ' AND ', $value);
-			} else {
-//EGEXP_INCLUDE
-				$value = str_replace('&', ' AND ', $value);
-				$value = str_replace('|', ' OR ', $value);
-			}
-
-			$value = preg_replace($functionid,$functions,$value);
-			$value = preg_replace('/([=|#]0)/','',$value);
-
-			$expressions[$id]['view'] = trim($value);
-		}
+		// break expression into parts
+		$expressions = $constructor->getPartsFromExpression($expression);
 	}
 	else{
 		$description = get_request('description','');
@@ -333,7 +294,6 @@ if(isset($_REQUEST['sform'])){
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
 		$expressions[0]['type'] = 0;
-		$expressions[0]['view'] = $expr_incase;
 		$bExprResult = false;
 	}
 
@@ -350,13 +310,17 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(_('Delete'),'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(
+			htmlspecialchars($expr['value']),
+			($expr['type'] == CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
+			array($imgup, SPACE, $imgdn),
+			$del_url
+		));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 
 		$frmTRLog->addVar('expressions['.$id.'][value]',$expr['value']);
 		$frmTRLog->addVar('expressions['.$id.'][type]',$expr['type']);
-		$frmTRLog->addVar('expressions['.$id.'][view]',$expr['view']);
 
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}

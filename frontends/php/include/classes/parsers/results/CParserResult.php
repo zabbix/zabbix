@@ -50,17 +50,4 @@ class CParserResult {
 	 * @var string
 	 */
 	public $endPos;
-
-	/**
-	 * @param string 	$source
-	 * @param string 	$match
-	 * @param int	 	$startPos
-	 * @param int 		$endPos
-	 */
-	public function __construct($source, $match, $startPos, $endPos) {
-		$this->source = $source;
-		$this->match = $match;
-		$this->startPos = $startPos;
-		$this->endPos = $endPos;
-	}
 }

@@ -41,7 +41,7 @@ function previousObject(p) {
 }
 
 function add_logexpr() {
-	var REGEXP_EXCLUDE = 1;
+	var EXPRESSION_TYPE_NO_MATCH = 1;
 	try {
 		var expr = document.getElementById('logexpr');
 		var expr_t = document.getElementById('expr_type');
@@ -53,14 +53,12 @@ function add_logexpr() {
 		throw('Error: ' + (IE ? e.description : e));
 	}
 
-	var ex = bt_and.disabled ? '|' : '&';
-	var ex_v = bt_and.disabled ? ' OR ' : ' AND ';
-	if (expr_t.value == REGEXP_EXCLUDE) {
-		ex = bt_and.disabled ? '&' : '|';
+	var ex = bt_and.disabled ? ' or ' : ' and ';
+	if (expr_t.value == EXPRESSION_TYPE_NO_MATCH) {
+		ex = bt_and.disabled ? ' and ' : ' or ';
 	}
 
 	var expression = '';
-	var expr_v = '';
 	var lp;
 	for (lp = 0; lp < key_count; lp++) {
 		var key = document.getElementsByName('keys[' + lp + '][value]')[0];
@@ -68,10 +66,8 @@ function add_logexpr() {
 		if (typeof(key) != 'undefined' && typeof(typ) != 'undefined') {
 			if (expression != '') {
 				expression += ex;
-				expr_v += ex_v;
 			}
 			expression += typ.value + '(' + key.value + ')';
-			expr_v += typ.value + '(' + key.value + ')';
 			remove_keyword('keytr' + lp);
 		}
 	}
@@ -79,12 +75,9 @@ function add_logexpr() {
 	if (typeof(expr.value) != 'undefined' && expr.value != '') {
 		if (expression != '') {
 			expression += ex;
-			expr_v += ex_v;
 		}
 		expression += iregexp.checked ? 'iregexp' : 'regexp';
 		expression += '(' + expr.value + ')';
-		expr_v += iregexp.checked ? 'iregexp' : 'regexp';
-		expr_v += '(' + expr.value + ')';
 	}
 
 	if (expression == '') {
@@ -101,18 +94,12 @@ function add_logexpr() {
 
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	td.appendChild(document.createTextNode(expr_v));
+	td.appendChild(document.createTextNode(expression));
 
 	jQuery(td).append(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][value]',
 		type: 'hidden',
 		value: expression
-	}));
-
-	jQuery(td).append(jQuery('<input>', {
-		name: 'expressions[' + logexpr_count + '][view]',
-		type: 'hidden',
-		value: expr_v
 	}));
 
 	var td = document.createElement('td');
@@ -238,14 +225,11 @@ function swapNodesNames(n1, n2) {
 		var elm = [];
 		elm[0] = document.getElementsByName('expressions[' + id1 + '][value]')[0];
 		elm[1] = document.getElementsByName('expressions[' + id1 + '][type]')[0];
-		elm[2] = document.getElementsByName('expressions[' + id1 + '][view]')[0];
-		elm[3] = document.getElementsByName('expressions[' + id2 + '][value]')[0];
-		elm[4] = document.getElementsByName('expressions[' + id2 + '][type]')[0];
-		elm[5] = document.getElementsByName('expressions[' + id2 + '][view]')[0];
+		elm[2] = document.getElementsByName('expressions[' + id2 + '][value]')[0];
+		elm[3] = document.getElementsByName('expressions[' + id2 + '][type]')[0];
 
-		swapNodes(elm[0], elm[3]);
-		swapNodes(elm[1], elm[4]);
-		swapNodes(elm[2], elm[5]);
+		swapNodes(elm[0], elm[1]);
+		swapNodes(elm[2], elm[3]);
 
 		return true;
 	}

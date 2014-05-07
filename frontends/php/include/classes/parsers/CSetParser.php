@@ -73,6 +73,12 @@ class CSetParser extends CParser {
 			return false;
 		}
 
-		return new CParserResult($source, $match, $startPos, $matchPos);
+		$result = new CParserResult();
+		$result->source = $source;
+		$result->match = $match;
+		$result->startPos = $startPos;
+		$result->endPos = $matchPos;
+
+		return $result;
 	}
 }

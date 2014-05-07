@@ -21,6 +21,7 @@
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
 require_once __DIR__.'/../../include/gettextwrapper.inc.php';
+require_once __DIR__.'/../../include/triggers.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';

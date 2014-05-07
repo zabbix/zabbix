@@ -531,46 +531,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	return true;
 }
 
-/**
- * Function split trigger expresion by '&' and '|', that all elements from first level would be separated.
- *
- * @param string $expresion		trigger expresion
- *
- * @return array
- */
-function splitByFirstLevel($expresion) {
-	$pos = 0;
-	$level = 0;
-
-	while (isset($expresion[$pos])) {
-		switch ($expresion[$pos]) {
-			case '(':
-				++$level;
-				break;
-			case ')':
-				--$level;
-				break;
-			case '&':
-			case '|':
-				if (!$level) {
-					$tmpArr[] = trim(substr($expresion, 0, $pos));
-					$expresion = substr($expresion, $pos + 1);
-					$pos = -1;
-				}
-				break;
-			default:
-				break;
-		}
-		++$pos;
-	}
-
-	if ($expresion) {
-		$tmpArr[] = trim($expresion);
-	}
-
-	return $tmpArr;
-}
-
 /********************************************************************************
  *																				*
  * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10	*
