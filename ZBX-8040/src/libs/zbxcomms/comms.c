@@ -903,6 +903,167 @@ void	zbx_tcp_free(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_sock_find_line                                               *
+ *                                                                            *
+ * Purpose: finds the next line from socket data buffer                       *
+ *                                                                            *
+ * Parameters:  s      - [IN] the socket                                      *
+ *              data   - [OUT] a pointer to the next line                     *
+ *                                                                            *
+ * Return value: SUCCEED - the next line was successfully returned            *
+ *               FAIL    - the the end of the next line (newline character)   *
+ *                         was not found in the socket data buffer            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_sock_find_line(zbx_sock_t *s, char **data)
+{
+	char	*ptr, *pstart = (ZBX_BUF_TYPE_DYN == s->buf_type ? s->buf_dyn : s->buf_stat);
+
+	/* check if the buffer contains the next line */
+	if (s->next_line - pstart <= s->read_bytes && NULL != (ptr = strchr(s->next_line, '\n')))
+	{
+		*data = s->next_line;
+		s->next_line = ptr + 1;
+
+		if ('\r' != *(--ptr))
+			ptr++;
+
+		*ptr = '\0';
+
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_recv_line                                                *
+ *                                                                            *
+ * Purpose: reads the next line from socket data buffer                       *
+ *                                                                            *
+ * Parameters:  s        - [IN] the socket                                    *
+ *              data     - [OUT] a pointer to the next line                   *
+ *              timeout  - [IN] timeout value (optional, can be 0)            *
+ *                                                                            *
+ * Return value: SUCCEED - the next line was successfully returned            *
+ *               FAIL    - an error occured or the socket was closed          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout)
+{
+#define	ZBX_TCP_MAX_LINE_LENTH	(64 * ZBX_KIBIBYTE)
+
+	char	buffer[ZBX_STAT_BUF_LEN], *ptr = NULL, *pstart;
+	int	nbytes, ret = FAIL, left, line_length;
+	size_t	alloc = 0, offset = 0;
+
+	/* check if the buffer already contains the next line */
+	if (SUCCEED == (ret = zbx_sock_find_line(s, data)))
+		return SUCCEED;
+
+	ZBX_TCP_START();
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+	/* find the size of leftover data from the last read line operation */
+	if (NULL != s->next_line)
+	{
+		pstart = ZBX_BUF_TYPE_DYN == s->buf_type ? s->buf_dyn : s->buf_stat;
+
+		left = s->read_bytes - (s->next_line - pstart);
+	}
+	else
+		left = 0;
+
+	/* copy the leftover data to the static buffer and reset the dynamic buffer */
+	s->read_bytes = left;
+	memmove(s->buf_stat, s->next_line, left);
+	s->next_line = s->buf_stat;
+
+	s->buf_type = ZBX_BUF_TYPE_STAT;
+	zbx_free(s->buf_dyn);
+
+	/* read data into static buffer */
+	if (ZBX_TCP_ERROR == (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + left, ZBX_STAT_BUF_LEN - left - 1)))
+		goto out;
+
+	s->buf_stat[left + nbytes] = '\0';
+
+	if (0 == nbytes)
+	{
+		/* docket was closed before newline was found, just return success       */
+		/* with the data we have or failure, if there are no data left in buffer */
+		*data = s->next_line;
+		s->next_line += s->read_bytes;
+		ret = (0 == s->read_bytes ? FAIL : SUCCEED);
+
+		goto out;
+	}
+
+	s->read_bytes += nbytes;
+
+	/* check if the buffer now contains the next line */
+	if (SUCCEED == (ret = zbx_sock_find_line(s, data)))
+		goto out;
+
+	/* copy the static buffer data into dynamic buffer */
+	s->buf_type = ZBX_BUF_TYPE_DYN;
+	zbx_strncpy_alloc(&s->buf_dyn, &alloc, &offset, s->buf_stat, s->read_bytes);
+	line_length = s->read_bytes;
+
+	/* Read data into dynamic buffer until newline has been found.       */
+	/* Lines larger than ZBX_TCP_MAX_LINE_LENTH bytes will be truncated. */
+	do
+	{
+		if (ZBX_TCP_ERROR == (nbytes = ZBX_TCP_READ(s->socket, buffer, ZBX_STAT_BUF_LEN - 1)))
+			goto out;
+
+		if (0 == nbytes)
+		{
+			/* socket was closed before newline was found, just return the data we have */
+			*data = s->buf_dyn;
+			s->next_line = s->buf_dyn + s->read_bytes;
+			ret = SUCCEED;
+
+			goto out;
+		}
+
+		buffer[nbytes] = '\0';
+
+		ptr = strchr(buffer, '\n');
+
+		/* if the line exceeds the defined limit then truncate it by skipping data until the newline */
+		if (s->read_bytes + nbytes < ZBX_TCP_MAX_LINE_LENTH && s->read_bytes == line_length)
+		{
+			zbx_strncpy_alloc(&s->buf_dyn, &alloc, &offset, buffer, nbytes);
+			s->read_bytes += nbytes;
+		}
+		else
+		{
+			if (NULL != ptr)
+			{
+				zbx_strncpy_alloc(&s->buf_dyn, &alloc, &offset, ptr, nbytes - (ptr - buffer));
+				s->read_bytes += nbytes - (ptr - buffer);
+			}
+		}
+
+		line_length += nbytes;
+
+	} while (NULL == ptr);
+
+	s->next_line = s->buf_dyn;
+	ret = zbx_sock_find_line(s, data);
+out:
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tcp_recv_ext                                                 *
  *                                                                            *
  * Purpose: receive data                                                      *
@@ -1073,7 +1234,10 @@ cleanup:
 		zbx_tcp_timeout_cleanup(s);
 
 	if (FAIL != total_bytes)
+	{
 		total_bytes += read_bytes;
+		s->read_bytes = total_bytes;
+	}
 
 	return total_bytes;
 }

@@ -73,11 +73,13 @@ typedef struct
 	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket_orig;
+	size_t		read_bytes;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buf_dyn;
 	zbx_buf_type_t	buf_type;
 	unsigned char	accepted;
 	char		*error;
+	char		*next_line;
 	int		timeout;
 }
 zbx_sock_t;
@@ -118,6 +120,7 @@ void    zbx_tcp_free(zbx_sock_t *s);
 #define	zbx_tcp_recv_to(s, data, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, data, 0, timeout))
 
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
+int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
