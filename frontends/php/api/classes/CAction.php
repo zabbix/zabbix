@@ -478,7 +478,7 @@ class CAction extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('action.exists method is deprecated.');
+		$this->deprecated('action.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),

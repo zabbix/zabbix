@@ -530,7 +530,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		self::deprecated('trigger.exists method is deprecated.');
+		$this->deprecated('trigger.exists method is deprecated.');
 
 		$keyFields = array(
 			array(

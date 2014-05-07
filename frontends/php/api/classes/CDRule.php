@@ -176,7 +176,7 @@ class CDRule extends CApiService {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		self::deprecated('drule.exists method is deprecated.');
+		$this->deprecated('drule.exists method is deprecated.');
 
 		$options = array(
 			'filter' => array(),
