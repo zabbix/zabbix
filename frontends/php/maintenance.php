@@ -509,10 +509,9 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	$groupIds = array();
-	if ($pageFilter->groupsSelected) {
-		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);
-	}
+	$groupIds = $pageFilter->groupsSelected && $pageFilter->groupid > 0
+		? $pageFilter->groupid
+		: null;
 
 	// get only maintenance IDs for paging
 	$data['maintenances'] = API::Maintenance()->get(array(
