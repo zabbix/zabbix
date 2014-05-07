@@ -634,8 +634,8 @@ class CHttpTest extends CZBXAPI {
 			}
 
 			foreach ($range as $value) {
-				if (!is_numeric($value)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				if (!is_numeric($value) && !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code or user macro "%1$s".', $value));
 				}
 			}
 		}
