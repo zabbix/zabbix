@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-01 13:31+0300\n"
-"PO-Revision-Date: 2013-09-13 10:08+0300\n"
-"Last-Translator: vins <piranesi@gmail.com>\n"
+"PO-Revision-Date: 2014-05-06 22:57+0300\n"
+"Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1379059698.0\n"
+"X-POOTLE-MTIME: 1399409871.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -34,15 +34,15 @@ msgstr "\"Iniciador parpadeará en cambio de estado\" necesita ser \"0\" o un en
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d día"
+msgstr[1] "%1$d días"
 
 #: include/blocks.inc.php:1043
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Se muestra %1$d de %2$d problemas"
+msgstr[1] "Se muestran %1$d de %2$d problemas"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -67,11 +67,11 @@ msgstr[0] "%1$s día"
 msgstr[1] "%1$s días"
 
 #: include/page_header.php:446
-#, c-format
+#, fuzzy, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s intento fallido de inicio de sesión registrado. El último intento fallido fue desde %1$s el %2$s a las %3$s."
+msgstr[1] "%4$s intentos fallidos de inicio de sesión registrados. El último intento fallido fue desde %1$s el %2$s a las %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -117,7 +117,7 @@ msgstr "(sin proxy)"
 
 #: include/setup.inc.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(con advertencias)"
 
 #: include/blocks.inc.php:1527
 msgid "-"
@@ -165,7 +165,7 @@ msgstr "Los últimos 500 valores"
 
 #: include/views/administration.script.edit.php:41
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:55
 msgid "<manual>"
@@ -271,11 +271,11 @@ msgstr "Aceptada"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Eventos reconocidos como BIEN"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Eventos reconocidos como PROBLEMA"
 
 #: acknow.php:27 tr_events.php:121
 msgid "Acknowledges"
@@ -316,17 +316,17 @@ msgstr "Acción"
 #: api/classes/CAction.php:675 api/classes/CAction.php:697
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "La acción \"%1$s\" ya existe."
 
 #: api/classes/CAction.php:541 api/classes/CAction.php:660
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "La acción \"%1$s\" tiene un valor incorrecto para \"esc_period\" (mínimo %2$s segundos)."
 
 #: api/classes/CAction.php:742
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "La acción \"%1$s\" no tiene operaciones definidas."
 
 #: actionconf.php:158
 msgid "Action added"
@@ -339,14 +339,14 @@ msgstr "Acción eliminada"
 #: actionconf.php:345
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Acción deshabilitada"
+msgstr[1] "Acciones deshabilitadas"
 
 #: actionconf.php:344
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Acción habilitada"
+msgstr[1] "Acciones habilitadas"
 
 #: include/views/configuration.action.edit.php:420
 msgid "Action operations"
@@ -373,7 +373,7 @@ msgstr "Activado"
 #: include/views/configuration.maintenance.list.php:62
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Activo"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:500
 #: include/views/configuration.maintenance.edit.php:89 maintenance.php:135
@@ -460,15 +460,15 @@ msgstr "Añadir link"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Agregar faltante"
 
 #: include/views/configuration.item.massupdate.php:534
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Agregar una aplicación nueva o existente"
 
 #: include/views/configuration.host.massupdate.php:107
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Agregar grupos de equipos"
 
 #: include/views/configuration.graph.edit.php:241
 msgid "Add prototype"
@@ -534,7 +534,7 @@ msgstr "Agente"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:311
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "El nombre de equipo del agente definido en el archivo de configuración. Cadena de texto."
 
 #: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.edit.php:337
@@ -549,7 +549,7 @@ msgstr "Agente o SNMP o JMX o interfaz IPMI"
 
 #: include/classes/items/CHelpItems.php:569
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Las comprobaciones adicionales no requieren de ningún agente en un equipo monitorizado. El servidor Zabbix recaba información adicional haciendo consultas directas a la base de datos. Ver el manual de Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:615 users.php:44
@@ -603,7 +603,7 @@ msgstr "Equipos permitidos"
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:551
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Cantidad de memoria en bytes. Si no se especifica el modo, se usa el total."
 
 #: tr_status.php:281 tr_status.php:287
 msgid "Any"
@@ -674,7 +674,7 @@ msgstr "Aplicar"
 #: include/views/configuration.maintenance.list.php:59
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Próximo"
 
 #: include/func.inc.php:252
 msgid "Apr"
@@ -715,36 +715,36 @@ msgstr "Como texto plano"
 
 #: include/hosts.inc.php:155
 msgid "Asset tag"
-msgstr ""
+msgstr "Etiqueta del recurso"
 
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s on %3$s"
-msgstr ""
+msgstr "A las %1$s:%2$s en %3$s"
 
 #: include/maintenances.inc.php:125
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "A las %1$s:%2$s en %3$s %4$s de cada %5$s"
 
 #: include/maintenances.inc.php:134
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "A las %1$s:%2$s del día %3$s de cada %4$s"
 
 #: include/maintenances.inc.php:83
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A las %1$s:%2$s de cada %3$s de cada semana"
+msgstr[1] "A las %1$s:%2$s de cada %3$s de cada %4$s semanas"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A las %1$s:%2$s de cada día"
+msgstr[1] "A las %1$s:%2$s de cada %3$s días"
 
 #: include/forms.inc.php:1779
 msgid "At (hour:minute)"
@@ -760,7 +760,7 @@ msgstr "Al menos debe crearse un periodo de mantenimiento"
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "Se admiten MySQL, PostgreSQL, Oracle, SQLite3, y IBM DB2."
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -773,12 +773,12 @@ msgstr "Auditoría de acciones"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de auditoría"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de auditoría (en días) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
@@ -832,7 +832,7 @@ msgstr "Clave de autenticación"
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Protocolo de autenticación"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -848,16 +848,16 @@ msgstr "Cierre de sesión automático (mínimo 90 seg)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de auto-registro (en días)"
 
 #: adm.housekeeper.php:43
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de alertas y eventos de auto-registro"
 
 #: adm.housekeeper.php:108
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de alertas y eventos de auto-registro (en días) \"%1$s\"."
 
 #: include/views/configuration.host.edit.php:777
 #: include/views/configuration.host.massupdate.php:242
@@ -867,7 +867,7 @@ msgstr "Automático"
 
 #: include/views/configuration.sysmap.edit.php:61
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Asignación automática de íconos"
 
 #: include/views/js/configuration.sysmaps.js.php:130
 #: include/views/js/configuration.sysmaps.js.php:255
@@ -897,19 +897,19 @@ msgstr "Media por"
 
 #: popup_trexpr.php:155
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "El valor promedio de un periodo T es < N"
 
 #: popup_trexpr.php:165
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "El valor promedio de un periodo T es = N"
 
 #: popup_trexpr.php:160
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "El valor promedio de un periodo T es > N"
 
 #: popup_trexpr.php:170
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "El valor promedio de un periodo T es ≠ N"
 
 #: popup_bitem.php:156
 msgid "Axis side"
@@ -1050,7 +1050,7 @@ msgstr "CONFIGURACIÓN DE GRUPOS DE EQUIPOS"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "CONFIGURACIÓN DE PROTOTIPOS DE EQUIPO"
 
 #: hosts.php:648 hosts.php:713 hosts.php:761
 msgid "CONFIGURATION OF HOSTS"
@@ -1058,7 +1058,7 @@ msgstr "CONFIGURACIÓN DE EQUIPOS"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "CONFIGURACIÓN DE LIMPIEZA"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1157,12 +1157,12 @@ msgstr "CONFIGURACIÓN DEL INICIADOR"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "CONFIGURACIÓN DE GRUPOS DE USUARIOS"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "CONFIGURACIÓN DE USUARIOS"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1184,22 +1184,22 @@ msgstr "CONFIGURACIÓN DE ZABBIX"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:443
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "Información de CPU - Por defecto, lista la información completa para todos los núcleos"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:419
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr ""
+msgstr "Carga de CPU. Carga del procesador. El número de núcleo y modo son opcionales. Si no se especifica el número de núcleo, se usa «all». Si no se especifica el modo, se usa «avg1». El valor devuelto no es un porcentaje."
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:431
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "Utilización de CPU. Carga del procesador en porcentaje. La CPU, el tipo, y el modo son opcionales. Si no se especifica el número de CPU, se usan todos. Si no se especifica el tipo, se usa «user». Si no se especifica el modo, se usa «avg1»."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:523
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "Calcula la suma de verificación MD5 de un archivo dado. Devuelve el valor hash MD5 del archivo. Puede ser usado para archivos de menos de 64MB; no se admiten archivos más pesados. Ejemplo: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1208,12 +1208,12 @@ msgstr "Calcular SLA, SLA aceptable (en %)"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:511
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
-msgstr ""
+msgstr "Calcula la suma de verificación de un archivo dado. Calculado por el algoritmo estándar usado por la utilidad cksum de UNIX. Ejemplo: vfs.file.cksum[/etc/passwd]"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:547
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "Calcula el espacio en disco de un volumen dado. En KB. Si no se especifica el modo, se usa «total». Si el volumen está montado, devuelve el espacio en disco no usado del sistema de archivos local. Ejemplo: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:96
 #: include/views/configuration.graph.edit.php:154
@@ -1226,7 +1226,7 @@ msgstr "Permisos calculados"
 
 #: include/hosts.inc.php:66
 msgid "Callback"
-msgstr ""
+msgstr "Devolución de llamada"
 
 #: api/classes/CTemplate.php:953
 msgid "Can't add group"
@@ -1272,17 +1272,17 @@ msgstr "No se pudo reconocer el evento"
 #: api/classes/CGraph.php:761
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "No se puede agregar un ítem no numérico \"%1$s\" a la gráfica \"%2$s\"."
 
 #: api/classes/CGraphPrototype.php:707 api/classes/CGraphPrototype.php:769
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "No se puede agregar un ítem no numérico \"%1$s\" al prototipo de gráfica \"%2$s\"."
 
 #: include/reports.inc.php:512
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "No se puede agregar un ítem no numérico \"%1$s\"."
 
 #: actionconf.php:158
 msgid "Cannot add action"
@@ -1290,7 +1290,7 @@ msgstr "No es posible añadir la acción"
 
 #: actionconf.php:233
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "No se pudo agregar la condición de acción"
 
 #: applications.php:108
 msgid "Cannot add application"
@@ -1303,7 +1303,7 @@ msgstr "No se puede añadir dependencia desde un equipo a una plantilla"
 #: include/triggers.inc.php:505
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "No se pudo agregar la dependencia del disparador \"%1$s:%2$s\" al disparador \"%3$s:%4$s\" porque éste último no existe."
 
 #: host_discovery.php:263
 msgid "Cannot add discovery rule"
@@ -1315,7 +1315,7 @@ msgstr "No es posible añadir el gráfico"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "No se pudo agregar el prototipo de gráfica"
 
 #: hostgroups.php:154 usergrps.php:186
 msgid "Cannot add group"
@@ -1327,7 +1327,7 @@ msgstr "No es posible añadir el equipo"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "No se pudo agregar el prototipo de equipo"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1344,11 +1344,11 @@ msgstr "No es posible añadir el monitor"
 #: api/classes/CApplication.php:547
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "No se pudo agregar el ítem \"%1$s\" desde \"%2$s\" a la aplicación \"%3$s\" desde \"%4$s\"."
 
 #: disc_prototypes.php:305
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "No se pudo agregar el prototipo de ítem"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
@@ -1369,7 +1369,7 @@ msgstr "No es posible añadir el tipo de medio"
 #: api/classes/CGraph.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "No se puede agregar más de un ítem con tipo \"Graph sum\" en la gráfica \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
 #, c-format
@@ -1483,7 +1483,7 @@ msgstr "No se pueden clonar los iniciadores"
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "No se pudo conectar al puerto rastreador del demonio del servidor Zabbix, pero debe poder ejecutar el script."
 
 #: graphs.php:347
 msgid "Cannot copy graphs"
@@ -1613,11 +1613,11 @@ msgstr "No es posible eliminar el grupo de equipos"
 
 #: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "No se pudo eliminar el prototipo de equipo."
 
 #: host_prototypes.php:119 host_prototypes.php:244
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "No se pudo eliminar los prototipos de equipo"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1726,7 +1726,7 @@ msgstr "No es posible eliminar los gráficos de la plantilla"
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "No se pudo eliminar el prototipo de plantilla de equipo."
 
 #: api/classes/CItem.php:693
 msgid "Cannot delete templated item."
@@ -1811,14 +1811,14 @@ msgstr[1] ""
 #: hostgroups.php:231 hosts.php:624 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo deshabilitar el equipo"
+msgstr[1] "No se pudo deshabilitar los equipos"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo deshabilitar el prototipo de equipo"
+msgstr[1] "No se pudo deshabilitar los prototipos de equipo"
 
 #: applications.php:213 items.php:682
 msgid "Cannot disable item"
@@ -1892,14 +1892,14 @@ msgstr[1] ""
 #: hostgroups.php:230 hosts.php:623 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo habilitar el equipo"
+msgstr[1] "No se pudo habilitar los equipos"
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pudo habilitar el prototipo de equipo"
+msgstr[1] "No se pudo habilitar los prototipos de equipo"
 
 #: applications.php:212 items.php:681
 msgid "Cannot enable item"
@@ -1973,13 +1973,13 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el equipo \"%1$s\" usado en el mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:497
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No se pudo encontrar el equipo \"%1$s\" usado en la dispositiva \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:764
 #, c-format
@@ -5200,12 +5200,12 @@ msgstr ""
 
 #: include/func.inc.php:250
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: include/forms.inc.php:1688 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
-msgstr ""
+msgstr "Febrero"
 
 #: hostinventoriesoverview.php:91 include/views/inventory.host.list.php:44
 msgid "Field"
@@ -5921,7 +5921,7 @@ msgstr "Ayuda"
 
 #: include/items.inc.php:139
 msgid "Hexadecimal"
-msgstr ""
+msgstr "Hexadecimal"
 
 #: include/views/configuration.sysmap.constructor.php:41 jsLoader.php:144
 msgid "Hidden"
@@ -8028,12 +8028,12 @@ msgstr "Identificador Jabber"
 
 #: include/func.inc.php:249
 msgid "Jan"
-msgstr ""
+msgstr "Ene"
 
 #: include/forms.inc.php:1683 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
-msgstr ""
+msgstr "Enero"
 
 #: include/locales.inc.php:65
 msgid "Japanese (ja_JP)"
@@ -8041,21 +8041,21 @@ msgstr "Japonés (ja_JP)"
 
 #: include/func.inc.php:255
 msgid "Jul"
-msgstr ""
+msgstr "Jul"
 
 #: include/forms.inc.php:1685 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
-msgstr ""
+msgstr "Julio"
 
 #: include/func.inc.php:254
 msgid "Jun"
-msgstr ""
+msgstr "Jun"
 
 #: include/forms.inc.php:1708 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
-msgstr ""
+msgstr "Junio"
 
 #: include/func.inc.php:440 include/func.inc.php:676
 msgctxt "Kilo short"
@@ -8745,12 +8745,12 @@ msgstr "Mapas"
 
 #: include/func.inc.php:251
 msgid "Mar"
-msgstr ""
+msgstr "Mar"
 
 #: include/forms.inc.php:1693 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
-msgstr ""
+msgstr "Marzo"
 
 #: include/views/configuration.sysmap.edit.php:65
 msgid "Mark elements on trigger status change"
@@ -8881,12 +8881,12 @@ msgstr[1] ""
 #: include/forms.inc.php:1703 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
-msgstr ""
+msgstr "Mayo"
 
 #: include/func.inc.php:253
 msgctxt "May short"
 msgid "May"
-msgstr ""
+msgstr "May"
 
 #: include/views/administration.users.edit.php:211
 #: include/views/administration.users.edit.php:339 popup_media.php:27
@@ -10258,12 +10258,12 @@ msgstr "Notificaciones"
 
 #: include/func.inc.php:259
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 #: include/forms.inc.php:1705 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
-msgstr ""
+msgstr "Noviembre"
 
 #: jsLoader.php:137
 msgid "Now"
@@ -10490,7 +10490,7 @@ msgstr "VISTAZO GENERAL"
 
 #: include/func.inc.php:258
 msgid "Oct"
-msgstr ""
+msgstr "Oct"
 
 #: include/items.inc.php:137
 msgid "Octal"
@@ -10499,7 +10499,7 @@ msgstr ""
 #: include/forms.inc.php:1700 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
-msgstr ""
+msgstr "Octubre"
 
 #: include/views/configuration.sysmap.constructor.php:38
 #: include/views/configuration.sysmap.constructor.php:44 jsLoader.php:143
@@ -12500,7 +12500,7 @@ msgstr "Septiembre"
 #: include/views/configuration.sysmap.edit.php:122
 #: include/views/monitoring.dashconf.php:93
 msgid "Separated"
-msgstr ""
+msgstr "Separado"
 
 #: include/forms.inc.php:1695 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
