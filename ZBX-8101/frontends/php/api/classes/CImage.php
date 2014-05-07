@@ -551,18 +551,31 @@ class CImage extends CZBXAPI {
 	}
 
 	/**
-	 * Unset image field from output.
+	 * Unset "image" field from output.
 	 *
-	 * @see CZBXAPI::applyQueryOutputOptions()
+	 * @param string $tableName
+	 * @param string $tableAlias
+	 * @param array  $options
+	 * @param array  $sqlParts
+	 *
+	 * @return array				The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if (is_array($options['output'])) {
-			unset($options['output']['image']);
-		}
-		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$options['output'] = array('imageid', 'imagetype', 'name');
+		if ($options['countOutput'] === null) {
+			if ($options['output'] == API_OUTPUT_EXTEND) {
+				$options['output'] = array('imageid', 'imagetype', 'name');
+			}
+			elseif (is_array($options['output']) && in_array('image', $options['output'])) {
+				foreach ($options['output'] as $idx => $field) {
+					if ($field === 'image') {
+						unset($options['output'][$idx]);
+					}
+				}
+			}
+
+			$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 
-		return parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+		return $sqlParts;
 	}
 }
