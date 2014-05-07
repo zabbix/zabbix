@@ -238,9 +238,7 @@ if (!$isDiscovered) {
 		$script = 'hostInterfacesManager.addNew("agent");';
 	}
 	else {
-		$json = new CJSON();
-		$encodedInterfaces = $json->encode(array_combine(range(1, count($interfaces)), array_values($interfaces)));
-		$script = 'hostInterfacesManager.add('.$encodedInterfaces.');';
+		$script = 'hostInterfacesManager.add('.CJs::encodeJson(array_values($interfaces)).');';
 	}
 	zbx_add_post_js($script);
 
