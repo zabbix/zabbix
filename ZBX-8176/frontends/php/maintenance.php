@@ -217,6 +217,8 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 	}
 
+	DBStart();
+
 	$goResult = API::Maintenance()->delete($maintenanceids);
 	if ($goResult) {
 		foreach ($maintenances as $maintenanceid => $maintenance) {
@@ -224,6 +226,8 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
+
+	$goResult = DBEnd($goResult);
 
 	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 	clearCookies($goResult);

@@ -170,6 +170,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 	$updated = 0;
 
+	DBstart();
+
 	foreach (getRequest('g_druleid') as $druleId) {
 		$result &= DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.zbx_dbstr($druleId));
 
@@ -186,6 +188,8 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$messageFailed = $enable
 		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+	$result = DBEnd($result);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
