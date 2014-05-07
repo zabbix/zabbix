@@ -895,6 +895,12 @@ define('SHORT_DESCRIPTION',	1);
 define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
+/*
+ * These numbers must be in sync with Backend!
+ */
+// particular tests result time
+define('RSM_ROLLWEEK_SHIFT_BACK', 180);
+
 // SLA monitoring start year
 define('SLA_MONITORING_START_YEAR',	2014);
 

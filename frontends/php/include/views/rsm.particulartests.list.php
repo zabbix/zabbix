@@ -64,7 +64,7 @@ $particularTestsTable = new CTableInfo($noData);
 $particularTestsTable->setHeader($headers);
 
 $down = new CSpan(_('Down'), 'red');
-$offline = new CSpan(_('Offline'), 'red');
+$offline = new CSpan(_('Offline'), 'gray');
 $noResult = _('No result');
 $up = new CSpan(_('Up'), 'green');
 
@@ -292,7 +292,14 @@ $particularTests = array(
 	BR(),
 	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time']))),
 	BR(),
-	new CSpan(array(bold(_('Test result')), ':', SPACE, $testResult))
+	new CSpan(array(bold(_('Test result')), ':', SPACE, $testResult, SPACE,
+		_s('(calculated at %1$s)', date('d.m.Y H:i:s', $this->data['time'] + RSM_ROLLWEEK_SHIFT_BACK)),
+	BR(),
+	new CSpan(array(bold(_('Note')), ':', SPACE, _('The following table displays the data that has being received by '.
+		'the central node, some of the values might have not being available at the time of the calculation of the '.
+		'"Test result"')
+	)),
+	))
 );
 
 $tableHeader[] = $particularTests;
