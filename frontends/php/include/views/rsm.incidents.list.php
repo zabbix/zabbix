@@ -327,7 +327,8 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['dnssec']['totalTests'],
 			'rsm.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_DNSSEC.'&slvItemId='.$this->data['dnssec']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_DNSSEC.'&slvItemId='.
+				$this->data['dnssec']['itemid']
 		);
 
 		$testsInfo = array(
@@ -353,7 +354,9 @@ if (isset($this->data['tld'])) {
 			$testsInfo
 		));
 
-		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dnssec']['slv'].'%'), 'rolling-week-status');
+		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dnssec']['slv'].'%'),
+			'rolling-week-status'
+		);
 		$dnssecInfoTable->addRow(array($details, $rollingWeek));
 		$dnssecTab->additem($dnssecInfoTable);
 
@@ -400,7 +403,8 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['rdds']['totalTests'],
 			'rsm.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_RDDS.'&slvItemId='.$this->data['rdds']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_RDDS.'&slvItemId='.
+				$this->data['rdds']['itemid']
 		);
 
 		$testsInfo = array(
@@ -473,7 +477,8 @@ if (isset($this->data['tld'])) {
 		$testsDown = new CLink(
 			$this->data['epp']['totalTests'],
 			'rsm.tests.php?filter_from='.$this->data['filter_from'].'&filter_to='.$this->data['filter_to'].
-				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_EPP.'&slvItemId='.$this->data['epp']['itemid']
+				'&filter_set=1&host='.$this->data['tld']['host'].'&type='.RSM_EPP.'&slvItemId='.
+				$this->data['epp']['itemid']
 		);
 
 		$testsInfo = array(

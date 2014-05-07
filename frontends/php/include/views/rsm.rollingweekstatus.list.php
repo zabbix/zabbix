@@ -122,7 +122,9 @@ if (isset($this->data['tld'])) {
 					);
 				}
 				else {
-					$dnsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
+					$dnsStatus =  new CDiv(null,
+						'service-icon status_icon_extra iconrollingweekfail cell-value pointer'
+					);
 				}
 			}
 			else {
@@ -164,7 +166,9 @@ if (isset($this->data['tld'])) {
 					);
 				}
 				else {
-					$dnssecStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
+					$dnssecStatus =  new CDiv(null,
+						'service-icon status_icon_extra iconrollingweekfail cell-value pointer'
+					);
 				}
 			}
 			else {
