@@ -74,15 +74,11 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED))
 		{
 			/* 'ZBX_NOTSUPPORTED\0<error message>' */
-			if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
-			{
-				zbx_snprintf(buffer, sizeof(buffer), "%s",
-					s.buffer + sizeof(ZBX_NOTSUPPORTED));
-			}
+			if (sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
+				zbx_snprintf(buffer, sizeof(buffer), "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED));
 			else
-			{
 				zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent");
-			}
+
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NOTSUPPORTED;
 		}

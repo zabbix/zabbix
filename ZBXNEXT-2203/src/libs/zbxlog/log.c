@@ -431,7 +431,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  * Comments: replace strerror to print also the error number                  *
  *                                                                            *
  ******************************************************************************/
-char *zbx_strerror(int errnum)
+char	*zbx_strerror(int errnum)
 {
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
 

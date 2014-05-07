@@ -70,20 +70,18 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == strcmp(section, "ent"))
 	{
-		if (1 != request->nparam && collector->vmstat.shared_enabled)
+		if (1 != request->nparam && 0 != collector->vmstat.shared_enabled)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			return SYSINFO_RET_FAIL;
 		}
-		else if (!collector->vmstat.shared_enabled)
+		else if (0 == collector->vmstat.shared_enabled)
 		{
 			SET_MSG_RESULT(result, strdup("No data available in collector."));
 			return SYSINFO_RET_FAIL;
 		}
 		else
-		{
 			SET_DBL_RESULT(result, collector->vmstat.ent);
-		}
 	}
 	else if (NULL == type)
 	{

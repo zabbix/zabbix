@@ -95,13 +95,9 @@ static void	get_signal_handler(int sig)
  *                                                                            *
  * Purpose: connect to Zabbix agent, receive and print value                  *
  *                                                                            *
- * Parameters: host   - server name or IP address                             *
- *             port   - port number                                           *
- *             key    - item's key                                            *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
+ * Parameters: host - server name or IP address                               *
+ *             port - port number                                             *
+ *             key  - item's key                                              *
  *                                                                            *
  ******************************************************************************/
 static void	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
@@ -128,8 +124,6 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 					zbx_rtrim(s.buffer, "\r\n");
 					printf("%s\n", s.buffer);
 				}
-
-
 			}
 		}
 
@@ -201,14 +195,12 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED == ret)
 	{
-
 #if !defined(_WINDOWS)
 		signal(SIGINT,  get_signal_handler);
 		signal(SIGTERM, get_signal_handler);
 		signal(SIGQUIT, get_signal_handler);
 		signal(SIGALRM, get_signal_handler);
 #endif
-
 		get_value(source_ip, host, port, key);
 	}
 

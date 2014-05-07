@@ -158,7 +158,8 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = SYSINFO_RET_FAIL;
 	}
 	return ret;
-#endif
+#else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "No pstat available."));
 	return SYSINFO_RET_FAIL;
+#endif
 }

@@ -123,7 +123,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get list of filesystems. Unable to open /proc/mounts: %s",
 			zbx_strerror(errno)));
-		return SYSINFO_RET_OK;
+		return SYSINFO_RET_FAIL;
 	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);

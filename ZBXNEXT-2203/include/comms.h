@@ -73,8 +73,8 @@ typedef struct
 	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket_orig;
-	zbx_buf_type_t	buf_type;
 	size_t		read_bytes;
+	zbx_buf_type_t	buf_type;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buffer;
 	unsigned char	accepted;

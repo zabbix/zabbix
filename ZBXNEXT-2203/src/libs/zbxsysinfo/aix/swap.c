@@ -43,7 +43,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(1 != perfstat_memory_total(NULL, &mem, sizeof(perfstat_memory_total_t), 1))
+	if (1 != perfstat_memory_total(NULL, &mem, sizeof(perfstat_memory_total_t), 1))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
 		return SYSINFO_RET_FAIL;
@@ -66,7 +66,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	return SYSINFO_RET_OK;
-#endif
+#else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "No libperfstat available."));
 	return SYSINFO_RET_FAIL;
+#endif
 }

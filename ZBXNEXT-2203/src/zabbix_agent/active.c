@@ -946,12 +946,14 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
+
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED, &active_metrics[i].lastlogsize, NULL, NULL, NULL,
-						NULL, NULL, 0);
+						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED,
+						&active_metrics[i].lastlogsize, NULL, NULL,
+						NULL, NULL, NULL, 0);
 			}
 		}
 		/* special processing for log files with rotation */
@@ -1015,12 +1017,14 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
+
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED, &active_metrics[i].lastlogsize,
-						&active_metrics[i].mtime, NULL, NULL, NULL, NULL, 0);
+						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED,
+						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
+						NULL, NULL, NULL, NULL, 0);
 			}
 		}
 		/* special processing for eventlog */
@@ -1248,8 +1252,9 @@ static void	process_active_checks(char *server, unsigned short port)
 										key_logeventid, ZBX_CASE_SENSITIVE))
 						{
 							send_err = process_value(server, port, CONFIG_HOSTNAME,
-									active_metrics[i].key_orig, value, NULL, &lastlogsize,
-									NULL, &timestamp, source, &severity, &logeventid, 1);
+									active_metrics[i].key_orig, value, ITEM_STATE_NORMAL,
+									&lastlogsize, NULL, &timestamp, source, &severity,
+									&logeventid, 1);
 							s_count++;
 						}
 						p_count++;
@@ -1280,16 +1285,17 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 			while (0); /* simple try realization */
 #endif	/* _WINDOWS */
-
 			if (FAIL == ret)
 			{
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
+
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED, &active_metrics[i].lastlogsize, NULL, NULL, NULL,
-						NULL, NULL, 0);
+						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED,
+						&active_metrics[i].lastlogsize, NULL, NULL,
+						NULL, NULL, NULL, 0);
 			}
 		}
 		else
@@ -1298,10 +1304,13 @@ static void	process_active_checks(char *server, unsigned short port)
 			{
 				if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", active_metrics[i].key,
-						*pvalue);
-					process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, *pvalue, ITEM_STATE_NORMAL,
-						NULL, NULL, NULL, NULL, NULL, NULL, 0);
+					zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]",
+							active_metrics[i].key, *pvalue);
+
+					process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
+							*pvalue, ITEM_STATE_NORMAL,
+							NULL, NULL, NULL,
+							NULL, NULL, NULL, 0);
 				}
 			}
 			else
@@ -1312,8 +1321,11 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
 						active_metrics[i].key);
-				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, *pvalue, ITEM_STATE_NOTSUPPORTED,
-						NULL, NULL, NULL, NULL, NULL, NULL, 0);
+
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
+						*pvalue, ITEM_STATE_NOTSUPPORTED,
+						NULL, NULL, NULL,
+						NULL, NULL, NULL, 0);
 			}
 
 			free_result(&result);

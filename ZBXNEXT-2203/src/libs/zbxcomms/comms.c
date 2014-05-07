@@ -900,9 +900,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 void	zbx_tcp_free(zbx_sock_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
-	{
 		zbx_free(s->buffer);
-	}
 }
 
 /******************************************************************************
@@ -1064,7 +1062,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 			}
 		}
 	}
-
 out:
 	if (ZBX_TCP_ERROR == nbytes)
 	{

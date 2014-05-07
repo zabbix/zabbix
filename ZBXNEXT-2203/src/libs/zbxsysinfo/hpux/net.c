@@ -192,7 +192,6 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&j, "{#IFNAME}", if_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 #if HPUX_VERSION < 1131
-
 		if (NULL != if_name_end)
 		{
 			*if_name_end = ZBX_IF_SEP;

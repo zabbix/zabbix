@@ -31,13 +31,12 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		hertz = sysconf(_SC_CLK_TCK);
 
-	}
-
-	/* make sure we do not divide by 0 */
-	if (0 == hertz)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
-		return SYSINFO_RET_FAIL;
+		/* make sure we do not divide by 0 */
+		if (0 == hertz)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get system uptime."));
+			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	/* AIX 6.1 */
