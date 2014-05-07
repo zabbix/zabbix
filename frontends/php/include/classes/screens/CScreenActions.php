@@ -86,8 +86,7 @@ class CScreenActions extends CScreenBase {
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 				' WHERE e.eventid=a.eventid'.
-					' AND alerttype='.ALERT_TYPE_MESSAGE.
-					andDbNode('a.alertid');
+					' AND alerttype='.ALERT_TYPE_MESSAGE;
 
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			$userid = CWebUser::$data['userid'];
@@ -126,7 +125,6 @@ class CScreenActions extends CScreenBase {
 		// create alert table
 		$actionTable = new CTableInfo(_('No action log entries found.'));
 		$actionTable->setHeader(array(
-			is_show_all_nodes() ? _('Nodes') : null,
 			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			_('Action'),
 			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
@@ -181,8 +179,7 @@ class CScreenActions extends CScreenBase {
 			}
 
 			$actionTable->addRow(array(
-				get_node_name_by_elid($alert['alertid']),
-				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 				new CCol($actions[$alert['actionid']]['name'], 'top'),
 				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),

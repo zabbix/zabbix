@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CHttpTest extends CZBXAPI {
+class CHttpTest extends CApiService {
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
@@ -52,7 +52,6 @@ class CHttpTest extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'        => null,
 			'httptestids'    => null,
 			'applicationids' => null,
 			'hostids'        => null,
@@ -201,7 +200,6 @@ class CHttpTest extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($httpTest = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -342,15 +340,15 @@ class CHttpTest extends CZBXAPI {
 	/**
 	 * Delete web scenario.
 	 *
-	 * @param $httpTestIds
+	 * @param array $httpTestIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($httpTestIds, $nopermissions = false) {
+	public function delete(array $httpTestIds, $nopermissions = false) {
 		if (empty($httpTestIds)) {
 			return true;
 		}
-		$httpTestIds = zbx_toArray($httpTestIds);
 
 		$delHttpTests = $this->get(array(
 			'httptestids' => $httpTestIds,
@@ -648,7 +646,6 @@ class CHttpTest extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'httptestids' => $ids,
 			'countOutput' => true
 		));
@@ -671,7 +668,6 @@ class CHttpTest extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'httptestids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -679,7 +675,6 @@ class CHttpTest extends CZBXAPI {
 
 		return (count($ids) == $count);
 	}
-
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -715,11 +710,10 @@ class CHttpTest extends CZBXAPI {
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApi()->select('httpstep', array(
+				$httpSteps = API::getApiService()->select('httpstep', array(
 					'output' => $this->outputExtend($options['selectSteps'], array('httptestid', 'httpstepid')),
 					'filters' => array('httptestid' => $httpTestIds),
-					'preservekeys' => true,
-					'nodeids' => get_current_nodeid(true)
+					'preservekeys' => true
 				));
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 

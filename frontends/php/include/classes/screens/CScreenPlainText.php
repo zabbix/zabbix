@@ -94,7 +94,7 @@ class CScreenPlainText extends CScreenBase {
 				$value = applyValueMap($value, $item['valuemapid']);
 			}
 
-			$table->addRow(array(zbx_date2str(_('d M Y H:i:s'), $history['clock']), new CCol($value, 'pre')));
+			$table->addRow(array(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), new CCol($value, 'pre')));
 		}
 
 		return $this->getOutput($table);

@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CUserGroup extends CZBXAPI {
+class CUserGroup extends CApiService {
 
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';
@@ -34,7 +34,6 @@ class CUserGroup extends CZBXAPI {
 	 * Get user groups.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']
 	 * @param array  $options['usrgrpids']
 	 * @param array  $options['userids']
 	 * @param bool   $options['status']
@@ -60,7 +59,6 @@ class CUserGroup extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
@@ -142,7 +140,6 @@ class CUserGroup extends CZBXAPI {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
@@ -180,11 +177,11 @@ class CUserGroup extends CZBXAPI {
 		$usrgrpids = array();
 
 		$res = DBselect(
-				'SELECT g.usrgrpid'.
-				' FROM usrgrp g'.
-				' WHERE g.name='.zbx_dbstr($groupData['name']).
-					andDbNode('g.usrgrpid', false)
+			'SELECT g.usrgrpid'.
+			' FROM usrgrp g'.
+			' WHERE g.name='.zbx_dbstr($groupData['name'])
 		);
+
 		while ($group = DBfetch($res)) {
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
@@ -196,19 +193,23 @@ class CUserGroup extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Check if user group exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($object) {
-		$options = array(
+		$this->deprecated('usergroup.exists method is deprecated.');
+
+		$objs = $this->get(array(
 			'filter' => array('name' => $object['name']),
 			'output' => array('usrgrpid'),
-			'nopermissions' => 1,
 			'limit' => 1,
-		);
-		if (isset($object['node']))
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
-			$options['nodeids'] = $object['nodeids'];
-
-		$objs = $this->get($options);
+		));
 
 		return !empty($objs);
 	}
@@ -235,8 +236,13 @@ class CUserGroup extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			if ($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User group').' [ '.$usrgrp['name'].' ] '._('already exists'));
+			$userGroupExists = $this->get(array(
+				'output' => array('usrgrpid'),
+				'filter' => array('name' => $usrgrp['name']),
+				'limit' => 1
+			));
+			if ($userGroupExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" already exists.', $usrgrp['name']));
 			}
 			$insert[$gnum] = $usrgrp;
 		}
@@ -688,7 +694,6 @@ class CUserGroup extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'countOutput' => true
 		));
@@ -707,7 +712,6 @@ class CUserGroup extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'usrgrpids' => $ids,
 			'editable' => true,
 			'countOutput' => true

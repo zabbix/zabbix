@@ -57,12 +57,8 @@ $currentYear = date('Y');
 
 // fetch media types
 $media_types = array();
-$db_media_types = DBselect(
-	'SELECT mt.*'.
-	' FROM media_type mt'.
-		whereDbNode('mt.mediatypeid').
-	' ORDER BY mt.description'
-);
+$db_media_types = DBselect('SELECT mt.* FROM media_type mt ORDER BY mt.description');
+
 while ($media_type_data = DBfetch($db_media_types)) {
 	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
 }
@@ -123,12 +119,7 @@ else {
 	show_table_header(_('Notifications'), $form);
 
 	$header = array();
-	$db_users = DBselect(
-			'SELECT u.*'.
-			' FROM users u'.
-			whereDbNode('u.userid').
-			' ORDER BY u.alias,u.userid'
-	);
+	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
 		$header[] = new CCol($user_data['alias'], 'vertical_rotation');
 		$users[$user_data['userid']] = $user_data['alias'];
@@ -139,7 +130,7 @@ else {
 		case 'yearly':
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
 
-			$dateFormat = REPORT4_ANNUALLY_DATE_FORMAT;
+			$dateFormat = 'Y';
 			array_unshift($header, new CCol(_('Year'), 'center'));
 
 			for ($i = $minYear; $i <= date('Y'); $i++) {
@@ -151,7 +142,7 @@ else {
 		case 'monthly':
 			$minTime = mktime(0, 0, 0, 1, 1, $year);
 
-			$dateFormat = REPORT4_MONTHLY_DATE_FORMAT;
+			$dateFormat = _x('F', 'Month long name');
 			array_unshift($header, new CCol(_('Month'),'center'));
 
 			$max = ($year == $currentYear) ? date('n') : 12;
@@ -164,7 +155,7 @@ else {
 		case 'daily':
 			$minTime = mktime(0, 0, 0, 1, 1, $year);
 
-			$dateFormat = REPORT4_DAILY_DATE_FORMAT;
+			$dateFormat = DATE_FORMAT;
 			array_unshift($header, new CCol(_('Day'),'center'));
 
 			$max = ($year == $currentYear) ? date('z') : DAY_IN_YEAR;
@@ -180,7 +171,7 @@ else {
 			$wd = ($wd == 0) ? 6 : $wd - 1;
 			$minTime = $time - $wd * SEC_PER_DAY;
 
-			$dateFormat = REPORT4_WEEKLY_DATE_FORMAT;
+			$dateFormat = DATE_TIME_FORMAT;
 			array_unshift($header, new CCol(_('From'), 'center'), new CCol(_('Till'), 'center'));
 
 			$max = ($year == $currentYear) ? date('W') - 1 : 52;
@@ -216,7 +207,7 @@ else {
 
 		// interval end, displayed only for week intervals
 		if ($period == 'weekly') {
-			$row[] = zbx_date2str($dateFormat, min($till, time()));
+			$row[] = _(zbx_date2str($dateFormat, min($till, time())));
 		}
 
 		// counting alert count for each user and media type

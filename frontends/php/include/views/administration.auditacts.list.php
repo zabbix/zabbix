@@ -45,9 +45,10 @@ $filterTable->addRow(array(array(
 		'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button'
 	)
 )));
-$filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+
+$filterButton = new CSubmit('filter_set', _('Filter'));
 $filterButton->useJQueryStyle('main');
-$resetButton = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst", 1); location.href = uri.getUrl();');
+$resetButton = new CSubmit('filter_rst', _('Reset'));
 $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
@@ -65,7 +66,6 @@ $auditForm->setName('auditForm');
 // create table
 $auditTable = new CTableInfo(_('No action log entries found.'));
 $auditTable->setHeader(array(
-	is_show_all_nodes() ? _('Nodes') : null,
 	_('Time'),
 	_('Action'),
 	_('Type'),
@@ -124,8 +124,7 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
-		get_node_name_by_elid($alert['alertid']),
-		new CCol(zbx_date2str(_('d M Y H:i:s'), $alert['clock']), 'top'),
+		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
 		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
 		new CCol($recipient, 'top'),

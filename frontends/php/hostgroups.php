@@ -159,7 +159,7 @@ elseif (isset($_REQUEST['save'])) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
-	$result = API::HostGroup()->delete($_REQUEST['groupid']);
+	$result = API::HostGroup()->delete(array(getRequest('groupid')));
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 
@@ -298,25 +298,6 @@ if (isset($_REQUEST['form'])) {
 		$data['deletableHostGroups'] = getDeletableHostGroups($data['groupid']);
 	}
 
-	// nodes
-	if (is_array(get_current_nodeid())) {
-		foreach ($data['db_groups'] as $key => $group) {
-			$data['db_groups'][$key]['name'] =
-				get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
-		}
-
-		foreach ($data['r_hosts'] as $key => $host) {
-			$data['r_hosts'][$key]['name'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
-		}
-
-		if (!$data['twb_groupid']) {
-			foreach ($data['db_hosts'] as $key => $host) {
-				$data['db_hosts'][$key]['name'] =
-					get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
-			}
-		}
-	}
-
 	// render view
 	$hostgroupView = new CView('configuration.hostgroups.edit', $data);
 	$hostgroupView->render();
@@ -324,8 +305,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'config' => $config,
-		'displayNodes' => is_array(get_current_nodeid())
+		'config' => $config
 	);
 
 	$sortfield = getPageSortField('name');
@@ -361,13 +341,6 @@ else {
 		'limitSelects' => $config['max_in_table'] + 1
 	));
 	order_result($data['groups'], $sortfield, $sortorder);
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['groups'] as $key => $group) {
-			$data['groups'][$key]['nodename'] = get_node_name_by_elid($group['groupid'], true);
-		}
-	}
 
 	// render view
 	$hostgroupView = new CView('configuration.hostgroups.list', $data);

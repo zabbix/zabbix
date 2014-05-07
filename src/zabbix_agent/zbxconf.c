@@ -163,7 +163,7 @@ void	load_perf_counters(const char **lines)
 {
 	char		name[MAX_STRING_LEN], counterpath[PDH_MAX_COUNTER_PATH], interval[8];
 	const char	**pline, *msg;
-	LPTSTR		wcounterPath;
+	wchar_t		*wcounterPath;
 
 #define ZBX_PC_FAIL(_msg) {msg = _msg; goto pc_fail;}
 
