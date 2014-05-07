@@ -32,8 +32,6 @@ extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 extern char	*CONFIG_DBSOCKET;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_NODEID;
-extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
@@ -101,7 +99,6 @@ zbx_graph_item_type;
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
-#define ITEM_LASTVALUE_LEN		255
 #define ITEM_ERROR_LEN			128
 #define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
 #define ITEM_TRAPPER_HOSTS_LEN		255
@@ -136,11 +133,6 @@ zbx_graph_item_type;
 #	define ITEM_DESCRIPTION_LEN	65535
 #endif
 
-#define FUNCTION_FUNCTION_LEN		12
-#define FUNCTION_FUNCTION_LEN_MAX	(FUNCTION_FUNCTION_LEN + 1)
-#define FUNCTION_PARAMETER_LEN		255
-#define FUNCTION_PARAMETER_LEN_MAX	(FUNCTION_PARAMETER_LEN + 1)
-
 #define HISTORY_STR_VALUE_LEN		255
 #ifdef HAVE_IBM_DB2
 #	define HISTORY_TEXT_VALUE_LEN	2048
@@ -170,12 +162,9 @@ zbx_graph_item_type;
 
 #define DSERVICE_KEY_LEN		255
 #define DSERVICE_VALUE_LEN		255
-#define DSERVICE_VALUE_LEN_MAX		(DSERVICE_VALUE_LEN + 1)
 
 #define HTTPTEST_HTTP_USER_LEN		64
-#define HTTPTEST_HTTP_USER_LEN_MAX	(HTTPTEST_HTTP_USER_LEN + 1)
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
-#define HTTPTEST_HTTP_PASSWORD_LEN_MAX	(HTTPTEST_HTTP_PASSWORD_LEN + 1)
 
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
@@ -216,9 +205,7 @@ zbx_graph_item_type;
 
 #define ZBX_MAX_SQL_LEN		65535
 
-#define ZBX_STANDALONE_MAX_IDS	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
-#define ZBX_DM_MAX_HISTORY_IDS	(zbx_uint64_t)__UINT64_C(100000000000000)
-#define ZBX_DM_MAX_CONFIG_IDS	(zbx_uint64_t)__UINT64_C(100000000000)
+#define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
 typedef struct
 {
@@ -261,7 +248,7 @@ typedef struct
 	int		status;
 	int		lastup;
 	int		lastdown;
-	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		*value;
 }
 DB_DSERVICE;
 
@@ -416,15 +403,6 @@ typedef struct
 }
 DB_ESCALATION;
 
-#define ZBX_SQL_NODE				"%s"
-#define DBand_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 0)
-#define DBwhere_node_local(field_name)		__DBnode(field_name, CONFIG_NODEID, 1)
-#define DBand_node(field_name, nodeid)		__DBnode(field_name, nodeid, 0)
-#define DBwhere_node(field_name, nodeid)	__DBnode(field_name, nodeid, 1)
-const char	*__DBnode(const char *field_name, int nodeid, int op);
-#define DBis_node_local_id(id)			DBis_node_id(id, CONFIG_NODEID)
-int	DBis_node_id(zbx_uint64_t id, int nodeid);
-
 int	DBconnect(int flag);
 void	DBinit();
 
@@ -535,11 +513,7 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
-const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
-
-double	multiply_item_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, const char *host_metadata, int now);
@@ -568,8 +542,6 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
-
-int	get_nodeid_by_id(zbx_uint64_t id);
 
 #ifdef HAVE_POSTGRESQL
 #	define DBbytea_escape	zbx_db_bytea_escape

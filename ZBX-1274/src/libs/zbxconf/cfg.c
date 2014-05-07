@@ -54,22 +54,19 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
 	char 			*path = NULL, *file_name;
-	wchar_t			*wpath;
-	struct _stat		sb;
+	wchar_t			*wpath = NULL;
+	zbx_stat_t		sb;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	path = zbx_strdup(path, cfg_file);
 	zbx_rtrim(path, "\\");
 
-	wpath = zbx_utf8_to_unicode(path);
-
-	if (0 != _wstat(wpath, &sb))
+	if (0 != zbx_stat(path, &sb))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		goto out;
 	}
-	zbx_free(wpath);
 
 	if (0 == S_ISDIR(sb.st_mode))
 	{
@@ -109,12 +106,12 @@ out:
 	return ret;
 #else
 	DIR		*dir;
-	struct stat	sb;
+	zbx_stat_t	sb;
 	struct dirent	*d;
 	char		*incl_file = NULL;
 	int		result = SUCCEED;
 
-	if (-1 == stat(cfg_file, &sb))
+	if (-1 == zbx_stat(cfg_file, &sb))
 	{
 		zbx_error("%s: %s\n", cfg_file, zbx_strerror(errno));
 		return FAIL;
@@ -133,7 +130,7 @@ out:
 	{
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
 
-		if (-1 == stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
+		if (-1 == zbx_stat(incl_file, &sb) || !S_ISREG(sb.st_mode))
 			continue;
 
 		if (FAIL == __parse_cfg_file(incl_file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))

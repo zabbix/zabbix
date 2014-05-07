@@ -84,7 +84,7 @@ class CWebUser {
 	public static function checkAuthentication($sessionid) {
 		try {
 			if ($sessionid !== null) {
-				self::$data = API::User()->checkAuthentication($sessionid);
+				self::$data = API::User()->checkAuthentication(array($sessionid));
 			}
 
 			if ($sessionid === null || empty(self::$data)) {
@@ -103,7 +103,6 @@ class CWebUser {
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				error(_('GUI access disabled.'));
 				throw new Exception();
 			}
 
@@ -123,7 +122,7 @@ class CWebUser {
 			'userid' => 0,
 			'lang' => 'en_gb',
 			'type' => '0',
-			'node' => array('name' => '- unknown -', 'nodeid' => 0)
+			'debug_mode' => false
 		);
 	}
 
@@ -136,6 +135,15 @@ class CWebUser {
 	 */
 	public static function getType() {
 		return self::$data['type'];
+	}
+
+	/**
+	 * Returns true if debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function getDebugMode() {
+		return (self::$data['debug_mode']);
 	}
 
 	/**

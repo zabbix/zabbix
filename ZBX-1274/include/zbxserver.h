@@ -42,10 +42,11 @@
 #define MACRO_TYPE_SCRIPT		0x1000
 #define MACRO_TYPE_SNMP_OID		0x2000
 #define MACRO_TYPE_HTTPTEST_FIELD	0x4000
+#define MACRO_TYPE_LLD_FILTER		0x8000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
+int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
 		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, char **data, int macro_type, char *error,
