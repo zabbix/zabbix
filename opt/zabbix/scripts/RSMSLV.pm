@@ -35,6 +35,14 @@ use constant SECONDS_WEEK => 604800;
 
 use constant SENDER_BATCH_COUNT => 250;
 
+# In order to do the calculation we should wait till all the results
+# are available on the server (from proxies). We shift back 2 minutes
+# in case of "availability" and 3 minutes in case of "rolling week"
+# calculations.
+# NB! These numbers must be in sync with Frontend (details page)!
+use constant AVAIL_SHIFT_BACK => 120; # seconds (must be divisible by 60 without remainder)
+use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 without remainder)
+
 our ($result, $dbh, $tld);
 
 our %OPTS; # command-line options
@@ -60,9 +68,6 @@ my $probe_key_automatic = 'probe.status[automatic,%]'; # match all in SQL
 
 # configuration, set in set_slv_config()
 my $config = undef;
-
-my $avail_shift_back = 120; # seconds (must be divisible by 60 without remainder)
-my $rollweek_shift_back = 180; # seconds (must be divisible by 60 without remainder)
 
 # make sure only one copy of script runs (unless in test mode)
 my $pidfile;
@@ -117,7 +122,7 @@ sub get_macro_rdds_rtt_low
 
 sub get_macro_dns_udp_delay
 {
-    my $value_time = (shift or time() - $avail_shift_back);
+    my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
 
     my $item_param = 'RSM.DNS.UDP.DELAY';
 
@@ -130,7 +135,7 @@ sub get_macro_dns_udp_delay
 
 sub get_macro_dns_tcp_delay
 {
-    my $value_time = (shift or time() - $avail_shift_back);
+    my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
 
     my $item_param = 'RSM.DNS.TCP.DELAY';
 
@@ -143,7 +148,7 @@ sub get_macro_dns_tcp_delay
 
 sub get_macro_rdds_delay
 {
-    my $value_time = (shift or time() - $avail_shift_back);
+    my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
 
     my $item_param = 'RSM.RDDS.DELAY';
 
@@ -156,7 +161,7 @@ sub get_macro_rdds_delay
 
 sub get_macro_epp_delay
 {
-    my $value_time = (shift or time() - $avail_shift_back);
+    my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
 
     my $item_param = 'RSM.EPP.DELAY';
 
@@ -424,13 +429,13 @@ sub set_slv_config
     $config = shift;
 }
 
-# Get bounds of the previous rdds test period shifted $avail_shift_back seconds back.
+# Get bounds of the previous rdds test period shifted AVAIL_SHIFT_BACK seconds back.
 sub get_interval_bounds
 {
     my $interval = shift;
 
     my $t = time();
-    my $till = int($t / 60) * 60 - $avail_shift_back;
+    my $till = int($t / 60) * 60 - AVAIL_SHIFT_BACK;
     my $from = $till - $interval;
 
     $till--;
@@ -438,11 +443,11 @@ sub get_interval_bounds
     return ($from, $till, $till - 29);
 }
 
-# Get bounds of the previous week shifted $rollweek_shift_back seconds back.
+# Get bounds of the previous week shifted ROLLWEEK_SHIFT_BACK seconds back.
 sub get_rollweek_bounds
 {
     my $t = time();
-    my $till = int($t / 60) * 60 - $rollweek_shift_back;
+    my $till = int($t / 60) * 60 - ROLLWEEK_SHIFT_BACK;
     my $from = $till - SECONDS_WEEK;
 
     $till--;
