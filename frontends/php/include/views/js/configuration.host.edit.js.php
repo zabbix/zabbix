@@ -257,9 +257,9 @@
 
 		return {
 			add: function(hostInterfaces) {
-				for (var hostInterfaceId in hostInterfaces) {
-					addHostInterface(hostInterfaces[hostInterfaceId]);
-					renderHostInterfaceRow(hostInterfaces[hostInterfaceId]);
+				for (var i = 0; i != hostInterfaces.length; i++) {
+					addHostInterface(hostInterfaces[i]);
+					renderHostInterfaceRow(hostInterfaces[i]);
 				}
 				resetMainInterfaces();
 			},
