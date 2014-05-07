@@ -35,8 +35,7 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == sysctl(mib, 2, &boottime, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get boot time: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get boot time: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

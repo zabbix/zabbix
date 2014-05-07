@@ -382,6 +382,7 @@ void	test_parameter(const char *key)
 		printf("%-*s", ZBX_COL_WIDTH - n, " ");
 
 	init_result(&result);
+
 	if (SUCCEED == process(key, 0, &result))
 	{
 		if (ISSET_UI64(&result))
@@ -402,13 +403,9 @@ void	test_parameter(const char *key)
 	else
 	{
 		if (ISSET_MSG(&result))
-		{
 			printf(" [m|" ZBX_NOTSUPPORTED "] [%s]", result.msg);
-		}
 		else
-		{
 			printf(" [m|" ZBX_NOTSUPPORTED "]");
-		}
 	}
 
 	free_result(&result);

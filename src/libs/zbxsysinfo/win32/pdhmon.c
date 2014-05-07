@@ -78,9 +78,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (SYSINFO_RET_FAIL == ret)
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -159,12 +157,9 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, value);
 		ret = SYSINFO_RET_OK;
 	}
-
 clean:
 	if (SYSINFO_RET_FAIL == ret)
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 

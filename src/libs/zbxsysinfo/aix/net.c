@@ -51,7 +51,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns, char **error)
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
 	{
-		*error = zbx_strdup(NULL, "Failed to get network interface stats");
+		*error = zbx_strdup(NULL, "Failed to get network interface stats.");
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -86,7 +86,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns,&error))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -121,7 +121,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns,&error))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;

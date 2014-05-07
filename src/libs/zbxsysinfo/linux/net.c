@@ -67,15 +67,15 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
 				ZBX_FS_UI64 "\t%*s\t" ZBX_FS_UI64 "\t%*s\t%*s\n",
 				name,
-				&(result->ibytes),	/* bytes */
-				&(result->ipackets),	/* packets */
-				&(result->ierr),	/* errs */
-				&(result->idrop),	/* drop */
-				&(result->obytes),	/* bytes */
-				&(result->opackets),	/* packets */
-				&(result->oerr),	/* errs */
-				&(result->odrop),	/* drop */
-				&(result->colls)))	/* icolls */
+				&result->ibytes,	/* bytes */
+				&result->ipackets,	/* packets */
+				&result->ierr,		/* errs */
+				&result->idrop,		/* drop */
+				&result->obytes,	/* bytes */
+				&result->opackets,	/* packets */
+				&result->oerr,		/* errs */
+				&result->odrop,		/* drop */
+				&result->colls))	/* icolls */
 		{
 			if (0 == strcmp(name, if_name))
 			{

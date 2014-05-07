@@ -43,10 +43,8 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 	*value_int = 0;
 
-	if (FAIL == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
-	{
-		goto clean;
-	}
+	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+		goto out;
 
 	if (NULL != request)
 		net = zbx_tcp_send_raw(&s, request);
@@ -57,7 +55,8 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		{
 			if (0 != strncmp(s.buffer, expect, strlen(expect)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, s.buffer);
+				zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]",
+						expect, s.buffer);
 				val = FAIL;
 			}
 		}
@@ -70,9 +69,8 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		*value_int = 1;
 
 	zbx_tcp_close(&s);
-
-clean:
-	if (FAIL == net)
+out:
+	if (SUCCEED != net)
 		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
 
 	return SYSINFO_RET_OK;

@@ -99,9 +99,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_STR_RESULT(result, zbx_strdup(NULL, line));
 	}
 	else
-	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to read from file."));
-	}
+
 	zbx_fclose(f);
 
 	return ret;

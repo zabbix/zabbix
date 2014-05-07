@@ -39,7 +39,8 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	if (NULL == CONFIG_HOSTNAME)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Standalone Zabbix agent does not support the Hostname in the configuration file."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Hostname parameter is not supported"
+					" in the zabbix_agent configuration file."));
 		return SYSINFO_RET_FAIL;
 	}
 

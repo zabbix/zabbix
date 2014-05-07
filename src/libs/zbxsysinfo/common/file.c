@@ -219,8 +219,8 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == nbytes)	/* error occurred */
 	{
-		zbx_free(contents);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		zbx_free(contents);
 		goto err;
 	}
 
@@ -346,6 +346,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			break;
 		}
 	}
+
 	if (-1 == nbytes)	/* error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));

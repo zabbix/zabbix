@@ -182,9 +182,7 @@ clean:
 	}
 
 	if (SYSINFO_RET_FAIL == ret)
-	{
 		*error = zbx_strdup(NULL, "Failed to get network interface stats.");
-	}
 
 	return ret;
 }

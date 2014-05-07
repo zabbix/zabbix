@@ -49,7 +49,7 @@ static void	process_listener(zbx_sock_t *s)
 
 		if (SUCCEED == process(s->buffer, 0, &result))
 		{
-			if (NULL != (value =  GET_TEXT_RESULT(&result)))
+			if (NULL != (value = GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
@@ -66,9 +66,7 @@ static void	process_listener(zbx_sock_t *s)
 				size_t		buffer_offset = 0;
 
 				if (NULL == buffer)
-				{
 					buffer = zbx_malloc(buffer, buffer_alloc);
-				}
 
 				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 						ZBX_NOTSUPPORTED, sizeof(ZBX_NOTSUPPORTED) - 1);
@@ -78,9 +76,7 @@ static void	process_listener(zbx_sock_t *s)
 				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, CONFIG_TIMEOUT);
 			}
 			else
-			{
 				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, CONFIG_TIMEOUT);
-			}
 		}
 
 		free_result(&result);

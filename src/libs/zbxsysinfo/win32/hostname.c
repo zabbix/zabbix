@@ -74,6 +74,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 			return SYSINFO_RET_FAIL;
 		}
 		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
+		{
 			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. gethostname() failed."));
 			return SYSINFO_RET_FAIL;

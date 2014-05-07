@@ -97,6 +97,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
 		PARSE(tmp);
+
 		if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
 		{
 			if (0 != strcmp(name, devname))

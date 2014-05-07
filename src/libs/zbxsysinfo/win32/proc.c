@@ -365,7 +365,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	procList = (DWORD *)malloc(MAX_PROCESSES * sizeof(DWORD));
 
-	if ( 0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
+	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
 		return SYSINFO_RET_FAIL;
