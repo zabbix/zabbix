@@ -264,7 +264,7 @@ class CMaintenance extends CApiService {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		self::deprecated('maintenance.exists method is deprecated.');
+		$this->deprecated('maintenance.exists method is deprecated.');
 
 		$keyFields = array(array('maintenanceid', 'name'));
 
