@@ -597,11 +597,19 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	else if (ASN_INTEGER == var->type)
 #endif
 	{
-		/* negative integer values are converted to double */
-		if (0 > *var->val.integer)
+		/* negative integer values are converted to double if item value type is not set to unsigned*/
+		if (ITEM_VALUE_TYPE_FLOAT == value_type)
 			SET_DBL_RESULT(result, (double)*var->val.integer);
-		else
+		else if (ITEM_VALUE_TYPE_UINT64 == value_type && 0 < *var->val.integer)
 			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
+		else
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [\"%d\"] is not "
+					"suitable for value type [%s] and data type [ASN_INTEGER]",
+					*var->val.integer, zbx_item_value_type_string(value_type)));
+
+			ret = NOTSUPPORTED;
+		}
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_FLOAT == var->type)
