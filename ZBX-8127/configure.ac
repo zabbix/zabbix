@@ -933,15 +933,26 @@ if test "x$ARCH" = "xlinux"; then
 	esac
 fi
 
-dnl Low Level Discovery needs a way to get the list of network
-dnl interfaces available on the monitored system. On HP-UX systems
-dnl that way depends on the OS version.
 if test "x$ARCH" = "xhpux"; then
+	dnl Low Level Discovery needs a way to get the list of network
+	dnl interfaces available on the monitored system. On HP-UX systems
+	dnl that way depends on the OS version.
 	hpux_version=${host_os#hpux}
 	hpux_major=${hpux_version%.*}
 	hpux_minor=${hpux_version#*.}
 
 	AC_DEFINE_UNQUOTED([HPUX_VERSION], $hpux_major$hpux_minor, [Define to HP-UX version])
+
+	dnl Checking for -D_HPUX_API_LEVEL=20040821 compilation flag
+	AC_MSG_CHECKING(for -D_HPUX_API_LEVEL=20040821 compilation flag)
+	saved_CFLAGS="$CFLAGS"
+	CFLAGS="-D_HPUX_API_LEVEL=20040821"
+	AC_TRY_RUN(
+	[int main(void) {return 0;}],
+	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
+	AC_MSG_RESULT(yes),
+	CFLAGS="$saved_CFLAGS"
+	AC_MSG_RESULT(no))
 fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])

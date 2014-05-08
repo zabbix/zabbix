@@ -29,18 +29,8 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct utsname	name;
-	char		*hostname;
-	int 		hostbufsize = 0;
-
-	if (-1 == uname(&name))
-		return SYSINFO_RET_FAIL;
-
-	/* On HP-UX machines name.nodename can be truncated to 8 bytes, therefore, it is */
-	/* recommended to use the host name returned by the gethostname() and query the  */
-	/* system for the maximum possible length by using sysconf(_SC_HOST_NAME_MAX).   */
-	/* However, _SC_HOST_NAME_MAX might not available on all versions of HP-UX. 	 */
-	/* In such case buffer size is set to 256 and explicitly NUll-terminated 	 */
+	char	*hostname;
+	int 	hostbufsize = 0;
 
 	#ifdef _SC_HOST_NAME_MAX
 	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
@@ -52,9 +42,10 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	hostname = zbx_malloc(NULL, sizeof(char) * hostbufsize);
 
 	if (0 != gethostname(hostname, hostbufsize))
-		hostname = name.nodename;
-	else
-		hostname[hostbufsize - 1] = '\0';
+	{
+		zbx_free(hostname);
+		return SYSINFO_RET_FAIL;
+	}
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, hostname));
 
