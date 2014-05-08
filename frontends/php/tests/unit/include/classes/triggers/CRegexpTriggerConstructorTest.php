@@ -188,7 +188,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 	public function testGetPartsFromExpressionProvider() {
 		return array(
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}=0',
+				'({Zabbix server:system.hostname.regexp(a)})=0',
 				array(
 					array(
 						'value' => 'regexp(a)',
@@ -197,20 +197,11 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}<>0',
+				'({Zabbix server:system.hostname.regexp(a)})<>0',
 				array(
 					array(
 						'value' => 'regexp(a)',
 						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				)
-			),
-			array(
-				'({Zabbix server:system.hostname.regexp(a)}=0)',
-				array(
-					array(
-						'value' => 'regexp(a)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					)
 				)
 			),
@@ -224,7 +215,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}=0 and {Zabbix server:system.hostname.regexp(b)}=0',
+				'({Zabbix server:system.hostname.regexp(a)})=0 and ({Zabbix server:system.hostname.regexp(b)})=0',
 				array(
 					array(
 						'value' => 'regexp(a)',
@@ -237,7 +228,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0',
+				'({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0',
 				array(
 					array(
 						'value' => 'regexp(a)',
@@ -250,7 +241,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'({Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0) and {Zabbix server:system.hostname.regexp(c)}=0',
+				'(({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0) and ({Zabbix server:system.hostname.regexp(c)})=0',
 				array(
 					array(
 						'value' => 'regexp(a) or regexp(b)',
@@ -263,7 +254,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}=0 or ({Zabbix server:system.hostname.regexp(b)}=0 and {Zabbix server:system.hostname.regexp(c)}=0)',
+				'({Zabbix server:system.hostname.regexp(a)})=0 or (({Zabbix server:system.hostname.regexp(b)})=0 and ({Zabbix server:system.hostname.regexp(c)})=0)',
 				array(
 					array(
 						'value' => 'regexp(a)',
@@ -276,7 +267,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				)
 			),
 			array(
-				'{Zabbix server:system.hostname.regexp(a)}=0 or {Zabbix server:system.hostname.regexp(b)}=0 and {Zabbix server:system.hostname.regexp(c)}=0',
+				'({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0 and ({Zabbix server:system.hostname.regexp(c)})=0',
 				array(
 					array(
 						'value' => 'regexp(a)',
@@ -288,6 +279,19 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					),
 					array(
 						'value' => 'regexp(c)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
+			),
+			array(
+				'(({Zabbix server:system.hostname.regexp(a)})=0 and ({Zabbix server:system.hostname.regexp(b)})=0) or (({Zabbix server:system.hostname.regexp(c)})=0 or ({Zabbix server:system.hostname.regexp(d)})=0)',
+				array(
+					array(
+						'value' => 'regexp(a) and regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(c) or regexp(d)',
 						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					),
 				)
