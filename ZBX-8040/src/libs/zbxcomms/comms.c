@@ -969,7 +969,7 @@ int	validate_pop(const char *line)
 int	validate_nntp(const char *line)
 {
 	if (0 == strncmp(line, "200 ", 4))
-	return TCP_EXPECT_OK;
+		return TCP_EXPECT_OK;
 
 	return TCP_EXPECT_IGNORE;
 }
