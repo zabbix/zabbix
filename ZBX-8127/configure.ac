@@ -877,18 +877,6 @@ darwin*|rhapsody*)
 	;;
 *solaris*)
 	ARCH="solaris"
-	dnl Forcing a 64-bit application for a 64-bit Solaris
-	dnl A 32-bit program that uses /proc is able to look at 32-bit processes,
-	dnl but is not able to understand all attributes of a 64-bit process.
-	AC_MSG_CHECKING(for -m64 compilation flag)
-	saved_CFLAGS="$CFLAGS"
-	CFLAGS="-m64"
-	AC_TRY_RUN(
-	[int main(void) {return 0;}],
-	CFLAGS="-m64 $saved_CFLAGS"
-	AC_MSG_RESULT(yes),
-	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT(no))
 	;;
 hpux*)
 	ARCH="hpux"
@@ -931,6 +919,21 @@ if test "x$ARCH" = "xlinux"; then
 			AC_MSG_RESULT([unknown family (${kernel})])
 			;;
 	esac
+fi
+
+if test "x$ARCH" = "xsolaris"; then
+	dnl Forcing a 64-bit application for a 64-bit Solaris
+	dnl A 32-bit program that uses /proc is able to look at 32-bit processes,
+	dnl but is not able to understand all attributes of a 64-bit process.
+	AC_MSG_CHECKING(for -m64 compilation flag)
+	saved_CFLAGS="$CFLAGS"
+	CFLAGS="-m64"
+	AC_TRY_RUN(
+	[int main(void) {return 0;}],
+	CFLAGS="-m64 $saved_CFLAGS"
+	AC_MSG_RESULT(yes),
+	CFLAGS="$saved_CFLAGS"
+	AC_MSG_RESULT(no))
 fi
 
 if test "x$ARCH" = "xhpux"; then
