@@ -98,41 +98,19 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: reads until '\n'                                                 *
- *                                                                            *
- ******************************************************************************/
-static ssize_t	smtp_readln(int fd, char *buf, int buf_len)
+static int	smtp_readln(zbx_sock_t *s, char **buf)
 {
-	ssize_t	nbytes, read_bytes;
+	int ret;
 
-	buf_len--;	/* '\0' */
+	while (SUCCEED == (ret = zbx_tcp_recv_line(s, buf, 0)) &&
+			3 <= strlen(*buf) &&
+			0 != isdigit((*buf)[0]) &&
+			0 != isdigit((*buf)[1]) &&
+			0 != isdigit((*buf)[2]) &&
+			'-' == (*buf)[3])
+		;
 
-	do
-	{
-		read_bytes = 0;
-
-		do
-		{
-			if (-1 == (nbytes = read(fd, &buf[read_bytes], 1)))
-				return nbytes;			/* error */
-
-			read_bytes += nbytes;
-		}
-		while (nbytes > 0 &&				/* end of file (socket closed) */
-				read_bytes < buf_len &&		/* end of buffer */
-				buf[read_bytes - 1] != '\n' );	/* new line */
-
-		buf[read_bytes] = '\0';
-	}
-	while (read_bytes >= 4 &&
-			isdigit(buf[0]) &&
-			isdigit(buf[1]) &&
-			isdigit(buf[2]) &&
-			buf[3] == '-');
-
-	return read_bytes;
+	return ret;
 }
 
 /********************************************************************************
@@ -299,7 +277,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 				smtp_server, zbx_tcp_strerror());
 		goto close;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+	if (-1 == smtp_readln(&s, (char**)&cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
 				zbx_strerror(errno));
@@ -322,7 +300,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 					zbx_strerror(errno));
 			goto out;
 		}
-		if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+		if (-1 == smtp_readln(&s, (char**)&cmd))
 		{
 			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
 					zbx_strerror(errno));
@@ -347,7 +325,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+	if (-1 == smtp_readln(&s, (char**)&cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s", zbx_strerror(errno));
 		goto out;
@@ -370,7 +348,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+	if (-1 == smtp_readln(&s, (char**)&cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
 		goto out;
@@ -390,7 +368,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+	if (-1 == smtp_readln(&s, (char**)&cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s", zbx_strerror(errno));
 		goto out;
@@ -477,7 +455,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
 		goto out;
 	}
-	if (-1 == smtp_readln(s.socket, cmd, sizeof(cmd)))
+	if (-1 == smtp_readln(&s, (char**)&cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s", zbx_strerror(errno));
 		goto out;
