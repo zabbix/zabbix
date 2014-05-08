@@ -86,8 +86,7 @@ my $trigger_rollweek_thresholds = { '1' => {'threshold' => '10', 'priority' => 2
 				    '2' => {'threshold' => '25', 'priority' => 3},
 				    '3' => {'threshold' => '50', 'priority' => 3},
 				    '4' => {'threshold' => '75', 'priority' => 4},
-				    '5' => {'threshold' => '90', 'priority' => 4},
-				    '6' => {'threshold' => '100', 'priority' => 5}
+				    '5' => {'threshold' => '100', 'priority' => 5}
 				  };
 
 my %OPTS;
@@ -763,7 +762,7 @@ sub create_items_rdds {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
                         'priority' => '2',
                 };
-    
+
     create_trigger($options);
 
     $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
@@ -1499,7 +1498,7 @@ sub create_slv_items {
     create_slv_item('DNS weekly unavailability', 'rsm.slv.dns.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
     my $depend_down;
-                                
+
     foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
 	my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
 	my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
@@ -1518,7 +1517,7 @@ sub create_slv_items {
         if (defined($depend_down)) {
             my $result = $zabbix->trigger_dep_add({'triggerid' => $depend_down, 'dependsOnTriggerid' => $triggerid});
         }
-        
+
         $depend_down = $triggerid;
     }
 
