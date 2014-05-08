@@ -131,7 +131,7 @@ class CBarGraphDraw extends CGraphDraw {
 		foreach ($seriesLegend as $key => $value) {
 			$this->seriesLegend[$key] = $value;
 
-			$tmp = zbx_strlen($value) * 7 + 8; // count of chars * font size + color box
+			$tmp = mb_strlen($value) * 7 + 8; // count of chars * font size + color box
 			if ($tmp > $this->shiftlegendright) {
 				$this->shiftlegendright = $tmp;
 			}

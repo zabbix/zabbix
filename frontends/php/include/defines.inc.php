@@ -617,9 +617,6 @@ define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
 define('PERM_DENY',			0);
 
-define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
-define('PERM_RES_DATA_ARRAY',	2);
-
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
@@ -674,6 +671,10 @@ define('GRAPH_TYPE_BAR',			6);
 define('GRAPH_TYPE_COLUMN',			7);
 define('GRAPH_TYPE_BAR_STACKED',	8);
 define('GRAPH_TYPE_COLUMN_STACKED',	9);
+
+define('BR_DISTRIBUTION_MULTIPLE_PERIODS',	1);
+define('BR_DISTRIBUTION_MULTIPLE_ITEMS',	2);
+define('BR_COMPARE_VALUE_MULTIPLE_PERIODS',	3);
 
 define('GRAPH_3D_ANGLE', 70);
 
@@ -917,6 +918,11 @@ define('QUEUE_DETAILS', 2);
 
 // item count to display in the details queue
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
+
+// constants for element "copy to..." target types
+define('COPY_TYPE_TO_HOST', 0);
+define('COPY_TYPE_TO_TEMPLATE', 2);
+define('COPY_TYPE_TO_HOST_GROUP', 1);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');

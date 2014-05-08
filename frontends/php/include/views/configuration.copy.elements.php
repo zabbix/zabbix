@@ -43,16 +43,17 @@ $triggersFormList = new CFormList('triggersFormList');
 
 // append copy types to form list
 $copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'submit()');
-$copyTypeComboBox->addItem(0, _('Hosts'));
-$copyTypeComboBox->addItem(1, _('Host groups'));
+$copyTypeComboBox->addItem(COPY_TYPE_TO_HOST, _('Hosts'));
+$copyTypeComboBox->addItem(COPY_TYPE_TO_TEMPLATE, _('Templates'));
+$copyTypeComboBox->addItem(COPY_TYPE_TO_HOST_GROUP, _('Host groups'));
 $triggersFormList->addRow(_('Target type'), $copyTypeComboBox);
 
 // append groups to form list
-if ($this->data['copy_type'] == 0) {
-	$groupComboBox = new CComboBox('filter_groupid', $this->data['filter_groupid'], 'submit()');
+if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
+	$groupComboBox = new CComboBox('copy_groupid', $this->data['copy_groupid'], 'submit()');
 	foreach ($this->data['groups'] as $group) {
-		if (empty($this->data['filter_groupid'])) {
-			$this->data['filter_groupid'] = $group['groupid'];
+		if (empty($this->data['copy_groupid'])) {
+			$this->data['copy_groupid'] = $group['groupid'];
 		}
 		$groupComboBox->addItem($group['groupid'], $group['name']);
 	}
@@ -61,7 +62,7 @@ if ($this->data['copy_type'] == 0) {
 
 // append targets to form list
 $targets = array();
-if ($this->data['copy_type'] == 0) {
+if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
 		array_push(
 			$targets,
@@ -73,8 +74,19 @@ if ($this->data['copy_type'] == 0) {
 			)
 		);
 	}
-}
-else {
+} elseif ($this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
+	foreach ($this->data['templates'] as $template) {
+		array_push(
+			$targets,
+			array(
+				new CCheckBox('copy_targetid['.$template['templateid'].']', uint_in_array($template['templateid'], $this->data['copy_targetid']), null, $template['templateid']),
+				SPACE,
+				$template['name'],
+				BR()
+			)
+		);
+	}
+} else {
 	foreach ($this->data['groups'] as $group) {
 		array_push(
 			$targets,

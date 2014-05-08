@@ -47,25 +47,25 @@ zbx_err_codes_t;
 extern int	CONFIG_LOG_FILE_SIZE;
 
 /* Type - 1 (syslog), 2 - file */
-int zabbix_open_log(int type,int level, const char *filename);
+int	zabbix_open_log(int type,int level, const char *filename);
 
 #ifdef HAVE___VA_ARGS__
 #	define zabbix_log(level, fmt, ...) __zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zabbix_log __zbx_zabbix_log
-#endif /* HAVE___VA_ARGS__ */
-void zabbix_errlog(zbx_err_codes_t err, ...);
-void __zbx_zabbix_log(int level, const char *fmt, ...);
+#endif
+void	zabbix_errlog(zbx_err_codes_t err, ...);
+void	__zbx_zabbix_log(int level, const char *fmt, ...);
 
-void zabbix_close_log();
-void zabbix_set_log_level(int level);
+void	zabbix_close_log();
+void	zabbix_set_log_level(int level);
 
-int zabbix_check_log_level(int level);
+int	zabbix_check_log_level(int level);
 
-char *zbx_strerror(int errnum);
-char *strerror_from_system(unsigned long error);
+char	*zbx_strerror(int errnum);
+char	*strerror_from_system(unsigned long error);
 #ifdef _WINDOWS
-char *strerror_from_module(unsigned long error, LPCTSTR module);
+char	*strerror_from_module(unsigned long error, const wchar_t *module);
 #endif
 
 #if defined(_WINDOWS)

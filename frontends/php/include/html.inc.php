@@ -57,11 +57,16 @@ function bold($str) {
 
 function make_decoration($haystack, $needle, $class = null) {
 	$result = $haystack;
-	$pos = zbx_stripos($haystack, $needle);
+
+	$tmpHaystack = mb_strtolower($haystack);
+	$tmpNeedle = mb_strtolower($needle);
+	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
+
 	if ($pos !== false) {
-		$start = CHtml::encode(zbx_substring($haystack, 0, $pos));
-		$end = CHtml::encode(zbx_substring($haystack, $pos + zbx_strlen($needle)));
-		$found = CHtml::encode(zbx_substring($haystack, $pos, $pos + zbx_strlen($needle)));
+		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
+		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
+		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+
 		if (is_null($class)) {
 			$result = array($start, bold($found), $end);
 		}
@@ -69,6 +74,7 @@ function make_decoration($haystack, $needle, $class = null) {
 			$result = array($start, new CSpan($found, $class), $end);
 		}
 	}
+
 	return $result;
 }
 
@@ -323,11 +329,11 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 					$status = new CSpan(_('In maintenance'), 'orange');
 				}
 				else {
-					$status = new CSpan(_('Monitored'), 'enabled');
+					$status = new CSpan(_('Enabled'), 'enabled');
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Not monitored'), 'on');
+				$status = new CSpan(_('Disabled'), 'on');
 				break;
 			default:
 				$status = _('Unknown');
@@ -546,11 +552,12 @@ function getAvailabilityTable($host) {
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
-		$deleteError->setHint(
-			_s('The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $host['hostDiscovery']['ts_delete'])
-			));
+		$deleteError->setHint(_s(
+			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($host['hostDiscovery']['ts_delete']),
+			zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
+			zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
+		));
 		$ad->addItem($deleteError);
 	}
 
@@ -602,7 +609,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 	$minute = new CNumericBox($name.'_minute', $i, 2);
 	$minute->attr('placeholder', _('mm'));
 
-	$fields = array($day, '/', $month, '/', $year, SPACE, $hour, ':', $minute, $calendarIcon);
+	$fields = array($year, '-', $month, '-', $day, SPACE, $hour, ':', $minute, $calendarIcon);
 
 	zbx_add_post_js('create_calendar(null,'.
 		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.

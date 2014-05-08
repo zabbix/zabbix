@@ -22,14 +22,12 @@
 /**
  * @property string $groupid
  * @property string $hostid
- * @property string $triggerid
  * @property string $graphid
  * @property string $druleid
  * @property string $severityMin
  * @property array  $groups
  * @property array  $hosts
  * @property array  $graphs
- * @property array  $triggers
  * @property array  $drules
  * @property bool   $groupsSelected
  * @property bool   $groupsAll
@@ -45,7 +43,6 @@ class CPageFilter {
 	const GROUP_LATEST_IDX = 'web.latest.groupid';
 	const HOST_LATEST_IDX = 'web.latest.hostid';
 	const GRAPH_LATEST_IDX = 'web.latest.graphid';
-	const TRIGGER_LATEST_IDX = 'web.latest.triggerid';
 	const DRULE_LATEST_IDX = 'web.latest.druleid';
 
 	/**
@@ -79,7 +76,6 @@ class CPageFilter {
 		'graphid' => null,
 
 		// works only if a specific host has been selected, will NOT work if the host filter is set to 'all'
-		'triggerid' => null,
 		'druleid' => null,
 
 		// API parameters to be used to retrieve filter objects
@@ -111,7 +107,6 @@ class CPageFilter {
 	protected $ids = array(
 		'groupid' => null,
 		'hostid' => null,
-		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
 		'severityMin' => null
@@ -146,7 +141,6 @@ class CPageFilter {
 	private $_profileIdx = array(
 		'groupid' => null,
 		'hostid' => null,
-		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
 		'severityMin' => null
@@ -160,7 +154,6 @@ class CPageFilter {
 	private $_profileIds = array(
 		'groupid' => null,
 		'hostid' => null,
-		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
 		'severityMin' => null
@@ -217,7 +210,6 @@ class CPageFilter {
 	 * @param array  $options['graphs']
 	 * @param string $options['graphid']
 	 * @param array  $options['triggers']
-	 * @param string $options['triggerid']
 	 * @param array  $options['drules']
 	 * @param string $options['druleid']
 	 * @param array  $options['applications']
@@ -276,11 +268,6 @@ class CPageFilter {
 			$this->_initGraphs($options['graphid'], $options['graphs']);
 		}
 
-		// triggers
-		if (isset($options['triggers'])) {
-			$this->_initTriggers($options['triggerid'], $options['triggers']);
-		}
-
 		// drules
 		if (isset($options['drules'])) {
 			$this->_initDiscoveries($options['druleid'], $options['drules']);
@@ -314,7 +301,6 @@ class CPageFilter {
 		$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
-		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
 		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
 		$this->_profileIdx['application'] = 'web.'.$profileSection.'.application';
 		$this->_profileIdx['severityMin'] = 'web.maps.severity_min';
@@ -323,7 +309,6 @@ class CPageFilter {
 			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
 			$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
 			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
-			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 			$this->_profileIds['application'] = '';
 			$this->_profileIds['severityMin'] = null;
@@ -332,7 +317,6 @@ class CPageFilter {
 			$this->_profileIds['groupid'] = 0;
 			$this->_profileIds['hostid'] = 0;
 			$this->_profileIds['graphid'] = 0;
-			$this->_profileIds['triggerid'] = 0;
 			$this->_profileIds['druleid'] = 0;
 			$this->_profileIds['application'] = '';
 			$this->_profileIds['severityMin'] = null;
@@ -341,7 +325,6 @@ class CPageFilter {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
 			$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
 			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
-			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
 			$this->_profileIds['application'] = CProfile::get($this->_profileIdx['application']);
 
@@ -353,7 +336,6 @@ class CPageFilter {
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
-		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
 		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
 		$this->_requestIds['application'] = isset($options['application']) ? $options['application'] : null;
 		$this->_requestIds['severityMin'] = isset($options['severityMin']) ? $options['severityMin'] : null;
@@ -584,43 +566,6 @@ class CPageFilter {
 		}
 		$this->isSelected['graphsSelected'] = $graphid > 0;
 		$this->ids['graphid'] = $graphid;
-	}
-
-	/**
-	 * Load available triggers, choose the selected trigger and remember the selection.
-	 * If no host is elected, or the host selection is set to 'All', reset the selected trigger to 0.
-	 *
-	 * @param int   $triggerid
-	 * @param array $options
-	 */
-	private function _initTriggers($triggerid, array $options) {
-		$this->data['triggers'] = array();
-
-		if (!$this->hostsSelected || $this->hostsAll) {
-			$triggerid = 0;
-		}
-		else {
-			$def_ptions = array(
-				'output' => array('triggerid', 'description'),
-				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
-				'hostids' => ($this->hostid > 0) ? $this->hostid : null
-			);
-			$options = zbx_array_merge($def_ptions, $options);
-			$triggers = API::Trigger()->get($options);
-			order_result($triggers, 'description');
-
-			foreach ($triggers as $trigger) {
-				$this->data['triggers'][$trigger['triggerid']] = $trigger;
-			}
-
-			if (is_null($triggerid)) {
-				$triggerid = $this->_profileIds['triggerid'];
-			}
-			$triggerid = isset($this->data['triggers'][$triggerid]) ? $triggerid : 0;
-		}
-
-		$this->isSelected['triggersSelected'] = $triggerid > 0;
-		$this->ids['triggerid'] = $triggerid;
 	}
 
 	/**

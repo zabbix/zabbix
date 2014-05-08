@@ -268,7 +268,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$this->sum += $item_value;
 
-			$convertedUnit = zbx_strlen(convert_units(array(
+			$convertedUnit = strlen(convert_units(array(
 				'value' => $item_value,
 				'units' => $this->items[$i]['units']
 			)));
