@@ -295,6 +295,23 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					),
 				)
+			),
+			array(
+				'((({Zabbix server:system.hostname.regexp(a)})=0) or (({Zabbix server:system.hostname.regexp(b)})=0)) and (({Zabbix server:system.hostname.regexp(c)})=0)',
+				array(
+					array(
+						'value' => 'regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+					array(
+						'value' => 'regexp(c)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					),
+				)
 			)
 		);
 	}
