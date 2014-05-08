@@ -41,7 +41,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 {
 	zbx_sock_t	s;
 	char		*buf;
-	int		net, val = SUCCEED, validate;
+	int		net, val = SUCCEED;
 
 	*value_int = 0;
 
@@ -59,8 +59,8 @@ wait_for_220sp:
 				{
 					val = FAIL;
 				}
-				validate = validate_func(buf);
-				if (1 == validate)
+
+				if (1 == validate_func(buf))
 					goto wait_for_220sp;
 			}
 		}
