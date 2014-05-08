@@ -65,7 +65,7 @@ $particularTestsTable->setHeader($headers);
 
 $down = new CSpan(_('Down'), 'red');
 $offline = new CSpan(_('Offline'), 'gray');
-$noResult = _('No result');
+$noResult = new CSpan(_('No result'), 'gray');
 $up = new CSpan(_('Up'), 'green');
 
 foreach ($this->data['probes'] as $probe) {
@@ -262,15 +262,6 @@ if ($this->data['type'] == RSM_DNS) {
 		new CSpan(array(bold(_('Probes Down')), ':', SPACE, $this->data['downProbes']))
 	);
 }
-elseif ($this->data['type'] == RSM_DNSSEC) {
-	$additionInfo = array(
-		new CSpan(bold(_s(
-			'%1$s out of %2$s tests reported availability of service',
-			round($this->data['availTests'] / $this->data['totalTests'] * 100, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT).'%',
-			$this->data['totalTests']
-		)))
-	);
-}
 
 $tldTriggersLink = new CLink($this->data['tld']['name'], 'tr_status.php?groupid=0&hostid='.$this->data['tld']['hostid']);
 $tldTriggersLink->setTarget('_blank');
@@ -303,7 +294,7 @@ $particularTests = array(
 );
 
 $tableHeader[] = $particularTests;
-if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
+if ($this->data['type'] == RSM_DNS) {
 	$tableHeader[] = $additionInfo;
 }
 

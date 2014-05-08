@@ -222,6 +222,36 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		}
 	}
 
+	// get test result for DNS service
+	if ($data['type'] == RSM_DNS) {
+		$probeResultItems = API::Item()->get(array(
+			'hostids' => $data['probe']['hostid'],
+			'output' => array('itemid', 'value_type', 'key_'),
+			'filter' => array(
+				'key_' => PROBE_DNS_UDP_ITEM
+			)
+		));
+
+		$probeResultItem = reset($probeResultItems);
+
+		$itemValue = API::History()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $probeResultItem['itemid'],
+			'time_from' => $testTimeFrom,
+			'time_till' => $testTimeTill,
+			'history' => $probeResultItem['value_type']
+
+		));
+
+		if ($itemValue) {
+			$itemValue = reset($itemValue);
+			$data['testResult'] = ($itemValue['value'] >= $minNs) ? true : false;
+		}
+		else {
+			$data['testResult'] = null;
+		}
+	}
+
 	// get items
 	$probeItems = API::Item()->get(array(
 		'hostids' => $host['hostid'],
@@ -270,15 +300,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	$data['positiveNs'] = count($totalNs) - count($negativeNs);
 
 	$data['minMs'] = $dnsUdpRtt;
-
-	if ($data['type'] == RSM_DNS) {
-		$data['probe']['test'] = ($data['positiveNs'] >= $minNs) ? true : false;
-	}
-	else {
-		$data['probe']['test'] = ($data['positiveNs'] / $data['totalNs'] * 100 > MIN_PROBE_OK_RESULT_PERCENTAGE)
-			? true
-			: false;
-	}
 }
 else {
 	access_deny();

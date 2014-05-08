@@ -78,14 +78,27 @@ $particularProxys = array(
 	new CSpan(array(bold(_('Test time')), ':', SPACE, date('d.m.Y H:i:s', $this->data['time']))),
 	BR(),
 	new CSpan(array(bold(_('Probe')), ':', SPACE, $this->data['probe']['name'])),
-	BR(),
-	new CSpan(array(
-		bold(_('Test result')),
-		':',
-		SPACE,
-		$this->data['probe']['test'] ? new CSpan(_('Up'), 'green') : new CSpan(_('Down'), 'red')
-	))
 );
+
+if ($this->data['type'] == RSM_DNS) {
+	if ($this->data['testResult'] == true) {
+		$testResult = new CSpan(_('Up'), 'green');
+	}
+	elseif ($this->data['testResult'] == false) {
+		$testResult = new CSpan(_('Down'), 'red');
+	}
+	else {
+		$testResult = new CSpan(_('No result'), 'gray');
+	}
+	array_push($particularProxys, array(BR(),
+		new CSpan(array(
+			bold(_('Test result')),
+			':',
+			SPACE,
+			$testResult
+		))
+	));
+}
 
 $particularProxysInfoTable->addRow(array($particularProxys));
 $particularProxysInfoTable->addRow(array(array(

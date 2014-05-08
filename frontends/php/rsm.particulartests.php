@@ -74,7 +74,7 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	// macro
 	if ($data['type'] == RSM_DNS || $data['type'] == RSM_DNSSEC) {
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
-		if ($data['type'] == 0) {
+		if ($data['type'] == RSM_DNS) {
 			$data['offlineProbes'] = 0;
 			$data['downProbes'] = 0;
 			$data['resultProbes'] = 0;
@@ -82,7 +82,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			$data['totalProbes'] = 0;
 		}
 		else {
-			$data['availTests'] = 0;
 			$data['totalTests'] = 0;
 		}
 	}
@@ -495,22 +494,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		));
 
 		$data['totalTests'] = count($testItems);
-
-		foreach ($testItems as $testItem) {
-			$itemHistory = API::History()->get(array(
-				'itemids' => $testItem['itemid'],
-				'time_from' => $testTimeFrom,
-				'time_till' => $testTimeTill,
-				'history' => $testItem['value_type'],
-				'output' => API_OUTPUT_EXTEND
-			));
-
-			$itemHistory = reset($itemHistory);
-
-			if ($itemHistory['value'] != DNSSEC_FAIL_ERROR_CODE) {
-				$data['availTests']++;
-			}
-		}
 	}
 
 	foreach ($hosts as $host) {
