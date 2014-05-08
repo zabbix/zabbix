@@ -108,9 +108,6 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-$c = new CRegexpTriggerConstructor(new CTriggerExpression());
-$c->getPartsFromExpression('(({Zabbix server:system.hostname.regexp(a)})=0 and ({Zabbix server:system.hostname.regexp(b)})=0) or (({Zabbix server:system.hostname.regexp(c)})=0 or ({Zabbix server:system.hostname.regexp(d)})=0)');
-
 /*
  * Permissions
  */
