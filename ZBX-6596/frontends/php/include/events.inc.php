@@ -173,7 +173,7 @@ function make_event_details($event, $trigger) {
 		new CCol(_('Event')),
 		new CCol(CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event)), 'wraptext')
 	));
-	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
+	$table->addRow(array(_('Time'), zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])));
 
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
@@ -246,7 +246,7 @@ function make_small_eventlist($startEvent) {
 
 		$table->addRow(array(
 			new CLink(
-				zbx_date2str(_('d M Y H:i:s'), $event['clock']),
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 				'action'
 			),
@@ -299,7 +299,7 @@ function make_popup_eventlist($triggerId, $eventId) {
 		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 		$table->addRow(array(
-			zbx_date2str(_('d M Y H:i:s'), $event['clock']),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),

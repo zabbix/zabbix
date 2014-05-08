@@ -298,10 +298,11 @@ ZABBIX.apps.map = (function($) {
 
 						this.imageUpdating = false;
 					}, this),
-					error: function(jqXHR, textStatus, errorThrown) {
-						window.console && window.console.log && window.console.log(jqXHR, textStatus, errorThrown);
+					error: $.proxy(function() {
 						alert('Map image update failed');
-					}
+
+						this.imageUpdating = false;
+					}, this)
 				});
 
 				$.when(ajaxRequest).always($.proxy(function() {

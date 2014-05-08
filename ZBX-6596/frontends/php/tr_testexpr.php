@@ -27,7 +27,7 @@ $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 define('COMBO_PATTERN', 'str_in_array({},array(');
-define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
+define('COMBO_PATTERN_LENGTH', strlen(COMBO_PATTERN));
 
 $definedErrorPhrases = array(
 	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
@@ -79,7 +79,8 @@ if ($expressionData->parse($expression)) {
 			$validation = $info['validation'];
 
 			if (substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN) {
-				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+				$end = strlen($validation) - COMBO_PATTERN_LENGTH - 4;
+				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, $end));
 				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
 
 				foreach ($vals as $v) {

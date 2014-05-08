@@ -36,19 +36,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'action' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null),
 	'resourcetype' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 31), null),
-	'filter_rst' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'alias' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'left' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'alias' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'dec' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'inc' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'left' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'right' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
+	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
 
@@ -74,21 +74,17 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_rst'])) {
-	$_REQUEST['alias'] = '';
-	$_REQUEST['action'] = -1;
-	$_REQUEST['resourcetype'] = -1;
+if (hasRequest('filter_set')) {
+	CProfile::update('web.auditlogs.filter.alias', getRequest('alias', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.auditlogs.filter.action', getRequest('action', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.auditlogs.filter.resourcetype', getRequest('resourcetype', -1), PROFILE_TYPE_INT);
 }
-else {
-	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
-	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action', -1));
-	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype', -1));
-}
-
-if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
-	CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
-	CProfile::update('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
-	CProfile::update('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.auditlogs.filter.alias');
+	CProfile::delete('web.auditlogs.filter.action');
+	CProfile::delete('web.auditlogs.filter.resourcetype');
+	DBend();
 }
 
 /*
@@ -98,9 +94,9 @@ $effectivePeriod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
 $data = array(
 	'stime' => get_request('stime'),
 	'actions' => array(),
-	'action' => get_request('action'),
-	'resourcetype' => get_request('resourcetype'),
-	'alias' => get_request('alias')
+	'action' => CProfile::get('web.auditlogs.filter.action', -1),
+	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
+	'alias' => CProfile::get('web.auditlogs.filter.alias', '')
 );
 
 $from = zbxDateToTime($data['stime']);

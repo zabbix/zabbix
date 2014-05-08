@@ -31,8 +31,8 @@ class testPageStatusOfZabbix extends CWebTest {
 
 		// data
 		$this->zbxTestTextPresent('Zabbix server is running');
-		$this->zbxTestTextPresent('Number of hosts (monitored/not monitored/templates)');
-		$this->zbxTestTextPresent('Number of items (monitored/disabled/not supported)');
+		$this->zbxTestTextPresent('Number of hosts (enabled/disabled/templates)');
+		$this->zbxTestTextPresent('Number of items (enabled/disabled/not supported)');
 		$this->zbxTestTextPresent('Number of triggers (enabled/disabled) [problem/ok]');
 		$this->zbxTestTextPresent('Number of users (online)');
 		$this->zbxTestTextPresent('Required server performance, new values per second');

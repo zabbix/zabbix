@@ -71,7 +71,7 @@ if (isset($_REQUEST['new_groups'])) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'] . ' (new)',
+				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
 				'isNew' => true
 			);
 		}
@@ -155,16 +155,13 @@ $hostFormList->addRow(
 );
 
 // append status to form list
-$statusComboBox = new CComboBox('status', $this->data['status']);
-$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Monitored'));
-$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 $hostFormList->addRow(
 	array(
-		_('Status'),
+		_('Enabled'),
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($this->data['visible']['status']), 'status', _('Original'))
 	),
-	$statusComboBox
+	new CCheckBox('status', (HOST_STATUS_MONITORED == $this->data['status']), null, HOST_STATUS_MONITORED)
 );
 
 $templatesFormList = new CFormList('templatesFormList');

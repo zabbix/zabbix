@@ -119,7 +119,7 @@ switch ($data['method']) {
 					}
 
 					$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
-					$url_events = 'events.php?triggerid='.$event['objectid'].'&source='.EVENT_SOURCE_TRIGGERS;
+					$url_events = 'events.php?filter_set=1&triggerid='.$event['objectid'].'&source='.EVENT_SOURCE_TRIGGERS;
 					$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
 
 					$result[$number] = array(
@@ -133,7 +133,8 @@ switch ($data['method']) {
 						'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
-							_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
+							_('Date').': [b][url='.$url_tr_events.']'.
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url][/b]',
 						),
 						'timeout' => $msgsettings['timeout']
 					);

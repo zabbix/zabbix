@@ -75,13 +75,13 @@ $userGroups->addItem(0, _('All'));
 foreach ($this->getArray('usergroups') as $userGroup){
 	$userGroups->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$scriptFormList->addRow(_('User groups'), $userGroups);
+$scriptFormList->addRow(_('User group'), $userGroups);
 
 // host groups
 $hostGroups = new CCombobox('hgstype', $this->get('hgstype'));
 $hostGroups->addItem(0, _('All'));
 $hostGroups->addItem(1, _('Selected'));
-$scriptFormList->addRow(_('Host groups'), $hostGroups);
+$scriptFormList->addRow(_('Host group'), $hostGroups);
 $scriptFormList->addRow(null, new CMultiSelect(array(
 	'name' => 'groupid',
 	'selectedLimit' => 1,

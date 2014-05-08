@@ -121,7 +121,7 @@ class CLdap {
 			// special bind string
 			$dn = $this->makeFilter($this->cnf['bind_dn'], array('user' => $user, 'host' => $this->cnf['host']));
 		}
-		elseif (zbx_strpos($this->cnf['base_dn'], '%{user}')) {
+		elseif (strpos($this->cnf['base_dn'], '%{user}')) {
 			// direct user bind
 			$dn = $this->makeFilter($this->cnf['base_dn'], array('user' => $user, 'host' => $this->cnf['host']));
 		}
