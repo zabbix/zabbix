@@ -257,7 +257,7 @@
 
 		return {
 			add: function(hostInterfaces) {
-				for (var i = 0; i != hostInterfaces.length; i++) {
+				for (var i = 0; i < hostInterfaces.length; i++) {
 					addHostInterface(hostInterfaces[i]);
 					renderHostInterfaceRow(hostInterfaces[i]);
 				}
