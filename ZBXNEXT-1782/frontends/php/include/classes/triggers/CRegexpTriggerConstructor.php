@@ -188,26 +188,35 @@ class CRegexpTriggerConstructor {
 			// replace whole function macros with their functions
 			foreach ($tokens as $token) {
 				$value = $token['value'];
-				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-					$value = $token['data']['function'];
+				switch ($token['type']) {
+					case CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO:
+						$value = $token['data']['function'];
+
+						break;
+					case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+						if ($token['value'] === 'and' || $token['value'] === 'or') {
+							$value = ' '.$token['value'].' ';
+						}
+
+						break;
 				}
 
 				$expr[] = $value;
 			}
 
-			$expr = implode($expr, ' ');
+			$expr = implode($expr);
 
 			// trim surrounding parentheses
-			$expr = preg_replace('/^\( (.*) \)$/u', '$1', $expr);
+			$expr = preg_replace('/^\((.*)\)$/u', '$1', $expr);
 
 			// trim parentheses around item function macros
-			$value = preg_replace('/\( (.*) \) (=|<>) 0/U', '$1', $expr);
+			$value = preg_replace('/\((.*)\)(=|<>)0/U', '$1', $expr);
 
 			// trim surrounding parentheses
-			$value = preg_replace('/^\( (.*) \)$/u', '$1', $value);
+			$value = preg_replace('/^\((.*)\)$/u', '$1', $value);
 
 			$expressions[$key]['value'] = trim($value);
-			$expressions[$key]['type'] = (zbx_strpos($expr, '<> 0', zbx_strlen($expr) - 5) === false)
+			$expressions[$key]['type'] = (zbx_strpos($expr, '<>0', zbx_strlen($expr) - 4) === false)
 				? self::EXPRESSION_TYPE_NO_MATCH
 				: self::EXPRESSION_TYPE_MATCH;
 		}

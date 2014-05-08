@@ -159,6 +159,17 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				),
 				'(({host:item.iregexp(test)})=0)'
 			),
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '(regexp(a))>0',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				),
+				'(({host:item.regexp(a)})=0)'
+			),
 		);
 	}
 
