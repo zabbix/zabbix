@@ -43,6 +43,9 @@ class CRegexpTriggerConstructor {
 	/**
 	 * Create a trigger expression from the given expression parts.
 	 *
+	 * Most of this function was left unchanged to preserve the current behavior of the constructor.
+	 * Feel free to rewrite and correct it if necessary.
+	 *
 	 * @param string    $host                       host name
 	 * @param string    $itemKey                    item key
 	 * @param array     $expressions                array of expression parts
@@ -162,12 +165,19 @@ class CRegexpTriggerConstructor {
 	 * To be successfully parsed, each item function macro must be wrapped in additional parentheses, for example,
 	 * (({item.item.regex(param)})=0)
 	 *
+	 * Most of this function was left unchanged to preserve the current behavior of the constructor.
+	 * Feel free to rewrite and correct it if necessary.
+	 *
 	 * @param string $expression    trigger expression
 	 *
 	 * @return array    an array of expression parts, see self::getExpressionFromParts() for the structure of the part
 	 *                  array
 	 */
 	public function getPartsFromExpression($expression) {
+		// strip extra parentheses
+		$expression = preg_replace('/\(\(\((.+?)\)\) and/i', '(($1) and', $expression);
+		$expression = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expression);
+
 		$parseResult = $this->triggerExpression->parse($expression);
 
 		$expressions = array();
@@ -185,8 +195,6 @@ class CRegexpTriggerConstructor {
 				$expr[] = $value;
 			}
 
-			// the following code was left unchanged to preserve the current behavior of the constructor
-			// feel free to rewrite and correct it if necessary
 			$expr = implode($expr, ' ');
 
 			// trim surrounding parentheses

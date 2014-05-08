@@ -203,12 +203,6 @@ if(isset($_REQUEST['sform'])){
 			$status = $rows['status'];
 		}
 
-		// strip extra parentheses
-		$expression = preg_replace('/\(\(\((.+?)\)\) and/i', '(($1) and', $expression);
-		$expression = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expression);
-
-		$expr_incase = $expression;
-
 		// break expression into parts
 		$expressions = $constructor->getPartsFromExpression($expression);
 	}
@@ -281,22 +275,6 @@ if(isset($_REQUEST['sform'])){
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 
 	$maxid=0;
-
-	$bExprResult = true;
-	$expression = $expressions ? $constructor->getExpressionFromParts($host['host'], $item['key_'], $expressions) : '';
-	$expressionData = new CTriggerExpression();
-	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !$expressionData->parse($expression)
-			&& !isset($_REQUEST['form_refresh'])) {
-
-		info($expressionData->error);
-
-		unset($expressions);
-		$expressions[0]['value'] = $expr_incase;
-		$expressions[0]['type'] = 0;
-		$bExprResult = false;
-	}
-
 	foreach($expressions as $id => $expr){
 
 		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
