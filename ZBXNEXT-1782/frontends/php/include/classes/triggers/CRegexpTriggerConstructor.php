@@ -222,23 +222,30 @@ class CRegexpTriggerConstructor {
 
 		$level = 0;
 		foreach ($tokens as $token) {
-			if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE) {
-				$level++;
-			}
-			elseif ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE) {
-				$level--;
+			switch ($token['type']) {
+				case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+					// look for an "or" or "and" operator on the top parentheses level
+					// if such an expression is found, save all of the tokens before it as a separate expression
+					if ($level == 0 && ($token['value'] === 'or' || $token['value'] === 'and')) {
+						$expresions[] = $currentExpression;
+						$currentExpression = array();
+
+						// continue to the next token
+						continue 2;
+					}
+
+					break;
+				case CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE:
+					$level++;
+
+					break;
+				case CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE:
+					$level--;
+
+					break;
 			}
 
-			if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
-					&& $level == 0
-					&& ($token['value'] === 'or' || $token['value'] === 'and')) {
-
-				$expresions[] = $currentExpression;
-				$currentExpression = array();
-			}
-			else {
-				$currentExpression[] = $token;
-			}
+			$currentExpression[] = $token;
 		}
 
 		$expresions[] = $currentExpression;
