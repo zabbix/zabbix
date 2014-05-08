@@ -245,11 +245,11 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 
 	ret = SUCCEED;
 close:
+	zbx_free(file);
 	FindClose(h_find);
 clean:
 	zbx_free(wfind_path);
 	zbx_free(find_path);
-	zbx_free(file);
 
 	return ret;
 }
@@ -265,7 +265,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 	if (NULL == (dir = opendir(path)))
 	{
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
-		goto clean;
+		goto out;
 	}
 
 	while (NULL != (d = readdir(dir)))
@@ -289,9 +289,9 @@ close:
 		zbx_error("%s: %s\n", path, zbx_strerror(errno));
 		ret = FAIL;
 	}
-clean:
-	zbx_free(file);
 
+	zbx_free(file);
+out:
 	return ret;
 }
 #endif
