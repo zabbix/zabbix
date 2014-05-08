@@ -69,15 +69,15 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	if ($cloningDiscoveredHost) {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		$description = getRequest('description', '');
-		$inventoryMode = $dbHost['inventory']['inventory_mode'];
 		$hostInventory = getRequest('host_inventory', array());
 	}
 	else {
 		$status = $dbHost['status'];
 		$description = $dbHost['description'];
 		$hostInventory = $dbHost['inventory'];
-		$inventoryMode = empty($hostInventory) ? HOST_INVENTORY_DISABLED : $dbHost['inventory']['inventory_mode'];
 	}
+
+	$inventoryMode = isset($dbHost['inventory']['inventory_mode']) ? $dbHost['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
 
 	$templateIds = array();
 	foreach ($originalTemplates as $tpl) {
