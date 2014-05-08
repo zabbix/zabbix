@@ -514,14 +514,19 @@ else {
 		: null;
 
 	// get only maintenance IDs for paging
-	$data['maintenances'] = API::Maintenance()->get(array(
-		'output' => array('maintenanceid'),
-		'groupids' => $groupIds,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'editable' => true,
-		'limit' => $config['search_limit'] + 1
-	));
+	if($config['dropdown_first_entry'] || $groupIds) {
+		$data['maintenances'] = API::Maintenance()->get(array(
+			'output' => array('maintenanceid'),
+			'groupids' => $groupIds,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
+		));
+	}
+	else {
+		$data['maintenances'] = array();
+	}
 	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 
 	// get list of maintenances
