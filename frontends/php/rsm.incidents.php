@@ -790,20 +790,19 @@ if ($host || $data['filter_search']) {
 
 			// get deleay items
 			$itemKeys = array();
-			if ((isset($data['dns']['events']) && $data['dns']['events'])
-					|| (isset($data['dnssec']['events']) && $data['dnssec']['events'])) {
+			if (isset($data['dns']['events']) || isset($data['dnssec']['events'])) {
 				array_push($itemKeys, CALCULATED_ITEM_DNS_DELAY, CALCULATED_DNS_ROLLWEEK_SLA);
-				if (isset($data['dns']['events']) && $data['dns']['events']) {
+				if (isset($data['dns']['events'])) {
 					$services['dns'] = array();
 				}
-				if (isset($data['dnssec']['events']) && $data['dnssec']['events']) {
+				if (isset($data['dnssec']['events'])) {
 					$services['dnssec'] = array();
 				}
 			}
-			if (isset($data['rdds']['events']) && $data['rdds']['events']) {
+			if (isset($data['rdds']['events'])) {
 				array_push($itemKeys, CALCULATED_ITEM_RDDS_DELAY, CALCULATED_RDDS_ROLLWEEK_SLA);
 			}
-			if (isset($data['epp']['events']) && $data['epp']['events']) {
+			if (isset($data['epp']['events'])) {
 				array_push($itemKeys, CALCULATED_ITEM_EPP_DELAY, CALCULATED_EPP_ROLLWEEK_SLA);
 			}
 
@@ -849,6 +848,7 @@ if ($host || $data['filter_search']) {
 							'output' => API_OUTPUT_EXTEND,
 							'limit' => 1
 						));
+
 						$itemValue = reset($itemValue);
 
 						if ($item['key_'] === CALCULATED_DNS_ROLLWEEK_SLA) {
@@ -903,7 +903,7 @@ if ($host || $data['filter_search']) {
 				foreach ($services as $key => $service) {
 					foreach ($data[$key]['events'] as &$event) {
 						if ($event['false_positive'] || $event['startTime'] > $weekTimeTill) {
-							$incidentPercentDown = 0;
+							$event['incidentSecDown'] = 0;
 						}
 						else {
 							$endTime = isset($event['endTime']) ? $event['endTime'] : $weekTimeTill;
@@ -926,10 +926,14 @@ if ($host || $data['filter_search']) {
 							$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom, $getFailedTill);
 
 							// get percent
-							$incidentPercentDown = (100 * $failedTests * $service['delay'] / 60) / $service['slaValue'];
+
+							$event['incidentSecDown'] = $failedTests * $service['delay'];
 						}
-						$event['incidentPercentDown'] = sprintf('%.3f', $incidentPercentDown);
 					}
+
+					$data[$key]['slaValue'] = $service['slaValue'] * 60;
+					$data[$key]['delay'] = $service['delay'];
+
 					unset($event);
 				}
 			}

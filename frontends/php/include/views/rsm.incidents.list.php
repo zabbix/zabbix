@@ -205,7 +205,7 @@ $headers = array(
 	_('End Time'),
 	_('Failed tests within incident'),
 	_('Total number of tests'),
-	_('Input into rolling week')
+	_('Downtime within rolling week')
 );
 $noData = _('No incidents found.');
 
@@ -243,7 +243,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				$event['incidentPercentDown']
+				convert_units($event['incidentSecDown'], 's')
 			);
 
 			$dnsTable->addRow($row);
@@ -276,7 +276,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			isset($this->data['dns']) ? count($this->data['dns']['events']) : 0,
 			BR(),
-			$testsInfo
+			$testsInfo,
+			BR(),
+			array(array(bold(_('SLA')), ':'.SPACE), convert_units($this->data['dns']['slaValue'], 's')),
+			BR(),
+			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['dns']['delay'], 's'))
 		));
 
 		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dns']['slv'].'%'), 'rolling-week-status');
@@ -317,12 +321,11 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				$event['incidentPercentDown']
+				convert_units($event['incidentSecDown'], 's')
 			);
 
 			$dnssecTable->addRow($row);
 		}
-
 
 		$testsDown = new CLink(
 			$this->data['dnssec']['totalTests'],
@@ -351,7 +354,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			isset($this->data['dnssec']) ? count($this->data['dnssec']['events']) : 0,
 			BR(),
-			$testsInfo
+			$testsInfo,
+			BR(),
+			array(array(bold(_('SLA')), ':'.SPACE), convert_units($this->data['dnssec']['slaValue'], 's')),
+			BR(),
+			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['dnssec']['delay'], 's'))
 		));
 
 		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dnssec']['slv'].'%'),
@@ -394,7 +401,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				$event['incidentPercentDown']
+				convert_units($event['incidentSecDown'], 's')
 			);
 
 			$rddsTable->addRow($row);
@@ -427,7 +434,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			isset($this->data['rdds']) ? count($this->data['rdds']['events']) : 0,
 			BR(),
-			$testsInfo
+			$testsInfo,
+			BR(),
+			array(array(bold(_('SLA')), ':'.SPACE), convert_units($this->data['rdds']['slaValue'], 's')),
+			BR(),
+			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['rdds']['delay'], 's'))
 		));
 
 		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['rdds']['slv'].'%'), 'rolling-week-status');
@@ -468,7 +479,7 @@ if (isset($this->data['tld'])) {
 				isset($event['endTime']) ? date('d.m.Y H:i:s', $event['endTime']) : '-',
 				$event['incidentFailedTests'],
 				$event['incidentTotalTests'],
-				$event['incidentPercentDown']
+				convert_units($event['incidentSecDown'], 's')
 			);
 
 			$eppTable->addRow($row);
@@ -501,7 +512,11 @@ if (isset($this->data['tld'])) {
 			SPACE,
 			isset($this->data['epp']) ? count($this->data['epp']['events']) : 0,
 			BR(),
-			$testsInfo
+			$testsInfo,
+			BR(),
+			array(array(bold(_('SLA')), ':'.SPACE), convert_units($this->data['epp']['slaValue'], 's')),
+			BR(),
+			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['epp']['delay'], 's'))
 		));
 
 		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['epp']['slv'].'%'), 'rolling-week-status');
