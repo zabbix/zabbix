@@ -937,8 +937,11 @@ static int	zbx_sock_find_line(zbx_sock_t *s, char **data)
 }
 
 
-
-/* validation functions for tcp_expect() */
+/******************************************************************************
+ *                                                                            *
+ * validation functions for tcp_expect()                                      *
+ *                                                                            *
+/*****************************************************************************/
 int	validate_smtp(const char *line)
 {
 	if (0 == strncmp(line, "220", 3))
