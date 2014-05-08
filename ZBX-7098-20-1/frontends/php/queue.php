@@ -103,6 +103,10 @@ require_once 'include/page_header.php';
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND ('.
+				' h.maintenance_status='.HOST_MAINTENANCE_STATUS_OFF.
+				' OR h.maintenance_type='.MAINTENANCE_TYPE_NORMAL.
+				')'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
 			' AND NOT i.lastclock IS NULL'.

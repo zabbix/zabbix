@@ -322,7 +322,8 @@ class CItem extends CItemGeneral {
 				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host'], false, true);
 			}
 
-			if (array_key_exists('flags', $options['filter']) && is_null($options['filter']['flags'])) {
+			if (array_key_exists('flags', $options['filter'])
+					&& ($options['filter']['flags'] === null || !zbx_empty($options['filter']['flags']))) {
 				unset($sqlParts['where']['flags']);
 			}
 		}

@@ -145,4 +145,10 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout);
 int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
 
+#if defined(HAVE_IPV6)
+#define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)						\
+	getnameinfo(sa, AF_INET == (sa)->sa_family ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),	\
+			host, hostlen, serv, servlen, flags)
+#endif
+
 #endif

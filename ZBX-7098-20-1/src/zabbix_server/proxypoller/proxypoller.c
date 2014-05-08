@@ -224,18 +224,21 @@ static int	process_proxy()
 					ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&j, ZBX_PROTO_TAG_DATA);
 
-			get_proxyconfig_data(proxy.hostid, &j);
-
-			zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
-					proxy.host, (zbx_fs_size_t)j.buffer_size);
-
-			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+			if (SUCCEED == (ret = get_proxyconfig_data(proxy.hostid, &j)))
 			{
-				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
-					ret = zbx_recv_response(&s, NULL, 0, 0);
+				zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen "
+						ZBX_FS_SIZE_T, proxy.host, (zbx_fs_size_t)j.buffer_size);
 
-				disconnect_proxy(&s);
+				if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+				{
+					if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
+						ret = zbx_recv_response(&s, NULL, 0, 0);
+
+					disconnect_proxy(&s);
+				}
 			}
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "cannot collect proxy configuration: database error");
 
 			if (SUCCEED != ret)
 				goto network_error;

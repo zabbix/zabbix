@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 16:18+0200\n"
+"POT-Creation-Date: 2014-03-24 15:56+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -120,15 +120,15 @@ msgstr "----[ОБЩО ПОТВЪРЖДАВАНЕ]----"
 msgid "0 or 1"
 msgstr "0 или 1"
 
-#: queue.php:162 queue.php:225
+#: queue.php:166 queue.php:229
 msgid "1 minute"
 msgstr "1 минута"
 
-#: queue.php:160 queue.php:223
+#: queue.php:164 queue.php:227
 msgid "10 seconds"
 msgstr "10 секунди"
 
-#: queue.php:161 queue.php:224
+#: queue.php:165 queue.php:228
 msgid "30 seconds"
 msgstr "30 секунди"
 
@@ -136,11 +136,11 @@ msgstr "30 секунди"
 msgid "3D view"
 msgstr "3D преглед"
 
-#: queue.php:163 queue.php:226
+#: queue.php:167 queue.php:230
 msgid "5 minutes"
 msgstr "5 минути"
 
-#: queue.php:159 queue.php:222
+#: queue.php:163 queue.php:226
 msgid "5 seconds"
 msgstr "5 секунди"
 
@@ -1381,7 +1381,7 @@ msgstr "Не може да се изтрие графиката"
 msgid "Cannot delete graph prototype"
 msgstr "Не може да се изтрие графичния прототип"
 
-#: api/classes/CItem.php:985
+#: api/classes/CItem.php:986
 msgid "Cannot delete graph."
 msgstr "Не може да се изтрие графиката."
 
@@ -1502,7 +1502,7 @@ msgstr "Не може да се изтрие шаблона"
 msgid "Cannot delete templated graphs."
 msgstr "Не може да се изтрият шаблонни графики."
 
-#: api/classes/CItem.php:949
+#: api/classes/CItem.php:950
 msgid "Cannot delete templated item."
 msgstr "Не може да се изтрие шаблонния елемент на данните."
 
@@ -1514,7 +1514,7 @@ msgstr "Не може да се изтрият шаблонни елементи
 msgid "Cannot delete templated items."
 msgstr "Не може да се изтрият шаблонни елементи на данните."
 
-#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:927
+#: api/classes/CTrigger.php:1027 api/classes/CTriggerPrototype.php:903
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не може да се изтрие шаблонния тригер \"%1$s:%2$s\"."
@@ -1527,7 +1527,7 @@ msgstr "Не може да се изтрие тригера"
 msgid "Cannot delete trigger prototype"
 msgstr "Не може да се изтрие шаблонния тригер прототипа"
 
-#: api/classes/CItem.php:1001
+#: api/classes/CItem.php:1002
 msgid "Cannot delete trigger."
 msgstr "Не може да се изтрие тригера."
 
@@ -1535,7 +1535,7 @@ msgstr "Не може да се изтрие тригера."
 msgid "Cannot delete triggers"
 msgstr "Не може да се изтрият тригерите"
 
-#: api/classes/CTriggerPrototype.php:965
+#: api/classes/CTriggerPrototype.php:941
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Не може да се изтрият тригерите, създадени с ниско ниво на откриване."
 
@@ -1674,8 +1674,8 @@ msgid "Cannot have empty visible template name"
 msgstr "Видимото име на шаблон не може да бъде празно"
 
 #: api/classes/CTrigger.php:1491 api/classes/CTrigger.php:1566
-#: api/classes/CTriggerPrototype.php:1008
-#: api/classes/CTriggerPrototype.php:1066
+#: api/classes/CTriggerPrototype.php:984
+#: api/classes/CTriggerPrototype.php:1042
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Не може да се отвори израз \"%s\"."
@@ -1863,7 +1863,7 @@ msgstr "Не може да се актуализира \"templateid\" за ек�
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за тригер \"%1$s\"."
 
-#: api/classes/CTriggerPrototype.php:833
+#: api/classes/CTriggerPrototype.php:820
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за тригер прототип \"%1$s\"."
@@ -2541,7 +2541,7 @@ msgstr "Координати"
 msgid "Copy"
 msgstr "Копирай"
 
-#: include/views/configuration.graph.list.php:138
+#: include/views/configuration.graph.list.php:140
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
@@ -2691,7 +2691,7 @@ msgstr "Създадено: Приложение \"%1$s\" в \"%2$s\"."
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Правило за откриване \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CItem.php:850
+#: api/classes/CItem.php:851
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: елемент на данните \"%1$s\" в \"%2$s\"."
@@ -2706,7 +2706,7 @@ msgstr "Създадено: елемент на данните прототип 
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Тригер \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1015
+#: api/classes/CTriggerPrototype.php:991
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Създадено: Тригер прототип \"%1$s\" в \"%2$s\"."
@@ -3150,7 +3150,7 @@ msgstr "Закъснение"
 msgid "Delay (in sec)"
 msgstr "Закъснение (в сек)"
 
-#: queue.php:247
+#: queue.php:251
 msgid "Delayed by"
 msgstr "Закъснение с"
 
@@ -3264,7 +3264,7 @@ msgstr "Изтриване на скрипт?"
 #: include/views/configuration.action.list.php:101
 #: include/views/configuration.application.list.php:89
 #: include/views/configuration.discovery.list.php:75
-#: include/views/configuration.graph.list.php:141
+#: include/views/configuration.graph.list.php:143
 #: include/views/configuration.host.discovery.list.php:109
 #: include/views/configuration.hostgroups.list.php:125
 #: include/views/configuration.httpconf.list.php:141
@@ -3300,7 +3300,7 @@ msgstr "Изтриване на избраните правила за откр�
 msgid "Delete selected elements?"
 msgstr "Изтриване на избраните елементи?"
 
-#: include/views/configuration.graph.list.php:142
+#: include/views/configuration.graph.list.php:144
 msgid "Delete selected graphs?"
 msgstr "Изтриване на избраните графики?"
 
@@ -3449,7 +3449,7 @@ msgstr "Изтрито: Графика \"%1$s\" в \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Изтрито: Хост \"%1$s\"."
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: елемент на данните \"%1$s\" в \"%2$s\"."
@@ -3475,7 +3475,7 @@ msgstr "Изтрито: Шаблон \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Тригер \"%1$s\" on \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:971
+#: api/classes/CTriggerPrototype.php:947
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Тригер прототип \"%1$s\" on \"%2$s\"."
@@ -4061,12 +4061,12 @@ msgstr "Състояние на действие празно."
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
 #: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:929 api/classes/CItemPrototype.php:708
+#: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
 #: api/classes/CTrigger.php:1219 api/classes/CTrigger.php:1333
-#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:909
+#: api/classes/CTrigger.php:1425 api/classes/CTriggerPrototype.php:885
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4728,7 +4728,7 @@ msgstr "Глобални скриптове"
 #: include/views/configuration.action.list.php:105
 #: include/views/configuration.application.list.php:93
 #: include/views/configuration.discovery.list.php:79
-#: include/views/configuration.graph.list.php:145
+#: include/views/configuration.graph.list.php:147
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.hostgroups.list.php:128
 #: include/views/configuration.httpconf.list.php:145
@@ -4829,6 +4829,16 @@ msgstr "елемент на данните от графика"
 msgid "Graph name"
 msgstr "Име на графика"
 
+#: api/classes/CGraphPrototype.php:881
+#, php-format
+msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CGraphPrototype.php:887
+#, php-format
+msgid "Graph prototype \"%1$s\" must have at least one item prototype."
+msgstr ""
+
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
@@ -4838,10 +4848,6 @@ msgstr "Графичен прототип \"%1$s\" с шаблонни елем�
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Графичен прототип \"%s\" изтрит."
-
-#: api/classes/CGraphPrototype.php:856
-msgid "Graph prototype must have at least one prototype."
-msgstr "Графичния прототип трябва да има поне един прототип."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
@@ -5176,7 +5182,7 @@ msgstr "Хоризонтално подравняване"
 #: include/views/monitoring.screen.php:122
 #: include/views/monitoring.slides.php:90 items.php:68 items.php:469
 #: items.php:624 items.php:647 jsLoader.php:142 latest.php:125 latest.php:191
-#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:249
+#: popup.php:476 popup.php:514 popup.php:1091 popup.php:1285 queue.php:253
 #: report2.php:235 report5.php:60 tr_status.php:173 tr_status.php:292
 msgid "Host"
 msgstr "Хост"
@@ -6564,7 +6570,7 @@ msgstr "Елемент на данните"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Елемент на данните \"%1$s\" вече съществува в \"%2$s\", наследен от друг шаблон."
 
-#: api/classes/CItem.php:1216
+#: api/classes/CItem.php:1217
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Елемент на данните \"%1$s\" не може да попълне липсващото поле номерирано \"%2$d\" инвентарни данни за потребителя. Изберете: от 0 (не попълвай) до %3$d."
@@ -6682,7 +6688,7 @@ msgstr "Ключ от елемент на данните \"%s\" вече същ�
 #: include/views/configuration.host.edit.php:338
 #: include/views/configuration.item.list.php:34
 #: include/views/configuration.template.edit.php:240
-#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:158
+#: include/views/conf.import.php:31 latest.php:127 popup.php:73 queue.php:162
 #: search.php:137 search.php:164 search.php:183 search.php:369 search.php:393
 #: search.php:416 templates.php:459 templates.php:523
 msgid "Items"
@@ -7820,7 +7826,7 @@ msgstr "Месец"
 msgid "Monthly"
 msgstr "Ежемесечно"
 
-#: queue.php:164 queue.php:227
+#: queue.php:168 queue.php:231
 msgid "More than 10 minutes"
 msgstr "Повече от 10 минути"
 
@@ -7932,7 +7938,7 @@ msgstr "NTLM автентификация"
 #: popup.php:1321 popup.php:1350 popup.php:1448 popup.php:1451 popup.php:1521
 #: popup.php:1524 popup.php:1581 popup.php:1585 popup.php:1636 popup.php:1667
 #: popup.php:1698 popup.php:1738 popup.php:1754 popup.php:1777 popup.php:1806
-#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:250
+#: popup.php:1813 popup_right.php:75 popup_usrgrp.php:92 queue.php:254
 #: report2.php:236 screenconf.php:50 services.php:42 slideconf.php:38
 #: sysmaps.php:48 sysmaps.php:257 trigger_prototypes.php:41 triggers.php:41
 #: tr_status.php:293 users.php:46
@@ -8031,7 +8037,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Следващо"
 
-#: queue.php:246
+#: queue.php:250
 msgid "Next check"
 msgstr "Следваща проверка"
 
@@ -8453,7 +8459,7 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CDiscoveryRule.php:662 api/classes/CDiscoveryRule.php:667
 #: api/classes/CDRule.php:423 api/classes/CDRule.php:726
 #: api/classes/CEvent.php:580 api/classes/CGraphGeneral.php:161
-#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:838
+#: api/classes/CGraph.php:792 api/classes/CGraphPrototype.php:841
 #: api/classes/CHostGeneral.php:340 api/classes/CHostGeneral.php:343
 #: api/classes/CHostInterface.php:505 api/classes/CHostInterface.php:521
 #: api/classes/CHostInterface.php:653 api/classes/CHostInterface.php:849
@@ -8461,7 +8467,7 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
-#: api/classes/CItem.php:946 api/classes/CItemPrototype.php:726
+#: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
@@ -8473,8 +8479,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
-#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:824
-#: api/classes/CTriggerPrototype.php:922 api/classes/CUserMacro.php:824
+#: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
+#: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CUser.php:691
 #: api/classes/CUser.php:743 api/classes/CUser.php:780
 #: api/classes/CWebCheck.php:444 include/config.inc.php:249 report6.php:159
@@ -8622,7 +8628,7 @@ msgstr "Не са дефинирани уеб сценарии."
 #: include/triggers.inc.php:1622 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
 #: include/views/monitoring.discovery.php:42 latest.php:190 popup.php:491
-#: popup_right.php:66 queue.php:248 report2.php:234 report5.php:59
+#: popup_right.php:66 queue.php:252 report2.php:234 report5.php:59
 #: search.php:128 search.php:257 search.php:366 tr_status.php:291
 msgid "Node"
 msgstr "Възлова точка"
@@ -9697,7 +9703,7 @@ msgid "Proxies"
 msgstr "Проксита"
 
 #: include/actions.inc.php:92 include/audit.inc.php:46
-#: include/views/administration.proxy.edit.php:86 queue.php:221
+#: include/views/administration.proxy.edit.php:86 queue.php:225
 msgid "Proxy"
 msgstr "Прокси"
 
@@ -10863,7 +10869,7 @@ msgid "Serial number B"
 msgstr "Сериен номер Б"
 
 #: include/views/administration.script.list.php:67 popup.php:1859
-#: queue.php:186
+#: queue.php:190
 msgid "Server"
 msgstr "Сървър"
 
@@ -11710,7 +11716,7 @@ msgstr[1] "Изображението се използва в карти на �
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Още не е открит елемента на данните и ще бъде изтрит от %1$s (on %2$s at %3$s)."
 
-#: queue.php:121
+#: queue.php:125
 msgid "The queue is empty"
 msgstr "Опашката е празна"
 
@@ -11874,7 +11880,7 @@ msgid "Top"
 msgstr "Горен край"
 
 #: include/blocks.inc.php:377 include/classes/class.chostsinfo.php:128
-#: queue.php:289
+#: queue.php:293
 msgid "Total"
 msgstr "Общо"
 
@@ -11928,11 +11934,6 @@ msgstr "Тригер \"%1$s\" вече съществува в \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Тригер \"%1$s\" зависи от тригер \"%2$s\", който не съществува."
 
-#: api/classes/CTriggerPrototype.php:885
-#, php-format
-msgid "Trigger \"%1$s\" does not have item prototype."
-msgstr "Тригер \"%1$s\" не разполага с прототип елементи на данните."
-
 #: include/classes/import/CXmlImport18.php:1434
 #: include/classes/import/CXmlImport18.php:1438
 #, php-format
@@ -11973,7 +11974,7 @@ msgstr "Преглед на опциите на тригер"
 msgid "Trigger expression condition"
 msgstr "Състояние на тригер израза"
 
-#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1054
+#: api/classes/CTrigger.php:1079 api/classes/CTriggerPrototype.php:1030
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Тригер израза трябва да съдържа поне един хост: ключова отправна точка."
 
@@ -12007,9 +12008,14 @@ msgstr "Име на тригер"
 msgid "Trigger prototype"
 msgstr "Тригер прототип"
 
-#: api/classes/CTriggerPrototype.php:791
+#: api/classes/CTriggerPrototype.php:1106
 #, php-format
-msgid "Trigger prototype expression \"%1$s\" must contain at least one item prototype."
+msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
+msgstr ""
+
+#: api/classes/CTriggerPrototype.php:1112
+#, php-format
+msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
 #: include/html.inc.php:428 include/html.inc.php:432
@@ -12099,7 +12105,7 @@ msgstr "Топ 100 на тригерите"
 msgid "Triggers with severity"
 msgstr "Тригери с важност"
 
-#: queue.php:289
+#: queue.php:293
 msgid "Truncated"
 msgstr "Пресечена"
 
@@ -12125,7 +12131,7 @@ msgstr "Турски (tr_TR)"
 msgid "Two elements should be selected"
 msgstr "Два елемента трябва да бъдат избрани"
 
-#: api/classes/CItem.php:1277
+#: api/classes/CItem.php:1278
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Двата елемента на данните (\"%1$s\" и \"%2$s\") не могат да се попълнят в едно поле \"%3$s\" инвентарни данни за хост, това ще доведе до конфликт."
@@ -12250,7 +12256,7 @@ msgstr "USA (160 символа)"
 msgid "USER PROFILE"
 msgstr "ПОТРЕБИТЕЛСКИ ПРОФИЛ"
 
-#: include/config.inc.php:760
+#: include/config.inc.php:761
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -12495,7 +12501,7 @@ msgstr "Актуализирано: Проиложение \"%1$s\" в \"%2$s\".
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Правило за откриване \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CItem.php:902
+#: api/classes/CItem.php:903
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Елемент на данните \"%1$s\" в \"%2$s\"."
@@ -12510,7 +12516,7 @@ msgstr "Актуализирано: Прототип на елемент на д
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Тригер \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1085
+#: api/classes/CTriggerPrototype.php:1061
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Актуализирано: Тригер прототип \"%1$s\" в \"%2$s\"."
@@ -13116,7 +13122,7 @@ msgstr "Грешни полета за услуга \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Грешни полета за време на услуга \"%1$s\"."
 
-#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:828
+#: api/classes/CTriggerPrototype.php:754 api/classes/CTriggerPrototype.php:815
 msgid "Wrong fields for trigger."
 msgstr "Грешни полета за тригер."
 

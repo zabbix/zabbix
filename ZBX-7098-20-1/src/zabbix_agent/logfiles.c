@@ -109,7 +109,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 {
 	const char	*__function_name = "split_filename";
 	const char	*separator = NULL;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	int		ret = FAIL;
 #ifdef _WINDOWS
 	size_t		sz;
@@ -1657,7 +1657,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	const char	*__function_name = "process_log";
 
 	int		f, ret = FAIL;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	zbx_uint64_t	l_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",

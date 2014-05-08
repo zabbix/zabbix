@@ -402,14 +402,14 @@ static void	close_trap_file()
  ******************************************************************************/
 static int	open_trap_file()
 {
-	struct stat	file_buf;
+	zbx_stat_t	file_buf;
 
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 	}
-	else if (FAIL == stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+	else if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		close_trap_file();
@@ -435,11 +435,11 @@ static int	open_trap_file()
  ******************************************************************************/
 static int	get_latest_data()
 {
-	struct stat	file_buf;
+	zbx_stat_t	file_buf;
 
 	if (-1 != trap_fd)	/* a trap file is already open */
 	{
-		if (0 != stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+		if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 		{
 			/* file might have been renamed or deleted, process the current file */
 

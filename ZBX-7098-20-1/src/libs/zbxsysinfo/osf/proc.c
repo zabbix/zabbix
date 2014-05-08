@@ -31,7 +31,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int	proc;
 
 	struct dirent	*entries;
-	struct stat		buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo = NULL;
 	struct prpsinfo	psinfo;
 
@@ -122,7 +122,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		strscpy(filename,"/proc/");
 		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 
-		if(stat(filename,&buf)==0)
+		if(0 == zbx_stat(filename,&buf))
 		{
 			proc = open(filename,O_RDONLY);
 			if(proc == -1)
@@ -200,7 +200,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int	proc;
 
 	struct  dirent	*entries;
-	struct  stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo = NULL;
 	struct prpsinfo	psinfo;
 
@@ -289,7 +289,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		strscpy(filename,"/proc/");
 		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 
-		if(stat(filename,&buf)==0)
+		if(0 == zbx_stat(filename,&buf))
 		{
 			proc = open(filename,O_RDONLY);
 			if(proc == -1)

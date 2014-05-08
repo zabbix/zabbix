@@ -884,6 +884,7 @@ int	DBget_queue_count(int from, int to)
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
 				" and ("
@@ -900,6 +901,7 @@ int	DBget_queue_count(int from, int to)
 				" and i.flags not in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
 			now - from,
@@ -955,9 +957,14 @@ double	DBget_requiredperformance()
 
 	/* !!! Don't forget to sync the code with PHP !!! */
 	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
+			" where h.hostid=i.hostid"
+			" and h.status=%d"
+			" and i.status=%d"
+			" and i.delay<>0"
+			" and i.flags<>%d",
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+			ITEM_STATUS_ACTIVE,
+			ZBX_FLAG_DISCOVERY_CHILD);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		qps_total = atof(row[0]);
 	DBfree_result(result);

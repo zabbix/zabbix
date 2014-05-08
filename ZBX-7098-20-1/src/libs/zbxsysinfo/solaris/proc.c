@@ -50,7 +50,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			proccomm[MAX_STRING_LEN];
 	DIR		*dir;
 	struct dirent	*entries;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo = NULL;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int		fd = -1;
@@ -112,7 +112,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))
@@ -169,7 +169,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			proccomm[MAX_STRING_LEN];
 	DIR		*dir;
 	struct dirent	*entries;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo = NULL;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int		fd = -1;
@@ -229,7 +229,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))
