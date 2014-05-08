@@ -331,9 +331,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 
-	if ($bExprResult) {
-		$frmTRLog->show();
-	}
+	$frmTRLog->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
