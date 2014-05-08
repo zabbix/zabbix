@@ -2,11 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< .mine
-"POT-Creation-Date: 2014-05-01 14:16+0300\n"
-=======
-"POT-Creation-Date: 2014-05-01 14:21+0300\n"
->>>>>>> .r45072
+"POT-Creation-Date: 2014-05-08 20:18+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1737,7 +1733,7 @@ msgstr "Tdak dapat menghapus item templated"
 msgid "Cannot delete templated items."
 msgstr "Tidak dapat menghapus item template."
 
-#: api/classes/CTrigger.php:1847 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1835 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Tidak dapat menghapus trigger template \"%1$s:%2$s\"."
@@ -2084,7 +2080,7 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] ""
@@ -9947,7 +9943,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
 #: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:597
 #: api/classes/CTrigger.php:940 api/classes/CTrigger.php:961
-#: api/classes/CTrigger.php:1826 api/classes/CTriggerPrototype.php:504
+#: api/classes/CTrigger.php:1814 api/classes/CTriggerPrototype.php:504
 #: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
 #: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
 #: api/classes/CUser.php:804 api/classes/CUser.php:824
