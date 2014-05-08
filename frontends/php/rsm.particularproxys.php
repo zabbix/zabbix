@@ -78,8 +78,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		date('Y', $data['time'])
 	);
 
-	$testTimeTill = $testTimeFrom + 59;
-
 	// get TLD
 	$tld = API::Host()->get(array(
 		'tlds' => true,
@@ -156,7 +154,17 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	$macroItemKey[] = CALCULATED_ITEM_DNS_UDP_RTT_HIGH;
 
 	if ($data['type'] == RSM_DNS) {
+		$macroItemKey[] = CALCULATED_ITEM_DNS_DELAY;
 		$macroItemKey[] = CALCULATED_ITEM_DNS_AVAIL_MINNS;
+	}
+	elseif ($data['type'] == RSM_DNSSEC) {
+		$macroItemKey[] = CALCULATED_ITEM_DNS_DELAY;
+	}
+	elseif ($data['type'] == RSM_RDDS) {
+		$macroItemKey[] = CALCULATED_ITEM_RDDS_DELAY;
+	}
+	else {
+		$macroItemKey[] = CALCULATED_ITEM_EPP_DELAY;
 	}
 
 	// get macros old value
@@ -167,6 +175,33 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			'key_' => $macroItemKey
 		)
 	));
+
+	// check items
+	if (count($macroItems) != count($macroItemKey)) {
+		show_error_message(_s('Missed calculated items on the host "%1$s"!', RSM_HOST));
+		require_once dirname(__FILE__).'/include/page_footer.php';
+		exit;
+	}
+
+	// get time till
+	foreach ($macroItems as $key => $macroItem) {
+		if ($macroItem['key_'] == CALCULATED_ITEM_DNS_DELAY || $macroItem['key_'] == CALCULATED_ITEM_RDDS_DELAY
+				|| $macroItem['key_'] == CALCULATED_ITEM_EPP_DELAY) {
+			$macroItemValue = API::History()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'itemids' => $macroItem['itemid'],
+				'time_from' => $testTimeFrom,
+				'history' => $macroItem['value_type'],
+				'limit' => 1
+			));
+
+			$macroItemValue = reset($macroItemValue);
+
+			$testTimeTill = $testTimeFrom + $macroItemValue['value'] - 1;
+
+			unset($macroItems[$key]);
+		}
+	}
 
 	foreach ($macroItems as $macroItem) {
 		$macroItemValue = API::History()->get(array(
@@ -185,22 +220,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 		else {
 			$minNs = $macroItemValue['value'];
 		}
-	}
-	if (!isset($dnsUdpRtt)) {
-		show_error_message(_s(
-			'No permissions to referred item with key "%1$s" or it does not exist!',
-			CALCULATED_ITEM_DNS_UDP_RTT_HIGH
-		));
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit;
-	}
-	if ($data['type'] == RSM_DNS && !isset($minNs)) {
-		show_error_message(_s(
-			'No permissions to referred item with key "%1$s" or it does not exist!',
-			CALCULATED_ITEM_DNS_AVAIL_MINNS
-		));
-		require_once dirname(__FILE__).'/include/page_footer.php';
-		exit;
 	}
 
 	// get items
