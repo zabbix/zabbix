@@ -228,8 +228,8 @@ function swapNodesNames(n1, n2) {
 		elm[2] = document.getElementsByName('expressions[' + id2 + '][value]')[0];
 		elm[3] = document.getElementsByName('expressions[' + id2 + '][type]')[0];
 
-		swapNodes(elm[0], elm[1]);
-		swapNodes(elm[2], elm[3]);
+		swapNodes(elm[0], elm[2]);
+		swapNodes(elm[1], elm[3]);
 
 		return true;
 	}
