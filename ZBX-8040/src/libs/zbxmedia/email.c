@@ -126,7 +126,11 @@ static ssize_t	smtp_readln(int fd, char *buf, int buf_len)
 
 		buf[read_bytes] = '\0';
 	}
-	while (read_bytes >= 4 && isdigit(buf[0]) && isdigit(buf[1]) && isdigit(buf[2]) && buf[3] == '-');
+	while (read_bytes >= 4 &&
+			isdigit(buf[0]) &&
+			isdigit(buf[1]) &&
+			isdigit(buf[2]) &&
+			buf[3] == '-');
 
 	return read_bytes;
 }
