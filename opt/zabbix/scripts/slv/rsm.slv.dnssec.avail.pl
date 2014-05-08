@@ -9,7 +9,7 @@ use RSMSLV;
 
 my $cfg_key_in = 'rsm.dns.udp.rtt[';
 my $cfg_key_out = 'rsm.slv.dnssec.avail';
-my $cfg_dnssec_ec = -204; 	# DNSSEC error
+use constant ZBX_EC_DNS_NS_ERRSIG => -204; # DNSSEC error
 
 parse_opts();
 exit_if_running();
@@ -79,7 +79,7 @@ foreach (@$tlds_ref)
     my $success_values = scalar(@$values_ref);
     foreach (@$values_ref)
     {
-	$success_values-- if ($cfg_dnssec_ec == $_->[1]);
+	$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
     }
 
     my $test_result = DOWN;
