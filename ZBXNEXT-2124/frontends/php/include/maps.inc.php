@@ -764,6 +764,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 		$hostsToGetInventories = array();
 	}
 
+	$submapApplications = array();
+
 	$selements = $sysmap['selements'];
 	foreach ($selements as $selementId => $selement) {
 		$selements[$selementId]['hosts'] = array();
@@ -790,9 +792,15 @@ function getSelementsInfo($sysmap, array $options = array()) {
 									break;
 								case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 									$hostgroups_map[$sel['elementid']][$selementId] = $selementId;
+									if ($sel['application'] !== '') {
+										$submapApplications[$selementId][] = $sel['application'];
+									}
 									break;
 								case SYSMAP_ELEMENT_TYPE_HOST:
 									$hosts_map[$sel['elementid']][$selementId] = $selementId;
+									if ($sel['application'] !== '') {
+										$submapApplications[$selementId][] = $sel['application'];
+									}
 									break;
 								case SYSMAP_ELEMENT_TYPE_TRIGGER:
 									$triggers_map_submaps[$sel['elementid']][$selementId] = $selementId;
@@ -941,6 +949,10 @@ function getSelementsInfo($sysmap, array $options = array()) {
 							$triggersToFilter[] = $trigger;
 						}
 
+						if (isset($submapApplications[$belongs_to_sel])) {
+							$triggersToFilter[] = $trigger;
+						}
+
 						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
 					}
 				}
@@ -968,19 +980,27 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			foreach ($triggersToFilter as $trigger) {
 				foreach ($trigger['items'] as $item) {
 					foreach ($items[$item['itemid']]['applications'] as $app) {
-						$triggerApps[$trigger['triggerid']][$app['name']] = true;
+						$triggerApps[$trigger['triggerid']][] = $app['name'];
 					}
 				}
 			}
 
 			// unset triggers that don't belong to the chosen applications
 			foreach ($selements as &$selement) {
-				if ($selement['application'] === '') {
+				if ($selement['application'] === '' && !isset($submapApplications[$selement['selementid']])) {
 					continue;
 				}
 
+				$applicationNamesForSelement = isset($submapApplications[$selement['selementid']])
+					? $submapApplications[$selement['selementid']]
+					: array();
+
+				if($selement['application'] !== '') {
+					$applicationNamesForSelement[] = $selement['application'];
+				}
+
 				foreach ($selement['triggers'] as $triggerId) {
-					if (!isset($triggerApps[$triggerId][$selement['application']])) {
+					if (!count(array_intersect($triggerApps[$triggerId], $applicationNamesForSelement))) {
 						unset($selement['triggers'][$triggerId]);
 					}
 				}
