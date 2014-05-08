@@ -162,12 +162,9 @@ zbx_graph_item_type;
 
 #define DSERVICE_KEY_LEN		255
 #define DSERVICE_VALUE_LEN		255
-#define DSERVICE_VALUE_LEN_MAX		(DSERVICE_VALUE_LEN + 1)
 
 #define HTTPTEST_HTTP_USER_LEN		64
-#define HTTPTEST_HTTP_USER_LEN_MAX	(HTTPTEST_HTTP_USER_LEN + 1)
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
-#define HTTPTEST_HTTP_PASSWORD_LEN_MAX	(HTTPTEST_HTTP_PASSWORD_LEN + 1)
 
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
@@ -251,7 +248,7 @@ typedef struct
 	int		status;
 	int		lastup;
 	int		lastdown;
-	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		*value;
 }
 DB_DSERVICE;
 

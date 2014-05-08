@@ -81,7 +81,7 @@ imagerectangle($im, 0, 0, $x-1, $y-1, $black);
 
 $d = zbx_date2str('Y');
 $str = _s('%1$s (year %2$s)', $service['name'], $d);
-$x = imagesx($im) / 2 - imagefontwidth(4) * zbx_strlen($str) / 2;
+$x = imagesx($im) / 2 - imagefontwidth(4) * mb_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 
 $now = time(null);
