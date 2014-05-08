@@ -36,11 +36,12 @@
  * 1 - OK
  * */
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *ignore, const char *sendtoclose, int *value_int)
+		const char *expect, int(*validate_func)(const char *), const char *sendtoclose,
+		int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
-	int		net, val = SUCCEED;
+	int		net, val = SUCCEED, validate;
 
 	*value_int = 0;
 
@@ -58,7 +59,8 @@ wait_for_220sp:
 				{
 					val = FAIL;
 				}
-				if ((NULL != ignore) && (0 == strncmp(buf, ignore, strlen(ignore))))
+				validate = validate_func(buf);
+				if (1 == validate)
 					goto wait_for_220sp;
 			}
 		}

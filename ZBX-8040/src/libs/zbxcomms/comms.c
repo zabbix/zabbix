@@ -936,6 +936,49 @@ static int	zbx_sock_find_line(zbx_sock_t *s, char **data)
 	return FAIL;
 }
 
+
+
+/* validation functions for tcp_expect() */
+int	validate_smtp(const char *line)
+{
+	if (0 == strncmp(line, "220", 3))
+	{
+		if ('-' == line[3])
+			return TCP_EXPECT_IGNORE;
+
+		if ('\0' == line[3] || ' ' == line[3])
+			return TCP_EXPECT_OK;
+	}
+
+	return TCP_EXPECT_FAIL;
+}
+
+int	validate_ftp(const char *line)
+{
+	if (0 == strncmp(line, "220 ", 4))
+		return TCP_EXPECT_OK;
+
+	return TCP_EXPECT_IGNORE;
+}
+
+int	validate_pop(const char *line)
+{
+	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
+}
+
+int	validate_nntp(const char *line)
+{
+	if (0 == strncmp(line, "200 ", 4))
+	return TCP_EXPECT_OK;
+
+	return TCP_EXPECT_IGNORE;
+}
+
+int	validate_imap(const char *line)
+{
+	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_recv_line                                                *
