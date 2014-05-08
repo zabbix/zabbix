@@ -966,7 +966,7 @@ static int	find_old2new(char *old2new, int num_new, int i_old)
  *                                                                            *
  ******************************************************************************/
 static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
-		struct stat *st)
+		zbx_stat_t *st)
 {
 	const char	*__function_name = "add_logfile";
 	int		i = 0, cmp = 0;
@@ -1096,7 +1096,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		int *logfiles_alloc, int *logfiles_num, int *use_ino)
 {
 	int		ret = FAIL;
-	struct stat	file_buf;
+	zbx_stat_t	file_buf;
 
 	if (0 == is_logrt)	/* log[] item */
 	{
