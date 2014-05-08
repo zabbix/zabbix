@@ -1709,48 +1709,6 @@ function expressionLevelDraw(array $next, $level) {
 }
 
 /**
- * Returns number of elements in a trigger expression
- *
- * For example:
- * expression "{host.key.last(0)}=0 & ({host2:key.last(0)}=0 & {host3.key.last(0)}=0)" has two elements:
- * "{host.key.last(0)}=0" and "({host2:key.last(0)}=0 & {host3.key.last(0)}=0)"
- *
- * @param CTriggerExpression $expressionData
- * @param int $start
- * @param int $end
- *
- * @return integer
- */
-function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end) {
-	for ($i = $start, $level = 0, $expressionElementsNum = 1; $i <= $end; $i++) {
-		switch ($expressionData->expression[$i]) {
-			case '(':
-				$level++;
-				break;
-			case ')':
-				$level--;
-				break;
-			case '|':
-			case '&':
-				if ($level == 0) {
-					$expressionElementsNum++;
-				}
-				break;
-			case '{':
-				foreach ($expressionData->expressions as $exprPart) {
-					if ($exprPart['pos'] == $i) {
-						$i += strlen($exprPart['expression']) - 1;
-						break;
-					}
-				}
-				break;
-		}
-	}
-
-	return $expressionElementsNum;
-}
-
-/**
  * Makes tree of expression elements
  *
  * Expression:
@@ -1760,7 +1718,7 @@ function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $e
  *     [0] => array(
  *       'id' => '0_92',
  *       'type' => 'operator',
- *       'operator' => '&',
+ *       'operator' => 'and',
  *       'elements' => array(
  *         [0] => array(
  *           'id' => '0_44',
@@ -1844,13 +1802,6 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 									$closeSymbolNum--;
 								}
 
-								// trim the parentheses around the expression if it contains only one element
-								$expressionElementsNum = getExpressionElementsNum($expressionData, $openSymbolNum, $closeSymbolNum);
-								if ($expressionElementsNum == 1 && $openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
-									$openSymbolNum++;
-									$closeSymbolNum--;
-								}
-
 								$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 								$openSymbolNum = $i + 1;
 								$operatorFound = true;
@@ -1871,13 +1822,6 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 		// we've found a whole expression and parsed the expression on the left side of the operator,
 		// parse the expression on the right
 		if ($operatorFound) {
-			// trim the parentheses around the expression if it contains only one element
-			$expressionElementsNum = getExpressionElementsNum($expressionData, $openSymbolNum, $closeSymbolNum);
-			if ($expressionElementsNum == 1 && $openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
-				$openSymbolNum++;
-				$closeSymbolNum--;
-			}
-
 			$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
 
 			// trim blank symbols in the beginning of the trigger expression
