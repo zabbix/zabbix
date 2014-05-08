@@ -98,21 +98,6 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 	}
 }
 
-static int	smtp_readln(zbx_sock_t *s, char **buf)
-{
-	int ret;
-
-	while (SUCCEED == (ret = zbx_tcp_recv_line(s, buf, 0)) &&
-			3 <= strlen(*buf) &&
-			0 != isdigit((*buf)[0]) &&
-			0 != isdigit((*buf)[1]) &&
-			0 != isdigit((*buf)[2]) &&
-			'-' == (*buf)[3])
-		;
-
-	return ret;
-}
-
 /********************************************************************************
  *                                                                              *
  * Function: smtp_parse_mailbox                                                 *

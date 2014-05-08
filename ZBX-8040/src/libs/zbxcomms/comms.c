@@ -936,6 +936,20 @@ static int	zbx_sock_find_line(zbx_sock_t *s, char **data)
 	return FAIL;
 }
 
+int	smtp_readln(zbx_sock_t *s, char **buf)
+{
+	int ret;
+
+	while (SUCCEED == (ret = zbx_tcp_recv_line(s, buf, 0)) &&
+			3 <= strlen(*buf) &&
+			0 != isdigit((*buf)[0]) &&
+			0 != isdigit((*buf)[1]) &&
+			0 != isdigit((*buf)[2]) &&
+			'-' == (*buf)[3])
+		;
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *

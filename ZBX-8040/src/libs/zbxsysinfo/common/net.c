@@ -52,17 +52,10 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 		if (NULL != expect && SUCCEED == net)
 		{
-wait_for_220sp:
-			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
-			{
-				if (0 != strncmp(buf, expect, strlen(expect)))
-				{
-					val = FAIL;
-				}
+			val = smtp_readln(&s, &buf);
 
-				if (1 == validate_func(buf))
-					goto wait_for_220sp;
-			}
+			if (1 == validate_func(buf))
+				return SYSINFO_RET_FAIL;
 		}
 
 		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
