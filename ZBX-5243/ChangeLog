@@ -2,6 +2,7 @@
 Changes for 2.3.0
 
 New features:
+...G...PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
 ...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
@@ -50,6 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+...G...PS. [ZBX-2196] changed status codes of various exit calls to library macros for consistency (Juris)
 ........S. [ZBX-1274] fixed negative values, received from SNMP agent, being displayed as large unsigned integers (igors)
 ...G...... [ZBX-8031] removed pre-processor aliases for Windows string functions; converted all references of Windows types to standard C types (Juris)
 .......PS. [ZBX-7534] removed the limit of authorization string (Nikolaj)
