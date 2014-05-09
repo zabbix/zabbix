@@ -84,26 +84,32 @@ jQuery(function($) {
 
 		return false;
 	});
-});
 
-/**
- * Insert popup values into multiselect field
- */
-function addPopupValues(list, form, object) {
-	if (!isset('object', list)) {
-		throw("Error hash attribute 'list' doesn't contain 'object' index");
-		return false;
-	}
+	/*
+	 * add.popup event
+	 */
+	$(document).on('add.popup', function(e, data) {
+		if (!isset('object', data)) {
+			throw("Error hash attribute 'data' doesn't contain 'object' index");
+			return false;
+		}
 
-	if (list.object == 'hostid') {
-		for (var i = 0; i < list.values.length; i++) {
-			if (list.values[i].templateid != undefined) {
-				var item = {
-					'id': list.values[i].templateid,
-					'name': list.values[i].host
-				};
-				jQuery('#add_templates_').multiSelect.addData(item);
+		// multiselect check
+		if (data.parentId !== null && $('#' + data.parentId).attr('class') === 'multiselect') {
+			for (var i = 0; i < data.values.length; i++) {
+				if (data.values[i].id != undefined) {
+					var item = {
+						'id': data.values[i].id,
+						'name': data.values[i].name
+					};
+					jQuery('# + data.parentId').multiSelect.addData(item);
+				}
 			}
 		}
-	}
-}
+
+		// execute function if they exist
+		if (addPopupValues !== undefined) {
+			addPopupValues(data);
+		}
+	});
+});

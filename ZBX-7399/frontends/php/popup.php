@@ -240,7 +240,7 @@ $withApplications = get_request('with_applications', 0);
 $withGraphs = get_request('with_graphs', 0);
 $withItems = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
-$existedTemplates = get_request('existed_templates', null);
+$existedTemplates = getRequest('existed_templates', array());
 $excludeids = get_request('excludeids', null);
 $reference = get_request('reference', get_request('srcfld1', 'unknown'));
 $realHosts = get_request('real_hosts', 0);
@@ -436,7 +436,7 @@ if ($value_types) {
 if ($normalOnly) {
 	$frmTitle->addVar('normal_only', $normalOnly);
 }
-if (!is_null($existedTemplates)) {
+if ($existedTemplates) {
 	$frmTitle->addVar('existed_templates', $existedTemplates);
 }
 if (!is_null($excludeids)) {
@@ -704,13 +704,16 @@ elseif ($srctbl == 'templates') {
 	$templates = API::Template()->get($options);
 	order_result($templates, 'name');
 
-	$ignoredItems = array();
+	$data = array();
+
 	foreach ($templates as &$template) {
 		$name = new CSpan($template['name'], 'link');
 		$name->attr('id', 'spanid'.$template['templateid']);
 
 		if ($multiselect) {
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).');';
+			$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
+				$parentId.');';
 			$checkBox = new CCheckBox('templates['.zbx_jsValue('templateid').']', null, null, $template['templateid']);
 		}
 		else {
@@ -723,27 +726,27 @@ elseif ($srctbl == 'templates') {
 			$checkBox->setChecked(1);
 			$checkBox->setEnabled('disabled');
 			$name->removeAttr('class');
-			$ignoredItems[] = $template['templateid'];
 		}
 		else {
 			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+
+			$data[$template['templateid']] = array(
+				'id' => $template['templateid'],
+				'name' => $template['name']
+			);
 		}
 
 		$table->addRow(array($multiselect ? $checkBox : null, $name));
 	}
 	unset($template);
 
-	foreach ($ignoredItems as $ignoredItem) {
-		unset($templates[$ignoredItem]);
-	}
-
 	if ($multiselect) {
 		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).');'
+			"javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).', '.$parentId.');'
 		);
 		$table->setFooter(new CCol($button, 'right'));
 
-		insert_js('var popupReference = '.zbx_jsvalue($templates, true).';');
+		insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 	}
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
