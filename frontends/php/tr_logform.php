@@ -185,14 +185,20 @@ if(isset($_REQUEST['sform'])){
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
 		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
-		$sql = 'SELECT DISTINCT t.expression, t.description, t.priority, t.comments, t.url, t.status, t.type'.
-					' FROM functions f, triggers t, items i '.
+		$res = DBselect('SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
+					' FROM triggers t'.
 					' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
-						' AND i.itemid=f.itemid '.
-						' AND f.triggerid = t.triggerid '.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')';
+						' AND EXISTS ('.
+							'SELECT NULL'.
+							' FROM functions f,items i'.
+							' WHERE t.triggerid=f.triggerid'.
+								' AND f.itemid=i.itemid '.
+								' AND i.value_type IN ('.
+									ITEM_VALUE_TYPE_LOG.','.ITEM_VALUE_TYPE_TEXT.','.ITEM_VALUE_TYPE_STR.
+								')'.
+						')'
+		);
 
-		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
 			$expression = explode_exp($rows['expression']);
