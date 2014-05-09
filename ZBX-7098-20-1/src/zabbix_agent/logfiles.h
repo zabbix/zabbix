@@ -35,7 +35,7 @@ struct st_logfile
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
 	zbx_uint64_t	size;		/* st_size from stat() */
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
-	md5_byte_t	md5buf[16];	/* md5 sum of the initial part of the file */
+	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
 int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,

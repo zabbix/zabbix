@@ -20,6 +20,7 @@
 #include "common.h"
 #include "logfiles.h"
 #include "log.h"
+#include "md5.h"
 
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
@@ -225,8 +226,8 @@ out:
  * Parameters:                                                                *
  *     f        - [IN] file descriptor                                        *
  *     length   - [IN] length of the block in bytes. Maximum is 512 bytes.    *
- *     md5buf   - [OUT] output buffer, 16-bytes long, where the calculated    *
- *                MD5 sum is placed                                           *
+ *     md5buf   - [OUT] output buffer, MD5_DIGEST_SIZE-bytes long, where the  *
+ *                calculated MD5 sum is placed                                *
  *     filename - [IN] file name, used in error logging                       *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -520,7 +521,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
 			int		f, ret;
-			md5_byte_t	md5tmp;
+			md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
 
 			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
 			{
@@ -529,7 +530,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 				return 2;
 			}
 
-			if (SUCCEED == file_start_md5(f, old->md5size, &md5tmp, new->filename))
+			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename))
 				ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? 1 : 0;
 			else
 				ret = 2;
