@@ -1923,7 +1923,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  *     [0] => array(
  *       'id' => '0_92',
  *       'type' => 'operator',
- *       'operator' => '&',
+ *       'operator' => 'and',
  *       'elements' => array(
  *         [0] => array(
  *           'id' => '0_44',
@@ -1962,7 +1962,6 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
 	foreach ($expressionTree as $key => $expression) {
 		if ($expressionId == $expressionTree[$key]['id']) {
 			switch ($action) {
-				// AND and OR
 				case 'and':
 				case 'or':
 					switch ($expressionTree[$key]['type']) {
@@ -2046,7 +2045,7 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
  *   $expressionTree = array(
  *     [0] => array(
  *       'type' => 'operator',
- *       'operator' => '&',
+ *       'operator' => 'and',
  *       'elements' => array(
  *         [0] => array(
  *           'type' => 'expression',
