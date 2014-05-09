@@ -51,7 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-........S. [ZBX-7729] added data alignment to prevent crash on non x86 processors (Nikolaj)
+...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors (Nikolaj, pablo.ruiz)
 ..F....... [ZBX-8160] removed justification in warning message (Ivo)
 ..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
 ..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
