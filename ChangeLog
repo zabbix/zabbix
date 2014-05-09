@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8176] fixed SQL errors while mass operations when using Oracle database (Krists)
 ..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
 ..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
 ..F....... [ZBX-8075] fixed triggers/data without application not showing in overview (Krists)
