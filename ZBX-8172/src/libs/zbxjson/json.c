@@ -559,77 +559,56 @@ static const char	*zbx_json_decode_value(const char *p, char *string, size_t len
 	char	*o = string;
 	u_char	c;
 
-	if ('"' == *p)
+	while ('\0' != *p)	/* this should never happen */
 	{
-		while ('\0' != *p)	/* this should never happen */
+		if ((*p == '"') || (*p == ']') || (*p == '}'))
 		{
-			if (*p == '"')
-			{
-				if (state == 1)
-				{
-					*o = '\0';
-					return ++p;
-				}
-				state = 1;
-			}
-			else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/)
-			{
-				if (*p == '\\')
-				{
-					switch (*++p)
-					{
-						case '"':
-							*o++ = '\"';
-							break;
-						case 'b':
-							*o++ = '\b';
-							break;
-						case 'f':
-							*o++ = '\f';
-							break;
-						case 'n':
-							*o++ = '\n';
-							break;
-						case 'r':
-							*o++ = '\r';
-							break;
-						case 't':
-							*o++ = '\t';
-							break;
-						case 'u':
-							p += 3; /* "u00" */
-							c = zbx_hex2num(*p++) << 4;
-							c += zbx_hex2num(*p);
-							*o++ = (char)c;
-							break;
-						default:
-							*o++ = *p;
-					}
-				}
-				else
-					*o++ = *p;
-			}
-
-			p++;
-		}
-	}
-	else if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) && ('.' != *p))
-	{
-		while ('\0' != *p)	/* this should never happen */
-		{
-			if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) &&
-					('.' != *p) && ('e' != *p) && ('E' != *p))
+			if (state == 1)
 			{
 				*o = '\0';
-				return p;
+				return ++p;
 			}
-			else if ((size_t)(o - string) < len - 1/*'\0'*/)
-			{
-				*o++ = *p;
-			}
-
-			p++;
+			state = 1;
 		}
+		else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/)
+		{
+			if (*p == '\\')
+			{
+				switch (*++p)
+				{
+					case '"':
+						*o++ = '\"';
+						break;
+					case 'b':
+						*o++ = '\b';
+						break;
+					case 'f':
+						*o++ = '\f';
+						break;
+					case 'n':
+						*o++ = '\n';
+						break;
+					case 'r':
+						*o++ = '\r';
+						break;
+					case 't':
+						*o++ = '\t';
+						break;
+					case 'u':
+						p += 3; /* "u00" */
+						c = zbx_hex2num(*p++) << 4;
+						c += zbx_hex2num(*p);
+						*o++ = (char)c;
+						break;
+					default:
+						*o++ = *p;
+				}
+			}
+			else
+				*o++ = *p;
+		}
+
+		p++;
 	}
 
 	return NULL;
