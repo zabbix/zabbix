@@ -41,7 +41,7 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_SYSTEM_STATUS => _('System status'),
 		SCREEN_RESOURCE_TRIGGERS_INFO => _('Triggers info'),
 		SCREEN_RESOURCE_TRIGGERS_OVERVIEW => _('Triggers overview'),
-		SCREEN_RESOURCE_URL => _('Url')
+		SCREEN_RESOURCE_URL => _('URL')
 	);
 
 	if (is_null($resource)) {
