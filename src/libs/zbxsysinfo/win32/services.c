@@ -25,8 +25,8 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;
-	LPTSTR		wname;
-	TCHAR		service_name[MAX_STRING_LEN];
+	wchar_t		*wname;
+	wchar_t		service_name[MAX_STRING_LEN];
 	DWORD		max_len_name = MAX_STRING_LEN;
 	int		i, ret = SYSINFO_RET_FAIL;
 	SERVICE_STATUS	status;
@@ -226,7 +226,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	while (0 != (ret = EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
-			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL)) || ERROR_MORE_DATA == GetLastError())
+			(unsigned char *)ssp, sz, &szn, &services, &resume_handle, NULL)) || ERROR_MORE_DATA == GetLastError())
 	{
 		for (i = 0; i < services; i++)
 		{

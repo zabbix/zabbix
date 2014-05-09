@@ -597,15 +597,15 @@ function construct_expression($itemid, $expressions) {
 				$complite_expr.=' | ';
 			}
 			if ($cexpor == 0) {
-				$startpos = zbx_strlen($complite_expr);
+				$startpos = mb_strlen($complite_expr);
 			}
 			$cexpor++;
 			$eq_global = '#0';
 		}
 		else {
 			if (($cexpor > 1) & ($startpos >= 0)) {
-				$head = substr($complite_expr, 0, $startpos);
-				$tail = substr($complite_expr, $startpos);
+				$head = mb_substr($complite_expr, 0, $startpos);
+				$tail = mb_substr($complite_expr, $startpos);
 				$complite_expr = $head.'('.$tail.')';
 			}
 			$cexpor = 0;
@@ -624,13 +624,12 @@ function construct_expression($itemid, $expressions) {
 		$multi = preg_match('/.+(&|\|).+/', $expr);
 
 		while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-			$arr[4] = zbx_strtolower($arr[4]);
 			if (!isset($functions[$arr[4]])) {
 				error(_('Incorrect function is used').'. ['.$expression['value'].']');
 				return false;
 			}
 			$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-			$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
+			$expr_array[$sub_expr_count]['regexp'] = $arr[4].$arr[5];
 
 			$sub_expr_count++;
 			$expr = $arr[1];
@@ -666,8 +665,8 @@ function construct_expression($itemid, $expressions) {
 	}
 
 	if (($cexpor > 1) & ($startpos >= 0)) {
-		$head = substr($complite_expr, 0, $startpos);
-		$tail = substr($complite_expr, $startpos);
+		$head = mb_substr($complite_expr, 0, $startpos);
+		$tail = mb_substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
 
@@ -685,7 +684,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 	$expressionExpanded = $html ? array() : '';
 	$trigger = array();
 
-	for ($i = 0, $state = '', $max = zbx_strlen($expressionCompressed); $i < $max; $i++) {
+	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
 		if ($expressionCompressed[$i] == '{') {
 			if ($expressionCompressed[$i + 1] == '$') {
 				$state = 'USERMACRO';
@@ -2292,7 +2291,7 @@ function get_item_function_info($expr) {
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'strlen' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6')
 	);
 
 	$expressionData = new CTriggerExpression();

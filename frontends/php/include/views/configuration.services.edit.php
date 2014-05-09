@@ -77,7 +77,6 @@ $servicesFormList->addRow(_('Trigger'), array(
 			'&srcfld1=triggerid'.
 			'&srcfld2=description'.
 			'&real_hosts=1'.
-			'&monitored_hosts=1'.
 			'&with_triggers=1");',
 		'formlist'
 	)
@@ -146,8 +145,8 @@ foreach ($this->data['times'] as $serviceTime) {
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
-			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_from']);
-			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_to']);
+			$from = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_from']);
+			$to = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_to']);
 			break;
 	}
 	$row = new CRow(array(
