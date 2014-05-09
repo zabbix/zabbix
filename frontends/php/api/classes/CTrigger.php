@@ -530,7 +530,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		self::deprecated('trigger.exists method is deprecated.');
+		$this->deprecated('trigger.exists method is deprecated.');
 
 		$keyFields = array(
 			array(
@@ -1784,21 +1784,9 @@ class CTrigger extends CTriggerGeneral {
 		return $result;
 	}
 
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
-		// since column "t.hostname" doesn't exist
-		if (!zbx_empty($options['sortfield'])
-				&& ($options['sortfield'] === 'hostname' || isset($sqlParts['select']['hostname']))) {
-			$sqlParts['select']['hostname'] = 'h.name as hostname';
-		}
-
-		return $sqlParts;
-	}
-
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		if ($sortfield == 'hostname') {
+		if ($sortfield === 'hostname') {
+			$sqlParts['select']['hostname'] = 'h.name AS hostname';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
