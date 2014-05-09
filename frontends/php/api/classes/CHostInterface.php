@@ -199,7 +199,7 @@ class CHostInterface extends CApiService {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		self::deprecated('hostinterface.exists method is deprecated.');
+		$this->deprecated('hostinterface.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),

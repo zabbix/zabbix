@@ -247,7 +247,7 @@ class CApplication extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('application.exists method is deprecated.');
+		$this->deprecated('application.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),

@@ -24,7 +24,7 @@
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*path, *mode;
-	LPTSTR		wpath;
+	wchar_t 	*wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
 	if (2 < request->nparam)
@@ -63,8 +63,8 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	TCHAR		fsName[MAX_PATH + 1];
-	LPTSTR		buffer = NULL, p;
+	wchar_t		fsName[MAX_PATH + 1];
+	wchar_t 	*buffer = NULL, *p;
 	char		*utf8;
 	DWORD		dwSize;
 	size_t		sz;
@@ -75,7 +75,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
 		return SYSINFO_RET_FAIL;
 
-	buffer = (LPTSTR)zbx_malloc(buffer, (dwSize + 1) * sizeof(TCHAR));
+	buffer = (wchar_t *)zbx_malloc(buffer, (dwSize + 1) * sizeof(wchar_t));
 
 	/* Make a second call to GetLogicalDriveStrings to get
 	   the actual data we require */
@@ -102,7 +102,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8);
 
-		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, sizeof(fsName) / sizeof(TCHAR)))
+		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, ARRSIZE(fsName)))
 		{
 			utf8 = zbx_unicode_to_utf8(fsName);
 			zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);

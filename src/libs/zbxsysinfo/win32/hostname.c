@@ -27,7 +27,7 @@ ZBX_METRIC	parameter_hostname =
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD	dwSize = 256;
-	TCHAR	computerName[256];
+	wchar_t	computerName[256];
 	char	*type, buffer[256];
 	int	netbios, ret;
 	WSADATA sockInfo;
