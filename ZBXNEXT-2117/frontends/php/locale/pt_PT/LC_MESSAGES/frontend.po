@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 14:21+0300\n"
+"POT-Creation-Date: 2014-05-08 20:17+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -27,7 +27,7 @@ msgstr "\"Mostrar triggers OK\" precisa de ser \"0\" ou um inteiro positivo."
 
 #: include/profiles.inc.php:364
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo.\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo.\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo.\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo.\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo."
+msgstr "\"Os triggers piscam ao mudar de estado\" precisa de ser \"0\" ou um inteiro positivo."
 
 #: include/func.inc.php:467
 #, c-format
@@ -338,7 +338,7 @@ msgstr ""
 #: api/classes/CAction.php:521 api/classes/CAction.php:640
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos).Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos).Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos).Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos).Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos)."
+msgstr "Acção \"%1$s\" tem um valor incorrecto para \"esc_period\" (mínimo %2$s segundos)."
 
 #: api/classes/CAction.php:722
 #, c-format
@@ -1310,7 +1310,7 @@ msgstr "Não foi possível adicionar dependência de um host para um template."
 #: include/triggers.inc.php:505
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr "Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\".Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\".Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\".Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\".Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\"."
+msgstr "Não foi possível adicionar dependência no trigger \"%1$s:%2$s\" para um trigger inexistente \"%3$s:%4$s\"."
 
 #: host_discovery.php:290
 msgid "Cannot add discovery rule"
@@ -1380,7 +1380,7 @@ msgstr "Não foi possível adicionar tipo de média"
 #: api/classes/CGraph.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\".Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\".Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\".Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\".Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\"."
+msgstr "Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
 #, c-format
@@ -1490,7 +1490,7 @@ msgstr "Não foi possível clonar protótipos do trigger."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script.Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script.Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script.Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script.Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script."
+msgstr "Não foi possível ligar ao porto de trapper do daemon do servidor zabbix, mas deve estar disponível para executar o script."
 
 #: graphs.php:352
 msgid "Cannot copy graphs"
@@ -1503,7 +1503,7 @@ msgstr "Não foi possível copiar itens"
 #: include/triggers.inc.php:412
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr "Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão.Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão.Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão.Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão.Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão."
+msgstr "Não foi possível copiar trigger \"%1$s:%2$s\", porque tem vários hosts na expressão."
 
 #: api/classes/CHostPrototype.php:151
 #, c-format
@@ -1563,7 +1563,7 @@ msgstr ""
 #: api/classes/CUser.php:1312
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador.Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador.Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador.Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador.Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador."
+msgstr "Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador."
 
 #: actionconf.php:165
 msgid "Cannot delete action"
@@ -1611,7 +1611,7 @@ msgstr "Não foi possível eliminar gráficos"
 
 #: api/classes/CGraphPrototype.php:581
 msgid "Cannot delete graphs created by low level discovery."
-msgstr "Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD).Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD).Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD).Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD).Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD)."
+msgstr "Não é possível eliminar gráficos criados pela descoberta de baixo nível (LLD)."
 
 #: hostgroups.php:164 hostgroups.php:175 usergrps.php:215 usergrps.php:243
 msgid "Cannot delete group"
@@ -1663,7 +1663,7 @@ msgstr "Não foi possível eliminar itens"
 
 #: api/classes/CItemPrototype.php:528
 msgid "Cannot delete items created by low level discovery."
-msgstr "Não é possível eliminar itens criados pela descoberta de baixo nível (LLD).Não é possível eliminar itens criados pela descoberta de baixo nível (LLD).Não é possível eliminar itens criados pela descoberta de baixo nível (LLD).Não é possível eliminar itens criados pela descoberta de baixo nível (LLD).Não é possível eliminar itens criados pela descoberta de baixo nível (LLD)."
+msgstr "Não é possível eliminar itens criados pela descoberta de baixo nível (LLD)."
 
 #: maintenance.php:239
 msgid "Cannot delete maintenance"
@@ -1697,12 +1697,12 @@ msgstr "Não foi possível eliminar script"
 
 #: api/classes/CScript.php:491
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio.Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio.Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio.Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio.Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio."
+msgstr "Não foi possível eliminar scripts. Parâmetro de entrada \"scriptids\" vazio."
 
 #: api/classes/CScript.php:523
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\".Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\".Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\".Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\".Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\"."
+msgstr "Não foi possível eliminar scripts. Script \"%1$s\" está a ser utilizado na acção \"%2$s\"."
 
 #: api/classes/CScript.php:506
 #, c-format
@@ -1749,7 +1749,7 @@ msgstr "Não foi possível eliminar itens do template"
 msgid "Cannot delete templated items."
 msgstr "Não foi possível eliminar itens do template."
 
-#: api/classes/CTrigger.php:1847 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1835 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Não foi possível eliminar trigger \"%1$s:%2$s\" do template."
@@ -1781,7 +1781,7 @@ msgstr "Não foi possível eliminar triggers"
 
 #: api/classes/CTriggerPrototype.php:635
 msgid "Cannot delete triggers created by low level discovery."
-msgstr "Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD).Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD).Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD).Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD).Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD)."
+msgstr "Não é possível eliminar triggers criados pela descoberta de baixo nível (LLD)."
 
 #: users.php:290 users.php:345
 msgid "Cannot delete user"
@@ -1957,7 +1957,7 @@ msgstr[1] ""
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\".Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\".Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\".Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\".Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\"."
+msgstr "Não foi possível encontrar imagem de fundo \"%1$s\" utilizada no mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:510
 #: include/classes/import/CXmlImport18.php:1700
@@ -2000,7 +2000,7 @@ msgstr ""
 #: include/items.inc.php:431
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\".Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\".Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\".Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\".Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\"."
+msgstr "Não foi possível encontrar interface do host em \"%1$s\" para a chave do item \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:972
 #: include/classes/import/CConfigurationImport.php:1086
@@ -2017,7 +2017,7 @@ msgstr "Não foi possível encontrar ícone \"%1$s\" utilizado no mapa \"%2$s\".
 #: include/classes/import/importers/CMapImporter.php:180
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\".Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\".Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\".Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\".Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\"."
+msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1070
 #, c-format
@@ -2049,7 +2049,7 @@ msgstr "Não foi possível encontrar item \"%1$s\" utilizado no ecrã \"%2$s\"."
 #: include/classes/import/CXmlImport18.php:725
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr "Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\".Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\".Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\".Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\".Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\"."
+msgstr "Não foi possível encontrar mapa \"%1$s\" utilizado no mapa exportado \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:201
 #, c-format
@@ -2097,7 +2097,7 @@ msgstr ""
 
 #: srv_status.php:169
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr "Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço.Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço.Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço.Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço.Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço."
+msgstr "Não foi possível formatar a estrutura em árvore. Verifique a estrutura lógica nos links de serviço."
 
 #: services.php:472
 msgid "Cannot format tree."
@@ -2180,17 +2180,17 @@ msgstr "Não é possível passar IDs de template duplicados para o link: %s."
 #: include/classes/db/DB.php:801
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE."
+msgstr "Não é possível executar uma operação DELETE na tabela \"%1$s\" sem uma condição WHERE."
 
 #: include/classes/db/DB.php:516
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores."
+msgstr "Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem valores."
 
 #: include/classes/db/DB.php:527
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr "Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE.Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE."
+msgstr "Não é possível executar uma operação UPDATE na tabela \"%1$s\" sem uma condição WHERE."
 
 #: api/classes/CApplication.php:511
 msgid "Cannot process applications from different hosts or templates."
@@ -2249,7 +2249,7 @@ msgstr "Não foi possível definir \"templateid\" para o ecrã \"%1$s\"."
 #: api/classes/CTriggerPrototype.php:458
 #, c-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível definir \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: api/classes/CHost.php:568 api/classes/CHost.php:1038
 msgid "Cannot set inventory fields for disabled inventory."
@@ -2306,7 +2306,7 @@ msgstr ""
 #: api/classes/CHostGeneral.php:234
 #, fuzzy, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host.Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host.Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host.Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host.Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host."
+msgstr "Não é possível desvincular o trigger \"%s\", existem itens do template que estão vinculados ao host."
 
 #: api/classes/CHost.php:581
 #, c-format
@@ -2371,7 +2371,7 @@ msgstr ""
 #: api/classes/CTriggerPrototype.php:514
 #, c-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\".Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível actualizar \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:60
 msgid "Cannot update a discovered graph."
@@ -2567,7 +2567,7 @@ msgstr "Não foi possível actualizar o média do utilizador."
 
 #: profile.php:114 users.php:187
 msgid "Cannot update user. Both passwords must be equal."
-msgstr "Não foi possível actualizar o utilizador. As palavras-passe não coincidem.Não foi possível actualizar o utilizador. As palavras-passe não coincidem.Não foi possível actualizar o utilizador. As palavras-passe não coincidem.Não foi possível actualizar o utilizador. As palavras-passe não coincidem.Não foi possível actualizar o utilizador. As palavras-passe não coincidem."
+msgstr "Não foi possível actualizar o utilizador. As palavras-passe não coincidem."
 
 #: adm.valuemapping.php:64
 msgid "Cannot update value map"
@@ -3429,7 +3429,7 @@ msgstr "Etiqueta personalizada"
 #: api/classes/CMap.php:419
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr "A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia.A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia.A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia.A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia.A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia."
+msgstr "A etiqueta personalizada no mapa \"%2$s\" para elementos do tipo \"%1$s\" não pode estar vazia."
 
 #: disc_prototypes.php:108 include/views/configuration.item.massupdate.php:300
 #: items.php:115
@@ -3450,7 +3450,7 @@ msgstr "Severidade personalizada"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!"
+msgstr "Nomes personalizados de severidade afectam todas as traduções e exigem tradução manual!"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Custom size"
@@ -3786,11 +3786,11 @@ msgstr "Eliminar e limpar"
 
 #: templates.php:661
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)"
+msgstr "Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts associados serão limpos!)"
 
 #: include/views/configuration.template.edit.php:458
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)"
+msgstr "Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)"
 
 #: include/views/configuration.application.edit.php:55
 msgid "Delete application?"
@@ -4040,7 +4040,7 @@ msgstr "Eliminar mapeamento de valor seleccionado?"
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelo item %d!"
-msgstr[1] "Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!"
+msgstr[1] "Eliminar o mapeamento de valor seleccionado? Está a ser utilizado pelos itens %d!"
 
 #: templates.php:660
 msgid "Delete selected with linked elements"
@@ -4259,11 +4259,11 @@ msgstr "A diferença entre o valor MÁX e o valor MÍN do período T é != N"
 
 #: popup_trexpr.php:231
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
-msgstr "Diferença entre último valor e o anterior, então N = 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N = 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N = 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N = 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N = 1, 0 - caso contrário"
+msgstr "Diferença entre último valor e o anterior, então N = 1, 0 - caso contrário"
 
 #: popup_trexpr.php:235
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr "Diferença entre último valor e o anterior, então N != 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N != 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N != 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N != 1, 0 - caso contrárioDiferença entre último valor e o anterior, então N != 1, 0 - caso contrário"
+msgstr "Diferença entre último valor e o anterior, então N != 1, 0 - caso contrário"
 
 #: popup_trexpr.php:195
 msgid "Difference between last and previous value is < N"
@@ -4470,7 +4470,7 @@ msgstr "Regra de descoberta"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template.Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template.Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template.Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template.Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template."
+msgstr "Regra de descoberta \"%1$s\" já existe em \"%2$s\", herdada de outro template."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
@@ -4486,7 +4486,7 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:903
 #, c-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)"
+msgstr "Regra de descoberta \"%1$s:%2$s\" tem um tempo de vida inválido: \"%3$s\". (mín: %4$d, máx: %5$d, macro de utilizador permitida)"
 
 #: discoveryconf.php:143 host_discovery.php:290
 msgid "Discovery rule created"
@@ -4695,7 +4695,7 @@ msgstr "EVENTOS"
 
 #: jsLoader.php:152
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr "Cada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nomeCada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nomeCada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nomeCada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nomeCada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nome"
+msgstr "Cada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nome"
 
 #: include/views/administration.users.edit.php:211
 #: include/views/configuration.action.edit.php:373
@@ -5010,11 +5010,11 @@ msgstr "ID do evento"
 
 #: popup_trexpr.php:443
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "ID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrário"
+msgstr "ID do evento do último registo de log faz match com a expressão regular T, então N = 1, 0 - caso contrário"
 
 #: popup_trexpr.php:448
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr "ID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrárioID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrário"
+msgstr "ID do evento do último registo de log faz match com a expressão regular T, então N != 1, 0 - caso contrário"
 
 #: acknow.php:168 include/actions.inc.php:86
 msgid "Event acknowledged"
@@ -5326,12 +5326,12 @@ msgstr "O formato do ficheiro não é suportado."
 #: include/classes/helpers/CUploadFile.php:153
 #, c-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr "O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes.O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes.O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes.O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes.O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes."
+msgstr "O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes."
 
 #: include/classes/class.cview.php:68
 #, fuzzy, c-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr "O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\".O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\".O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\".O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\".O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\"."
+msgstr "O ficheiro fornecido para uma vista não existe. Tentativa de encontrar \"%s\"."
 
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:539
@@ -5375,11 +5375,11 @@ msgstr ""
 
 #: popup_trexpr.php:315
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr "Encontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrário"
+msgstr "Encontrar a string V no último (mais recente) valor. N = 1 - se encontrado, 0 - caso contrário"
 
 #: popup_trexpr.php:320
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr "Encontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrárioEncontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrário"
+msgstr "Encontrar a string V no último (mais recente) valor. N != 1 - se encontrado, 0 - caso contrário"
 
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:531
@@ -5647,17 +5647,17 @@ msgstr "O gráfico \"%1$s\" já existe em \"%2$s\"."
 #: api/classes/CGraph.php:371 api/classes/CGraphPrototype.php:375
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax)."
+msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymax)."
 
 #: api/classes/CGraph.php:379 api/classes/CGraphPrototype.php:384
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin).O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin)."
+msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\" (item para o Ymin)."
 
 #: api/classes/CGraph.php:365 api/classes/CGraphPrototype.php:369
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\".O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\".O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\".O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\".O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\"."
+msgstr "O gráfico \"%1$s\" não pode herdar. Não existem os itens necessários em \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:489
 #, c-format
@@ -5673,7 +5673,7 @@ msgstr "Gráfico \"%1$s\" ignorado - regra de utilizador."
 #: api/classes/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts."
+msgstr "O gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts."
 
 #: graphs.php:249
 msgid "Graph added"
@@ -5712,7 +5712,7 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts.O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts."
+msgstr "O protótipo de gráfico \"%1$s\" contém itens de template. Nesta situação não é possível adicionar itens de outros hosts."
 
 #: api/classes/CGraphPrototype.php:588
 #, c-format
@@ -5762,7 +5762,7 @@ msgstr "Gráfico actualizado"
 #: api/classes/CGraphGeneral.php:758
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr "Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos.Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos.Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos.Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos.Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos."
+msgstr "Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos de gráficos."
 
 #: api/classes/CGraph.php:415 api/classes/CGraph.php:436
 #: api/classes/CGraphPrototype.php:426 api/classes/CGraphPrototype.php:447
@@ -6128,7 +6128,7 @@ msgstr "O host \"%1$s\" é monitorizado pelo proxy \"%2$s\"."
 #: include/classes/import/CXmlImport18.php:952
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI.O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI.O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI.O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI.O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI."
+msgstr "O host \"%1$s\" tem o parâmetro \"useipmi\" habilitado, mas não tem o parâmetro \"impi_ip\" definido! Será utilizado o IP do host como endereço IPMI."
 
 #: include/views/configuration.screen.constructor.edit.php:323
 msgid "Host (ascending)"
@@ -6653,17 +6653,17 @@ msgstr "Mapeamento de ícone"
 #: api/classes/CIconMap.php:313
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr "O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\".O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\".O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\".O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\".O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\"."
+msgstr "O mapeamento de ícone \"%1$s\" não pode ser eliminado. Está a ser utilizado no mapa \"%2$s\"."
 
 #: api/classes/CIconMap.php:416
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr "O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto.O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto.O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto.O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto.O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto."
+msgstr "O mapa de ícone \"%1$s\" tem um mapeamento com um iconid \"%2$s\" incorrecto."
 
 #: api/classes/CIconMap.php:412
 #, c-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
-msgstr "O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto.O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto.O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto.O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto.O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto."
+msgstr "O mapeamento de ícone \"%1$s\" tem um mapeamento com um link de inventário \"%2$s\" incorrecto."
 
 #: api/classes/CIconMap.php:183 api/classes/CIconMap.php:261
 #, c-format
@@ -6673,12 +6673,12 @@ msgstr "O mapeamento de ícone \"%s\" já existe."
 #: api/classes/CIconMap.php:426
 #, fuzzy, c-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr "O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia."
+msgstr "O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão vazia."
 
 #: api/classes/CIconMap.php:430
 #, fuzzy, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr "O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista.O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista."
+msgstr "O mapeamento de ícone \"%s\" não pode ter um mapeamento com uma expressão global que não exista."
 
 #: api/classes/CIconMap.php:434
 #, c-format
@@ -6738,7 +6738,7 @@ msgstr ""
 
 #: include/func.inc.php:1778 include/func.inc.php:1798
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias.Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias.Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias.Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias.Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias."
+msgstr "Se acha que esta mensagem está errada, por favor consulte os administradores a fim de conseguir as permissões necessárias."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
 #: include/maps.inc.php:727
@@ -6899,7 +6899,7 @@ msgstr "A verificação de descoberta é invalida para esta acção."
 
 #: api/classes/CAction.php:1690
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela."
+msgstr "A acção tem uma condição de descoberta inválida. A verificação de descoberta não existe ou o utilizador não tem acesso a ela."
 
 #: api/classes/CAction.php:1573
 msgid "Incorrect action condition discovery object."
@@ -6907,7 +6907,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1687
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela.A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela."
+msgstr "A acção tem uma condição de descoberta inválida. A regra de descoberta não existe ou o utilizador não tem acesso a ela."
 
 #: api/classes/CAction.php:1618
 msgid "Incorrect action condition discovery status."
@@ -6919,11 +6919,11 @@ msgstr ""
 
 #: api/classes/CAction.php:1675
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma condição de grupo de hosts inválida. O grupo de hosts não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1678
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma condição de host inválida. O host não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1589
 #, c-format
@@ -6941,11 +6941,11 @@ msgstr ""
 
 #: api/classes/CAction.php:1693
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma condição com proxy inválido. O proxy não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1681
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma condição com template inválido. O template não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1634
 msgid "Incorrect action condition trigger severity."
@@ -6957,7 +6957,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1684
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele.A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma condição com trigger inválido. O trigger não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1668
 msgid "Incorrect action condition type."
@@ -6978,7 +6978,7 @@ msgstr "A acção tem uma condição de operação com tipo de comando inválido
 
 #: api/classes/CAction.php:1717
 msgid "Incorrect action operation condition acknowledge type."
-msgstr "A acção tem uma condição de operação com tipo de reconhecimento inválido.A acção tem uma condição de operação com tipo de reconhecimento inválido.A acção tem uma condição de operação com tipo de reconhecimento inválido.A acção tem uma condição de operação com tipo de reconhecimento inválido.A acção tem uma condição de operação com tipo de reconhecimento inválido."
+msgstr "A acção tem uma condição de operação com tipo de reconhecimento inválido."
 
 #: api/classes/CAction.php:1722
 msgid "Incorrect action operation condition type."
@@ -6986,15 +6986,15 @@ msgstr "A acção tem uma condição de operação com tipo inválido."
 
 #: api/classes/CAction.php:1293 api/classes/CAction.php:1297
 msgid "Incorrect action operation escalation step values."
-msgstr "A acção tem uma condição de operação com valor de passo de escalonamento inválido.A acção tem uma condição de operação com valor de passo de escalonamento inválido.A acção tem uma condição de operação com valor de passo de escalonamento inválido.A acção tem uma condição de operação com valor de passo de escalonamento inválido.A acção tem uma condição de operação com valor de passo de escalonamento inválido."
+msgstr "A acção tem uma condição de operação com valor de passo de escalonamento inválido."
 
 #: api/classes/CAction.php:1446
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr "A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma operação com grupo de hosts inválido. O grupo de hosts não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1449
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr "A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma operação com host inválido. O host não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1381 api/classes/CAction.php:1385
 #, c-format
@@ -7011,11 +7011,11 @@ msgstr "A acção tem uma operação com tipo inválido."
 
 #: api/classes/CAction.php:1455
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr "A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma operação com grupo de utilizadores inválido. O grupo de utilizadores não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:1452
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr "A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele.A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele."
+msgstr "A acção tem uma operação com utilizador inválido. O utilizador não existe ou o utilizador não tem acesso a ele."
 
 #: api/classes/CAction.php:740
 msgid "Incorrect action operationid."
@@ -7111,7 +7111,7 @@ msgstr ""
 #: include/classes/db/DB.php:534 include/classes/db/DB.php:808
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\".O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\".O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\".O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\".O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\"."
+msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para a tabela \"%2$s\"."
 
 #: api/classes/CMap.php:362
 msgid "Incorrect fields for sysmap."
@@ -7148,7 +7148,7 @@ msgstr "O intervalo flexível \"%1$s\" é inválido."
 #: api/classes/CItemGeneral.php:827
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr "O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string.O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string.O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string.O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string.O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string."
+msgstr "O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string."
 
 #: include/triggers.inc.php:628 include/triggers.inc.php:1793
 #: tr_testexpr.php:36
@@ -7237,7 +7237,7 @@ msgstr "Item inválido para o valor eixo."
 #: api/classes/CTrigger.php:693 include/triggers.inc.php:1037
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\".Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\".Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\".Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\".Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\"."
+msgstr "Está a ser utilizada uma chave de item inválida \"%1$s\" na expressão do trigger em \"%2$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:254
 #, c-format
@@ -7254,7 +7254,7 @@ msgstr "Lista de itens incorrecta."
 
 #: maintenance.php:318
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038"
+msgstr "Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038"
 
 #: maintenance.php:346
 msgid "Incorrect maintenance date"
@@ -7339,7 +7339,7 @@ msgstr "Parâmetros inválidos para a condição."
 #: api/classes/CIconMap.php:218
 #, fuzzy, c-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
-msgstr "Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\".Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\".Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\".Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\".Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\"."
+msgstr "Parâmetros inválidos para o método de actualização do mapeamento de ícone \"%s\"."
 
 #: api/classes/CMaintenance.php:350 api/classes/CMaintenance.php:577
 msgid "Incorrect parameters for maintenance."
@@ -7450,12 +7450,12 @@ msgstr ""
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr "A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final.A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final.A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final.A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final.A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final."
+msgstr "A data de início fornecida \"%1$s\" é inválida, deverá ser igual ou superior ao dia final."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
 #, c-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr "O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final.O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final.O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final.O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final.O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final."
+msgstr "O horário de início fornecido \"%1$s\" é inválido, deverá ser igual ou superior ao horário final."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
@@ -7480,16 +7480,16 @@ msgstr "Trigger com expressão inválida."
 #: include/triggers.inc.php:1139
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr "Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele."
+msgstr "Trigger com expressão inválida. O host \"%1$s\" não existe ou o utilizador não acesso a ele."
 
 #: api/classes/CTrigger.php:673
 #, fuzzy, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele.Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele."
+msgstr "Trigger com expressão inválida. O host \"%s\" não existe ou o utilizador não acesso a ele."
 
 #: api/classes/CTrigger.php:679
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr "Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo.Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo.Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo.Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo.Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo."
+msgstr "Trigger com expressão inválida. Os elementos da expressão não podem fazer referência a um template e a um host em simultâneo."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -7620,7 +7620,7 @@ msgstr "A interface está associada ao item \"%1$s\" em \"%2$s\"."
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr "A interface está a ser utilizada por itens que requerem este tipo de interface.A interface está a ser utilizada por itens que requerem este tipo de interface.A interface está a ser utilizada por itens que requerem este tipo de interface.A interface está a ser utilizada por itens que requerem este tipo de interface.A interface está a ser utilizada por itens que requerem este tipo de interface."
+msgstr "A interface está a ser utilizada por itens que requerem este tipo de interface."
 
 #: api/classes/CHostInterface.php:296
 #, c-format
@@ -7630,7 +7630,7 @@ msgstr "A interface com o DNS \"%1$s\" não pode ter o campo IP vazio."
 #: api/classes/CHostInterface.php:302 api/classes/CHostInterface.php:309
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr "A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\".A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\".A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\".A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\".A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\"."
+msgstr "A interface com o IP \"%1$s\" não pode ter o DNS vazio enquanto a propriedade \"Utilizar DNS\" estiver seleccionada em \"%2$s\"."
 
 #: api/classes/CHostInterface.php:315
 #, c-format
@@ -7697,7 +7697,7 @@ msgstr "Intervalo (em seg)"
 
 #: api/rpc/class.cjsonrpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
-msgstr "JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON.JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON.JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON.JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON.JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON."
+msgstr "JSON inválido. Ocorreu um erro quando o servidor processava o texto JSON."
 
 #: api/rpc/class.cjsonrpc.php:174
 msgid "Invalid Request."
@@ -7864,7 +7864,7 @@ msgstr ""
 #: api/classes/CItem.php:900
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr "O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d.O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d.O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d.O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d.O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d."
+msgstr "O item \"%1$s\" não pode popular um campo em falta num host \"%2$d\". As opções são: de 0 (não popular) até %3$d."
 
 #: api/classes/CTemplateScreen.php:503
 #, c-format
@@ -7995,22 +7995,22 @@ msgstr "O item utiliza um tipo de interface inválido."
 
 #: api/classes/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr "O item não será actualizado. Por favor especifique um intervalo de actualização correcto.O item não será actualizado. Por favor especifique um intervalo de actualização correcto.O item não será actualizado. Por favor especifique um intervalo de actualização correcto.O item não será actualizado. Por favor especifique um intervalo de actualização correcto.O item não será actualizado. Por favor especifique um intervalo de actualização correcto."
+msgstr "O item não será actualizado. Por favor especifique um intervalo de actualização correcto."
 
 #: api/classes/CItemGeneral.php:440
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta.Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta.Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta.Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta.Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta."
+msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta."
 
 #: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item."
+msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item."
 
 #: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item."
+msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item."
 
 #: api/classes/CItemGeneral.php:437
 #, c-format
@@ -8020,7 +8020,7 @@ msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item."
 #: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido.Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido."
+msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido."
 
 #: api/classes/CItemGeneral.php:804
 #, c-format
@@ -8166,7 +8166,7 @@ msgstr "Chave"
 #: api/classes/CItemGeneral.php:306
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr "A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"].A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"].A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"].A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"].A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
+msgstr "A chave \"%1$s\" não faz corresponde <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
 #: include/views/configuration.action.edit.php:748
 #: include/views/js/common.item.edit.js.php:179
@@ -8406,17 +8406,17 @@ msgstr ""
 #: api/classes/CMap.php:480
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\"."
+msgstr "O campo selementid1 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\"."
 
 #: api/classes/CMap.php:487
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\".O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\"."
+msgstr "O campo selementid2 tem uma ligação que aponta para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\"."
 
 #: api/classes/CMap.php:462
 #, fuzzy, c-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr "A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\".A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\".A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\".A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\".A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\"."
+msgstr "A ligação precisa ter os campos \"nome\" e \"url\" preenchidos para o mapa \"%s\"."
 
 #: include/views/configuration.host.massupdate.php:196
 msgid "Link templates"
@@ -8513,11 +8513,11 @@ msgstr "A severidade da última entrada do log é != N"
 
 #: popup_trexpr.php:469
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr "A origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrário"
+msgstr "A origem da última entrada do log que corresponde ao parâmetro T, então N = 1, 0 - caso contrário"
 
 #: popup_trexpr.php:474
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr "A origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrárioA origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrário"
+msgstr "A origem da última entrada do log que corresponde ao parâmetro T, então N != 1, 0 - caso contrário"
 
 #: include/views/configuration.item.edit.php:357
 #: include/views/configuration.item.massupdate.php:415
@@ -8646,12 +8646,12 @@ msgstr "A macro \"%1$s\" não é única."
 #: api/classes/CUserMacro.php:620
 #, c-format
 msgid "Macro \"%1$s\" value is too long, it should not exceed 255 chars."
-msgstr "O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres.O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres.O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres.O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres.O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres."
+msgstr "O valor para a macro \"%1$s\" é muito longo, o valor não deve exceder 255 caracteres."
 
 #: api/classes/CUserMacro.php:604
 #, c-format
 msgid "Macro name \"%1$s\" is too long, it should not exceed 64 chars."
-msgstr "O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres.O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres.O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres.O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres.O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres."
+msgstr "O nome da macro \"%1$s\" é muito longo, o valor não deve exceder 64 caracteres."
 
 #: api/classes/CUserMacro.php:788
 #, c-format
@@ -8693,7 +8693,7 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:386 api/classes/CMaintenance.php:523
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr "O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada.O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada.O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada.O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada.O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada."
+msgstr "O valor fornecido no campo \"Activo a partir de\" não pode ser superior ao valor definido para \"Activo até\" na manutenção programada."
 
 #: api/classes/CAction.php:1624
 msgid "Maintenance action condition value must be empty."
@@ -9620,12 +9620,12 @@ msgstr ""
 #: api/classes/CAction.php:1340
 #, fuzzy, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\".Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\".Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\".Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\".Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\"."
+msgstr "Não foi definido o tipo de autenticação para a operação do comando da acção \"%s\"."
 
 #: api/classes/CAction.php:1344 api/classes/CAction.php:1358
 #, fuzzy, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\".Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\".Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\".Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\".Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\"."
+msgstr "Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\"."
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
@@ -9651,11 +9651,11 @@ msgstr "Não foram recolhidos dados"
 
 #: popup_trexpr.php:511
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr "Sem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrário"
+msgstr "Sem dados recebidos durante um período de tempo T, então N = 1, 0 - caso contrário"
 
 #: popup_trexpr.php:516
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "Sem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrárioSem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrário"
+msgstr "Sem dados recebidos durante um período de tempo T, então N != 1, 0 - caso contrário"
 
 #: api/classes/CHostInterface.php:785
 #, c-format
@@ -10007,7 +10007,7 @@ msgstr "Sem permissões para acesso ao sistema."
 #: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
 #: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:597
 #: api/classes/CTrigger.php:940 api/classes/CTrigger.php:961
-#: api/classes/CTrigger.php:1826 api/classes/CTriggerPrototype.php:504
+#: api/classes/CTrigger.php:1814 api/classes/CTriggerPrototype.php:504
 #: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
 #: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
 #: api/classes/CUser.php:804 api/classes/CUser.php:824
@@ -10019,7 +10019,7 @@ msgstr "Sem permissões para o objecto referenciado ou o objecto não existe!"
 #: api/classes/CAction.php:1352
 #, fuzzy, c-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr "Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\".Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\".Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\".Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\".Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\"."
+msgstr "Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\"."
 
 #: api/classes/CItemGeneral.php:342
 msgid "No private key file specified."
@@ -10036,7 +10036,7 @@ msgstr "Sem proxy"
 #: api/classes/CAction.php:1349
 #, fuzzy, c-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr "Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\".Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\".Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\".Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\".Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\"."
+msgstr "Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\"."
 
 #: api/classes/CItemGeneral.php:339
 msgid "No public key file specified."
@@ -10107,7 +10107,7 @@ msgstr ""
 
 #: include/views/configuration.services.edit.php:129
 msgid "No times defined. Work 24x7."
-msgstr "Não foram definidos horários. O horário de trabalho será considerado 24x7.Não foram definidos horários. O horário de trabalho será considerado 24x7.Não foram definidos horários. O horário de trabalho será considerado 24x7.Não foram definidos horários. O horário de trabalho será considerado 24x7.Não foram definidos horários. O horário de trabalho será considerado 24x7."
+msgstr "Não foram definidos horários. O horário de trabalho será considerado 24x7."
 
 #: include/views/monitoring.overview.php:67
 msgid "No trigger"
@@ -10330,19 +10330,19 @@ msgstr "Número de passos"
 
 #: popup_trexpr.php:211
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is < N"
-msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < N"
+msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é < N"
 
 #: popup_trexpr.php:221
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is = N"
-msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = N"
+msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é = N"
 
 #: popup_trexpr.php:216
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is > N"
-msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > N"
+msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é > N"
 
 #: popup_trexpr.php:226
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
-msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != NNúmero de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != N"
+msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para o período T é != N"
 
 #: include/blocks.inc.php:829
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -10602,7 +10602,7 @@ msgstr ""
 
 #: include/blocks.inc.php:830
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Apenas são contabilizados triggers associados a hosts activos e que dependam de items activosApenas são contabilizados triggers associados a hosts activos e que dependam de items activosApenas são contabilizados triggers associados a hosts activos e que dependam de items activosApenas são contabilizados triggers associados a hosts activos e que dependam de items activosApenas são contabilizados triggers associados a hosts activos e que dependam de items activos"
+msgstr "Apenas são contabilizados triggers associados a hosts activos e que dependam de items activos"
 
 #: include/views/configuration.httpconf.edit.php:110
 msgid "Opera"
@@ -11139,7 +11139,7 @@ msgstr "Tocar som"
 
 #: include/setup.inc.php:231
 msgid "Please correct all issues and press \"Retry\" button"
-msgstr "Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\"Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\"Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\"Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\"Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\""
+msgstr "Por favor corrija todos os problemas e pressione o botão \"Tentar novamente\""
 
 #: scripts.php:95
 msgid "Please enter confirmation text."
@@ -11508,19 +11508,19 @@ msgstr "A expressão regular \"%s\" já existe."
 
 #: popup_trexpr.php:423
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr "A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário"
+msgstr "A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário"
 
 #: popup_trexpr.php:433
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr "A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)"
+msgstr "A expressão regular V faz correspondência com o último valor no período T, então N = 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)"
 
 #: popup_trexpr.php:428
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr "A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrárioA expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário"
+msgstr "A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário"
 
 #: popup_trexpr.php:438
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr "A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)"
+msgstr "A expressão regular V faz correspondência com o último valor no período T, então N != 1, 0 - caso contrário (sem distinção de maiúsculas e minúsculas)"
 
 #: adm.regexps.php:132
 msgid "Regular expression added"
@@ -11690,7 +11690,7 @@ msgstr "O campo obrigatório \"iconid\" está em falta no mapeamento de ícones.
 
 #: api/classes/CIconMap.php:405
 msgid "Required field \"inventory_link\" is missing in icon mapping."
-msgstr "O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones.O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones.O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones.O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones.O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones."
+msgstr "O campo obrigatório \"inventory_link\" está em falta no mapeamento de ícones."
 
 #: include/views/administration.script.edit.php:96
 msgid "Required host permissions"
@@ -12553,7 +12553,7 @@ msgstr ""
 #: api/classes/CService.php:1298
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
-msgstr "Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço.Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço.Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço.Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço.Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço."
+msgstr "Não foi possível eliminar o serviço \"%1$s\", porque depende de outro serviço."
 
 #: api/classes/CService.php:1319
 #, c-format
@@ -12563,7 +12563,7 @@ msgstr "O serviço \"%1$s\" não pode depender dele próprio."
 #: api/classes/CService.php:1398
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
-msgstr "O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo.O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo.O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo.O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo.O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo."
+msgstr "O serviço \"%1$s\" não pode estar associado a um trigger e ter um filho ao mesmo tempo."
 
 #: api/classes/CService.php:1373
 #, c-format
@@ -12932,7 +12932,7 @@ msgstr "Espanhol (es_ES)"
 
 #: api/classes/CAction.php:1371
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
-msgstr "O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção.O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção.O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção.O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção.O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção."
+msgstr "O script especificado não existe ou o utilizador não tem permissões para realizar a operação comando da acção."
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -13159,7 +13159,7 @@ msgstr "Sueco (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr "Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?"
+msgstr "Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:150
 msgid "System default"
@@ -13285,7 +13285,7 @@ msgstr "Template adicionado"
 
 #: api/classes/CHostBase.php:294
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates.Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates.Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates.Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates.Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates."
+msgstr "Um template não pode ser associado a outro template mais do que uma vez mesmo que através de outros templates."
 
 #: templates.php:361 templates.php:377 templates.php:405
 msgid "Template deleted"
@@ -13459,7 +13459,7 @@ msgstr[1] ""
 #: include/views/configuration.item.list.php:124
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s).O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s).O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s).O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s).O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s)."
+msgstr "O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (em %2$s às %3$s)."
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -13601,11 +13601,11 @@ msgstr "Timestamp"
 
 #: popup_trexpr.php:413
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "Timestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrário"
+msgstr "Timestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N = 1, 0 caso contrário"
 
 #: popup_trexpr.php:418
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "Timestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrárioTimestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrário"
+msgstr "Timestamp com desvio não superior a T segundos em relação ao Zabbix Server, então N != 1, 0 caso contrário"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:411
@@ -13624,7 +13624,7 @@ msgstr "Para"
 
 #: jsLoader.php:226
 msgid "To set a host interface select a single item type for all items"
-msgstr "Para definir uma interface do host seleccionar um tipo de item único para todos os itensPara definir uma interface do host seleccionar um tipo de item único para todos os itensPara definir uma interface do host seleccionar um tipo de item único para todos os itensPara definir uma interface do host seleccionar um tipo de item único para todos os itensPara definir uma interface do host seleccionar um tipo de item único para todos os itens"
+msgstr "Para definir uma interface do host seleccionar um tipo de item único para todos os itens"
 
 #: srv_status.php:35
 msgid "Today"
@@ -13780,7 +13780,7 @@ msgstr "Expressão de condição do trigger"
 
 #: api/classes/CTrigger.php:653 api/classes/CTriggerPrototype.php:724
 msgid "Trigger expression must contain at least one host:key reference."
-msgstr "A expressão do trigger tem de conter pelo menos uma referência host:key.A expressão do trigger tem de conter pelo menos uma referência host:key.A expressão do trigger tem de conter pelo menos uma referência host:key.A expressão do trigger tem de conter pelo menos uma referência host:key.A expressão do trigger tem de conter pelo menos uma referência host:key."
+msgstr "A expressão do trigger tem de conter pelo menos uma referência host:key."
 
 #: tr_logform.php:27
 msgid "Trigger form"
@@ -13802,11 +13802,11 @@ msgstr ""
 #: api/classes/CHostBase.php:143
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
-msgstr "O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\".O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\".O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\".O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\".O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\"."
+msgstr "O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:449
 msgid "Trigger just added. No status update so far."
-msgstr "O trigger acabou de ser adicionado. Não existem actualizações de estado até agora.O trigger acabou de ser adicionado. Não existem actualizações de estado até agora.O trigger acabou de ser adicionado. Não existem actualizações de estado até agora.O trigger acabou de ser adicionado. Não existem actualizações de estado até agora.O trigger acabou de ser adicionado. Não existem actualizações de estado até agora."
+msgstr "O trigger acabou de ser adicionado. Não existem actualizações de estado até agora."
 
 #: include/views/configuration.sysmap.edit.php:91
 msgid "Trigger label type"
@@ -13975,7 +13975,7 @@ msgstr "Deverão ser seleccionados dois elementos"
 #: api/classes/CItem.php:961
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito.Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito.Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito.Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito.Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito."
+msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito."
 
 #: include/actions.inc.php:820 include/classes/screens/CScreenActions.php:50
 #: include/classes/screens/CScreenActions.php:56
@@ -14044,7 +14044,7 @@ msgstr "O tipo de informação tem de ser \"Log\" para a chave de log."
 
 #: api/classes/CItemGeneral.php:314
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr "O tipo de informação tem de ser \"Numérico (float)\" para itens agregados.O tipo de informação tem de ser \"Numérico (float)\" para itens agregados.O tipo de informação tem de ser \"Numérico (float)\" para itens agregados.O tipo de informação tem de ser \"Numérico (float)\" para itens agregados.O tipo de informação tem de ser \"Numérico (float)\" para itens agregados."
+msgstr "O tipo de informação tem de ser \"Numérico (float)\" para itens agregados."
 
 #: include/forms.inc.php:880
 msgid "Types"
@@ -14487,7 +14487,7 @@ msgstr "Um utilizador não pode alterar o tipo dele próprio"
 
 #: api/classes/CUserGroup.php:455
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr "Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado.Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado.Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado.Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado.Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado."
+msgstr "Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado."
 
 #: include/users.inc.php:210
 msgid "User cannot change GUI access for himself."
@@ -14573,12 +14573,12 @@ msgstr "Um utilizador não pode eliminar-se a si próprio."
 #: api/classes/CUser.php:311
 #, fuzzy, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr "Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\"."
+msgstr "Um utilizador não pode alterar o acesso à GUI dele próprio tornando-se membro do grupo de utilizadores \"%s\"."
 
 #: api/classes/CUser.php:315
 #, fuzzy, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\".Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\"."
+msgstr "Um utilizador não pode alterar o estado de sistema dele próprio tornando-se membro do grupo de utilizadores \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
 #: include/views/configuration.action.edit.php:718
@@ -14843,7 +14843,7 @@ msgstr "Valor"
 #: api/classes/CMap.php:447
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
-msgstr "O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\"O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\"O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\"O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\"O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\""
+msgstr "O valor \"%1$s\" é inválido para o parâmetro \"grid_align\". As opções são: \"%2$s\" e \"%3$s\""
 
 #: api/classes/CMap.php:452
 #, c-format
@@ -14858,12 +14858,12 @@ msgstr ""
 #: include/classes/db/DB.php:333
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
-msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres."
+msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres."
 
 #: include/classes/db/DB.php:362
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
-msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres.O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres."
+msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de 2048 caracteres."
 
 #: include/validate.inc.php:326 include/validate.inc.php:350
 #, c-format
@@ -15007,7 +15007,7 @@ msgstr "Nome visível"
 
 #: api/classes/CHost.php:651
 msgid "Visible name cannot be empty if host name is missing."
-msgstr "O nome visível não pode estar vazio se não estiver definido o nome do host.O nome visível não pode estar vazio se não estiver definido o nome do host.O nome visível não pode estar vazio se não estiver definido o nome do host.O nome visível não pode estar vazio se não estiver definido o nome do host.O nome visível não pode estar vazio se não estiver definido o nome do host."
+msgstr "O nome visível não pode estar vazio se não estiver definido o nome do host."
 
 #: jsLoader.php:125
 msgctxt "Wednesday short"
@@ -15358,12 +15358,12 @@ msgstr "Yotta"
 
 #: include/views/administration.users.edit.php:141
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web.Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web.Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web.Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web.Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web."
+msgstr "Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web."
 
 #: api/classes/CUser.php:327
 #, fuzzy, c-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
-msgstr "O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\".O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\".O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\".O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\".O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\"."
+msgstr "O utilizador actual não tem permissões para alterar os privilégios para o utilizador \"%s\"."
 
 #: include/func.inc.php:1794
 msgid "You are not logged in."
@@ -15384,12 +15384,12 @@ msgstr "Não foi especificado nenhum grupo de hosts para esta operação."
 #: api/classes/CAction.php:1412
 #, fuzzy, c-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr "Não foi especificado nenhum destino para a operação comando da acção \"%s\".Não foi especificado nenhum destino para a operação comando da acção \"%s\".Não foi especificado nenhum destino para a operação comando da acção \"%s\".Não foi especificado nenhum destino para a operação comando da acção \"%s\".Não foi especificado nenhum destino para a operação comando da acção \"%s\"."
+msgstr "Não foi especificado nenhum destino para a operação comando da acção \"%s\"."
 
 #: api/classes/CAction.php:1409
 #, fuzzy, c-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr "Não foi especificado nenhum destino para a operação script global da acção \"%s\".Não foi especificado nenhum destino para a operação script global da acção \"%s\".Não foi especificado nenhum destino para a operação script global da acção \"%s\".Não foi especificado nenhum destino para a operação script global da acção \"%s\".Não foi especificado nenhum destino para a operação script global da acção \"%s\"."
+msgstr "Não foi especificado nenhum destino para a operação script global da acção \"%s\"."
 
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:553
 #: api/classes/CHost.php:906 api/classes/CHost.php:963
@@ -15409,11 +15409,11 @@ msgstr "O utilizador actual não tem permissões para criar utilizadores."
 
 #: api/classes/CUser.php:260
 msgid "You do not have permissions to update other users."
-msgstr "O utilizador actual não tem permissões para actualizar outros utilizadores.O utilizador actual não tem permissões para actualizar outros utilizadores.O utilizador actual não tem permissões para actualizar outros utilizadores.O utilizador actual não tem permissões para actualizar outros utilizadores.O utilizador actual não tem permissões para actualizar outros utilizadores."
+msgstr "O utilizador actual não tem permissões para actualizar outros utilizadores."
 
 #: api/classes/CUser.php:256
 msgid "You do not have permissions to update user or user does not exist."
-msgstr "O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe.O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe.O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe.O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe.O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe."
+msgstr "O utilizador actual não tem permissões para actualizar o utilizador ou o utilizador não existe."
 
 #: include/func.inc.php:1776
 msgid "You have no permissions to access this page."
@@ -15519,7 +15519,7 @@ msgstr "Informação do servidor Zabbix"
 
 #: jsrpc.php:174
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada.O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada.O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada.O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada.O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada."
+msgstr "O servidor Zabbix não está em execução: a informação mostrada poderá não estar actualizada."
 
 #: include/blocks.inc.php:807
 msgid "Zabbix server is running"
@@ -15528,7 +15528,7 @@ msgstr "O servidor Zabbix está em execução"
 #: adm.gui.php:80
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr "O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\".O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\".O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\".O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\".O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\"."
+msgstr "O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\"."
 
 #: include/setup.inc.php:434
 msgid "Zabbix server name"
