@@ -65,7 +65,7 @@ class CRegexpTriggerConstructor {
 		}
 
 		// regexp used to split an expressions into tokens
-		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?[(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) [(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
 		$functions = array('regexp' => 1, 'iregexp' => 1);
 		$expr_array = array();
 		$cexpor = 0;
@@ -108,14 +108,13 @@ class CRegexpTriggerConstructor {
 			// split an expression into separate tokens
 			// start from the first part of the expression, then move to the next one
 			while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-				$arr[5] = zbx_strtolower($arr[5]);
-				if (!isset($functions[$arr[5]])) {
+				$arr[4] = zbx_strtolower($arr[4]);
+				if (!isset($functions[$arr[4]])) {
 					error(_('Incorrect function is used').'. ['.$expression['value'].']');
 					return false;
 				}
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-				$expr_array[$sub_expr_count]['not'] = trim($arr[3]);
-				$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[5]).$arr[6];
+				$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
 
 				$sub_expr_count++;
 				$expr = $arr[1];
@@ -135,12 +134,11 @@ class CRegexpTriggerConstructor {
 
 			foreach ($expr_array as $id => $expr) {
 				$eq = ($expr['eq'] === '') ? '' : ' '.$expr['eq'].' ';
-				$not = ($expr['not'] === '') ? '' : $expr['not'].' ';
 				if ($multi > 0) {
-					$sub_expr = $eq.'('.$not.'{'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
+					$sub_expr = $eq.'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
 				}
 				else {
-					$sub_expr = $eq.$expr['eq'].$not.'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
+					$sub_expr = $eq.$expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
 				}
 			}
 
@@ -196,7 +194,7 @@ class CRegexpTriggerConstructor {
 
 						break;
 					case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
-						if ($token['value'] === 'and' || $token['value'] === 'or' || $token['value'] === 'not') {
+						if ($token['value'] === 'and' || $token['value'] === 'or') {
 							$value = ' '.$token['value'].' ';
 						}
 

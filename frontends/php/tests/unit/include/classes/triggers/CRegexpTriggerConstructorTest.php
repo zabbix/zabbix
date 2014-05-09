@@ -170,67 +170,6 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				),
 				'(({host:item.regexp(a)})=0)'
 			),
-
-			// "not" cases
-			array(
-				'host',
-				'item',
-				array(
-					array(
-						'value' => 'not regexp(test)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
-				'((not {host:item.regexp(test)})=0)'
-			),
-			array(
-				'host',
-				'item',
-				array(
-					array(
-						'value' => 'not (regexp(test))',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
-				'((not {host:item.regexp(test)})=0)'
-			),
-			array(
-				'host',
-				'item',
-				array(
-					array(
-						'value' => 'not regexp(a) and not regexp(b)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
-				'((not {host:item.regexp(a)})<>0 and (not {host:item.regexp(b)})<>0)'
-			),
-			array(
-				'host',
-				'item',
-				array(
-					array(
-						'value' => 'not regexp(a) or not regexp(b)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
-				'((not {host:item.regexp(a)})<>0 or (not {host:item.regexp(b)})<>0)'
-			),
-			array(
-				'host',
-				'item',
-				array(
-					array(
-						'value' => 'not regexp(a)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-					array(
-						'value' => 'not regexp(b)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-				),
-				'(((not {host:item.regexp(a)})<>0) or ((not {host:item.regexp(b)})<>0))'
-			),
 		);
 	}
 
@@ -384,36 +323,7 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					),
 				)
-			),
-
-			// "not" cases
-			array(
-				'(not {Zabbix server:system.hostname.regexp(a)})=0',
-				array(
-					array(
-						'value' => 'not regexp(a)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
-				'(not ({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
-						'value' => 'not regexp(a)',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
-				'not (({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
-						'value' => 'not (regexp(a))',
-						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
+			)
 		);
 	}
 
