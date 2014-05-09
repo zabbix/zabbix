@@ -156,7 +156,7 @@ elseif (isset($_REQUEST['delete'])) {
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
 
-	DBStart();
+	DBstart();
 
 	$goResult = API::Script()->delete($scriptIds);
 
@@ -166,7 +166,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 		}
 	}
 
-	$goResult = DBEnd($goResult);
+	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Script deleted'), _('Cannot delete script'));
 	clearCookies($goResult);

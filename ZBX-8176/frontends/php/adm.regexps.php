@@ -173,7 +173,6 @@ elseif (isset($_REQUEST['go'])) {
 			}
 
 			unset($_REQUEST['form'], $_REQUEST['regexpid']);
-			clearCookies($result);
 		}
 
 		$result = DBend($result);
@@ -183,6 +182,7 @@ elseif (isset($_REQUEST['go'])) {
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
 
+		clearCookies($result);
 	}
 }
 

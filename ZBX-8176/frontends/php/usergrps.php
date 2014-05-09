@@ -222,9 +222,9 @@ elseif ($_REQUEST['go'] == 'delete') {
 		$groups[$group['usrgrpid']] = $group;
 	}
 
-	DBStart();
-
 	if ($groups) {
+		DBstart();
+
 		$goResult = API::UserGroup()->delete($groupIds);
 
 		if ($goResult) {
@@ -233,7 +233,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 			}
 		}
 
-		$goResult = DBEnd($goResult);
+		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
 		clearCookies($goResult);

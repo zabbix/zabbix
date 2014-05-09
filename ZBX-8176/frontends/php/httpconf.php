@@ -307,7 +307,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 	$goResult = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
 
-	DBStart();
+	DBstart();
 
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
@@ -324,7 +324,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 		}
 	}
 
-	$goResult = DBEnd($goResult);
+	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('History cleared'), null);
 	clearCookies($goResult, $_REQUEST['hostid']);

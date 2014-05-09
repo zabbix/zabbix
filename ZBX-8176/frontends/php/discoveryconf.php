@@ -189,7 +189,7 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 
-	$result = DBEnd($result);
+	$result = DBend($result);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 	clearCookies($result);
