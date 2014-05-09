@@ -116,6 +116,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #ifdef _WINDOWS
 	ZBX_DO_EXIT();
 
-	zbx_thread_exit(0);
+	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }

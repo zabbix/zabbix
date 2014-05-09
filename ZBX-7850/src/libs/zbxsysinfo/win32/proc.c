@@ -24,7 +24,6 @@
 #include "log.h"
 
 #define MAX_PROCESSES		4096
-/*#define MAX_MODULES		512*/
 #define MAX_NAME		256
 
 /* function 'zbx_get_processname' require 'baseName' with size 'MAX_NAME' */
@@ -32,14 +31,12 @@ static int	zbx_get_processname(HANDLE hProcess, char *baseName)
 {
 	HMODULE	hMod;
 	DWORD	dwSize;
-	TCHAR	name[MAX_NAME];
-/*			if (0 != EnumProcessModules(hProcess, modList, sizeof(HMODULE) * MAX_MODULES, &dwSize))
-				if (0 != GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName)))*/
+	wchar_t	name[MAX_NAME];
 
 	if (0 == EnumProcessModules(hProcess, &hMod, sizeof(hMod), &dwSize))
 		return FAIL;
 
-	if (0 == GetModuleBaseName(hProcess, hMod, name, sizeof(name)))
+	if (0 == GetModuleBaseName(hProcess, hMod, name, MAX_NAME))
 		return FAIL;
 
 	zbx_unicode_to_utf8_static(name, baseName, MAX_NAME);
@@ -53,7 +50,7 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName)
 	HANDLE		tok;
 	TOKEN_USER	*ptu = NULL;
 	DWORD		sz = 0, nlen, dlen;
-	TCHAR		name[MAX_NAME], dom[MAX_NAME];
+	wchar_t		name[MAX_NAME], dom[MAX_NAME];
 	int		iUse, res = FAIL;
 
 	assert(userName);

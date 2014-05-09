@@ -113,7 +113,7 @@ class CTree {
 
 	private function makeSImgStr($id) {
 		$tr = new CRow();
-		$count = isset($this->tree[$id]['nodeimg']) ? zbx_strlen($this->tree[$id]['nodeimg']) : 0;
+		$count = isset($this->tree[$id]['nodeimg']) ? strlen($this->tree[$id]['nodeimg']) : 0;
 
 		for ($i = 0; $i < $count; $i++) {
 			$td = new CCol();

@@ -72,7 +72,7 @@ int	DBconnect(int flag)
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
@@ -883,7 +883,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					zabbix_log(LOG_LEVEL_CRIT, "maximum number of id's exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
 							table->table, table->recid, ret1);
-					exit(FAIL);
+					exit(EXIT_FAILURE);
 				}
 			}
 			DBfree_result(result);
@@ -1142,22 +1142,6 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
 		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
 	DBfree_result(result);
-
-	return buf_string;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_host_key_string_by_item                                      *
- *                                                                            *
- * Return value: <host>:<key>                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_host_key_string_by_item(DB_ITEM *item)
-{
-	zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", item->host_name, item->key);
 
 	return buf_string;
 }
@@ -2398,6 +2382,6 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 

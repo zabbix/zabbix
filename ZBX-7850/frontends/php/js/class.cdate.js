@@ -52,7 +52,8 @@ CDate.prototype = {
 
 	/**
 	* Formats date according given format. Uses server timezone.
-	* Supported formats: 'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
+	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d', 'H:i:s', 'H:i',
+	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i'
 	*
 	* @param format PHP style date format limited to supported formats
 	*
@@ -65,7 +66,8 @@ CDate.prototype = {
 			mnth = this.getMonth(),
 			yr = this.getFullYear(),
 			hrs = this.getHours(),
-			mnts = this.getMinutes();
+			mnts = this.getMinutes(),
+			sec = this.getSeconds();
 
 		/**
 		 * Transform datetime parts to two digits e.g., 2 becomes 02
@@ -101,6 +103,17 @@ CDate.prototype = {
 				return dt + '. ' + shortMn[mnth] + ' ' + yr + ' ' + hrs + ':' + appZr(mnts);
 			case 'Y/m/d H:i':
 				return yr + '/' + appZr(mnth + 1) + '/' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'Y-m-d H:i':
+				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'Y-m-d H:i:s':
+				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
+					':' + appZr(sec);
+			case 'Y-m-d':
+				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt);
+			case 'H:i:s':
+				return  appZr(hrs) + ':' + appZr(mnts) + ':' + appZr(sec);
+			case 'H:i':
+				return  appZr(hrs) + ':' + appZr(mnts);
 			case 'M jS, Y h:i A':
 				var ampm = (hrs < 12) ? 'AM' : 'PM';
 				hrs = appZr((hrs + 11) % 12 + 1);

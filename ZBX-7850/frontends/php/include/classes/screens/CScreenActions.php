@@ -179,7 +179,7 @@ class CScreenActions extends CScreenBase {
 			}
 
 			$actionTable->addRow(array(
-				new CCol(zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $alert['clock']), 'top'),
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
 				new CCol($actions[$alert['actionid']]['name'], 'top'),
 				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
 				new CCol($recipient, 'top'),

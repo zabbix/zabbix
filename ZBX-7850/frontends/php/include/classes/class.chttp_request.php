@@ -60,7 +60,7 @@ class CHTTP_request {
 
 		$this->headers = array();
 		foreach ($_SERVER as $i => $val) {
-			if (zbx_strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
+			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(array('HTTP_', '_'), array('', '-'), $i);
 				$this->headers[$name] = $val;
 			}
@@ -86,7 +86,7 @@ class CHTTP_request {
 	 * @param string Case-Insensitive HTTP Header Name (eg: "User-Agent")
 	 */
 	public function header($name) {
-		$name = zbx_strtoupper($name);
+		$name = strtoupper($name);
 		return isset($this->headers[$name]) ? $this->headers[$name] : false;
 	}
 
