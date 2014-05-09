@@ -51,6 +51,10 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8160] removed justification in warning message (Ivo)
+..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
+..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
+..F....... [ZBX-8165] fixed issue when maintenance items with its hosts/host groups removed are not accessible in configuration (Krists)
 ...G...PS. [ZBX-2196] changed status codes of various exit calls to library macros for consistency (Juris)
 ........S. [ZBX-1274] fixed negative values, received from SNMP agent, being displayed as large unsigned integers (igors)
 ...G...... [ZBX-8031] removed pre-processor aliases for Windows string functions; converted all references of Windows types to standard C types (Juris)
@@ -120,6 +124,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8176] fixed SQL errors while mass operations when using Oracle database (Krists)
 ..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
 ..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
 ..F....... [ZBX-8075] fixed triggers/data without application not showing in overview (Krists)
