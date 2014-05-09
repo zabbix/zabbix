@@ -182,10 +182,10 @@ if(isset($_REQUEST['sform'])){
 
 	if(isset($_REQUEST['triggerid'])) $frmTRLog->addVar('triggerid',$_REQUEST['triggerid']);
 
-	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
-		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
+	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])) {
+		$frmTRLog->addVar('form_refresh', get_request('form_refresh', 1));
 
-		$res = DBselect('SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
+		$result = DBselect('SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
 					' FROM triggers t'.
 					' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
 						' AND EXISTS ('.
@@ -199,27 +199,27 @@ if(isset($_REQUEST['sform'])){
 						')'
 		);
 
-		while($rows = DBfetch($res)){
-			$description = $rows['description'];
-			$expression = explode_exp($rows['expression']);
-			$type = $rows['type'];
-			$priority = $rows['priority'];
-			$comments = $rows['comments'];
-			$url = $rows['url'];
-			$status = $rows['status'];
+		if ($row = DBfetch($result)) {
+			$description = $row['description'];
+			$expression = explode_exp($row['expression']);
+			$type = $row['type'];
+			$priority = $row['priority'];
+			$comments = $row['comments'];
+			$url = $row['url'];
+			$status = $row['status'];
 		}
 
 		// break expression into parts
 		$expressions = $constructor->getPartsFromExpression($expression);
 	}
-	else{
-		$description = get_request('description','');
-		$expressions = get_request('expressions',array());
-		$type = get_request('type',0);
-		$priority = get_request('priority',0);
-		$comments = get_request('comments','');
-		$url = get_request('url','');
-		$status = get_request('status',0);
+	else {
+		$description = get_request('description', '');
+		$expressions = get_request('expressions', array());
+		$type = get_request('type', 0);
+		$priority = get_request('priority', 0);
+		$comments = get_request('comments', '');
+		$url = get_request('url', '');
+		$status = get_request('status', 0);
 	}
 
 	$keys = get_request('keys',array());
@@ -256,10 +256,9 @@ if(isset($_REQUEST['sform'])){
 
 
 	$exp_select = new CComboBox('expr_type');
-	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH,_('Include'));
-		$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH,_('Exclude'));
-
+	$exp_select->setAttribute('id', 'expr_type');
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
 	$ctb = new CTextBox('expression','',80);
 	$ctb->setAttribute('id','logexpr');
