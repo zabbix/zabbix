@@ -836,6 +836,8 @@ AC_MSG_RESULT(yes),
 LDFLAGS="$saved_LDFLAGS"
 AC_MSG_RESULT(no))
 
+AC_CHECK_SIZEOF([void *])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Checks for operating systems                  *
