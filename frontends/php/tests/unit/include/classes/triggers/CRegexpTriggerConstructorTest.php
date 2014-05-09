@@ -231,6 +231,67 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				),
 				'(((not {host:item.regexp(a)})<>0) or ((not {host:item.regexp(b)})<>0))'
 			),
+
+			// "-" cases
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '- regexp(test)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				),
+				'((-{host:item.regexp(test)})=0)'
+			),
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '- (regexp(test))',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				),
+				'((-{host:item.regexp(test)})=0)'
+			),
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '- regexp(a) and - regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
+					)
+				),
+				'((-{host:item.regexp(a)})<>0 and (-{host:item.regexp(b)})<>0)'
+			),
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '- regexp(a) or - regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
+					)
+				),
+				'((-{host:item.regexp(a)})<>0 or (-{host:item.regexp(b)})<>0)'
+			),
+			array(
+				'host',
+				'item',
+				array(
+					array(
+						'value' => '- regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
+					),
+					array(
+						'value' => '- regexp(b)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH
+					),
+				),
+				'(((-{host:item.regexp(a)})<>0) or ((-{host:item.regexp(b)})<>0))'
+			),
 		);
 	}
 
@@ -410,6 +471,62 @@ class CRegexpTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 				array(
 					array(
 						'value' => 'not (regexp(a))',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+
+			// "-" cases
+			array(
+				'(-{Zabbix server:system.hostname.regexp(a)})=0',
+				array(
+					array(
+						'value' => '-regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'(-({Zabbix server:system.hostname.regexp(a)})=0)',
+				array(
+					array(
+						'value' => '-regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'-(({Zabbix server:system.hostname.regexp(a)})=0)',
+				array(
+					array(
+						'value' => '-(regexp(a))',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'(- {Zabbix server:system.hostname.regexp(a)})=0',
+				array(
+					array(
+						'value' => '-regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'(- ({Zabbix server:system.hostname.regexp(a)})=0)',
+				array(
+					array(
+						'value' => '-regexp(a)',
+						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
+					)
+				)
+			),
+			array(
+				'- (({Zabbix server:system.hostname.regexp(a)})=0)',
+				array(
+					array(
+						'value' => '-(regexp(a))',
 						'type' => CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					)
 				)
