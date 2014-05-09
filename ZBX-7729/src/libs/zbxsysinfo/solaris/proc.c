@@ -17,12 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <procfs.h>
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
-
-#define _STRUCTURED_PROC 1
-#include <sys/procfs.h>
 
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
