@@ -21,9 +21,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#define _STRUCTURED_PROC 1
-#include <sys/procfs.h>
-
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
 	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
