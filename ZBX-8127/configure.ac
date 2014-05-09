@@ -946,7 +946,7 @@ if test "x$ARCH" = "xhpux"; then
 
 	AC_DEFINE_UNQUOTED([HPUX_VERSION], $hpux_major$hpux_minor, [Define to HP-UX version])
 
-	dnl Checking for -D_HPUX_API_LEVEL=20040821 compilation flag
+	dnl This API level is needed so that "utsname.nodename" is not truncated.
 	AC_MSG_CHECKING(for -D_HPUX_API_LEVEL=20040821 compilation flag)
 	saved_CFLAGS="$CFLAGS"
 	CFLAGS="-D_HPUX_API_LEVEL=20040821"
