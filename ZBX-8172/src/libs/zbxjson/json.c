@@ -578,6 +578,9 @@ static const char	*zbx_json_decode_value(const char *p, char *string, size_t len
 				{
 					switch (*++p)
 					{
+						case '"':
+							*o++ = '\"';
+							break;
 						case 'b':
 							*o++ = '\b';
 							break;
@@ -610,8 +613,7 @@ static const char	*zbx_json_decode_value(const char *p, char *string, size_t len
 			p++;
 		}
 	}
-	else if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) &&
-			('.' != *p) && ('e' != *p) && ('E' != *p))
+	else if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) && ('.' != *p))
 	{
 		while ('\0' != *p)	/* this should never happen */
 		{
