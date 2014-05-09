@@ -838,7 +838,7 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
 		return NULL;
 
-	if (NULL == (p = zbx_json_decodestring(p, name, len)))
+	if (NULL == (p = zbx_json_decode_value(p, name, len)))
 		return NULL;
 
 	SKIP_WHITESPACE(p);
