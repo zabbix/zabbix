@@ -302,7 +302,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
 	int		err;
-	char		auth[HTTPTEST_HTTP_USER_LEN_MAX + HTTPTEST_HTTP_PASSWORD_LEN_MAX];
+	char		*auth = NULL;
+	size_t		auth_alloc = 0, auth_offset;
 	CURL            *easyhandle = NULL;
 #endif
 
@@ -411,7 +412,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					break;
 			}
 
-			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->httptest.http_user,
+			auth_offset = 0;
+			zbx_snprintf_alloc(&auth, &auth_alloc, &auth_offset, "%s:%s", httptest->httptest.http_user,
 					httptest->httptest.http_password);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)) ||
@@ -525,6 +527,8 @@ httpstep_error:
 			break;
 		}
 	}
+
+	zbx_free(auth);
 clean:
 	curl_easy_cleanup(easyhandle);
 #else

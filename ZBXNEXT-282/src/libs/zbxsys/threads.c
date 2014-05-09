@@ -105,7 +105,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 
 		/* The zbx_thread_exit must be called from the handler. */
 		/* And in normal case the program will never reach this point. */
-		zbx_thread_exit(0);
+		zbx_thread_exit(EXIT_SUCCESS);
 		/* program will never reach this point */
 	}
 	else if (-1 == thread)

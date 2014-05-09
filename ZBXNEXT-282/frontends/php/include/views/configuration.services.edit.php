@@ -77,7 +77,6 @@ $servicesFormList->addRow(_('Trigger'), array(
 			'&srcfld1=triggerid'.
 			'&srcfld2=description'.
 			'&real_hosts=1'.
-			'&monitored_hosts=1'.
 			'&with_triggers=1");',
 		'formlist'
 	)
