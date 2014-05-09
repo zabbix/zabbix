@@ -2118,7 +2118,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (proxy_hostid != items[i].host.proxy_hostid)
 			continue;
 
-		if (HOST_STATUS_NOT_MONITORED == items[i].host.status)
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
