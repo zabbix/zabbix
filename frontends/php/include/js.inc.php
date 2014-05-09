@@ -121,7 +121,7 @@ function insert_javascript_for_editable_combobox() {
 			obj.oldValue = obj.value;
 		}
 
-		function CEditableComboBoxOnChange(obj, size) {
+		function CEditableComboBoxOnChange(obj, size, width) {
 			if (-1 != obj.value) {
 				obj.oldValue = obj.value;
 			}
@@ -134,9 +134,10 @@ function insert_javascript_for_editable_combobox() {
 
 				if (size && size > 0) {
 					newObj.size = size;
-					if (size == '.ZBX_TEXTBOX_STANDARD_SIZE.') {
-						newObj.style.width = \''.ZBX_TEXTAREA_STANDARD_WIDTH.'px\';
-					}
+				}
+
+				if (width && width > 0) {
+					newObj.style.width = width + "px";
 				}
 
 				if (obj.oldValue) {

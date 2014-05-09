@@ -25,7 +25,9 @@ class CEditableComboBox extends CComboBox {
 		insert_javascript_for_editable_combobox();
 		parent::__construct($name, $value, $action);
 		parent::addAction('onfocus', 'CEditableComboBoxInit(this);');
-		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.');');
+
+		$width = ($size == ZBX_TEXTBOX_STANDARD_SIZE) ? ZBX_TEXTAREA_STANDARD_WIDTH : 0;
+		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.', '.$width.');');
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
