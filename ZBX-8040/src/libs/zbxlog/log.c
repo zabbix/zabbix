@@ -72,7 +72,7 @@ void	redirect_std(const char *filename)
 	else
 	{
 		zbx_error("cannot open [%s]: %s", filename, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(FAIL);
 	}
 }
 #endif	/* not _WINDOWS */
@@ -106,19 +106,19 @@ int zabbix_open_log(int type, int level, const char *filename)
 		if (MAX_STRING_LEN <= strlen(filename))
 		{
 			zbx_error("too long path for logfile");
-			exit(EXIT_FAILURE);
+			exit(FAIL);
 		}
 
 		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for log file");
-			exit(EXIT_FAILURE);
+			exit(FAIL);
 		}
 
 		if (NULL == (log_file = fopen(filename, "a+")))
 		{
 			zbx_error("unable to open log file [%s]: %s", filename, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			exit(FAIL);
 		}
 
 		log_type = LOG_TYPE_FILE;

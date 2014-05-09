@@ -36,8 +36,7 @@
  * 1 - OK
  * */
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, int(*validate_func)(const char *), const char *sendtoclose,
-		int *value_int)
+		const char *expect, const char *ignore, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
@@ -52,10 +51,16 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 		if (NULL != expect && SUCCEED == net)
 		{
-			val = smtp_readln(&s, &buf);
-
-			if (1 == validate_func(buf))
-				return SYSINFO_RET_FAIL;
+wait_for_220sp:
+			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
+			{
+				if (0 != strncmp(buf, expect, strlen(expect)))
+				{
+					val = FAIL;
+				}
+				if ((NULL != ignore) && (0 == strncmp(buf, ignore, strlen(ignore))))
+					goto wait_for_220sp;
+			}
 		}
 
 		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)

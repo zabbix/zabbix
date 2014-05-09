@@ -745,7 +745,7 @@ msgstr "毎%5$s %3$s %4$s %1$s:%2$s"
 #: include/maintenances.inc.php:127
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr "毎%4$s %3$s日 %1$s:%2$s"
+msgstr "毎%4$s %3$日 %1$s:%2$s"
 
 #: include/maintenances.inc.php:76
 #, c-format

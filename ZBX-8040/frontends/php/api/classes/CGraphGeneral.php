@@ -251,7 +251,7 @@ abstract class CGraphGeneral extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		$this->deprecated('graph.exists method is deprecated.');
+		self::deprecated('graph.exists method is deprecated.');
 
 		$options = array(
 			'filter' => array('flags' => null),

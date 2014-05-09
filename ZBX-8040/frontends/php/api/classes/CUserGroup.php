@@ -203,7 +203,7 @@ class CUserGroup extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		$this->deprecated('usergroup.exists method is deprecated.');
+		self::deprecated('usergroup.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => array('name' => $object['name']),

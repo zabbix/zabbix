@@ -65,7 +65,7 @@ void	zbx_strpool_create(size_t size)
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_STRPOOL_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for string pool");
-		exit(EXIT_FAILURE);
+		exit(FAIL);
 	}
 
 	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize", 0);

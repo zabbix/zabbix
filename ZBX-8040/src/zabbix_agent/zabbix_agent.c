@@ -149,14 +149,14 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(EXIT_SUCCESS);
+				exit(FAIL);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(EXIT_SUCCESS);
+				exit(FAIL);
 				break;
 			case 'p':
 				if (task == ZBX_TASK_START)
@@ -171,7 +171,7 @@ int	main(int argc, char **argv)
 				break;
 			default:
 				usage();
-				exit(EXIT_FAILURE);
+				exit(FAIL);
 				break;
 		}
 	}
@@ -279,5 +279,5 @@ void	zbx_on_exit()
 	free_metrics();
 	alias_list_free();
 
-	exit(EXIT_SUCCESS);
+	exit(SUCCEED);
 }

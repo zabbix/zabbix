@@ -2,11 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< .mine
-"POT-Creation-Date: 2014-05-01 14:16+0300\n"
-=======
 "POT-Creation-Date: 2014-05-01 14:21+0300\n"
->>>>>>> .r45072
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -2087,7 +2083,7 @@ msgstr[0] ""
 #, fuzzy, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] ""
+msgstr[0] "Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada.Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada.Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -2268,7 +2264,7 @@ msgstr ""
 #: api/classes/CHostGeneral.php:234
 #, fuzzy, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
+msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
 
 #: api/classes/CHost.php:581
 #, c-format
@@ -6085,7 +6081,7 @@ msgstr "Host \"%1$s\" dipantau dengan proxy \"%2$s\"."
 #: include/classes/import/CXmlImport18.php:952
 #, fuzzy, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
+msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
 
 #: include/views/configuration.screen.constructor.edit.php:323
 msgid "Host (ascending)"
@@ -6631,7 +6627,7 @@ msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi kosong."
 #: api/classes/CIconMap.php:430
 #, fuzzy, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada."
+msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada."
 
 #: api/classes/CIconMap.php:434
 #, c-format
@@ -6772,7 +6768,7 @@ msgstr "Impor berhasil"
 #: hostinventories.php:180
 #, fuzzy, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
-msgstr "Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada."
+msgstr "Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada."
 
 #: screenedit.php:307 screenedit.php:347
 msgid "Impossible to remove last row and column."
@@ -7433,16 +7429,16 @@ msgstr "Kesalahan ekspresi trigger."
 #: include/triggers.inc.php:1139
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
+msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
 
 #: api/classes/CTrigger.php:673
 #, fuzzy, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
+msgstr "Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
 
 #: api/classes/CTrigger.php:679
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan."
+msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -7746,7 +7742,7 @@ msgstr "Periode waktu tidak sah"
 #: include/classes/class.cview.php:62
 #, fuzzy, c-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr "Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\"."
+msgstr "Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\"."
 
 #: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:306
 msgid "Inventory"
@@ -8830,13 +8826,13 @@ msgstr[0] ""
 #, fuzzy, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: api/classes/CHost.php:626
 #, fuzzy, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: include/views/configuration.host.discovery.edit.php:241
 #: include/views/configuration.item.edit.php:308
@@ -8880,7 +8876,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: include/forms.inc.php:1673 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:115
@@ -9560,12 +9556,12 @@ msgstr ""
 #: api/classes/CAction.php:1340
 #, fuzzy, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CAction.php:1344 api/classes/CAction.php:1358
 #, fuzzy, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
@@ -9652,7 +9648,7 @@ msgstr "Tidak ada event untuk pemberitahuan"
 #: api/classes/CAction.php:1335
 #, fuzzy, c-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: include/classes/helpers/CUploadFile.php:156
 msgid "No file was uploaded."
@@ -9959,7 +9955,7 @@ msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 #: api/classes/CAction.php:1352
 #, fuzzy, c-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:342
 msgid "No private key file specified."
@@ -9976,7 +9972,7 @@ msgstr "Tidak ada proxy"
 #: api/classes/CAction.php:1349
 #, fuzzy, c-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:339
 msgid "No public key file specified."
@@ -14503,12 +14499,12 @@ msgstr "User tidak diizinkan menghapus dirinya sendiri."
 #: api/classes/CUser.php:311
 #, fuzzy, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr "User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
+msgstr "User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
 
 #: api/classes/CUser.php:315
 #, fuzzy, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
+msgstr "User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
 #: include/views/configuration.action.edit.php:718
@@ -15317,7 +15313,7 @@ msgstr "Anda tidak dapat menentukan target untuk perintah aksi operasi \"%s\"."
 #: api/classes/CAction.php:1409
 #, fuzzy, c-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\"."
+msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\"."
 
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:553
 #: api/classes/CHost.php:906 api/classes/CHost.php:963

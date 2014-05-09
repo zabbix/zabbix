@@ -282,7 +282,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return bool
 	 */
 	public function exists($object) {
-		$this->deprecated('discoveryrule.exists method is deprecated.');
+		self::deprecated('discoveryrule.exists method is deprecated.');
 
 		$options = array(
 			'filter' => array('key_' => $object['key_']),

@@ -213,7 +213,7 @@ class CDService extends CApiService {
 	 * @return bool
 	 */
 	public function exists($object) {
-		$this->deprecated('dservice.exists method is deprecated.');
+		self::deprecated('dservice.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),

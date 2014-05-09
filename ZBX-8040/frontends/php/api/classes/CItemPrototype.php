@@ -274,7 +274,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @return bool
 	 */
 	public function exists($object) {
-		$this->deprecated('itemprototype.exists method is deprecated.');
+		self::deprecated('itemprototype.exists method is deprecated.');
 
 		$options = array(
 			'filter' => array('key_' => $object['key_']),

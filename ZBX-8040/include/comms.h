@@ -161,14 +161,3 @@ int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error);
 #endif
 
 #endif
-
-#define TCP_EXPECT_FAIL		(-1)
-#define TCP_EXPECT_OK		(0)
-#define	TCP_EXPECT_IGNORE	(1)
-
-int	smtp_readln(zbx_sock_t *s, char **buf);
-int	validate_smtp(const char *line);
-int	validate_ftp(const char *line);
-int	validate_pop(const char *line);
-int	validate_nntp(const char *line);
-int	validate_imap(const char *line);

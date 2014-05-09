@@ -310,7 +310,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 	if (ITER_START == iter->slot || ITER_FINISH == iter->slot || NULL == iter->entry)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "removing a hashset entry through a bad iterator");
-		exit(EXIT_FAILURE);
+		exit(FAIL);
 	}
 
 	if (iter->hashset->slots[iter->slot] == iter->entry)

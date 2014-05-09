@@ -412,7 +412,7 @@ class CItem extends CItemGeneral {
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		$this->deprecated('item.exists method is deprecated.');
+		self::deprecated('item.exists method is deprecated.');
 
 		$options = array(
 			'filter' => array('key_' => $object['key_']),

@@ -169,7 +169,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
 				__function_name, zbx_strerror(errno));
-		exit(EXIT_SUCCESS);
+		exit(0);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
@@ -178,7 +178,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 
 	/* execl() returns only when an error occurs */
 	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
-	exit(EXIT_SUCCESS);
+	exit(0);
 }
 
 /******************************************************************************
@@ -551,6 +551,6 @@ int	zbx_execute_nowait(const char *command)
 	}
 
 	/* always exit, parent has already returned */
-	exit(EXIT_SUCCESS);
+	exit(0);
 #endif
 }

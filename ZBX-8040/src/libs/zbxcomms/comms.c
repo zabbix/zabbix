@@ -936,66 +936,6 @@ static int	zbx_sock_find_line(zbx_sock_t *s, char **data)
 	return FAIL;
 }
 
-int	smtp_readln(zbx_sock_t *s, char **buf)
-{
-	int ret;
-
-	while (SUCCEED == (ret = zbx_tcp_recv_line(s, buf, 0)) &&
-			3 <= strlen(*buf) &&
-			0 != isdigit((*buf)[0]) &&
-			0 != isdigit((*buf)[1]) &&
-			0 != isdigit((*buf)[2]) &&
-			'-' == (*buf)[3])
-		;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * validation functions for tcp_expect()                                      *
- *                                                                            *
-/*****************************************************************************/
-int	validate_smtp(const char *line)
-{
-	if (0 == strncmp(line, "220", 3))
-	{
-		if ('-' == line[3])
-			return TCP_EXPECT_IGNORE;
-
-		if ('\0' == line[3] || ' ' == line[3])
-			return TCP_EXPECT_OK;
-	}
-
-	return TCP_EXPECT_FAIL;
-}
-
-int	validate_ftp(const char *line)
-{
-	if (0 == strncmp(line, "220 ", 4))
-		return TCP_EXPECT_OK;
-
-	return TCP_EXPECT_IGNORE;
-}
-
-int	validate_pop(const char *line)
-{
-	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
-}
-
-int	validate_nntp(const char *line)
-{
-	if (0 == strncmp(line, "200 ", 4))
-		return TCP_EXPECT_OK;
-
-	return TCP_EXPECT_IGNORE;
-}
-
-int	validate_imap(const char *line)
-{
-	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_recv_line                                                *
@@ -1012,7 +952,7 @@ int	validate_imap(const char *line)
  ******************************************************************************/
 int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout)
 {
-#define	ZBX_TCP_MAX_LINE_LENGTH	(64 * ZBX_KIBIBYTE)
+#define	ZBX_TCP_MAX_LINE_LENTH	(64 * ZBX_KIBIBYTE)
 
 	char	buffer[ZBX_STAT_BUF_LEN], *ptr = NULL, *pstart;
 	int	nbytes, ret = FAIL, left, line_length;
@@ -1020,7 +960,12 @@ int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout)
 
 	/* check if the buffer already contains the next line */
 	if (SUCCEED == (ret = zbx_sock_find_line(s, data)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: zbx_tcp_recv_line: socket found line |%s|", data);
 		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: zbx_tcp_recv_line: socket did NOT found line |%s|", data);
 
 	ZBX_TCP_START();
 
@@ -1095,7 +1040,7 @@ int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout)
 		ptr = strchr(buffer, '\n');
 
 		/* if the line exceeds the defined limit then truncate it by skipping data until the newline */
-		if (s->read_bytes + nbytes < ZBX_TCP_MAX_LINE_LENGTH && s->read_bytes == line_length)
+		if (s->read_bytes + nbytes < ZBX_TCP_MAX_LINE_LENTH && s->read_bytes == line_length)
 		{
 			zbx_strncpy_alloc(&s->buf_dyn, &alloc, &offset, buffer, nbytes);
 			s->read_bytes += nbytes;

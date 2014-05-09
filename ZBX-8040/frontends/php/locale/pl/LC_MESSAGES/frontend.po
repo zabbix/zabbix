@@ -6911,7 +6911,7 @@ msgstr ""
 #: api/classes/CMap.php:432
 #, fuzzy, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr "Błędny rodzaj etykiety %1$s dla mapy \"%2$s\"."
+msgstr "Błędny rodzaj etykiety $1%s dla mapy \"%2$s\"."
 
 #: include/classes/api/clients/CLocalApiClient.php:61
 #, c-format
@@ -7570,7 +7570,7 @@ msgstr ""
 #: include/classes/db/DB.php:352
 #, fuzzy, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
-msgstr "Niepoprawna wartość \"%1$s\" dla pola zmiennoprzecinkowego \"%2$s\"."
+msgstr "Niepoprawna wartość \"%s$s\" dla pola zmiennoprzecinkowego \"%2$s\"."
 
 #: include/classes/db/DB.php:346
 #, c-format

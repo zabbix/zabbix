@@ -265,13 +265,13 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", validate_smtp, "QUIT\r\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "220-", "QUIT\r\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", validate_ftp, "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "220-", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "http"))
 	{
@@ -283,19 +283,19 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", validate_pop, "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", NULL, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "nntp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", validate_nntp, "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", NULL, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "imap"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", validate_imap, "a1 LOGOUT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", NULL, "a1 LOGOUT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "tcp"))
 	{

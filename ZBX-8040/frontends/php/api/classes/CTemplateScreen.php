@@ -396,7 +396,7 @@ class CTemplateScreen extends CScreen {
 	 * @return bool
 	 */
 	public function exists($data) {
-		$this->deprecated('templatescreen.exists method is deprecated.');
+		self::deprecated('templatescreen.exists method is deprecated.');
 
 		$screens = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $data),

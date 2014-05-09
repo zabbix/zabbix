@@ -43,7 +43,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			SIG_CHECKED_FIELD(siginfo, si_code),
 			SIG_CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
 	print_fatal_info(sig, siginfo, context);
-	exit(EXIT_FAILURE);
+	exit(FAIL);
 }
 
 /******************************************************************************
@@ -79,7 +79,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				SIG_CHECKED_FIELD(siginfo, si_pid),
 				SIG_CHECKED_FIELD(siginfo, si_uid),
 				SIG_CHECKED_FIELD(siginfo, si_code));
-		exit(EXIT_FAILURE);
+		exit(FAIL);
 	}
 	else
 	{
@@ -113,7 +113,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	if (!SIG_PARENT_PROCESS)
-		exit(EXIT_FAILURE);
+		exit(FAIL);
 
 	if (0 == sig_exiting)
 	{
