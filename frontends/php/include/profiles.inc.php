@@ -274,7 +274,7 @@ class CProfile {
 			case PROFILE_TYPE_INT:
 				return zbx_is_int($value);
 			case PROFILE_TYPE_STR:
-				return zbx_strlen($value) <= self::$stringProfileMaxLength;
+				return mb_strlen($value) <= self::$stringProfileMaxLength;
 			default:
 				return true;
 		}
@@ -468,7 +468,8 @@ function getHistoryUrl($page) {
 	// if url length is greater than db field size, skip history update
 	$historyTableSchema = DB::getSchema('user_history');
 
-	return (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
+	// $url is encoded
+	return (strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
 }
 
 function addUserHistory($title, $url) {

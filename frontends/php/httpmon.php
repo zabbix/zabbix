@@ -134,7 +134,7 @@ if ($pageFilter->hostsSelected) {
 				&& $lastHttpTestData[$httpTest['httptestid']]['lastfailedstep'] !== null) {
 			$lastData = $lastHttpTestData[$httpTest['httptestid']];
 
-			$lastcheck = zbx_date2str(_('d M Y H:i:s'), $lastData['lastcheck']);
+			$lastcheck = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastData['lastcheck']);
 
 			if ($lastData['lastfailedstep'] != 0) {
 				$stepData = get_httpstep_by_no($httpTest['httptestid'], $lastData['lastfailedstep']);
