@@ -595,7 +595,7 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
 					(old + i)->filename, (new + j)->filename, *(p + j));
 		}
-		p += (size_t)num_new * sizeof(char);
+		p += (size_t)num_new;
 	}
 	return SUCCEED;
 }
