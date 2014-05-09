@@ -663,67 +663,6 @@ static size_t	zbx_json_string_size(const char *p)
 	return (size_t)(-1);
 }
 
-static const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
-{
-	int	state = 0; /* 0 - init; 1 - inside string */
-	char	*o = string;
-	u_char	c;
-
-	if ('"' != *p)
-		return NULL;
-
-	while ('\0' != *p)	/* this should never happen */
-	{
-		if (*p == '"')
-		{
-			if (state == 1)
-			{
-				*o = '\0';
-				return ++p;
-			}
-			state = 1;
-		}
-		else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/)
-		{
-			if (*p == '\\')
-			{
-				switch (*++p)
-				{
-					case 'b':
-						*o++ = '\b';
-						break;
-					case 'f':
-						*o++ = '\f';
-						break;
-					case 'n':
-						*o++ = '\n';
-						break;
-					case 'r':
-						*o++ = '\r';
-						break;
-					case 't':
-						*o++ = '\t';
-						break;
-					case 'u':
-						p += 3; /* "u00" */
-						c = zbx_hex2num(*p++) << 4;
-						c += zbx_hex2num(*p);
-						*o++ = (char)c;
-						break;
-					default:
-						*o++ = *p;
-				}
-			}
-			else
-				*o++ = *p;
-		}
-
-		p++;
-	}
-
-	return NULL;
-}
-
 static size_t	zbx_json_int_size(const char *p)
 {
 	size_t	sz = 0;
@@ -739,29 +678,6 @@ static size_t	zbx_json_int_size(const char *p)
 	}
 
 	return (size_t)(-1);
-}
-
-static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
-{
-	char	*o = string;
-
-	while ('\0' != *p)	/* this should never happen */
-	{
-		if (('0' > *p || '9' < *p) && ('-' != *p) && ('+' != *p) &&
-				('.' != *p) && ('e' != *p) && ('E' != *p))
-		{
-			*o = '\0';
-			return p;
-		}
-		else if ((size_t)(o - string) < len - 1/*'\0'*/)
-		{
-			*o++ = *p;
-		}
-
-		p++;
-	}
-
-	return NULL;
 }
 
 static const char	*zbx_json_decodenull(const char *p)
