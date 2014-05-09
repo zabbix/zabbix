@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 14:21+0300\n"
+"POT-Creation-Date: 2014-05-08 20:17+0300\n"
 "PO-Revision-Date: 2014-04-23 06:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1732,7 +1732,7 @@ msgstr "テンプレートのアイテムを削除できません"
 msgid "Cannot delete templated items."
 msgstr "テンプレートのアイテムを削除できません"
 
-#: api/classes/CTrigger.php:1847 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1835 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
@@ -9939,7 +9939,7 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
 #: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:597
 #: api/classes/CTrigger.php:940 api/classes/CTrigger.php:961
-#: api/classes/CTrigger.php:1826 api/classes/CTriggerPrototype.php:504
+#: api/classes/CTrigger.php:1814 api/classes/CTriggerPrototype.php:504
 #: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
 #: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
 #: api/classes/CUser.php:804 api/classes/CUser.php:824

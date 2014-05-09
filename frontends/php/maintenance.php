@@ -509,20 +509,19 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	$groupIds = array();
+	$data['maintenances'] = array();
+
 	if ($pageFilter->groupsSelected) {
-		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);
+		$data['maintenances'] = API::Maintenance()->get(array(
+			'output' => array('maintenanceid'),
+			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
+		));
 	}
 
-	// get only maintenance IDs for paging
-	$data['maintenances'] = API::Maintenance()->get(array(
-		'output' => array('maintenanceid'),
-		'groupids' => $groupIds,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'editable' => true,
-		'limit' => $config['search_limit'] + 1
-	));
 	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 
 	// get list of maintenances
