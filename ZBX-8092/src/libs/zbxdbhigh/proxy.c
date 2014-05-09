@@ -1939,7 +1939,7 @@ try_again:
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
 		zbx_json_addobject(j, NULL);

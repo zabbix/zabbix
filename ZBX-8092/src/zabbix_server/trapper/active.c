@@ -214,7 +214,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 				continue;
 			}
 
-			if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
@@ -374,7 +374,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				continue;
 			}
 
-			if (HOST_STATUS_NOT_MONITORED == dc_items[i].host.status)
+			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
