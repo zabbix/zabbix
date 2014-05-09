@@ -451,10 +451,6 @@ class CHttpTest extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 			}
 
-			if (isset($httpTest['headers']) && strlen($httpTest['headers']) > 2048) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maximum length of web scenario headers (2048 characters) exceeded.'));
-			}
-
 			$this->checkSslParameters($httpTest);
 
 			if (empty($httpTest['steps'])) {
@@ -488,10 +484,6 @@ class CHttpTest extends CApiService {
 			$missingKeys = checkRequiredKeys($httpTest, array('httptestid'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
-			}
-
-			if (isset($httpTest['headers']) && strlen($httpTest['headers']) > 2048) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maximum length of web scenario headers (2048 characters) exceeded.'));
 			}
 
 			if (isset($httpTest['name'])) {
@@ -580,13 +572,6 @@ class CHttpTest extends CApiService {
 			}
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
-			}
-
-			if (isset($step['headers']) && strlen($step['headers']) > 2048) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Maximum length of web scenario headers (2048 characters) exceeded for step "%1$s".', $step['name'])
-				);
 			}
 
 			if (isset($step['follow_redirects'])) {
@@ -794,10 +779,16 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		$sslCertFile = isset($httpTest['ssl_cert_file']) ? $httpTest['ssl_cert_file'] : '';
-		$sslKeyFile = isset($httpTest['ssl_key_file']) ? $httpTest['ssl_key_file'] : '';
+		$dbHttpTest = API::getApiService()->select('httptest', (array(
+			'httptestids' => $httpTest['httptestid'],
+			'output' => array('httptestid', 'ssl_cert_file', 'ssl_key_file')
+		)));
+		$dbHttpTest = reset($dbHttpTest);
 
-		if (($sslCertFile !== '') && ($sslKeyFile === '')) {
+		$newSslCertFile = isset($httpTest['ssl_cert_file']) ? $httpTest['ssl_cert_file'] : $dbHttpTest['ssl_cert_file'];
+		$newSslKeyFile = isset($httpTest['ssl_key_file']) ? $httpTest['ssl_key_file'] : $dbHttpTest['ssl_key_file'];
+
+		if (($newSslCertFile !== '') && ($newSslKeyFile === '')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('SSL key file is required for SSL cert file.'));
 		}
 	}

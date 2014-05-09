@@ -88,7 +88,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
 
-	$infoIcon = null;
+	$infoIcon = SPACE;
 	if ($this->data['showInfoColumn'] && ($httpTest['status'] == HTTPTEST_STATUS_ACTIVE)
 			&& isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
 		$lastData = $httpTestsLastData[$httpTestId];

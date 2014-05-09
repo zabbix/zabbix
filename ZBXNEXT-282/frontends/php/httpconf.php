@@ -278,7 +278,7 @@ elseif (isset($_REQUEST['save'])) {
 				}
 			}
 
-			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
+			$httpTest['httptestid'] = $httpTestId = $_REQUEST['httptestid'];
 			$result = API::HttpTest()->update($httpTest);
 			if (!$result) {
 				throw new Exception();
@@ -299,7 +299,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$_REQUEST['name'].'] ['.$httptestid.'] Host ['.$host['host'].']');
+		add_audit($action, AUDIT_RESOURCE_SCENARIO, 'Scenario ['.$_REQUEST['name'].'] ['.$httpTestId.'] Host ['.$host['host'].']');
 
 		unset($_REQUEST['httptestid'], $_REQUEST['form']);
 		show_messages(true, $messageTrue);
