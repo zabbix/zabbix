@@ -28,6 +28,9 @@ class CEditableComboBox extends CComboBox {
 
 		$width = ($size == ZBX_TEXTBOX_STANDARD_SIZE) ? ZBX_TEXTAREA_STANDARD_WIDTH : 0;
 		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.', '.$width.');');
+
+		// prevent Firefox remembering selected option on page refresh
+		$this->setAttribute('autocomplete', 'off');
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
