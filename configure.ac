@@ -836,8 +836,6 @@ AC_MSG_RESULT(yes),
 LDFLAGS="$saved_LDFLAGS"
 AC_MSG_RESULT(no))
 
-AC_CHECK_SIZEOF([void *])
-
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Checks for operating systems                  *
@@ -948,6 +946,8 @@ fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
+
+AC_CHECK_SIZEOF([void *])
 
 dnl *****************************************************************
 dnl *                                                               *
