@@ -138,8 +138,6 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 	-1 => _('other').' ...'
 ));
 
-$agentComboBox->setAttribute('autocomplete', 'off');
-
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append HTTP proxy to form list
