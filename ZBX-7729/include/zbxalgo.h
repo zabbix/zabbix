@@ -105,12 +105,6 @@ ZBX_HASHSET_ENTRY_T
 {
 	ZBX_HASHSET_ENTRY_T	*next;
 	zbx_hash_t		hash;
-	/*
-	 * We need to pad here to avoid unaligned access
-	 * to data on struct aling archs like SPARC.
-	 * 2014/05/01 -- pablo.ruiz _at_ gmail.com
-	 */
-	char			padding[sizeof(void*) - sizeof(zbx_hash_t)];
 	char			data[1];
 };
 
