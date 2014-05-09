@@ -303,7 +303,7 @@ else {
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
 	$eventsWidget->addPageHeader(
-		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
+		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
 		array(
 			$frmForm,
 			SPACE,
@@ -601,7 +601,7 @@ else {
 
 			if ($csvExport) {
 				$csvRows[] = array(
-					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
+					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event_data['clock']),
 					$event_data['object_data']['ip'],
 					$event_data['object_data']['dns'],
 					$event_data['description'],
@@ -610,7 +610,7 @@ else {
 			}
 			else {
 				$table->addRow(array(
-					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT, $event_data['clock']),
+					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event_data['clock']),
 					$event_data['object_data']['ip'],
 					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
@@ -742,7 +742,7 @@ else {
 
 				if ($csvExport) {
 					$csvRows[] = array(
-						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 						(getRequest('hostid', 0) == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
@@ -780,7 +780,7 @@ else {
 					}
 
 					$table->addRow(array(
-						new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+						new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 							'action'
 						),
