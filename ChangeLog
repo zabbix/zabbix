@@ -51,6 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
 ..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
 ..F....... [ZBX-8165] fixed issue when maintenance items with its hosts/host groups removed are not accessible in configuration (Krists)
 ...G...PS. [ZBX-2196] changed status codes of various exit calls to library macros for consistency (Juris)
