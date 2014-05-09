@@ -961,11 +961,8 @@ int	zbx_tcp_recv_line(zbx_sock_t *s, char **data, int timeout)
 	/* check if the buffer already contains the next line */
 	if (SUCCEED == (ret = zbx_sock_find_line(s, data)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: zbx_tcp_recv_line: socket found line |%s|", data);
 		return SUCCEED;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "SUMMER:: zbx_tcp_recv_line: socket did NOT found line |%s|", data);
 
 	ZBX_TCP_START();
 

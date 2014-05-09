@@ -31,16 +31,53 @@
 #	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
-/*
- * 0 - NOT OK
- * 1 - OK
- * */
+/* validation functions for tcp_expect() */
+int	validate_smtp(const char *line)
+{
+	if (0 == strncmp(line, "220", 3))
+	{
+		if ('-' == line[3])
+			return TCP_EXPECT_IGNORE;
+
+		if ('\0' == line[3] || ' ' == line[3])
+			return TCP_EXPECT_OK;
+	}
+
+	return TCP_EXPECT_FAIL;
+}
+
+int	validate_ftp(const char *line)
+{
+	if (0 == strncmp(line, "220 ", 4))
+		return TCP_EXPECT_OK;
+
+	return TCP_EXPECT_IGNORE;
+}
+
+int	validate_pop(const char *line)
+{
+	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
+}
+
+int	validate_nntp(const char *line)
+{
+	if (0 == strncmp(line, "200 ", 4))
+		return TCP_EXPECT_OK;
+
+	return TCP_EXPECT_IGNORE;
+}
+
+int	validate_imap(const char *line)
+{
+	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
+}
+
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
-		const char *expect, const char *ignore, const char *sendtoclose, int *value_int)
+		int(*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
-	int		net, val = SUCCEED;
+	int		net, val = TCP_EXPECT_OK;
 
 	*value_int = 0;
 
@@ -49,34 +86,21 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		if (NULL != request)
 			net = zbx_tcp_send_raw(&s, request);
 
-		if (NULL != expect && SUCCEED == net)
+		if (NULL != validate_func && SUCCEED == net)
 		{
-wait_for_220sp:
-			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
-			{
-				if (0 != strncmp(buf, expect, strlen(expect)))
-				{
-					val = FAIL;
-				}
-				if ((NULL != ignore) && (0 == strncmp(buf, ignore, strlen(ignore))))
-					goto wait_for_220sp;
-			}
+			while (SUCCEED == (net = zbx_tcp_recv_line(&s, &buf, 0)) &&
+				TCP_EXPECT_IGNORE == (val = validate_func(buf)))
+				;
 		}
 
-		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
+		if (NULL != sendtoclose && SUCCEED == net && TCP_EXPECT_OK == val)
 			zbx_tcp_send_raw(&s, sendtoclose);
 
-		if (SUCCEED == net && SUCCEED == val)
+		if (SUCCEED == net && TCP_EXPECT_OK == val)
 			*value_int = 1;
 
 		zbx_tcp_close(&s);
 	}
-
-	if (FAIL == net)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
-
-	if (FAIL == val)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, buf);
 
 	return SYSINFO_RET_OK;
 }
@@ -101,7 +125,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;
