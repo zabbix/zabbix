@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 14:21+0300\n"
+"POT-Creation-Date: 2014-05-08 20:17+0300\n"
 "PO-Revision-Date: 2014-04-01 19:53+0300\n"
 "Last-Translator: refaston <refaston@o2.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1769,7 +1769,7 @@ msgstr "Nie można usunąć elementów użytych jako szablony"
 msgid "Cannot delete templated items."
 msgstr "Nie można usunąć pozycji z szablonu."
 
-#: api/classes/CTrigger.php:1847 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1835 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nie można usunąć szablonu wyzwalacza \"%1$s:%2$s\"."
@@ -6911,7 +6911,7 @@ msgstr ""
 #: api/classes/CMap.php:432
 #, fuzzy, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr "Błędny rodzaj etykiety $1%s dla mapy \"%2$s\"."
+msgstr "Błędny rodzaj etykiety %1$s dla mapy \"%2$s\"."
 
 #: include/classes/api/clients/CLocalApiClient.php:61
 #, c-format
@@ -7570,7 +7570,7 @@ msgstr ""
 #: include/classes/db/DB.php:352
 #, fuzzy, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
-msgstr "Niepoprawna wartość \"%s$s\" dla pola zmiennoprzecinkowego \"%2$s\"."
+msgstr "Niepoprawna wartość \"%1$s\" dla pola zmiennoprzecinkowego \"%2$s\"."
 
 #: include/classes/db/DB.php:346
 #, c-format
@@ -10063,7 +10063,7 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
 #: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:597
 #: api/classes/CTrigger.php:940 api/classes/CTrigger.php:961
-#: api/classes/CTrigger.php:1826 api/classes/CTriggerPrototype.php:504
+#: api/classes/CTrigger.php:1814 api/classes/CTriggerPrototype.php:504
 #: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
 #: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
 #: api/classes/CUser.php:804 api/classes/CUser.php:824
