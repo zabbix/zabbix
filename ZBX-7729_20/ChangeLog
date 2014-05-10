@@ -13,6 +13,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
 ...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
 ..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
 ...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
