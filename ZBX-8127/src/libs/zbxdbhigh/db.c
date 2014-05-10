@@ -1219,22 +1219,6 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_host_key_string_by_item                                      *
- *                                                                            *
- * Return value: <host>:<key>                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_host_key_string_by_item(DB_ITEM *item)
-{
-	zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", item->host_name, item->key);
-
-	return buf_string;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_user_string                                                  *
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *

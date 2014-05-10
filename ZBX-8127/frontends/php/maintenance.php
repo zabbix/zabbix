@@ -212,6 +212,8 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 
 	zbx_value2array($maintenanceids);
 
+	DBstart();
+
 	$maintenances = array();
 	foreach ($maintenanceids as $id => $maintenanceid) {
 		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
@@ -224,6 +226,8 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
+
+	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 	clearCookies($goResult);
