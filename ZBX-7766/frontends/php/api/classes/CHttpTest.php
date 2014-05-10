@@ -627,13 +627,16 @@ class CHttpTest extends CZBXAPI {
 			return true;
 		}
 
-		$ranges = explode(',', $statusCodeRange);
-
 		// accept exactly one user macro
-		if ((count($ranges) == 1) && preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $ranges[0])) {
+		if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $statusCodeRange)) {
 			return true;
 		}
+		// any status code string with user macro in it is not valid
+		if (preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $statusCodeRange)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+		}
 
+		$ranges = explode(',', $statusCodeRange);
 		foreach ($ranges as $range) {
 			$range = explode('-', $range);
 			if (count($range) > 2) {
