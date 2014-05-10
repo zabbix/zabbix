@@ -36,14 +36,13 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 
 	if (NULL == fsname || '\0' == *fsname)
 	{
-		*error = strdup("Filesystem name cannot be empty.");
+		*error = zbx_strdup(NULL, "Filesystem name cannot be empty.");
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 != ZBX_STATFS(fsname, &s))
 	{
-		*error = zbx_dsprintf(NULL, "Failed to get filesystem stats: %s",
-			zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -121,8 +120,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/mounts", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get list of filesystems. Unable to open /proc/mounts: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

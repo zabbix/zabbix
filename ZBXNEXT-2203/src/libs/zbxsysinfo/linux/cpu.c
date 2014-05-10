@@ -48,8 +48,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (ncpu = sysconf(name)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of CPUs: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain number of CPUs: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -72,7 +71,9 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	{
 		cpu_num = 0;
+	}
 	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
@@ -137,7 +138,9 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	{
 		per_cpu = 0;
+	}
 	else if (0 != strcmp(tmp, "percpu"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
@@ -160,7 +163,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (mode >= getloadavg(load, 3))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get load average."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain load average."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -170,7 +173,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of CPUs: %s",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain number of CPUs: %s",
 				zbx_strerror(errno)));
 			return SYSINFO_RET_FAIL;
 		}
@@ -191,8 +194,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of context switches. Unable to open /proc/stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -211,7 +213,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches from /proc/stat: ctxt information not found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find a line with \"ctxt\" in /proc/stat."));
 
 	return ret;
 }
@@ -225,8 +227,7 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get number of interrupts. Unable to open /proc/stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -245,7 +246,7 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts from /proc/stat: intr information not found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find a line with \"intr\" in /proc/stat."));
 
 	return ret;
 }

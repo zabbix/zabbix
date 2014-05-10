@@ -42,7 +42,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -264,7 +264,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap statistics."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -272,7 +272,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats about pages."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -307,7 +307,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap statistics."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -315,7 +315,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats about pages."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 

@@ -44,14 +44,13 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
-		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == (f = fopen("/proc/net/dev", "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Failed to get network stats. Unable to open /proc/net/dev: %s",
-			zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -89,7 +88,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		*error = zbx_strdup(NULL, "Failed to find network interface.");
+		*error = zbx_strdup(NULL, "Cannot find statistics for this network interface in /proc/net/dev.");
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -289,8 +288,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/net/dev", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to list of network interfaces. Unable to open /proc/net/dev: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

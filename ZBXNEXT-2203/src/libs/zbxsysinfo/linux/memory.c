@@ -27,8 +27,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get total memory: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -43,8 +42,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get free memory: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -59,8 +57,7 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get buffer memory: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -77,8 +74,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 	if (NULL == (f = fopen("/proc/meminfo", "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get buffer memory. Unable to open /proc/meminfo: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/meminfo: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -116,8 +112,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get used memory: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -132,14 +127,13 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == info.totalram)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -156,8 +150,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -168,7 +161,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == ret)
 		SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get memory stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 
 	free_result(&result_tmp);
 
@@ -184,8 +177,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -195,7 +187,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get memory stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
 	}
 
@@ -204,13 +196,12 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	if (0 == total)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
 	SET_DBL_RESULT(result, available / (double)total * 100);
-
 clean:
 	free_result(&result_tmp);
 
@@ -224,8 +215,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -233,7 +223,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 #else
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by the agent for Linux kernels newer than 2.4."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Supported for Linux 2.4 only."));
 	return SYSINFO_RET_FAIL;
 #endif
 }

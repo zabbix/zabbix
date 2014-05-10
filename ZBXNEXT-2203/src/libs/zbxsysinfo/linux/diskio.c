@@ -194,7 +194,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		type = ZBX_DSTAT_TYPE_OPER;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -203,13 +203,13 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		if (request->nparam > 2)
 		{
 			/* Mode is supported only if type is in: operations, sectors. */
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			return SYSINFO_RET_FAIL;
 		}
 
 		if (SUCCEED != get_diskstat(devname, dstats))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk statistics."));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -242,15 +242,18 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		/* the collectors are not available and keys "vfs.dev.read", "vfs.dev.write" with some parameters */
 		/* (e.g. sps, ops) are not supported. */
 
-		SET_MSG_RESULT(result, strdup("This item is available only in daemon mode when collectors are started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "This item is available only in daemon mode when collectors are"
+				" started."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
+	{
 		*kernel_devname = '\0';
+	}
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get device information."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device name used internally by the kernel."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -258,13 +261,13 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	{
 		if (SUCCEED != get_diskstat(kernel_devname, dstats))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk statistics."));
 			return SYSINFO_RET_FAIL;
 		}
 
 		if (NULL == (device = collector_diskdevice_add(kernel_devname)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to add disk device to agent collector."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot add disk device to agent collector."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
