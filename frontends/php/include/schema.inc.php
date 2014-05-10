@@ -1069,7 +1069,7 @@ return array(
 			'error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'lastlogsize' => array(
