@@ -203,7 +203,7 @@ foreach ($hosts as $hnum => $host) {
 	}
 
 	// display the host name only if it matches the search string and is different from the visible name
-	if ($host['host'] !== $host['name'] && zbx_stripos($host['host'], $search) !== false) {
+	if ($host['host'] !== $host['name'] && stripos($host['host'], $search) !== false) {
 		$hostCell[] = BR();
 		$hostCell[] = '(';
 		$hostCell[] = make_decoration($host['host'], $search);
@@ -461,7 +461,7 @@ if ($admin) {
 		}
 
 		// display the template host name only if it matches the search string and is different from the visible name
-		if ($template['host'] !== $template['name'] && zbx_stripos($template['host'], $search) !== false) {
+		if ($template['host'] !== $template['name'] && stripos($template['host'], $search) !== false) {
 			$templateCell[] = BR();
 			$templateCell[] = '(';
 			$templateCell[] = make_decoration($template['host'], $search);

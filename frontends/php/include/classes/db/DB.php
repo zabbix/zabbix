@@ -326,7 +326,7 @@ class DB {
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
 					case self::FIELD_TYPE_CHAR:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
 						if ($length > $tableSchema['fields'][$field]['length']) {
@@ -354,10 +354,10 @@ class DB {
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
 					case self::FIELD_TYPE_TEXT:
-						$length = zbx_strlen($values[$field]);
+						$length = mb_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
-						if ($DB['TYPE'] == ZBX_DB_DB2) {
+						if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_ORACLE) {
 							if ($length > 2048) {
 								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
 									$values[$field], $field, $length));

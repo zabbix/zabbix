@@ -1388,7 +1388,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	ZBX_DO_EXIT();
 
-	zbx_thread_exit(0);
+	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }
 

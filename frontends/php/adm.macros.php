@@ -66,7 +66,7 @@ if (isset($_REQUEST['save'])) {
 		$duplicatedMacros = array();
 		foreach ($newMacros as $number => $newMacro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
-			$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
+			$newMacros[$number]['macro'] = mb_strtoupper($newMacro['macro']);
 		}
 
 		// update

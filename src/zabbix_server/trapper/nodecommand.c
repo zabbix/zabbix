@@ -94,7 +94,7 @@ fail:
  *                                                                            *
  * Function: node_process_command                                             *
  *                                                                            *
- * Purpose: process command received from a master node or php                *
+ * Purpose: process command received from the frontend                        *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
