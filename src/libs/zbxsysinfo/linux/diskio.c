@@ -209,7 +209,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 		if (SUCCEED != get_diskstat(devname, dstats))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk statistics."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -261,7 +261,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	{
 		if (SUCCEED != get_diskstat(kernel_devname, dstats))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk statistics."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
 		}
 

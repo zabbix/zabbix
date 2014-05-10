@@ -88,7 +88,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		*error = zbx_strdup(NULL, "Cannot find statistics for this network interface in /proc/net/dev.");
+		*error = zbx_strdup(NULL, "Cannot find information for this network interface in /proc/net/dev.");
 		return SYSINFO_RET_FAIL;
 	}
 
