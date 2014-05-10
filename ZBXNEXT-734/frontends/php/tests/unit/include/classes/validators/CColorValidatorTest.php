@@ -25,6 +25,7 @@ class CColorValidatorTest extends CValidatorTest {
 		return array(
 			array(array(
 				'empty' => true,
+				'messageType' => 'Not a string',
 				'messageEmpty' => 'Empty color',
 				'messageRegex' => 'Incorrect color'
 			))

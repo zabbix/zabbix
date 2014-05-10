@@ -220,7 +220,7 @@ elseif ($config == QUEUE_DETAILS) {
 		$host = reset($item['hosts']);
 
 		$table->addRow(array(
-			zbx_date2str(QUEUE_NODES_DATE_FORMAT, $itemData['nextcheck']),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $itemData['nextcheck']),
 			zbx_date2age($itemData['nextcheck']),
 			$host['name'],
 			$item['name_expanded']

@@ -85,7 +85,7 @@ class CStringValidator extends CValidator {
 			}
 		}
 
-		if ($this->maxLength && zbx_strlen($value) > $this->maxLength) {
+		if ($this->maxLength && mb_strlen($value) > $this->maxLength) {
 			$this->error($this->messageMaxLength, $this->maxLength);
 
 			return false;

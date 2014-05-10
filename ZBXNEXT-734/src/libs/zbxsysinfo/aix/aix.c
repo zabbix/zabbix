@@ -27,6 +27,9 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
+	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"hdisk0,operations"},
+	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"hdisk0,operations"},
+
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo0,bytes"},

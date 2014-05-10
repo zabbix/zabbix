@@ -22,8 +22,39 @@
 #include "setproctitle.h"
 
 #ifdef _WINDOWS
+
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+int	__zbx_stat(const char *path, zbx_stat_t *buf)
+{
+	int	ret, fd;
+	wchar_t	*wpath;
+
+	wpath = zbx_utf8_to_unicode(path);
+
+	if (-1 == (ret = _wstat64(wpath, buf)))
+		goto out;
+
+	if (0 != S_ISDIR(buf->st_mode) || 0 != buf->st_size)
+		goto out;
+
+	/* In the case of symlinks _wstat64 returns zero file size.   */
+	/* Try to work around it by opening the file and using fstat. */
+
+	ret = -1;
+
+	if (-1 != (fd = _wopen(wpath, O_RDONLY)))
+	{
+		ret = _fstat64(fd, buf);
+		_close(fd);
+	}
+out:
+	zbx_free(wpath);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************
@@ -223,7 +254,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -262,7 +293,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -294,7 +325,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
@@ -313,7 +344,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
 
-	exit(FAIL);
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************

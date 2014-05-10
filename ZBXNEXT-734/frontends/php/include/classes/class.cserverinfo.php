@@ -37,7 +37,7 @@ class CServerInfo extends CTable {
 			: _('Zabbix server');
 
 		$this->addRow(new CCol(_('Zabbix server info'), 'nowrap ui-corner-all ui-widget-header'));
-		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(SERVER_INFO_DATE_FORMAT, time()));
+		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(DATE_TIME_FORMAT_SECONDS, time()));
 		$this->addRow(_('Users (online)').NAME_DELIMITER.$status['users_count'].'('.$status['users_online'].')');
 		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php'))));
 		$this->addRow(new CCol(array($serverLink, SPACE._('is').SPACE, $server)), 'status');

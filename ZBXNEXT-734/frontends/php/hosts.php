@@ -395,6 +395,7 @@ elseif (hasRequest('save')) {
 			$host = array(
 				'hostid' => $hostId,
 				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+				'description' => getRequest('description', ''),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? array()
 					: getRequest('host_inventory', array())
@@ -442,7 +443,7 @@ elseif (hasRequest('save')) {
 				}
 				else {
 					// transform macros to uppercase {$aaa} => {$AAA}
-					$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
+					$macros[$key]['macro'] = mb_strtoupper($macro['macro']);
 				}
 			}
 

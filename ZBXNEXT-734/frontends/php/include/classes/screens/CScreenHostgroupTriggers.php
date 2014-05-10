@@ -129,7 +129,9 @@ class CScreenHostgroupTriggers extends CScreenBase {
 		$params['screenid'] = $this->screenid;
 
 		$output = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
-		$output->setDoubleHeader(array(_('HOST GROUP ISSUES'), SPACE, zbx_date2str(_('[H:i:s]')), SPACE), $item);
+		$output->setDoubleHeader(array(_('HOST GROUP ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE),
+			$item
+		);
 
 		return $this->getOutput($output);
 	}
