@@ -218,9 +218,16 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
+		errno = 0;
+
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -247,8 +254,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (dir = opendir("/proc")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to list of processes. Unable to open /proc: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -257,9 +263,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
-		/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd]. */
-		/* Better approach: check if /proc/x/ is symbolic link. */
-		if (0 == strncmp(entries->d_name, "self", MAX_STRING_LEN))
+		if (0 == strcmp(entries->d_name, "self"))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
@@ -327,9 +331,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	closedir(dir);
 
 	if (ZBX_DO_AVG == do_task)
-	{
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
-	}
 	else
 		SET_UI64_RESULT(result, memsize);
 
@@ -357,9 +359,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
+		errno = 0;
+
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -386,8 +395,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (dir = opendir("/proc")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get list of processes. Unable to open /proc: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -396,9 +404,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
-		/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-		/* Better approach: check if /proc/x/ is symbolic link */
-		if (0 == strncmp(entries->d_name, "self", MAX_STRING_LEN))
+		if (0 == strcmp(entries->d_name, "self"))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);

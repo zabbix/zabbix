@@ -27,8 +27,7 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysinfo(&info))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get system uptime: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
