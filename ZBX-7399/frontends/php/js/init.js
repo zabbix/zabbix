@@ -89,15 +89,10 @@ jQuery(function($) {
 	 * add.popup event
 	 */
 	$(document).on('add.popup', function(e, data) {
-		if (!isset('object', data)) {
-			throw("Error hash attribute 'data' doesn't contain 'object' index");
-			return false;
-		}
-
 		// multiselect check
-		if (data.parentId !== null && $('#' + data.parentId).attr('class') === 'multiselect') {
+		if (data.parentId !== null && $('#' + data.parentId).hasClass('multiselect')) {
 			for (var i = 0; i < data.values.length; i++) {
-				if (data.values[i].id != undefined) {
+				if (typeof data.values[i].id !== undefined) {
 					var item = {
 						'id': data.values[i].id,
 						'name': data.values[i].name
@@ -108,7 +103,7 @@ jQuery(function($) {
 		}
 
 		// execute function if they exist
-		if (addPopupValues !== undefined) {
+		if (typeof addPopupValues !== undefined) {
 			addPopupValues(data);
 		}
 	});

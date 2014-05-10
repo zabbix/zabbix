@@ -419,7 +419,7 @@ function insert_js_function($fnct_name) {
 						return close_window();
 					}
 
-					if (typeof(parentId) === "undefined") {
+					if (typeof parentId === "undefined") {
 						var parentId = null;
 					}
 
@@ -457,7 +457,7 @@ function insert_js_function($fnct_name) {
 						value[object] = singleValue;
 					}
 
-					if (typeof(parentId) === "undefined") {
+					if (typeof parentId === "undefined") {
 						var parentId = null;
 					}
 					var data = { object: object, values: [value], parentId: parentId };

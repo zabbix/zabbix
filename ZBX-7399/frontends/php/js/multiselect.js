@@ -73,10 +73,10 @@ jQuery(function($) {
 	 * @param bool   options['addNew']			allow user to create new names
 	 * @param int    options['selectedLimit']	how many items can be selected
 	 * @param int    options['limit']			how many available items can be received from backend
-	 * @param object options['popup']			popup data {create, parameters, width, height}
-	 * @param string options['parameters']
-	 * @param int    options['width']
-	 * @param int    options['height']
+	 * @param object options['popup']			popup data {parameters, width, height}
+	 * @param string options['popup']['parameters']
+	 * @param int    options['popup']['width']
+	 * @param int    options['popup']['height']
 	 *
 	 * @return object
 	 */
@@ -92,7 +92,7 @@ jQuery(function($) {
 				'new': 'new'
 			},
 			data: [],
-			ignored: [],
+			ignored: {},
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
@@ -187,7 +187,7 @@ jQuery(function($) {
 					isAvailableOpenned: false,
 					selected: {},
 					available: {},
-					ignored: empty(options.ignored) ? [] : options.ignored
+					ignored: empty(options.ignored) ? {} : options.ignored
 				}
 			};
 
@@ -448,7 +448,7 @@ jQuery(function($) {
 
 				var urlParameters = options.popup.parameters;
 
-				if (options.ignored != '') {
+				if (options.ignored) {
 					$.each(options.ignored, function(i, value) {
 						urlParameters = urlParameters + '&existed_templates[' + i + ']=' + i;
 					});
@@ -457,10 +457,10 @@ jQuery(function($) {
 				var popupButton = $('<input>', {
 					type: 'button',
 					class: 'input link_menu',
-					name: 'popupAdd',
 					value: 'Select',
-					onClick: 'PopUp("popup.php?' + urlParameters + '", ' + options.popup.width + ', '
-						+ options.popup.height + ')'
+					click: function() {
+						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
+					}
 				});
 
 				obj.parent().prepend(popupBlock.append(popupButton));
