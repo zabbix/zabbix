@@ -75,7 +75,7 @@ foreach ($this->data['probes'] as $probe) {
 			$link = $offline;
 		}
 		elseif ($this->data['type'] == RSM_RDDS) {
-			$rdds = 'red';
+			$rdds = 'gray';
 			$rdds43 = $offline;
 			$rdds80 = $offline;
 		}
