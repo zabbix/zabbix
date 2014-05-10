@@ -150,8 +150,9 @@ jQuery(function($) {
 			/**
 			 * Insert outside data
 			 */
-			$.fn.multiSelect.addData = function(item) {
-				addSelected(item, obj, values, options);
+			$.fn.multiSelect.addData = function(item, msId) {
+				var ms = window.multiSelect[msId];
+				addSelected(item, ms.obj, ms.values, ms.options);
 			};
 
 			/**

@@ -102,7 +102,7 @@ jQuery(function($) {
 						'id': data.values[i].id,
 						'name': data.values[i].name
 					};
-					jQuery('# + data.parentId').multiSelect.addData(item);
+					jQuery('#' + data.parentId).multiSelect.addData(item, data.parentId);
 				}
 			}
 		}
