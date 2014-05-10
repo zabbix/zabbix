@@ -685,29 +685,29 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 	{
 		update = updates->values[i];
 
-		if (NULL != (index = zbx_hashset_search(&itservices.index, update)))
+		if (NULL == (index = zbx_hashset_search(&itservices.index, update)))
+			continue;
+
+		/* change the status of services based on the update */
+		for (j = 0; j < index->itservices.values_num; j++)
 		{
-			/* change the status of services based on the update */
-			for (j = 0; j < index->itservices.values_num; j++)
-			{
-				zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
+			zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
 
-				if (SERVICE_ALGORITHM_NONE == itservice->algorithm || itservice->status == update->status)
-					continue;
+			if (SERVICE_ALGORITHM_NONE == itservice->algorithm || itservice->status == update->status)
+				continue;
 
-				its_updates_append(&alarms, itservice->serviceid, update->status, update->clock);
-				itservice->status = update->status;
-			}
+			its_updates_append(&alarms, itservice->serviceid, update->status, update->clock);
+			itservice->status = update->status;
+		}
 
-			/* recalculate status of the parent services */
-			for (j = 0; j < index->itservices.values_num; j++)
-			{
-				zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
+		/* recalculate status of the parent services */
+		for (j = 0; j < index->itservices.values_num; j++)
+		{
+			zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
 
-				/* update parent services */
-				for (k = 0; k < itservice->parents.values_num; k++)
-					its_itservice_update_status(itservice->parents.values[k], update->clock, &alarms);
-			}
+			/* update parent services */
+			for (k = 0; k < itservice->parents.values_num; k++)
+				its_itservice_update_status(itservice->parents.values[k], update->clock, &alarms);
 		}
 	}
 
