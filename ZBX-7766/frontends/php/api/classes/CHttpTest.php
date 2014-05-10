@@ -627,25 +627,26 @@ class CHttpTest extends CZBXAPI {
 			return true;
 		}
 
-		// accept exactly one user macro
+		// accept status code string with exactly and only one user macro
 		if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $statusCodeRange)) {
 			return true;
 		}
-		// any status code string with user macro in it is not valid
+
+		// any other status code string with user macro(s) in it is not valid
 		if (preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $statusCodeRange)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
 		}
 
 		$ranges = explode(',', $statusCodeRange);
 		foreach ($ranges as $range) {
 			$range = explode('-', $range);
 			if (count($range) > 2) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
 			}
 
 			foreach ($range as $value) {
 				if (!is_numeric($value)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
 				}
 			}
 		}
