@@ -264,7 +264,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap statistics."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -307,7 +307,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_swap_stat(swapdev, &ss))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap statistics."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain swap information."));
 		return SYSINFO_RET_FAIL;
 	}
 
