@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -50,7 +51,8 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != ZBX_STATFS(fsname, &s))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get filesystem stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -70,7 +72,7 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -84,7 +86,7 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 			return SYSINFO_RET_FAIL;
 		}
 	}

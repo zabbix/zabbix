@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 typedef struct
 {
@@ -38,20 +39,18 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns, char **error)
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_id_t		ps_id;
 	perfstat_netinterface_t	ps_netif;
-#endif
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
-		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
 		return SYSINFO_RET_FAIL;
 	}
 
-#if defined(HAVE_LIBPERFSTAT)
 	strscpy(ps_id.name, if_name);
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
 	{
-		*error = zbx_strdup(NULL, "Failed to get network interface stats.");
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -67,7 +66,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns, char **error)
 
 	return SYSINFO_RET_OK;
 #else
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "No libperfstat available."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif
 }
@@ -212,7 +211,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* check how many perfstat_netinterface_t structures are available */
 	if (-1 == (rc = perfstat_netinterface(NULL, NULL, sizeof(perfstat_netinterface_t), 0)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -254,7 +253,7 @@ end:
 
 	return ret;
 #else
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "No libperfstat available."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif
 }
