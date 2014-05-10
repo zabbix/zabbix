@@ -1594,7 +1594,8 @@ out1:
 	if (0 < logfiles_num)
 		*logfiles_old = logfiles;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error_count:%d", __function_name, zbx_result_string(ret), *error_count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error_count:%d", __function_name, zbx_result_string(ret),
+			*error_count);
 
 	return ret;
 }
