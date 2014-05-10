@@ -30,7 +30,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -48,7 +48,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 == collector->vmstat.data_available)
 		{
-			SET_MSG_RESULT(result, strdup("No data available in collector."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "No data available in collector."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
