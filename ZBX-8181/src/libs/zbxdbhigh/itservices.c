@@ -691,7 +691,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 		/* change the status of services based on the update */
 		for (j = 0; j < index->itservices.values_num; j++)
 		{
-			zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
+			zbx_itservice_t	*itservice = (zbx_itservice_t *)index->itservices.values[j];
 
 			if (SERVICE_ALGORITHM_NONE == itservice->algorithm || itservice->status == update->status)
 				continue;
@@ -703,7 +703,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 		/* recalculate status of the parent services */
 		for (j = 0; j < index->itservices.values_num; j++)
 		{
-			zbx_itservice_t	*itservice = (zbx_itservice_t*)index->itservices.values[j];
+			zbx_itservice_t	*itservice = (zbx_itservice_t *)index->itservices.values[j];
 
 			/* update parent services */
 			for (k = 0; k < itservice->parents.values_num; k++)
