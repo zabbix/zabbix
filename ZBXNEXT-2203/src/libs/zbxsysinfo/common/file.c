@@ -22,6 +22,7 @@
 #include "md5.h"
 #include "file.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
@@ -49,7 +50,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -83,7 +84,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -171,7 +172,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != zbx_stat(filename, &stat_buf))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get file stats."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -219,7 +220,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == nbytes)	/* error occurred */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		zbx_free(contents);
 		goto err;
 	}
@@ -307,7 +308,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Faile to open file."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -349,7 +350,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == nbytes)	/* error occurred */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
 	}
 
@@ -427,7 +428,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open file."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -461,7 +462,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == nbytes)	/* error occurred */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
 	}
 
@@ -504,7 +505,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open file."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -531,7 +532,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 > nbytes)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
 	}
 
@@ -643,7 +644,7 @@ int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to open file."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
@@ -671,7 +672,7 @@ int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 > nr)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Read from file failed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
 	}
 

@@ -199,12 +199,14 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+	{
 		return EXECUTE_STR(command, result);
+	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
 		if (SUCCEED != zbx_execute_nowait(command))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed command execution."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot execute command."));
 			return SYSINFO_RET_FAIL;
 		}
 	}

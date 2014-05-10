@@ -169,6 +169,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (4 > request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
 	hostname = get_rparam(request, 0);
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
@@ -176,34 +182,24 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	length_str = get_rparam(request, 4);
 	output = get_rparam(request, 5);
 
-	if (NULL == hostname || '\0' == *hostname)
+	if ('\0' == *hostname)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == path_str || '\0' == *path_str)
+	if ('\0' == *path_str)
 		*path = '\0';
 	else
 		strscpy(path, path_str);
 
-	if (NULL == port_str || '\0' == *port_str)
+	if ('\0' == *port_str)
 		port_number = ZBX_DEFAULT_HTTP_PORT;
 	else if (FAIL == is_ushort(port_str, &port_number))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
 	}
-
-	if (NULL == regexp)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	/* by default return the matched part of web page */
-	if (NULL == output || '\0' == *output)
-		output = "\\0";
 
 	if (NULL == length_str || '\0' == *length_str)
 		length = MAX_BUFFER_LEN - 1;
@@ -212,6 +208,10 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	/* by default return the matched part of web page */
+	if (NULL == output || '\0' == *output)
+		output = "\\0";
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 

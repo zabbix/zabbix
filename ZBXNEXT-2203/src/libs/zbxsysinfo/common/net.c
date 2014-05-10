@@ -322,7 +322,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (DNS_RCODE_NOERROR != res)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform DNS query: [%d]", res));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -443,13 +443,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #else	/* not _WINDOWS */
 	if (-1 == res_init())	/* initialize always, settings might have changed */
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "res_init() failed."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize DNS subsystem: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -497,7 +497,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -516,7 +516,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -555,7 +555,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -566,7 +566,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -575,14 +575,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_SOA:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -610,7 +610,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_WKS:
 				if (INT32SZ + 1 > q_len)
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 
@@ -676,14 +676,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -714,7 +714,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to query DNS record."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
