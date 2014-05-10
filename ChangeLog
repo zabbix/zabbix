@@ -51,6 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A.F....... [ZBX-8190] fixed validation in API to prevent SQL errors with Oracle database when string with excessive length is stored (Krists)
 ...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
 ..F....... [ZBX-8160] removed justification in warning message (Ivo)
 ..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
