@@ -26,7 +26,7 @@ ZBX_METRIC	parameter_hostname =
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*hostname;
-	int 	hostbufsize = 0;
+	long 	hostbufsize = 0;
 
 #ifdef _SC_HOST_NAME_MAX
 	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
