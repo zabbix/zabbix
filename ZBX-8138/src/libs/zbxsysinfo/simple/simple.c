@@ -114,17 +114,16 @@ lbl_ret:
  *          FAIL - otherwise                                                  *
  *                                                                            *
  ******************************************************************************/
-
 static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *remote_minor)
 {
-	const char	*r = NULL, *l = recv_buf;
+	const char	*r, *l = recv_buf;
 
 	while (NULL != (r = strchr(l, '\n')))
 	{
 		if (2 == sscanf(l, "SSH-%d.%d-%*s", remote_major, remote_minor))
 			return SUCCEED;
 
-		l = ++r;
+		l = r+1;
 	}
 
 	return FAIL;
