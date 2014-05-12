@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
-static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
+static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused,
+		char **error)
 {
 	int		mib[2];
 	size_t		len;
@@ -32,7 +34,10 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 	len = sizeof(v);
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* int pagesize;	size of a page (PAGE_SIZE): must be power of 2 */
 	/* int swpages;		number of PAGE_SIZE'ed swap pages */
@@ -55,9 +60,13 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_swap_size(&value, NULL, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_swap_size(&value, NULL, NULL, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -67,9 +76,13 @@ static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_swap_size(NULL, &value, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_swap_size(NULL, &value, NULL, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -79,9 +92,13 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, &value, NULL, NULL))
+	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, &value, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -91,9 +108,13 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 {
 	double	value;
+	char	*error;
 
-	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, NULL, &value, NULL))
+	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, NULL, &value, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, value);
 
@@ -103,9 +124,13 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 {
 	double	value;
+	char	*error;
 
-	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, NULL, NULL, &value))
+	if (SYSINFO_RET_OK != get_swap_size(NULL, NULL, NULL, NULL, &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, value);
 
@@ -115,7 +140,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*swapdev, *mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (2 < request->nparam)
 	{
@@ -130,7 +155,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	/* default parameter */
@@ -147,16 +172,14 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
-
-	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
 
 	return ret;
 }
 
-static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t *ocount, zbx_uint64_t *opages)
+static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t *ocount, zbx_uint64_t *opages,
+		char **error)
 {
 	int		mib[2];
 	size_t		len;
@@ -168,7 +191,10 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 	len = sizeof(v);
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* int swapins;		swapins */
 	/* int swapouts;	swapouts */
@@ -182,7 +208,10 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 		*ocount = (zbx_uint64_t)v.swapouts;
 #else
 	if (NULL != icount || NULL != ocount)
+	{
+		*error = zbx_dsprintf(NULL, "Not supported by the system starting from OpenBSD 5.4.");
 		return SYSINFO_RET_FAIL;
+	}
 #endif
 	if (NULL != ipages)
 		*ipages = (zbx_uint64_t)v.pgswapin;
@@ -194,9 +223,9 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
-	char		*swapdev, *mode;
-	zbx_uint64_t	value = 0;
+	int		ret;
+	char		*swapdev, *mode, *error;
+	zbx_uint64_t	value;
 
 	if (2 < request->nparam)
 	{
@@ -217,11 +246,11 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* default parameter */
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 	{
-		ret = get_swap_io(&value, NULL, NULL, NULL);
+		ret = get_swap_io(&value, NULL, NULL, NULL, &error);
 	}
 	else if (0 == strcmp(mode, "pages"))
 	{
-		ret = get_swap_io(NULL, &value, NULL, NULL);
+		ret = get_swap_io(NULL, &value, NULL, NULL, &error);
 	}
 	else
 	{
@@ -232,16 +261,16 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == ret)
 		SET_UI64_RESULT(result, value);
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		SET_MSG_RESULT(result, error);
 
 	return ret;
 }
 
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
-	char		*swapdev, *mode;
-	zbx_uint64_t	value = 0;
+	int		ret;
+	char		*swapdev, *mode, *error;
+	zbx_uint64_t	value;
 
 	if (2 < request->nparam)
 	{
@@ -262,11 +291,11 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* default parameter */
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 	{
-		ret = get_swap_io(NULL, NULL, &value, NULL);
+		ret = get_swap_io(NULL, NULL, &value, NULL, &error);
 	}
 	else if (0 == strcmp(mode, "pages"))
 	{
-		ret = get_swap_io(NULL, NULL, NULL, &value);
+		ret = get_swap_io(NULL, NULL, NULL, &value, &error);
 	}
 	else
 	{
@@ -277,8 +306,8 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == ret)
 		SET_UI64_RESULT(result, value);
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get swap stats."));
+		SET_MSG_RESULT(result, error);
 
 
-	return SYSINFO_RET_OK;
+	return ret;
 }

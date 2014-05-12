@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 #include <sys/sockio.h>
 
@@ -47,8 +48,8 @@ static int	get_ifdata(const char *if_name,
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
-		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
-		return FAIL;
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
+		return SYSINFO_RET_FAIL;
 	}
 
 	/* if(i)_ibytes;	total number of octets received */
@@ -128,12 +129,16 @@ static int	get_ifdata(const char *if_name,
 							*terrors += v.if_ierrors + v.if_oerrors;
 						if (icollisions)
 							*icollisions += v.if_collisions;
+
 						ret = SYSINFO_RET_OK;
 					}
 				}
 			}
 		}
 		kvm_close(kp);
+
+		if (SYSINFO_RET_FAIL == ret)
+			*error = zbx_strdup(NULL, "Cannot find information for this network interface.");
 	}
 	else
 	{
@@ -144,13 +149,19 @@ static int	get_ifdata(const char *if_name,
 		struct if_data	v;
 
 		if ((if_s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+		{
+			*error = zbx_dsprintf(NULL, "Cannot create socket: %s", zbx_strerror(errno)));
 			goto clean;
+		}
 
 		zbx_strlcpy(ifr.ifr_name, if_name, IFNAMSIZ - 1);
 		ifr.ifr_data = (caddr_t)&v;
 
 		if (ioctl(if_s, SIOCGIFDATA, &ifr) < 0)
+		{
+			*error = zbx_dsprintf(NULL, "Cannot set socket parameters: %s", zbx_strerror(errno)));
 			goto clean;
+		}
 
 		if (ibytes)
 			*ibytes += v.ifi_ibytes;
@@ -181,9 +192,6 @@ clean:
 			close(if_s);
 	}
 
-	if (SYSINFO_RET_FAIL == ret)
-		*error = zbx_strdup(NULL, "Failed to get network interface stats.");
-
 	return ret;
 }
 
@@ -201,7 +209,8 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &error))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL,
+			NULL, NULL, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -238,7 +247,8 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL, NULL, NULL, &error))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL,
+			NULL, NULL, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -273,7 +283,8 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets, &terrors, NULL, &error))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets,
+			&terrors, NULL, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -307,7 +318,8 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &icollisions, &error))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, &icollisions, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -326,7 +338,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (interfaces = if_nameindex()))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

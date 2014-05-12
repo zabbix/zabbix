@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 #include <sys/sensors.h>
 
@@ -183,6 +184,8 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (errno == ENOENT)
 				break;
 
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+					zbx_strerror(errno)));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -191,7 +194,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (SUCCEED != get_device_sensors(do_task, mib, &sensordev, name, &aggr, &cnt))
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get sensor stats."));
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain sensor information."));
 				return SYSINFO_RET_FAIL;
 			}
 		}
@@ -199,7 +202,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == cnt)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get sensor stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain sensor information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -215,7 +218,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Kernel does not support sysctl for getting sensor stats."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"sensordev\" structure."));
 	return SYSINFO_RET_FAIL;
 }
 
