@@ -91,7 +91,7 @@ $expressionRow = array($expressionTextBox, $addExpressionButton);
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
-	$insertMacroButton = new CButton('insert_macro', _('Insert macro'), null, 'formlist');
+	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'formlist');
 	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
 	if ($this->data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
