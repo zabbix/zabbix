@@ -396,6 +396,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 			break;
 		case IPMI_BOTH_VALUES_PRESENT:
 			s->value = val;
+			h->ret = SUCCEED;
 
 			/* next lines only for debug logging */
 			ent = ipmi_sensor_get_entity(sensor);
