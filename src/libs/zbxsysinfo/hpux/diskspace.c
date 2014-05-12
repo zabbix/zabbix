@@ -20,9 +20,10 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
-		zbx_uint64_t *used, double *pfree, double *pused)
+		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -33,10 +34,12 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fs);
-
 	if (0 != ZBX_STATFS(fs, &s))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (total)
 		*total = (zbx_uint64_t)s.f_blocks * s.ZBX_BSIZE;
@@ -66,10 +69,14 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value = 0;
+	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &value, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &value, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -78,10 +85,14 @@ static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 
 static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value = 0;
+	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &value, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &value, NULL, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -90,10 +101,14 @@ static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 
 static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value = 0;
+	zbx_uint64_t	value;
+	char		*error;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &value, NULL, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &value, NULL, NULL, NULL, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, value);
 
@@ -103,10 +118,14 @@ static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 
 static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 {
-	double	value = 0;
+	double	value;
+	char	*error;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &value, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &value, NULL, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, value);
 
@@ -115,10 +134,14 @@ static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 
 static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 {
-	double	value = 0;
+	double	value;
+	char	*error;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &value))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, value);
 
@@ -161,9 +184,6 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get filesystem stats."));
-
 	return ret;
 }
 
@@ -176,7 +196,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* opening the mounted filesystems file */
 	if (NULL == (f = setmntent(MNT_MNTTAB, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -28,6 +28,7 @@
 #include "sysinfo.h"
 #include <sys/pstat.h>
 #include "zbxregexp.h"
+#include "log.h"
 
 static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 {
@@ -70,9 +71,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 1);
 	if (NULL != param && '\0' != *param)
 	{
+		errno = 0;
+
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -125,7 +133,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == count)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
 		return SYSINFO_RET_FAIL;
 	}
 
