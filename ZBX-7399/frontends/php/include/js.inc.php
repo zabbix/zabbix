@@ -486,7 +486,7 @@ function insert_js_function($fnct_name) {
 						if (parentDocumentForms.length > 0) {
 							frmStorage = jQuery(parentDocumentForms[0]).find("#" + key).get(0);
 						}
-						if (typeof(frmStorage) == "undefined" || is_null(frmStorage)) {
+						if (typeof frmStorage === "undefined" || is_null(frmStorage)) {
 							frmStorage = parentDocument.getElementById(key);
 						}
 

@@ -89,7 +89,8 @@ jQuery(function($) {
 				'No matches found': 'No matches found',
 				'More matches found...': 'More matches found...',
 				'type here to search': 'type here to search',
-				'new': 'new'
+				'new': 'new',
+				'Select': 'Select'
 			},
 			data: [],
 			ignored: {},
@@ -443,27 +444,27 @@ jQuery(function($) {
 			// draw popup link
 			if (options.popup.parameters != null) {
 				var popupBlock = $('<div>', {
-					class: 'selectPopup'
+					class: 'select-popup'
 				});
 
 				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
 					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&existed_templates[' + i + ']=' + i;
+						urlParameters = urlParameters + '&ignoredIds[' + i + ']=' + i;
 					});
 				}
 
 				var popupButton = $('<input>', {
 					type: 'button',
-					class: 'input link_menu',
-					value: 'Select',
+					class: 'input link_menu select-popup',
+					value: options.labels['Select'],
 					click: function() {
 						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
 					}
 				});
 
-				obj.parent().prepend(popupBlock.append(popupButton));
+				obj.parent().append(popupButton);
 			}
 		});
 	};

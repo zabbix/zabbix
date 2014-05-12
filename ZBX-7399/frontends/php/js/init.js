@@ -92,7 +92,7 @@ jQuery(function($) {
 		// multiselect check
 		if (data.parentId !== null && $('#' + data.parentId).hasClass('multiselect')) {
 			for (var i = 0; i < data.values.length; i++) {
-				if (typeof data.values[i].id !== undefined) {
+				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
 						'id': data.values[i].id,
 						'name': data.values[i].name
@@ -103,7 +103,7 @@ jQuery(function($) {
 		}
 
 		// execute function if they exist
-		if (typeof addPopupValues !== undefined) {
+		if (typeof addPopupValues !== 'undefined') {
 			addPopupValues(data);
 		}
 	});

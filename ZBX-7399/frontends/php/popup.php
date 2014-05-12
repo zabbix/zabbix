@@ -162,7 +162,7 @@ $fields = array(
 	'screenid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'templates' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'host_templates' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'existed_templates' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
+	'ignoredIds' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'multiselect' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'submit' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'excludeids' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -240,7 +240,7 @@ $withApplications = get_request('with_applications', 0);
 $withGraphs = get_request('with_graphs', 0);
 $withItems = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
-$existedTemplates = getRequest('existed_templates', array());
+$ignoredIds = getRequest('ignoredIds', array());
 $excludeids = get_request('excludeids', null);
 $reference = get_request('reference', get_request('srcfld1', 'unknown'));
 $realHosts = get_request('real_hosts', 0);
@@ -436,8 +436,8 @@ if ($value_types) {
 if ($normalOnly) {
 	$frmTitle->addVar('normal_only', $normalOnly);
 }
-if ($existedTemplates) {
-	$frmTitle->addVar('existed_templates', $existedTemplates);
+if ($ignoredIds) {
+	$frmTitle->addVar('ignoredIds', $ignoredIds);
 }
 if (!is_null($excludeids)) {
 	$frmTitle->addVar('excludeids', $excludeids);
@@ -722,7 +722,7 @@ elseif ($srctbl == 'templates') {
 		}
 
 		// check for existing
-		if (in_array($template['templateid'], $existedTemplates)) {
+		if (in_array($template['templateid'], $ignoredIds)) {
 			$checkBox->setChecked(1);
 			$checkBox->setEnabled('disabled');
 			$name->removeAttr('class');

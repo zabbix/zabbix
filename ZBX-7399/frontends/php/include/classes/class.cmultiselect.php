@@ -28,8 +28,10 @@ class CMultiSelect extends CTag {
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->attr('id', zbx_formatDomId($options['name']));
-		$this->addClass('multiselect');
+		$this->addClass('multiselect-wrapper');
+
+		$multiSelect = new CDiv(null, 'multiselect');
+		$multiSelect->attr('id', zbx_formatDomId($options['name']));
 
 		// url
 		$url = new Curl('jsrpc.php');
@@ -44,14 +46,15 @@ class CMultiSelect extends CTag {
 		}
 
 		$params = array(
-			'id' => $this->getAttribute('id'),
+			'id' => $multiSelect->getAttribute('id'),
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
 			'labels' => array(
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
 				'type here to search' => _('type here to search'),
-				'new' => _('new')
+				'new' => _('new'),
+				'Select' => _('Select')
 			),
 			'data' => empty($options['data']) ? array() : zbx_cleanHashes($options['data']),
 			'ignored' => isset($options['ignored']) ? $options['ignored'] : null,
@@ -65,7 +68,7 @@ class CMultiSelect extends CTag {
 				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null
 			)
 		);
-
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
+		$this->addItem($multiSelect);
+		zbx_add_post_js('jQuery("#'.$multiSelect->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
 	}
 }
