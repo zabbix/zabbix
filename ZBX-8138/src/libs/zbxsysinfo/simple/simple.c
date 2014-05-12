@@ -134,7 +134,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	int		ret;
 	zbx_sock_t	s;
 	char		send_buf[MAX_STRING_LEN], *recv_buf;
-	int		remote_major = 0, remote_minor = 0;
+	int		remote_major, remote_minor;
 
 	*value_int = 0;
 
