@@ -48,7 +48,8 @@ jQuery(function($) {
 			'No matches found': t('No matches found'),
 			'More matches found...': t('More matches found...'),
 			'type here to search': t('type here to search'),
-			'new': t('new')
+			'new': t('new'),
+			'Select': t('Select')
 		};
 
 		return this.each(function() {
@@ -451,7 +452,7 @@ jQuery(function($) {
 
 				if (options.ignored) {
 					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&ignoredIds[' + i + ']=' + i;
+						urlParameters = urlParameters + '&excludeids[' + i + ']=' + i;
 					});
 				}
 
