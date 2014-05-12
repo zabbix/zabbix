@@ -261,19 +261,19 @@ exit:
  ******************************************************************************/
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
-	size_t					buf_size = PIPE_BUFFER_SIZE, offset = 0;
-	int					ret = FAIL;
+	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
+	int			ret = FAIL;
 #ifdef _WINDOWS
-	STARTUPINFO				si;
-	PROCESS_INFORMATION			pi;
-	SECURITY_ATTRIBUTES			sa;
-	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
-	char					*cmd = NULL;
-	wchar_t					*wcmd = NULL;
-	struct _timeb				start_time, current_time;
+	STARTUPINFO		si;
+	PROCESS_INFORMATION	pi;
+	SECURITY_ATTRIBUTES	sa;
+	HANDLE			job = NULL, hWrite = NULL, hRead = NULL;
+	char			*cmd = NULL;
+	wchar_t			*wcmd = NULL;
+	struct _timeb		start_time, current_time;
 #else
-	pid_t					pid;
-	int					fd;
+	pid_t			pid;
+	int			fd;
 #endif
 
 	*error = '\0';
