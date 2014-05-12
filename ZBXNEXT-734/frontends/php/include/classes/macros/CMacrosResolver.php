@@ -71,6 +71,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => array('graphFunctionalItem'),
 			'source' => 'name',
 			'method' => 'resolveGraph'
+		),
+		'screenElementURL' => array(
+			'types' => array('host', 'hostId', 'interfaceWithoutPort', 'user'),
+			'source' => 'url',
+			'method' => 'resolveTexts'
 		)
 	);
 
@@ -115,7 +120,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$macros = array();
 
-		$hostMacrosAvailable = $agentInterfaceAvailable = $interfaceWithoutPortMacrosAvailable = false;
+		$hostMacrosAvailable = false;
+		$hostIdMacrosAvailable = false;
+		$agentInterfaceAvailable = false;
+		$interfaceWithoutPortMacrosAvailable = false;
 
 		if ($this->isTypeAvailable('host')) {
 			foreach ($data as $hostId => $texts) {
@@ -125,6 +133,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 
 					$hostMacrosAvailable = true;
+				}
+			}
+		}
+
+		if ($this->isTypeAvailable('hostId')) {
+			foreach ($data as $hostId => $texts) {
+				if ($hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts)) {
+					foreach ($hostIdMacros as $hostMacro) {
+						$macros[$hostId][$hostMacro] = UNRESOLVED_MACRO_STRING;
+					}
+
+					$hostIdMacrosAvailable = true;
 				}
 			}
 		}
@@ -172,6 +192,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								$macros[$hostId][$hostMacro] = $dbHost['name'];
 								break;
 						}
+					}
+				}
+			}
+		}
+
+		// {HOST.ID} is available
+		if ($hostIdMacrosAvailable) {
+			foreach ($data as $hostId => $texts) {
+				foreach ($hostIdMacros as $hostMacro) {
+					if ($hostMacro === '{HOST.ID}') {
+						$macros[$hostId][$hostMacro] = $hostId;
+						break;
 					}
 				}
 			}
@@ -322,10 +354,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// replace macros to value
 		if ($macros) {
+			$pattern = '/'.self::PATTERN_HOST.'|'.self::PATTERN_HOST_ID.'|'.self::PATTERN_INTERFACE.'|'.
+				ZBX_PREG_EXPRESSION_USER_MACROS.'/';
+
 			foreach ($data as $hostId => $texts) {
 				if (isset($macros[$hostId])) {
 					foreach ($texts as $tnum => $text) {
-						preg_match_all('/'.self::PATTERN_HOST.'|'.self::PATTERN_INTERFACE.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $text, $matches, PREG_OFFSET_CAPTURE);
+						preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
 
 						for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 							$matche = $matches[0][$i];
