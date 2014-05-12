@@ -1134,9 +1134,10 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		regex_t			re;
 #ifdef _WINDOWS
 		int			win_err = 0;
-		char			*find_path = NULL;
+		char			*find_path = NULL, *file_name_utf8;
+		wchar_t			*find_wpath = NULL;
 		intptr_t		find_handle;
-		struct _finddata_t	find_data;
+		struct _wfinddata_t	find_data;
 #else
 		DIR			*dir = NULL;
 		struct dirent		*d_ent = NULL;
@@ -1164,8 +1165,10 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 #ifdef _WINDOWS
 		/* try to "open" Windows directory */
 		find_path = zbx_dsprintf(find_path, "%s*", directory);
-		find_handle = _findfirst((const char *)find_path, &find_data);
-		if (-1 == find_handle)
+		find_wpath = zbx_utf8_to_unicode(find_path);
+		zbx_free(find_path);
+
+		if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
 					zbx_strerror(errno));
@@ -1177,22 +1180,23 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			regfree(&re);
 			zbx_free(directory);
 			zbx_free(format);
-			zbx_free(find_path);
+			zbx_free(find_wpath);
 			goto out;
 		}
 
 		do
 		{
-			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
+			file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, file_name_utf8);
 
 			if (0 == zbx_stat(logfile_candidate, &file_buf))
 			{
 				if (S_ISREG(file_buf.st_mode) &&
 						*mtime <= file_buf.st_mtime &&
-						0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
+						0 == regexec(&re, file_name_utf8, (size_t)0, NULL, 0))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-					add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate,
+					add_logfile(logfiles, logfiles_alloc, logfiles_num, file_name_utf8,
 							&file_buf);
 				}
 			}
@@ -1200,8 +1204,9 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
 
 			zbx_free(logfile_candidate);
+			zbx_free(file_name_utf8);
 		}
-		while (0 == _findnext(find_handle, &find_data));
+		while (0 == _wfindnext(find_handle, &find_data));
 
 		if (-1 == _findclose(find_handle))
 		{
