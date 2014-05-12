@@ -129,7 +129,10 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 			command, strlen(cmd_result), cmd_result);
 
 	if ('\0' == *cmd_result)	/* we got whitespace only */
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Non-empty output is expected."));
 		goto lbl_exit;
+	}
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
