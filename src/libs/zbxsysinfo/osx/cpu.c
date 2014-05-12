@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "log.h"
 
 static int	get_cpu_num(int online)
 {
@@ -58,7 +59,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (cpu_num = get_cpu_num(online)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -104,7 +105,10 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (mode >= getloadavg(load, 3))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain load average: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	value = load[mode];
 
@@ -112,7 +116,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = get_cpu_num(1)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;
