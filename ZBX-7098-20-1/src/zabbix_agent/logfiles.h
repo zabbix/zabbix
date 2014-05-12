@@ -22,7 +22,7 @@
 
 #include "md5.h"
 
-struct st_logfile
+struct	st_logfile
 {
 	char		*filename;
 	int		mtime;		/* st_mtime from stat() */
