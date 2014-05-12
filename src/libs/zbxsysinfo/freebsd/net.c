@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "../common/common.h"
 #include "zbxjson.h"
+#include "log.h"
 
 static struct ifmibdata	ifmd;
 
@@ -31,7 +32,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
-		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
 		return FAIL;
 	}
 
@@ -45,7 +46,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 
 	if (-1 == sysctl(mib, 5, &ifcount, &len, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "Failed sysctl.");
+		*error = zbx_strdup(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -68,7 +69,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 			return SUCCEED;
 	}
 
-	*error = zbx_strdup(NULL, "No interface found.");
+	*error = zbx_strdup(NULL, "Cannot find information for this network interface.");
 
 	return FAIL;
 }
@@ -270,7 +271,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (interfaces = if_nameindex()))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

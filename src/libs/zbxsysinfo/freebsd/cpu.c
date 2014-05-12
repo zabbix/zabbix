@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "log.h"
 
 static int	get_cpu_num(int online)
 {
@@ -63,7 +64,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (ncpu = get_cpu_num(online)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get CPU stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -168,7 +169,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (mode >= getloadavg(load, 3))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get load average."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain load average: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -178,7 +179,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = get_cpu_num(1)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;
@@ -198,7 +199,8 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysctlbyname("vm.stats.sys.v_swtch", &v_swtch, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain \"vm.stats.sys.v_swtch\" system parameter: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -216,7 +218,8 @@ int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != sysctlbyname("vm.stats.sys.v_intr", &v_intr, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain \"vm.stats.sys.v_intr\" system parameter: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

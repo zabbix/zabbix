@@ -19,17 +19,18 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 static u_int	pagesize = 0;
 
-#define ZBX_SYSCTLBYNAME(name, value)								\
-												\
-	len = sizeof(value);									\
-	if (0 != sysctlbyname(name, &value, &len, NULL, 0))					\
-	{											\
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get memory stats: %s",	\
-			zbx_strerror(errno)));							\
-		return SYSINFO_RET_FAIL;							\
+#define ZBX_SYSCTLBYNAME(name, value)									\
+													\
+	len = sizeof(value);										\
+	if (0 != sysctlbyname(name, &value, &len, NULL, 0))						\
+	{												\
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain \"%s\" system parameter: %s",	\
+				name, zbx_strerror(errno)));						\
+		return SYSINFO_RET_FAIL;								\
 	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
@@ -131,7 +132,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	if (0 == totalpages)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -167,7 +168,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	if (0 == totalpages)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -196,7 +197,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 
 	if (0 != sysctl(mib, 2, &vm, &len, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed sysctl."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 

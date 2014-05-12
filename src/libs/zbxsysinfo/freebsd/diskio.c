@@ -141,15 +141,15 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	if (type == ZBX_DSTAT_TYPE_BYTE || type == ZBX_DSTAT_TYPE_OPER)
 	{
-		if (request->nparam > 2)
+		if (2 < request->nparam)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			return SYSINFO_RET_FAIL;
 		}
 
 		if (FAIL == get_diskstat(pd, dstats))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -182,7 +182,8 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		/* the collectors are not available and keys "vfs.dev.read", "vfs.dev.write" with some parameters */
 		/* (e.g. sps, ops) are not supported. */
 
-		SET_MSG_RESULT(result, strdup("This parameter is available only in daemon mode when collectors are started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "This item is available only in daemon mode when collectors are"
+				" started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -190,13 +191,13 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	{
 		if (FAIL == get_diskstat(pd, dstats))	/* validate device name */
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
 		}
 
 		if (NULL == (device = collector_diskdevice_add(pd)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get disk stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot add disk device to agent collector."));
 			return SYSINFO_RET_FAIL;
 		}
 	}

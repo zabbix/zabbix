@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 #if(__FreeBSD_version > 500000)
 #	define ZBX_COMMLEN	COMMLEN
@@ -57,7 +58,8 @@ retry:
 	sz = (size_t)args_alloc;
 	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
 	{
-		if (errno == ENOMEM) {
+		if (errno == ENOMEM)
+		{
 			args_alloc *= 2;
 			args = zbx_realloc(args, args_alloc);
 			goto retry;
@@ -108,9 +110,16 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
+		errno = 0;
+
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -159,8 +168,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -168,8 +177,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain process information: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -251,9 +260,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != param && '\0' != *param)
 	{
+		errno = 0;
+
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid user name."));
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -300,8 +316,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -309,8 +325,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
 	{
 		zbx_free(proc);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get proc stat: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain process information: %s",
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
