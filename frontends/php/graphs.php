@@ -167,15 +167,19 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 		: API::GraphPrototype()->get($options);
 	$graph = reset($graph);
 
-	$_REQUEST = array_merge($_REQUEST, $graph);
-
-	// graph items
-	$_REQUEST['items'] = API::GraphItem()->get(array(
+	$graph['items'] = API::GraphItem()->get(array(
 		'graphids' => $_REQUEST['graphid'],
 		'sortfield' => 'gitemid',
 		'output' => API_OUTPUT_EXTEND,
 		'expandData' => true
 	));
+
+	if($graph['templateid']) {
+		$_REQUEST = array_merge($_REQUEST, $graph);
+	}
+	else {
+		$graph = array_merge($graph, $_REQUEST);
+	}
 
 	unset($_REQUEST['graphid']);
 

@@ -394,7 +394,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -521,11 +520,17 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param $object
+	 * Check if trigger exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
+		$this->deprecated('trigger.exists method is deprecated.');
+
 		$keyFields = array(
 			array(
 				'hostid',
@@ -547,8 +552,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggers = $this->get(array(
 			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
+			'output' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($triggers as $trigger) {
@@ -1779,21 +1783,9 @@ class CTrigger extends CTriggerGeneral {
 		return $result;
 	}
 
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
-		// since column "t.hostname" doesn't exist
-		if (!zbx_empty($options['sortfield'])
-				&& ($options['sortfield'] === 'hostname' || isset($sqlParts['select']['hostname']))) {
-			$sqlParts['select']['hostname'] = 'h.name as hostname';
-		}
-
-		return $sqlParts;
-	}
-
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		if ($sortfield == 'hostname') {
+		if ($sortfield === 'hostname') {
+			$sqlParts['select']['hostname'] = 'h.name AS hostname';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';

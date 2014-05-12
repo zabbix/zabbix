@@ -418,7 +418,7 @@ table.warningTable tr.header { height: 24px; color: #FFFFFF; font-weight: bold; 
 table.warningTable tr.header td { padding: 0 2px 4px 10px; }
 table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
-table.warningTable tr.content { vertical-align: text-top; text-align: justify; font-size: 10px; }
+table.warningTable tr.content { vertical-align: text-top; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
 
 /* history */

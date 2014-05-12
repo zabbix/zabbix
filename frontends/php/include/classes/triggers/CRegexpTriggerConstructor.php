@@ -77,15 +77,15 @@ class CRegexpTriggerConstructor {
 					$result.=' or ';
 				}
 				if ($cexpor == 0) {
-					$startpos = zbx_strlen($result);
+					$startpos = mb_strlen($result);
 				}
 				$cexpor++;
 				$eq_global = '<>0';
 			}
 			else {
 				if (($cexpor > 1) & ($startpos >= 0)) {
-					$head = substr($result, 0, $startpos);
-					$tail = substr($result, $startpos);
+					$head = mb_substr($result, 0, $startpos);
+					$tail = mb_substr($result, $startpos);
 					$result = $head.'('.$tail.')';
 				}
 				$cexpor = 0;
@@ -116,7 +116,7 @@ class CRegexpTriggerConstructor {
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
 				$expr_array[$sub_expr_count]['not'] = trim($arr[3]);
 				$expr_array[$sub_expr_count]['minus'] = trim($arr[4]);
-				$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[6]).$arr[7];
+				$expr_array[$sub_expr_count]['regexp'] = $arr[6].$arr[7];
 
 				$sub_expr_count++;
 				$expr = $arr[1];
@@ -154,8 +154,8 @@ class CRegexpTriggerConstructor {
 		}
 
 		if (($cexpor > 1) & ($startpos >= 0)) {
-			$head = substr($result, 0, $startpos);
-			$tail = substr($result, $startpos);
+			$head = mb_substr($result, 0, $startpos);
+			$tail = mb_substr($result, $startpos);
 			$result = $head.'('.$tail.')';
 		}
 
@@ -219,7 +219,7 @@ class CRegexpTriggerConstructor {
 			$value = preg_replace('/^\((.*)\)$/u', '$1', $value);
 
 			$expressions[$key]['value'] = trim($value);
-			$expressions[$key]['type'] = (zbx_strpos($expr, '<>0', zbx_strlen($expr) - 4) === false)
+			$expressions[$key]['type'] = (strpos($expr, '<>0', mb_strlen($expr) - 4) === false)
 				? self::EXPRESSION_TYPE_NO_MATCH
 				: self::EXPRESSION_TYPE_MATCH;
 		}

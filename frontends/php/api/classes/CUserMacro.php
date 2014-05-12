@@ -600,7 +600,7 @@ class CUserMacro extends CApiService {
 		if (!isset($macro['macro']) || zbx_empty($macro['macro'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty macro.'));
 		}
-		if (zbx_strlen($macro['macro']) > 64) {
+		if (mb_strlen($macro['macro']) > 64) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1$s" is too long, it should not exceed 64 chars.', $macro['macro']));
 		}
 		if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])) {
@@ -616,7 +616,7 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the field is too long.
 	 */
 	protected function checkValue(array $macro) {
-		if (isset($macro['value']) && zbx_strlen($macro['value']) > 255) {
+		if (isset($macro['value']) && mb_strlen($macro['value']) > 255) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 		}
 	}

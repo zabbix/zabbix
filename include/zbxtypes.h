@@ -26,16 +26,10 @@
 #define ZBX_PTR_SIZE		sizeof(void *)
 
 #if defined(_WINDOWS)
+#	include <strsafe.h>
 
 #	define zbx_stat(path, buf)		__zbx_stat(path, buf)
 #	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-
-#	include <strsafe.h>
-#	define zbx_wsnprintf	StringCchPrintf
-#	define zbx_strlen	wcslen
-#	define zbx_strchr	wcschr
-#	define zbx_strstr	wcsstr
-#	define zbx_fullpath	_wfullpath
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
