@@ -574,12 +574,12 @@ $screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton,
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
-$show_dynamic = in_array($resourceType, array(
+$showDynamic = in_array($resourceType, array(
 	SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL
 ));
 
 // dynamic addon
-if ($this->data['screen']['templateid'] == 0 && $show_dynamic) {
+if ($this->data['screen']['templateid'] == 0 && $showDynamic) {
 	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
 }
 

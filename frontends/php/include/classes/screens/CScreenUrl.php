@@ -27,6 +27,19 @@ class CScreenUrl extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		return $this->getOutput(new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto'));
+		// prevent from resolving macros in configuration page
+		if ($this->mode == SCREEN_MODE_PREVIEW || $this->mode == SCREEN_MODE_SLIDESHOW) {
+			$url = CMacrosResolverHelper::resolveScreenElementURL(array(
+				$this->hostid => array(
+					'url' => $this->screenitem['url']
+				)
+			));
+
+			$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
+		}
+
+		return $this->getOutput(
+			new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
+		);
 	}
 }
