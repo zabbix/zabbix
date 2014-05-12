@@ -531,6 +531,149 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	return true;
 }
 
+/**
+ * Function split trigger expresion by '&' and '|', that all elements from first level would be separated.
+ *
+ * @param string $expresion		trigger expresion
+ *
+ * @return array
+ */
+function splitByFirstLevel($expresion) {
+	$pos = 0;
+	$level = 0;
+
+	while (isset($expresion[$pos])) {
+		switch ($expresion[$pos]) {
+			case '(':
+				++$level;
+				break;
+			case ')':
+				--$level;
+				break;
+			case '&':
+			case '|':
+				if (!$level) {
+					$tmpArr[] = trim(substr($expresion, 0, $pos));
+					$expresion = substr($expresion, $pos + 1);
+					$pos = -1;
+				}
+				break;
+			default:
+				break;
+		}
+		++$pos;
+	}
+
+	if ($expresion) {
+		$tmpArr[] = trim($expresion);
+	}
+
+	return $tmpArr;
+}
+
+function construct_expression($itemid, $expressions) {
+	$complite_expr = '';
+	$item = get_item_by_itemid($itemid);
+	$host = get_host_by_itemid($itemid);
+	$prefix = $host['host'].':'.$item['key_'].'.';
+
+	if (empty($expressions)) {
+		error(_('Expression cannot be empty'));
+		return false;
+	}
+
+	$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*)([&|]{1})[(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+	$functions = array('regexp' => 1, 'iregexp' => 1);
+	$expr_array = array();
+	$cexpor = 0;
+	$startpos = -1;
+
+	foreach ($expressions as $expression) {
+		$expression['value'] = preg_replace('/\s+(AND){1,2}\s+/U', '&', $expression['value']);
+		$expression['value'] = preg_replace('/\s+(OR){1,2}\s+/U', '|', $expression['value']);
+
+		if ($expression['type'] == REGEXP_INCLUDE) {
+			if (!empty($complite_expr)) {
+				$complite_expr.=' | ';
+			}
+			if ($cexpor == 0) {
+				$startpos = zbx_strlen($complite_expr);
+			}
+			$cexpor++;
+			$eq_global = '#0';
+		}
+		else {
+			if (($cexpor > 1) & ($startpos >= 0)) {
+				$head = substr($complite_expr, 0, $startpos);
+				$tail = substr($complite_expr, $startpos);
+				$complite_expr = $head.'('.$tail.')';
+			}
+			$cexpor = 0;
+			$eq_global = '=0';
+			if (!empty($complite_expr)) {
+				$complite_expr.=' & ';
+			}
+		}
+
+		$expr = '&'.$expression['value'];
+		$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U', '$1', $expr);
+
+		$expr_array = array();
+		$sub_expr_count=0;
+		$sub_expr = '';
+		$multi = preg_match('/.+(&|\|).+/', $expr);
+
+		while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
+			$arr[4] = zbx_strtolower($arr[4]);
+			if (!isset($functions[$arr[4]])) {
+				error(_('Incorrect function is used').'. ['.$expression['value'].']');
+				return false;
+			}
+			$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
+			$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
+
+			$sub_expr_count++;
+			$expr = $arr[1];
+		}
+
+		if (empty($expr_array)) {
+			error(_('Incorrect trigger expression').'. ['.$expression['value'].']');
+			return false;
+		}
+
+		$expr_array[$sub_expr_count-1]['eq'] = '';
+
+		$sub_eq = '';
+		if ($multi > 0) {
+			$sub_eq = $eq_global;
+		}
+
+		foreach ($expr_array as $id => $expr) {
+			if ($multi > 0) {
+				$sub_expr = $expr['eq'].'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
+			}
+			else {
+				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
+			}
+		}
+
+		if ($multi > 0) {
+			$complite_expr .= '('.$sub_expr.')';
+		}
+		else {
+			$complite_expr .= '(('.$sub_expr.')'.$eq_global.')';
+		}
+	}
+
+	if (($cexpor > 1) & ($startpos >= 0)) {
+		$head = substr($complite_expr, 0, $startpos);
+		$tail = substr($complite_expr, $startpos);
+		$complite_expr = $head.'('.$tail.')';
+	}
+
+	return $complite_expr;
+}
+
 /********************************************************************************
  *																				*
  * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10	*
@@ -542,7 +685,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 	$expressionExpanded = $html ? array() : '';
 	$trigger = array();
 
-	for ($i = 0, $state = '', $max = zbx_strlen($expressionCompressed); $i < $max; $i++) {
+	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
 		if ($expressionCompressed[$i] == '{') {
 			if ($expressionCompressed[$i + 1] == '$') {
 				$state = 'USERMACRO';
@@ -2136,7 +2279,7 @@ function get_item_function_info($expr) {
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'strlen' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6')
 	);
 
 	$expressionData = new CTriggerExpression();

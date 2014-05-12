@@ -200,8 +200,13 @@ if ($items) {
 
 	// filter items by name
 	foreach ($items as $key => $item) {
-		if (!zbx_empty($filterSelect) && !zbx_stristr($item['name_expanded'], $filterSelect)) {
-			unset($items[$key]);
+		if (!zbx_empty($filterSelect)) {
+			$haystack = mb_strtolower($item['name_expanded']);
+			$needle = mb_strtolower($filterSelect);
+
+			if (!mb_strpos($haystack, $needle)) {
+				unset($items[$key]);
+			}
 		}
 	}
 
@@ -398,7 +403,7 @@ foreach ($items as $key => $item){
 
 	// last check time and last value
 	if ($lastHistory) {
-		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
+		$lastClock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock']);
 		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
 	}
 	else {
@@ -574,7 +579,7 @@ foreach ($items as $item) {
 
 	// last check time and last value
 	if ($lastHistory) {
-		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
+		$lastClock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock']);
 		$lastValue = formatHistoryValue($lastHistory['value'], $item, false);
 	}
 	else {

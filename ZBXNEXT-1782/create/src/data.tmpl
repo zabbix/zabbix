@@ -267,11 +267,11 @@ ROW   |336          |10082 |Memory Pool       |
 ROW   |337          |10082 |Operating System  |
 ROW   |338          |10082 |Runtime           |
 ROW   |339          |10082 |Threads           |
+ROW   |343          |10083 |Sessions          |
+ROW   |344          |10083 |Tomcat            |
 ROW   |340          |10083 |http-8080         |
 ROW   |341          |10083 |http-8443         |
 ROW   |342          |10083 |jk-8009           |
-ROW   |343          |10083 |Sessions          |
-ROW   |344          |10083 |Tomcat            |
 ROW   |346          |10084 |CPU               |
 ROW   |347          |10084 |Filesystems       |
 ROW   |348          |10084 |General           |
@@ -322,14 +322,14 @@ FIELDS|valuemapid|name                                 |
 ROW   |4         |APC Battery Replacement Status       |
 ROW   |5         |APC Battery Status                   |
 ROW   |7         |Dell Open Manage System Status       |
-ROW   |2         |Host status                          |
 ROW   |6         |HP Insight System Status             |
-ROW   |1         |Service state                        |
+ROW   |2         |Host status                          |
 ROW   |9         |SNMP device status (hrDeviceStatus)  |
 ROW   |11        |SNMP interface status (ifAdminStatus)|
 ROW   |8         |SNMP interface status (ifOperStatus) |
-ROW   |13        |VMware status                        |
+ROW   |1         |Service state                        |
 ROW   |12        |VMware VirtualMachinePowerState      |
+ROW   |13        |VMware status                        |
 ROW   |3         |Windows service state                |
 ROW   |10        |Zabbix agent ping status             |
 
@@ -1141,7 +1141,6 @@ ROW   |13086    |({TRIGGER.VALUE}=0 and {13111}>75) or ({TRIGGER.VALUE}=1 and {1
 ROW   |13087    |({TRIGGER.VALUE}=0 and {13113}>75) or ({TRIGGER.VALUE}=1 and {13113}>65)|Zabbix http poller processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13088    |({TRIGGER.VALUE}=0 and {13115}>75) or ({TRIGGER.VALUE}=1 and {13115}>65)|Zabbix icmp pinger processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13089    |({TRIGGER.VALUE}=0 and {13117}>75) or ({TRIGGER.VALUE}=1 and {13117}>65)|Zabbix ipmi poller processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
-ROW   |13090    |({TRIGGER.VALUE}=0 and {13121}>75) or ({TRIGGER.VALUE}=1 and {13121}>65)|Zabbix node watcher processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13091    |({TRIGGER.VALUE}=0 and {13123}>75) or ({TRIGGER.VALUE}=1 and {13123}>65)|Zabbix poller processes more than 75% busy                          |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13092    |({TRIGGER.VALUE}=0 and {13125}>75) or ({TRIGGER.VALUE}=1 and {13125}>65)|Zabbix proxy poller processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13093    |({TRIGGER.VALUE}=0 and {13029}>75) or ({TRIGGER.VALUE}=1 and {13029}>65)|Zabbix self-monitoring processes more than 75% busy                 |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
@@ -1361,7 +1360,6 @@ ROW   |13472    |({TRIGGER.VALUE}=0 and {13110}>75) or ({TRIGGER.VALUE}=1 and {1
 ROW   |13473    |({TRIGGER.VALUE}=0 and {13112}>75) or ({TRIGGER.VALUE}=1 and {13112}>65)|Zabbix housekeeper processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13086     |0   |0    |
 ROW   |13474    |({TRIGGER.VALUE}=0 and {13114}>75) or ({TRIGGER.VALUE}=1 and {13114}>65)|Zabbix http poller processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13087     |0   |0    |
 ROW   |13475    |({TRIGGER.VALUE}=0 and {13116}>75) or ({TRIGGER.VALUE}=1 and {13116}>65)|Zabbix icmp pinger processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13088     |0   |0    |
-ROW   |13476    |({TRIGGER.VALUE}=0 and {13118}>75) or ({TRIGGER.VALUE}=1 and {13118}>65)|Zabbix ipmi poller processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13089     |0   |0    |
 ROW   |13477    |({TRIGGER.VALUE}=0 and {13120}>75) or ({TRIGGER.VALUE}=1 and {13120}>65)|Zabbix java poller processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |13275     |0   |0    |
 ROW   |13478    |({TRIGGER.VALUE}=0 and {13122}>75) or ({TRIGGER.VALUE}=1 and {13122}>65)|Zabbix node watcher processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |13090     |0   |0    |
 ROW   |13479    |({TRIGGER.VALUE}=0 and {13124}>75) or ({TRIGGER.VALUE}=1 and {13124}>65)|Zabbix poller processes more than 75% busy                          |   |0     |3       |                                                                                                                                      |13091     |0   |0    |
@@ -3332,4 +3330,3 @@ ROW   |17              |22760 |8       |{#SNMPVALUE}|@Storage devices for SNMP d
 ROW   |18              |22767 |8       |{#SNMPVALUE}|@Storage devices for SNMP discovery|
 ROW   |19              |23278 |8       |{#IFNAME}   |@Network interfaces for discovery  |
 ROW   |20              |23279 |8       |{#FSTYPE}   |@File systems for discovery        |
-

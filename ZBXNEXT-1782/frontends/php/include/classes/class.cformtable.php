@@ -78,7 +78,7 @@ class CFormTable extends CForm {
 		if (is_null($value)) {
 			$this->help = new CHelp();
 		}
-		elseif (is_object($value) && zbx_strtolower(get_class($value)) == 'chelp') {
+		elseif (is_object($value) && strtolower(get_class($value)) === 'chelp') {
 			$this->help = $value;
 		}
 		elseif (is_string($value)) {
@@ -95,9 +95,9 @@ class CFormTable extends CForm {
 	}
 
 	public function addRow($item1, $item2 = null, $class = null, $id = null) {
-		if (is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow') {
+		if (is_object($item1) && strtolower(get_class($item1)) === 'crow') {
 		}
-		elseif (is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable') {
+		elseif (is_object($item1) && strtolower(get_class($item1)) === 'ctable') {
 			$td = new CCol($item1, 'form_row_c');
 			$td->setColSpan(2);
 			$item1 = new CRow($td);

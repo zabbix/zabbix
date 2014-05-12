@@ -93,7 +93,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
 	{
-		zbx_error("failed to create a thread: %s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 
@@ -105,7 +105,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 
 		/* The zbx_thread_exit must be called from the handler. */
 		/* And in normal case the program will never reach this point. */
-		zbx_thread_exit(0);
+		zbx_thread_exit(EXIT_SUCCESS);
 		/* program will never reach this point */
 	}
 	else if (-1 == thread)

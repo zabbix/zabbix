@@ -2,7 +2,13 @@
 Changes for 2.3.0
 
 New features:
-..F....... [ZBX-7941] debug now is not sent in fullscreen mode (Krists)
+...G...PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
+...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
+..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
+A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
+A.F....... [ZBX-7949] improved multibyte string support (Ivo)
+..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
+..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
 ..F....... [ZBX-7979] added button "Clear history and trends" to scenarios form (Krists)
@@ -30,7 +36,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 ..F....... [ZBX-7095] added 'Cancel' button in dashboard configuration (Ivo)
 ..F....... [ZBXNEXT-2140] enabled Monitoring -> Latest data filter option "Show items without data" by default (Richlv)
 ..F....... [ZBX-7713] changed the event details page to display all hosts used in a trigger (Ivo)
-........S. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
+.......PS. [ZBXNEXT-1700] added informative messages about database connection restoration (Juris)
 ..F....... [ZBX-7609] improved frontend messages mute/unmute (Eduard)
 ..F....... [ZBXNEXT-1291] added clickable links for template names in host, template, host prototype and discovered host property templates tab (Oleg)
 ..F....... [ZBXNEXT-2073] improved dashboard refresh time menu (Eduard)
@@ -45,6 +51,30 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-6834] fixed trigger.get not returning any results when using the "host" parameter (Pavels)
+A.F....... [ZBX-8190] fixed validation in API to prevent SQL errors with Oracle database when string with excessive length is stored (Krists)
+...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
+..F....... [ZBX-8160] removed justification in warning message (Ivo)
+..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
+..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
+..F....... [ZBX-8165] fixed issue when maintenance items with its hosts/host groups removed are not accessible in configuration (Krists)
+...G...PS. [ZBX-2196] changed status codes of various exit calls to library macros for consistency (Juris)
+........S. [ZBX-1274] fixed negative values, received from SNMP agent, being displayed as large unsigned integers (igors)
+...G...... [ZBX-8031] removed pre-processor aliases for Windows string functions; converted all references of Windows types to standard C types (Juris)
+.......PS. [ZBX-7534] removed the limit of authorization string (Nikolaj)
+..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
+A.F....... [ZBX-8118] changed image update so that image type can not be changed after create (Krists)
+..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
+....I..... [ZBX-7890] fixed broken make distclean (Nikolaj)
+A......... [ZBX-7981] fixed validation when renaming host to an existing template in host.massupdate; fixed validation when renaming template to an existing host in template.massupdate (Ivo)
+..F....... [ZBX-7436] changed string "comment" to "description" in trigger list and trigger comments (Krists)
+..F....... [ZBX-8159] fixed missing history bar when viewing or editing trigger descriptions (Krists)
+A......... [ZBX-7949] fixed inherited graph and graph prototype case insensitive name comparison (Ivo)
+.......PS. [ZBX-7534] removed the limit of dservice value (Nikolaj)
+A......... [ZBX-8132] fixed image.get not properly returning all images for sysmaps (Krists)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
+...G...... [ZBX-5243] increased the length of program name and command line that proc.mem[] and proc.num[] can match on AIX; thanks to Boris Manojlovic for patch (asaveljevs)
+...G...... [ZBX-7448] fixed Windows agents limit check (Nikolaj, wiper)
 ..F....... [ZBX-7335] improved element copy dialog by having hosts, templates and host group in separate target types and empty groups are not shown (Krists)
 .......PS. [ZBX-3336] fixed autodiscovery rule doesn't clear/rescan hosts in dhosts/dservices (Nikolaj)
 ..F....... [ZBX-6497] improved frontend filters, Filter and Reset now is submit buttons, removed JS form reset scripts, changed filter data saving process in profiles (Oleg)
@@ -93,10 +123,25 @@ Changes for 2.2.4rc1
 
 New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...GI..... [ZBX-8127] fixed truncation of hostname on HP-UX machines (igors)
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
+..F....... [ZBX-8176] fixed SQL errors while mass operations when using Oracle database (Krists)
+..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
+..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
+..F....... [ZBX-8075] fixed triggers/data without application not showing in overview (Krists)
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+........S. [ZBX-7887] fixed calculated item becoming not found if referenced item becomes not supported (igors)
+..F....... [ZBX-8100] fixed map mass deletion using Oracle (Eduard)
+..F....... [ZBX-8148] fixed maintenance warning message on php < 5.4 versions (Eduard)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
+.......PS. [ZBX-8115] added workaround for 64 bit integer binding not working with Oracle versions less than 11.2 (wiper)
+..F....... [ZBX-8140] added net.udp.listen key to item popup (Eduard)
+..F....... [ZBX-8123] fixed form fields show/hide switching in IE9 (Eduard)
+..F....... [ZBX-8083] fixed proxy performance query item conditions to be same as in dashboard (Krists)
 ..F....... [ZBX-8021] fixed password changing for users with internal authentication (Eduard)
 ........S. [ZBX-8133] fixed possible deadlock while updating host_inventory table (Sasha)
 ..F....... [ZBX-8104] fixed inverted case sensitivity for regular expressions (Krists)
@@ -150,6 +195,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
 ..F....... [ZBX-7896] fixed translated error messages not being rendered correctly in images (Pavels)
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
 A......... [ZBX-7972] fixed not being able to full clone a template with an application if a destination host is specified (Ivo)
@@ -1005,15 +1051,30 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.12rc3
+
+Bug fixes:
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc2
+
+Bug fixes:
+...G...... [ZBX-7856] fixed zbx_stat() not working with directories in Windows (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.12rc1
 
 New features:
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 ....IJ.... [ZBXNEXT-1889] made startup.sh and shutdown.sh scripts for Java gateway work in /bin/sh (asaveljevs)
 .D........ [ZBX-7597] added description of the returned value types to the agentd manpage (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Persian, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
+..F....... [ZBX-8111] fixed possible XSS in tables with vertical header row cells (Krists)
+...G...... [ZBX-8108] fixed reading /proc virtual files without rewinding the file position (Juris)
 .......P.. [ZBX-7825] fixed saving of the history data in sequential time order on proxy side (Sasha)
 .......PS. [ZBX-4675] added error checks to avoid partial configuration loading (dimir)
 .D........ [ZBX-6542] added additional information in the default server configuration file about HousekeepingFrequency parameter (Sasha)
@@ -2973,7 +3034,7 @@ Changes for 1.8.6rc1
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
  - [ZBX-3166] fixed application updating in Template linking event. Changed linked Template color in application page. Added param NOEMPTY for popup page witch allows hide Empty button in application and item pages (Eduard)
- - [ZBX-3565] reformating media types in notifications page, adding links to media types (Eduard)
+ - [ZBX-3565] reformatting media types in notifications page, adding links to media types (Eduard)
  - [ZBX-3784] added validation on duplicate discovery rule name (Eduard)
  - [ZBX-3733] make possible to save Device uniqueness criteria status (discovery rule) in cloning event (Eduard)
  - [ZBX-3845] check, if this user group is used in the config, if so it cannot be deleted (Eduard)
