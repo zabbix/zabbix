@@ -168,7 +168,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_if_names(&if_list, &if_list_alloc, &if_list_offset))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		zbx_free(if_list);
 		return SYSINFO_RET_FAIL;
 	}
@@ -411,7 +411,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_net_stat(&mib, if_name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -448,7 +448,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_net_stat(&mib, if_name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -485,7 +485,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_net_stat(&mib, if_name))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 

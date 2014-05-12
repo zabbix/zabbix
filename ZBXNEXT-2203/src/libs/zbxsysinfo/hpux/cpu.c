@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "log.h"
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -43,7 +44,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed pstat_getdynamic."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -133,7 +134,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed pstat_getdynamic."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -155,7 +156,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= dyn.psd_proc_cnt)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= dyn.psd_proc_cnt;
