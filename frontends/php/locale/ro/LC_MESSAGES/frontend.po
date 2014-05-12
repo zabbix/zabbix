@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 13:31+0300\n"
+"POT-Creation-Date: 2014-05-12 03:02+0300\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1124,7 +1124,7 @@ msgstr "CONFIGURARE NODURI"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "CONFIGURARE PROXY-URI"
 
-#: adm.regexps.php:212
+#: adm.regexps.php:214
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "CONFIGURARE EXPRESII REGULATE"
 
@@ -1581,7 +1581,7 @@ msgstr "Nu se poate șterge dependința"
 msgid "Cannot delete discovery rule"
 msgstr "Nu se poate șterge regula de detecție"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Nu se pot șterge regulile de detecție"
 
@@ -1609,7 +1609,7 @@ msgstr "Nu se pot șterge graficele"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Nu se pot șterge graficele create de detecția automată."
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Cannot delete group"
 msgstr "Nu se poate șterge grupul"
 
@@ -1661,7 +1661,7 @@ msgstr "Nu se pot șterge elementele"
 msgid "Cannot delete items created by low level discovery."
 msgstr "Nu se pot șterge elementele create de detecția automată."
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Cannot delete maintenance"
 msgstr "Nu se poate șterge mentenanța"
 
@@ -1681,18 +1681,18 @@ msgstr "Nu se poate șterge nodul"
 msgid "Cannot delete proxy"
 msgstr "Nu se poate șterge proxy-ul"
 
-#: adm.regexps.php:173
+#: adm.regexps.php:182
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Nu se poate șterge expresia regulată"
 msgstr[1] "Nu se pot șterge expresiile regulate"
 msgstr[2] "Nu se pot șterge expresiile regulate"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Cannot delete screen"
 msgstr "Nu se poate șterge ecranul"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Cannot delete script"
 msgstr "Nu se poate șterge scriptul"
 
@@ -1784,7 +1784,7 @@ msgstr "Nu se pot șterge triggerii"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Nu se pot șterge trigerii creați de detecția automată."
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "Cannot delete user"
 msgstr "Nu se poate șterge utilizatorul"
 
@@ -1796,7 +1796,7 @@ msgstr "Nu se poate șterge media utilizator."
 msgid "Cannot delete value map"
 msgstr "Nu se poate șterge maparea valorii"
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Cannot delete web scenario"
 msgstr "Nu se poate șterge scenariul web"
 
@@ -1807,7 +1807,7 @@ msgstr[0] "Nu se poate dezactiva acţiunea"
 msgstr[1] "Nu se pot dezactiva acţiunile"
 msgstr[2] "Nu se pot dezactiva acţiunile"
 
-#: discoveryconf.php:188
+#: discoveryconf.php:190
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nu se poate dezactiva regula de detecție"
@@ -1870,14 +1870,14 @@ msgstr[0] "Nu se poate prototipul triggerului"
 msgstr[1] "Nu se poate dezactiva prototipurile triggerilor"
 msgstr[2] "Nu se poate dezactiva prototipurile triggerilor"
 
-#: usergrps.php:343
+#: usergrps.php:348
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "Nu se poate dezactiva grupul utilizatorului"
 msgstr[1] "Nu se pot dezactiva grupurile utilizatorilor"
 msgstr[2] "Nu se pot dezactiva grupurile utilizatorilor"
 
-#: httpconf.php:297
+#: httpconf.php:299
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Nu se poate dezactiva scenariul web"
@@ -1899,7 +1899,7 @@ msgstr[0] "Nu se poate activa acțiunea"
 msgstr[1] "Nu se pot activa acțiunile"
 msgstr[2] "Nu se pot activa acțiunile"
 
-#: discoveryconf.php:187
+#: discoveryconf.php:189
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nu se poate activa regula de detecție"
@@ -1962,14 +1962,14 @@ msgstr[0] "Nu se poate activa prototipul triggerului"
 msgstr[1] "Nu se pot activa prototipurile triggerului"
 msgstr[2] "Nu se pot activa prototipurile triggerului"
 
-#: usergrps.php:342
+#: usergrps.php:347
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "Nu se poate activa grupul utilizatorului"
 msgstr[1] "Nu se pot activa grupurile utilizatorului"
 msgstr[2] "Nu se pot activa grupurile utilizatorului"
 
-#: httpconf.php:296
+#: httpconf.php:298
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Nu se poate activa scenariul web"
@@ -2276,7 +2276,7 @@ msgstr "Nu se pot seta câmpurile inventarului pentru un inventar dezactivat."
 msgid "Cannot switch host for interface."
 msgstr "Nu se poate schimba serverul pentru interfață."
 
-#: users.php:353
+#: users.php:354
 msgid "Cannot unblock users"
 msgstr "Nu se pot debloca utilizatorii"
 
@@ -2407,7 +2407,7 @@ msgstr "Nu se poate actualiza comentariul"
 msgid "Cannot update configuration"
 msgstr "Nu se poate actualiza configurația"
 
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Cannot update debug mode"
 msgstr "Nu se poate actualiza modul de depanare"
 
@@ -2415,7 +2415,7 @@ msgstr "Nu se poate actualiza modul de depanare"
 msgid "Cannot update discovery rule"
 msgstr "Nu se poate actualiza regula de detecție"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Cannot update frontend access"
 msgstr "Nu se poate actualiza accesul la frontend"
 
@@ -3721,7 +3721,7 @@ msgstr "Depanare"
 msgid "Debug mode"
 msgstr "Mod depanare"
 
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Debug mode updated"
 msgstr "Modu depanare actualizat"
 
@@ -4510,14 +4510,14 @@ msgstr "Regulă de detecție creată"
 msgid "Discovery rule deleted"
 msgstr "Regulă de detecție ștearsă"
 
-#: discoveryconf.php:185 host_discovery.php:283
+#: discoveryconf.php:187 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regulă de detecție dezactivată"
 msgstr[1] "Reguli de detecție dezactivate"
 msgstr[2] "Reguli de detecție dezactivate"
 
-#: discoveryconf.php:184 host_discovery.php:282
+#: discoveryconf.php:186 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regulă de detecție activată"
@@ -4537,7 +4537,7 @@ msgstr "Regulă de detecție actualizată"
 msgid "Discovery rules"
 msgstr "Reguli de detecție"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Reguli de detecție șterse"
 
@@ -5445,7 +5445,7 @@ msgstr "De la"
 msgid "Frontend access"
 msgstr "Acces la interfață"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Frontend access updated"
 msgstr "Acces la interfață actualizat"
 
@@ -5488,7 +5488,7 @@ msgid "GSM modem"
 msgstr "Modem GSM"
 
 #: adm.gui.php:95 adm.housekeeper.php:126 adm.iconmapping.php:109
-#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:192
+#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:194
 #: adm.triggerdisplayoptions.php:74 adm.triggerseverities.php:79
 #: adm.valuemapping.php:126 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
@@ -5828,7 +5828,7 @@ msgstr "Grupul \"%1$s\" pentru serverul \"%2$s\" nu există."
 msgid "Group added"
 msgstr "Grup adăugat"
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Group deleted"
 msgstr "Grup șters"
 
@@ -6023,7 +6023,7 @@ msgstr "Istoric"
 msgid "History and simple graphs"
 msgstr "Istoric și grafice simple"
 
-#: httpconf.php:320 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
 msgid "History cleared"
 msgstr "Istoric șters"
 
@@ -6462,7 +6462,7 @@ msgid "Hours"
 msgstr "Ore"
 
 #: adm.gui.php:96 adm.housekeeper.php:127 adm.iconmapping.php:110
-#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:193
+#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:195
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:80
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
@@ -6716,7 +6716,7 @@ msgstr "Icon hartă cu iconmapid \"%s\" nu există."
 
 #: adm.gui.php:98 adm.housekeeper.php:129 adm.iconmapping.php:112
 #: adm.iconmapping.php:176 adm.images.php:134 adm.macros.php:161
-#: adm.other.php:113 adm.regexps.php:195 adm.triggerdisplayoptions.php:77
+#: adm.other.php:113 adm.regexps.php:197 adm.triggerdisplayoptions.php:77
 #: adm.triggerseverities.php:82 adm.valuemapping.php:129
 #: adm.workingtime.php:64
 msgid "Icon mapping"
@@ -6784,7 +6784,7 @@ msgid "Image updated"
 msgstr "Imagine actualizată"
 
 #: adm.gui.php:97 adm.housekeeper.php:128 adm.iconmapping.php:111
-#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:194
+#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:196
 #: adm.triggerdisplayoptions.php:76 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:63
 #: include/views/administration.general.image.list.php:29
@@ -7233,35 +7233,35 @@ msgstr "Cheie incorectă."
 msgid "Incorrect list of items."
 msgstr "Listă incorectă de itemi."
 
-#: maintenance.php:307
+#: maintenance.php:311
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Mentenanță incorectă - data trebuie să fie între 1970.01.01 și 2038.01.18"
 
-#: maintenance.php:335
+#: maintenance.php:339
 msgid "Incorrect maintenance date"
 msgstr "Date mentenanță incorecte"
 
-#: maintenance.php:314
+#: maintenance.php:318
 msgid "Incorrect maintenance day period"
 msgstr "Perioadă de zi a mentenanței incorectă"
 
-#: maintenance.php:321 maintenance.php:332
+#: maintenance.php:325 maintenance.php:336
 msgid "Incorrect maintenance days of week"
 msgstr "Zilele săptămânii mentenanței incorecte"
 
-#: maintenance.php:329
+#: maintenance.php:333
 msgid "Incorrect maintenance month period"
 msgstr "Perioadă lunară a mentenanței incorectă"
 
-#: maintenance.php:294
+#: maintenance.php:298
 msgid "Incorrect maintenance period"
 msgstr "Perioadă a mentenanței incorectă"
 
-#: maintenance.php:291
+#: maintenance.php:295
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Perioadă a mentenanței incorectă (minim 5 minute)"
 
-#: maintenance.php:318
+#: maintenance.php:322
 msgid "Incorrect maintenance week period"
 msgstr "Perioadă săptămânala a mentenanței incorectă"
 
@@ -7711,7 +7711,7 @@ msgstr "Cheie invalidă \"%1$s\" pentru prototipul item \"%2$s\" pe \"%3$s\": %4
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Cheie invalidă \"%1$s\": %2$s."
 
-#: maintenance.php:302
+#: maintenance.php:306
 msgid "Invalid maintenance period"
 msgstr "Perioadă de mentenanță invalidă"
 
@@ -8645,7 +8645,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Nu există macro cu hostmacroid \"%1$s\"."
 
 #: adm.gui.php:100 adm.housekeeper.php:131 adm.iconmapping.php:114
-#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:197
+#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:199
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
@@ -8683,7 +8683,7 @@ msgstr "Valoarea mentenanței acțiunii condiției de  trebuie sa fie goală."
 msgid "Maintenance added"
 msgstr "Mentenanță adăugată"
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Maintenance deleted"
 msgstr "Mentenanță ștearsă"
 
@@ -9310,7 +9310,7 @@ msgid "NTLM authentication"
 msgstr "Autentificare NTLM"
 
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
-#: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
+#: adm.regexps.php:172 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
 #: include/hosts.inc.php:115 include/reports.inc.php:174
@@ -9374,7 +9374,7 @@ msgstr "Autentificare NTLM"
 #: include/views/inventory.host.list.php:79
 #: include/views/js/configuration.sysmaps.js.php:181 items.php:44
 #: latest.php:339 latest.php:340 maintenance.php:44 maintenance.php:200
-#: maintenance.php:223 popup_httpstep.php:36 popup.php:557 popup.php:616
+#: maintenance.php:225 popup_httpstep.php:36 popup.php:557 popup.php:616
 #: popup.php:678 popup.php:701 popup.php:815 popup.php:925 popup.php:934
 #: popup.php:1018 popup.php:1053 popup.php:1082 popup.php:1176 popup.php:1179
 #: popup.php:1249 popup.php:1252 popup.php:1315 popup.php:1319 popup.php:1370
@@ -9481,7 +9481,7 @@ msgstr "Item nou pentru grafic"
 msgid "New media"
 msgstr "Element media nou"
 
-#: adm.regexps.php:208
+#: adm.regexps.php:210
 msgid "New regular expression"
 msgstr "Exoresie uzuală nouă"
 
@@ -10784,7 +10784,7 @@ msgid "Original blue"
 msgstr "Albastru original"
 
 #: adm.gui.php:105 adm.housekeeper.php:136 adm.iconmapping.php:119
-#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:202
+#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:204
 #: adm.triggerdisplayoptions.php:84 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:71
 #: include/classes/class.ctweenbox.php:76
@@ -11589,7 +11589,7 @@ msgstr "Expresia uzuală V se potrivește cu ultima valoare în perioada T, astf
 msgid "Regular expression added"
 msgstr "Expresie uzuală adăugată"
 
-#: adm.regexps.php:172
+#: adm.regexps.php:181
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Expresie uzuală ștearsă"
@@ -11605,7 +11605,7 @@ msgid "Regular expression updated"
 msgstr "Expresie uzuală actualizată"
 
 #: adm.gui.php:99 adm.housekeeper.php:130 adm.iconmapping.php:113
-#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:196
+#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:198
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:65
 #: include/views/administration.general.regularexpressions.list.php:22
@@ -12311,7 +12311,7 @@ msgstr "Ecran adăugat"
 msgid "Screen cell configuration"
 msgstr "Configurare celule ecrane"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Screen deleted"
 msgstr "Ecran șters"
 
@@ -12341,7 +12341,7 @@ msgstr "Ecrane"
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.edit.php:109
 #: include/views/administration.script.list.php:51 scripts.php:146
-#: scripts.php:163
+#: scripts.php:165
 msgid "Script"
 msgstr "Script"
 
@@ -12355,7 +12355,7 @@ msgstr "Scriptul \"%1$s\" există deja."
 msgid "Script added"
 msgstr "Script adăugat"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Script deleted"
 msgstr "Script șters"
 
@@ -13815,7 +13815,7 @@ msgstr[1] "Triggeri dezactivați"
 msgstr[2] "Triggeri dezactivați"
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
-#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
+#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:203
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:70
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
@@ -13940,7 +13940,7 @@ msgid "Trigger prototypes updated"
 msgstr "Prototipi trigger actualizat"
 
 #: adm.gui.php:103 adm.housekeeper.php:134 adm.iconmapping.php:117
-#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:200
+#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.workingtime.php:69
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -14566,7 +14566,7 @@ msgstr "Utilizatorul nu poate să își schimbe statutul"
 msgid "User cannot change status of himself."
 msgstr "Utilizatorul nu poate să își schimbe statutul"
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "User deleted"
 msgstr "Utilizator șters"
 
@@ -14599,14 +14599,14 @@ msgstr "Grup utilizator \"%1$s\" folosit în script \"%2$s\"."
 msgid "User group \"%s\" already exists."
 msgstr "Grupul utilizator \"%1$s\" există deja."
 
-#: usergrps.php:340
+#: usergrps.php:345
 msgid "User group disabled"
 msgid_plural "User groups disabled"
 msgstr[0] "Grup utilizator dezafectat"
 msgstr[1] "Grupuri utilizator dezafectate"
 msgstr[2] "Grupuri utilizator dezafectate"
 
-#: usergrps.php:339
+#: usergrps.php:344
 msgid "User group enabled"
 msgid_plural "User groups enabled"
 msgstr[0] "Grup utilizator dezafectat"
@@ -14712,7 +14712,7 @@ msgstr "Utilizatori"
 msgid "Users (online)"
 msgstr "Utilizatori (online)"
 
-#: users.php:353
+#: users.php:354
 msgid "Users unblocked"
 msgstr "Utilizatori deblocați"
 
@@ -14997,7 +14997,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Valoare hartă cu valuemapid \"%1$s\" nu există."
 
 #: adm.gui.php:101 adm.housekeeper.php:132 adm.iconmapping.php:115
-#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:198
+#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:200
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.valuemapping.php:199 adm.workingtime.php:67
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -15117,18 +15117,18 @@ msgstr "Scenariul web \"%1$s\" deja există pe serverul \"%2$s\"."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Scenariul web \"%1$s\" există deja."
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Web scenario deleted"
 msgstr "Scenariul web șters"
 
-#: httpconf.php:294
+#: httpconf.php:296
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Scenariul web dezactivat"
 msgstr[1] "Scenariile web dezactivate"
 msgstr[2] "Scenariile web dezactivate"
 
-#: httpconf.php:293
+#: httpconf.php:295
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Scenariul web activat"
@@ -15229,7 +15229,7 @@ msgid "Wizard"
 msgstr "Expert"
 
 #: adm.gui.php:102 adm.housekeeper.php:133 adm.iconmapping.php:116
-#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:199
+#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:68
 #: include/views/administration.general.workingtime.edit.php:25

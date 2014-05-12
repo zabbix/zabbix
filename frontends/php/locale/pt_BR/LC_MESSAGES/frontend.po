@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 13:31+0300\n"
+"POT-Creation-Date: 2014-05-12 03:02+0300\n"
 "PO-Revision-Date: 2014-05-07 22:06+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1117,7 +1117,7 @@ msgstr "CONFIGURAÇÃO DE NODES"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "CONFIGURAÇÃO DE PROXIES"
 
-#: adm.regexps.php:212
+#: adm.regexps.php:214
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "CONFIGURAÇÃO DE EXPRESSÕES REGULARES"
 
@@ -1574,7 +1574,7 @@ msgstr "Não é possível excluir dependência"
 msgid "Cannot delete discovery rule"
 msgstr "A autobusca não pôde ser excluída"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Não foi possível excluir a autobusca"
 
@@ -1602,7 +1602,7 @@ msgstr "Não foi possível remover gráficos"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Não é possível excluir gráficos criados pela auto-busca (LLD)."
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Cannot delete group"
 msgstr "Grupo não foi removido"
 
@@ -1654,7 +1654,7 @@ msgstr "Itens não foram removidos"
 msgid "Cannot delete items created by low level discovery."
 msgstr "Não é possível excluir itens criados pela auto-busca (LLD)."
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Cannot delete maintenance"
 msgstr "Não foi possível remover período de manutenção"
 
@@ -1674,17 +1674,17 @@ msgstr "Não foi possível remover nó"
 msgid "Cannot delete proxy"
 msgstr "Não foi possível remover proxy"
 
-#: adm.regexps.php:173
+#: adm.regexps.php:182
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Não foi possível remover expressão regular"
 msgstr[1] "Não foi possível remover expressões regulares"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Cannot delete screen"
 msgstr "Não foi possível excluir a tela"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Cannot delete script"
 msgstr "Não foi possível remover script"
 
@@ -1776,7 +1776,7 @@ msgstr "As triggers não foram excluídas"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Não é possível excluir triggers criadas pela auto-busca (LLD)."
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "Cannot delete user"
 msgstr "Usuário não foi removido"
 
@@ -1788,7 +1788,7 @@ msgstr "Não foi possível excluir a mídia do usuário."
 msgid "Cannot delete value map"
 msgstr "Mapeamento não foi removido"
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Cannot delete web scenario"
 msgstr "Não foi possível excluir o cenário web"
 
@@ -1798,7 +1798,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desativar a ação"
 msgstr[1] "Não foi possível desativar as ações"
 
-#: discoveryconf.php:188
+#: discoveryconf.php:190
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Não foi possível desativar regra de descoberta"
@@ -1853,13 +1853,13 @@ msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] "Não foi possível desativar protótipo de trigger"
 msgstr[1] "Não foi possível desativar protótipos de trigger"
 
-#: usergrps.php:343
+#: usergrps.php:348
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "Não foi possível desativar o grupo de usuários"
 msgstr[1] "Não foi possível desativar os grupos de usuários"
 
-#: httpconf.php:297
+#: httpconf.php:299
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Não foi possível desativar o cenário web"
@@ -1879,7 +1879,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível ativar a ação"
 msgstr[1] "Não foi possível ativar as ações"
 
-#: discoveryconf.php:187
+#: discoveryconf.php:189
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Não foi possível ativar a regra de descoberta"
@@ -1934,13 +1934,13 @@ msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] "Não foi possível ativar protótipo de trigger"
 msgstr[1] "Não foi possível ativar protótipos de triggers"
 
-#: usergrps.php:342
+#: usergrps.php:347
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "Não foi possível ativar o grupo de usuários"
 msgstr[1] "Não foi possível ativar os grupos de usuários"
 
-#: httpconf.php:296
+#: httpconf.php:298
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Não foi possível ativar o cenário web"
@@ -2244,7 +2244,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 msgid "Cannot switch host for interface."
 msgstr "Não foi possível mudar a interface do host."
 
-#: users.php:353
+#: users.php:354
 msgid "Cannot unblock users"
 msgstr "Não foi possível desbloquear usuários"
 
@@ -2375,7 +2375,7 @@ msgstr "Comentário não foi alterado"
 msgid "Cannot update configuration"
 msgstr "Não foi possível atualizar a configuração"
 
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Cannot update debug mode"
 msgstr "Modo de depuração não foi atualizado"
 
@@ -2383,7 +2383,7 @@ msgstr "Modo de depuração não foi atualizado"
 msgid "Cannot update discovery rule"
 msgstr "Regra de autobusca não foi atualizada"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Cannot update frontend access"
 msgstr "Não é possível atualizar o acesso ao frontend"
 
@@ -3689,7 +3689,7 @@ msgstr "Depuração"
 msgid "Debug mode"
 msgstr "Modo de depuração"
 
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Debug mode updated"
 msgstr "Modo de depuração atualizado"
 
@@ -4478,13 +4478,13 @@ msgstr "A regra de descoberta foi criada"
 msgid "Discovery rule deleted"
 msgstr "A regra de autobusca excluída"
 
-#: discoveryconf.php:185 host_discovery.php:283
+#: discoveryconf.php:187 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regra de descoberta desativada"
 msgstr[1] "Regras de descoberta desativadas"
 
-#: discoveryconf.php:184 host_discovery.php:282
+#: discoveryconf.php:186 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regra de descoberta ativada"
@@ -4503,7 +4503,7 @@ msgstr "Regra de autobusca atualizada"
 msgid "Discovery rules"
 msgstr "Regras de descoberta"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "A regra de descoberta foi excluída"
 
@@ -5411,7 +5411,7 @@ msgstr "De"
 msgid "Frontend access"
 msgstr "Acesso à interface web"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Frontend access updated"
 msgstr "Acesso à interface web atualizado"
 
@@ -5454,7 +5454,7 @@ msgid "GSM modem"
 msgstr "Modem GSM"
 
 #: adm.gui.php:95 adm.housekeeper.php:126 adm.iconmapping.php:109
-#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:192
+#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:194
 #: adm.triggerdisplayoptions.php:74 adm.triggerseverities.php:79
 #: adm.valuemapping.php:126 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
@@ -5794,7 +5794,7 @@ msgstr "O grupo \"%1$s\" para o host \"%2$s\" não existe."
 msgid "Group added"
 msgstr "Grupo incluído"
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Group deleted"
 msgstr "Grupo removido"
 
@@ -5989,7 +5989,7 @@ msgstr "Histórico"
 msgid "History and simple graphs"
 msgstr "Gráficos simples e de histórico"
 
-#: httpconf.php:320 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
 msgid "History cleared"
 msgstr "Histórico zerado"
 
@@ -6425,7 +6425,7 @@ msgid "Hours"
 msgstr "Horas"
 
 #: adm.gui.php:96 adm.housekeeper.php:127 adm.iconmapping.php:110
-#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:193
+#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:195
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:80
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
@@ -6679,7 +6679,7 @@ msgstr "O mapeamento de ícone com o iconmapid \"%s\" não existe."
 
 #: adm.gui.php:98 adm.housekeeper.php:129 adm.iconmapping.php:112
 #: adm.iconmapping.php:176 adm.images.php:134 adm.macros.php:161
-#: adm.other.php:113 adm.regexps.php:195 adm.triggerdisplayoptions.php:77
+#: adm.other.php:113 adm.regexps.php:197 adm.triggerdisplayoptions.php:77
 #: adm.triggerseverities.php:82 adm.valuemapping.php:129
 #: adm.workingtime.php:64
 msgid "Icon mapping"
@@ -6747,7 +6747,7 @@ msgid "Image updated"
 msgstr "Imagem atualizada"
 
 #: adm.gui.php:97 adm.housekeeper.php:128 adm.iconmapping.php:111
-#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:194
+#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:196
 #: adm.triggerdisplayoptions.php:76 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:63
 #: include/views/administration.general.image.list.php:29
@@ -7196,35 +7196,35 @@ msgstr "Chave inválida."
 msgid "Incorrect list of items."
 msgstr "Lista de itens inválida."
 
-#: maintenance.php:307
+#: maintenance.php:311
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038"
 
-#: maintenance.php:335
+#: maintenance.php:339
 msgid "Incorrect maintenance date"
 msgstr "Data de manutenção inválida"
 
-#: maintenance.php:314
+#: maintenance.php:318
 msgid "Incorrect maintenance day period"
 msgstr "Dias de manutenção inválidos"
 
-#: maintenance.php:321 maintenance.php:332
+#: maintenance.php:325 maintenance.php:336
 msgid "Incorrect maintenance days of week"
 msgstr "Dias da semana de manutenção inválidos"
 
-#: maintenance.php:329
+#: maintenance.php:333
 msgid "Incorrect maintenance month period"
 msgstr "Mês de manutenção inválido"
 
-#: maintenance.php:294
+#: maintenance.php:298
 msgid "Incorrect maintenance period"
 msgstr "Período de manutenção inválido"
 
-#: maintenance.php:291
+#: maintenance.php:295
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Período de manutenção inválido (o mínimo é de 5 minutos)"
 
-#: maintenance.php:318
+#: maintenance.php:322
 msgid "Incorrect maintenance week period"
 msgstr "Semana de manutenção inválida"
 
@@ -7677,7 +7677,7 @@ msgstr "A chave \"%1$s\" é inválida para o protótipo de item \"%2$s\" em \"%3
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Chave inválida \"%1$s\": %2$s."
 
-#: maintenance.php:302
+#: maintenance.php:306
 msgid "Invalid maintenance period"
 msgstr "Período de manutenção inválido"
 
@@ -8613,7 +8613,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "A macro com o ID de host \"%1$s\" (hostmacroid) não existe."
 
 #: adm.gui.php:100 adm.housekeeper.php:131 adm.iconmapping.php:114
-#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:197
+#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:199
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
@@ -8651,7 +8651,7 @@ msgstr "O valor da condição da manutenção não pode ser nulo."
 msgid "Maintenance added"
 msgstr "Manutenção adicionada"
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Maintenance deleted"
 msgstr "Manutenção excluída"
 
@@ -9270,7 +9270,7 @@ msgid "NTLM authentication"
 msgstr "Autenticação NTLM"
 
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
-#: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
+#: adm.regexps.php:172 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
 #: include/hosts.inc.php:115 include/reports.inc.php:174
@@ -9334,7 +9334,7 @@ msgstr "Autenticação NTLM"
 #: include/views/inventory.host.list.php:79
 #: include/views/js/configuration.sysmaps.js.php:181 items.php:44
 #: latest.php:339 latest.php:340 maintenance.php:44 maintenance.php:200
-#: maintenance.php:223 popup_httpstep.php:36 popup.php:557 popup.php:616
+#: maintenance.php:225 popup_httpstep.php:36 popup.php:557 popup.php:616
 #: popup.php:678 popup.php:701 popup.php:815 popup.php:925 popup.php:934
 #: popup.php:1018 popup.php:1053 popup.php:1082 popup.php:1176 popup.php:1179
 #: popup.php:1249 popup.php:1252 popup.php:1315 popup.php:1319 popup.php:1370
@@ -9441,7 +9441,7 @@ msgstr "Novo item de gráfico"
 msgid "New media"
 msgstr "Nova mídia"
 
-#: adm.regexps.php:208
+#: adm.regexps.php:210
 msgid "New regular expression"
 msgstr "Nova expressão regular"
 
@@ -10753,7 +10753,7 @@ msgid "Original blue"
 msgstr "Azul original"
 
 #: adm.gui.php:105 adm.housekeeper.php:136 adm.iconmapping.php:119
-#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:202
+#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:204
 #: adm.triggerdisplayoptions.php:84 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:71
 #: include/classes/class.ctweenbox.php:76
@@ -11558,7 +11558,7 @@ msgstr "Expressão regular V corresponde ao último valor num período T, então
 msgid "Regular expression added"
 msgstr "Expressão regular adicionada"
 
-#: adm.regexps.php:172
+#: adm.regexps.php:181
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Expressão regular excluída"
@@ -11573,7 +11573,7 @@ msgid "Regular expression updated"
 msgstr "Expressão regular atualizada"
 
 #: adm.gui.php:99 adm.housekeeper.php:130 adm.iconmapping.php:113
-#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:196
+#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:198
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:65
 #: include/views/administration.general.regularexpressions.list.php:22
@@ -12281,7 +12281,7 @@ msgstr "Tela incluída"
 msgid "Screen cell configuration"
 msgstr "Configuração de célula de tela"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Screen deleted"
 msgstr "A tela foi excluída"
 
@@ -12311,7 +12311,7 @@ msgstr "Telas"
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.edit.php:109
 #: include/views/administration.script.list.php:51 scripts.php:146
-#: scripts.php:163
+#: scripts.php:165
 msgid "Script"
 msgstr "Script"
 
@@ -12325,7 +12325,7 @@ msgstr "O scritp \"%1$s\" já existe."
 msgid "Script added"
 msgstr "Script adicionado"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Script deleted"
 msgstr "Script removido"
 
@@ -13784,7 +13784,7 @@ msgstr[0] "Trigger desativada"
 msgstr[1] "Triggers desativadas"
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
-#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
+#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:203
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:70
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
@@ -13906,7 +13906,7 @@ msgid "Trigger prototypes updated"
 msgstr "Protótipos de trigger atualizados"
 
 #: adm.gui.php:103 adm.housekeeper.php:134 adm.iconmapping.php:117
-#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:200
+#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.workingtime.php:69
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -14533,7 +14533,7 @@ msgstr "Usuário não pode alterar seu próprio status"
 msgid "User cannot change status of himself."
 msgstr "Um usuário não pode modificar seu próprio status."
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "User deleted"
 msgstr "Usuário removido"
 
@@ -14566,13 +14566,13 @@ msgstr "O grupo de usuários \"%1$s\" é utilizado pelo script \"%2$s\"."
 msgid "User group \"%s\" already exists."
 msgstr "O grupo de usuários \"%s\" já existe."
 
-#: usergrps.php:340
+#: usergrps.php:345
 msgid "User group disabled"
 msgid_plural "User groups disabled"
 msgstr[0] "Grupo de usuários desativado"
 msgstr[1] "Grupos de usuários desativados"
 
-#: usergrps.php:339
+#: usergrps.php:344
 msgid "User group enabled"
 msgid_plural "User groups enabled"
 msgstr[0] "Grupo de usuários ativo"
@@ -14677,7 +14677,7 @@ msgstr "Usuários"
 msgid "Users (online)"
 msgstr "Usuários (online)"
 
-#: users.php:353
+#: users.php:354
 msgid "Users unblocked"
 msgstr "Usuários desbloqueados"
 
@@ -14962,7 +14962,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Não existe mapeamento de valor com o \"valuemapid\" \"%1$s\"."
 
 #: adm.gui.php:101 adm.housekeeper.php:132 adm.iconmapping.php:115
-#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:198
+#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:200
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.valuemapping.php:199 adm.workingtime.php:67
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -15082,17 +15082,17 @@ msgstr "Já existe o cenário web \"%1$s\" no host \"%2$s\"."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "O cenário web \"%1$s\" já existe."
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Web scenario deleted"
 msgstr "Cenário web excluído"
 
-#: httpconf.php:294
+#: httpconf.php:296
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Cenário web desativado"
 msgstr[1] "Cenários web desativados"
 
-#: httpconf.php:293
+#: httpconf.php:295
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Cenário web ativado"
@@ -15192,7 +15192,7 @@ msgid "Wizard"
 msgstr "Assistente"
 
 #: adm.gui.php:102 adm.housekeeper.php:133 adm.iconmapping.php:116
-#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:199
+#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:68
 #: include/views/administration.general.workingtime.edit.php:25
