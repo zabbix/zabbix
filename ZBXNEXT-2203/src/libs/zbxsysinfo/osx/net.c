@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "../common/common.h"
+#include "log.h"
 
 static struct ifmibdata	ifmd;
 
@@ -30,7 +31,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 
 	if (NULL == if_name || '\0'== *if_name)
 	{
-		*error = zbx_strdup(NULL, "Network interface cannot be empty.");
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -44,7 +45,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 
 	if (-1 == sysctl(mib, 5, &ifcount, &len, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "Failed sysctl."));
+		*error = zbx_dsprintf(NULL, "Cannot obtain number of network interfaces: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -60,15 +61,18 @@ static int	get_ifmib_general(const char *if_name, char **error)
 			if (ENOENT == errno)
 				continue;
 
-			break;
+			*error = zbx_dsprintf(NULL, "Cannot obtain network interface information: %s",
+					zbx_strerror(errno));
+			return SYSINFO_RET_FAIL;
 		}
 
 		if (0 == strcmp(ifmd.ifmd_name, if_name))
-			return SUCCEED;
+			return SYSINFO_RET_OK;
 	}
 
-	*error = zbx_strdup(NULL, "Failed to find network interface.");
-	return FAIL;
+	*error = zbx_strdup(NULL, "Cannot find information for this network interface.");
+
+	return SYSINFO_RET_FAIL;
 }
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -84,7 +88,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name, &error))
+	if (SYSINFO_RET_FAIL == get_ifmib_general(if_name, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -120,7 +124,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name, &error))
+	if (SYSINFO_RET_FAIL == get_ifmib_general(if_name, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -154,7 +158,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (FAIL == get_ifmib_general(if_name, &error))
+	if (SYSINFO_RET_FAIL == get_ifmib_general(if_name, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -179,7 +183,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
-	int		res;
+	int		ret;
 
 	if (1 < request->nparam)
 	{
@@ -197,20 +201,20 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
-		return res;
+	if (SYSINFO_RET_FAIL == (ret = EXECUTE_INT(command, result)))
+		return ret;
 
 	if (1 < result->ui64)
 		result->ui64 = 1;
 
-	return res;
+	return ret;
 }
 
 int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
-	int		res;
+	int		ret;
 
 	if (1 < request->nparam)
 	{
@@ -228,13 +232,13 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
-		return res;
+	if (SYSINFO_RET_FAIL == (ret = EXECUTE_INT(command, result)))
+		return ret;
 
 	if (1 < result->ui64)
 		result->ui64 = 1;
 
-	return res;
+	return ret;
 }
 
 int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -249,7 +253,7 @@ int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 
-	if (FAIL == get_ifmib_general(if_name, &error))
+	if (SYSINFO_RET_FAIL == get_ifmib_general(if_name, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
