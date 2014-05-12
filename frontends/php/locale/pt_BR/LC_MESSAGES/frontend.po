@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-12 03:06+0300\n"
-"PO-Revision-Date: 2014-02-19 17:26+0300\n"
+"POT-Creation-Date: 2014-05-12 03:07+0300\n"
+"PO-Revision-Date: 2014-04-30 23:15+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392823609.0\n"
+"X-POOTLE-MTIME: 1398892515.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -78,8 +78,8 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s tentava faltando"
+msgstr[1] "%1$s tentavas faltando"
 
 #: jsLoader.php:218 jsLoader.php:219
 #, c-format
@@ -195,7 +195,7 @@ msgstr "<manual>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "LOG DE AÇÕES"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -215,7 +215,7 @@ msgstr "E"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "LOG DE AUDITORIA"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -371,7 +371,7 @@ msgstr[1] "Ações ativadas"
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 msgid "Action log"
-msgstr ""
+msgstr "Log de ações"
 
 #: include/views/configuration.action.edit.php:408
 msgid "Action operations"
@@ -627,13 +627,13 @@ msgstr "Tamanho da memória em bytes. Se o modo estiver faltando o total será u
 #: include/views/configuration.action.edit.php:925
 #: include/views/configuration.host.discovery.edit.php:278
 msgid "And"
-msgstr ""
+msgstr "E"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:924
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr ""
+msgstr "E/OU"
 
 #: tr_status.php:258 tr_status.php:265
 msgid "Any"
@@ -666,11 +666,10 @@ msgid "Application added"
 msgstr "Aplicação incluída"
 
 #: applications.php:151 applications.php:186
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Aplicação excluída"
-msgstr[1] "Aplicação excluída"
+msgstr[1] "Aplicações excluídas"
 
 #: api/rpc/class.cjsonrpc.php:194
 msgid "Application error."
@@ -809,7 +808,7 @@ msgstr "Período de retenção da auditoria (em dias) \"%1$s\"."
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Audit log"
-msgstr ""
+msgstr "Log de auditoria"
 
 #: include/func.inc.php:258
 msgid "Aug"
