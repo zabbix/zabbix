@@ -1336,7 +1336,7 @@ function getTriggerMassupdateFormData() {
  *
  * @return array
  */
-function getTriggerFormData($exprAction = null) {
+function getTriggerFormData($exprAction) {
 	$data = array(
 		'form' => get_request('form'),
 		'form_refresh' => get_request('form_refresh'),
