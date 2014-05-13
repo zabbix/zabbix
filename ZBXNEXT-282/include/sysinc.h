@@ -382,6 +382,7 @@
 #	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
 #		define curl_easy_escape(handle, string, length) curl_escape(string, length)
 #	endif
+#	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
 /* Net-SNMP is used */

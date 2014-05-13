@@ -313,7 +313,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	lastfailedstep = 0;
 
 	result = DBselect(
-			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables"
+			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects"
 			" from httpstep"
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
@@ -329,7 +329,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
@@ -368,6 +367,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				&httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		httpstep.variables = row[8];
+		httpstep.follow_redirects = atoi(row[9]);
 
 		memset(&stat, 0, sizeof(stat));
 
@@ -389,6 +389,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
+		}
+
+		if (0 != httpstep.follow_redirects)
+		{
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1L)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS,
+					ZBX_CURLOPT_MAXREDIRS)))
+			{
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				goto httpstep_error;
+			}
 		}
 
 		if (HTTPTEST_AUTH_NONE != httptest->httptest.authentication)
