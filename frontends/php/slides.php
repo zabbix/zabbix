@@ -227,6 +227,9 @@ if ($data['screen']) {
 			'hostid' => getRequest('hostid'),
 			'groupid' => getRequest('groupid')
 		));
+
+		$data['groupid'] = $data['pageFilter']->groupid;
+		$data['hostid'] = $data['pageFilter']->hostid;
 	}
 
 	// get element

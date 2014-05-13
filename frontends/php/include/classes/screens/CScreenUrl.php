@@ -28,15 +28,23 @@ class CScreenUrl extends CScreenBase {
 	 */
 	public function get() {
 		// prevent from resolving macros in configuration page
-		if ($this->mode == SCREEN_MODE_PREVIEW || $this->mode == SCREEN_MODE_SLIDESHOW) {
-			$url = CMacrosResolverHelper::resolveScreenElementURL(array(
-				$this->hostid => array(
-					'url' => $this->screenitem['url']
-				)
-			));
-
-			$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
+		if ($this->mode != SCREEN_MODE_PREVIEW && $this->mode != SCREEN_MODE_SLIDESHOW) {
+			return $this->getOutput(
+				new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
+			);
 		}
+		elseif ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid == 0) {
+			return $this->getOutput(new CTableInfo(_('No host selected.')));
+		}
+
+		// user macros can be resolved for non-dynamic screen elements
+		$url = CMacrosResolverHelper::resolveScreenElementURL(array(
+			$this->hostid => array(
+				'url' => $this->screenitem['url']
+			)
+		));
+
+		$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
 
 		return $this->getOutput(
 			new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
