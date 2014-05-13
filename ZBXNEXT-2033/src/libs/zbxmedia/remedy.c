@@ -30,18 +30,19 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XML_HEADER_CONTENTTYPE		"Content-Type:text/xml; charset=utf-8"
-#define	ZBX_XML_HEADER_SOAPACTION_CREATE	"SOAPAction:urn:HPD_IncidentInterface_Create_WS/HelpDesk_Submit_Service"
+#define	ZBX_XML_HEADER_SOAPACTION_CREATE	"SOAPAction:urn:HPD_Incident_Interface_Create_Monitor_WS/" \
+						"HelpDesk_Submit_Service"
 #define	ZBX_XML_HEADER_SOAPACTION_QUERY		"SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Query_Service"
 #define	ZBX_XML_HEADER_SOAPACTION_MODIFY	"SOAPAction:urn:HPD_IncidentInterface_WS/HelpDesk_Modify_Service"
 
 
 #define ZBX_SOAP_URL		"&webService=HPD_IncidentInterface_WS"
-#define ZBX_SOAP_URL_CREATE	"&webService=HPD_IncidentInterface_Create_WS"
+#define ZBX_SOAP_URL_CREATE	"&webService=HPD_Incident_Interface_Create_Monitor_WS"
 
 #define ZBX_SOAP_XML_HEADER		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 
 #define ZBX_SOAP_ENVELOPE_CREATE_OPEN	"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\""\
-					" xmlns:urn=\"urn:HPD_IncidentInterface_Create_WS\">"
+					" xmlns:urn=\"urn:HPD_Incident_Interface_Create_Monitor_WS\">"
 #define ZBX_SOAP_ENVELOPE_CREATE_CLOSE	"</soapenv:Envelope>"
 
 #define ZBX_SOAP_ENVELOPE_OPEN	"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\""\
@@ -83,6 +84,7 @@
 #define ZBX_REMEDY_ACTION_MODIFY	"MODIFY"
 
 #define ZBX_REMEDY_CI_ID_FIELD		"tag"
+#define ZBX_REMEDY_SERVICECLASS_FIELD	"serialno_b"
 
 /* incident status for automatic event acknowledgement */
 #define ZBX_REMEDY_ACK_UNKNOWN	0
@@ -456,7 +458,7 @@ out:
 static int	remedy_create_ticket(const char *url, const char *proxy, const char *user, const char *password,
 		const char *loginid, const char *service_name, const char *service_id, const char *ci,
 		const char *ci_id, const char *summary, const char *notes, const char *impact, const char *urgency,
-		const char *company, char **externalid, char **error)
+		const char *company, const char *serviceclass, char **externalid, char **error)
 {
 #	define ZBX_POST_REMEDY_CREATE_SERVICE								\
 		ZBX_SOAP_ENVELOPE_CREATE_OPEN								\
@@ -480,6 +482,8 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 			"<urn:HPD_CI_ReconID>%s</urn:HPD_CI_ReconID>"					\
 			"<urn:Login_ID>%s</urn:Login_ID>"						\
 			"<urn:Customer_Company>%s</urn:Customer_Company>"				\
+			"<urn:CSC_INC></urn:CSC_INC>"							\
+			"<urn:Service_Class>%s</urn:Service_Class>"					\
 		"</urn:HelpDesk_Submit_Service>"							\
 		ZBX_SOAP_BODY_CLOSE									\
 		ZBX_SOAP_ENVELOPE_CREATE_CLOSE
@@ -491,7 +495,7 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	char			*xml = NULL, *summary_esc = NULL, *notes_esc = NULL, *ci_esc = NULL,
 				*service_url = NULL, *impact_esc, *urgency_esc, *company_esc, *service_name_esc,
 				*service_id_esc, *user_esc = NULL, *password_esc = NULL, *ci_id_esc = NULL,
-				*loginid_esc = NULL;
+				*loginid_esc = NULL, *serviceclass_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -515,10 +519,11 @@ static int	remedy_create_ticket(const char *url, const char *proxy, const char *
 	service_id_esc = xml_escape_dyn(service_id);
 	company_esc = xml_escape_dyn(company);
 	loginid_esc = xml_escape_dyn(loginid);
+	serviceclass_esc = xml_escape_dyn(serviceclass);
 
 	xml = zbx_dsprintf(xml, ZBX_POST_REMEDY_CREATE_SERVICE, user_esc, password_esc, impact_esc,
 			ZBX_REMEDY_ACTION_CREATE, summary_esc, notes_esc, urgency_esc, service_name_esc,
-			service_id_esc, ci_esc, ci_id_esc, loginid_esc, company_esc);
+			service_id_esc, ci_esc, ci_id_esc, loginid_esc, company_esc, serviceclass_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
 	{
@@ -548,6 +553,7 @@ out:
 	curl_slist_free_all(headers);
 
 	zbx_free(xml);
+	zbx_free(serviceclass_esc);
 	zbx_free(loginid_esc);
 	zbx_free(company_esc);
 	zbx_free(service_id_esc);
@@ -1374,7 +1380,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		DBfree_result(result);
 
 		/* find the host */
-		result = DBselect("select h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD
+		result = DBselect("select h.host,h.hostid,hi." ZBX_REMEDY_CI_ID_FIELD "," ZBX_REMEDY_SERVICECLASS_FIELD
 				" from items i,functions f,hosts h left join host_inventory hi"
 					" on hi.hostid=h.hostid"
 				" where f.functionid=" ZBX_FS_UI64
@@ -1391,6 +1397,20 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		if (SUCCEED == DBis_null(row[2]))
 		{
 			*error = zbx_dsprintf(NULL, "Host inventory is not enabled for the host '%s'", row[0]);
+			goto out;
+		}
+
+		if ('\0' == *row[2])
+		{
+			*error = zbx_dsprintf(NULL, "Host '%s' inventory Recon ID field (" ZBX_REMEDY_CI_ID_FIELD
+					") is not set", row[0]);
+			goto out;
+		}
+
+		if ('\0' == *row[3])
+		{
+			*error = zbx_dsprintf(NULL, "Host '%s' inventory Service Class field ("
+					ZBX_REMEDY_SERVICECLASS_FIELD ") is not set", row[0]);
 			goto out;
 		}
 
@@ -1426,7 +1446,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 
 		ret = remedy_create_ticket(media->smtp_server, media->smtp_helo, media->username, media->passwd,
 				loginid, service_name, service_id, row[0], row[2], subject, message,
-				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path,
+				impact_map[remedy_event], urgency_map[remedy_event], media->exec_path, row[3],
 				&incident_number, error);
 
 		zbx_free(service_name);
