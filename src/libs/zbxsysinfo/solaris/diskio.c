@@ -44,7 +44,7 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk, char **error)
 
 	if (NULL == (kc = kstat_open()))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
 		return ret;
 	}
 
@@ -53,7 +53,7 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk, char **error)
 		if (NULL == (kt = kstat_lookup(kc, NULL, -1, (char *)name)))
 		{
 			*error = zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s",
-					zbx_strerror(errno)));
+					zbx_strerror(errno));
 			goto clean;
 		}
 
@@ -67,7 +67,7 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk, char **error)
 		if (-1 == kstat_read(kc, kt, &kio))
 		{
 			*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
-					zbx_strerror(errno)));
+					zbx_strerror(errno));
 			goto clean;
 		}
 
@@ -87,7 +87,7 @@ static int	get_kstat_io(const char *name, zbx_kstat_t *zk, char **error)
 				if (-1 == kstat_read(kc, kt, &kio))
 				{
 					*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
-							zbx_strerror(errno)));
+							zbx_strerror(errno));
 					goto clean;
 				}
 
@@ -111,7 +111,7 @@ static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 	zbx_kstat_t	zk;
 	char		*error;
 
-	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error)))
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -127,7 +127,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	zbx_kstat_t	zk;
 	char		*error;
 
-	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error)))
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -143,7 +143,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 	zbx_kstat_t	zk;
 	char		*error;
 
-	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error)))
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
@@ -159,7 +159,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	zbx_kstat_t	zk;
 	char		*error;
 
-	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error)))
+	if (SYSINFO_RET_OK != get_kstat_io(devname, &zk, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;

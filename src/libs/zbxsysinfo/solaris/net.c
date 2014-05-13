@@ -28,6 +28,7 @@ static int	get_kstat_named_field(const char *name, const char *field, kstat_name
 	int		ret = FAIL;
 	kstat_ctl_t	*kc;
 	kstat_t		*kp;
+	kstat_named_t	*kn;
 
 	if (NULL == (kc = kstat_open()))
 	{
@@ -50,7 +51,7 @@ static int	get_kstat_named_field(const char *name, const char *field, kstat_name
 	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot look up data in kernel statistics facility: %s",
-				zbx_strerror(errno)));
+				zbx_strerror(errno));
 		goto clean;
 	}
 
@@ -218,8 +219,8 @@ static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
 	{
 		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
 	}
-	else if (SUCCEED == get_kstat_named_field(if_name, "ipackets", &ik, &errorn) &&
-			SUCCEED == get_kstat_named_field(if_name, "opackets", &ok, &errorn))
+	else if (SUCCEED == get_kstat_named_field(if_name, "ipackets", &ikn, &error) &&
+			SUCCEED == get_kstat_named_field(if_name, "opackets", &okn, &error))
 	{
 		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
 	}

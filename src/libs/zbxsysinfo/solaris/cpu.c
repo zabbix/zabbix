@@ -123,26 +123,26 @@ static int	get_kstat_system_misc(char *key, int *value, char **error)
 
 	if (NULL == (kc = kstat_open()))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
 		return ret;
 	}
 
 	if (NULL == (ksp = kstat_lookup(kc, "unix", 0, "system_misc")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s", zbx_strerror(errno));
 		goto close;
 	}
 
 	if (-1 == kstat_read(kc, ksp, NULL))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s", zbx_strerror(errno));
 		goto close;
 	}
 
 	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(ksp, key)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot look up data in kernel statistics facility: %s",
-				zbx_strerror(errno)));
+				zbx_strerror(errno));
 		goto close;
 	}
 
