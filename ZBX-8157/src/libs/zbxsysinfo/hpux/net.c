@@ -49,7 +49,7 @@ static struct strbuf	ctlbuf =
 
 #define ZBX_IF_SEP	','
 
-void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, const char *name)
+static void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, const char *name)
 {
 	if (FAIL == str_in_list(*if_list, name, ZBX_IF_SEP))
 	{
@@ -60,7 +60,7 @@ void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, 
 	}
 }
 
-int	get_if_names(char **if_list, size_t *if_list_alloc, size_t *if_list_offset)
+static int	get_if_names(char **if_list, size_t *if_list_alloc, size_t *if_list_offset)
 {
 	int			s, ifreq_size, numifs, i, family = AF_INET;
 	struct sockaddr		*from;
@@ -148,6 +148,7 @@ end:
 #endif
 	return SUCCEED;
 }
+
 #endif	/* HPUX_VERSION < 1131 */
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -294,6 +295,7 @@ static int	dlpi_get_stats(int fd, Ext_mib_t *mib)
 	stat_msg = *(dl_get_statistics_ack_t *)buf_ctl;
 
 	memcpy(mib, (Ext_mib_t *)(buf_ctl + stat_msg.dl_stat_offset), sizeof(Ext_mib_t));
+
 	return SUCCEED;
 }
 
@@ -360,9 +362,11 @@ static int get_ppa(int fd, const char *if_name, int *ppa)
 				break;
 			}
 		}
+
 		zbx_free(buf);
 		zbx_free(ppa_data_buf);
 	}
+
 	return ret;
 }
 
