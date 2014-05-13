@@ -604,9 +604,9 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
 		else
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [\"%d\"] is not "
-					"suitable for value type [%s] and data type [ASN_INTEGER]",
-					*var->val.integer, zbx_item_value_type_string(value_type)));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [\"%d\"] is not"
+					" suitable for value type [%s].", *var->val.integer,
+					zbx_item_value_type_string(value_type)));
 
 			ret = NOTSUPPORTED;
 		}
