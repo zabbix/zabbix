@@ -51,7 +51,9 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
-........S. [ZBX-7729] added data alignment to prevent crash on non x86 processors (Nikolaj)
+A......... [ZBX-6834] fixed trigger.get not returning any results when using the "host" parameter (Pavels)
+A.F....... [ZBX-8190] fixed validation in API to prevent SQL errors with Oracle database when string with excessive length is stored (Krists)
+...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
 ..F....... [ZBX-8160] removed justification in warning message (Ivo)
 ..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
 ..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
@@ -125,6 +127,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...GI..... [ZBX-8127] fixed truncation of hostname on HP-UX machines (igors)
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
 ..F....... [ZBX-8176] fixed SQL errors while mass operations when using Oracle database (Krists)
 ..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
 ..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
@@ -1045,6 +1049,17 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12
+
+2.0.12rc3 was released as 2.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc3
+
+Bug fixes:
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.12rc2
