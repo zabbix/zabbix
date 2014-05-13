@@ -532,7 +532,7 @@ else {
 }
 
 if (in_array($resourceType, array(SCREEN_RESOURCE_URL))) {
-	$screenFormList->addRow(_('Url'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
+	$screenFormList->addRow(_('URL'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
 }
 else {
 	$screenFormList->addVar('url', '');
