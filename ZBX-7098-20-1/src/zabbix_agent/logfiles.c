@@ -235,34 +235,31 @@ out:
  ******************************************************************************/
 static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *filename)
 {
-	int		ret = FAIL;
 	md5_state_t	state;
 	char		buf[MAX_LEN_MD5];
 
 	if (MAX_LEN_MD5 < length)
-		return ret;
+		return FAIL;
 
 	if ((zbx_offset_t)-1 == zbx_lseek(f, 0, SEEK_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to 0 for file \"%s\": %s", filename,
 				zbx_strerror(errno));
-		return ret;
+		return FAIL;
 	}
 
 	if (length != (int)read(f, buf, (size_t)length))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
 				(zbx_fs_size_t)length, filename, zbx_strerror(errno));
-		return ret;
+		return FAIL;
 	}
 
 	md5_init(&state);
 	md5_append(&state, (const md5_byte_t *)buf, length);
 	md5_finish(&state, md5buf);
 
-	ret = SUCCEED;
-
-	return ret;
+	return SUCCEED;
 }
 
 #ifdef _WINDOWS
@@ -587,14 +584,14 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 			rc = is_same_file(old + i, new + j, use_ino);
 
 			if (0 == rc)
-				*(p + j) = '0';
+				p[j] = '0';
 			else if (1 == rc)
-				*(p + j) = '1';
+				p[j] = '1';
 			else if (2 == rc)
 				return FAIL;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
-					(old + i)->filename, (new + j)->filename, *(p + j));
+					old[i].filename, new[j].filename, p[j]);
 		}
 		p += (size_t)num_new;
 	}
@@ -1105,7 +1102,6 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			if (S_ISREG(file_buf.st_mode))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", filename);
 				add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #ifdef _WINDOWS
 				if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino))
