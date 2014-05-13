@@ -1313,7 +1313,7 @@ out:
  *                             set.                                           *
  *     regexps          - [IN] array of regexps                               *
  *     pattern          - [IN] pattern to match                               *
- *     output_template - [IN] output formatting template                      *
+ *     output_template  - [IN] output formatting template                     *
  *     p_count          - [IN/OUT] limit of records to be processed           *
  *     s_count          - [IN/OUT] limit of records to be sent to server      *
  *     process_value    - [IN] pointer to function process_value()            *
