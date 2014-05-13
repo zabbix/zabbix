@@ -528,7 +528,14 @@
 					'objectOptions' => array(
 						'editable' => true
 					),
-					'data' => $groupFilter
+					'data' => $groupFilter,
+					'popup' => array(
+						'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
+							'&srcfld1=groupid&writeonly=1',
+						'width' => 450,
+						'height' => 450,
+						'buttonClass' => 'input filter-multiselect-select-button'
+					)
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -567,7 +574,14 @@
 						'editable' => true,
 						'templated_hosts' => true
 					),
-					'data' => $hostFilterData
+					'data' => $hostFilterData,
+					'popup' => array(
+						'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
+							'&srcfld1=hostid&writeonly=1&templated_hosts=1',
+						'width' => 450,
+						'height' => 450,
+						'buttonClass' => 'input filter-multiselect-select-button'
+					)
 				))
 			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),

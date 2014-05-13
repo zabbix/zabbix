@@ -52,7 +52,12 @@ $replaceGroups = new CMultiSelect(array(
 	'name' => 'groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array('editable' => true),
-	'data' => $hostGroupsToReplace
+	'data' => $hostGroupsToReplace,
+	'popup' => array(
+		'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=groups&srcfld1=groupid&writeonly=1',
+		'width' => 450,
+		'height' => 450
+	)
 ));
 
 $hostFormList->addRow(

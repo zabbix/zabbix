@@ -60,24 +60,25 @@ jQuery(function($) {
 	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['id']				multi select id in dom
-	 * @param string options['url']				backend url
-	 * @param string options['name']			input element name
-	 * @param object options['labels']			translated labels
-	 * @param object options['data']			preload data {id, name, prefix}
+	 * @param string options['id']					multi select id in dom
+	 * @param string options['url']					backend url
+	 * @param string options['name']				input element name
+	 * @param object options['labels']				translated labels
+	 * @param object options['data']				preload data {id, name, prefix}
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
-	 * @param array  options['ignored']			preload ignored {id: name}
-	 * @param string options['defaultValue']	default value for input element
-	 * @param bool   options['disabled']		turn on/off readonly state
-	 * @param bool   options['addNew']			allow user to create new names
-	 * @param int    options['selectedLimit']	how many items can be selected
-	 * @param int    options['limit']			how many available items can be received from backend
-	 * @param object options['popup']			popup data {parameters, width, height}
+	 * @param array  options['ignored']				preload ignored {id: name}
+	 * @param string options['defaultValue']		default value for input element
+	 * @param bool   options['disabled']			turn on/off readonly state
+	 * @param bool   options['addNew']				allow user to create new names
+	 * @param int    options['selectedLimit']		how many items can be selected
+	 * @param int    options['limit']				how many available items can be received from backend
+	 * @param object options['popup']				popup data {parameters, width, height, buttonClass}
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
+	 * @param string options['popup']['buttonClass']
 	 *
 	 * @return object
 	 */
@@ -154,6 +155,15 @@ jQuery(function($) {
 			 */
 			$.fn.multiSelect.addData = function(item, msId) {
 				var ms = window.multiSelect[msId];
+
+				// clean input if selectedLimit = 1
+				if (ms.options.selectedLimit == 1) {
+					for (var id in ms.values.selected) {
+						removeSelected(id, ms.obj, ms.values, ms.options);
+					}
+
+					cleanAvailable(ms.obj, ms.values);
+				}
 				addSelected(item, ms.obj, ms.values, ms.options);
 			};
 
@@ -458,7 +468,7 @@ jQuery(function($) {
 
 				var popupButton = $('<input>', {
 					type: 'button',
-					class: 'input link_menu select-popup',
+					class: options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
 					value: options.labels['Select'],
 					click: function() {
 						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);

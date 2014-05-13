@@ -36,6 +36,10 @@ switch ($srctbl) {
 		$page['title'] = _('Templates');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
+	case 'host_groups':
+		$page['title'] = _('Host groups');
+		$min_user_type = USER_TYPE_ZABBIX_USER;
+		break;
 	case 'proxies':
 		$page['title'] = _('Proxies');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -144,7 +148,8 @@ $allowedSrcFields = array(
 	'usrgrp'				=> '"usrgrpid", "name"',
 	'applications'			=> '"name"',
 	'scripts'				=> '"scriptid", "name"',
-	'templates'				=> '"hostid", "host"'
+	'templates'				=> '"hostid", "host"',
+	'host_groups'			=> '"groupid", "name"',
 );
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -680,8 +685,8 @@ elseif ($srctbl == 'templates') {
 	$form->setAttribute('id', 'templates');
 
 	$table = new CTableInfo(_('No templates found.'));
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_templates', null,
-		"javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');") : null), _('Name')
+	$table->setHeader(array(($multiselect ? new CCheckBox('allTemplates', null,
+		"javascript: checkAll('".$form->getName()."', 'allTemplates', 'templates');") : null), _('Name')
 	));
 
 	$options = array(
@@ -705,21 +710,20 @@ elseif ($srctbl == 'templates') {
 		$name = new CSpan($template['name'], 'link');
 		$name->attr('id', 'spanid'.$template['templateid']);
 
+		$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
+			$parentId.');';
+
 		if ($multiselect) {
-			$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
-				$parentId.');';
 			$checkBox = new CCheckBox('templates['.zbx_jsValue('templateid').']', null, null, $template['templateid']);
-		}
-		else {
-			$jsAction = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.
-				zbx_jsvalue($values).'); close_window(); return false;';
 		}
 
 		// check for existing
 		if (in_array($template['templateid'], $excludeids)) {
-			$checkBox->setChecked(1);
-			$checkBox->setEnabled('disabled');
+			if ($multiselect) {
+				$checkBox->setChecked(1);
+				$checkBox->setEnabled('disabled');
+			}
 			$name->removeAttr('class');
 		}
 		else {
@@ -740,10 +744,82 @@ elseif ($srctbl == 'templates') {
 			"javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).', '.$parentId.');'
 		);
 		$table->setFooter(new CCol($button, 'right'));
-
-		insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 	}
+
+	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
+
+	$form->addItem($table);
+	$form->show();
+}
+
+/*
+ * Host group
+ */
+elseif ($srctbl == 'host_groups') {
+	$form = new CForm();
+	$form->setName('hostGroupsform');
+	$form->setAttribute('id', 'hostGroups');
+
+	$table = new CTableInfo(_('No host groups found.'));
+	$table->setHeader(array(($multiselect ? new CCheckBox('allHostGroups', null,
+		"javascript: checkAll('".$form->getName()."', 'allHostGroups', 'hostGroups');") : null), _('Name')
+	));
+
+	$options = array(
+		'nodeids' => $nodeId,
+		'output' => array('groupid', 'name'),
+		'preservekeys' => true
+	);
+	if (!is_null($writeonly)) {
+		$options['editable'] = true;
+	}
+	$hostgroups = API::HostGroup()->get($options);
+	order_result($hostgroups, 'name');
+
+	$data = array();
+
+	foreach ($hostgroups as &$hostgroup) {
+		$name = new CSpan(get_node_name_by_elid($hostgroup['groupid'], null, NAME_DELIMITER).$hostgroup['name'], 'link');
+		$name->attr('id', 'spanid'.$hostgroup['groupid']);
+
+		$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
+			$parentId.');';
+		if ($multiselect) {
+			$checkBox = new CCheckBox('hostGroups['.zbx_jsValue('groupid').']', null, null, $hostgroup['groupid']);
+		}
+
+		// check for existing
+		if (in_array($hostgroup['groupid'], $excludeids)) {
+			if ($multiselect) {
+				$checkBox->setChecked(1);
+				$checkBox->setEnabled('disabled');
+			}
+			$name->removeAttr('class');
+		}
+		else {
+			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+
+			$data[$hostgroup['groupid']] = array(
+				'id' => $hostgroup['groupid'],
+				'name' => $hostgroup['name']
+			);
+		}
+
+		$table->addRow(array($multiselect ? $checkBox : null, $name));
+	}
+	unset($hostgroup);
+
+	if ($multiselect) {
+		$button = new CButton('select', _('Select'),
+			"javascript: addSelectedValues('hostGroups', ".zbx_jsvalue($reference).', '.$parentId.');'
+		);
+		$table->setFooter(new CCol($button, 'right'));
+	}
+
+	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
+	zbx_add_post_js('chkbxRange.pageGoName = "hostGroups";');
 
 	$form->addItem($table);
 	$form->show();
