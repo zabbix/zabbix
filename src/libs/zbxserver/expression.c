@@ -3731,7 +3731,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	char		*sql = NULL, value[MAX_BUFFER_LEN], error[MAX_STRING_LEN] = { 0 };
+	char		*sql = NULL, value[MAX_BUFFER_LEN], *error = NULL;
 	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 	int		i;
 	zbx_ifunc_t	*ifunc = NULL;
@@ -3799,10 +3799,22 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			if (NULL != func->error)
 				continue;
 
-			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec, error, sizeof(error)))
+			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter,
+					func->timespec.sec, &error))
 			{
-				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)} %s",
-						item.host_name, item.key, func->function, func->parameter, ('\0' != *error) ? error : "");
+				if (NULL != error)
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
+						item.host_name, item.key, func->function, func->parameter, error);
+					zbx_free(error);
+				}
+				else
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\".",
+						item.host_name, item.key, func->function, func->parameter);
+				}
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
