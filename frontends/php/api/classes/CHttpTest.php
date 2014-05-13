@@ -612,30 +612,35 @@ class CHttpTest extends CZBXAPI {
 	}
 
 	/**
-	 * Validate http response code reange.
-	 * Range can contain ',' and '-'
-	 * Range can be empty string.
+	 * Validate http response code range.
+	 * Range can be empty string, can be set as user macro or be numeric and contain ',' and '-'.
 	 *
-	 * Examples: '100-199, 301, 404, 500-550'
+	 * Examples: '100-199, 301, 404, 500-550' or '{$USER_MACRO123}'
+	 *
+	 * @throws APIException if the status code range is invalid.
 	 *
 	 * @param string $statusCodeRange
 	 *
 	 * @return bool
 	 */
 	protected  function checkStatusCode($statusCodeRange) {
-		if ($statusCodeRange == '') {
+		if ($statusCodeRange === '' || preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $statusCodeRange)) {
 			return true;
 		}
+		else {
+			$ranges = explode(',', $statusCodeRange);
+			foreach ($ranges as $range) {
+				$range = explode('-', $range);
+				if (count($range) > 2) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $statusCodeRange));
+				}
 
-		foreach (explode(',', $statusCodeRange) as $range) {
-			$range = explode('-', $range);
-			if (count($range) > 2) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
-			}
-
-			foreach ($range as $value) {
-				if (!is_numeric($value)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				foreach ($range as $value) {
+					if (!is_numeric($value)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid response code "%1$s".', $statusCodeRange)
+						);
+					}
 				}
 			}
 		}

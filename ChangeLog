@@ -74,6 +74,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Slovak and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-7766] fixed webscenario status code field validation to accept user macros (Krists)
 ...G...... [ZBX-7301] do not put logrt[] item into unsupported state if log files do not exist (fixed as part of ZBX-6731 solution) (Andris)
 ..F....... [ZBX-7896] fixed translated error messages not being rendered correctly in images (Pavels)
 .......PS. [ZBX-7777] increased maximum data transfer limit per connection to remain consistent with 2.0 (Juris)
