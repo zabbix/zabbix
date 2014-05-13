@@ -179,7 +179,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 	if (separator < filename)
 		goto out;
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain any path separator '%c'", filename,
