@@ -46,7 +46,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 
 	if (-1 == sysctl(mib, 5, &ifcount, &len, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return FAIL;
 	}
 
