@@ -870,7 +870,6 @@ static int	DBpatch_2030091(void)
 
 	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
-#endif
 
 static int      DBpatch_2030092(void)
 {
@@ -878,6 +877,7 @@ static int      DBpatch_2030092(void)
 
 	return DBset_default("httpstep", &field);
 }
+#endif
 
 DBPATCH_START(2030)
 
