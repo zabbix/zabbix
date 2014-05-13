@@ -1393,6 +1393,9 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
 
+	if (ITEM_STATUS_ACTIVE != item.status)
+		goto out;
+
 	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value, &found) || 1 != found)
 		goto out;
 
@@ -3762,10 +3765,19 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			if (SUCCEED != errcodes[i])
 			{
 				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
-						" item is disabled or does not exist.",
+						" item does not exist.",
 						func->function, func->parameter);
 				continue;
 			}
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item is disabled.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
 
 			if (HOST_STATUS_MONITORED != items[i].host.status)
 			{

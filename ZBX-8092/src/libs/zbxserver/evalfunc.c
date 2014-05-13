@@ -2204,7 +2204,15 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	if (SUCCEED != errcode)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,
-				"cannot evaluate function \"%s:%s.%s(%s)\": item is disabled or does not exist",
+				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
+				host, key, function, parameter);
+		goto out;
+	}
+
+	if (ITEM_STATUS_ACTIVE != item.status)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,
+				"cannot evaluate function \"%s:%s.%s(%s)\": item is disabled",
 				host, key, function, parameter);
 		goto out;
 	}

@@ -1939,6 +1939,9 @@ try_again:
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		if (ITEM_STATUS_ACTIVE != dc_items[i].status)
+			continue;
+
 		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
@@ -2116,6 +2119,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 
 		if (proxy_hostid != items[i].host.proxy_hostid)
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
 			continue;
 
 		if (HOST_STATUS_MONITORED != items[i].host.status)
