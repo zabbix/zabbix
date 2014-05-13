@@ -139,12 +139,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($this->isTypeAvailable('hostId')) {
 			foreach ($data as $hostId => $texts) {
-				if ($hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts)) {
+				$hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts);
+				if ($hostIdMacros) {
 					foreach ($hostIdMacros as $hostMacro) {
-						$macros[$hostId][$hostMacro] = UNRESOLVED_MACRO_STRING;
+						$macros[$hostId][$hostMacro] = ($hostId === '') ? UNRESOLVED_MACRO_STRING : $hostId;
 					}
-
-					$hostIdMacrosAvailable = true;
 				}
 			}
 		}
@@ -192,18 +191,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								$macros[$hostId][$hostMacro] = $dbHost['name'];
 								break;
 						}
-					}
-				}
-			}
-		}
-
-		// {HOST.ID} is available
-		if ($hostIdMacrosAvailable) {
-			foreach ($data as $hostId => $texts) {
-				foreach ($hostIdMacros as $hostMacro) {
-					if ($hostMacro === '{HOST.ID}') {
-						$macros[$hostId][$hostMacro] = $hostId;
-						break;
 					}
 				}
 			}
