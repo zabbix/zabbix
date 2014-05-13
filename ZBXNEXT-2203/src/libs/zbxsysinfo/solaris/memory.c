@@ -51,7 +51,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -75,7 +75,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to calculate because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -87,7 +87,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (1 < request->nparam)
 	{
@@ -112,7 +112,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	return ret;

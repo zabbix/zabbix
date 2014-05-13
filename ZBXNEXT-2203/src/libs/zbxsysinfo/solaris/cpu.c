@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "log.h"
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -47,7 +48,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == (ncpu = sysconf(name)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -113,7 +114,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 #ifdef HAVE_KSTAT_H
-static int	get_kstat_system_misc(char *key, int *value)
+static int	get_kstat_system_misc(char *key, int *value, char **error)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*ksp;
@@ -121,16 +122,29 @@ static int	get_kstat_system_misc(char *key, int *value)
 	int		ret = FAIL;
 
 	if (NULL == (kc = kstat_open()))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno)));
 		return ret;
+	}
 
 	if (NULL == (ksp = kstat_lookup(kc, "unix", 0, "system_misc")))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s", zbx_strerror(errno)));
 		goto close;
+	}
 
 	if (-1 == kstat_read(kc, ksp, NULL))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s", zbx_strerror(errno)));
 		goto close;
+	}
 
 	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(ksp, key)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot look up data in kernel statistics facility: %s",
+				zbx_strerror(errno)));
 		goto close;
+	}
 
 	*value = get_kstat_numeric_value(kn);
 
@@ -151,10 +165,9 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	mode;
 	double	load[ZBX_AVG_COUNT];
 #elif defined(HAVE_KSTAT_H)
-	char	*key;
+	char	*key, *error;
 	int	load;
 #endif
-
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -187,7 +200,10 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (mode >= getloadavg(load, 3))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain load average: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	value = load[mode];
 #elif defined(HAVE_KSTAT_H)
@@ -205,22 +221,22 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (FAIL == get_kstat_system_misc(key, &load))
+	if (FAIL == get_kstat_system_misc(key, &load, &error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get load average."));
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
 	}
 
 	value = (double)load / FSCALE;
 #else
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent does not support load average stats."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for CPU load information."));
 	return SYSINFO_RET_FAIL;
 #endif
 	if (1 == per_cpu)
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;
@@ -239,28 +255,32 @@ int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		cpu_count = 0;
 	double		swt_count = 0.0;
 
-	if (NULL != (kc = kstat_open()))
+	if (NULL == (kc = kstat_open()))
 	{
-		k = kc->kc_chain;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s",
+				zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
 
-		while (NULL != k)
+	k = kc->kc_chain;
+
+	while (NULL != k)
+	{
+		if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 		{
-			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
-			{
-				cpu = (cpu_stat_t *)k->ks_data;
-				swt_count += (double)cpu->cpu_sysinfo.pswitch;
-				cpu_count += 1;
-			}
-
-			k = k->ks_next;
+			cpu = (cpu_stat_t *)k->ks_data;
+			swt_count += (double)cpu->cpu_sysinfo.pswitch;
+			cpu_count += 1;
 		}
 
-		kstat_close(kc);
+		k = k->ks_next;
 	}
+
+	kstat_close(kc);
 
 	if (0 == cpu_count)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of context switches."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find CPU information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -277,28 +297,32 @@ int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		cpu_count = 0;
 	double		intr_count = 0.0;
 
-	if (NULL != (kc = kstat_open()))
+	if (NULL == (kc = kstat_open()))
 	{
-		k = kc->kc_chain;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s",
+				zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
 
-		while (NULL != k)
+	k = kc->kc_chain;
+
+	while (NULL != k)
+	{
+		if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 		{
-			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
-			{
-				cpu = (cpu_stat_t *)k->ks_data;
-				intr_count += (double)cpu->cpu_sysinfo.intr;
-				cpu_count += 1;
-			}
-
-			k = k->ks_next;
+			cpu = (cpu_stat_t *)k->ks_data;
+			intr_count += (double)cpu->cpu_sysinfo.intr;
+			cpu_count += 1;
 		}
 
-		kstat_close(kc);
+		k = k->ks_next;
 	}
+
+	kstat_close(kc);
 
 	if (0 == cpu_count)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of interrupts."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find CPU information."));
 		return SYSINFO_RET_FAIL;
 	}
 

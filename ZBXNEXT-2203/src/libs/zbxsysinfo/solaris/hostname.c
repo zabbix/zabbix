@@ -18,6 +18,7 @@
 **/
 
 #include "sysinfo.h"
+#include "log.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
@@ -33,8 +34,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (-1 == uname(&name))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Failed to get host name: %s",
-			zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
