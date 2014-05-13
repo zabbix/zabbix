@@ -579,7 +579,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND) &&
 			0 == strcmp(key, "system.run"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not allowed."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
 		goto notsupported;
 	}
 
@@ -637,7 +637,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		if (SUCCEED != parse_item_key(tmp, &request))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Item key is badly formatted."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
 			goto notsupported;
 		}
 	}
