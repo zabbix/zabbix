@@ -132,11 +132,11 @@ function insert_javascript_for_editable_combobox() {
 				newObj.name = obj.name;
 				newObj.className = "input text";
 
-				if (size && size > 0) {
+				if (size !== null) {
 					newObj.size = size;
 				}
 
-				if (width && width > 0) {
+				if (width !== null) {
 					newObj.style.width = width + "px";
 				}
 
