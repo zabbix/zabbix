@@ -207,7 +207,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		zbx_free(*format);
 		goto out;
 	}
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	ret = SUCCEED;
 out:
