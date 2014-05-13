@@ -121,7 +121,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macros = array();
 
 		$hostMacrosAvailable = false;
-		$hostIdMacrosAvailable = false;
 		$agentInterfaceAvailable = false;
 		$interfaceWithoutPortMacrosAvailable = false;
 
