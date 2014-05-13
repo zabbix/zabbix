@@ -36,8 +36,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 
 	if (0 != ZBX_STATFS(fs, &s))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
-				zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
