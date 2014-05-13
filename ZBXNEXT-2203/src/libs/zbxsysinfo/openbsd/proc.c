@@ -201,7 +201,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, 6, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf("Cannot obtain necessary buffer size from system: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
@@ -223,7 +223,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, 4, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf("Cannot obtain necessary buffer size from system: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
@@ -380,7 +380,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, 6, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf("Cannot obtain necessary buffer size from system: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
@@ -402,7 +402,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	sz = 0;
 	if (0 != sysctl(mib, 4, NULL, &sz, NULL, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf("Cannot obtain necessary buffer size from system: %s",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}

@@ -150,7 +150,7 @@ static int	get_ifdata(const char *if_name,
 
 		if ((if_s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 		{
-			*error = zbx_dsprintf(NULL, "Cannot create socket: %s", zbx_strerror(errno)));
+			*error = zbx_dsprintf(NULL, "Cannot create socket: %s", zbx_strerror(errno));
 			goto clean;
 		}
 
@@ -159,7 +159,7 @@ static int	get_ifdata(const char *if_name,
 
 		if (ioctl(if_s, SIOCGIFDATA, &ifr) < 0)
 		{
-			*error = zbx_dsprintf(NULL, "Cannot set socket parameters: %s", zbx_strerror(errno)));
+			*error = zbx_dsprintf(NULL, "Cannot set socket parameters: %s", zbx_strerror(errno));
 			goto clean;
 		}
 
