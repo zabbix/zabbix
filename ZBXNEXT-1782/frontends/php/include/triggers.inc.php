@@ -2064,7 +2064,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  * Example:
  *   $expressionTree = array(
  *     [0] => array(
- *       'id' => '0_92',
+ *       'id' => '0_94',
  *       'type' => 'operator',
  *       'operator' => 'and',
  *       'elements' => array(
@@ -2074,7 +2074,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
  *         ),
  *         [1] => array(
- *           'id' => '48_92',
+ *           'id' => '50_94',
  *           'type' => 'expression',
  *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
  *         )
@@ -2082,7 +2082,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  *     )
  *   )
  *   $action = 'R'
- *   $expressionId = '48_92'
+ *   $expressionId = '50_94'
  *
  * Result:
  *   $expressionTree = array(
@@ -2203,7 +2203,7 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
  *   )
  *
  * Result:
- *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
+ *   "{host1:system.cpu.util[,iowait].last(0)} > 50 and {host2:system.cpu.util[,iowait].last(0)} > 50"
  *
  * @param array  $expressionTree
  * @param int    $level				parameter only for recursive call
