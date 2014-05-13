@@ -249,7 +249,7 @@ static int	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *pgswapin, zbx_uint64_
 
 	if (NULL == (kc = kstat_open()))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -260,7 +260,7 @@ static int	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *pgswapin, zbx_uint64_
 			if (-1 == kstat_read(kc, k, NULL))
 			{
 				*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
-						zbx_strerror(errno)));
+						zbx_strerror(errno));
 				goto clean;
 			}
 
