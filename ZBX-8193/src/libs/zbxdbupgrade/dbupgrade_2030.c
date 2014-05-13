@@ -872,6 +872,13 @@ static int	DBpatch_2030091(void)
 }
 #endif
 
+static int      DBpatch_2030092(void)
+{
+	const ZBX_FIELD field = {"timeout", "15", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("httpstep", &field);
+}
+
 DBPATCH_START(2030)
 
 /* version, duplicates flag, mandatory flag */
@@ -967,5 +974,6 @@ DBPATCH_ADD(2030088, 0, 1)
 DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
+DBPATCH_ADD(2030092, 0, 1)
 
 DBPATCH_END()
