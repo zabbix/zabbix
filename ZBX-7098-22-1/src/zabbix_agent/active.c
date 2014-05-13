@@ -906,7 +906,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		else if (0 == strncmp(active_metrics[i].key, "logrt[", 6))	/* log files with rotation */
 			is_logrt = 1;
 
-		if (0 == is_logrt || 1 == is_logrt)
+		if (-1 != is_logrt)
 		{
 			int	err;
 
