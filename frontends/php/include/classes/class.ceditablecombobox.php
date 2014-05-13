@@ -21,11 +21,18 @@
 
 class CEditableComboBox extends CComboBox {
 
-	public function __construct($name = 'editablecombobox', $value = null, $size = 0, $action = null) {
+	public function __construct($name = 'editablecombobox', $value = null, $size = null, $action = null) {
 		insert_javascript_for_editable_combobox();
 		parent::__construct($name, $value, $action);
 		parent::addAction('onfocus', 'CEditableComboBoxInit(this);');
-		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.');');
+
+		$width = ($size == ZBX_TEXTBOX_STANDARD_SIZE) ? ZBX_TEXTAREA_STANDARD_WIDTH : null;
+		parent::addAction('onchange',
+			'CEditableComboBoxOnChange(this, '.CJs::encodeJson($size).', '.CJs::encodeJson($width).');'
+		);
+
+		// prevent Firefox remembering selected option on page refresh
+		$this->setAttribute('autocomplete', 'off');
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
