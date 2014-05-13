@@ -1119,7 +1119,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, char *error, size_t errsiz)
+static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters, char **error)
 {
 	const char			*__function_name = "evaluate_NODATA";
 	int				arg1, flag, now, ret = FAIL;
@@ -1131,15 +1131,15 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	if (1 < num_param(parameters))
 	{
-		if (NULL != error && 0 < errsiz)
-			zbx_strlcpy(error, "Too many parameters", errsiz);
+		if (NULL != error)
+			*error = zbx_strdup(*error, "too many parameters");
 		goto out;
 	}
 
 	if (SUCCEED != get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 	{
-		if (NULL != error && 0 < errsiz)
-			zbx_strlcpy(error, "Could not retrieve function parameter", errsiz);
+		if (NULL != error)
+			*error = zbx_strdup(*error, "invalid first parameter");
 		goto out;
 	}
 
@@ -1159,14 +1159,18 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
 		{
-			if (NULL != error && 0 < errsiz)
-				zbx_strlcpy(error, "Could not retrieve data for item", errsiz);
+			if (NULL != error)
+				*error = zbx_strdup(*error, "item does not exist");
 			goto out;
 		}
-		else if (seconds + arg1 > now)
+
+		if (seconds + arg1 > now)
 		{
-			if (NULL != error && 0 < errsiz)
-				zbx_strlcpy(error, "Item does not have enough data after server (re)start/item creation", errsiz);
+			if (NULL != error)
+			{
+				*error = zbx_strdup(*error,
+						"item does not have enough data after server start/item creation");
+			}
 			goto out;
 		}
 
@@ -1715,7 +1719,8 @@ clean:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now, char *error, size_t errsiz)
+int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now,
+		char **error)
 {
 	const char	*__function_name = "evaluate_function";
 
@@ -1761,7 +1766,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter, error, errsiz);
+		ret = evaluate_NODATA(value, item, function, parameter, error);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
@@ -1834,7 +1839,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "unsupported function:%s", function);
+		*error = zbx_strdup(*error, "function is not supported");
 		ret = FAIL;
 	}
 
@@ -2214,11 +2219,10 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DB_ITEM		item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*host_esc, *key_esc, error[MAX_STRING_LEN] = { 0 };
+	char		*host_esc, *key_esc, *error = NULL;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
-			__function_name, host, key, function, parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
 
 	host_esc = DBdyn_escape_string(host);
 	key_esc = DBdyn_escape_string(key);
@@ -2244,7 +2248,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	DBget_item_from_db(&item, row);
 
-	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL), error, sizeof(error))))
+	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL), &error)))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
@@ -2264,10 +2268,11 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		}
 	}
 
+	zbx_free(error);
+
 	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
-			zbx_result_string(ret), value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);
 
 	return ret;
 }

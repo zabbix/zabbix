@@ -144,7 +144,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	const char	*__function_name = "calcitem_evaluate_expression";
 	function_t	*f = NULL;
 	char		*sql = NULL, *host_esc, *key_esc,
-			*buf, replace[16], errstr[MAX_STRING_LEN] = { 0 };
+			*buf, replace[16], *errstr = NULL;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 	int		i, ret = SUCCEED;
 	time_t		now;
@@ -242,10 +242,19 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			f->found = 1;
 			f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
 
-			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now, errstr, sizeof(errstr)))
+			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now, &errstr))
 			{
-				zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)] %s",
-						f->func, f->params, ('\0' != *errstr) ? errstr : "");
+				if (NULL != errstr)
+				{
+					zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\": %s",
+							f->func, f->params, errstr);
+					zbx_free(errstr);
+				}
+				else
+				{
+					zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\"",
+							f->func, f->params);
+				}
 
 				ret = NOTSUPPORTED;
 				break;
