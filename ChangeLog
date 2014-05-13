@@ -936,6 +936,7 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.12
