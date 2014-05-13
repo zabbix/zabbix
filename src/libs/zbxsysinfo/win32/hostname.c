@@ -26,11 +26,10 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
 	DWORD	dwSize = 256;
 	wchar_t	computerName[256];
 	char	*type, buffer[256];
-	int	netbios, ret;
+	int	netbios, rc;
 	WSADATA sockInfo;
 
 	if (1 < request->nparam)
@@ -68,11 +67,11 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+		if (0 != (rc = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
+			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(rc));
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize Winsock DLL: %s",
-					strerror_from_system(ret)));
+					strerror_from_system(rc)));
 			return SYSINFO_RET_FAIL;
 		}
 		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
