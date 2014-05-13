@@ -23,8 +23,8 @@
 #include "symbols.h"
 #include "log.h"
 
-#define MAX_PROCESSES		4096
-#define MAX_NAME		256
+#define MAX_PROCESSES	4096
+#define MAX_NAME	256
 
 /* function 'zbx_get_processname' require 'baseName' with size 'MAX_NAME' */
 static int	zbx_get_processname(HANDLE hProcess, char *baseName)
@@ -114,7 +114,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -367,7 +367,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of processes."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -392,7 +392,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == ret)
 		SET_DBL_RESULT(result, value);
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get process stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
 
 	return ret;
 }

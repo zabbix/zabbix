@@ -40,7 +40,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == zbx_GetPerformanceInfo)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get memory stats."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 			return SYSINFO_RET_FAIL;
 		}
 

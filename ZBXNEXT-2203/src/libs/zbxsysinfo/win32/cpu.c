@@ -63,7 +63,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -96,7 +96,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get performance data from collector."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -127,7 +127,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
-		SET_MSG_RESULT(result, strdup("Collector is not started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -149,7 +149,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get performance data from collector."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -171,7 +171,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 >= (cpu_num = get_cpu_num()))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get number of CPUs."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
 		}
 		value /= cpu_num;

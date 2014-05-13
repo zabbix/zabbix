@@ -46,7 +46,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
 	{
 		zbx_free(wpath);
-		SET_MSG_RESULT(result, "Failed to get filesystem stats.");
+		SET_MSG_RESULT(result, "Cannot obtain filesystem information.");
 		return SYSINFO_RET_FAIL;
 	}
 	zbx_free(wpath);
@@ -84,7 +84,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	   get the necessary size into the dwSize variable */
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain necessary buffer size from system."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -95,7 +95,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
 	{
 		zbx_free(buffer);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of filesystems."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
 		return SYSINFO_RET_FAIL;
 	}
 
