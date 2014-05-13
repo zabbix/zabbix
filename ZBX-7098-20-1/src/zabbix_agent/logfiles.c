@@ -1188,7 +1188,6 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 						*mtime <= file_buf.st_mtime &&
 						0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 					add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate,
 							&file_buf);
 				}
@@ -1233,7 +1232,6 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 						*mtime <= file_buf.st_mtime &&
 						0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
 					add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate,
 							&file_buf);
 				}
