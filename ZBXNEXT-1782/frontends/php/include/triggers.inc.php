@@ -1855,11 +1855,11 @@ function expressionLevelDraw(array $next, $level) {
  * Makes tree of expression elements
  *
  * Expression:
- *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
+ *   "{host1:system.cpu.util[,iowait].last(0)} > 50 and {host2:system.cpu.util[,iowait].last(0)} > 50"
  * Result:
  *   array(
  *     [0] => array(
- *       'id' => '0_92',
+ *       'id' => '0_94',
  *       'type' => 'operator',
  *       'operator' => 'and',
  *       'elements' => array(
@@ -1869,7 +1869,7 @@ function expressionLevelDraw(array $next, $level) {
  *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
  *         ),
  *         [1] => array(
- *           'id' => '48_92',
+ *           'id' => '50_94',
  *           'type' => 'expression',
  *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
  *         )
