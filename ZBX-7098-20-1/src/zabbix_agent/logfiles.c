@@ -1098,31 +1098,27 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 	if (0 == is_logrt)	/* log[] item */
 	{
-		if (0 == zbx_stat(filename, &file_buf))
-		{
-			if (S_ISREG(file_buf.st_mode))
-			{
-				add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
-#ifdef _WINDOWS
-				if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino))
-					goto out;
-#else
-				/* on UNIX file systems we always assume that inodes can be used to identify files */
-				*use_ino = 1;
-#endif
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] "
-						"item", filename);
-				goto out;
-			}
-		}
-		else
+		if (0 != zbx_stat(filename, &file_buf))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
 			goto out;
 		}
+
+		if (! S_ISREG(file_buf.st_mode))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] item",
+					filename);
+			goto out;
+		}
+
+		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
+#ifdef _WINDOWS
+		if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino))
+			goto out;
+#else
+		/* on UNIX file systems we always assume that inodes can be used to identify files */
+		*use_ino = 1;
+#endif
 	}
 	else	/* logrt[] item */
 	{
