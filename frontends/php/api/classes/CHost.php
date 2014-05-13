@@ -487,7 +487,7 @@ class CHost extends CHostGeneral {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('host.exists method is deprecated.');
+		$this->deprecated('host.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
@@ -577,7 +577,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-				'allowed' => array('hostid', 'status', 'inventory'),
+				'allowed' => array('hostid', 'status', 'inventory', 'description'),
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
 			if ($update) {
