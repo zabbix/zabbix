@@ -660,7 +660,7 @@ int	DBcheck_version(void)
 {
 	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i, total = 0;
+	int			db_mandatory, db_optional, required, ret = FAIL, i, total = 0, op = 0;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
@@ -682,7 +682,12 @@ int	DBcheck_version(void)
 	for (i = 0; 0 != patches[i].version; i++)
 	{
 		if (0 != patches[i].mandatory)
+		{
 			required = patches[i].version;
+			op = 0;
+		}
+		else
+			op++;
 	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -745,6 +750,9 @@ int	DBcheck_version(void)
 #ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
+
+	if(0 < op)
+		zabbix_log(LOG_LEVEL_INFORMATION, "%d optional patch(es) were found", op);
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 
