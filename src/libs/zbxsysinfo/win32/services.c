@@ -47,7 +47,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to call OpenSCManager."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -242,7 +242,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to call OpenSCManager."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
 

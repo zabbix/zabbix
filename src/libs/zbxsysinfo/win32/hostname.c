@@ -59,7 +59,8 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 == GetComputerName(computerName, &dwSize))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. GetComputerName() failed."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
+					strerror_from_system(GetLastError())));
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -70,13 +71,15 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. WSAStartup() failed."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize Winsock DLL: %s",
+					strerror_from_system(ret)));
 			return SYSINFO_RET_FAIL;
 		}
 		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get hostname. gethostname() failed."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain host name: %s",
+					strerror_from_system(WSAGetLastError())));
 			return SYSINFO_RET_FAIL;
 		}
 

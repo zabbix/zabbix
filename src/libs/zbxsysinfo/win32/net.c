@@ -163,7 +163,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -206,7 +206,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -249,7 +249,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get network stats."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -296,7 +296,8 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -389,7 +390,8 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain IP address information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -407,7 +409,8 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to get list of network interfaces."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain network interface information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -509,6 +512,8 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetTcpTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 

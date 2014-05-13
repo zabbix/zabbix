@@ -49,7 +49,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SUCCEED != perf_collector_started())
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started.");
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -78,7 +78,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (SYSINFO_RET_FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -128,7 +128,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (SUCCEED != perf_collector_started())
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started.");
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 			goto clean;
 		}
 
@@ -158,8 +158,8 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = SYSINFO_RET_OK;
 	}
 clean:
-	if (SYSINFO_RET_FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to get collector stats.");
+	if (SYSINFO_RET_FAIL == ret && !ISSET_MSG(result))
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain performance information from collector."));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
