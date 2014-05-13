@@ -208,6 +208,7 @@ function getMenuPopupHistory(options) {
  * @param string options[]['confirmation']	confirmation text
  * @param bool   options['hasGraphs']		link to host graphs page
  * @param bool   options['hasScreens']		link to host screen page
+ * @param bool   options['showTriggers']	show "Triggers" link enabled or disabled
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
@@ -239,10 +240,10 @@ function getMenuPopupHost(options) {
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// trigger status. If host is disabled, show disabled link for triggers
+		// if host is disabled, show disabled link for triggers
 		gotos[gotos.length] = {
 			label: t('Triggers'),
-			css: options.hasTriggers ? '' : 'ui-state-disabled',
+			css: options.showTriggers ? '' : 'ui-state-disabled',
 			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
 
