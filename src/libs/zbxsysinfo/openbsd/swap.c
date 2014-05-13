@@ -35,7 +35,7 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -192,7 +192,7 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -40,7 +40,7 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 
 	if (0 != sysctl(mib, 2, &drive_count, &len, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "Cannot obtain number of disks: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot obtain number of disks: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -63,7 +63,7 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 	if (0 != sysctl(mib, 2, stats, &len, NULL, 0))
 	{
 		zbx_free(stats);
-		*error = zbx_strdup(NULL, "Cannot obtain disk information: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot obtain disk information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
