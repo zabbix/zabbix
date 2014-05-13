@@ -19,22 +19,30 @@
 
 #include "sysinfo.h"
 
-#ifdef HAVE_SYS_UTSNAME_H
-#	include <sys/utsname.h>
-#endif
-
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct utsname	name;
+	char	*hostname;
+	long 	hostbufsize = 0;
 
-	if (-1 == uname(&name))
+#ifdef _SC_HOST_NAME_MAX
+	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
+#endif
+	if (0 == hostbufsize)
+		hostbufsize = 256;
+
+	hostname = zbx_malloc(NULL, hostbufsize);
+
+	if (0 != gethostname(hostname, hostbufsize))
+	{
+		zbx_free(hostname);
 		return SYSINFO_RET_FAIL;
+	}
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, name.nodename));
+	SET_STR_RESULT(result, hostname);
 
 	return SYSINFO_RET_OK;
 }
