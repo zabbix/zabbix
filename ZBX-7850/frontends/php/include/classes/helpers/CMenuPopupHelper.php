@@ -218,6 +218,7 @@ class CMenuPopupHelper {
 	 *
 	 * @param array  $host						host data
 	 * @param string $host['hostid']			host id
+	 * @param string $host['status']			host status
 	 * @param array  $host['graphs']			host graphs (optional)
 	 * @param array  $host['screens']			host screens (optional)
 	 * @param array  $scripts					host scripts (optional)
@@ -234,7 +235,7 @@ class CMenuPopupHelper {
 			'hostid' => $host['hostid'],
 			'hasGraphs' => (isset($host['graphs']) && $host['graphs']),
 			'hasScreens' => (isset($host['screens']) && $host['screens']),
-			'hasTriggers' => (isset($host['triggers']) && $host['triggers']),
+			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $hasGoTo
 		);
 

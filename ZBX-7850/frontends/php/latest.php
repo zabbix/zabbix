@@ -541,9 +541,6 @@ foreach ($applications as $appid => $dbApp) {
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
 
-		// display status of triggers link in menu "Go to" menu pop-up
-		$host['triggers'] = ($host['status'] == HOST_STATUS_MONITORED);
-
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
@@ -714,9 +711,6 @@ foreach ($hosts as $hostId => $dbHost) {
 		$hostName = new CSpan($host['name'],
 			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
 		);
-
-		// display status of triggers link in menu "Go to" menu pop-up
-		$host['triggers'] = ($host['status'] == HOST_STATUS_MONITORED);
 
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
