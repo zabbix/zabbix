@@ -37,7 +37,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	return FAIL;
 }
 
-static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp)
+static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	int	err;
@@ -75,7 +75,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp)
 	}
 
 	if (0 == err)
-		*error = zbx_dsprintf(NULL, "Cannot obtain system information.");
+		*error = zbx_strdup(NULL, "Cannot obtain system information.");
 	else
 		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 
