@@ -144,6 +144,12 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_PROC_STAT_SLEEP	2
 #define ZBX_PROC_STAT_ZOMB	3
 
+#define ZBX_DO_SUM		0
+#define ZBX_DO_MAX		1
+#define ZBX_DO_MIN		2
+#define ZBX_DO_AVG		3
+#define ZBX_DO_ONE		4
+
 #define ZBX_DSTAT_TYPE_SECT	0
 #define ZBX_DSTAT_TYPE_OPER	1
 #define ZBX_DSTAT_TYPE_BYTE	2

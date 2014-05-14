@@ -207,7 +207,7 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 
 	DWORD		dwSize = 256;
-	TCHAR		computer_name[256];
+	wchar_t		computer_name[256];
 	SYSTEM_INFO	si;
 	OSVERSIONINFOEX	vi;
 	char		*os = NULL, *utf8;

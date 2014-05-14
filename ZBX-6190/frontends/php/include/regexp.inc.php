@@ -20,12 +20,7 @@
 
 
 function getRegexp($regexpId) {
-	return DBfetch(DBselect(
-		'SELECT re.*'.
-		' FROM regexps re'.
-		' WHERE regexpid='.zbx_dbstr($regexpId).
-			andDbNode('re.regexpid')
-	));
+	return DBfetch(DBselect('SELECT re.* FROM regexps re WHERE regexpid='.zbx_dbstr($regexpId)));
 }
 
 function getRegexpExpressions($regexpId) {
@@ -34,8 +29,7 @@ function getRegexpExpressions($regexpId) {
 	$dbExpressions = DBselect(
 		'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 		' FROM expressions e'.
-		' WHERE regexpid='.zbx_dbstr($regexpId).
-			andDbNode('e.expressionid')
+		' WHERE regexpid='.zbx_dbstr($regexpId)
 	);
 	while ($expression = DBfetch($dbExpressions)) {
 		$expressions[$expression['expressionid']] = $expression;
@@ -56,8 +50,8 @@ function addRegexp(array $regexp, array $expressions) {
 		// check duplicate name
 		$sql = 'SELECT re.regexpid'.
 				' FROM regexps re'.
-				' WHERE re.name='.zbx_dbstr($regexp['name']).
-					andDbNode('re.regexpid');
+				' WHERE re.name='.zbx_dbstr($regexp['name']);
+
 		if (DBfetch(DBselect($sql))) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
 		}
@@ -95,8 +89,7 @@ function updateRegexp(array $regexp, array $expressions) {
 		$dbRegexp = DBfetch(DBselect(
 			'SELECT re.regexpid'.
 			' FROM regexps re'.
-			' WHERE re.name='.zbx_dbstr($regexp['name']).
-				andDbNode('re.regexpid')
+			' WHERE re.name='.zbx_dbstr($regexp['name'])
 		));
 		if ($dbRegexp && bccomp($regexpId, $dbRegexp['regexpid']) != 0) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));

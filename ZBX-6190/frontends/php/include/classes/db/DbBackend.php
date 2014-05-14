@@ -72,7 +72,7 @@ abstract class DbBackend {
 			$sql .= '('.implode(',', array_values($row)).'),';
 		}
 
-		$sql[strlen($sql) - 1] = ' ';
+		$sql = substr($sql, 0, -1);
 
 		return $sql;
 	}

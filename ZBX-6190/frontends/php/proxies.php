@@ -35,6 +35,7 @@ $fields = array(
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
 	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -57,7 +58,8 @@ if (isset($_REQUEST['proxyid'])) {
 		'selectInterface' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	));
-	if (empty($dbProxy)) {
+
+	if (!$dbProxy) {
 		access_deny();
 	}
 }
@@ -86,7 +88,8 @@ if (isset($_REQUEST['save'])) {
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
-		'interface' => get_request('interface')
+		'interface' => get_request('interface'),
+		'description' => getRequest('description')
 	);
 
 	DBstart();
@@ -152,11 +155,9 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable')) && hasReque
 	$updated = 0;
 	foreach ($hosts as $hostId) {
 		$dbHosts = DBselect(
-			'SELECT h.hostid,h.status'.
-			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.zbx_dbstr($hostId).
-				andDbNode('h.hostid')
+			'SELECT h.hostid,h.status FROM hosts h WHERE h.proxy_hostid='.zbx_dbstr($hostId)
 		);
+
 		while ($dbHost = DBfetch($dbHosts)) {
 			$oldStatus = $dbHost['status'];
 			$updated++;
@@ -206,11 +207,12 @@ if (isset($_REQUEST['form'])) {
 		'status' => get_request('status', HOST_STATUS_PROXY_ACTIVE),
 		'hosts' => get_request('hosts', array()),
 		'interface' => get_request('interface', array()),
-		'proxy' => array()
+		'proxy' => array(),
+		'description' => getRequest('description', '')
 	);
 
 	// proxy
-	if (!empty($data['proxyid'])) {
+	if ($data['proxyid']) {
 		$dbProxy = reset($dbProxy);
 
 		if (!isset($_REQUEST['form_refresh'])) {
@@ -218,11 +220,12 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = $dbProxy['status'];
 			$data['interface'] = $dbProxy['interface'];
 			$data['hosts'] = zbx_objectValues($dbProxy['hosts'], 'hostid');
+			$data['description'] = $dbProxy['description'];
 		}
 	}
 
 	// interface
-	if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && empty($data['interface'])) {
+	if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && !$data['interface']) {
 		$data['interface'] = array(
 			'dns' => 'localhost',
 			'ip' => '127.0.0.1',
@@ -236,7 +239,6 @@ if (isset($_REQUEST['form'])) {
 		'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			andDbNode('h.hostid').
 			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	order_result($data['dbHosts'], 'name');
@@ -248,7 +250,6 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
 		'config' => select_config()
 	);
 
@@ -269,12 +270,6 @@ else {
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['proxies'], array('proxyid'));
 
-	// nodes
-	foreach ($data['proxies'] as &$proxy) {
-		$proxy['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($proxy['proxyid'], true) : '';
-	}
-	unset($proxy);
-
 	// calculate performance
 	$dbPerformance = DBselect(
 		'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
@@ -283,6 +278,7 @@ else {
 			' AND i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
+			' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
 			' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
 		' GROUP BY h.proxy_hostid'
 	);

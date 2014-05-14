@@ -52,7 +52,7 @@ function svc_default_port($type_int) {
 }
 
 function discovery_check_type2str($type = null) {
-	$discovery_types = array(
+	$discoveryTypes = array(
 		SVC_SSH => _('SSH'),
 		SVC_LDAP => _('LDAP'),
 		SVC_SMTP => _('SMTP'),
@@ -71,12 +71,11 @@ function discovery_check_type2str($type = null) {
 		SVC_HTTPS => _('HTTPS')
 	);
 
-	if (is_null($type)) {
-		order_result($discovery_types);
-		return $discovery_types;
+	if ($type === null) {
+		return $discoveryTypes;
 	}
-	elseif (isset($discovery_types[$type])) {
-		return $discovery_types[$type];
+	elseif (isset($discoveryTypes[$type])) {
+		return $discoveryTypes[$type];
 	}
 	else {
 		return false;

@@ -64,8 +64,6 @@ function condition_type2str($conditionType) {
 			return _('Host');
 		case CONDITION_TYPE_TIME_PERIOD:
 			return _('Time period');
-		case CONDITION_TYPE_NODE:
-			return _('Node');
 		case CONDITION_TYPE_DRULE:
 			return _('Discovery rule');
 		case CONDITION_TYPE_DCHECK:
@@ -122,18 +120,13 @@ function condition_value2str($conditiontype, $value) {
 			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
 				'output' => array('name'),
-				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 
 			if ($groups) {
 				$group = reset($groups);
 
-				$str_val = '';
-				if (id2nodeid($value) != get_current_nodeid()) {
-					$str_val = get_node_name_by_elid($value, true, NAME_DELIMITER);
-				}
-				$str_val .= $group['name'];
+				$str_val = $group['name'];
 			}
 			else {
 				return _('Unknown');
@@ -145,7 +138,6 @@ function condition_value2str($conditiontype, $value) {
 				'expandDescription' => true,
 				'output' => array('description'),
 				'selectHosts' => array('name'),
-				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 
@@ -153,11 +145,7 @@ function condition_value2str($conditiontype, $value) {
 				$trig = reset($trigs);
 				$host = reset($trig['hosts']);
 
-				$str_val = '';
-				if (id2nodeid($value) != get_current_nodeid()) {
-					$str_val = get_node_name_by_elid($value, true, NAME_DELIMITER);
-				}
-				$str_val .= $host['name'].NAME_DELIMITER.$trig['description'];
+				$str_val = $host['name'].NAME_DELIMITER.$trig['description'];
 			}
 			else {
 				return _('Unknown');
@@ -166,11 +154,7 @@ function condition_value2str($conditiontype, $value) {
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_TEMPLATE:
 			if ($host = get_host_by_hostid($value)) {
-				$str_val = '';
-				if (id2nodeid($value) != get_current_nodeid()) {
-					$str_val = get_node_name_by_elid($value, true, NAME_DELIMITER);
-				}
-				$str_val .= $host['name'];
+				$str_val = $host['name'];
 			}
 			else {
 				return _('Unknown');
@@ -192,14 +176,6 @@ function condition_value2str($conditiontype, $value) {
 			break;
 		case CONDITION_TYPE_MAINTENANCE:
 			$str_val = _('maintenance');
-			break;
-		case CONDITION_TYPE_NODE:
-			if ($node = get_node_by_nodeid($value)) {
-				$str_val = $node['name'];
-			}
-			else {
-				return _('Unknown');
-			}
 			break;
 		case CONDITION_TYPE_DRULE:
 			if ($drule = get_discovery_rule_by_druleid($value)) {
@@ -571,11 +547,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_HOST
 	);
 
-	if (ZBX_DISTRIBUTED) {
-		array_push($conditions[EVENT_SOURCE_TRIGGERS], CONDITION_TYPE_NODE);
-		array_push($conditions[EVENT_SOURCE_INTERNAL], CONDITION_TYPE_NODE);
-	}
-
 	if (isset($conditions[$eventsource])) {
 		return $conditions[$eventsource];
 	}
@@ -720,10 +691,6 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_IN,
 		CONDITION_OPERATOR_NOT_IN
 	);
-	$operators[CONDITION_TYPE_NODE] = array(
-		CONDITION_OPERATOR_EQUAL,
-		CONDITION_OPERATOR_NOT_EQUAL
-	);
 	$operators[CONDITION_TYPE_DRULE] = array(
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL
@@ -821,32 +788,56 @@ function count_operations_delay($operations, $def_period = 0) {
 	return $delays;
 }
 
-function get_action_msgs_for_event($event) {
+/**
+ * Get action messages.
+ *
+ * @param array  $alerts
+ * @param string $alerts[n]['alertid']
+ * @param string $alerts[n]['userid']
+ * @param int    $alerts[n]['alerttype']
+ * @param array  $alerts[n]['mediatypes']
+ * @param string $alerts[n]['clock']
+ * @param int    $alerts[n]['esc_step']
+ * @param int    $alerts[n]['status']
+ * @param int    $alerts[n]['retries']
+ * @param string $alerts[n]['subject']
+ * @param string $alerts[n]['sendto']
+ * @param string $alerts[n]['message']
+ * @param string $alerts[n]['error']
+ *
+ * @return CTableInfo
+ */
+function getActionMessages(array $alerts) {
+	$dbUsers = API::User()->get(array(
+		'output' => array('userid', 'alias', 'name', 'surname'),
+		'userids' => zbx_objectValues($alerts, 'userid'),
+		'preservekeys' => true
+	));
+
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('Time'),
 		_('Type'),
 		_('Status'),
 		_('Retries left'),
 		_('Recipient(s)'),
 		_('Message'),
-		_('Error')
+		_('Info')
 	));
 
-	$alerts = $event['alerts'];
-	foreach ($alerts as $alertid => $alert) {
+	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
 			continue;
 		}
 
-		$mediatype = array_pop($alert['mediatypes']);
+		$mediaType = array_pop($alert['mediatypes']);
 
-		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
+
 		if ($alert['esc_step'] > 0) {
 			$time = array(
 				bold(_('Step').NAME_DELIMITER),
-				$alert["esc_step"],
+				$alert['esc_step'],
 				br(),
 				bold(_('Time').NAME_DELIMITER),
 				br(),
@@ -866,7 +857,10 @@ function get_action_msgs_for_event($event) {
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
-		$sendto = $alert['sendto'];
+
+		$recipient = $alert['userid']
+			? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
+			: $alert['sendto'];
 
 		$message = array(
 			bold(_('Subject').NAME_DELIMITER),
@@ -876,47 +870,61 @@ function get_action_msgs_for_event($event) {
 			br(),
 			bold(_('Message').NAME_DELIMITER)
 		);
+
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
-		if (empty($alert['error'])) {
-			$error = new CSpan(SPACE, 'off');
+		if (zbx_empty($alert['error'])) {
+			$info = '';
 		}
 		else {
-			$error = new CSpan($alert['error'], 'on');
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($alert['error'], '', 'on');
 		}
 
 		$table->addRow(array(
-			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
-			new CCol((!empty($mediatype['description']) ? $mediatype['description'] : ''), 'top'),
+			new CCol((isset($mediaType['description']) ? $mediaType['description'] : ''), 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
-			new CCol($sendto, 'top'),
+			new CCol($recipient, 'top'),
 			new CCol($message, 'wraptext top'),
-			new CCol($error, 'wraptext top')
+			new CCol($info, 'wraptext top')
 		));
 	}
 
 	return $table;
 }
 
-function get_action_cmds_for_event($event) {
+/**
+ * Get action remote commands.
+ *
+ * @param array  $alerts
+ * @param string $alerts[n]['alertid']
+ * @param int    $alerts[n]['alerttype']
+ * @param string $alerts[n]['clock']
+ * @param int    $alerts[n]['esc_step']
+ * @param int    $alerts[n]['status']
+ * @param string $alerts[n]['message']
+ * @param string $alerts[n]['error']
+ *
+ * @return CTableInfo
+ */
+function getActionCommands(array $alerts) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('Time'),
 		_('Status'),
 		_('Command'),
 		_('Error')
 	));
 
-	$alerts = $event['alerts'];
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
 			continue;
 		}
 
-		$time = zbx_date2str(EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
+		$time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
+
 		if ($alert['esc_step'] > 0) {
 			$time = array(
 				bold(_('Step').NAME_DELIMITER),
@@ -932,24 +940,22 @@ function get_action_cmds_for_event($event) {
 			case ALERT_STATUS_SENT:
 				$status = new CSpan(_('executed'), 'green');
 				break;
+
 			case ALERT_STATUS_NOT_SENT:
 				$status = new CSpan(_('In progress'), 'orange');
 				break;
+
 			default:
 				$status = new CSpan(_('not sent'), 'red');
 				break;
 		}
 
-		$message = array(bold(_('Command').NAME_DELIMITER));
-		array_push($message, BR(), zbx_nl2br($alert['message']));
-
-		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
+		$error = $alert['error'] ? new CSpan($alert['error'], 'on') : new CSpan(SPACE, 'off');
 
 		$table->addRow(array(
-			get_node_name_by_elid($alert['alertid']),
 			new CCol($time, 'top'),
 			new CCol($status, 'top'),
-			new CCol($message, 'wraptext top'),
+			new CCol(array(bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])), 'wraptext top'),
 			new CCol($error, 'wraptext top')
 		));
 	}
@@ -961,7 +967,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
-		is_show_all_nodes() ? _('Nodes') : null,
 		_('User'),
 		_('Details'),
 		_('Status')
@@ -975,7 +980,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				andDbNode('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);
 
@@ -1022,12 +1026,12 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 		}
 
 		$tab_hint->addRow(array(
-			get_node_name_by_elid($row['alertid']),
 			$row['alias'],
 			$message,
 			$status
 		));
 	}
+
 	return $tab_hint;
 }
 

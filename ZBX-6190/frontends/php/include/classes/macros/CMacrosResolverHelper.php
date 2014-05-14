@@ -478,6 +478,40 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Expand functional macros in given map label.
+	 *
+	 * @param string $label			label to expand
+	 * @param array  $replaceHosts	list of hosts in order which they appear in trigger expression if trigger label is
+	 * given, or single host when host label is given
+	 *
+	 * @return string
+	 */
+	public static function resolveMapLabelMacros($label, $replaceHosts = null) {
+		self::init();
+
+		return self::$macrosResolver->resolveMapLabelMacros($label, $replaceHosts);
+	}
+
+	/**
+	 * Resolve all kinds of macros in map labels.
+	 *
+	 * @static
+	 *
+	 * @param array  $selement
+	 * @param string $selement['label']						label to expand
+	 * @param int    $selement['elementtype']				element type
+	 * @param int    $selement['elementid']					element id
+	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
+	 *
+	 * @return string
+	 */
+	public static function resolveMapLabelMacrosAll(array $selement) {
+		self::init();
+
+		return self::$macrosResolver->resolveMapLabelMacrosAll($selement);
+	}
+
+	/**
 	 * Create CMacrosResolver object and store in static variable.
 	 *
 	 * @static

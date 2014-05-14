@@ -24,7 +24,7 @@
  *
  * @package API
  */
-abstract class CMapElement extends CZBXAPI {
+abstract class CMapElement extends CApiService {
 
 	protected function checkSelementInput(&$selements, $method) {
 		$update = ($method == 'updateSelements');
@@ -128,7 +128,7 @@ abstract class CMapElement extends CZBXAPI {
 	 * @return array
 	 */
 	protected function fetchSelementsByIds(array $selementIds) {
-		$selements = API::getApi()->select('sysmaps_elements', array(
+		$selements = API::getApiService()->select('sysmaps_elements', array(
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('selementid' => $selementIds),
 			'preservekeys' => true
@@ -140,7 +140,7 @@ abstract class CMapElement extends CZBXAPI {
 			}
 			unset($selement);
 
-			$selementUrls = API::getApi()->select('sysmap_element_url', array(
+			$selementUrls = API::getApiService()->select('sysmap_element_url', array(
 				'output' => API_OUTPUT_EXTEND,
 				'filter' => array('selementid' => $selementIds)
 			));
@@ -160,7 +160,7 @@ abstract class CMapElement extends CZBXAPI {
 		if ($update || $delete) {
 			$linkDbFields = array('linkid' => null);
 
-			$dbLinks = API::getApi()->select('sysmap_element_url', array(
+			$dbLinks = API::getApiService()->select('sysmap_element_url', array(
 				'filter' => array('selementid' => zbx_objectValues($links, 'linkid')),
 				'output' => array('linkid'),
 				'preservekeys' => true

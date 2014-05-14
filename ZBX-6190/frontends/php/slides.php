@@ -173,7 +173,7 @@ if (hasRequest('favobj') && hasRequest('favid')) {
 	}
 }
 
-if (in_array($page['type'], array(PAGE_TYPE_JS, PAGE_TYPE_HTML_BLOCK))) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
@@ -188,11 +188,8 @@ $data = array(
 );
 
 // get slideshows
-$dbSlideshows = DBselect(
-	'SELECT s.slideshowid,s.name'.
-	' FROM slideshows s'.
-	whereDbNode('s.slideshowid')
-);
+$dbSlideshows = DBselect('SELECT s.slideshowid,s.name FROM slideshows s');
+
 while ($dbSlideshow = DBfetch($dbSlideshows)) {
 	if (slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
 		$data['slideshows'][$dbSlideshow['slideshowid']] = $dbSlideshow;

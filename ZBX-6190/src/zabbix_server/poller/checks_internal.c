@@ -264,7 +264,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			case ZBX_PROCESS_TYPE_WATCHDOG:
 			case ZBX_PROCESS_TYPE_ALERTER:
 			case ZBX_PROCESS_TYPE_ESCALATOR:
-			case ZBX_PROCESS_TYPE_NODEWATCHER:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
 				if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
@@ -475,15 +474,16 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (0 == strcmp(tmp, "buffer"))
 		{
 			if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, stats.total - stats.used);
+				SET_UI64_RESULT(result, stats.free_size);
 			else if (0 == strcmp(tmp1, "pfree"))
-				SET_DBL_RESULT(result, (double)(stats.total - stats.used) / stats.total * 100);
+				SET_DBL_RESULT(result, (double)stats.free_size / stats.total_size * 100);
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, stats.total);
+				SET_UI64_RESULT(result, stats.total_size);
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, stats.used);
+				SET_UI64_RESULT(result, stats.total_size - stats.free_size);
 			else if (0 == strcmp(tmp1, "pused"))
-				SET_DBL_RESULT(result, (double)stats.used / stats.total * 100);
+				SET_DBL_RESULT(result, (double)(stats.total_size - stats.free_size) /
+						stats.total_size * 100);
 			else
 				goto notsupported;
 		}

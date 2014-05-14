@@ -44,6 +44,7 @@
 
 			var url = document.createElement('a');
 			url.setAttribute('href', 'services.php?form=1&serviceid=' + serviceid);
+			url.setAttribute('target', '_blank');
 			url.appendChild(document.createTextNode(name));
 
 			td.appendChild(inputServiceId);

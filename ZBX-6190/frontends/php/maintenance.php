@@ -397,8 +397,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
  * Display
  */
 $data = array(
-	'form' => get_request('form'),
-	'displayNodes' => (is_array(get_current_nodeid()) && $pageFilter->groupid == 0)
+	'form' => get_request('form')
 );
 
 if (!empty($data['form'])) {
@@ -500,18 +499,6 @@ if (!empty($data['form'])) {
 	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
 	order_result($data['hosts'], 'name');
 
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['all_groups'] as $key => $group) {
-			$data['all_groups'][$key]['name'] =
-				get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
-		}
-
-		foreach ($data['hosts'] as $key => $host) {
-			$data['hosts'][$key]['name'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
-		}
-	}
-
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.edit', $data);
 	$maintenanceView->render();
@@ -522,18 +509,25 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	$groupIds = array();
+	$data['maintenances'] = array();
+
 	if ($pageFilter->groupsSelected) {
-		$groupIds = ($pageFilter->groupid > 0) ? $pageFilter->groupid : array_keys($pageFilter->groups);
+		$data['maintenances'] = API::Maintenance()->get(array(
+			'output' => array('maintenanceid'),
+			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
+		));
 	}
 
+	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
+
+	// get list of maintenances
 	$data['maintenances'] = API::Maintenance()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'groupids' => $groupIds,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'editable' => true,
-		'limit' => $config['search_limit'] + 1
+		'maintenanceids' => zbx_objectValues($data['maintenances'], 'maintenanceid')
 	));
 
 	foreach ($data['maintenances'] as $key => $maintenance) {
@@ -550,16 +544,7 @@ else {
 
 	order_result($data['maintenances'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 	$data['pageFilter'] = $pageFilter;
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['maintenances'] as &$maintenance) {
-			$maintenance['nodename'] = get_node_name_by_elid($maintenance['maintenanceid'], true);
-		}
-		unset($maintenance);
-	}
 
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.list', $data);

@@ -196,7 +196,7 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || getRequest('go') == 
 
 	$maps = API::Map()->get(array(
 		'sysmapids' => $sysmapIds,
-		'output' => array('name'),
+		'output' => array('sysmapid', 'name'),
 		'editable' => true
 	));
 	$result = API::Map()->delete($sysmapIds);
@@ -270,10 +270,6 @@ if (isset($_REQUEST['form'])) {
 	));
 	order_result($data['images'], 'name');
 
-	foreach ($data['images'] as $num => $image) {
-		$data['images'][$num]['name'] = get_node_name_by_elid($image['imageid'], null, NAME_DELIMITER).$image['name'];
-	}
-
 	// icon maps
 	$data['iconMaps'] = API::IconMap()->get(array(
 		'output' => array('iconmapid', 'name'),
@@ -304,14 +300,6 @@ else {
 
 	// paging
 	$data['paging'] = getPagingLine($data['maps'], array('sysmapid'));
-
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($data['maps'] as &$map) {
-			$map['nodename'] = get_node_name_by_elid($map['sysmapid'], true);
-		}
-		unset($map);
-	}
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

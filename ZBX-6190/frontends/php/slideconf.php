@@ -198,7 +198,6 @@ else {
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
 				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
-			whereDbNode('s.slideshowid').
 			' GROUP BY s.slideshowid,s.name,s.delay'
 	));
 
@@ -211,14 +210,6 @@ else {
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 
 	$data['paging'] = getPagingLine($data['slides'], array('slideshowid'));
-
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($data['slides'] as &$slide) {
-			$slide['nodename'] = get_node_name_by_elid($slide['slideshowid'], true);
-		}
-		unset($slide);
-	}
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.list', $data);
