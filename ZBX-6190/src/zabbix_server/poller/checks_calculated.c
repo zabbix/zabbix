@@ -219,13 +219,13 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		{
 			if (NULL != errstr)
 			{
-				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\": %s",
+				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\": %s.",
 						f->func, f->params, errstr);
 				zbx_free(errstr);
 			}
 			else
 			{
-				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\"",
+				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\".",
 						f->func, f->params);
 			}
 
