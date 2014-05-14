@@ -528,7 +528,7 @@ $fields = array(
 	'itemid' =>				array(T_ZBX_INT, O_OPT, null,	null,		'isset({insert})'),
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'expr_type'=>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
-	'param' =>				array(T_ZBX_STR, O_OPT, null,	0,			'isset({insert})'),
+	'param' =>				array(T_ZBX_STR, O_OPT, null,	0,			null),
 	'paramtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_TIME.','.PARAM_TYPE_COUNTS), 'isset({insert})'),
 	'value' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
 	// action
@@ -537,74 +537,93 @@ $fields = array(
 );
 check_fields($fields);
 
+$dstfrm = getRequest('dstfrm', 0);
+$dstfld1 = getRequest('dstfld1', '');
+$itemId = getRequest('itemid', 0);
+$value = getRequest('value', 0);
+$param = getRequest('param', array());
+$paramType = getRequest('paramtype');
+$exprType = getRequest('expr_type', 'last[=]');
+
+// opening the popup when editing an expression in the trigger constructor
 if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
 	$expressionData = new CTriggerExpression();
+	$result = $expressionData->parse(getRequest('expression'));
 
-	if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
-		$exprPart = reset($expressionData->expressions);
+	if ($result) {
+		// only one item function macro is supported in an expression
+		$functionMacroTokens = $result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO);
+		if (count($functionMacroTokens) == 1) {
+			$functionMacroToken = $functionMacroTokens[0];
 
-		preg_match('/\}[ \t\r\n]*([=><]{1,2})[ \t\r\n]*([0-9]+)$/', $_REQUEST['expression'], $exprSymbols);
+			// function
+			$function = $functionMacroToken['data']['functionName'];
 
-		if (isset($exprSymbols[1])) {
-			$_REQUEST['expr_type'] = $exprPart['functionName'].'['.$exprSymbols[1].']';
-		}
+			// determine param type
+			$param = $functionMacroToken['data']['functionParams'];
+			$paramNumber = in_array($function, array('regexp', 'iregexp', 'str')) ? 1 : 0;
+			if (isset($param[$paramNumber][0]) && $param[$paramNumber][0] == '#') {
+				$paramType = PARAM_TYPE_COUNTS;
+				$param[$paramNumber] = substr($param[$paramNumber], 1);
+			}
+			else {
+				$paramType = PARAM_TYPE_TIME;
+			}
 
-		$_REQUEST['description'] = $exprPart['host'].':'.$exprPart['item'];
-		$_REQUEST['param'] = $exprPart['functionParamList'];
+			// try to find an operator and a numeric value
+			// we only support expressions where the operator and value immediately follow an item macro
+			$tokens = $result->getTokens();
+			foreach ($tokens as $key => $token) {
+				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+					if (isset($tokens[$key + 1])
+							&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
+							&& isset($tokens[$key + 2])
+							&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
 
-		$paramNumber = in_array($exprPart['functionName'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+						$operator = $tokens[$key + 1]['value'];
 
-		if (isset($_REQUEST['param'][$paramNumber][0]) && $_REQUEST['param'][$paramNumber][0] == '#') {
-			$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
-			$_REQUEST['param'][$paramNumber] = substr($_REQUEST['param'][$paramNumber], 1);
-		}
-		else {
-			$_REQUEST['paramtype'] = PARAM_TYPE_TIME;
-		}
+						$value = $tokens[$key + 2]['value'];
+						$exprType = $function.'['.$operator.']';
+					}
+					else {
+						break;
+					}
+				}
+			}
 
-		if (isset($exprSymbols[2])) {
-			$_REQUEST['value'] = $exprSymbols[2];
-		}
+			// find the item
+			$myItem = API::Item()->get(array(
+				'filter' => array(
+					'host' => $functionMacroToken['data']['host'],
+					'key_' => $functionMacroToken['data']['item'],
+					'flags' => null
+				),
+				'output' => array('itemid'),
+				'webitems' => true
+			));
+			$myItem = reset($myItem);
 
-		$myItem = API::Item()->get(array(
-			'filter' => array('host' => $exprPart['host'], 'key_' => $exprPart['item'], 'flags' => null),
-			'output' => array('itemid'),
-			'webitems' => true
-		));
-		$myItem = reset($myItem);
-
-		if (isset($myItem['itemid'])) {
-			$_REQUEST['itemid'] = $myItem['itemid'];
-		}
-		else {
-			error(_('Unknown host item, no such item in selected host'));
+			if ($myItem) {
+				$itemId = $myItem['itemid'];
+			}
+			else {
+				error(_('Unknown host item, no such item in selected host'));
+			}
 		}
 	}
 }
+// opening an empty form or switching a function
+else {
+	if (preg_match('/^([a-z]+)\[([=><]{1,2})\]$/i', $exprType, $matches)) {
+		$function = $matches[1];
+		$operator = $matches[2];
 
-$exprType = get_request('expr_type', 'last[=]');
-
-if (preg_match('/^([a-z]+)\[([=><]{1,2})\]$/i', $exprType, $exprRes)) {
-	$function = $exprRes[1];
-	$operator = $exprRes[2];
-
-	if (!isset($functions[$exprType])) {
-		unset($function);
+		if (!isset($functions[$exprType])) {
+			unset($function);
+		}
 	}
-}
-
-$dstfrm = get_request('dstfrm', 0);
-$dstfld1 = get_request('dstfld1', '');
-$itemId = get_request('itemid', 0);
-$value = get_request('value', 0);
-$param = get_request('param', 0);
-$paramType = get_request('paramtype');
-
-if (!isset($function)) {
-	$function = 'last[=]';
-	$exprType = $function;
 }
 
 if ($itemId) {
@@ -635,15 +654,6 @@ elseif (is_null($paramType)) {
 	$paramType = PARAM_TYPE_TIME;
 }
 
-if (!is_array($param)) {
-	if (isset($functions[$exprType]['params'])) {
-		$param = explode(',', $param, count($functions[$exprType]['params']));
-	}
-	else {
-		$param = array($param);
-	}
-}
-
 /*
  * Display
  */
@@ -657,8 +667,6 @@ $data = array(
 	'paramtype' => $paramType,
 	'description' => $description,
 	'functions' => $functions,
-	'function' => $function,
-	'operator' => $operator,
 	'item_host' => $itemHost,
 	'item_key' => $itemKey,
 	'itemValueType' => null,
@@ -682,12 +690,11 @@ if ($itemId) {
 	}
 }
 
-$submittedFunction = $data['function'].'['.$data['operator'].']';
 $data['selectedFunction'] = null;
 
 // check if submitted function is usable with selected item
 foreach ($data['functions'] as $id => $f) {
-	if ((!$data['itemValueType'] || isset($f['allowed_types'][$data['itemValueType']])) && $id == $submittedFunction) {
+	if ((!$data['itemValueType'] || isset($f['allowed_types'][$data['itemValueType']])) && $id == $exprType) {
 		$data['selectedFunction'] = $id;
 		break;
 	}
@@ -695,7 +702,7 @@ foreach ($data['functions'] as $id => $f) {
 
 if ($data['selectedFunction'] === null) {
 	error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
-		$data['functions'][$submittedFunction]['description'],
+		$data['functions'][$exprType]['description'],
 		$data['description']
 	));
 }
@@ -712,11 +719,11 @@ if (isset($data['insert'])) {
 	try {
 		if ($data['description']) {
 			if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
-				$paramNumber = in_array($data['function'], array('regexp', 'iregexp', 'str')) ? 1 : 0;
+				$paramNumber = in_array($function, array('regexp', 'iregexp', 'str')) ? 1 : 0;
 				$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
 			}
 
-			if ($data['paramtype'] == PARAM_TYPE_TIME && in_array($data['function'], array('last', 'band', 'strlen'))) {
+			if ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, array('last', 'band', 'strlen'))) {
 				$data['param'][0] = '';
 			}
 
@@ -729,9 +736,9 @@ if (isset($data['insert'])) {
 			$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
 				$data['item_host'],
 				$data['item_key'],
-				$data['function'],
+				$function,
 				rtrim(implode(',', $params), ','),
-				$data['operator'],
+				$operator,
 				$data['value']
 			);
 

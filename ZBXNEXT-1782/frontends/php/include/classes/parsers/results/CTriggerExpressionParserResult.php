@@ -28,6 +28,7 @@ class CTriggerExpressionParserResult extends CParserResult {
 	const TOKEN_TYPE_OPERATOR = 2;
 	const TOKEN_TYPE_EXPRESSION = 3;
 	const TOKEN_TYPE_FUNCTION_MACRO = 4;
+	const TOKEN_TYPE_NUMBER = 5;
 
 	/**
 	 * Array of expression tokens.
@@ -39,7 +40,11 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 *
 	 * The following "data" information can be available depending on the type of the token.
 	 * For self::TOKEN_TYPE_FUNCTION_MACRO tokens:
-	 * - function   - the function string, e.g., "function(param1, param2)"
+	 * - host           - host name
+	 * - item           - item key
+	 * - function       - the function string, e.g., "function(param1, param2)"
+	 * - functionName   - function name without parameters
+	 * - functionParams - array of function parameters
 	 *
 	 * @var array
 	 */
@@ -69,5 +74,24 @@ class CTriggerExpressionParserResult extends CParserResult {
 			'value' => $value,
 			'data' => $data
 		);
+	}
+
+	/**
+	 * Returns all tokens of the given type.
+	 *
+	 * @param $type
+	 *
+	 * @return array
+	 */
+	public function getTokensByType($type) {
+		$result = array();
+
+		foreach ($this->tokens as $token) {
+			if ($token['type'] == $type) {
+				$result[] = $token;
+			}
+		}
+
+		return $result;
 	}
 }

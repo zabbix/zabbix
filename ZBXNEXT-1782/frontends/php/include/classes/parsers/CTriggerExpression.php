@@ -66,6 +66,8 @@ class CTriggerExpression {
 	 *     )
 	 *   )
 	 *
+	 * @deprecated  use result tokens instead
+	 *
 	 * @var array
 	 */
 	public $expressions = array();
@@ -80,6 +82,8 @@ class CTriggerExpression {
 	 *       'expression' => '{TRIGGER.VALUE}'
 	 *     )
 	 *   )
+	 *
+	 * @deprecated use result tokens instead
 	 *
 	 * @var array
 	 */
@@ -102,6 +106,8 @@ class CTriggerExpression {
 	 *     )
 	 *   )
 	 *
+	 * @deprecated use result tokens instead
+	 *
 	 * @var array
 	 */
 	public $usermacros = array();
@@ -122,6 +128,8 @@ class CTriggerExpression {
 	 *       'expression' => '{#MACRO}'
 	 *     )
 	 *   )
+	 *
+	 * @deprecated use result tokens instead
 	 *
 	 * @var array
 	 */
@@ -243,7 +251,7 @@ class CTriggerExpression {
 	 *
 	 * @param string $expression
 	 *
-	 * @return CParserResult|bool   returns a CParserResult object if a match has been found or false otherwise
+	 * @return CTriggerExpressionParserResult|bool   returns a result object if a match has been found or false otherwise
 	 */
 	public function parse($expression) {
 		// initializing local variables
@@ -597,9 +605,14 @@ class CTriggerExpression {
 		}
 
 		$expression = substr($this->expression, $this->pos, $j - $this->pos + 1);
+		$functionName = substr($function, 0, strpos($function, '('));
 
 		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO, $expression, array(
-			'function' => $function
+			'host' => $host,
+			'item' => $item,
+			'function' => $function,
+			'functionName' => $functionName,
+			'functionParams' => $functionParamList
 		));
 
 		$this->expressions[] = array(
@@ -608,7 +621,7 @@ class CTriggerExpression {
 			'host' => $host,
 			'item' => $item,
 			'function' => $function,
-			'functionName' => substr($function, 0, strpos($function, '(')),
+			'functionName' => $functionName,
 			'functionParam' => substr($function, strpos($function, '(') + 1, -1),
 			'functionParamList' => $functionParamList
 		);
@@ -900,7 +913,7 @@ class CTriggerExpression {
 			$j++;
 		}
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
 			substr($this->expression, $this->pos, $j - $this->pos)
 		);
 
