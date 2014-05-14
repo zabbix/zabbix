@@ -600,7 +600,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		if (ITEM_VALUE_TYPE_UINT64 == value_type && 0 > *var->val.integer)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%d]"
-					"is not suitable for value type [%s].",
+					" is not suitable for value type [%s].",
 					*var->val.integer, zbx_item_value_type_string(value_type)));
 			ret = NOTSUPPORTED;
 		}
