@@ -27,7 +27,7 @@
  * @return object $reportForm
  */
 function valueDistributionFormForMultiplePeriods($items = array()) {
-	$config = get_request('config', 1);
+	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
 	$title = get_request('title', _('Report 1'));
@@ -84,13 +84,9 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 			$color = new CColorCell(null, $item['color']);
 
 			$caption = new CSpan($item['caption'], 'link');
-			$caption->onClick('return PopUp("popup_bitem.php?'.
-				'config=1'.
-				'&list_name=items'.
-				'&dstfrm='.$reportForm->GetName().
-				url_param($item, false).
-				url_param($id, false, 'gid').
-				'", 550, 400, "graph_item_form");'
+			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
+				'&list_name=items&dstfrm='.$reportForm->GetName().url_param($item, false).
+				url_param($id, false, 'gid').'", 550, 400, "graph_item_form");'
 			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
@@ -119,18 +115,15 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
-		new CButton('add_item', _('Add'),
-			'return PopUp("popup_bitem.php?config=1&dstfrm='.$reportForm->getName().
-			'", 800, 400, "graph_item_form");'),
+		new CButton('add_item', _('Add'), 'return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
+			'&dstfrm='.$reportForm->getName().'", 800, 400, "graph_item_form");'
+		),
 		$delete_button
 	));
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
-
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
@@ -144,7 +137,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
  * @return object $reportForm
  */
 function valueDistributionFormForMultipleItems($items = array(), $periods = array()){
-	$config = get_request('config', 1);
+	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	$title = get_request('title', _('Report 2'));
 	$xlabel = get_request('xlabel', '');
@@ -185,14 +178,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		foreach ($periods as $pid => $period) {
 			$color = new CColorCell(null, $period['color']);
 
-			$edit_link = 'popup_period.php?'.
-				'period_id='.$pid.
-				'&config=2'.
-				'&dstfrm='.$reportForm->getName().
-				'&caption='.$period['caption'].
-				'&report_timesince='.$period['report_timesince'].
-				'&report_timetill='.$period['report_timetill'].
-				'&color='.$period['color'];
+			$edit_link = 'popup_period.php?period_id='.$pid.'&config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
+				'&dstfrm='.$reportForm->getName().'&caption='.$period['caption'].'&report_timesince='.
+				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
 			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
@@ -200,8 +188,8 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),
 				$caption,
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']),
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']),
 				$color
 			));
 		}
@@ -217,8 +205,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 
 	$reportForm->addRow(_('Period'), array(
 		$periods_table,
-		new CButton('add_period', _('Add'),
-			'return PopUp("popup_period.php?config=2&dstfrm='.$reportForm->getName().'", 840, 340, "period_form");'),
+		new CButton('add_period', _('Add'), 'return PopUp("popup_period.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
+			'&dstfrm='.$reportForm->getName().'", 840, 340, "period_form");'
+		),
 		$delete_button
 	));
 	unset($periods_table, $delete_button);
@@ -229,13 +218,9 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		$items_table = new CTableInfo();
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
-			$caption->onClick('return PopUp("popup_bitem.php?'.
-				'config=2'.
-				'&list_name=items'.
-				'&dstfrm='.$reportForm->GetName().
-				url_param($item, false).
-				url_param($id, false, 'gid').
-				'", 550, 400, "graph_item_form");'
+			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.'&list_name=items'.
+				'&dstfrm='.$reportForm->GetName().url_param($item, false).url_param($id, false, 'gid').'", 550, 400, "'.
+				'graph_item_form");'
 			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
@@ -262,18 +247,15 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
-		new CButton('add_item',_('Add'),
-			"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
-			"', 550, 400, 'graph_item_form');"),
+		new CButton('add_item',_('Add'), "return PopUp('popup_bitem.php?config=".BR_DISTRIBUTION_MULTIPLE_ITEMS.
+			"&dstfrm=".$reportForm->getName()."', 550, 400, 'graph_item_form');"
+		),
 		$delete_button
 	));
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
-
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
@@ -284,7 +266,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
  * @return object $reportForm
  */
 function valueComparisonFormForMultiplePeriods() {
-	$config = get_request('config', 1);
+	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	$title = get_request('title', _('Report 3'));
 	$xlabel = get_request('xlabel', '');
@@ -451,11 +433,9 @@ function valueComparisonFormForMultiplePeriods() {
 	$paletteTypeCmb->addItem(2, _('Brighten'));
 
 	$reportForm->addRow(_('Palette'), array($paletteCmb, $paletteTypeCmb));
-	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 
-	$reset = new CButton('reset', _('Reset'));
-	$reset->setType('reset');
-	$reportForm->addItemToBottomRow($reset);
+	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
+	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
 
 	return $reportForm;
 }
@@ -470,14 +450,14 @@ function valueComparisonFormForMultiplePeriods() {
  * @return mixed	valid items array on success or false on failure
  */
 function validateBarReportItems($items = array()) {
-	$config = get_request('config', 1);
+	$config = get_request('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	if (!isset($items) || !$items) {
 		return false;
 	}
 
 	$fields = array('itemid', 'calc_fnc');
-	if ($config == 1) {
+	if ($config == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
 		array_push($fields, 'color');
 	}
 
@@ -496,7 +476,6 @@ function validateBarReportItems($items = array()) {
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 		'selectHosts' => array('name'),
 		'webitems' => true,
-		'nodeids' => get_current_nodeid(true),
 		'itemids' => $itemIds,
 		'preservekeys' => true
 	));
@@ -537,7 +516,7 @@ function validateBarReportItems($items = array()) {
 		'values' => array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT)
 	));
 
-	if ($config == 1) {
+	if ($config == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
 		$colorValidator = new CColorValidator();
 	}
 	foreach ($items as $item) {
@@ -549,7 +528,7 @@ function validateBarReportItems($items = array()) {
 			show_error_message(_s('Incorrect value for field "%1$s".', 'axisside'));
 			return false;
 		}
-		if ($config == 1) {
+		if ($config == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
 			if (!$colorValidator->validate($item['color'])) {
 				show_error_message($colorValidator->getError());
 				return false;
@@ -600,8 +579,8 @@ function validateBarReportPeriods($periods = array()) {
 			return false;
 		}
 		if (!isset($period['caption']) || zbx_empty($period['caption'])) {
-			$period['caption'] = zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']).' - '.
-				zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']);
+			$period['caption'] = zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']).' - '.
+				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']);
 		}
 
 	}

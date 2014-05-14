@@ -1141,7 +1141,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	if (NULL == os_hnd)
 	{
 		SET_MSG_RESULT(value, strdup("IPMI handler is not initialised"));
-		return NOTSUPPORTED;
+		return CONFIG_ERROR;
 	}
 
 	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,

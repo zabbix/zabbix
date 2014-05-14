@@ -19,7 +19,7 @@
 **/
 
 
-$triggersWidget = new CWidget();
+$triggersWidget = new CWidget(null, 'trigger-list');
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -71,8 +71,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 else {
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
+	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	$triggersWidget->addHeader(_('Triggers'), $filterForm);
 	$triggersWidget->addHeaderRowNumber(array(
@@ -104,17 +104,19 @@ $link = $link->getUrl();
 $triggersTable = new CTableInfo(_('No triggers found.'));
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Severity'), 'priority', $link),
 	empty($this->data['hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	$data['showErrorColumn'] ? _('Error') : null
+	$data['showInfoColumn'] ? _('Info') : null
 ));
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
+
+	// description
 	$description = array();
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -169,18 +171,35 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$dependencies = $trigger['dependencies'];
 		if (count($dependencies) > 0) {
 			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
-			foreach ($dependencies as $dep_trigger) {
-				$description[] = BR();
+			$triggerDependencies = array();
 
-				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
-				while ($host = DBfetch($db_hosts)) {
-					$description[] = CHtml::encode($host['name']);
-					$description[] = ', ';
+			foreach ($dependencies as $dependency) {
+				$depTrigger = $this->data['dependencyTriggers'][$dependency['triggerid']];
+				$hostNames = array();
+
+				foreach ($depTrigger['hosts'] as $host) {
+					$hostNames[] = CHtml::encode($host['name']);
+					$hostNames[] = ', ';
 				}
-				array_pop($description);
-				$description[] = NAME_DELIMITER;
-				$description[] = CHtml::encode($dep_trigger['description']);
+				array_pop($hostNames);
+
+				if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$host = reset($depTrigger['hosts']);
+					$triggerDependencies[] = new CLink(
+						array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+						'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
+						triggerIndicatorStyle($depTrigger['status'])
+					);
+				}
+				else {
+					$triggerDependencies[] = array($hostNames, NAME_DELIMITER, $depTrigger['description']);
+				}
+
+				$triggerDependencies[] = BR();
 			}
+			array_pop($triggerDependencies);
+
+			$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
 		}
 	}
 	else {
@@ -194,19 +213,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
-	if ($data['showErrorColumn']) {
-		$error = '';
-		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			if (!zbx_empty($trigger['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($trigger['error'], '', 'on');
-			}
-			else {
-				$error = new CDiv(SPACE, 'status_icon iconok');
-			}
+	// info
+	if ($data['showInfoColumn']) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && !zbx_empty($trigger['error'])) {
+			$info = new CDiv(SPACE, 'status_icon iconerror');
+			$info->setHint($trigger['error'], '', 'on');
+		}
+		else {
+			$info = '';
 		}
 	}
+	else {
+		$info = null;
+	}
 
+	// status
 	$status = '';
 	if (!empty($this->data['parent_discoveryid'])) {
 		$status = new CLink(
@@ -230,6 +251,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
+	// hosts
 	$hosts = null;
 	if (empty($this->data['hostid'])) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
@@ -240,23 +262,23 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
+	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
+	// expression
 	$expressionColumn = new CCol(triggerExpression($trigger, true));
 	$expressionColumn->setAttribute('style', 'white-space: normal;');
 
 	$triggersTable->addRow(array(
 		$checkBox,
-		$this->data['displayNodes'] ? $trigger['nodename'] : null,
 		getSeverityCell($trigger['priority']),
 		$hosts,
 		$description,
 		$expressionColumn,
 		$status,
-		$data['showErrorColumn'] ? $error : null
+		$info
 	));
-	$triggers[$tnum] = $trigger;
 }
 
 // create go button

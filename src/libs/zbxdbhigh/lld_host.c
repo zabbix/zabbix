@@ -1202,13 +1202,9 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 	zbx_lld_group_prototype_t	*group_prototype;
 	zbx_lld_host_t			*host;
 	zbx_uint64_t			groupid = 0;
-	char				*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *name_esc, *name_proto_esc;
-	size_t				sql1_alloc = 0, sql1_offset = 0,
-					sql2_alloc = 0, sql2_offset = 0,
-					sql3_alloc = 0, sql3_offset = 0;
-	const char			*ins_groups_sql = "insert into groups (groupid,name,flags) values ";
-	const char			*ins_group_discovery_sql =
-					"insert into group_discovery (groupid,parent_group_prototypeid,name) values ";
+	char				*sql = NULL, *name_esc, *name_proto_esc;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t			db_insert, db_insert_gdiscovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1234,17 +1230,15 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 	{
 		groupid = DBget_maxid_num("groups", new_groups);
 
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_groups_sql);
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_group_discovery_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "groups", "groupid", "name", "flags", NULL);
+
+		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupid", "parent_group_prototypeid",
+				"name", NULL);
 	}
 
 	if (0 != upd_groups)
 	{
-		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < groups->values_num; i++)
@@ -1254,31 +1248,20 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
-		name_esc = DBdyn_escape_string(group->name);
-
 		if (0 == group->groupid)
 		{
 			group->groupid = groupid++;
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_groups_sql);
-#endif
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "(" ZBX_FS_UI64 ",'%s',%d)" ZBX_ROW_DL,
-					group->groupid, name_esc, ZBX_FLAG_DISCOVERY_CREATED);
+
+			zbx_db_insert_add_values(&db_insert, group->groupid, group->name,
+					(int)ZBX_FLAG_DISCOVERY_CREATED);
 
 			if (FAIL != (j = zbx_vector_ptr_bsearch(group_prototypes, &group->group_prototypeid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[j];
 
-				name_proto_esc = DBdyn_escape_string(group_prototype->name);
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_group_discovery_sql);
-#endif
-				zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-						group->groupid, group->group_prototypeid, name_proto_esc);
-
-				zbx_free(name_proto_esc);
+				zbx_db_insert_add_values(&db_insert_gdiscovery, group->groupid,
+						group->group_prototypeid, group_prototype->name);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -1295,10 +1278,16 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 		{
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, "update groups set ");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update groups set ");
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "name='%s'", name_esc);
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+				{
+					name_esc = DBdyn_escape_string(group->name);
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
+
+					zbx_free(name_esc);
+				}
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						" where groupid=" ZBX_FS_UI64 ";\n", group->groupid);
 			}
 
@@ -1311,7 +1300,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 
 					name_proto_esc = DBdyn_escape_string(group_prototype->name);
 
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update group_discovery"
 							" set name='%s'"
 							" where groupid=" ZBX_FS_UI64 ";\n",
@@ -1323,31 +1312,22 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_pr
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
-
-		zbx_free(name_esc);
-	}
-
-	if (0 != new_groups)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql1_offset--;
-		sql2_offset--;
-		zbx_chrcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ';');
-		zbx_chrcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ';');
-#endif
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-		DBexecute("%s", sql1);
-		DBexecute("%s", sql2);
-		zbx_free(sql1);
-		zbx_free(sql2);
 	}
 
 	if (0 != upd_groups)
 	{
-		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBexecute("%s", sql3);
-		zbx_free(sql3);
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		DBexecute("%s", sql);
+		zbx_free(sql);
+	}
+
+	if (0 != new_groups)
+	{
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		zbx_db_insert_execute(&db_insert_gdiscovery);
+		zbx_db_insert_clean(&db_insert_gdiscovery);
 	}
 
 	DBcommit();
@@ -1655,37 +1635,13 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_lld_interface_t	*interface;
 	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL, *sql6 = NULL,
-				*sql7 = NULL, *sql8 = NULL, *sql9 = NULL, *host_esc, *name_esc, *host_proto_esc,
-				*ipmi_username_esc, *ipmi_password_esc, *macro_esc, *value_esc, *ip_esc, *dns_esc,
+	char			*sql1 = NULL, *sql2 = NULL, *host_esc, *name_esc, *host_proto_esc,
+				*ipmi_username_esc, *ipmi_password_esc, *value_esc, *ip_esc, *dns_esc,
 				*port_esc;
 	size_t			sql1_alloc = 0, sql1_offset = 0,
-				sql2_alloc = 0, sql2_offset = 0,
-				sql3_alloc = 0, sql3_offset = 0,
-				sql4_alloc = 0, sql4_offset = 0,
-				sql5_alloc = 0, sql5_offset = 0,
-				sql6_alloc = 0, sql6_offset = 0,
-				sql7_alloc = 0, sql7_offset = 0,
-				sql8_alloc = 0, sql8_offset = 0,
-				sql9_alloc = 0, sql9_offset = 0;
-	const char		*ins_hosts_sql =
-				"insert into hosts (hostid,host,name,proxy_hostid,ipmi_authtype,ipmi_privilege,"
-					"ipmi_username,ipmi_password,status,flags)"
-				" values ";
-	const char		*ins_host_discovery_sql =
-				"insert into host_discovery (hostid,parent_hostid,host) values ";
-#ifdef HAVE_MYSQL
-	const ZBX_TABLE		*table;
-	char			*ins_host_inventory_sql = NULL, *ex_values = NULL;
-#else
-	const char		*ins_host_inventory_sql = "insert into host_inventory (hostid,inventory_mode) values ";
-#endif
-	const char		*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
-	const char		*ins_hostmacro_sql = "insert into hostmacro (hostmacroid,hostid,macro,value) values ";
-	const char		*ins_interface_sql =
-				"insert into interface (interfaceid,hostid,type,main,useip,ip,dns,port) values ";
-	const char		*ins_interface_discovery_sql =
-				"insert into interface_discovery (interfaceid,parent_interfaceid) values ";
+				sql2_alloc = 0, sql2_offset = 0;
+	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
+				db_insert_hmacro, db_insert_interface, db_insert_idiscovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1762,85 +1718,47 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_hosts_sql);
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "proxy_hostid", "ipmi_authtype",
+				"ipmi_privilege", "ipmi_username", "ipmi_password", "status", "flags", NULL);
+
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host",
+				NULL);
 	}
 
 	if (0 != new_host_inventories)
 	{
-#ifdef HAVE_MYSQL
-		table = DBget_table("host_inventory");
-
-		ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql,
-				"insert into host_inventory (hostid,inventory_mode");
-
-		for (i = 0; NULL != table->fields[i].name; i++)
-		{
-			switch (table->fields[i].type)
-			{
-				case ZBX_TYPE_BLOB:
-				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
-				case ZBX_TYPE_LONGTEXT:
-					ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql, ",");
-					ins_host_inventory_sql =
-							zbx_strdcat(ins_host_inventory_sql, table->fields[i].name);
-					ex_values = zbx_strdcat(ex_values, ",''");
-			}
-		}
-
-		ins_host_inventory_sql = zbx_strdcat(ins_host_inventory_sql, ") values ");
-#endif
-		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", NULL);
 	}
 
 	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
 	{
-		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hostgroups)
 	{
 		hostgroupid = DBget_maxid_num("hosts_groups", new_hostgroups);
 
-		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hosts_groups_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert_hgroups, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
 	}
 
 	if (0 != new_hostmacros)
 	{
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
-		DBbegin_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_hostmacro_sql);
-#endif
+		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value", NULL);
 	}
 
 	if (0 != new_interfaces)
 	{
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
-		DBbegin_multiple_update(&sql8, &sql8_alloc, &sql8_offset);
-		DBbegin_multiple_update(&sql9, &sql9_alloc, &sql9_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ins_interface_sql);
-		zbx_strcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ins_interface_discovery_sql);
-#endif
-	}
+		zbx_db_insert_prepare(&db_insert_interface, "interface", "interfaceid", "hostid", "type", "main",
+				"useip", "ip", "dns", "port", NULL);
 
-	host_proto_esc = DBdyn_escape_string(host_proto);
-	ipmi_username_esc = DBdyn_escape_string(ipmi_username);
-	ipmi_password_esc = DBdyn_escape_string(ipmi_password);
+		zbx_db_insert_prepare(&db_insert_idiscovery, "interface_discovery", "interfaceid",
+				"parent_interfaceid", NULL);
+	}
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1849,40 +1767,18 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		host_esc = DBdyn_escape_string(host->host);
-		name_esc = DBdyn_escape_string(host->name);
-
 		if (0 == host->hostid)
 		{
 			host->hostid = hostid++;
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_hosts_sql);
-#endif
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%s,%d,%d,'%s','%s',%d,%d)" ZBX_ROW_DL,
-					host->hostid, host_esc, name_esc, DBsql_id_ins(proxy_hostid),
-					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username_esc, ipmi_password_esc,
-					(int)status, ZBX_FLAG_DISCOVERY_CREATED);
 
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
-#endif
-			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-					host->hostid, parent_hostid, host_proto_esc);
+			zbx_db_insert_add_values(&db_insert, host->hostid, host->host, host->name, proxy_hostid,
+					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
+					(int)status, (int)ZBX_FLAG_DISCOVERY_CREATED);
+
+			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
 			if (HOST_INVENTORY_DISABLED != inventory_mode)
-			{
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
-#endif
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d",
-						host->hostid, (int)inventory_mode);
-#ifdef HAVE_MYSQL
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ex_values);
-#endif
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ")" ZBX_ROW_DL);
-			}
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)inventory_mode);
 		}
 		else
 		{
@@ -1890,71 +1786,81 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update hosts set ");
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set ");
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "host='%s'", host_esc);
+					host_esc = DBdyn_escape_string(host->host);
+
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "host='%s'", host_esc);
 					d = ",";
+
+					zbx_free(host_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					name_esc = DBdyn_escape_string(host->name);
+
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sname='%s'", d, name_esc);
 					d = ",";
+
+					zbx_free(name_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_PROXY))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sproxy_hostid=%s", d, DBsql_id_ins(proxy_hostid));
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sipmi_authtype=%d", d, (int)ipmi_authtype);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sipmi_privilege=%d", d, (int)ipmi_privilege);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					ipmi_username_esc = DBdyn_escape_string(ipmi_username);
+
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sipmi_username='%s'", d, ipmi_username_esc);
 					d = ",";
+
+					zbx_free(ipmi_username_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					ipmi_password_esc = DBdyn_escape_string(ipmi_password);
+
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%sipmi_password='%s'", d, ipmi_password_esc);
+
+					zbx_free(ipmi_password_esc);
 				}
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where hostid=" ZBX_FS_UI64 ";\n",
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 						host->hostid);
 			}
 
 			if (host->inventory_mode != inventory_mode && HOST_INVENTORY_DISABLED == host->inventory_mode)
-			{
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
-#endif
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d",
-						host->hostid, (int)inventory_mode);
-#ifdef HAVE_MYSQL
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ex_values);
-#endif
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ")" ZBX_ROW_DL);
-			}
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)inventory_mode);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+				host_proto_esc = DBdyn_escape_string(host_proto);
+
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						"update host_discovery"
 						" set host='%s'"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						host_proto_esc, host->hostid);
+
+				zbx_free(host_proto_esc);
 			}
 		}
 
@@ -1965,84 +1871,67 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (0 == interface->interfaceid)
 			{
 				interface->interfaceid = interfaceid++;
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ins_interface_sql);
-				zbx_strcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ins_interface_discovery_sql);
-#endif
-				ip_esc = DBdyn_escape_string(interface->ip);
-				dns_esc = DBdyn_escape_string(interface->dns);
-				port_esc = DBdyn_escape_string(interface->port);
 
-				zbx_snprintf_alloc(&sql8, &sql8_alloc, &sql8_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s','%s')" ZBX_ROW_DL,
-						interface->interfaceid, host->hostid, (int)interface->type,
-						(int)interface->main, (int)interface->useip, ip_esc, dns_esc, port_esc);
+				zbx_db_insert_add_values(&db_insert_interface, interface->interfaceid, host->hostid,
+						(int)interface->type, (int)interface->main, (int)interface->useip,
+						interface->ip, interface->dns, interface->port);
 
-				zbx_free(port_esc);
-				zbx_free(dns_esc);
-				zbx_free(ip_esc);
-
-				zbx_snprintf_alloc(&sql9, &sql9_alloc, &sql9_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-						interface->interfaceid, interface->parent_interfaceid);
+				zbx_db_insert_add_values(&db_insert_idiscovery, interface->interfaceid,
+						interface->parent_interfaceid);
 			}
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE))
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update interface set ");
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update interface set ");
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "type=%d",
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "type=%d",
 							(int)interface->type);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%smain=%d",
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%smain=%d",
 							d, (int)interface->main);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP))
 				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%suseip=%d",
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%suseip=%d",
 							d, (int)interface->useip);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_IP))
 				{
 					ip_esc = DBdyn_escape_string(interface->ip);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sip='%s'", d, ip_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sip='%s'", d, ip_esc);
 					zbx_free(ip_esc);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS))
 				{
 					dns_esc = DBdyn_escape_string(interface->dns);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdns='%s'", d, dns_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d, dns_esc);
 					zbx_free(dns_esc);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT))
 				{
 					port_esc = DBdyn_escape_string(interface->port);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sport='%s'",
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sport='%s'",
 							d, port_esc);
 					zbx_free(port_esc);
 				}
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
 			}
 		}
 
 		for (j = 0; j < host->new_groupids.values_num; j++)
 		{
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hosts_groups_sql);
-#endif
-			zbx_snprintf_alloc(&sql5, &sql5_alloc, &sql5_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					hostgroupid++, host->hostid, host->new_groupids.values[j]);
+			zbx_db_insert_add_values(&db_insert_hgroups, hostgroupid++, host->hostid,
+					host->new_groupids.values[j]);
 		}
 
 		for (j = 0; j < host->new_hostmacros.values_num; j++)
@@ -2053,20 +1942,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			if (0 == hostmacro->hostmacroid)
 			{
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_hostmacro_sql);
-#endif
-				macro_esc = DBdyn_escape_string(hostmacro->macro);
-
-				zbx_snprintf_alloc(&sql6, &sql6_alloc, &sql6_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')" ZBX_ROW_DL,
-						hostmacroid++, host->hostid, macro_esc, value_esc);
-
-				zbx_free(macro_esc);
+				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid++, host->hostid,
+						hostmacro->macro, hostmacro->value);
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						"update hostmacro"
 						" set value='%s'"
 						" where hostmacroid=" ZBX_FS_UI64 ";\n",
@@ -2075,141 +1956,101 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_free(value_esc);
 		}
-
-		zbx_free(name_esc);
-		zbx_free(host_esc);
 	}
-
-	zbx_free(ipmi_password_esc);
-	zbx_free(ipmi_username_esc);
-	zbx_free(host_proto_esc);
 
 	if (0 != new_hosts)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql1_offset--;
-		sql2_offset--;
-		zbx_chrcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ';');
-		zbx_chrcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ';');
-#endif
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-		DBexecute("%s", sql1);
-		DBexecute("%s", sql2);
-		zbx_free(sql1);
-		zbx_free(sql2);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		zbx_db_insert_execute(&db_insert_hdiscovery);
+		zbx_db_insert_clean(&db_insert_hdiscovery);
 	}
 
 	if (0 != new_host_inventories)
 	{
-#ifdef HAVE_MYSQL
-		zbx_free(ex_values);
-		zbx_free(ins_host_inventory_sql);
-#endif
-#ifdef HAVE_MULTIROW_INSERT
-		sql3_offset--;
-		zbx_chrcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ';');
-#endif
-		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBexecute("%s", sql3);
-		zbx_free(sql3);
-	}
-
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
-	{
-		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
-		DBexecute("%s", sql4);
-		zbx_free(sql4);
+		zbx_db_insert_execute(&db_insert_hinventory);
+		zbx_db_insert_clean(&db_insert_hinventory);
 	}
 
 	if (0 != new_hostgroups)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql5_offset--;
-		zbx_chrcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ';');
-#endif
-		DBend_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
-		DBexecute("%s", sql5);
-		zbx_free(sql5);
+		zbx_db_insert_execute(&db_insert_hgroups);
+		zbx_db_insert_clean(&db_insert_hgroups);
 	}
 
 	if (0 != new_hostmacros)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql6_offset--;
-		zbx_chrcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ';');
-#endif
-		DBend_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
-		DBexecute("%s", sql6);
-		zbx_free(sql6);
+		zbx_db_insert_execute(&db_insert_hmacro);
+		zbx_db_insert_clean(&db_insert_hmacro);
+	}
+
+	if (0 != new_interfaces)
+	{
+		zbx_db_insert_execute(&db_insert_interface);
+		zbx_db_insert_clean(&db_insert_interface);
+
+		zbx_db_insert_execute(&db_insert_idiscovery);
+		zbx_db_insert_clean(&db_insert_idiscovery);
+	}
+
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
+	{
+		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		DBexecute("%s", sql1);
+		zbx_free(sql1);
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids->values_num ||
 			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num ||
 			0 != del_interfaceids.values_num)
 	{
-		DBbegin_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
+		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
 		if (0 != del_hostgroupids->values_num)
 		{
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from hosts_groups where");
-			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostgroupid",
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hosts_groups where");
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostgroupid",
 					del_hostgroupids->values, del_hostgroupids->values_num);
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
 		if (0 != del_hostmacroids->values_num)
 		{
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from hostmacro where");
-			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostmacroid",
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hostmacro where");
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostmacroid",
 					del_hostmacroids->values, del_hostmacroids->values_num);
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
 		if (0 != upd_host_inventory_hostids.values_num)
 		{
-			zbx_snprintf_alloc(&sql7, &sql7_alloc, &sql7_offset,
+			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 					"update host_inventory set inventory_mode=%d where", (int)inventory_mode);
-			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostid",
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostid",
 					upd_host_inventory_hostids.values, upd_host_inventory_hostids.values_num);
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
 		if (0 != del_host_inventory_hostids.values_num)
 		{
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from host_inventory where");
-			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostid",
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from host_inventory where");
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostid",
 					del_host_inventory_hostids.values, del_host_inventory_hostids.values_num);
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
 		if (0 != del_interfaceids.values_num)
 		{
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from interface where");
-			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "interfaceid",
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface where");
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "interfaceid",
 					del_interfaceids.values, del_interfaceids.values_num);
-			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
-		DBend_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
-		DBexecute("%s", sql7);
-		zbx_free(sql7);
-	}
-
-	if (0 != new_interfaces)
-	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql8_offset--;
-		sql9_offset--;
-		zbx_chrcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ';');
-		zbx_chrcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ';');
-#endif
-		DBend_multiple_update(&sql8, &sql8_alloc, &sql8_offset);
-		DBend_multiple_update(&sql9, &sql9_alloc, &sql9_offset);
-		DBexecute("%s", sql8);
-		DBexecute("%s", sql9);
-		zbx_free(sql8);
-		zbx_free(sql9);
+		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		DBexecute("%s", sql2);
+		zbx_free(sql2);
 	}
 
 	DBcommit();

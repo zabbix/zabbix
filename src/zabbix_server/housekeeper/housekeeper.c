@@ -168,11 +168,11 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
  ******************************************************************************/
 static int	hk_item_update_cache_compare(const void *d1, const void *d2)
 {
-	zbx_hk_delete_queue_t	*r1 = *(zbx_hk_delete_queue_t**)d1;
-	zbx_hk_delete_queue_t	*r2 = *(zbx_hk_delete_queue_t**)d2;
+	zbx_hk_delete_queue_t	*r1 = *(zbx_hk_delete_queue_t **)d1;
+	zbx_hk_delete_queue_t	*r2 = *(zbx_hk_delete_queue_t **)d2;
 
-	if (r1->itemid > r2->itemid) return 1;
-	if (r1->itemid < r2->itemid) return -1;
+	ZBX_RETURN_IF_NOT_EQUAL(r1->itemid, r2->itemid);
+
 	return 0;
 }
 

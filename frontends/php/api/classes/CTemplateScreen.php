@@ -34,7 +34,6 @@ class CTemplateScreen extends CScreen {
 	 * Get screen data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']		Node IDs
 	 * @param bool   $options['with_items']		only with items
 	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
 	 * @param int    $options['count']			count Hosts, returned column name is rowscount
@@ -59,7 +58,6 @@ class CTemplateScreen extends CScreen {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'templateids'				=> null,
@@ -132,9 +130,6 @@ class CTemplateScreen extends CScreen {
 						')';
 			}
 		}
-
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 		// screenids
 		if (!is_null($options['screenids'])) {
@@ -210,7 +205,6 @@ class CTemplateScreen extends CScreen {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -234,13 +228,12 @@ class CTemplateScreen extends CScreen {
 
 		// adding screenitems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', array(
 				'output' => $this->outputExtend($options['selectScreenItems'],
 					array('screenid', 'screenitemid', 'resourcetype', 'resourceid')
 				),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
@@ -393,23 +386,24 @@ class CTemplateScreen extends CScreen {
 		return $result;
 	}
 
+	/**
+	 * Check if template screen exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($data) {
-		$keyFields = array(array('screenid', 'name'), 'templateid');
+		$this->deprecated('templatescreen.exists method is deprecated.');
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $data),
+		$screens = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $data),
 			'preservekeys' => true,
 			'output' => array('screenid'),
-			'nopermissions' => true,
 			'limit' => 1
-		);
-		if (isset($data['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($data['node']);
-		}
-		elseif (isset($data['nodeids'])) {
-			$options['nodeids'] = $data['nodeids'];
-		}
-		$screens = $this->get($options);
+		));
 
 		return !empty($screens);
 	}
@@ -576,20 +570,38 @@ class CTemplateScreen extends CScreen {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
-	 * @throws APIException if the input is invalid
+	 * Update template screens.
 	 *
 	 * @param array $screens
+	 *
+	 * @return array
 	 */
-	protected function validateUpdate(array $screens) {
+	public function update(array $screens) {
+		$screens = zbx_toArray($screens);
+
+		// check hostids before doing anything
+		$this->checkObjectIds($screens, 'screenid',
+			_('No "%1$s" given for template screen.'),
+			_('Empty screen ID for template screen.'),
+			_('Incorrect template screen ID.')
+		);
+
 		$dbScreens = $this->get(array(
+			'output' => array('screenid', 'hsize', 'vsize', 'templateid'),
+			'selectScreenItems' => array('screenitemid', 'x', 'y', 'colspan', 'rowspan'),
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
-			'output' => array('screenid', 'templateid'),
 			'preservekeys' => true
 		));
 
+		$this->validateUpdate($screens, $dbScreens);
+		$this->updateReal($screens);
+		$this->truncateScreenItems($screens, $dbScreens);
+
+		return array('screenids' => zbx_objectValues($screens, 'screenid'));
+	}
+
+	protected function validateUpdate(array $screens, array $dbScreens) {
 		foreach ($screens as $screen) {
 			if (!isset($dbScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

@@ -274,7 +274,7 @@ if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 $conditionFormList->addRow(_('Type of calculation'),
 	array(
 		new CComboBox('evaltype', $this->data['evaltype'], null, array(
-			CONDITION_EVAL_TYPE_AND_OR => _('And / or'),
+			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 			CONDITION_EVAL_TYPE_AND => _('And'),
 			CONDITION_EVAL_TYPE_OR => _('Or'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')

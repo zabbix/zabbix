@@ -207,7 +207,7 @@ if (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 
-	$screenitemid = API::ScreenItem()->delete($_REQUEST['screenitemid']);
+	$screenitemid = API::ScreenItem()->delete(array(getRequest('screenitemid')));
 
 	if ($screenitemid) {
 		$screenitemid = reset($screenitemid);
@@ -272,6 +272,14 @@ elseif (isset($_REQUEST['rmv_row'])) {
 		$rmv_row = getRequest('rmv_row', 0);
 
 		DBstart();
+		// reduce the rowspan of the items that are displayed in the removed row
+		DBexecute(
+			'UPDATE screens_items'.
+				' SET rowspan=(rowspan-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND y+rowspan>'.zbx_dbstr($rmv_row).
+				' AND y<'.zbx_dbstr($rmv_row)
+		);
 
 		$result = DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 		$result &= DBexecute(
@@ -304,6 +312,14 @@ elseif (isset($_REQUEST['rmv_col'])) {
 		$rmv_col = getRequest('rmv_col', 0);
 
 		DBstart();
+		// reduce the colspan of the items that are displayed in the removed column
+		DBexecute(
+			'UPDATE screens_items'.
+				' SET colspan=(colspan-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND x+colspan>'.zbx_dbstr($rmv_col).
+				' AND x<'.zbx_dbstr($rmv_col)
+		);
 
 		$result = DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
 		$result &= DBexecute(

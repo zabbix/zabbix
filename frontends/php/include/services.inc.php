@@ -234,13 +234,13 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		);
 
 		$caption = array(new CLink(
-			array(get_node_name_by_elid($service['serviceid'], null, NAME_DELIMITER), $service['name']),
+			$service['name'],
 			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
 		));
 		$trigger = $service['trigger'];
 		if ($trigger) {
 			$url = new CLink($trigger['description'],
-				'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
+				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
 			);
 			$caption[] = ' - ';
 			$caption[] = $url;
@@ -252,7 +252,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$problemList = new CList(null, 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
-					'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
 				));
 			}
 		}
@@ -374,13 +374,14 @@ function update_services_rec($serviceid) {
  * Retrieves the service linked to given trigger, sets it's status to $status and propagates the status change
  * to the parent services.
  *
- * @param $triggerid
- * @param $status
+ * @param string $triggerId
+ * @param int    $status
  */
-function update_services($triggerid, $status) {
-	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.zbx_dbstr($triggerid));
+function updateServices($triggerId, $status) {
+	DBexecute('UPDATE services SET status='.zbx_dbstr($status).' WHERE triggerid='.zbx_dbstr($triggerId));
 
-	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerid));
+	$result = DBselect('SELECT s.serviceid FROM services s WHERE s.triggerid='.zbx_dbstr($triggerId));
+
 	while ($row = DBfetch($result)) {
 		add_service_alarm($row['serviceid'], $status, time());
 		update_services_rec($row['serviceid']);

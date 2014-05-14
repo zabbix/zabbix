@@ -130,27 +130,6 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	char	*devname, *mode;
-	int	ret = SYSINFO_RET_FAIL;
-
-	if (2 < request->nparam)
-		return SYSINFO_RET_FAIL;
-
-	devname = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
-
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
-		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
-	else if (0 == strcmp(mode, "bytes"))
-		ret = VFS_DEV_WRITE_BYTES(devname, result);
-	else
-		ret = SYSINFO_RET_FAIL;
-
-	return ret;
-}
-
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*devname, *mode;
@@ -166,6 +145,27 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = VFS_DEV_READ_OPERATIONS(devname, result);
 	else if (0 == strcmp(mode, "bytes"))
 		ret = VFS_DEV_READ_BYTES(devname, result);
+	else
+		ret = SYSINFO_RET_FAIL;
+
+	return ret;
+}
+
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char	*devname, *mode;
+	int	ret = SYSINFO_RET_FAIL;
+
+	if (2 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	devname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
+	else if (0 == strcmp(mode, "bytes"))
+		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
 		ret = SYSINFO_RET_FAIL;
 

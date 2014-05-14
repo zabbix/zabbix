@@ -103,14 +103,14 @@
 		createPlaceholders();
 	}
 
-	jQuery(function($) {
-		var slideTable = $('#slideTable'),
+	function initSortable() {
+		var slideTable = jQuery('#slideTable'),
 			slideTableWidth = slideTable.width(),
-			slideTableColumns = $('#slideTable .header td'),
+			slideTableColumns = jQuery('#slideTable .header td'),
 			slideTableColumnWidths = [];
 
 		slideTableColumns.each(function() {
-			slideTableColumnWidths[slideTableColumnWidths.length] = $(this).width();
+			slideTableColumnWidths[slideTableColumnWidths.length] = jQuery(this).width();
 		});
 
 		slideTable.sortable({
@@ -127,10 +127,10 @@
 				slideTable.width(slideTableWidth);
 			},
 			helper: function(e, ui) {
-				ui.children().each(function() {
-					var td = $(this);
+				ui.children().each(function(i) {
+					var td = jQuery(this);
 
-					td.width(td.width());
+					td.width(slideTableColumnWidths[i]);
 				});
 
 				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixes to right
@@ -140,15 +140,18 @@
 				}
 
 				slideTableColumns.each(function(i) {
-					$(this).width(slideTableColumnWidths[i]);
+					jQuery(this).width(slideTableColumnWidths[i]);
 				});
 
 				return ui;
 			},
 			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 			}
 		});
-	});
+	}
 
+	jQuery(function() {
+		initSortable();
+	});
 </script>

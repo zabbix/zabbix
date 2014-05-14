@@ -20,8 +20,6 @@
 
 
 define('ZBX_PAGE_NO_AUTHORIZATION', true);
-define('ZBX_NOT_ALLOW_ALL_NODES', true);
-define('ZBX_HIDE_NODE_SELECTION', true);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -66,15 +64,16 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
 	DBstart();
+	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
+	DBend(true);
 
-	if (CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
+	if ($loginSuccess) {
 		// save remember login preference
 		$user = array('autologin' => getRequest('autologin', 0));
+
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			API::User()->updateProfile($user);
 		}
-		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
-		DBend(true);
 
 		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
@@ -86,7 +85,6 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	}
 	// login failed, fall back to a guest account
 	else {
-		DBend(false);
 		CWebUser::checkAuthentication(null);
 	}
 }

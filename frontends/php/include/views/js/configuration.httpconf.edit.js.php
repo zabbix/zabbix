@@ -114,10 +114,10 @@
 				stepTable.width(stepTableWidth);
 			},
 			helper: function(e, ui) {
-				ui.children().each(function() {
+				ui.children().each(function(i) {
 					var td = $(this);
 
-					td.width(td.width());
+					td.width(stepTableColumnWidths[i]);
 				});
 
 				// when dragging element on safari, it jumps out of the table

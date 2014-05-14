@@ -21,21 +21,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#define DO_SUM 0
-#define DO_MAX 1
-#define DO_MIN 2
-#define DO_AVG 3
-
-static FILE	*open_proc_file(const char *filename)
-{
-	struct stat	s;
-
-	if (0 != stat(filename, &s))
-		return NULL;
-
-	return fopen(filename, "r");
-}
-
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
 	size_t	line_alloc = ZBX_KIBIBYTE, n;
@@ -238,13 +223,13 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 2);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
-		do_task = DO_SUM;
+		do_task = ZBX_DO_SUM;
 	else if (0 == strcmp(param, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(param, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(param, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -265,12 +250,12 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
 
-		if (NULL == (f_cmd = open_proc_file(tmp)))
+		if (NULL == (f_cmd = fopen(tmp, "r")))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/status", entries->d_name);
 
-		if (NULL == (f_stat = open_proc_file(tmp)))
+		if (NULL == (f_stat = fopen(tmp, "r")))
 			continue;
 
 		if (FAIL == check_procname(f_cmd, f_stat, procname))
@@ -313,9 +298,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				memsize = value;
 			else
 			{
-				if (DO_MAX == do_task)
+				if (ZBX_DO_MAX == do_task)
 					memsize = MAX(memsize, value);
-				else if (DO_MIN == do_task)
+				else if (ZBX_DO_MIN == do_task)
 					memsize = MIN(memsize, value);
 				else
 					memsize += value;
@@ -327,7 +312,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f_stat);
 	closedir(dir);
 
-	if (do_task == DO_AVG)
+	if (ZBX_DO_AVG == do_task)
 	{
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
 	}
@@ -391,12 +376,12 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
 
-		if (NULL == (f_cmd = open_proc_file(tmp)))
+		if (NULL == (f_cmd = fopen(tmp, "r")))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/status", entries->d_name);
 
-		if (NULL == (f_stat = open_proc_file(tmp)))
+		if (NULL == (f_stat = fopen(tmp, "r")))
 			continue;
 
 		if (FAIL == check_procname(f_cmd, f_stat, procname))

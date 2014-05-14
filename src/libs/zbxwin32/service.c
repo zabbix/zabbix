@@ -63,8 +63,6 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
-			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent shutdown requested");
-
 			serviceStatus.dwCurrentState	= SERVICE_STOP_PENDING;
 			serviceStatus.dwWaitHint	= 4000;
 			SetServiceStatus(serviceHandle, &serviceStatus);
@@ -86,9 +84,9 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
-static VOID WINAPI	ServiceEntry(DWORD argc, LPTSTR *argv)
+static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 {
-	LPTSTR	wservice_name;
+	wchar_t	*wservice_name;
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 	serviceHandle = RegisterServiceCtrlHandler(wservice_name, ServiceCtrlHandler);
@@ -150,7 +148,7 @@ static int	svc_OpenSCManager(SC_HANDLE *mgr)
 
 static int	svc_OpenService(SC_HANDLE mgr, SC_HANDLE *service, DWORD desired_access)
 {
-	LPTSTR	wservice_name;
+	wchar_t	*wservice_name;
 	int	ret = SUCCEED;
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
@@ -167,49 +165,49 @@ static int	svc_OpenService(SC_HANDLE mgr, SC_HANDLE *service, DWORD desired_acce
 	return ret;
 }
 
-static void	svc_get_fullpath(const char *path, LPTSTR fullpath, size_t max_fullpath)
+static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_fullpath)
 {
-	LPTSTR	wpath;
+	wchar_t	*wpath;
 
 	wpath = zbx_acp_to_unicode(path);
-	zbx_fullpath(fullpath, wpath, max_fullpath);
+	_wfullpath(fullpath, wpath, max_fullpath);
 	zbx_free(wpath);
 }
 
-static void	svc_get_command_line(const char *path, int multiple_agents, LPTSTR cmdLine, size_t max_cmdLine)
+static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine)
 {
-	TCHAR	path1[MAX_PATH], path2[MAX_PATH];
+	wchar_t	path1[MAX_PATH], path2[MAX_PATH];
 
 	svc_get_fullpath(path, path2, MAX_PATH);
 
-	if (NULL == zbx_strstr(path2, TEXT(".exe")))
-		zbx_wsnprintf(path1, MAX_PATH, TEXT("%s.exe"), path2);
+	if (NULL == wcsstr(path2, TEXT(".exe")))
+		StringCchPrintf(path1, MAX_PATH, TEXT("%s.exe"), path2);
 	else
-		zbx_wsnprintf(path1, MAX_PATH, path2);
+		StringCchPrintf(path1, MAX_PATH, path2);
 
 	if (NULL != CONFIG_FILE)
 	{
 		svc_get_fullpath(CONFIG_FILE, path2, MAX_PATH);
-		zbx_wsnprintf(cmdLine, max_cmdLine, TEXT("\"%s\" %s--config \"%s\""),
+		StringCchPrintf(cmdLine, max_cmdLine, TEXT("\"%s\" %s--config \"%s\""),
 				path1,
 				(0 == multiple_agents) ? TEXT("") : TEXT("--multiple-agents "),
 				path2);
 	}
 	else
-		zbx_wsnprintf(cmdLine, max_cmdLine, TEXT("\"%s\""), path1);
+		StringCchPrintf(cmdLine, max_cmdLine, TEXT("\"%s\""), path1);
 }
 
 static int	svc_install_event_source(const char *path)
 {
 	HKEY	hKey;
 	DWORD	dwTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
-	TCHAR	execName[MAX_PATH];
-	TCHAR	regkey[256], *wevent_source;
+	wchar_t	execName[MAX_PATH];
+	wchar_t	regkey[256], *wevent_source;
 
 	svc_get_fullpath(path, execName, MAX_PATH);
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, sizeof(regkey)/sizeof(TCHAR), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE, regkey, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -221,7 +219,7 @@ static int	svc_install_event_source(const char *path)
 
 	RegSetValueEx(hKey, TEXT("TypesSupported"), 0, REG_DWORD, (BYTE *)&dwTypes, sizeof(DWORD));
 	RegSetValueEx(hKey, TEXT("EventMessageFile"), 0, REG_EXPAND_SZ, (BYTE *)execName,
-			(DWORD)(zbx_strlen(execName) + 1) * sizeof(TCHAR));
+			(DWORD)(wcslen(execName) + 1) * sizeof(wchar_t));
 	RegCloseKey(hKey);
 
 	zbx_error("event source [%s] installed successfully", ZABBIX_EVENT_SOURCE);
@@ -231,19 +229,17 @@ static int	svc_install_event_source(const char *path)
 
 int	ZabbixCreateService(const char *path, int multiple_agents)
 {
-#define MAX_CMD_LEN	(MAX_PATH * 2)
-
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;
-	TCHAR			cmdLine[MAX_CMD_LEN];
-	LPTSTR			wservice_name;
+	wchar_t			cmdLine[MAX_PATH];
+	wchar_t			*wservice_name;
 	DWORD			code;
 	int			ret = FAIL;
 
 	if (FAIL == svc_OpenSCManager(&mgr))
 		return ret;
 
-	svc_get_command_line(path, multiple_agents, cmdLine, MAX_CMD_LEN);
+	svc_get_command_line(path, multiple_agents, cmdLine, MAX_PATH);
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 
@@ -283,12 +279,12 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 
 static int	svc_RemoveEventSource()
 {
-	TCHAR	regkey[256];
-	LPTSTR	wevent_source;
+	wchar_t	regkey[256];
+	wchar_t	*wevent_source;
 	int	ret = FAIL;
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, sizeof(regkey)/sizeof(TCHAR), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE, regkey))

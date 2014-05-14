@@ -63,7 +63,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		);
 
 		$defOptions = array(
-			'nodeids'						=> null,
 			'groupids'						=> null,
 			'templateids'					=> null,
 			'hostids'						=> null,
@@ -387,7 +386,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
@@ -469,20 +467,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			// check item prototypes
 			$items = getExpressionItems($triggerExpression);
-
-			$hasPrototype = false;
-			foreach ($items as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$hasPrototype = true;
-					break;
-				}
-			}
-
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-						$trigger['expression']));
-			}
+			$this->checkDiscoveryRuleCount($trigger, $items);
 		}
 
 		$this->createReal($triggers);
@@ -543,21 +528,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 				}
 
+				// check item prototypes
 				$items = getExpressionItems($triggerExpression);
-
-				$hasPrototype = false;
-				foreach ($items as $item) {
-					if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$hasPrototype = true;
-						break;
-					}
-				}
-
-				if (!$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-							$trigger['expression']));
-				}
+				$this->checkDiscoveryRuleCount($trigger, $items);
 			}
 
 			if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0) {
@@ -593,20 +566,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Delete triggers.
+	 * Delete trigger prototypes.
 	 *
-	 * @param int|string|array $triggerIds array with trigger ids
-	 * @param bool             $nopermissions
+	 * @param array 	$triggerIds array with trigger ids
+	 * @param bool      $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete($triggerIds, $nopermissions = false) {
+	public function delete(array $triggerIds, $nopermissions = false) {
 		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		$triggerIds = zbx_toArray($triggerIds);
-		$triggerPrototypeIds = $triggerIds;
 
 		$delTriggers = $this->get(array(
 			'triggerids' => $triggerIds,
@@ -677,7 +647,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		DB::delete('triggers', array('triggerid' => $triggerIds));
 
-		return array('triggerids' => $triggerPrototypeIds);
+		return array('triggerids' => $triggerIds);
 	}
 
 	protected function createReal(array &$triggers) {
@@ -844,7 +814,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'triggerid', 'itemid', 'functions');
 			$items = API::Item()->get(array(
-				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'webitems' => true,
@@ -870,7 +839,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
-				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -879,5 +847,38 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check if trigger prototype has at least one item prototype and belongs to one discovery rule.
+	 *
+	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
+	 *
+	 * @param array  $trigger						array of trigger data
+	 * @param string $trigger['description']		trigger description
+	 * @param array  $items							array of trigger items
+	 */
+	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
+		if ($items) {
+			$itemDiscoveries = API::getApiService()->select('item_discovery', array(
+				'output' => array('parent_itemid'),
+				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
+			));
+
+			$itemDiscoveryIds = array_flip(zbx_objectValues($itemDiscoveries, 'parent_itemid'));
+
+			if (count($itemDiscoveryIds) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
+					$trigger['description']
+				));
+			}
+			elseif (!$itemDiscoveryIds) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" must contain at least one item prototype.',
+					$trigger['description']
+				));
+			}
+		}
 	}
 }

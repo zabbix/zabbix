@@ -597,15 +597,15 @@ function construct_expression($itemid, $expressions) {
 				$complite_expr.=' | ';
 			}
 			if ($cexpor == 0) {
-				$startpos = zbx_strlen($complite_expr);
+				$startpos = mb_strlen($complite_expr);
 			}
 			$cexpor++;
 			$eq_global = '#0';
 		}
 		else {
 			if (($cexpor > 1) & ($startpos >= 0)) {
-				$head = substr($complite_expr, 0, $startpos);
-				$tail = substr($complite_expr, $startpos);
+				$head = mb_substr($complite_expr, 0, $startpos);
+				$tail = mb_substr($complite_expr, $startpos);
 				$complite_expr = $head.'('.$tail.')';
 			}
 			$cexpor = 0;
@@ -624,13 +624,12 @@ function construct_expression($itemid, $expressions) {
 		$multi = preg_match('/.+(&|\|).+/', $expr);
 
 		while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-			$arr[4] = zbx_strtolower($arr[4]);
 			if (!isset($functions[$arr[4]])) {
 				error(_('Incorrect function is used').'. ['.$expression['value'].']');
 				return false;
 			}
 			$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-			$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
+			$expr_array[$sub_expr_count]['regexp'] = $arr[4].$arr[5];
 
 			$sub_expr_count++;
 			$expr = $arr[1];
@@ -666,8 +665,8 @@ function construct_expression($itemid, $expressions) {
 	}
 
 	if (($cexpor > 1) & ($startpos >= 0)) {
-		$head = substr($complite_expr, 0, $startpos);
-		$tail = substr($complite_expr, $startpos);
+		$head = mb_substr($complite_expr, 0, $startpos);
+		$tail = mb_substr($complite_expr, $startpos);
 		$complite_expr = $head.'('.$tail.')';
 	}
 
@@ -685,7 +684,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 	$expressionExpanded = $html ? array() : '';
 	$trigger = array();
 
-	for ($i = 0, $state = '', $max = zbx_strlen($expressionCompressed); $i < $max; $i++) {
+	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
 		if ($expressionCompressed[$i] == '{') {
 			if ($expressionCompressed[$i + 1] == '$') {
 				$state = 'USERMACRO';
@@ -799,15 +798,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($functionData['itemid']),
+									$trigger['discoveryRuleid'],
 								$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'].'&switch_node='.
-									id2nodeid($functionData['itemid']),
+								'items.php?form=update&itemid='.$functionData['itemid'],
 								$style
 							);
 						}
@@ -1026,8 +1024,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'.
-					andDbNode('i.itemid')
+					' AND h.hostid=i.hostid'
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];
@@ -1106,8 +1103,7 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
 					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'.
-					andDbNode('i.itemid')
+					' AND h.hostid=i.hostid'
 			);
 			if ($dbItem = DBfetch($dbItems)) {
 				$items[] = $dbItem;
@@ -1225,7 +1221,6 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	foreach ($dbTriggers as $trigger) {
 		$host = reset($trigger['hosts']);
 
-		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 		$hostNames[$host['hostid']] = $host['name'];
 
@@ -1452,77 +1447,87 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	return $column;
 }
 
-function calculate_availability($triggerid, $period_start, $period_end) {
-	$start_value = TRIGGER_VALUE_FALSE;
-	if ($period_start > 0 && $period_start <= time()) {
+/**
+ * Calculate trigger availability.
+ *
+ * @param int $triggerId		trigger id
+ * @param int $startTime		begin period
+ * @param int $endTime			end period
+ *
+ * @return array
+ */
+function calculateAvailability($triggerId, $startTime, $endTime) {
+	$startValue = TRIGGER_VALUE_FALSE;
+
+	if ($startTime > 0 && $startTime <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
-				' WHERE e.objectid='.zbx_dbstr($triggerid).
+				' WHERE e.objectid='.zbx_dbstr($triggerId).
 					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' AND e.clock<'.zbx_dbstr($period_start).
+					' AND e.clock<'.zbx_dbstr($startTime).
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
-			$start_value = $row['value'];
-			$min = $period_start;
+			$startValue = $row['value'];
+			$min = $startTime;
 		}
 	}
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
-			' WHERE e.objectid='.zbx_dbstr($triggerid).
+			' WHERE e.objectid='.zbx_dbstr($triggerId).
 				' AND e.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
-	if ($period_start != 0) {
-		$sql .= ' AND clock>='.zbx_dbstr($period_start);
+	if ($startTime) {
+		$sql .= ' AND e.clock>='.zbx_dbstr($startTime);
 	}
-	if ($period_end != 0) {
-		$sql .= ' AND clock<='.zbx_dbstr($period_end);
+	if ($endTime) {
+		$sql .= ' AND e.clock<='.zbx_dbstr($endTime);
 	}
 
-	$db_events = DBfetch(DBselect($sql));
-	if ($db_events['cnt'] > 0) {
+	$dbEvents = DBfetch(DBselect($sql));
+	if ($dbEvents['cnt'] > 0) {
 		if (!isset($min)) {
-			$min = $db_events['min_clock'];
+			$min = $dbEvents['min_clock'];
 		}
-		$max = $db_events['max_clock'];
+		$max = $dbEvents['max_clock'];
 	}
 	else {
-		if ($period_start == 0 && $period_end == 0) {
+		if ($startTime == 0 && $endTime == 0) {
 			$max = time();
 			$min = $max - SEC_PER_DAY;
 		}
 		else {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
-			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
-			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
+			$ret['true'] = (TRIGGER_VALUE_TRUE == $startValue) ? 100 : 0;
+			$ret['false'] = (TRIGGER_VALUE_FALSE == $startValue) ? 100 : 0;
 			return $ret;
 		}
 	}
 
-	$state = $start_value;
+	$state = $startValue;
 	$true_time = 0;
 	$false_time = 0;
 	$time = $min;
-	if ($period_start == 0 && $period_end == 0) {
+	if ($startTime == 0 && $endTime == 0) {
 		$max = time();
 	}
-	if ($period_end == 0) {
-		$period_end = $max;
+	if ($endTime == 0) {
+		$endTime = $max;
 	}
 
 	$rows = 0;
-	$db_events = DBselect(
+	$dbEvents = DBselect(
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
-		' WHERE e.objectid='.zbx_dbstr($triggerid).
+		' WHERE e.objectid='.zbx_dbstr($triggerId).
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.eventid'
 	);
-	while ($row = DBfetch($db_events)) {
+	while ($row = DBfetch($dbEvents)) {
 		$clock = $row['clock'];
 		$value = $row['value'];
 
@@ -1541,15 +1546,15 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	}
 
 	if ($rows == 0) {
-		$trigger = get_trigger_by_triggerid($triggerid);
+		$trigger = get_trigger_by_triggerid($triggerId);
 		$state = $trigger['value'];
 	}
 
 	if ($state == TRIGGER_VALUE_FALSE) {
-		$false_time = $false_time + $period_end - $time;
+		$false_time = $false_time + $endTime - $time;
 	}
 	elseif ($state == TRIGGER_VALUE_TRUE) {
-		$true_time = $true_time + $period_end - $time;
+		$true_time = $true_time + $endTime - $time;
 	}
 	$total_time = $true_time + $false_time;
 
@@ -1584,7 +1589,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	$config = select_config();
 
 	$options = array(
-		'nodeids' => get_current_nodeid(),
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => array(),
@@ -1640,9 +1644,6 @@ function make_trigger_details($trigger) {
 	array_pop($hostNames);
 
 	$table = new CTableInfo();
-	if (is_show_all_nodes()) {
-		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
-	}
 	$table->addRow(array(
 		new CCol(_n('Host', 'Hosts', count($hosts))),
 		new CCol($hostNames, 'wraptext')
@@ -2258,14 +2259,14 @@ function get_item_function_info($expr) {
 
 	$type_of_value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
-		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
+		ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL_BIG,
 		ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 		ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 	);
 
 	$function_info = array(
-		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'band' =>		array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2290,7 +2291,7 @@ function get_item_function_info($expr) {
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'strlen' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6')
+		'time' =>		array('value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6')
 	);
 
 	$expressionData = new CTriggerExpression();
@@ -2331,7 +2332,7 @@ function get_item_function_info($expr) {
 				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
-					'key_' => array($exprPart['item']),
+					'key_' => array($exprPart['item'])
 				),
 				'webitems' => true
 			));
@@ -2341,7 +2342,7 @@ function get_item_function_info($expr) {
 					'output' => array('value_type'),
 					'hostids' => zbx_objectValues($hostFound, 'hostid'),
 					'filter' => array(
-						'key_' => array($exprPart['item']),
+						'key_' => array($exprPart['item'])
 					)
 				));
 
@@ -2357,7 +2358,7 @@ function get_item_function_info($expr) {
 				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
 				$result['type'] = $result['type'][$itemFound['value_type']];
 
-				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
+				if ($result['type'] == T_ZBX_INT) {
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
@@ -2532,4 +2533,40 @@ function triggerIndicatorStyle($status, $state = null) {
 	}
 
 	return 'unknown';
+}
+
+/**
+ * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ *
+ * Keep in sync with orderItemsByStatus().
+ *
+ * @param array  $triggers
+ * @param string $sortorder
+ */
+function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
+	$sort = array();
+
+	foreach ($triggers as $key => $trigger) {
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			$statusOrder = ($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? 2 : 0;
+		}
+		elseif ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+			$statusOrder = 1;
+		}
+
+		$sort[$key] = $statusOrder;
+	}
+
+	if ($sortorder == ZBX_SORT_UP) {
+		asort($sort);
+	}
+	else {
+		arsort($sort);
+	}
+
+	$sortedTriggers = array();
+	foreach ($sort as $key => $val) {
+		$sortedTriggers[$key] = $triggers[$key];
+	}
+	$triggers = $sortedTriggers;
 }

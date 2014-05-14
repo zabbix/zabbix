@@ -71,7 +71,7 @@ if (isset($_REQUEST['new_groups'])) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'] . ' (new)',
+				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
 				'isNew' => true
 			);
 		}
@@ -129,6 +129,16 @@ else {
 	);
 }
 
+// append description to form list
+$hostFormList->addRow(
+	array(
+		_('Description'),
+		SPACE,
+		new CVisibilityBox('visible[description]', isset($this->data['visible']['description']), 'description', _('Original'))
+	),
+	new CTextArea('description', $this->data['description'])
+);
+
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $this->data['proxy_hostid']);
 $proxyComboBox->addItem(0, _('(no proxy)'));
@@ -145,19 +155,17 @@ $hostFormList->addRow(
 );
 
 // append status to form list
-$statusComboBox = new CComboBox('status', $this->data['status']);
-$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Monitored'));
-$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 $hostFormList->addRow(
 	array(
-		_('Status'),
+		_('Enabled'),
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($this->data['visible']['status']), 'status', _('Original'))
 	),
-	$statusComboBox
+	new CCheckBox('status', (HOST_STATUS_MONITORED == $this->data['status']), null, HOST_STATUS_MONITORED)
 );
 
 $templatesFormList = new CFormList('templatesFormList');
+
 // append templates table to from list
 $templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
@@ -193,6 +201,7 @@ $templatesFormList->addRow(
 );
 
 $ipmiFormList = new CFormList('ipmiFormList');
+
 // append ipmi to form list
 $ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $this->data['ipmi_authtype']);
 $ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
@@ -235,6 +244,7 @@ $ipmiFormList->addRow(
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
+
 // append inventories to form list
 $inventoryModesComboBox = new CComboBox('inventory_mode', $this->data['inventory_mode'], 'submit()');
 $inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
@@ -285,8 +295,9 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 
 // append tabs to form
 $hostTab = new CTabView();
+
 // reset the tab when opening the form for the first time
-if (!hasRequest('masssave')) {
+if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
 $hostTab->addTab('hostTab', _('Host'), $hostFormList);
