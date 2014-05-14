@@ -220,8 +220,8 @@ elseif (isset($_REQUEST['save'])) {
 			'variables' => $_REQUEST['variables'],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
-			'verify_peer' => hasRequest('verify_peer') ? 1 : 0,
-			'verify_host' => hasRequest('verify_host') ? 1 : 0,
+			'verify_peer' => getRequest('verify_peer', 0),
+			'verify_host' => getRequest('verify_host', 0),
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
@@ -580,10 +580,11 @@ else {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 		foreach ($httpTestsLastData as $httpTestId => &$lastData) {
-			if($lastData['lastfailedstep'] !== null) {
+			if ($lastData['lastfailedstep'] !== null) {
 				$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
 			}
 		}
+		unset($lastData);
 
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
