@@ -223,6 +223,8 @@ elseif ($_REQUEST['go'] == 'delete') {
 	}
 
 	if ($groups) {
+		DBstart();
+
 		$goResult = API::UserGroup()->delete($groupIds);
 
 		if ($goResult) {
@@ -230,6 +232,8 @@ elseif ($_REQUEST['go'] == 'delete') {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$group['name'].']');
 			}
 		}
+
+		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
 		clearCookies($goResult);
@@ -254,7 +258,6 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		DBstart();
 
 		$goResult = change_group_gui_access($groupIds, $_REQUEST['set_gui_access']);
-		$goResult = DBend($goResult);
 
 		if ($goResult) {
 			$auditAction = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
@@ -263,6 +266,8 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'GUI access for group name ['.$group['name'].']');
 			}
 		}
+
+		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Frontend access updated'), _('Cannot update frontend access'));
 		clearCookies($goResult);
@@ -289,7 +294,6 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		DBstart();
 
 		$goResult = change_group_debug_mode($groupIds, $setDebugMode);
-		$goResult = DBend($goResult);
 
 		if ($goResult) {
 			$auditAction = ($setDebugMode == GROUP_DEBUG_MODE_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
@@ -298,6 +302,8 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 				add_audit($auditAction, AUDIT_RESOURCE_USER_GROUP, 'Debug mode for group name ['.$group['name'].']');
 			}
 		}
+
+		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Debug mode updated'), _('Cannot update debug mode'));
 		clearCookies($goResult);
@@ -327,7 +333,6 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 		DBstart();
 
 		$result = change_group_status($groupIds, $status);
-		$result = DBend($result);
 
 		if ($result) {
 			foreach ($groups as $group) {
@@ -341,6 +346,8 @@ elseif (str_in_array(getRequest('go'), array('enable_status', 'disable_status'))
 		$messageFailed = $enable
 			? _n('Cannot enable user group', 'Cannot enable user groups', $updated)
 			: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
+
+		$result = DBend($result);
 
 		show_messages($result, $messageSuccess, $messageFailed);
 		clearCookies($result);
