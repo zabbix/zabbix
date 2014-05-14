@@ -233,8 +233,8 @@ class CMenuPopupHelper {
 		$data = array(
 			'type' => 'host',
 			'hostid' => $host['hostid'],
-			'hasGraphs' => (isset($host['graphs']) && $host['graphs']),
-			'hasScreens' => (isset($host['screens']) && $host['screens']),
+			'showGraphs' => (isset($host['graphs']) && $host['graphs']),
+			'showScreens' => (isset($host['screens']) && $host['screens']),
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $hasGoTo
 		);
