@@ -572,26 +572,30 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 				$paramType = PARAM_TYPE_TIME;
 			}
 
+			// default operator
+			$operator = '=';
+
 			// try to find an operator and a numeric value
-			// we only support expressions where the operator and value immediately follow an item macro
+			// the value and operator can be extracted only if the immediately follow the item function macro
 			$tokens = $result->getTokens();
 			foreach ($tokens as $key => $token) {
 				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
 					if (isset($tokens[$key + 1])
 							&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
+							&& in_array($tokens[$key + 1]['type'], array('=', '<>', '>', '<'))
 							&& isset($tokens[$key + 2])
 							&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
 
 						$operator = $tokens[$key + 1]['value'];
-
 						$value = $tokens[$key + 2]['value'];
-						$exprType = $function.'['.$operator.']';
 					}
 					else {
 						break;
 					}
 				}
 			}
+
+			$exprType = $function.'['.$operator.']';
 
 			// find the item
 			$myItem = API::Item()->get(array(
