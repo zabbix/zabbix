@@ -1073,6 +1073,48 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
 
 /******************************************************************************
  *                                                                            *
+ * Function: pick_logfiles                                                    *
+ *                                                                            *
+ * Purpose: a helper function for make_logfile_list()                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     directory      - [IN] directory where the logfiles reside              *
+ *     filename       - [IN] name of the logfile (without path)               *
+ *     mtime          - [IN] selection criterion "logfile modification time"  *
+ *                      The logfile will be selected if modified not before   *
+ *                      'mtime'.                                              *
+ *     re             - [IN] selection criterion "regexp describing filename  *
+ *                      pattern"                                              *
+ *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
+ *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
+ *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
+ *                                                                            *
+ ******************************************************************************/
+static void	pick_logfiles(const char *directory, const char *filename, int mtime, const regex_t *re,
+		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+{
+	char		*logfile_candidate = NULL;
+	zbx_stat_t	file_buf;
+
+	logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, filename);
+
+	if (0 == zbx_stat(logfile_candidate, &file_buf))
+	{
+		if (S_ISREG(file_buf.st_mode) &&
+				mtime <= file_buf.st_mtime &&
+				0 == regexec(re, filename, (size_t)0, NULL, 0))
+		{
+			add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
+		}
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
+
+	zbx_free(logfile_candidate);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: make_logfile_list                                                *
  *                                                                            *
  * Purpose: select log files to be analyzed and make a list, set 'use_ino'    *
@@ -1122,7 +1164,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 	}
 	else	/* logrt[] item */
 	{
-		char			*directory = NULL, *format = NULL, *logfile_candidate = NULL;
+		char			*directory = NULL, *format = NULL;
 		int			reg_error;
 		regex_t			re;
 #ifdef _WINDOWS
@@ -1176,22 +1218,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 		do
 		{
-			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
-
-			if (0 == zbx_stat(logfile_candidate, &file_buf))
-			{
-				if (S_ISREG(file_buf.st_mode) &&
-						*mtime <= file_buf.st_mtime &&
-						0 == regexec(&re, find_data.name, (size_t)0, NULL, 0))
-				{
-					add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate,
-							&file_buf);
-				}
-			}
-			else
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
-
-			zbx_free(logfile_candidate);
+			pick_logfiles(directory, find_data.name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
 		}
 		while (0 == _findnext(find_handle, &find_data));
 
@@ -1220,22 +1247,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 		while (NULL != (d_ent = readdir(dir)))
 		{
-			logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
-
-			if (0 == zbx_stat(logfile_candidate, &file_buf))
-			{
-				if (S_ISREG(file_buf.st_mode) &&
-						*mtime <= file_buf.st_mtime &&
-						0 == regexec(&re, d_ent->d_name, (size_t)0, NULL, 0))
-				{
-					add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate,
-							&file_buf);
-				}
-			}
-			else
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s'", logfile_candidate);
-
-			zbx_free(logfile_candidate);
+			pick_logfiles(directory, d_ent->d_name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
 		}
 
 		if (-1 == closedir(dir))
