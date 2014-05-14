@@ -104,10 +104,10 @@ lbl_ret:
  * Purpose: parse recv_buf for ssh identification string as per               *
  *          RFC 4253, section 4.2                                             *
  *                                                                            *
- * Parameters: recv_buf [IN] - buffer to parse                                *
- *             remote_major [OUT] - memory pointer where protocol major is    *
+ * Parameters: recv_buf     - [IN] buffer to parse                            *
+ *             remote_major - [OUT] memory pointer where protocol major is    *
  *                                  to be written to                          *
- *             remote_minor [OUT] - memory pointer where protocol minor is    *
+ *             remote_minor - [OUT] memory pointer where protocol minor is    *
  *                                  to be written to                          *
  *                                                                            *
  * Returns: SUCCEED - if a string matching the specification is found         *
@@ -123,7 +123,7 @@ static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *r
 		if (2 == sscanf(l, "SSH-%d.%d-%*s", remote_major, remote_minor))
 			return SUCCEED;
 
-		l = r+1;
+		l = r + 1;
 	}
 
 	return FAIL;
