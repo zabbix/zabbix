@@ -3258,7 +3258,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'data' => array(),
 			),
 			array(
-				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
 				'value' => '1',
 				'data' => array(),
 			),
@@ -3271,7 +3271,11 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
 				'value' => '{host:item.last(0)}',
 				'data' => array(
-					'function' => 'last(0)'
+					'host' => 'host',
+					'item' => 'item',
+					'function' => 'last(0)',
+					'functionName' => 'last',
+					'functionParams' => array('0')
 				),
 			),
 			array(
