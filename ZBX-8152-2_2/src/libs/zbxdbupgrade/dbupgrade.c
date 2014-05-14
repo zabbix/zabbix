@@ -2694,10 +2694,10 @@ int	DBcheck_version(void)
 		if (0 != patches[i].mandatory)
 		{
 			required = patches[i].version;
-			op = 0;
+			optional_num = 0;
 		}
 		else
-			op++;
+			optional_num++;
 
 		if (db_optional < patches[i].version)
 			total++;
@@ -2726,8 +2726,8 @@ int	DBcheck_version(void)
 	if (0 == total)
 		goto out;
 
-	if(0 != optional_num)
-		zabbix_log(LOG_LEVEL_INFORMATION, "%d optional patch(es) were found", op);
+	if (0 != optional_num)
+		zabbix_log(LOG_LEVEL_INFORMATION, "optional patches were found");
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 
