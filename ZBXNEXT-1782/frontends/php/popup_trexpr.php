@@ -528,7 +528,7 @@ $fields = array(
 	'itemid' =>				array(T_ZBX_INT, O_OPT, null,	null,		'isset({insert})'),
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'expr_type'=>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
-	'param' =>				array(T_ZBX_STR, O_OPT, null,	0,			null),
+	'params' =>				array(T_ZBX_STR, O_OPT, null,	0,			null),
 	'paramtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_TIME.','.PARAM_TYPE_COUNTS), 'isset({insert})'),
 	'value' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
 	// action
@@ -541,7 +541,7 @@ $dstfrm = getRequest('dstfrm', 0);
 $dstfld1 = getRequest('dstfld1', '');
 $itemId = getRequest('itemid', 0);
 $value = getRequest('value', 0);
-$param = getRequest('param', array());
+$params = getRequest('params', array());
 $paramType = getRequest('paramtype');
 $exprType = getRequest('expr_type', 'last[=]');
 
@@ -562,11 +562,11 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 			$function = $functionMacroToken['data']['functionName'];
 
 			// determine param type
-			$param = $functionMacroToken['data']['functionParams'];
+			$params = $functionMacroToken['data']['functionParams'];
 			$paramNumber = in_array($function, array('regexp', 'iregexp', 'str')) ? 1 : 0;
-			if (isset($param[$paramNumber][0]) && $param[$paramNumber][0] == '#') {
+			if (isset($params[$paramNumber][0]) && $params[$paramNumber][0] == '#') {
 				$paramType = PARAM_TYPE_COUNTS;
-				$param[$paramNumber] = substr($param[$paramNumber], 1);
+				$params[$paramNumber] = substr($params[$paramNumber], 1);
 			}
 			else {
 				$paramType = PARAM_TYPE_TIME;
@@ -667,7 +667,7 @@ $data = array(
 	'dstfld1' => $dstfld1,
 	'itemid' => $itemId,
 	'value' => $value,
-	'param' => $param,
+	'params' => $params,
 	'paramtype' => $paramType,
 	'description' => $description,
 	'functions' => $functions,
@@ -724,24 +724,24 @@ if (isset($data['insert'])) {
 		if ($data['description']) {
 			if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
 				$paramNumber = in_array($function, array('regexp', 'iregexp', 'str')) ? 1 : 0;
-				$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
+				$data['params'][$paramNumber] = '#'.$data['params'][$paramNumber];
 			}
 
 			if ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, array('last', 'band', 'strlen'))) {
-				$data['param'][0] = '';
+				$data['params'][0] = '';
 			}
 
 			// quote function param
-			$params = array();
-			foreach ($data['param'] as $param) {
-				$params[] = quoteFunctionParam($param);
+			$quotedParams = array();
+			foreach ($data['params'] as $param) {
+				$quotedParams[] = quoteFunctionParam($param);
 			}
 
 			$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
 				$data['item_host'],
 				$data['item_key'],
 				$function,
-				rtrim(implode(',', $params), ','),
+				rtrim(implode(',', $quotedParams), ','),
 				$operator,
 				$data['value']
 			);
@@ -772,8 +772,8 @@ if (isset($data['insert'])) {
 
 			// quote function param
 			if (isset($data['insert'])) {
-				foreach ($data['param'] as $pnum => $param) {
-					$data['param'][$pnum] = quoteFunctionParam($param);
+				foreach ($data['params'] as $pnum => $param) {
+					$data['params'][$pnum] = quoteFunctionParam($param);
 				}
 			}
 		}
