@@ -1104,7 +1104,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			goto out;
 		}
 
-		if (! S_ISREG(file_buf.st_mode))
+		if (!S_ISREG(file_buf.st_mode))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] item",
 					filename);
