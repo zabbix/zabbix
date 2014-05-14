@@ -705,12 +705,12 @@ elseif ($srctbl == 'templates') {
 	order_result($templates, 'name');
 
 	$data = array();
+	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($templates as &$template) {
 		$name = new CSpan($template['name'], 'link');
 		$name->attr('id', 'spanid'.$template['templateid']);
 
-		$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
 			$parentId.');';
 
@@ -778,12 +778,12 @@ elseif ($srctbl == 'host_groups') {
 	order_result($hostgroups, 'name');
 
 	$data = array();
+	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hostgroups as &$hostgroup) {
 		$name = new CSpan(get_node_name_by_elid($hostgroup['groupid'], null, NAME_DELIMITER).$hostgroup['name'], 'link');
 		$name->attr('id', 'spanid'.$hostgroup['groupid']);
 
-		$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
 		if ($multiselect) {

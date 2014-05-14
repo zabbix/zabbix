@@ -139,7 +139,13 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0
+			'defaultValue' => 0,
+			'popup' => array(
+				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
+					'&srcfld1=groupid&writeonly=1&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
 		));
 		break;
 
@@ -150,7 +156,13 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0
+			'defaultValue' => 0,
+			'popup' => array(
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
+					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1',
+				'width' => 450,
+				'height' => 450
+			)
 		));
 		break;
 
@@ -803,7 +815,13 @@ if (!empty($this->data['new_operation'])) {
 					new CMultiSelect(array(
 						'name' => 'discoveryHostGroup',
 						'objectName' => 'hostGroup',
-						'objectOptions' => array('editable' => true)
+						'objectOptions' => array('editable' => true),
+						'popup' => array(
+							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
+								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1',
+							'width' => 450,
+							'height' => 450
+						)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
 				), null, 2),
@@ -848,7 +866,13 @@ if (!empty($this->data['new_operation'])) {
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
 						'objectName' => 'templates',
-						'objectOptions' => array('editable' => true)
+						'objectOptions' => array('editable' => true),
+						'popup' => array(
+							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
+								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1',
+							'width' => 450,
+							'height' => 450
+						)
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
 				), null, 2),
