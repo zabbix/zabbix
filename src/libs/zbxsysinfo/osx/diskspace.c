@@ -167,7 +167,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == fsname || '\0' == *fsname)
 	{
-		SET_MSG_RESULT(result, error);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
