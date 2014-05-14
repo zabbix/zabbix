@@ -122,7 +122,7 @@ switch ($page['type']) {
 		}
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
-			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
+			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::$data['refresh']).']';
 		}
 		break;
 }
