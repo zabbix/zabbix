@@ -598,19 +598,21 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 			$exprType = $function.'['.$operator.']';
 
 			// find the item
-			$myItem = API::Item()->get(array(
+			$item = API::Item()->get(array(
+				'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+				'selectHosts' => array('host'),
+				'webitems' => true,
 				'filter' => array(
 					'host' => $functionMacroToken['data']['host'],
 					'key_' => $functionMacroToken['data']['item'],
 					'flags' => null
 				),
-				'output' => array('itemid'),
-				'webitems' => true
+				'limit' => 1
 			));
-			$myItem = reset($myItem);
+			$item = reset($item);
 
-			if ($myItem) {
-				$itemId = $myItem['itemid'];
+			if ($item) {
+				$itemId = $item['itemid'];
 			}
 			else {
 				error(_('Unknown host item, no such item in selected host'));
@@ -628,20 +630,24 @@ else {
 			unset($function);
 		}
 	}
+
+	// fetch item
+	$item = API::Item()->get(array(
+		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+		'selectHosts' => array('host'),
+		'itemids' => $itemId,
+		'webitems' => true,
+		'filter' => array('flags' => null),
+		'limit' => 1
+	));
+	$item = reset($item);
 }
 
 if ($itemId) {
-	$items = API::Item()->get(array(
-		'output' => array('itemid', 'hostid', 'name', 'key_'),
-		'itemids' => $itemId,
-		'webitems' => true,
-		'selectHosts' => array('host'),
-		'filter' => array('flags' => null)
-	));
+	$items = CMacrosResolverHelper::resolveItemNames(array($item));
+	$item = $items[0];
 
-	$items = CMacrosResolverHelper::resolveItemNames($items);
-
-	$item = reset($items);
+	$itemValueType = $item['value_type'];
 	$itemKey = $item['key_'];
 	$itemHost = reset($item['hosts']);
 	$itemHost = $itemHost['host'];
@@ -649,6 +655,7 @@ if ($itemId) {
 }
 else {
 	$itemKey = $itemHost = $description = '';
+	$itemValueType = null;
 }
 
 if (is_null($paramType) && isset($functions[$exprType]['params']['M'])) {
@@ -673,28 +680,12 @@ $data = array(
 	'functions' => $functions,
 	'item_host' => $itemHost,
 	'item_key' => $itemKey,
-	'itemValueType' => null,
+	'itemValueType' => $itemValueType,
+	'selectedFunction' => null,
 	'expr_type' => $exprType,
 	'insert' => get_request('insert', null),
 	'cancel' => get_request('cancel', null)
 );
-
-// if user has already selected an item
-if ($itemId) {
-	// get item value type
-	$selectedItems = API::Item()->get(array(
-		'itemids' => array($itemId),
-		'output' => array('value_type'),
-		'filter' => array('flags' => null),
-		'webitems' => true
-	));
-
-	if ($selectedItem = reset($selectedItems)) {
-		$data['itemValueType'] = $selectedItem['value_type'];
-	}
-}
-
-$data['selectedFunction'] = null;
 
 // check if submitted function is usable with selected item
 foreach ($data['functions'] as $id => $f) {
