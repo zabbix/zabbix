@@ -604,13 +604,16 @@ else {
 		$data['httpTestsLastData'] = $httpTestsLastData;
 	}
 
-	$host = API::Host()->get(array(
-		'output' => array('hostid', 'status'),
-		'hostids' => getRequest('hostid'),
-	));
-	$host = reset($host);
-
-	$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	// show the error column only for hosts
+	if (getRequest('hostid') != 0) {
+		$data['showInfoColumn'] = (bool) API::Host()->get(array(
+			'hostids' => getRequest('hostid'),
+			'output' => array('status')
+		));
+	}
+	else {
+		$data['showInfoColumn'] = true;
+	}
 
 	// render view
 	$httpView = new CView('configuration.httpconf.list', $data);

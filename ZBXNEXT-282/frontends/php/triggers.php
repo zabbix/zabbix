@@ -441,14 +441,10 @@ else {
 
 	// determine, show or not column of errors
 	if ($data['hostid'] > 0) {
-		$host = API::Host()->get(array(
-			'hostids' => $_REQUEST['hostid'],
-			'output' => array('status'),
-			'templated_hosts' => true,
-			'editable' => true
+		$data['showInfoColumn'] = (bool) API::Host()->get(array(
+			'hostids' => $data['hostid'],
+			'output' => array('status')
 		));
-		$host = reset($host);
-		$data['showInfoColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
 		$data['showInfoColumn'] = true;
