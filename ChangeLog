@@ -51,6 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+.......PS. [ZNX-8202] fixed host availability issue monitoring with proxy (Nikolaj)
 A......... [ZBX-8193] changed web scenario default timeout to 15 (Nikolaj)
 ........S. [ZBX-6190] added a more informative message to return when an item does not have enough information to perform nodata() calculations (Juris)
 ..F....... [ZBX-8157] fixed size and style of custom user agent in web scenario edit form and fixed IE displaying input field on second click (Ivo)
