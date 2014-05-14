@@ -51,6 +51,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+........S. [ZBX-6190] added a more informative message to return when an item does not have enough information to perform nodata() calculations (Juris)
 ..F....... [ZBX-8157] fixed size and style of custom user agent in web scenario edit form and fixed IE displaying input field on second click (Ivo)
 A......... [ZBX-6834] fixed trigger.get not returning any results when using the "host" parameter (Pavels)
 A.F....... [ZBX-8190] fixed validation in API to prevent SQL errors with Oracle database when string with excessive length is stored (Krists)
