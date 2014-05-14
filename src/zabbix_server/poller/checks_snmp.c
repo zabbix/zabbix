@@ -605,6 +605,10 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		{
 			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
 		}
+		else if (ITEM_VALUE_TYPE_STR == value_type)
+		{
+			SET_STR_RESULT(result, zbx_dsprintf(NULL, "%d", *var->val.integer));
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%d] is not"
