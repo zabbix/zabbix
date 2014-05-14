@@ -206,9 +206,9 @@ function getMenuPopupHistory(options) {
  * @param string options[]['name']			script name
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
- * @param bool   options['hasGraphs']		link to host graphs page
- * @param bool   options['hasScreens']		link to host screen page
- * @param bool   options['showTriggers']	show "Triggers" link enabled or disabled
+ * @param bool   options['showGraphs']		link to host graphs page
+ * @param bool   options['showScreens']		link to host screen page
+ * @param bool   options['showTriggers']	link to "Status of triggers" page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
@@ -240,7 +240,7 @@ function getMenuPopupHost(options) {
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// if host is disabled, show disabled link for triggers
+		// triggers
 		gotos[gotos.length] = {
 			label: t('Triggers'),
 			css: options.showTriggers ? '' : 'ui-state-disabled',
@@ -248,20 +248,18 @@ function getMenuPopupHost(options) {
 		};
 
 		// graphs
-		if (options.hasGraphs) {
-			gotos[gotos.length] = {
-				label: t('Graphs'),
-				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Graphs'),
+			css: options.showGraphs ? '' : 'ui-state-disabled',
+			url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// screens
-		if (options.hasScreens) {
-			gotos[gotos.length] = {
-				label: t('Host screens'),
-				url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			css: options.showScreens ?  '' : 'ui-state-disabled',
+			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
+		};
 
 		sections[sections.length] = {
 			label: t('Go to'),
@@ -284,10 +282,14 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showGraphs']		display "Graphs" link enabled or disabled
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showScreens']	display "Screens" link enabled or disabled
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
@@ -349,6 +351,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Triggers'),
+				css: options.gotos.showTriggers ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -363,6 +366,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Graphs'),
+				css: options.gotos.showGraphs ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -377,6 +381,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host screens'),
+				css: options.gotos.showScreens ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
