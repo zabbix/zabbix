@@ -125,8 +125,10 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 	'Lynx/2.8.4rel.1 libwww-FM/2.14' => 'Lynx 2.8.4rel.1',
 	'Links (2.3pre1; Linux 2.6.35.10 i686; 225x51)' => 'Links 2.3pre1',
 	'Links (2.2; Linux 2.6.37.6-0.7-desktop i686; 225x51)' => 'Links 2.2',
-	'Googlebot/2.1 (+http://www.google.com/bot.html)' => 'Googlebot'
+	'Googlebot/2.1 (+http://www.google.com/bot.html)' => 'Googlebot',
+	-1 => _('other').' ...'
 ));
+
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append HTTP proxy to form list
