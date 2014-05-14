@@ -868,6 +868,24 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * Return seconds in next week relative to given week start timestamp.
+	 * @param int $currentWeekStartTimestamp
+	 *
+	 * @return int
+	 */
+	protected function secondsPerNextWeek($currentWeekStartTimestamp) {
+
+		$currentWeekStartDate = new \DateTime();
+		$currentWeekStartDate->setTimestamp($currentWeekStartTimestamp);
+
+		$currentWeekStartDate->modify('+7 day');
+
+		$result = $currentWeekStartDate->getTimestamp() - $currentWeekStartTimestamp;
+
+		return $result;
+	}
+
+	/**
 	 * @see calculateSla()
 	 *
 	 * @param $data
@@ -880,12 +898,27 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	function expandPeriodicalTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
-		$week = getdate($period_start);
-		$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN - $week['seconds'];
+		$weekStartDate = new \DateTime();
+		$weekStartDate->setTimestamp($period_start);
 
-		for (; $week < $period_end; $week += SEC_PER_WEEK) {
-			$_s = $week + $ts_from;
-			$_e = $week + $ts_to;
+		$days = $weekStartDate->format('w');
+		$hours = $weekStartDate->format('H');
+		$minutes = $weekStartDate->format('i');
+		$seconds = $weekStartDate->format('s');
+
+		$weekStartDate->modify('-'.$days.' day -'.$hours.' hour -'.$minutes.' minute -'.$seconds.' second');
+
+		$weekStartTimestamp = $weekStartDate->getTimestamp();
+
+		for (; $weekStartTimestamp < $period_end; $weekStartTimestamp += $this->secondsPerNextWeek($weekStartTimestamp)) {
+
+			$weekStartDate->setTimestamp($weekStartTimestamp);
+			$weekStartDate->modify('+'.$ts_from.' second');
+			$_s = $weekStartDate->getTimestamp();
+
+			$weekStartDate->setTimestamp($weekStartTimestamp);
+			$weekStartDate->modify('+'.$ts_to.' second');
+			$_e = $weekStartDate->getTimestamp();
 
 			if ($period_end < $_s || $period_start >= $_e) {
 				continue;
