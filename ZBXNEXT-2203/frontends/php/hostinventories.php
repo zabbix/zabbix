@@ -83,7 +83,7 @@ if ($hostId > 0) {
 
 	// overview tab
 	$data['host'] = API::Host()->get(array(
-		'output' => array('hostid', 'host', 'name', 'maintenance_status', 'description'),
+		'output' => array('hostid', 'host', 'name', 'status', 'maintenance_status', 'description'),
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
