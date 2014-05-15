@@ -139,8 +139,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
-	function_t	*f;
-	char		*buf, replace[16];
+	function_t	*f = NULL;
+	char		*buf, replace[16], *errstr = NULL;
 	int		i, ret = SUCCEED;
 	time_t		now;
 	zbx_host_key_t	*keys = NULL;
@@ -197,9 +197,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 		if (SUCCEED != errcodes[i])
 		{
-			zbx_snprintf(error, max_error_len,
-					"Cannot evaluate function [%s(%s)]:"
-					" item [%s:%s] does not exist, is disabled or belongs to a disabled host.",
+			zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\":"
+					" item \"%s:%s\" does not exist, is disabled or belongs to a disabled host.",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;
@@ -208,8 +207,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 		if (ITEM_STATE_NOTSUPPORTED == items[i].state)
 		{
 			zbx_snprintf(error, max_error_len,
-					"Cannot evaluate function [%s(%s)]:"
-					" item [%s:%s] not supported.",
+					"Cannot evaluate function \"%s(%s)\": item \"%s:%s\" not supported.",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;
 			break;
@@ -217,10 +215,20 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 
 		f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
 
-		if (SUCCEED != evaluate_function(f->value, &items[i], f->func, f->params, now))
+		if (SUCCEED != evaluate_function(f->value, &items[i], f->func, f->params, now, &errstr))
 		{
-			zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)].",
-					f->func, f->params);
+			if (NULL != errstr)
+			{
+				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\": %s.",
+						f->func, f->params, errstr);
+				zbx_free(errstr);
+			}
+			else
+			{
+				zbx_snprintf(error, max_error_len, "Cannot evaluate function \"%s(%s)\".",
+						f->func, f->params);
+			}
+
 			ret = NOTSUPPORTED;
 			break;
 		}
@@ -278,11 +286,9 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-				"Received value [" ZBX_FS_DBL "] is not suitable"
-				" for value type [%s] and data type [%s]",
-				value, zbx_item_value_type_string(dc_item->value_type),
-				zbx_item_data_type_string(dc_item->data_type)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [" ZBX_FS_DBL "]"
+				" is not suitable for value type [%s].",
+				value, zbx_item_value_type_string(dc_item->value_type)));
 		ret = NOTSUPPORTED;
 		goto clean;
 	}

@@ -117,45 +117,37 @@ function insert_javascript_for_editable_combobox() {
 
 	$js = '
 		function CEditableComboBoxInit(obj) {
-			// check if option exist
-			var opt = obj.options;
-			if (obj.value) {
-				obj.oldValue = obj.value;
-			}
-			for (var i = 0; i < opt.length; i++) {
-				if (-1 == opt.item(i).value) {
-					return null;
-				}
-			}
-			// create option
-			opt = document.createElement("option");
-			opt.value = -1;
-			if (IE) {
-				opt.innerHTML = "('._('other').' ...)";
-			}
-			else {
-				opt.text = "('._('other').' ...)";
-			}
-			obj.insertBefore(opt, obj.firstChild);
+			// store previous value
+			obj.oldValue = obj.value;
 		}
 
-		function CEditableComboBoxOnChange(obj, size) {
+		function CEditableComboBoxOnChange(obj, size, width) {
 			if (-1 != obj.value) {
 				obj.oldValue = obj.value;
 			}
 			else {
-				var new_obj = document.createElement("input");
-				new_obj.type = "text";
-				new_obj.name = obj.name;
-				if (size && size > 0) {
-					new_obj.size = size;
+				var newObj = document.createElement("input");
+
+				newObj.type = "text";
+				newObj.name = obj.name;
+				newObj.className = "input text";
+
+				if (size !== null) {
+					newObj.size = size;
 				}
+
+				if (width !== null) {
+					newObj.style.width = width + "px";
+				}
+
 				if (obj.oldValue) {
-					new_obj.value = obj.oldValue;
+					newObj.value = obj.oldValue;
 				}
-				obj.parentNode.replaceChild(new_obj, obj);
-				new_obj.focus();
-				new_obj.select();
+
+				obj.parentNode.replaceChild(newObj, obj);
+
+				newObj.focus();
+				newObj.select();
 			}
 		}';
 	insert_js($js);
