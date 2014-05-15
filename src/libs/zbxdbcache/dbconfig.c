@@ -3331,13 +3331,13 @@ void	init_configuration_cache()
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
 	{
 		zbx_error("Can't create IPC key for configuration cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&config_lock, ZBX_MUTEX_CONFIG))
 	{
 		zbx_error("Unable to create mutex for configuration cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
@@ -5793,21 +5793,21 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (0 != host->errors_from)
+				if (HOST_AVAILABLE_TRUE != host->available)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (0 != host->snmp_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->snmp_available)
 					continue;
 				break;
 			case ITEM_TYPE_IPMI:
-				if (0 != host->ipmi_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->ipmi_available)
 					continue;
 				break;
 			case ITEM_TYPE_JMX:
-				if (0 != host->jmx_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->jmx_available)
 					continue;
 				break;
 			default:
