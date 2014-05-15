@@ -5793,21 +5793,21 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_CALCULATED:
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (0 != host->errors_from)
+				if (HOST_AVAILABLE_TRUE != host->available)
 					continue;
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (0 != host->snmp_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->snmp_available)
 					continue;
 				break;
 			case ITEM_TYPE_IPMI:
-				if (0 != host->ipmi_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->ipmi_available)
 					continue;
 				break;
 			case ITEM_TYPE_JMX:
-				if (0 != host->jmx_errors_from)
+				if (HOST_AVAILABLE_TRUE != host->jmx_available)
 					continue;
 				break;
 			default:

@@ -871,13 +871,19 @@ static int	DBpatch_2030091(void)
 	return DBcreate_index("valuemaps", "valuemaps_1", "name", 1);
 }
 
-static int	DBpatch_2030092(void)
+static int      DBpatch_2030092(void)
+{
+	const ZBX_FIELD field = {"timeout", "15", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("httpstep", &field);
+}
+
+static int	DBpatch_2030093(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field);
 }
-
 #endif
 
 DBPATCH_START(2030)
@@ -976,5 +982,6 @@ DBPATCH_ADD(2030089, 0, 1)
 DBPATCH_ADD(2030090, 0, 1)
 DBPATCH_ADD(2030091, 0, 1)
 DBPATCH_ADD(2030092, 0, 1)
+DBPATCH_ADD(2030093, 0, 1)
 
 DBPATCH_END()
