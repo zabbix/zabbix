@@ -3754,7 +3754,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
 	DC_ITEM		*items = NULL;
-	char		value[MAX_BUFFER_LEN];
+	char		value[MAX_BUFFER_LEN], *error = NULL;
 	int		i, k;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
@@ -3798,10 +3798,23 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 				continue;
 			}
 
-			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter, func->timespec.sec))
+			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter,
+					func->timespec.sec, &error))
 			{
-				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}.",
+				if (NULL != error)
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter,
+						error);
+					zbx_free(error);
+				}
+				else
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\".",
 						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				}
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
