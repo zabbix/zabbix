@@ -961,6 +961,8 @@ fi
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
 
+AC_CHECK_SIZEOF([void *])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *         Checks for options given on the command line          *
