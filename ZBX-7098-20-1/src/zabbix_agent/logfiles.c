@@ -1375,7 +1375,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 		goto out;
 	}
 
-	start_idx = (1 == *skip_old_data && 0 < logfiles_num) ? logfiles_num - 1 : 0;
+	start_idx = (1 == *skip_old_data) ? logfiles_num - 1 : 0;
 
 	/* mark files to be skipped as processed (in case of 'skip_old_data' was set) */
 	for (i = 0; i < start_idx; i++)
