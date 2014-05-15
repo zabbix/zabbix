@@ -1349,26 +1349,15 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	/* Minimize data loss if the system clock has been set back in time. */
 	/* Setting the clock ahead of time is harmless in our case. */
-	if ((time_t)-1 != (now = time(NULL)))
+	if (*mtime > (now = time(NULL)))
 	{
-		if (now < *mtime)
-		{
-			int	old_mtime;
+		int	old_mtime;
 
-			old_mtime = *mtime;
-			*mtime = (int)now;
+		old_mtime = *mtime;
+		*mtime = (int)now;
 
-			zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
-					"seconds back.", (int)(old_mtime - now));
-		}
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get system time");
-
-		(*error_count)++;
-		ret = SUCCEED;
-		goto out;
+		zabbix_log(LOG_LEVEL_WARNING, "System clock has been set back in time. Setting agent mtime %d "
+				"seconds back.", (int)(old_mtime - now));
 	}
 
 	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino))
