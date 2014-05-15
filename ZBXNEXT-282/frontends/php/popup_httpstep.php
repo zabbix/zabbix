@@ -39,7 +39,7 @@ $fields = array(
 	'variables' =>		array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
 	'headers' =>		array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
 	'retrieve_mode' =>	array(T_ZBX_STR, O_OPT, null,
-		IN(array(HTTPSTEP_STEP_RETRIEVE_MODE_CONTENT, HTTPSTEP_STEP_RETRIEVE_MODE_HEADERS)),
+		IN(array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)),
 		'isset({save})'
 	),
 	'follow_redirects' => array(T_ZBX_STR, O_OPT, null,	null,				null),

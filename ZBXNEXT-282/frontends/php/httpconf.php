@@ -528,6 +528,17 @@ else {
 		'paging' => null
 	);
 
+	// show the error column only for hosts
+	if (getRequest('hostid') != 0) {
+		$data['showInfoColumn'] = (bool) API::Host()->get(array(
+			'hostids' => getRequest('hostid'),
+			'output' => array('status')
+		));
+	}
+	else {
+		$data['showInfoColumn'] = true;
+	}
+
 	if ($data['pageFilter']->hostsSelected) {
 		$sortField = getPageSortField('hostname');
 
@@ -551,22 +562,9 @@ else {
 
 		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
 
-		$selectFields = array(
-			'ht.httptestid',
-			'ht.name',
-			'ht.delay',
-			'ht.status',
-			'ht.hostid',
-			'ht.templateid',
-			'h.name AS hostname',
-			'ht.retries',
-			'ht.authentication',
-			'ht.http_proxy',
-			'a.name AS application_name'
-		);
-
 		$dbHttpTests = DBselect(
-			'SELECT '.join(',', $selectFields).
+			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
+				'ht.authentication,ht.http_proxy,a.name AS application_name'.
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
 				' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
@@ -577,14 +575,19 @@ else {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
 
-		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
+		if($data['showInfoColumn']) {
+			$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
-		foreach ($httpTestsLastData as $httpTestId => &$lastData) {
-			if ($lastData['lastfailedstep'] !== null) {
-				$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
+			foreach ($httpTestsLastData as $httpTestId => &$lastData) {
+				if ($lastData['lastfailedstep'] !== null) {
+					$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
+				}
 			}
+			unset($lastData);
 		}
-		unset($lastData);
+		else {
+			$httpTestsLastData = array();
+		}
 
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
@@ -602,17 +605,6 @@ else {
 
 		$data['httpTests'] = $httpTests;
 		$data['httpTestsLastData'] = $httpTestsLastData;
-	}
-
-	// show the error column only for hosts
-	if (getRequest('hostid') != 0) {
-		$data['showInfoColumn'] = (bool) API::Host()->get(array(
-			'hostids' => getRequest('hostid'),
-			'output' => array('status')
-		));
-	}
-	else {
-		$data['showInfoColumn'] = true;
 	}
 
 	// render view

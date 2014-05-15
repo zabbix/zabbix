@@ -269,6 +269,15 @@ class CHttpTest extends CApiService {
 			}
 		}
 
+		foreach($httpTests as &$httpTest) {
+			$defaultValues = array(
+				'verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'verify_host' => HTTPTEST_VERIFY_HOST_OFF
+			);
+
+			check_db_fields($defaultValues, $httpTest);
+		}
+
 		$this->validateCreate($httpTests);
 
 		$httpTests = Manager::HttpTest()->persist($httpTests);
@@ -292,7 +301,8 @@ class CHttpTest extends CApiService {
 		}
 
 		$dbHttpTests = array();
-		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
+		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,'.
+				'ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password,ht.verify_peer,ht.verify_host'.
 				' FROM httptest ht'.
 				' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests)));
 		while ($dbHttpTest = DBfetch($dbCursor)) {
@@ -330,7 +340,7 @@ class CHttpTest extends CApiService {
 			unset($test);
 		}
 
-		$this->validateUpdate($httpTests);
+		$this->validateUpdate($httpTests, $dbHttpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
@@ -470,13 +480,18 @@ class CHttpTest extends CApiService {
 	 *  - check that each web scenario object has httptestid defined
 	 *
 	 * @param array $httpTests
+	 * @param array $dbHttpTests
 	 */
-	protected function validateUpdate(array $httpTests) {
+	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
 		if (!$this->isWritable($httpTestIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
 		}
+
+		$httpTests = $this->extendFromObjects(zbx_toHash($httpTests, 'httptestid'), $dbHttpTests, array(
+			'ssl_key_file', 'ssl_cert_file', 'verify_host', 'verify_peer'
+		));
 
 		$this->checkNames($httpTests);
 
@@ -575,19 +590,33 @@ class CHttpTest extends CApiService {
 			}
 
 			if (isset($step['follow_redirects'])) {
-				if (!in_array($step['follow_redirects'], array(0, 1))) {
+				$followRedirectsValidator = new CSetValidator(
+					array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+				);
+				if (!$followRedirectsValidator->validate($step['follow_redirects'])) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_('Bad value for "follow_redirects" parameter for step "%1$s".', $step['name'])
+						_s(
+							'Incorrect follow redirects value for step "%1$s" of web scenario "%2$s".',
+							$step['name'],
+							$httpTest['name']
+						)
 					);
 				}
 			}
 
 			if (isset($step['retrieve_mode'])) {
-				if (!in_array($step['retrieve_mode'], array(0, 1))) {
+				$retrieveModeValidator = new CSetValidator(
+					array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+				);
+				if (!$retrieveModeValidator->validate($step['retrieve_mode'])) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Bad value for "retrieve_mode" parameter for step "%1$s".', $step['name'])
+						_s(
+							'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
+							$step['name'],
+							$httpTest['name']
+						)
 					);
 				}
 			}
@@ -769,32 +798,35 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException if bad value for "verify_peer" parameter.
 	 * @throws APIException if bad value for "verify_host" parameter.
-	 * @throws APIException if image with same name already exists.
+	 * @throws APIException if SSL cert is present but SSL key is not.
 	 */
 	protected function checkSslParameters($httpTest) {
-		if (isset($httpTest['verify_peer'])) {
-			if (!in_array($httpTest['verify_peer'], array(0, 1))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Bad value for "verify_peer" parameter.'));
-			}
+
+		$verifyPeerValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF))
+		);
+		if (!$verifyPeerValidator->validate($httpTest['verify_peer'])) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect SSL verify peer value for web scenario "%1$s".', $httpTest['name'])
+			);
 		}
 
-		if (isset($httpTest['verify_host'])) {
-			if (!in_array($httpTest['verify_host'], array(0, 1))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Bad value for "verify_host" parameter.'));
-			}
+		$verifyHostValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF))
+		);
+		if (!$verifyHostValidator->validate($httpTest['verify_host'])) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect SSL verify host value for web scenario "%1$s".', $httpTest['name'])
+			);
 		}
 
-		$dbHttpTest = API::getApiService()->select('httptest', (array(
-			'httptestids' => $httpTest['httptestid'],
-			'output' => array('httptestid', 'ssl_cert_file', 'ssl_key_file')
-		)));
-		$dbHttpTest = reset($dbHttpTest);
-
-		$newSslCertFile = isset($httpTest['ssl_cert_file']) ? $httpTest['ssl_cert_file'] : $dbHttpTest['ssl_cert_file'];
-		$newSslKeyFile = isset($httpTest['ssl_key_file']) ? $httpTest['ssl_key_file'] : $dbHttpTest['ssl_key_file'];
-
-		if (($newSslCertFile !== '') && ($newSslKeyFile === '')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('SSL key file is required for SSL cert file.'));
+		if (($httpTest['ssl_cert_file'] != '') && ($httpTest['ssl_key_file'] == '')) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Empty SSL key file for web scenario "%1$s".', $httpTest['name'])
+			);
 		}
 	}
 }

@@ -67,8 +67,8 @@ $httpTable->setHeader(array(
 	_('HTTP proxy'),
 	_('Application'),
 	make_sorting_header(_('Status'), 'status'),
-	_('Info'))
-);
+	$this->data['showInfoColumn'] ? _('Info') : null
+));
 
 $authTypeLabels = array(
 	HTTPTEST_AUTH_BASIC => _('Basic'),
@@ -88,25 +88,31 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
 
-	$infoIcon = SPACE;
-	if ($this->data['showInfoColumn'] && ($httpTest['status'] == HTTPTEST_STATUS_ACTIVE)
-			&& isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
-		$lastData = $httpTestsLastData[$httpTestId];
+	if ($this->data['showInfoColumn']) {
+		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
+			$lastData = $httpTestsLastData[$httpTestId];
 
-		$failedStep = $lastData['failedstep'];
+			$failedStep = $lastData['failedstep'];
 
-		$errorMessage = $failedStep
-			? _s(
-				'Step "%1$s" [%2$s of %3$s] failed: %4$s',
-				$failedStep['name'],
-				$failedStep['no'],
-				$httpTest['stepscnt'],
-				($lastData['error'] === null) ? _('Unknown error') : $lastData['error']
-			)
-			: _s('Unknown step failed: %1$s', $lastData['error']);
+			$errorMessage = $failedStep
+				? _s(
+					'Step "%1$s" [%2$s of %3$s] failed: %4$s',
+					$failedStep['name'],
+					$failedStep['no'],
+					$httpTest['stepscnt'],
+					($lastData['error'] === null) ? _('Unknown error') : $lastData['error']
+				)
+				: _s('Unknown step failed: %1$s', $lastData['error']);
 
-		$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-		$infoIcon->setHint($errorMessage, '', 'on');
+			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
+			$infoIcon->setHint($errorMessage, '', 'on');
+		}
+		else {
+			$infoIcon = SPACE;
+		}
+	}
+	else {
+		$infoIcon = null;
 	}
 
 	$httpTable->addRow(array(
@@ -117,8 +123,8 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['delay'],
 		$httpTest['retries'],
 		$authTypeLabels[$httpTest['authentication']],
-		trim($httpTest['http_proxy']) ? _('Yes') : _('No'),
-		$httpTest['application_name'] ?: '-',
+		$httpTest['http_proxy'] ? _('Yes') : _('No'),
+		($httpTest['application_name'] !== '') ? $httpTest['application_name'] : '-',
 		new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
