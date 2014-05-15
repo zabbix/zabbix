@@ -1626,7 +1626,8 @@ function make_trigger_details($trigger) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostIds,
-		'selectScreens' => API_OUTPUT_COUNT
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT
 	));
 
 	if (count($hosts) > 1) {
