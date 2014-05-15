@@ -268,3 +268,6 @@ div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px
 div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
 div.setup_wizard .requirements .notice { color: #EE6000; border-color: #EE6000; }
 div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }
+
+/* httptest */
+.httptest-popup #retrieve_mode_2 { margin-left: 20px; }

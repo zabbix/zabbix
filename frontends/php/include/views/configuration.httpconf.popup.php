@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget();
+$httpPopupWidget = new CWidget(null, 'httptest-popup');
 
 $result = false;
 if (hasRequest('save')) {
@@ -39,44 +39,37 @@ if (hasRequest('save')) {
 
 if (hasRequest('stepid')) {
 	$followRedirects = getRequest('follow_redirects', false);
-	$retrieveMode = getRequest('retrieve_mode', HTTPSTEP_STEP_RETRIEVE_MODE_CONTENT);
+	$retrieveMode = getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 }
 else {
 	$followRedirects = true;
-	$retrieveMode = HTTPSTEP_STEP_RETRIEVE_MODE_CONTENT;
+	$retrieveMode = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 }
 
 if (hasRequest('save') && $result) {
+
+	$httpStepForJs = array(
+		'stepid' => getRequest('stepid'),
+		'name' => getRequest('name'),
+		'timeout' => getRequest('timeout'),
+		'url' => getRequest('url'),
+		'posts'  => getRequest('posts'),
+		'variables' => getRequest('variables'),
+		'required' => getRequest('required'),
+		'status_codes' => getRequest('status_codes'),
+		'headers' => getRequest('headers'),
+		'follow_redirects' => getRequest('follow_redirects'),
+		'retrieve_mode'  => getRequest('retrieve_mode')
+	);
+
 	if (!hasRequest('stepid')) {
-		insert_js('add_httpstep('.
-					CJs::encodeJson(getRequest('dstfrm')).','.
-					CJs::encodeJson(getRequest('name')).','.
-					CJs::encodeJson(getRequest('timeout')).','.
-					CJs::encodeJson(getRequest('url')).','.
-					CJs::encodeJson(getRequest('posts')).','.
-					CJs::encodeJson(getRequest('variables')).','.
-					CJs::encodeJson(getRequest('required')).','.
-					CJs::encodeJson(getRequest('status_codes')).','.
-					CJs::encodeJson(getRequest('headers')).','.
-					CJs::encodeJson(getRequest('follow_redirects')).','.
-					CJs::encodeJson(getRequest('retrieve_mode')).");\n"
-		);
+		insert_js('add_httpstep('.CJs::encodeJson(getRequest('dstfrm')).','.
+					CJs::encodeJson($httpStepForJs).');'."\n");
 	}
 	else {
-		insert_js('update_httpstep('.
-					CJs::encodeJson(getRequest('dstfrm')).','.
+		insert_js('update_httpstep('.CJs::encodeJson(getRequest('dstfrm')).','.
 					CJs::encodeJson(getRequest('list_name')).','.
-					CJs::encodeJson(getRequest('stepid')).','.
-					CJs::encodeJson(getRequest('name')).','.
-					CJs::encodeJson(getRequest('timeout')).','.
-					CJs::encodeJson(getRequest('url')).','.
-					CJs::encodeJson(getRequest('posts')).','.
-					CJs::encodeJson(getRequest('variables')).','.
-					CJs::encodeJson(getRequest('required')).','.
-					CJs::encodeJson(getRequest('status_codes')).','.
-					CJs::encodeJson(getRequest('headers')).','.
-					CJs::encodeJson(getRequest('follow_redirects')).','.
-					CJs::encodeJson(getRequest('retrieve_mode')).");\n"
+					CJs::encodeJson($httpStepForJs).');'."\n"
 		);
 	}
 }
@@ -99,9 +92,9 @@ else {
 	$httpPopupFormList->addRow(_('Follow redirects'), new CCheckBox('follow_redirects', $followRedirects, null, true));
 
 	$retrieveModeRadioButtonList = new CRadioButtonList('retrieve_mode', $retrieveMode);
-	$retrieveModeRadioButtonList->addValue(_('page content'), HTTPSTEP_STEP_RETRIEVE_MODE_CONTENT);
+	$retrieveModeRadioButtonList->addValue(_('page content'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 	$retrieveModeRadioButtonList->addItem(SPACE);
-	$retrieveModeRadioButtonList->addValue(_('page headers'), HTTPSTEP_STEP_RETRIEVE_MODE_HEADERS);
+	$retrieveModeRadioButtonList->addValue(_('page headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS);
 	$httpPopupFormList->addRow(_('Retrieve'), $retrieveModeRadioButtonList);
 
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5));
