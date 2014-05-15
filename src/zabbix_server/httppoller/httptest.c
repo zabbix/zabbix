@@ -272,6 +272,45 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#ifdef HAVE_LIBCURL
+static void	zbx_add_headers(char *headers, struct curl_slist **headers_slist)
+{
+	const char	*p_start;
+	char		*p;
+
+	if ('\0' == *headers)
+		return;
+
+	p_start = headers;
+
+	while (NULL != (p = strstr(p_start, "\r\n")) || '\0' != *p_start)
+	{
+		if (p_start != p)
+		{
+			char	*line;
+
+			if (NULL != p)
+				*p = '\0';
+			line = zbx_strdup(NULL, p_start);
+			if (NULL != p)
+				*p = '\r';
+
+			zbx_lrtrim(line, ZBX_WHITESPACE);
+			if ('\0' != *line)
+				*headers_slist = curl_slist_append(*headers_slist, line);
+			zbx_free(line);
+		}
+
+		if (NULL == p)
+			break;
+
+		p_start = p + 2;	/* \r\n */
+		while ('\0' != *p_start && 0 != isspace(*p_start))
+			p_start++;
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: process_httptest                                                 *
@@ -313,7 +352,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	lastfailedstep = 0;
 
 	result = DBselect(
-			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects"
+			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects,"
+				"headers"
 			" from httpstep"
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
@@ -340,6 +380,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		struct curl_slist	*headers_slist = NULL;
+
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
 
@@ -368,6 +410,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		httpstep.variables = row[8];
 		httpstep.follow_redirects = atoi(row[9]);
+		httpstep.headers = zbx_strdup(NULL, row[10]);
 
 		memset(&stat, 0, sizeof(stat));
 
@@ -400,6 +443,19 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 				goto httpstep_error;
 			}
+		}
+
+		/* collect headers defined in a scenario */
+		zbx_add_headers(httptest->httptest.headers, &headers_slist);
+
+		/* collect headers defined in a step */
+		zbx_add_headers(httpstep.headers, &headers_slist);
+
+		if (NULL != headers_slist && CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
+				headers_slist)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
 		}
 
 		if (HTTPTEST_AUTH_NONE != httptest->httptest.authentication)
@@ -453,6 +509,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				break;
 		}
 		while (0 != --httptest->httptest.retries);
+
+		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 
 		if (CURLE_OK == err)
 		{
@@ -528,6 +586,7 @@ httpstep_error:
 		zbx_free(httpstep.required);
 		zbx_free(httpstep.posts);
 		zbx_free(httpstep.url);
+		zbx_free(httpstep.headers);
 
 		zbx_timespec(&ts);
 		process_step_data(httpstep.httpstepid, &stat, &ts);
@@ -621,7 +680,7 @@ int	process_httptests(int httppoller_num, int now)
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
 	result = DBselect(
-			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.agent,"
+			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.headers,t.agent,"
 				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
@@ -650,26 +709,28 @@ int	process_httptests(int httppoller_num, int now)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
 				&httptest.httptest.variables, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
-		httptest.httptest.agent = zbx_strdup(NULL, row[6]);
+		httptest.httptest.headers = zbx_strdup(NULL, row[6]);
+
+		httptest.httptest.agent = zbx_strdup(NULL, row[7]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 				&httptest.httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[7])))
+		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[8])))
 		{
-			httptest.httptest.http_user = zbx_strdup(NULL, row[8]);
+			httptest.httptest.http_user = zbx_strdup(NULL, row[9]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 					&httptest.httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
-			httptest.httptest.http_password = zbx_strdup(NULL, row[9]);
+			httptest.httptest.http_password = zbx_strdup(NULL, row[10]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
-		httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		httptest.httptest.http_proxy = zbx_strdup(NULL, row[11]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
-		httptest.httptest.retries = atoi(row[11]);
+		httptest.httptest.retries = atoi(row[12]);
 
 		/* add httptest varriables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
@@ -683,6 +744,7 @@ int	process_httptests(int httppoller_num, int now)
 			zbx_free(httptest.httptest.http_user);
 		}
 		zbx_free(httptest.httptest.agent);
+		zbx_free(httptest.httptest.headers);
 		zbx_free(httptest.httptest.variables);
 
 		/* clear the macro cache used in this http test */

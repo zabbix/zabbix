@@ -365,6 +365,7 @@ typedef struct
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*variables;
+	char		*headers;
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
@@ -387,6 +388,7 @@ typedef struct
 	int		timeout;
 	char		*variables;
 	int		follow_redirects;
+	char		*headers;
 }
 DB_HTTPSTEP;
 
