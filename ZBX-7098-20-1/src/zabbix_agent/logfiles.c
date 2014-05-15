@@ -307,8 +307,8 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\", error code:%u",
-					filename, GetLastError());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get file information for \"%s\": %s",
+					filename, strerror_from_system(GetLastError()));
 			return ret;
 		}
 	}
@@ -325,7 +325,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get extended file information for "
-						"\"%s\", error code:%u", filename, GetLastError());
+						"\"%s\": %s", filename, strerror_from_system(GetLastError()));
 				return ret;
 			}
 		}
@@ -365,8 +365,8 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 	if (0 == GetVolumePathName(path_uni, mount_point,
 			sizeof(mount_point) / sizeof(TCHAR)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": error code:%u", path,
-				GetLastError());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": %s", path,
+				strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
 	}
@@ -378,8 +378,8 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 			sizeof(fs_type) / sizeof(TCHAR)))
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume information for \"%s\": error code: %u", utf8,
-				GetLastError());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume information for \"%s\": %s", utf8,
+				strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
 	}
