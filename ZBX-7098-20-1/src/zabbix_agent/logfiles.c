@@ -1023,9 +1023,9 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 		break;
 	}
 
-	if (!(0 == i && 0 == *logfiles_num) && !(0 < *logfiles_num && *logfiles_num == i))
+	if (*logfiles_num > i)
 	{
-		/* do not move if there are no logfiles or we are appending the logfile */
+		/* free a gap for inserting the new element */
 		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
 				(size_t)(*logfiles_num - i) * sizeof(struct st_logfile));
 	}
