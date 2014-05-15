@@ -1552,6 +1552,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20
