@@ -1143,24 +1143,25 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		if (0 != zbx_stat(filename, &file_buf))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
-			goto out;
+			goto clean;
 		}
 
 		if (!S_ISREG(file_buf.st_mode))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "'%s' is not a regular file, it cannot be used in log[] item",
 					filename);
-			goto out;
+			goto clean;
 		}
 
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #ifdef _WINDOWS
 		if (SUCCEED != set_use_ino_by_fs_type(filename, use_ino))
-			goto out;
+			goto clean;
 #else
 		/* on UNIX file systems we always assume that inodes can be used to identify files */
 		*use_ino = 1;
 #endif
+		ret = SUCCEED;
 	}
 	else	/* logrt[] item */
 	{
@@ -1168,7 +1169,6 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		int			reg_error;
 		regex_t			re;
 #ifdef _WINDOWS
-		int			win_err = 0;
 		char			*find_path = NULL;
 		intptr_t		find_handle;
 		struct _finddata_t	find_data;
@@ -1182,7 +1182,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "filename '%s' does not contain a valid directory and/or format",
 					filename);
-			goto out;
+			goto clean;
 		}
 
 		if (0 != (reg_error = regcomp(&re, format, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
@@ -1192,9 +1192,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			regerror(reg_error, &re, err_buf, sizeof(err_buf));
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot compile a regexp describing filename pattern '%s' for "
 					"a logrt[] item. Error: %s", format, err_buf);
-			zbx_free(directory);
-			zbx_free(format);
-			goto out;
+			goto clean1;
 		}
 #ifdef _WINDOWS
 		/* try to "open" Windows directory */
@@ -1204,31 +1202,17 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open directory \"%s\" for reading: %s", directory,
 					zbx_strerror(errno));
-			win_err = 1;
+			goto clean2;
 		}
 
-		if (1 == win_err || SUCCEED != set_use_ino_by_fs_type(find_path, use_ino))
-		{
-			regfree(&re);
-			zbx_free(directory);
-			zbx_free(format);
-			zbx_free(find_path);
-			goto out;
-		}
+		if (SUCCEED != set_use_ino_by_fs_type(find_path, use_ino))
+			goto clean3;
 
 		do
 		{
 			pick_logfiles(directory, find_data.name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
 		}
 		while (0 == _findnext(find_handle, &find_data));
-
-		if (-1 == _findclose(find_handle))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
-					zbx_strerror(errno));
-		}
-
-		zbx_free(find_path);
 
 #else	/* not _WINDOWS */
 
@@ -1239,10 +1223,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory,
 					zbx_strerror(errno));
-			regfree(&re);
-			zbx_free(directory);
-			zbx_free(format);
-			goto out;
+			goto clean2;
 		}
 
 		while (NULL != (d_ent = readdir(dir)))
@@ -1264,12 +1245,26 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
 		}
 
+		ret = SUCCEED;
+
+#ifdef _WINDOWS
+clean3:
+		if (-1 == _findclose(find_handle))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle for '%s': %s", find_path,
+					zbx_strerror(errno));
+		}
+#endif
+clean2:
 		regfree(&re);
+#ifdef _WINDOWS
+		zbx_free(find_path);
+#endif
+clean1:
 		zbx_free(directory);
 		zbx_free(format);
 	}
-	ret = SUCCEED;
-out:
+clean:
 	if (FAIL == ret && NULL != *logfiles)
 		destroy_logfile_list(logfiles, logfiles_alloc, logfiles_num);
 
