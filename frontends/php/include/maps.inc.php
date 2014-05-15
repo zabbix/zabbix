@@ -1017,7 +1017,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				}
 
 				foreach ($selement['triggers'] as $triggerId) {
-					if (!count(array_intersect($triggerApps[$triggerId], $applicationNamesForSelement))) {
+					if (!isset($triggerApps[$triggerId]) || !count(array_intersect($triggerApps[$triggerId], $applicationNamesForSelement))) {
 						unset($selement['triggers'][$triggerId]);
 					}
 				}
