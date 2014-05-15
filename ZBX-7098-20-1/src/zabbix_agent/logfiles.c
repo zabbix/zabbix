@@ -1465,8 +1465,7 @@ out1:
 					logfiles[j].processed_size = logfiles[j].size;
 					logfiles[j].seq = seq++;
 				}
-				else if ((*logfiles_old)[i].size != (*logfiles_old)[i].processed_size
-						|| (*logfiles_old)[i].size != logfiles[j].size)
+				else
 				{
 					/* the file was not fully processed during the previous check or has grown */
 					logfiles[j].processed_size = (*logfiles_old)[i].processed_size;
