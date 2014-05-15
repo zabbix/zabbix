@@ -357,13 +357,13 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 {
 	char	*utf8;
-	TCHAR	*path_uni, mount_point[MAX_PATH + 1], fs_type[MAX_PATH + 1];
+	wchar_t	*path_uni, mount_point[MAX_PATH + 1], fs_type[MAX_PATH + 1];
 
 	path_uni = zbx_utf8_to_unicode(path);
 
 	/* get volume mount point */
 	if (0 == GetVolumePathName(path_uni, mount_point,
-			sizeof(mount_point) / sizeof(TCHAR)))
+			sizeof(mount_point) / sizeof(wchar_t)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume mount point for \"%s\": %s", path,
 				strerror_from_system(GetLastError()));
@@ -375,7 +375,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino)
 
 	/* Which file system type this directory resides on ? */
 	if (0 == GetVolumeInformation(mount_point, NULL, 0, NULL, NULL, NULL, fs_type,
-			sizeof(fs_type) / sizeof(TCHAR)))
+			sizeof(fs_type) / sizeof(wchar_t)))
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get volume information for \"%s\": %s", utf8,
