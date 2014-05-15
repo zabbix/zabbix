@@ -394,7 +394,6 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -1784,21 +1783,9 @@ class CTrigger extends CTriggerGeneral {
 		return $result;
 	}
 
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// if the parent method call adds a hostname column to the select clause, replace it with "h.name"
-		// since column "t.hostname" doesn't exist
-		if (!zbx_empty($options['sortfield'])
-				&& ($options['sortfield'] === 'hostname' || isset($sqlParts['select']['hostname']))) {
-			$sqlParts['select']['hostname'] = 'h.name as hostname';
-		}
-
-		return $sqlParts;
-	}
-
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		if ($sortfield == 'hostname') {
+		if ($sortfield === 'hostname') {
+			$sqlParts['select']['hostname'] = 'h.name AS hostname';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';

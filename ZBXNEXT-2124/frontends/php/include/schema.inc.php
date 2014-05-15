@@ -842,7 +842,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '30',
+				'default' => '15',
 			),
 			'posts' => array(
 				'null' => false,

@@ -2,11 +2,12 @@
 Changes for 2.3.0
 
 New features:
+...G...PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
 ...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
 A.F....... [ZBX-7949] improved multibyte string support (Ivo)
-..F....... [ZBXNEXT-2270] changed "Status" dropdown in hosts, host prototypes and host mass update forms to "Enabled" checkbox (Krists)
+..F....... [ZBXNEXT-2270] changed "Status" dropdown in host and host prototype forms to "Enabled" checkbox (Krists)
 ..F....... [ZBX-7941] changed page footer to not show debug in fullscreen mode (Krists)
 A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed monitoring (Eduard, Sasha)
 ........S. [ZBXNEXT-2256] added support of host level macros like {HOST.*} along with user macros in LLD filter regexps (Sasha)
@@ -21,7 +22,7 @@ A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed mo
 A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
 A.F.I...S. [ZBXNEXT-2117] added "Description" field for templates, hosts and proxies (Eduard, Sasha)
 ..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added a patch to change screen item sort order (Oleg, Pavels)
-..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
+..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places and made menu links disabled instead of hidden (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
@@ -50,6 +51,17 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-8193] changed web scenario default timeout to 15 (Nikolaj)
+........S. [ZBX-6190] added a more informative message to return when an item does not have enough information to perform nodata() calculations (Juris)
+..F....... [ZBX-8157] fixed size and style of custom user agent in web scenario edit form and fixed IE displaying input field on second click (Ivo)
+A......... [ZBX-6834] fixed trigger.get not returning any results when using the "host" parameter (Pavels)
+A.F....... [ZBX-8190] fixed validation in API to prevent SQL errors with Oracle database when string with excessive length is stored (Krists)
+...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
+..F....... [ZBX-8160] removed justification in warning message (Ivo)
+..F....... [ZBX-8141] corrected 'URL' abbreviation string to uppercase (Ivo)
+..F....... [ZBX-7839] fixed cloning of graphs and hosts to use changed form values (Krists)
+..F....... [ZBX-8165] fixed issue when maintenance items with its hosts/host groups removed are not accessible in configuration (Krists)
+...G...PS. [ZBX-2196] changed status codes of various exit calls to library macros for consistency (Juris)
 ........S. [ZBX-1274] fixed negative values, received from SNMP agent, being displayed as large unsigned integers (igors)
 ...G...... [ZBX-8031] removed pre-processor aliases for Windows string functions; converted all references of Windows types to standard C types (Juris)
 .......PS. [ZBX-7534] removed the limit of authorization string (Nikolaj)
@@ -118,6 +130,15 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
+.......PS. [ZBX-8202] fixed queue calculation for unavailable hosts which are monitored through a proxy (Nikolaj)
+.......PS. [ZBX-8152] added informative log message about optional database patches (Juris)
+...G...PS. [ZBX-8138] fixed ssh infostring searching and validation for ssh related items to allow information messages as per RFC4253 Section 4.2 (Juris)
+...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
+A.F....... [ZBX-7766] fixed webscenario status code field validation to accept user macros (Krists)
+...GI..... [ZBX-8127] fixed truncation of hostname on HP-UX machines (igors)
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
+..F....... [ZBX-8176] fixed SQL errors while mass operations when using Oracle database (Krists)
 ..F....... [ZBX-8158] fixed disabled hosts not shown in trigger selection popup when in configuration (Krists)
 ..F....... [ZBX-7553] fixed graph not getting period when coming from screen (Krists)
 ..F....... [ZBX-8075] fixed triggers/data without application not showing in overview (Krists)
@@ -1037,6 +1058,26 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.13rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
+...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12
+
+2.0.12rc3 was released as 2.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12rc3
+
+Bug fixes:
+........S. [ZBX-8181] fixed possible entering of "history syncer" process in an eternal loop when processing IT services (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.12rc2
@@ -2574,6 +2615,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20

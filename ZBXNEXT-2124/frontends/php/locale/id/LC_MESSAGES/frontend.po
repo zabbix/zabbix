@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-01 14:21+0300\n"
+"POT-Creation-Date: 2014-05-12 03:06+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -27,7 +27,7 @@ msgstr "\"Tampilan OK memicu\" harus \"0\" atau bilangan bulat positif."
 
 #: include/profiles.inc.php:364
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif.\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif.\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif.\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif.\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif."
+msgstr "\"Pemicu berkedip pada perubahan status\" harus \"0\" atau bilangan bulat positif."
 
 #: include/func.inc.php:467
 #, c-format
@@ -102,7 +102,7 @@ msgstr ""
 msgid "(0 - infinitely)"
 msgstr "(0 - tak terbatas)"
 
-#: include/views/configuration.host.edit.php:206
+#: include/views/configuration.host.edit.php:219
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:124
 msgid "(Only super admins can create groups)"
@@ -120,8 +120,8 @@ msgstr "(dalam detik)"
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(paling rendah 60 detik, 0 - gunakan aksi yang berlaku)"
 
-#: include/views/configuration.host.edit.php:394
-#: include/views/configuration.host.edit.php:415
+#: include/views/configuration.host.edit.php:401
+#: include/views/configuration.host.edit.php:422
 #: include/views/configuration.host.massupdate.php:144
 #: include/views/configuration.host.prototype.edit.php:154
 msgid "(no proxy)"
@@ -159,7 +159,7 @@ msgstr "10 detik"
 msgid "30 seconds"
 msgstr "30 detik"
 
-#: include/views/configuration.graph.edit.php:211
+#: include/views/configuration.graph.edit.php:222
 msgid "3D view"
 msgstr "Tampilan 3D"
 
@@ -302,9 +302,9 @@ msgstr "Mengakui dinonaktifkan"
 #: include/views/configuration.action.edit.php:632
 #: include/views/configuration.action.edit.php:884
 #: include/views/configuration.action.edit.php:1005
-#: include/views/configuration.graph.edit.php:229
+#: include/views/configuration.graph.edit.php:240
 #: include/views/configuration.host.discovery.edit.php:198
-#: include/views/configuration.host.edit.php:661
+#: include/views/configuration.host.edit.php:668
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.massupdate.php:321
@@ -419,14 +419,14 @@ msgstr "Aktif sampai"
 #: include/views/configuration.action.edit.php:838
 #: include/views/configuration.action.edit.php:984
 #: include/views/configuration.action.edit.php:993
-#: include/views/configuration.graph.edit.php:232
+#: include/views/configuration.graph.edit.php:243
 #: include/views/configuration.host.discovery.edit.php:237
 #: include/views/configuration.host.discovery.edit.php:336
-#: include/views/configuration.host.edit.php:251
-#: include/views/configuration.host.edit.php:268
-#: include/views/configuration.host.edit.php:284
-#: include/views/configuration.host.edit.php:299
-#: include/views/configuration.host.edit.php:699
+#: include/views/configuration.host.edit.php:262
+#: include/views/configuration.host.edit.php:279
+#: include/views/configuration.host.edit.php:295
+#: include/views/configuration.host.edit.php:310
+#: include/views/configuration.host.edit.php:706
 #: include/views/configuration.host.prototype.edit.php:190
 #: include/views/configuration.host.prototype.edit.php:247
 #: include/views/configuration.httpconf.edit.php:233
@@ -486,7 +486,7 @@ msgstr ""
 msgid "Add new or existing host groups"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:241
+#: include/views/configuration.graph.edit.php:252
 msgid "Add prototype"
 msgstr "Tambah bentuk dasar"
 
@@ -548,8 +548,8 @@ msgstr "Agen"
 msgid "Agent host name defined in the configuration file. String value."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:259
-#: include/views/configuration.host.edit.php:343
+#: include/views/configuration.host.edit.php:270
+#: include/views/configuration.host.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:108
 #: include/views/inventory.host.view.php:103
 msgid "Agent interfaces"
@@ -671,10 +671,10 @@ msgstr "Aplikasi telah diperbarui"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikasi dengan ID \"%1$s\" tidak tersedia pada \"%2$s\"."
 
-#: hosts.php:836 hosts.php:928 include/forms.inc.php:875
+#: hosts.php:837 hosts.php:929 include/forms.inc.php:875
 #: include/html.inc.php:361 include/html.inc.php:365
 #: include/views/configuration.application.list.php:47
-#: include/views/configuration.host.edit.php:441
+#: include/views/configuration.host.edit.php:448
 #: include/views/configuration.item.edit.php:406
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.list.php:57
@@ -808,8 +808,8 @@ msgstr "Agustus"
 msgid "Authentication"
 msgstr "Otentikasi"
 
-#: include/views/configuration.host.edit.php:730
-#: include/views/configuration.host.edit.php:742
+#: include/views/configuration.host.edit.php:737
+#: include/views/configuration.host.edit.php:749
 #: include/views/configuration.host.prototype.edit.php:260
 msgid "Authentication algorithm"
 msgstr "Algoritma otentikasi"
@@ -873,7 +873,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:790
+#: include/views/configuration.host.edit.php:796
 #: include/views/configuration.host.massupdate.php:252
 #: include/views/configuration.host.prototype.edit.php:302
 msgid "Automatic"
@@ -888,7 +888,7 @@ msgstr "Pemetaan ikon otomatis"
 msgid "Automatic icon selection"
 msgstr "Pemilihan ikon otomatis"
 
-#: hosts.php:845
+#: hosts.php:846
 msgid "Availability"
 msgstr "Ketersediaan"
 
@@ -1066,7 +1066,7 @@ msgstr "KONFIGURASI GRUP HOST"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr ""
 
-#: hosts.php:681 hosts.php:746 hosts.php:792
+#: hosts.php:682 hosts.php:747 hosts.php:793
 msgid "CONFIGURATION OF HOSTS"
 msgstr "KONFIGURASI HOST"
 
@@ -1224,8 +1224,8 @@ msgstr ""
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 msgstr ""
 
-#: include/items.inc.php:97 include/views/configuration.graph.edit.php:96
-#: include/views/configuration.graph.edit.php:154
+#: include/items.inc.php:97 include/views/configuration.graph.edit.php:107
+#: include/views/configuration.graph.edit.php:165
 msgid "Calculated"
 msgstr "Dihitung"
 
@@ -1289,7 +1289,7 @@ msgstr ""
 msgid "Cannot add application"
 msgstr "Tidak dapat menambah aplikasi"
 
-#: api/classes/CTrigger.php:1386
+#: api/classes/CTrigger.php:1385
 msgid "Cannot add dependency from a host to a template."
 msgstr "Tidak dapat menambah dependency dari host ke template."
 
@@ -1302,11 +1302,11 @@ msgstr "Tidak dapat menambah dependency dari trigger \"%1$s:%2$s\" ke trigger ya
 msgid "Cannot add discovery rule"
 msgstr "Tidak dapat menambah aturan discovery"
 
-#: graphs.php:250
+#: graphs.php:254
 msgid "Cannot add graph"
 msgstr "Tidak dapat menambah grafik"
 
-#: graphs.php:232
+#: graphs.php:236
 msgid "Cannot add graph prototype"
 msgstr ""
 
@@ -1366,7 +1366,7 @@ msgstr "Tidak dapat menambah tipe media"
 #: api/classes/CGraph.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\".Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\".Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\".Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\".Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\"."
+msgstr "Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada grafik \"%1$s\"."
 
 #: api/classes/CGraphPrototype.php:43
 #, c-format
@@ -1476,9 +1476,9 @@ msgstr "Tidak dapat meng-klon prototipe trigger."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr "Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script.Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script.Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script.Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script.Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script."
+msgstr "Tidak dapat terhubung ke port penangkap dari server daemon zabbix, tetapi harus tersedia untuk menjalankan script."
 
-#: graphs.php:352
+#: graphs.php:356
 msgid "Cannot copy graphs"
 msgstr "Tidak dapan menyalin grafik"
 
@@ -1489,7 +1489,7 @@ msgstr "Tidak dapat menyalin item"
 #: include/triggers.inc.php:412
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr "Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi.Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi.Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi.Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi.Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi."
+msgstr "Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih dari satu pada ekspresi."
 
 #: api/classes/CHostPrototype.php:151
 #, c-format
@@ -1500,11 +1500,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Tidak dapat membuat koneksi database lainnya."
 
-#: api/classes/CTrigger.php:1420
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create circular dependencies."
 msgstr "Tidak dapat membuat dependensi melingkar."
 
-#: api/classes/CTrigger.php:1392
+#: api/classes/CTrigger.php:1391
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
@@ -1549,7 +1549,7 @@ msgstr ""
 #: api/classes/CUser.php:1312
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut.Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut.Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut.Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut.Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut."
+msgstr "Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut."
 
 #: actionconf.php:165
 msgid "Cannot delete action"
@@ -1561,7 +1561,7 @@ msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "Tidak dapat menghapus aplikasi"
 
-#: api/classes/CTrigger.php:1046
+#: api/classes/CTrigger.php:1045
 msgid "Cannot delete dependency"
 msgstr "Tidak dapat menghapus dependency"
 
@@ -1574,15 +1574,15 @@ msgstr "Tidak dapat menghapus aturan discovery"
 msgid "Cannot delete discovery rules"
 msgstr "Tidak dapat menghapus aturan discovery"
 
-#: graphs.php:285
+#: graphs.php:289
 msgid "Cannot delete graph"
 msgstr "Tidak dapat menghapus grafik"
 
-#: api/classes/CItemPrototype.php:511 graphs.php:279
+#: api/classes/CItemPrototype.php:511 graphs.php:283
 msgid "Cannot delete graph prototype"
 msgstr "Tidak dapat menghapus prototipe grafik"
 
-#: graphs.php:299
+#: graphs.php:303
 msgid "Cannot delete graph prototypes"
 msgstr ""
 
@@ -1590,7 +1590,7 @@ msgstr ""
 msgid "Cannot delete graph."
 msgstr "Tidak dapat menghapus grafik."
 
-#: graphs.php:305
+#: graphs.php:309
 msgid "Cannot delete graphs"
 msgstr "Tidak dapat menghapus grafik"
 
@@ -1602,7 +1602,7 @@ msgstr "Tidak dapat menghapus grafik yang dibuat oleh discovery tingkat bawah."
 msgid "Cannot delete group"
 msgstr "Tidak dapat menghapus grup"
 
-#: hosts.php:611 hosts.php:628
+#: hosts.php:612 hosts.php:629
 msgid "Cannot delete host"
 msgstr "Tidak dapat menghapus host"
 
@@ -1686,7 +1686,7 @@ msgstr "Tidak dapat menghapus script. Parameter input kosong \"scriptids\"."
 #: api/classes/CScript.php:523
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\".Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\".Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\".Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\".Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\"."
+msgstr "Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operasi aksi \"%2$s\"."
 
 #: api/classes/CScript.php:506
 #, c-format
@@ -1733,7 +1733,7 @@ msgstr "Tdak dapat menghapus item templated"
 msgid "Cannot delete templated items."
 msgstr "Tidak dapat menghapus item template."
 
-#: api/classes/CTrigger.php:1847 api/classes/CTriggerPrototype.php:597
+#: api/classes/CTrigger.php:1834 api/classes/CTriggerPrototype.php:597
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Tidak dapat menghapus trigger template \"%1$s:%2$s\"."
@@ -1798,7 +1798,7 @@ msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 
-#: hostgroups.php:227 hosts.php:657 proxies.php:183
+#: hostgroups.php:227 hosts.php:658 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] ""
@@ -1867,7 +1867,7 @@ msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 
-#: hostgroups.php:226 hosts.php:656 proxies.php:182
+#: hostgroups.php:226 hosts.php:657 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] ""
@@ -1960,7 +1960,7 @@ msgstr ""
 #: include/items.inc.php:431
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\".Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\".Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\".Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\".Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\"."
+msgstr "Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:972
 #: include/classes/import/CConfigurationImport.php:1086
@@ -2009,7 +2009,7 @@ msgstr "Tidak dapat menemukan item \"%1$s\" yang digunakan pada layar \"%2$s\"."
 #: include/classes/import/CXmlImport18.php:725
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
+msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
 
 #: include/classes/import/importers/CMapImporter.php:201
 #, c-format
@@ -2067,7 +2067,7 @@ msgstr "Tidak dapat memformat tree."
 msgid "Cannot have empty visible template name."
 msgstr ""
 
-#: api/classes/CTrigger.php:1079 api/classes/CTrigger.php:1218
+#: api/classes/CTrigger.php:1078 api/classes/CTrigger.php:1217
 #: api/classes/CTriggerPrototype.php:678 api/classes/CTriggerPrototype.php:736
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2080,10 +2080,10 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] ""
 
 #: include/classes/import/importers/CTemplateImporter.php:114
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada.Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada.Tidak bisa mengimpor template \"%2$s\", template \"%3$s\" yang terhubung tidak ada."
+msgstr[0] ""
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -2138,7 +2138,7 @@ msgstr "Tidak mengizinkan duplakasi template ID untuk linkage: %s."
 #: include/classes/db/DB.php:801
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition.Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition.Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition.Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition.Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition."
+msgstr "Tidak bisa menghapus pernyataan pada tabel \"%1$s\" tanpa where condition."
 
 #: include/classes/db/DB.php:516
 #, c-format
@@ -2189,7 +2189,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:620
+#: api/classes/CTrigger.php:619
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2264,7 +2264,7 @@ msgstr ""
 #: api/classes/CHostGeneral.php:234
 #, fuzzy, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung.Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
+msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
 
 #: api/classes/CHost.php:581
 #, c-format
@@ -2276,7 +2276,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for a discovered item."
 msgstr ""
 
-#: api/classes/CTrigger.php:592
+#: api/classes/CTrigger.php:591
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr ""
@@ -2291,7 +2291,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:620
+#: api/classes/CTrigger.php:619
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
@@ -2369,11 +2369,11 @@ msgstr "Tidak dapat perbarui aturan discovery"
 msgid "Cannot update frontend access"
 msgstr "Tidak dapat perbarui akses frontend"
 
-#: graphs.php:244
+#: graphs.php:248
 msgid "Cannot update graph"
 msgstr "Tidak dapat perbarui grafik"
 
-#: graphs.php:226
+#: graphs.php:230
 msgid "Cannot update graph prototype"
 msgstr ""
 
@@ -2741,9 +2741,9 @@ msgstr "Jam"
 #: include/views/configuration.action.edit.php:1013
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
-#: include/views/configuration.graph.edit.php:305
+#: include/views/configuration.graph.edit.php:316
 #: include/views/configuration.host.discovery.edit.php:361
-#: include/views/configuration.host.edit.php:856
+#: include/views/configuration.host.edit.php:862
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:323
 #: include/views/configuration.httpconf.edit.php:252
@@ -2773,7 +2773,7 @@ msgstr "Tutup pembangun ekspresi"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
-#: include/views/configuration.graph.edit.php:228
+#: include/views/configuration.graph.edit.php:239
 #: include/views/js/configuration.sysmaps.js.php:399 popup_bitem.php:43
 #: popup_bitem.php:160 popup_period.php:130
 msgid "Colour"
@@ -3043,8 +3043,8 @@ msgid "Confirmation text"
 msgstr "Teks konfirmasi"
 
 #: include/views/administration.proxy.edit.php:56
-#: include/views/configuration.host.edit.php:243
-#: include/views/configuration.host.edit.php:330
+#: include/views/configuration.host.edit.php:254
+#: include/views/configuration.host.edit.php:341
 #: include/views/configuration.host.prototype.edit.php:95
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3184,7 +3184,7 @@ msgstr "Buat grafik (pilih host lebih dulu)"
 msgid "Create graph prototype"
 msgstr "Buat prototipe grafik"
 
-#: hosts.php:787
+#: hosts.php:788
 msgid "Create host"
 msgstr "Buat host"
 
@@ -3306,7 +3306,7 @@ msgstr "Dibuat: Item \"%1$s\" pada \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Dibuat: Prototipe item \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CTrigger.php:1113
+#: api/classes/CTrigger.php:1112
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Dibuat: Trigger \"%1$s\" pada \"%2$s\"."
@@ -3407,7 +3407,7 @@ msgstr "Custom severity"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!"
+msgstr "Custom nama severity berdampak pada semua locales dan membutuhkan translasi manual!"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Custom size"
@@ -3449,7 +3449,7 @@ msgstr "NON-AKTIFKAN"
 msgid "DISCOVERED"
 msgstr "DISCOVERED"
 
-#: events.php:460 hosts.php:805 include/views/administration.proxy.edit.php:62
+#: events.php:460 hosts.php:806 include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3459,8 +3459,8 @@ msgid "DNS"
 msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:55
-#: include/views/configuration.host.edit.php:242
-#: include/views/configuration.host.edit.php:329
+#: include/views/configuration.host.edit.php:253
+#: include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.prototype.edit.php:94
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3675,8 +3675,8 @@ msgstr "Desimal"
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
 #: include/views/configuration.action.edit.php:362
-#: include/views/configuration.host.edit.php:245
-#: include/views/configuration.host.edit.php:332
+#: include/views/configuration.host.edit.php:256
+#: include/views/configuration.host.edit.php:343
 #: include/views/configuration.host.prototype.edit.php:97
 #: include/views/js/configuration.sysmaps.js.php:82
 #: include/views/js/configuration.sysmaps.js.php:141
@@ -3743,11 +3743,11 @@ msgstr "Hapus dan bersihkan"
 
 #: templates.php:661
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)"
+msgstr "Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)"
 
 #: include/views/configuration.template.edit.php:458
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)"
+msgstr "Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)"
 
 #: include/views/configuration.application.edit.php:55
 msgid "Delete application?"
@@ -3767,11 +3767,11 @@ msgstr "Hapus aturan discovery?"
 msgid "Delete expression?"
 msgstr "Hapus ekspresi?"
 
-#: include/views/configuration.graph.edit.php:302
+#: include/views/configuration.graph.edit.php:313
 msgid "Delete graph prototype?"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:302
+#: include/views/configuration.graph.edit.php:313
 msgid "Delete graph?"
 msgstr "Hapus grafik?"
 
@@ -3831,7 +3831,7 @@ msgstr "Hapus layar?"
 msgid "Delete script?"
 msgstr "Hapus script?"
 
-#: hosts.php:1059 include/reports.inc.php:110 include/reports.inc.php:199
+#: hosts.php:1060 include/reports.inc.php:110 include/reports.inc.php:199
 #: include/reports.inc.php:242
 #: include/views/administration.general.regularexpressions.list.php:65
 #: include/views/administration.mediatypes.list.php:119
@@ -3912,11 +3912,11 @@ msgstr ""
 msgid "Delete selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:858
+#: include/views/configuration.host.edit.php:864
 msgid "Delete selected host?"
 msgstr "Hapus host yang dipilih?"
 
-#: hosts.php:1060
+#: hosts.php:1061
 msgid "Delete selected hosts?"
 msgstr "Hapus host yang dipilih?"
 
@@ -4072,7 +4072,7 @@ msgstr "Dihapus: Proxy \"%1$s\"."
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Dihapus : Template \"%1$s\"."
 
-#: api/classes/CTrigger.php:816
+#: api/classes/CTrigger.php:815
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Dihapus: Trigger \"%1$s\" pada \"%2$s\"."
@@ -4132,7 +4132,7 @@ msgstr "Status deployment"
 #: include/views/administration.proxy.edit.php:89
 #: include/views/administration.script.edit.php:70
 #: include/views/configuration.host.discovery.edit.php:256
-#: include/views/configuration.host.edit.php:385
+#: include/views/configuration.host.edit.php:396
 #: include/views/configuration.host.massupdate.php:135
 #: include/views/configuration.item.edit.php:437
 #: include/views/configuration.item.massupdate.php:546
@@ -4262,7 +4262,7 @@ msgstr "Non-aktifkan mode debug pada grup yang dipilih?"
 msgid "Disable host"
 msgstr "Non-aktifkan host"
 
-#: hosts.php:969 hosts.php:982
+#: hosts.php:970 hosts.php:983
 msgid "Disable host?"
 msgstr "Non-aktifkan host?"
 
@@ -4274,7 +4274,7 @@ msgstr "Non-aktifkan host pada grup host yang dipilih?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Non-aktifkan host yang dimonitor dengan proxy yang terpilih?"
 
-#: hosts.php:1056 include/views/administration.mediatypes.list.php:115
+#: hosts.php:1057 include/views/administration.mediatypes.list.php:115
 #: include/views/administration.proxy.list.php:105
 #: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:99
@@ -4315,7 +4315,7 @@ msgstr "Non-aktifkan grup yang dipilih?"
 msgid "Disable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1057
+#: hosts.php:1058
 msgid "Disable selected hosts?"
 msgstr "Non-aktifkan host yang dipilih?"
 
@@ -4339,7 +4339,7 @@ msgstr ""
 msgid "Disable selected triggers?"
 msgstr "Non-aktifkan trigger yang dipilih?"
 
-#: auditlogs.php:146 dashboard.php:295 hosts.php:974
+#: auditlogs.php:146 dashboard.php:295 hosts.php:975
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
 #: include/items.inc.php:209 include/triggers.inc.php:1662
@@ -4352,7 +4352,7 @@ msgstr "Non-aktifkan trigger yang dipilih?"
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.list.php:72
-#: include/views/configuration.host.edit.php:786
+#: include/views/configuration.host.edit.php:792
 #: include/views/configuration.host.massupdate.php:250
 #: include/views/configuration.host.prototype.edit.php:298
 #: include/views/configuration.item.massupdate.php:300
@@ -4371,7 +4371,7 @@ msgstr "Bencana"
 msgid "Discovered"
 msgstr "Ditemukan"
 
-#: include/views/configuration.host.edit.php:171
+#: include/views/configuration.host.edit.php:184
 msgid "Discovered by"
 msgstr ""
 
@@ -4379,7 +4379,7 @@ msgstr ""
 msgid "Discovered device"
 msgstr "Perangkat yang ditemukan"
 
-#: events.php:338 hosts.php:840 hosts.php:936 include/html.inc.php:351
+#: events.php:338 hosts.php:841 hosts.php:937 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:220
@@ -4426,7 +4426,7 @@ msgstr "Aturan penemuan"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain.Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain.Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain.Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain.Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain."
+msgstr "Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template lain."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
@@ -4442,7 +4442,7 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:903
 #, c-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)"
+msgstr "Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)"
 
 #: discoveryconf.php:143 host_discovery.php:290
 msgid "Discovery rule created"
@@ -4468,7 +4468,7 @@ msgstr "Aturan penemuan diperbarui"
 
 #: include/html.inc.php:472 include/html.inc.php:476
 #: include/views/configuration.host.discovery.list.php:32
-#: include/views/configuration.host.edit.php:548
+#: include/views/configuration.host.edit.php:555
 #: include/views/configuration.template.edit.php:289
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:87
@@ -4538,23 +4538,23 @@ msgstr "Mati"
 msgid "Downtime"
 msgstr "Downtime"
 
-#: include/views/configuration.host.edit.php:297
+#: include/views/configuration.host.edit.php:308
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"IPMI\"."
 
-#: include/views/configuration.host.edit.php:282
+#: include/views/configuration.host.edit.php:293
 msgid "Drag here to change the type of the interface to \"JMX\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"JMX\"."
 
-#: include/views/configuration.host.edit.php:266
+#: include/views/configuration.host.edit.php:277
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"SNMP\"."
 
-#: include/views/configuration.host.edit.php:249
+#: include/views/configuration.host.edit.php:260
 msgid "Drag here to change the type of the interface to \"agent\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"agent\""
 
-#: include/views/configuration.graph.edit.php:225
+#: include/views/configuration.graph.edit.php:236
 msgid "Draw style"
 msgstr "Menggambar gaya"
 
@@ -4572,7 +4572,7 @@ msgstr "Drowdown catatan pertama \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown ingat yang dipilih \"%1$s\"."
 
-#: api/classes/CTrigger.php:1562
+#: api/classes/CTrigger.php:1561
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Duplikasi dependensi pada trigger \"%1$s\"."
@@ -4649,7 +4649,7 @@ msgstr "EVENT"
 
 #: jsLoader.php:152
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernamaSetiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernamaSetiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernamaSetiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernamaSetiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
+msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
 
 #: include/views/administration.users.edit.php:211
 #: include/views/configuration.action.edit.php:373
@@ -4735,8 +4735,8 @@ msgstr ""
 #: api/classes/CProxy.php:474 api/classes/CService.php:341
 #: api/classes/CService.php:376 api/classes/CService.php:442
 #: api/classes/CService.php:514 api/classes/CTemplate.php:577
-#: api/classes/CTrigger.php:841 api/classes/CTrigger.php:921
-#: api/classes/CTrigger.php:1011 api/classes/CTriggerPrototype.php:578
+#: api/classes/CTrigger.php:840 api/classes/CTrigger.php:920
+#: api/classes/CTrigger.php:1010 api/classes/CTriggerPrototype.php:578
 #: api/classes/CUserGroup.php:628 api/classes/CUserMacro.php:347
 #: api/classes/CUserMacro.php:499 api/classes/CUser.php:525
 msgid "Empty input parameter."
@@ -4821,7 +4821,7 @@ msgstr "Aktifkan pemberitahuan event"
 msgid "Enable host"
 msgstr "Aktifkan host"
 
-#: hosts.php:976
+#: hosts.php:977
 msgid "Enable host?"
 msgstr "Aktifkan host?"
 
@@ -4838,7 +4838,7 @@ msgstr "Aktifkan host yang termonitor pada proxies yang terpilih?"
 msgid "Enable internal housekeeping"
 msgstr ""
 
-#: hosts.php:1053 include/views/administration.mediatypes.list.php:111
+#: hosts.php:1054 include/views/administration.mediatypes.list.php:111
 #: include/views/administration.proxy.list.php:101
 #: include/views/administration.usergroups.list.php:132
 #: include/views/configuration.action.list.php:95
@@ -4879,7 +4879,7 @@ msgstr "Aktifkan grup yang dipilih?"
 msgid "Enable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1054 include/views/configuration.hostgroups.list.php:156
+#: hosts.php:1055 include/views/configuration.hostgroups.list.php:156
 msgid "Enable selected hosts?"
 msgstr "Aktifkan host yang dipilih?"
 
@@ -4903,7 +4903,7 @@ msgstr ""
 msgid "Enable selected triggers?"
 msgstr "Aktifkan trigger yang dipilih?"
 
-#: auditlogs.php:143 dashboard.php:295 hosts.php:965
+#: auditlogs.php:143 dashboard.php:295 hosts.php:966
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
 #: include/items.inc.php:206 include/triggers.inc.php:2509
@@ -4921,7 +4921,7 @@ msgstr "Aktifkan trigger yang dipilih?"
 #: include/views/configuration.action.list.php:78
 #: include/views/configuration.discovery.edit.php:77
 #: include/views/configuration.host.discovery.edit.php:260
-#: include/views/configuration.host.edit.php:420
+#: include/views/configuration.host.edit.php:427
 #: include/views/configuration.host.massupdate.php:160
 #: include/views/configuration.host.prototype.edit.php:159
 #: include/views/configuration.httpconf.edit.php:148
@@ -4964,11 +4964,11 @@ msgstr "Event ID"
 
 #: popup_trexpr.php:443
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "ID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidak"
+msgstr "ID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N = 1, 0 - jika tidak"
 
 #: popup_trexpr.php:448
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
-msgstr "ID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidakID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidak"
+msgstr "ID event dari catatan entri terakhir cocok dengan ekspresi reguler T, lalu N BUKAN 1, 0 - jika tidak"
 
 #: acknow.php:168 include/actions.inc.php:86
 msgid "Event acknowledged"
@@ -5086,7 +5086,7 @@ msgstr "Kadaluarsa"
 msgid "Exploded"
 msgstr "Meledak"
 
-#: hosts.php:1051 include/views/configuration.screen.list.php:68
+#: hosts.php:1052 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:61 templates.php:656
 msgid "Export selected"
 msgstr "Ekspor yang dipilih"
@@ -5296,7 +5296,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "Region diisi"
 
-#: events.php:399 hosts.php:810 include/forms.inc.php:602
+#: events.php:399 hosts.php:811 include/forms.inc.php:602
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/inventory.host.list.php:52
@@ -5329,11 +5329,11 @@ msgstr ""
 
 #: popup_trexpr.php:315
 msgid "Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise"
-msgstr "Cari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidak"
+msgstr "Cari V string dalam nilai (paling baru) terakhir. N = 1 - jika ditemukan, 0 - jika tidak"
 
 #: popup_trexpr.php:320
 msgid "Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise"
-msgstr "Cari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidakCari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidak"
+msgstr "Cari V string dalam nilai (paling baru) terakhir. N BUKAN 1 - jika ditemukan, 0 - jika tidak"
 
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:531
@@ -5366,8 +5366,8 @@ msgstr "Pertama"
 msgid "Fit to map"
 msgstr "Paskan pada peta"
 
-#: include/views/configuration.graph.edit.php:97
-#: include/views/configuration.graph.edit.php:155
+#: include/views/configuration.graph.edit.php:108
+#: include/views/configuration.graph.edit.php:166
 msgid "Fixed"
 msgstr "Tetap"
 
@@ -5427,7 +5427,7 @@ msgstr "Akses frontend telah diperbarui"
 msgid "Frontend messaging"
 msgstr "Sistem pesan frontend"
 
-#: include/views/configuration.host.edit.php:857
+#: include/views/configuration.host.edit.php:863
 #: include/views/configuration.template.edit.php:456
 msgid "Full clone"
 msgstr "Full clone"
@@ -5436,7 +5436,7 @@ msgstr "Full clone"
 msgid "Fullscreen"
 msgstr "Layar penuh"
 
-#: include/views/configuration.graph.edit.php:224
+#: include/views/configuration.graph.edit.php:235
 #: include/views/configuration.triggers.expression.php:63 popup_bitem.php:149
 msgid "Function"
 msgstr "Fungsi"
@@ -5531,7 +5531,7 @@ msgstr "Skrip global"
 msgid "Global scripts"
 msgstr "Skrip global"
 
-#: hosts.php:1062
+#: hosts.php:1063
 #: include/views/administration.general.regularexpressions.list.php:68
 #: include/views/administration.mediatypes.list.php:123
 #: include/views/administration.proxy.list.php:113
@@ -5574,7 +5574,7 @@ msgid "Gradient line"
 msgstr "Garis gradasi"
 
 #: include/audit.inc.php:29 include/screens.inc.php:30
-#: include/views/configuration.graph.edit.php:283
+#: include/views/configuration.graph.edit.php:294
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:443 latest.php:620
 #: report2.php:397
@@ -5601,17 +5601,17 @@ msgstr "Grafik \"%1$s\" sudah ada di \"%2$s\"."
 #: api/classes/CGraph.php:371 api/classes/CGraphPrototype.php:375
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax)."
+msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymax)."
 
 #: api/classes/CGraph.php:379 api/classes/CGraphPrototype.php:384
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin).Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin)."
+msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\" (Nilai item Ymin)."
 
 #: api/classes/CGraph.php:365 api/classes/CGraphPrototype.php:369
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\".Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\".Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\".Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\".Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\"."
+msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pada \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:489
 #, c-format
@@ -5627,13 +5627,13 @@ msgstr "Grafik \"%1$s\" diabaikan - aturan user."
 #: api/classes/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya.Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya.Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya.Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya.Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya."
+msgstr "Grafik \"%1$s\" dengan item template tidak boleh mengandung item dari host lainnya."
 
-#: graphs.php:249
+#: graphs.php:253
 msgid "Graph added"
 msgstr "Grafik ditambahkan"
 
-#: graphs.php:285
+#: graphs.php:289
 msgid "Graph deleted"
 msgstr "Grafik dihapus"
 
@@ -5649,7 +5649,7 @@ msgstr "Item grafik"
 msgid "Graph name"
 msgstr "Nama grafik"
 
-#: include/views/configuration.graph.edit.php:283
+#: include/views/configuration.graph.edit.php:294
 msgid "Graph prototype"
 msgstr ""
 
@@ -5666,33 +5666,33 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain.Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain.Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain.Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain.Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain."
+msgstr "Prototipe grafik \"%1$s\" dengan kerangka item tidak boleh mengandung item dari host lain."
 
 #: api/classes/CGraphPrototype.php:588
 #, c-format
 msgid "Graph prototype \"%s\" deleted."
 msgstr "Prototipe grafik \"%s\" dihapus."
 
-#: graphs.php:231
+#: graphs.php:235
 msgid "Graph prototype added"
 msgstr ""
 
-#: graphs.php:279
+#: graphs.php:283
 msgid "Graph prototype deleted"
 msgstr ""
 
-#: graphs.php:225
+#: graphs.php:229
 msgid "Graph prototype updated"
 msgstr ""
 
 #: include/html.inc.php:424 include/html.inc.php:428
 #: include/views/configuration.host.discovery.list.php:124
-#: include/views/configuration.host.edit.php:622
+#: include/views/configuration.host.edit.php:629
 #: include/views/configuration.template.edit.php:354
 msgid "Graph prototypes"
 msgstr "Prototipe grafik"
 
-#: graphs.php:299
+#: graphs.php:303
 msgid "Graph prototypes deleted"
 msgstr ""
 
@@ -5709,7 +5709,7 @@ msgstr "Grafik jumlah"
 msgid "Graph type"
 msgstr "Tipe grafik"
 
-#: graphs.php:243
+#: graphs.php:247
 msgid "Graph updated"
 msgstr "Grafik diperbarui"
 
@@ -5723,11 +5723,11 @@ msgstr "Grafik dengan nama \"%1$s\" sudah ada dalam grafik atau prototipe grafik
 msgid "Graph with same name but other type exist."
 msgstr "Grafik dengan nama yang sama tetapi tipe lain sudah ada."
 
-#: dashboard.php:317 hosts.php:839 hosts.php:934 include/html.inc.php:435
+#: dashboard.php:317 hosts.php:840 hosts.php:935 include/html.inc.php:435
 #: include/html.inc.php:439 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
-#: include/views/configuration.host.edit.php:522
+#: include/views/configuration.host.edit.php:529
 #: include/views/configuration.template.edit.php:265
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:206
 #: include/views/inventory.host.view.php:219
@@ -5738,11 +5738,11 @@ msgstr "Grafik dengan nama yang sama tetapi tipe lain sudah ada."
 msgid "Graphs"
 msgstr "Grafik"
 
-#: graphs.php:352
+#: graphs.php:356
 msgid "Graphs copied"
 msgstr "Grafik telah disalin"
 
-#: graphs.php:305
+#: graphs.php:309
 msgid "Graphs deleted"
 msgstr "Grafik telah dihapus"
 
@@ -5755,7 +5755,7 @@ msgstr "Greek (el_GR)"
 msgid "Grid"
 msgstr "Kisi-kisi"
 
-#: events.php:326 hostinventoriesoverview.php:83 hosts.php:795 httpmon.php:70
+#: events.php:326 hostinventoriesoverview.php:83 hosts.php:796 httpmon.php:70
 #: include/classes/class.chostsinfo.php:105
 #: include/classes/class.ctriggersinfo.php:113
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -5841,8 +5841,8 @@ msgstr "Grup berdasarkan"
 
 #: include/reports.inc.php:322 include/views/administration.users.edit.php:67
 #: include/views/administration.users.list.php:58
-#: include/views/configuration.host.edit.php:200
-#: include/views/configuration.host.edit.php:219
+#: include/views/configuration.host.edit.php:213
+#: include/views/configuration.host.edit.php:232
 #: include/views/configuration.host.prototype.edit.php:174
 #: include/views/configuration.host.prototype.edit.php:202
 #: include/views/configuration.template.edit.php:117
@@ -6039,8 +6039,7 @@ msgstr "Luruskan horisontal"
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:60
 #: include/views/configuration.graph.list.php:54
-#: include/views/configuration.host.edit.php:58
-#: include/views/configuration.host.edit.php:644
+#: include/views/configuration.host.edit.php:651
 #: include/views/configuration.host.massupdate.php:303
 #: include/views/configuration.host.prototype.edit.php:161
 #: include/views/configuration.httpconf.list.php:44
@@ -6081,7 +6080,7 @@ msgstr "Host \"%1$s\" dipantau dengan proxy \"%2$s\"."
 #: include/classes/import/CXmlImport18.php:952
 #, fuzzy, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI.Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
+msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
 
 #: include/views/configuration.screen.constructor.edit.php:323
 msgid "Host (ascending)"
@@ -6101,23 +6100,23 @@ msgstr "Host ditambah"
 
 #: api/classes/CHostInterface.php:789
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama.Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama.Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama.Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama.Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama."
+msgstr "Host tidak boleh memiliki lebih dari satu default interface pada tipe yang sama."
 
 #: hostinventoriesoverview.php:92
 #: include/views/administration.proxy.list.php:43
 msgid "Host count"
 msgstr "Hitung host"
 
-#: hosts.php:611 hosts.php:628
+#: hosts.php:612 hosts.php:629
 msgid "Host deleted"
 msgstr "Host dihapus"
 
-#: hostgroups.php:224 hosts.php:654 proxies.php:180
+#: hostgroups.php:224 hosts.php:655 proxies.php:180
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 
-#: hostgroups.php:223 hosts.php:653 proxies.php:179
+#: hostgroups.php:223 hosts.php:654 proxies.php:179
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
@@ -6187,7 +6186,7 @@ msgstr "Grup host"
 msgid "Host interface"
 msgstr "Antarmuka host"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:847
+#: hostinventories.php:26 include/views/configuration.host.edit.php:853
 #: include/views/configuration.host.prototype.edit.php:311 jsLoader.php:199
 msgid "Host inventory"
 msgstr "Inventaris Host"
@@ -6213,7 +6212,7 @@ msgid "Host metadata"
 msgstr ""
 
 #: host_prototypes.php:40 hosts.php:53 include/actions.inc.php:58
-#: include/views/configuration.host.edit.php:182
+#: include/views/configuration.host.edit.php:195
 #: include/views/configuration.host.prototype.edit.php:66
 #: include/views/inventory.host.view.php:41
 msgid "Host name"
@@ -6292,7 +6291,7 @@ msgstr ""
 
 #: include/html.inc.php:448 include/html.inc.php:452
 #: include/views/configuration.host.discovery.list.php:100
-#: include/views/configuration.host.edit.php:641
+#: include/views/configuration.host.edit.php:648
 msgid "Host prototypes"
 msgstr ""
 
@@ -6352,7 +6351,7 @@ msgstr ""
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host dengan nama tampil yang sama \"%s\" sudah ada."
 
-#: hostinventoriesoverview.php:85 hosts.php:797 include/forms.inc.php:199
+#: hostinventoriesoverview.php:85 hosts.php:798 include/forms.inc.php:199
 #: include/forms.inc.php:870 include/items.inc.php:723
 #: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:364 include/views/administration.proxy.edit.php:88
@@ -6436,7 +6435,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:459 hosts.php:806
+#: events.php:459 hosts.php:807
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:61
 #: include/views/inventory.host.view.php:57
@@ -6449,8 +6448,8 @@ msgstr "IP"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:54
 #: include/views/configuration.discovery.edit.php:68
-#: include/views/configuration.host.edit.php:241
-#: include/views/configuration.host.edit.php:328
+#: include/views/configuration.host.edit.php:252
+#: include/views/configuration.host.edit.php:339
 #: include/views/configuration.host.prototype.edit.php:93
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -6476,7 +6475,7 @@ msgstr "Jarak IP tidak boleh kosong."
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:53
 #: include/views/configuration.action.edit.php:683
-#: include/views/configuration.host.edit.php:750
+#: include/views/configuration.host.edit.php:757
 #: include/views/configuration.host.massupdate.php:305
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "IPMI"
@@ -6490,8 +6489,8 @@ msgstr "Agen IPMI"
 msgid "IPMI authentication algorithm"
 msgstr "Algoritma otentikasi IPMI"
 
-#: include/views/configuration.host.edit.php:306
-#: include/views/configuration.host.edit.php:382
+#: include/views/configuration.host.edit.php:317
+#: include/views/configuration.host.edit.php:393
 #: include/views/configuration.host.prototype.edit.php:147
 #: include/views/inventory.host.view.php:162
 msgid "IPMI interfaces"
@@ -6627,7 +6626,7 @@ msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi kosong."
 #: api/classes/CIconMap.php:430
 #, fuzzy, c-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada.Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada."
+msgstr "Peta ikon \"%s\" tidak boleh memiliki pemetaan dengan ekspresi global yang tidak ada."
 
 #: api/classes/CIconMap.php:434
 #, c-format
@@ -6687,7 +6686,7 @@ msgstr ""
 
 #: include/func.inc.php:1778 include/func.inc.php:1798
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan.Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan."
+msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untuk mendapatkan izin yang diperlukan."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
 #: include/maps.inc.php:727
@@ -6746,7 +6745,7 @@ msgstr "Gambar untuk semua peta akan diperbarui!"
 msgid "Immediately"
 msgstr "Segera"
 
-#: hosts.php:788 include/views/configuration.screen.list.php:33
+#: hosts.php:789 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
 #: templates.php:477
@@ -6768,7 +6767,7 @@ msgstr "Impor berhasil"
 #: hostinventories.php:180
 #, fuzzy, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
-msgstr "Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada.Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada."
+msgstr "Tidak memungkinkan untuk filter berdasarkan field inventori \"%s\", yang tidak ada."
 
 #: screenedit.php:307 screenedit.php:347
 msgid "Impossible to remove last row and column."
@@ -6784,12 +6783,12 @@ msgstr "Dalam"
 msgid "In group"
 msgstr "Dalam grup"
 
-#: include/views/configuration.host.edit.php:200
+#: include/views/configuration.host.edit.php:213
 #: include/views/configuration.template.edit.php:117
 msgid "In groups"
 msgstr "Dalam grup"
 
-#: hosts.php:961 include/html.inc.php:329
+#: hosts.php:962 include/html.inc.php:329
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -6848,7 +6847,7 @@ msgstr "Aksi kondisi pemeriksa penemuan salah."
 
 #: api/classes/CAction.php:1690
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi pemeriksa penemuan salah. Pemeriksa penemuan tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1573
 msgid "Incorrect action condition discovery object."
@@ -6856,7 +6855,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1687
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi aturan penemuan salah. Aturan penemuan tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1618
 msgid "Incorrect action condition discovery status."
@@ -6868,11 +6867,11 @@ msgstr ""
 
 #: api/classes/CAction.php:1675
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi grup host salah. Grup host tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1678
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi host salah. Host tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1589
 #, c-format
@@ -6890,11 +6889,11 @@ msgstr ""
 
 #: api/classes/CAction.php:1693
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi proxy salah. Proxy tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1681
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi template salah. Template tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1634
 msgid "Incorrect action condition trigger severity."
@@ -6906,7 +6905,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1684
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu.Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu."
+msgstr "Aksi kondisi trigger salah. Trigger tidak ada atau Anda tidak memiliki akses untuk itu."
 
 #: api/classes/CAction.php:1668
 msgid "Incorrect action condition type."
@@ -6939,11 +6938,11 @@ msgstr "Kesalahan aksi operasi nilai langkah eskalasi."
 
 #: api/classes/CAction.php:1446
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr "Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini.Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini.Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini.Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini.Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini."
+msgstr "Kesalahan aksi operasi grup host. Grup host tidak ada atau Anda tidak memiliki akses ke grup host ini."
 
 #: api/classes/CAction.php:1449
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr "Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini.Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini.Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini.Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini.Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini."
+msgstr "Kesalahan aksi operasi host. Host tidak ada atau Anda tidak memiliki akses ke host ini."
 
 #: api/classes/CAction.php:1381 api/classes/CAction.php:1385
 #, c-format
@@ -6960,11 +6959,11 @@ msgstr "Kesalahan tipe aksi operasi."
 
 #: api/classes/CAction.php:1455
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr "Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini.Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini.Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini.Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini.Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini."
+msgstr "Kesalahan aksi operasi grup user. Grup user tidak ada atau Anda tidak memiliki akses ke grup user ini."
 
 #: api/classes/CAction.php:1452
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr "Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini.Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini.Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini.Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini.Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini."
+msgstr "Kesalahan aksi operasi user. User tidak ada atau Anda tidak memiliki akses ke user ini."
 
 #: api/classes/CAction.php:740
 msgid "Incorrect action operationid."
@@ -7060,13 +7059,13 @@ msgstr ""
 #: include/classes/db/DB.php:534 include/classes/db/DB.php:808
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\".Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\".Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\".Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\".Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\"."
+msgstr "Kesalahan nama field \"%1$s\" atau nilai pada statemen where untuk tabel \"%2$s\"."
 
 #: api/classes/CMap.php:362
 msgid "Incorrect fields for sysmap."
 msgstr ""
 
-#: api/classes/CTrigger.php:625
+#: api/classes/CTrigger.php:624
 msgid "Incorrect fields for trigger."
 msgstr "Kesalahan field untuk trigger."
 
@@ -7097,7 +7096,7 @@ msgstr "Kesalahan interval flexible \"%1$s\"."
 #: api/classes/CItemGeneral.php:827
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
-msgstr "Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string.Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string."
+msgstr "Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string."
 
 #: include/triggers.inc.php:628 include/triggers.inc.php:1793
 #: tr_testexpr.php:36
@@ -7183,10 +7182,10 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "Kesalahan item untuk nilai axis."
 
-#: api/classes/CTrigger.php:693 include/triggers.inc.php:1037
+#: api/classes/CTrigger.php:692 include/triggers.inc.php:1037
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\".Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\"."
+msgstr "Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:254
 #, c-format
@@ -7399,12 +7398,12 @@ msgstr ""
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr "Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir.Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir.Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir.Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir.Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir."
+msgstr "Kesalahan periode waktu \"%1$s\" hari pertama harus lebih kecil atau sama dengan dari hari akhir."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
 #, c-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr "Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir.Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir.Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir.Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir.Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir."
+msgstr "Kesalahan periode waktu \"%1$s\" waktu mulai harus lebih kecil dan waktu akhir."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
@@ -7429,16 +7428,16 @@ msgstr "Kesalahan ekspresi trigger."
 #: include/triggers.inc.php:1139
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
+msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
 
-#: api/classes/CTrigger.php:673
+#: api/classes/CTrigger.php:672
 #, fuzzy, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut.Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
+msgstr "Kesalahan ekspresi trigger. Host \"%s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
 
-#: api/classes/CTrigger.php:679
+#: api/classes/CTrigger.php:678
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan.Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan."
+msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -7557,7 +7556,7 @@ msgstr "Instalasi"
 msgid "Installer name"
 msgstr "Nama installer"
 
-#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:842
+#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:843
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "Interface"
@@ -7579,7 +7578,7 @@ msgstr "Interface dengan DNS \"%1$s\" alamat IP tidak boleh kosong."
 #: api/classes/CHostInterface.php:302 api/classes/CHostInterface.php:309
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr "Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\".Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\".Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\".Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\".Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\"."
+msgstr "Interface dengan IP \"%1$s\" tidak boleh mengosongkan nama DNS ketika memiliki \"Use DNS\" properti pada \"%2$s\"."
 
 #: api/classes/CHostInterface.php:315
 #, c-format
@@ -7742,7 +7741,7 @@ msgstr "Periode waktu tidak sah"
 #: include/classes/class.cview.php:62
 #, fuzzy, c-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr "Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\".Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\"."
+msgstr "Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" dan \".\"."
 
 #: include/menu.inc.php:99 include/views/configuration.host.massupdate.php:306
 msgid "Inventory"
@@ -7788,8 +7787,8 @@ msgstr "Italian (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:164
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1079
-#: include/reports.inc.php:422 include/views/configuration.graph.edit.php:98
-#: include/views/configuration.graph.edit.php:156
+#: include/reports.inc.php:422 include/views/configuration.graph.edit.php:109
+#: include/views/configuration.graph.edit.php:167
 #: include/views/configuration.triggers.expression.php:57 items.php:500
 #: items.php:738 items.php:765 tr_logform.php:282
 msgid "Item"
@@ -7813,7 +7812,7 @@ msgstr ""
 #: api/classes/CItem.php:900
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr "Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d.Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d.Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d.Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d.Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d."
+msgstr "Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilang . Pilihannya : dari 0 (jangan diisi) ke %3$d."
 
 #: api/classes/CTemplateScreen.php:503
 #, c-format
@@ -7913,7 +7912,7 @@ msgstr ""
 
 #: include/html.inc.php:374 include/html.inc.php:378
 #: include/views/configuration.host.discovery.list.php:110
-#: include/views/configuration.host.edit.php:571
+#: include/views/configuration.host.edit.php:578
 #: include/views/configuration.template.edit.php:312
 msgid "Item prototypes"
 msgstr "Item prototipe"
@@ -7940,7 +7939,7 @@ msgstr "Item menggunakan tipe inferface yang salah."
 
 #: api/classes/CItemGeneral.php:327
 msgid "Item will not be refreshed. Please enter a correct update interval."
-msgstr "Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar.Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar.Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar.Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar.Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar."
+msgstr "Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar."
 
 #: api/classes/CItemGeneral.php:440
 #, c-format
@@ -7950,12 +7949,12 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai aturan discover
 #: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item."
+msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item."
 
 #: api/classes/CItemGeneral.php:443
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item."
+msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item."
 
 #: api/classes/CItemGeneral.php:437
 #, c-format
@@ -7965,7 +7964,7 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item."
 #: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui.Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui."
+msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui."
 
 #: api/classes/CItemGeneral.php:804
 #, c-format
@@ -7978,13 +7977,13 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
-#: hosts.php:837 hosts.php:930 include/html.inc.php:385
+#: hosts.php:838 hosts.php:931 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
 #: include/reports.inc.php:116 include/reports.inc.php:248
 #: include/views/configuration.application.list.php:97
-#: include/views/configuration.graph.edit.php:274
+#: include/views/configuration.graph.edit.php:285
 #: include/views/configuration.host.discovery.list.php:51
-#: include/views/configuration.host.edit.php:464
+#: include/views/configuration.host.edit.php:471
 #: include/views/configuration.item.list.php:42
 #: include/views/configuration.template.edit.php:223
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:217
@@ -8023,8 +8022,8 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "Agen JMX"
 
-#: include/views/configuration.host.edit.php:291
-#: include/views/configuration.host.edit.php:369
+#: include/views/configuration.host.edit.php:302
+#: include/views/configuration.host.edit.php:380
 #: include/views/configuration.host.prototype.edit.php:134
 #: include/views/inventory.host.view.php:142
 msgid "JMX interfaces"
@@ -8111,7 +8110,7 @@ msgstr "Kunci"
 #: api/classes/CItemGeneral.php:306
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr "Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"].Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"].Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"].Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"].Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
+msgstr "Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
 #: include/views/configuration.action.edit.php:748
 #: include/views/js/common.item.edit.js.php:179
@@ -8341,7 +8340,7 @@ msgstr "Indikator tautan"
 msgid "Link name should be unique for map \"%s\"."
 msgstr "Nama tautan harus unik untuk peta \"%s\"."
 
-#: include/views/configuration.host.edit.php:701
+#: include/views/configuration.host.edit.php:708
 #: include/views/configuration.host.prototype.edit.php:249
 #: include/views/configuration.template.edit.php:436
 msgid "Link new templates"
@@ -8350,12 +8349,12 @@ msgstr ""
 #: api/classes/CMap.php:480
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\"."
+msgstr "Field tautan selementid1 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\"."
 
 #: api/classes/CMap.php:487
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\".Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\"."
+msgstr "Field tautan selementid2 mengarah kepada peta yang tidak ada selement ID \"%1$s\" untuk peta \"%2$s\"."
 
 #: api/classes/CMap.php:462
 #, c-format
@@ -8378,8 +8377,8 @@ msgstr "Tautan ke template"
 msgid "Link with templates"
 msgstr "Tautan dengan template"
 
-#: include/views/configuration.host.edit.php:686
-#: include/views/configuration.host.edit.php:713
+#: include/views/configuration.host.edit.php:693
+#: include/views/configuration.host.edit.php:720
 #: include/views/configuration.host.prototype.edit.php:228
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.edit.php:438 templates.php:503
@@ -8457,11 +8456,11 @@ msgstr "Log keparahan dari entri log terakhir adalah BUKAN N"
 
 #: popup_trexpr.php:469
 msgid "Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise"
-msgstr "Log sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidak"
+msgstr "Log sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N = 1, 0 - jika tidak"
 
 #: popup_trexpr.php:474
 msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise"
-msgstr "Log sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidak"
+msgstr "Log sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidakLog sumber dari entri log terakhir cocok dengan parameter T, maka N BUKAN 1, 0 - jika tidak"
 
 #: include/views/configuration.item.edit.php:357
 #: include/views/configuration.item.massupdate.php:415
@@ -8612,7 +8611,7 @@ msgstr "Makro dengan hostmacroid \"%1$s\" tidak ada."
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:86
 #: adm.valuemapping.php:131 adm.workingtime.php:67
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/configuration.host.edit.php:763
+#: include/views/configuration.host.edit.php:770
 #: include/views/configuration.host.prototype.edit.php:274
 #: include/views/configuration.template.edit.php:448
 msgid "Macros"
@@ -8637,7 +8636,7 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:386 api/classes/CMaintenance.php:523
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
-msgstr "Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\".Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\".Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\".Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\".Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\"."
+msgstr "Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\".Pemeliharaan \"Aktif sejak\" nilai tidak boleh lebih besar dari \"Aktif sampai\"."
 
 #: api/classes/CAction.php:1624
 msgid "Maintenance action condition value must be empty."
@@ -8687,7 +8686,7 @@ msgstr "Pemeliharaan tanpa koleksi data"
 msgid "Mandatory parameter is missing."
 msgstr "Parameter wajib telah hilang."
 
-#: include/views/configuration.host.edit.php:788
+#: include/views/configuration.host.edit.php:794
 #: include/views/configuration.host.massupdate.php:251
 #: include/views/configuration.host.prototype.edit.php:300
 msgid "Manual"
@@ -8788,7 +8787,7 @@ msgstr "Tandai yang dipilih"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:1052 include/views/configuration.item.list.php:268
+#: hosts.php:1053 include/views/configuration.item.list.php:268
 #: include/views/configuration.item.massupdate.php:554
 #: include/views/configuration.triggers.list.php:300
 msgid "Mass update"
@@ -8826,13 +8825,13 @@ msgstr[0] ""
 #, fuzzy, c-format
 msgid "Maximum alias length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Panjang maksimal alias adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: api/classes/CHost.php:626
 #, fuzzy, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Panjang maksimal nama host adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: include/views/configuration.host.discovery.edit.php:241
 #: include/views/configuration.item.edit.php:308
@@ -8876,7 +8875,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter.Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
+msgstr[0] "Maksimal panjang nama host terlihat adalah %2$d karakter, \"%3$s\" adalah %1$d karakter."
 
 #: include/forms.inc.php:1673 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:115
@@ -9148,7 +9147,7 @@ msgstr "Sen"
 msgid "Monday"
 msgstr "Senin"
 
-#: include/views/configuration.host.edit.php:418
+#: include/views/configuration.host.edit.php:425
 #: include/views/configuration.host.massupdate.php:150
 #: include/views/configuration.host.prototype.edit.php:156
 msgid "Monitored by proxy"
@@ -9236,7 +9235,7 @@ msgstr "Otentikasi NTLM"
 
 #: actionconf.php:37 actionconf.php:154 adm.regexps.php:37 adm.regexps.php:138
 #: adm.regexps.php:171 applications.php:38 disc_prototypes.php:42
-#: graphs.php:41 host_discovery.php:49 hosts.php:804 hosts.php:835
+#: graphs.php:41 host_discovery.php:49 hosts.php:805 hosts.php:836
 #: httpconf.php:44 httpmon.php:85 include/forms.inc.php:577
 #: include/hosts.inc.php:115 include/reports.inc.php:167
 #: include/setup.inc.php:384
@@ -9263,12 +9262,12 @@ msgstr "Otentikasi NTLM"
 #: include/views/configuration.discovery.edit.php:40
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.edit.php:221
+#: include/views/configuration.graph.edit.php:232
 #: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.edit.php:52
 #: include/views/configuration.host.discovery.list.php:50
-#: include/views/configuration.host.edit.php:661
-#: include/views/configuration.host.edit.php:705
+#: include/views/configuration.host.edit.php:668
+#: include/views/configuration.host.edit.php:712
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.host.prototype.list.php:52
@@ -9389,7 +9388,7 @@ msgstr "Element baru"
 msgid "New flexible interval"
 msgstr "Interval fleksibel baru"
 
-#: include/views/configuration.host.edit.php:204
+#: include/views/configuration.host.edit.php:217
 #: include/views/configuration.template.edit.php:122
 msgid "New group"
 msgstr "Grup baru"
@@ -9481,7 +9480,7 @@ msgstr "Tidak ada field \"ymax_type\" untuk grafik \"%s\"."
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymix_type\" untuk grafik \"%s\"."
 
-#: include/views/configuration.host.edit.php:379
+#: include/views/configuration.host.edit.php:390
 #: include/views/configuration.host.prototype.edit.php:144
 msgid "No IPMI interfaces found."
 msgstr ""
@@ -9490,7 +9489,7 @@ msgstr ""
 msgid "No IT services found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:366
+#: include/views/configuration.host.edit.php:377
 #: include/views/configuration.host.prototype.edit.php:131
 msgid "No JMX interfaces found."
 msgstr ""
@@ -9503,7 +9502,7 @@ msgstr ""
 msgid "No SNMP community specified."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:353
+#: include/views/configuration.host.edit.php:364
 #: include/views/configuration.host.prototype.edit.php:118
 msgid "No SNMP interfaces found."
 msgstr ""
@@ -9534,7 +9533,7 @@ msgstr ""
 msgid "No actions found."
 msgstr "Tidak ada aksi yang ditemukan."
 
-#: include/views/configuration.host.edit.php:339
+#: include/views/configuration.host.edit.php:350
 #: include/views/configuration.host.prototype.edit.php:104
 msgid "No agent interfaces found."
 msgstr ""
@@ -9556,12 +9555,12 @@ msgstr ""
 #: api/classes/CAction.php:1340
 #, fuzzy, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CAction.php:1344 api/classes/CAction.php:1358
 #, fuzzy, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:334
 msgid "No authentication user name specified."
@@ -9648,7 +9647,7 @@ msgstr "Tidak ada event untuk pemberitahuan"
 #: api/classes/CAction.php:1335
 #, fuzzy, c-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\".Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada sasaran eksekusi yang spesifik untuk aksi operasi perintah \"%s\"."
 
 #: include/classes/helpers/CUploadFile.php:156
 msgid "No file was uploaded."
@@ -9737,7 +9736,7 @@ msgstr ""
 msgid "No host with hostid \"%s\"."
 msgstr "Tidak ada host dengan hostid \"%s\"."
 
-#: hostinventoriesoverview.php:88 hosts.php:832
+#: hostinventoriesoverview.php:88 hosts.php:833
 #: include/views/inventory.host.list.php:72 search.php:129
 msgid "No hosts found."
 msgstr ""
@@ -9941,9 +9940,9 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CScreen.php:603 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:556
 #: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
-#: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:597
-#: api/classes/CTrigger.php:940 api/classes/CTrigger.php:961
-#: api/classes/CTrigger.php:1826 api/classes/CTriggerPrototype.php:504
+#: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:596
+#: api/classes/CTrigger.php:939 api/classes/CTrigger.php:960
+#: api/classes/CTrigger.php:1813 api/classes/CTriggerPrototype.php:504
 #: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
 #: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
 #: api/classes/CUser.php:804 api/classes/CUser.php:824
@@ -9955,7 +9954,7 @@ msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 #: api/classes/CAction.php:1352
 #, fuzzy, c-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:342
 msgid "No private key file specified."
@@ -9972,7 +9971,7 @@ msgstr "Tidak ada proxy"
 #: api/classes/CAction.php:1349
 #, fuzzy, c-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\".Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
+msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
 #: api/classes/CItemGeneral.php:339
 msgid "No public key file specified."
@@ -10026,7 +10025,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Tidak ada sasaran yang dipilih"
 
-#: graphs.php:360 items.php:722
+#: graphs.php:364 items.php:722
 msgid "No target selected."
 msgstr "Tidak ada sasaran yang dipilih."
 
@@ -10034,7 +10033,7 @@ msgstr "Tidak ada sasaran yang dipilih."
 msgid "No templates found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:650
+#: include/views/configuration.host.edit.php:657
 #: include/views/configuration.host.prototype.edit.php:208
 #: include/views/configuration.host.prototype.edit.php:232
 #: include/views/configuration.template.edit.php:388
@@ -10115,7 +10114,7 @@ msgstr "Bukan pemberitahuan"
 msgid "Not Templated items"
 msgstr "Bukan item yang dibuat template"
 
-#: api/classes/CTrigger.php:1465
+#: api/classes/CTrigger.php:1464
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Tidak semua template terhubung ke \"%s\"."
@@ -10538,7 +10537,7 @@ msgstr ""
 
 #: include/blocks.inc.php:830
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung.Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung.Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung.Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung.Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung."
+msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung."
 
 #: include/views/configuration.httpconf.edit.php:110
 msgid "Opera"
@@ -10658,7 +10657,7 @@ msgstr "Parameter konfigurasi lainnya"
 
 #: include/reports.inc.php:322
 #: include/views/administration.usergroups.edit.php:55
-#: include/views/configuration.host.edit.php:200
+#: include/views/configuration.host.edit.php:213
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.edit.php:117
 msgid "Other groups"
@@ -10964,7 +10963,7 @@ msgstr "Pasif"
 #: include/views/configuration.action.edit.php:739
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
-#: include/views/configuration.host.edit.php:749
+#: include/views/configuration.host.edit.php:756
 #: include/views/configuration.host.prototype.edit.php:266
 #: include/views/configuration.httpconf.edit.php:83
 #: include/views/configuration.item.edit.php:170
@@ -10998,11 +10997,11 @@ msgstr "Password tidak seharusnya kosong"
 msgid "Peak memory usage: %s"
 msgstr "Puncak penggunakan memori: %s"
 
-#: graphs.php:53 include/views/configuration.graph.edit.php:80
+#: graphs.php:53 include/views/configuration.graph.edit.php:85
 msgid "Percentile line (left)"
 msgstr "Baris persentil (kiri)"
 
-#: graphs.php:54 include/views/configuration.graph.edit.php:90
+#: graphs.php:54 include/views/configuration.graph.edit.php:101
 msgid "Percentile line (right)"
 msgstr "Baris persentil (kanan)"
 
@@ -11094,13 +11093,13 @@ msgid "Populates host inventory field"
 msgstr "Mengisi field inventaris host"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:85
-#: hosts.php:807 include/forms.inc.php:470 include/setup.inc.php:379
+#: hosts.php:808 include/forms.inc.php:470 include/setup.inc.php:379
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:57
 #: include/views/configuration.action.edit.php:753
 #: include/views/configuration.host.discovery.edit.php:154
-#: include/views/configuration.host.edit.php:244
-#: include/views/configuration.host.edit.php:331
+#: include/views/configuration.host.edit.php:255
+#: include/views/configuration.host.edit.php:342
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/configuration.item.edit.php:160
 #: include/views/configuration.item.massupdate.php:199
@@ -11139,7 +11138,7 @@ msgstr "Post"
 #: include/views/administration.general.iconmap.edit.php:64
 #: include/views/administration.general.iconmap.edit.php:102
 #: include/views/administration.general.iconmap.edit.php:130
-#: include/views/configuration.graph.edit.php:294
+#: include/views/configuration.graph.edit.php:305
 msgid "Preview"
 msgstr "Tinjau"
 
@@ -11220,8 +11219,8 @@ msgstr ""
 msgid "Private key file"
 msgstr "File kunci pribadi"
 
-#: include/views/configuration.host.edit.php:737
-#: include/views/configuration.host.edit.php:745
+#: include/views/configuration.host.edit.php:744
+#: include/views/configuration.host.edit.php:752
 #: include/views/configuration.host.prototype.edit.php:263
 msgid "Privilege level"
 msgstr "Tingkatan hak"
@@ -11444,19 +11443,19 @@ msgstr "Ekspresi regule \"%s\" sudah ada."
 
 #: popup_trexpr.php:423
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise"
-msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak "
+msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak"
 
 #: popup_trexpr.php:433
 msgid "Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)"
-msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)"
+msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N = 1, 0 - jika tidak (bukan case-sensitive)"
 
 #: popup_trexpr.php:428
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise"
-msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak "
+msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak"
 
 #: popup_trexpr.php:438
 msgid "Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)"
-msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)"
+msgstr "Ekspresi reguler V cocok dengan nilai terakhir dalam periode T, maka N BUKAN 1, 0 - jika tidak (bukan case-sensitive)"
 
 #: adm.regexps.php:132
 msgid "Regular expression added"
@@ -11651,7 +11650,7 @@ msgstr "Dibutuhkan kode status"
 msgid "Required string"
 msgstr "Dibutuhkan string"
 
-#: events.php:400 hosts.php:813 include/forms.inc.php:605
+#: events.php:400 hosts.php:814 include/forms.inc.php:605
 #: include/html.inc.php:209 include/reports.inc.php:126
 #: include/reports.inc.php:258 include/reports.inc.php:438
 #: include/views/administration.auditacts.list.php:51
@@ -11942,8 +11941,8 @@ msgstr "OID SNMP"
 msgid "SNMP community"
 msgstr "Komunitas SNMP"
 
-#: include/views/configuration.host.edit.php:276
-#: include/views/configuration.host.edit.php:356
+#: include/views/configuration.host.edit.php:287
+#: include/views/configuration.host.edit.php:367
 #: include/views/configuration.host.prototype.edit.php:121
 #: include/views/inventory.host.view.php:123
 msgid "SNMP interfaces"
@@ -12061,9 +12060,9 @@ msgstr "Sabtu"
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
-#: include/views/configuration.graph.edit.php:298
+#: include/views/configuration.graph.edit.php:309
 #: include/views/configuration.host.discovery.edit.php:370
-#: include/views/configuration.host.edit.php:862
+#: include/views/configuration.host.edit.php:868
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:328
@@ -12346,8 +12345,8 @@ msgstr ""
 #: include/views/configuration.action.edit.php:221
 #: include/views/configuration.action.edit.php:234
 #: include/views/configuration.action.edit.php:691
-#: include/views/configuration.graph.edit.php:119
-#: include/views/configuration.graph.edit.php:177
+#: include/views/configuration.graph.edit.php:130
+#: include/views/configuration.graph.edit.php:188
 #: include/views/configuration.item.edit.php:71
 #: include/views/configuration.screen.constructor.edit.php:117
 #: include/views/configuration.screen.constructor.edit.php:126
@@ -12372,8 +12371,8 @@ msgstr ""
 msgid "Select"
 msgstr "Pilih"
 
-#: include/views/configuration.graph.edit.php:133
-#: include/views/configuration.graph.edit.php:191
+#: include/views/configuration.graph.edit.php:144
+#: include/views/configuration.graph.edit.php:202
 #: include/views/configuration.triggers.expression.php:50
 msgid "Select prototype"
 msgstr "Pilih prototipe"
@@ -12498,7 +12497,7 @@ msgstr "Service \"%1$s\" tidak dapat terkait pada dirinya sendiri."
 #: api/classes/CService.php:1398
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
-msgstr "Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan.Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan.Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan.Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan.Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan."
+msgstr "Service \"%1$s\" tidak dapat dihubungkan ke trigger dan memiliki turunan secara bersamaan."
 
 #: api/classes/CService.php:1373
 #, c-format
@@ -12867,7 +12866,7 @@ msgstr "Spanish (es_ES)"
 
 #: api/classes/CAction.php:1371
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
-msgstr "Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi.Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi.Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi.Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi.Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi."
+msgstr "Skrip yang dispesifikasikan tidak ada atau Anda tidak memiliki hak atasnya untuk perintah aksi operasi."
 
 #: httpdetails.php:131 httpdetails.php:296
 msgid "Speed"
@@ -12899,7 +12898,7 @@ msgstr "State"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:462 events.php:477 hosts.php:844 httpdetails.php:134
+#: events.php:462 events.php:477 hosts.php:845 httpdetails.php:134
 #: httpmon.php:88 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13094,7 +13093,7 @@ msgstr "Swedish (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:126
 msgid "Switching authentication method will reset all except this session! Continue?"
-msgstr "Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?"
+msgstr "Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini! Lanjutkan?"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:150
 msgid "System default"
@@ -13220,7 +13219,7 @@ msgstr "Template telah ditambah"
 
 #: api/classes/CHostBase.php:294
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya.Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya.Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya.Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya.Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya."
+msgstr "Template tidak dapat dikaitkan dengan template lain lebih dari sekali bahkan melalui template lainnya."
 
 #: templates.php:361 templates.php:377 templates.php:405
 msgid "Template deleted"
@@ -13283,9 +13282,9 @@ msgstr "Template dengan visible name yang sama \"%s\" sudah ada."
 msgid "Templated items"
 msgstr "Item yang memiliki template"
 
-#: hosts.php:843 include/menu.inc.php:158
+#: hosts.php:844 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
-#: include/views/configuration.host.edit.php:716
+#: include/views/configuration.host.edit.php:723
 #: include/views/configuration.hostgroups.list.php:144
 #: include/views/configuration.host.massupdate.php:304
 #: include/views/configuration.host.prototype.edit.php:252
@@ -13392,7 +13391,7 @@ msgstr[0] ""
 #: include/views/configuration.item.list.php:124
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s).Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s).Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s).Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s).Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s)."
+msgstr "Item ini tidak ditemukan lagi dan akan terhapus dalam %1$s (on %2$s at %3$s)."
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -13424,7 +13423,7 @@ msgstr[0] "Ada \"%1$d\" grup dengan akses Internal GUI."
 msgid "Third"
 msgstr "Ketiga"
 
-#: include/views/configuration.host.edit.php:821
+#: include/views/configuration.host.edit.php:827
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Field ini secara otomatis diisi oleh item \"%s\"."
@@ -13533,11 +13532,11 @@ msgstr "Timestamp"
 
 #: popup_trexpr.php:413
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "Timestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidak"
+msgstr "Timestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N = 1, 0 - jika tidak"
 
 #: popup_trexpr.php:418
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "Timestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidakTimestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidak"
+msgstr "Timestamp tidak berbeda dengan waktu server Zabbix selama T detik, maka N BUKAN 1, 0 - jika tidak"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:411
@@ -13652,7 +13651,7 @@ msgstr "Trigger \"%1$s\" tergantung pada trigger \"%2$s\", yang tidak ada."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" diabaikan - aturan user."
 
-#: api/classes/CTrigger.php:1604
+#: api/classes/CTrigger.php:1603
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
@@ -13661,7 +13660,7 @@ msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
 msgid "Trigger added"
 msgstr "Trigger ditambah"
 
-#: api/classes/CTrigger.php:1508
+#: api/classes/CTrigger.php:1507
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -13708,7 +13707,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr "Trigger kondisi ekspresi"
 
-#: api/classes/CTrigger.php:653 api/classes/CTriggerPrototype.php:724
+#: api/classes/CTrigger.php:652 api/classes/CTriggerPrototype.php:724
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Ekspresi trigger harus mengandung setidaknya satu host:key referensi."
 
@@ -13719,7 +13718,7 @@ msgstr "Trigger dari"
 #: api/classes/CHostBase.php:187
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host.Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host.Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host.Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host.Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host."
+msgstr "Trigger memiliki item dari template \"%1$s\" yang tidak ditautkan ke host."
 
 #: include/actions.inc.php:1161
 msgid "Trigger in \"normal\" state"
@@ -13732,7 +13731,7 @@ msgstr ""
 #: api/classes/CHostBase.php:143
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
-msgstr "Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\".Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\".Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\".Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\".Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\"."
+msgstr "Trigger pada template \"%1$s\" memiliki ketergantungan dengan trigger pada template \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:449
 msgid "Trigger just added. No status update so far."
@@ -13784,7 +13783,7 @@ msgstr ""
 
 #: include/html.inc.php:399 include/html.inc.php:403
 #: include/views/configuration.host.discovery.list.php:117
-#: include/views/configuration.host.edit.php:598
+#: include/views/configuration.host.edit.php:605
 #: include/views/configuration.template.edit.php:333
 msgid "Trigger prototypes"
 msgstr "Prototipe trigger"
@@ -13821,12 +13820,12 @@ msgstr "Trigger diperbarui"
 msgid "Trigger value"
 msgstr "Nilai trigger"
 
-#: hosts.php:838 hosts.php:932 include/forms.inc.php:568
+#: hosts.php:839 hosts.php:933 include/forms.inc.php:568
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
 #: include/triggers.inc.php:1258
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
-#: include/views/configuration.host.edit.php:491
+#: include/views/configuration.host.edit.php:498
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.list.php:203
 #: include/views/configuration.template.edit.php:244
@@ -13903,7 +13902,7 @@ msgstr "Dua elemen harus dipilih"
 #: api/classes/CItem.php:961
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik.Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik.Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik.Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik.Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik."
+msgstr "Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik."
 
 #: include/actions.inc.php:820 include/classes/screens/CScreenActions.php:50
 #: include/classes/screens/CScreenActions.php:56
@@ -13916,7 +13915,7 @@ msgstr "Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventor
 #: include/views/administration.script.edit.php:48
 #: include/views/administration.script.list.php:39
 #: include/views/configuration.action.edit.php:695
-#: include/views/configuration.graph.edit.php:223
+#: include/views/configuration.graph.edit.php:234
 #: include/views/configuration.host.discovery.edit.php:57
 #: include/views/configuration.host.discovery.edit.php:64
 #: include/views/configuration.host.discovery.list.php:57
@@ -13972,7 +13971,7 @@ msgstr "Tipe informasi harus berupa \"Log\" untuk kunci log."
 
 #: api/classes/CItemGeneral.php:314
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr "Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi.Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi.Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi.Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi.Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi."
+msgstr "Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi."
 
 #: include/forms.inc.php:880
 msgid "Types"
@@ -13986,8 +13985,10 @@ msgstr "TIDAK DIKENAL"
 msgid "UP"
 msgstr "ATAS"
 
+#: include/screens.inc.php:44
 #: include/views/configuration.httpconf.edit.php:164
 #: include/views/configuration.httpconf.popup.php:78
+#: include/views/configuration.screen.constructor.edit.php:535
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:246
 #: include/views/js/configuration.sysmaps.js.php:187 jsLoader.php:216
@@ -14080,7 +14081,7 @@ msgid "Units"
 msgstr "Unit"
 
 #: events.php:572 events.php:573 events.php:583 events.php:584 events.php:585
-#: events.php:586 hosts.php:981 httpdetails.php:165 httpmon.php:167
+#: events.php:586 hosts.php:982 httpdetails.php:165 httpmon.php:167
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:132
 #: include/actions.inc.php:151 include/actions.inc.php:160
@@ -14125,7 +14126,7 @@ msgstr "Fungsi yang tidak dikenal."
 
 #: include/triggers.inc.php:1791 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
-msgstr "Item host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilihItem host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilih"
+msgstr "Item host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilih"
 
 #: include/triggers.inc.php:1790 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
@@ -14148,13 +14149,13 @@ msgstr ""
 msgid "Unknown value type"
 msgstr "Tipe nilai tidak dikenal"
 
-#: include/views/configuration.host.edit.php:672
+#: include/views/configuration.host.edit.php:679
 #: include/views/configuration.host.prototype.edit.php:222
 #: include/views/configuration.template.edit.php:403
 msgid "Unlink"
 msgstr "Putuskan"
 
-#: include/views/configuration.host.edit.php:676
+#: include/views/configuration.host.edit.php:683
 #: include/views/configuration.template.edit.php:407
 msgid "Unlink and clear"
 msgstr "Putuskan dan bersihkan"
@@ -14335,7 +14336,7 @@ msgstr "Diperbarui: Item \"%1$s\" pada \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diperbarui: Prototipe item \"%1$s\" pada \"%2$s\"."
 
-#: api/classes/CTrigger.php:1258
+#: api/classes/CTrigger.php:1257
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Diperbarui: Trigger \"%1$s\" pada \"%2$s\"."
@@ -14372,11 +14373,6 @@ msgstr ""
 #: include/actions.inc.php:82
 msgid "Uptime/Downtime"
 msgstr "Waktu nyala/Waktu mati"
-
-#: include/screens.inc.php:44
-#: include/views/configuration.screen.constructor.edit.php:535
-msgid "Url"
-msgstr "Url"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
@@ -14415,7 +14411,7 @@ msgstr "User tidak dapat mengganti tipe untuk dirinya sendiri"
 
 #: api/classes/CUserGroup.php:455
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr "User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif.User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif.User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif.User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif.User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif."
+msgstr "User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif."
 
 #: include/users.inc.php:210
 msgid "User cannot change GUI access for himself."
@@ -14499,12 +14495,12 @@ msgstr "User tidak diizinkan menghapus dirinya sendiri."
 #: api/classes/CUser.php:311
 #, fuzzy, c-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr "User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
+msgstr "User tidak dapat memodifikasi akses GUI untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
 
 #: api/classes/CUser.php:315
 #, fuzzy, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\".User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
+msgstr "User tidak dapat memodifikasi status sistem untuk dirinya sendiri dengan menjadi anggota dari grup user \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:67
 #: include/views/configuration.action.edit.php:718
@@ -14557,7 +14553,7 @@ msgstr "User dengan alias \"%s\" sudah ada."
 
 #: include/views/administration.mediatypes.edit.php:85
 #: include/views/administration.mediatypes.list.php:68
-#: include/views/configuration.host.edit.php:748
+#: include/views/configuration.host.edit.php:755
 #: include/views/configuration.host.prototype.edit.php:265
 #: include/views/general.login.php:66 index.php:32
 msgid "Username"
@@ -14769,7 +14765,7 @@ msgstr "Nilai"
 #: api/classes/CMap.php:447
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
-msgstr "Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\"Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\"Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\"Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\"Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\""
+msgstr "Nilai \"%1$s\" tidak valid untuk parameter \"grid_align\". Pilihannya : \"%2$s\" dan \"%3$s\""
 
 #: api/classes/CMap.php:452
 #, c-format
@@ -14784,12 +14780,12 @@ msgstr ""
 #: include/classes/db/DB.php:333
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
-msgstr "Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter."
+msgstr "Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah %4$d karakter."
 
 #: include/classes/db/DB.php:362
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
-msgstr "Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter.Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter."
+msgstr "Nilai \"%1$s\" terlalu panjang untuk field \"%2$s\" - %3$d karakter. Panjang yang diizinkan adalah 2048 karakter."
 
 #: include/validate.inc.php:326 include/validate.inc.php:350
 #, c-format
@@ -14924,7 +14920,7 @@ msgstr "Tampilan tidak diberikan."
 msgid "Virtual memory statistics."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:186
+#: include/views/configuration.host.edit.php:199
 #: include/views/configuration.host.prototype.edit.php:71
 #: include/views/configuration.template.edit.php:102
 #: include/views/inventory.host.view.php:44
@@ -14953,9 +14949,9 @@ msgstr ""
 
 #: jsLoader.php:166
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
-msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai.Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai.Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai.Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai.Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai."
+msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai."
 
-#: hosts.php:841 hosts.php:938 include/menu.inc.php:41
+#: hosts.php:842 hosts.php:939 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:222
 #: include/views/inventory.host.view.php:231 search.php:139 search.php:145
@@ -15223,7 +15219,7 @@ msgctxt "Yotta short"
 msgid "Y"
 msgstr "Y"
 
-#: include/views/configuration.graph.edit.php:208
+#: include/views/configuration.graph.edit.php:219
 msgid "Y axis MAX value"
 msgstr "Nilai Y axis MAX"
 
@@ -15232,11 +15228,11 @@ msgstr "Nilai Y axis MAX"
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Nilai Y axis MAX harus lebih besar dari nilai Y axis MIN."
 
-#: include/views/configuration.graph.edit.php:150
+#: include/views/configuration.graph.edit.php:161
 msgid "Y axis MIN value"
 msgstr "Nilai Y axis MIN"
 
-#: include/views/configuration.graph.edit.php:227
+#: include/views/configuration.graph.edit.php:238
 msgid "Y axis side"
 msgstr "Sisi Y axis"
 
@@ -15282,7 +15278,7 @@ msgstr "Yotta"
 
 #: include/views/administration.users.edit.php:141
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server.Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server.Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server.Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server.Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server."
+msgstr "Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server."
 
 #: api/classes/CUser.php:327
 #, c-format
@@ -15313,7 +15309,7 @@ msgstr "Anda tidak dapat menentukan target untuk perintah aksi operasi \"%s\"."
 #: api/classes/CAction.php:1409
 #, fuzzy, c-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\".Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\"."
+msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\"."
 
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:553
 #: api/classes/CHost.php:906 api/classes/CHost.php:963
@@ -15443,7 +15439,7 @@ msgstr "Info server Zabbix"
 
 #: jsrpc.php:174
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini.Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini.Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini.Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini.Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini."
+msgstr "Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak saat ini."
 
 #: include/blocks.inc.php:807
 msgid "Zabbix server is running"
@@ -15691,7 +15687,7 @@ msgstr ""
 msgid "last"
 msgstr "terakhir"
 
-#: hosts.php:804 hosts.php:805 hosts.php:806 include/actions.inc.php:29
+#: hosts.php:805 hosts.php:806 hosts.php:807 include/actions.inc.php:29
 #: include/forms.inc.php:449 include/forms.inc.php:456
 #: include/forms.inc.php:463 include/forms.inc.php:470
 #: include/forms.inc.php:577 include/forms.inc.php:592
