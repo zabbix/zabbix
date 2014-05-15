@@ -168,7 +168,7 @@ static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 
 	MsgDll = zbx_malloc(MsgDll, dwResult);
 
-	if (0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH)
+	if (0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
 		return NULL;
 
 	ret_inst = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
