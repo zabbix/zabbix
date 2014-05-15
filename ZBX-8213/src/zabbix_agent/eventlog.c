@@ -159,10 +159,14 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
  ******************************************************************************/
 static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 {
-	TCHAR	MsgDll[MAX_PATH];
+	TCHAR	*MsgDll = NULL;
+	DWORD	dwResult;
 
-	if (NULL == szFileName || 0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
+	if (NULL == szFileName || 0 == (dwResult = ExpandEnvironmentStrings(szFileName, NULL, MAX_PATH)))
 		return NULL;
+
+	MsgDll = zbx_malloc(MsgDll, dwResult);
+	ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH);
 
 	return LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
 }
