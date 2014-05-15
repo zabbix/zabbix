@@ -22,7 +22,7 @@ A.F.I...S. [ZBXNEXT-1343] removed support of old style node-based distributed mo
 A.F....... [ZBXNEXT-2123] implemented the application and host inventory filters on the trigger monitoring page (Pavels)
 A.F.I...S. [ZBXNEXT-2117] added "Description" field for templates, hosts and proxies (Eduard, Sasha)
 ..F.I..... [ZBXNEXT-1533] added "Action name" in "History of actions" screen and added a patch to change screen item sort order (Oleg, Pavels)
-..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places (Ivo)
+..F....... [ZBX-7850] unified the "Go to" section of host pop-up menus displayed in maps and other other places and made menu links disabled instead of hidden (Ivo)
 ..F....... [ZBXNEXT-421] implemented user name in action audit page (Eduard)
 ..F....... [ZBXNEXT-2167] improved info column in latest data monitoring and item, trigger, discovery host configuration (Eduard)
 ..F....... [ZBX-6374] added pagination in availability reports (Oleg)
