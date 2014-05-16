@@ -217,6 +217,7 @@ create_macro('{$RSM.SLV.EPP.UPDATE}', 99, undef);
 create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
 
 create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', RSM_ROLLWEEK_THRESHOLDS, undef);
+create_macro('{$RSM_ROLLWEEK_SECONDS}', 604800, undef);
 create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef);
 
 my $result;

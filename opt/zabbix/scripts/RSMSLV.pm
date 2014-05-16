@@ -31,8 +31,6 @@ use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant TRIGGER_VALUE_TRUE => 1;
 use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
 
-use constant SECONDS_WEEK => 604800;
-
 use constant SENDER_BATCH_COUNT => 250;
 
 # In order to do the calculation we should wait till all the results
@@ -448,7 +446,11 @@ sub get_rollweek_bounds
 {
     my $t = time();
     my $till = int($t / 60) * 60 - ROLLWEEK_SHIFT_BACK;
-    my $from = $till - SECONDS_WEEK;
+
+    # mind the rollweek threshold setting
+    my $rollweek_seconds = __get_macro('{$RSM_ROLLWEEK_SECONDS}');
+
+    my $from = $till - $rollweek_seconds;
 
     $till--;
 
