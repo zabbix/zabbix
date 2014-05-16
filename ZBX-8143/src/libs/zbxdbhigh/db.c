@@ -488,7 +488,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _dc_trigger *trigger)
 {
 	const char	*__function_name = "process_trigger";
 
