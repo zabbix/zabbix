@@ -576,8 +576,8 @@
 					),
 					'data' => $hostFilterData,
 					'popup' => array(
-						'parameters' => 'srctbl=hosts&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
-							'&srcfld1=hostid&writeonly=1&templated_hosts=1',
+						'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
+							'&srcfld1=hostid&writeonly=1',
 						'width' => 450,
 						'height' => 450,
 						'buttonClass' => 'input filter-multiselect-select-button'
@@ -597,7 +597,7 @@
 			new CCol(array(
 				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_app', _('Select'),
-					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+					'return PopUp("popup.php?srctbl=applications&srcfld1=applicationid'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 						'&with_applications=1'.
 						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'

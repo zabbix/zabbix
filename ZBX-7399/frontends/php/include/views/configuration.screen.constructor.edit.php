@@ -339,7 +339,13 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
 			'defaultValue' => 0,
-			'selectedLimit' => 1
+			'selectedLimit' => 1,
+			'popup' => array(
+				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=hostid&writeonly=1',
+				'width' => 450,
+				'height' => 450
+			)
 		)));
 	}
 

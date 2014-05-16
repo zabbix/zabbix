@@ -173,7 +173,13 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0
+			'defaultValue' => 0,
+			'popup' => array(
+				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
+					'&srcfld1=hostid&writeonly=1&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
 		));
 		break;
 
@@ -184,7 +190,13 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0
+			'defaultValue' => 0,
+			'popup' => array(
+				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
+					'&srcfld1=triggerid&writeonly=1&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
 		));
 		break;
 

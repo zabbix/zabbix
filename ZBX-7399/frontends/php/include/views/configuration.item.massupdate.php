@@ -479,15 +479,22 @@ if ($this->data['displayApplications']) {
 	}
 
 	$replaceApp = new CMultiSelect(array(
+		'id' => 'replaceApp',
 		'name' => 'applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
-		'data' => $appToReplace
+		'data' => $appToReplace,
+		'popup' => array(
+			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
+				'&srcfld1=applicationid&multiselect=1&hostid='.$this->data['hostid'],
+			'width' => 450,
+			'height' => 450
+		)
 	));
 
 	$itemFormList->addRow(
 		array(_('Replace applications'), SPACE, new CVisibilityBox('visible[applications]',
-			isset($this->data['visible']['applications']), 'applications_', _('Original')
+			isset($this->data['visible']['applications']), 'replaceApp', _('Original')
 		)),
 		$replaceApp
 	);
@@ -523,16 +530,23 @@ if ($this->data['displayApplications']) {
 	}
 
 	$newApp = new CMultiSelect(array(
+		'id' => 'newApp',
 		'name' => 'new_applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
 		'data' => $appToAdd,
-		'addNew' => true
+		'addNew' => true,
+		'popup' => array(
+			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
+				'&srcfld1=applicationid&multiselect=1&hostid='.$this->data['hostid'],
+			'width' => 450,
+			'height' => 450
+		)
 	));
 
 	$itemFormList->addRow(
 		array(_('Add new or existing applications'), SPACE, new CVisibilityBox('visible[new_applications]',
-			isset($this->data['visible']['new_applications']), 'new_applications_', _('Original')
+			isset($this->data['visible']['new_applications']), 'newApp', _('Original')
 		)),
 		$newApp
 	);
