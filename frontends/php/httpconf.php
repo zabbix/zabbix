@@ -202,8 +202,9 @@ elseif (isset($_REQUEST['save'])) {
 			$i = 1;
 			foreach ($steps as $stepNumber => &$step) {
 				$step['no'] = $i++;
-				$step['follow_redirects'] = $step['follow_redirects'] ? 1 : 0;
-				$step['retrieve_mode'] = $step['retrieve_mode'] ? 1 : 0;
+				$step['follow_redirects'] = $step['follow_redirects']
+					? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
+					: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
 			}
 			unset($step);
 		}
@@ -220,8 +221,8 @@ elseif (isset($_REQUEST['save'])) {
 			'variables' => $_REQUEST['variables'],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
-			'verify_peer' => getRequest('verify_peer', 0),
-			'verify_host' => getRequest('verify_host', 0),
+			'verify_peer' => getRequest('verify_peer', HTTPTEST_VERIFY_PEER_OFF),
+			'verify_host' => getRequest('verify_host', HTTPTEST_VERIFY_HOST_OFF),
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
