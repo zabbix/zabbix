@@ -171,6 +171,9 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
+	if (0 != strncmp(item->key_orig, "eventlog[", 9))
+		goto out;
+
 	if (1 < num_param(parameters))
 		goto out;
 
@@ -238,6 +241,9 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
+	if (0 != strncmp(item->key_orig, "eventlog[", 9))
+		goto out;
+
 	if (1 < num_param(parameters))
 		goto out;
 
@@ -290,6 +296,9 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
+		goto out;
+
+	if (0 != strncmp(item->key_orig, "eventlog[", 9))
 		goto out;
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
