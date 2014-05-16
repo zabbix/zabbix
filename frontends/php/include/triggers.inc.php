@@ -2283,23 +2283,26 @@ function get_item_function_info($expr) {
 	);
 
 	$expressionData = new CTriggerExpression();
+	$parseResult = $expressionData->parse($expr);
 
-	if ($expressionData->parse($expr)) {
-		if (isset($expressionData->macros[0])) {
+	if ($parseResult) {
+		if ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
 			$result = array(
 				'value_type' => _('0 or 1'),
 				'type' => T_ZBX_INT,
 				'validation' => IN('0,1')
 			);
 		}
-		elseif (isset($expressionData->usermacros[0]) || isset($expressionData->lldmacros[0])) {
+		elseif ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)
+				|| $parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
+
 			$result = array(
 				'value_type' => $value_type[ITEM_VALUE_TYPE_FLOAT],
 				'type' => T_ZBX_STR,
 				'validation' => 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u", {})'
 			);
 		}
-		elseif (isset($expressionData->expressions[0])) {
+		elseif ($parseResult->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)) {
 			$exprPart = reset($expressionData->expressions);
 
 			if (!isset($function_info[$exprPart['functionName']])) {
