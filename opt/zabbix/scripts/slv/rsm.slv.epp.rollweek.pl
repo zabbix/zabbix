@@ -15,10 +15,9 @@ exit_if_running();
 
 set_slv_config(get_rsm_config());
 
-my ($from, $till, $value_ts) = get_rollweek_bounds();
-
 db_connect();
 
+my ($from, $till, $value_ts) = get_rollweek_bounds();
 my $interval = get_macro_epp_delay($from);
 my $cfg_sla = get_macro_epp_rollweek_sla();
 
