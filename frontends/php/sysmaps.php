@@ -259,8 +259,8 @@ if (isset($_REQUEST['form'])) {
 
 	// images
 	$data['images'] = API::Image()->get(array(
-		'filter' => array('imagetype' => 2),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('imageid', 'name'),
+		'filter' => array('imagetype' => IMAGE_TYPE_BACKGROUND)
 	));
 	order_result($data['images'], 'name');
 
