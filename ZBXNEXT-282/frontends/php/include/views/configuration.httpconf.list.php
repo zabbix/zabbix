@@ -108,7 +108,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			$infoIcon->setHint($errorMessage, '', 'on');
 		}
 		else {
-			$infoIcon = SPACE;
+			$infoIcon = '';
 		}
 	}
 	else {
@@ -123,7 +123,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['delay'],
 		$httpTest['retries'],
 		$authTypeLabels[$httpTest['authentication']],
-		$httpTest['http_proxy'] ? _('Yes') : _('No'),
+		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
 		($httpTest['application_name'] !== '') ? $httpTest['application_name'] : '-',
 		new CLink(
 			httptest_status2str($httpTest['status']),
