@@ -93,7 +93,6 @@ else {
 
 	$retrieveModeRadioButtonList = new CRadioButtonList('retrieve_mode', $retrieveMode);
 	$retrieveModeRadioButtonList->addValue(_('page content'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-	$retrieveModeRadioButtonList->addItem(SPACE);
 	$retrieveModeRadioButtonList->addValue(_('page headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS);
 	$httpPopupFormList->addRow(_('Retrieve'), $retrieveModeRadioButtonList);
 

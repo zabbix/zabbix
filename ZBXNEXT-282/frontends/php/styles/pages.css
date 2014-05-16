@@ -270,4 +270,4 @@ div.setup_wizard .requirements .notice { color: #EE6000; border-color: #EE6000; 
 div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }
 
 /* httptest */
-.httptest-popup #retrieve_mode_2 { margin-left: 20px; }
+.httptest-popup #retrieve_mode_2 { margin-left: 10px; }
