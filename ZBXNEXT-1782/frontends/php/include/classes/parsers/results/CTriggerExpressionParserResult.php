@@ -104,4 +104,21 @@ class CTriggerExpressionParserResult extends CParserResult {
 
 		return $result;
 	}
+
+	/**
+	 * Check whether the expression contains at least one token of the given type.
+	 *
+	 * @param int $type
+	 *
+	 * @return bool
+	 */
+	public function hasTokenOfType($type) {
+		foreach ($this->tokens as $token) {
+			if ($token['type'] == $type) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

@@ -1842,22 +1842,6 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'functionParam' => '5',
 							'functionParamList' => array('5')
 						)
-					),
-					'macros' => array(
-						0 => array(
-							'expression' => '{TRIGGER.VALUE}'
-						)
-					),
-					'usermacros' => array(
-						0 => array(
-							'expression' => '{$USERMACRO1}'
-						),
-						1 => array(
-							'expression' => '{$USERMACRO2}'
-						),
-						2 => array(
-							'expression' => '{$USERMACRO3}'
-						)
 					)
 				),
 				true
@@ -1886,9 +1870,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'functionParam' => '"{HOSTNAME1}",{HOSTNAME2}',
 							'functionParamList' => array('{HOSTNAME1}', '{HOSTNAME2}')
 						)
-					),
-					'macros' => array(),
-					'usermacros' => array()
+					)
 				),
 				true
 			),
@@ -2012,9 +1994,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'functionParam' => '123',
 							'functionParamList' => array('123')
 						)
-					),
-					'macros' => array(),
-					'usermacros' => array()
+					)
 				),
 				true
 			),
@@ -2264,9 +2244,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'functionParam' => '#1',
 							'functionParamList' => array('#1')
 						)
-					),
-					'macros' => array(),
-					'usermacros' => array()
+					)
 				),
 				true
 			),
@@ -2767,25 +2745,6 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'functionParam' => '',
 							'functionParamList' => array('')
 						)
-					),
-					'macros' => array(
-						0 => array(
-							'expression' => '{TRIGGER.VALUE}'
-						),
-						1 => array(
-							'expression' => '{TRIGGER.VALUE}'
-						)
-					),
-					'usermacros' => array(
-						0 => array(
-							'expression' => '{$M}'
-						),
-						1 => array(
-							'expression' => '{$M1234}'
-						),
-						2 => array(
-							'expression' => '{$CUSTOM}'
-						)
 					)
 				),
 				true
@@ -3234,8 +3193,6 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			if (isset($result)) {
 				$this->assertEquals($result['error'], $expressionData->error);
 				$this->assertEquals($result['expressions'], $expressionData->expressions);
-				$this->assertEquals($result['macros'], $expressionData->macros);
-				$this->assertEquals($result['usermacros'], $expressionData->usermacros);
 			}
 		}
 		else {

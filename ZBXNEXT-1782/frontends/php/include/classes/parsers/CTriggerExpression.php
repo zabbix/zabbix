@@ -73,69 +73,6 @@ class CTriggerExpression {
 	public $expressions = array();
 
 	/**
-	 * An array of macros like {TRIGGER.VALUE}
-	 * The array isn't unique. Same macros can repeats.
-	 *
-	 * Example:
-	 *   'expressions' => array(
-	 *     0 => array(
-	 *       'expression' => '{TRIGGER.VALUE}'
-	 *     )
-	 *   )
-	 *
-	 * @deprecated use result tokens instead
-	 *
-	 * @var array
-	 */
-	public $macros = array();
-
-	/**
-	 * An array of user macros like {$MACRO}
-	 * The array isn't unique. Same macros can repeats.
-	 *
-	 * Example:
-	 *    array(
-	 *     0 => array(
-	 *       'expression' => '{$MACRO}'
-	 *     ),
-	 *     1 => array(
-	 *       'expression' => '{$MACRO2}'
-	 *     ),
-	 *     2 => array(
-	 *       'expression' => '{$MACRO}'
-	 *     )
-	 *   )
-	 *
-	 * @deprecated use result tokens instead
-	 *
-	 * @var array
-	 */
-	public $usermacros = array();
-
-	/**
-	 * An array of low-level discovery macros like {#MACRO}
-	 * The array isn't unique. Same macros can repeats.
-	 *
-	 * Example:
-	 *    array(
-	 *     0 => array(
-	 *       'expression' => '{#MACRO}'
-	 *     ),
-	 *     1 => array(
-	 *       'expression' => '{#MACRO2}'
-	 *     ),
-	 *     2 => array(
-	 *       'expression' => '{#MACRO}'
-	 *     )
-	 *   )
-	 *
-	 * @deprecated use result tokens instead
-	 *
-	 * @var array
-	 */
-	public $lldmacros = array();
-
-	/**
 	 * An options array
 	 *
 	 * Supported otions:
@@ -259,9 +196,6 @@ class CTriggerExpression {
 		$this->isValid = true;
 		$this->error = '';
 		$this->expressions = array();
-		$this->macros = array();
-		$this->usermacros = array();
-		$this->lldmacros = array();
 
 		$this->pos = 0;
 		$this->expression = $expression;
@@ -592,8 +526,10 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseMacro() || $this->parseUserMacro()
-				|| $this->parseLLDMacro()) {
+		if ($this->parseFunctionMacro() || $this->parseNumber()
+				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)
+				|| $this->parseUserMacro() || $this->parseLLDMacro()) {
+
 			return true;
 		}
 
@@ -960,24 +896,6 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Parses a macro constant in the trigger expression and
-	 * moves a current position ($this->pos) on a last symbol of the macro
-	 *
-	 * @return bool returns true if parsed successfully, false otherwise
-	 */
-	private function parseMacro() {
-		$result = $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO);
-
-		if (!$result) {
-			return false;
-		}
-
-		$this->macros[] = array('expression' => $result->match);
-
-		return true;
-	}
-
-	/**
 	 * Parses an user macro constant in the trigger expression and
 	 * moves a current position ($this->pos) on a last symbol of the macro
 	 *
@@ -1011,8 +929,9 @@ class CTriggerExpression {
 		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $usermacro,
 			$this->pos, $macroLength
 		);
-		$this->usermacros[] = array('expression' => $usermacro);
+
 		$this->pos = $j;
+
 		return true;
 	}
 
@@ -1054,8 +973,9 @@ class CTriggerExpression {
 		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO, $lldmacro,
 			$this->pos, $macroLength
 		);
-		$this->lldmacros[] = array('expression' => $lldmacro);
+
 		$this->pos = $j;
+
 		return true;
 	}
 
