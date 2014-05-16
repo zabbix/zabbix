@@ -746,11 +746,12 @@ class CConfigurationExport {
 		$this->data['maps'] = $sysmaps;
 
 		$images = API::Image()->get(array(
+			'output' => array('imageid', 'name', 'imagetype'),
 			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
-			'output' => API_OUTPUT_EXTEND,
 			'select_image' => true,
 			'preservekeys' => true
 		));
+
 		foreach ($images as &$image) {
 			$image = array(
 				'name' => $image['name'],
@@ -1177,8 +1178,8 @@ class CConfigurationExport {
 	protected function getImagesReferences(array $imageIds) {
 		$idents = array();
 		$images = API::Image()->get(array(
+			'output' => array('imageid', 'name'),
 			'imageids' => $imageIds,
-			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
