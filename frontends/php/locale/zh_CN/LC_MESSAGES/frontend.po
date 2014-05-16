@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-12 03:02+0300\n"
+"POT-Creation-Date: 2014-05-17 00:37+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1325,7 +1325,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "无法添加图片"
 
-#: include/classes/import/CXmlImport18.php:633
+#: include/classes/import/CXmlImport18.php:631
 msgid "Cannot add image."
 msgstr "无法添加图片."
 
@@ -1524,7 +1524,7 @@ msgstr "无法创建图示对应"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "无法创建同名为\"%s\"的图示对应."
 
-#: include/classes/import/CXmlImport18.php:817
+#: include/classes/import/CXmlImport18.php:815
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "无法创建拓墣图 \"%s\"."
@@ -1537,7 +1537,7 @@ msgstr "无法创建新的应用程序, web 场景已分配给应用程序."
 msgid "Cannot create new element"
 msgstr "无法创建新组件"
 
-#: include/classes/import/CXmlImport18.php:1706
+#: include/classes/import/CXmlImport18.php:1704
 msgid "Cannot create screen."
 msgstr "无法创建筛选."
 
@@ -1911,20 +1911,20 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
-#: include/classes/import/CXmlImport18.php:677
+#: include/classes/import/CXmlImport18.php:675
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到用在筛选 \"%2$s\" 中的群组 \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1663
+#: include/classes/import/CXmlImport18.php:1661
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到图表 \"%1$s\" 用于屏幕 \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:724
+#: include/classes/import/CXmlImport18.php:722
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1936,7 +1936,7 @@ msgstr "无法找到群组 \"%1$s\" 用于地图 \"%2$s\"."
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到群组 \"%1$s\" 用于屏幕 \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:735
+#: include/classes/import/CXmlImport18.php:733
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -1966,7 +1966,7 @@ msgstr "找不到用于项目键\"%2$s\"的主机介面于 \"%1$s\" ."
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:768
+#: include/classes/import/CXmlImport18.php:766
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1998,13 +1998,13 @@ msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for gr
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1676
+#: include/classes/import/CXmlImport18.php:1674
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到监控项 \"%1$s\" 用于屏幕 \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:713
+#: include/classes/import/CXmlImport18.php:711
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "无法找到地图 \"%1$s\" 用于被导出的地图 \"%2$s\"."
@@ -2035,8 +2035,8 @@ msgstr "无法找到屏幕 \"%1$s\" 用于屏幕 \"%2$s\"."
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/CXmlImport18.php:789
+#: include/classes/import/CXmlImport18.php:744
+#: include/classes/import/CXmlImport18.php:787
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2392,7 +2392,7 @@ msgstr "无法更新图示对应"
 msgid "Cannot update image"
 msgstr "无法更新图片"
 
-#: include/classes/import/CXmlImport18.php:640
+#: include/classes/import/CXmlImport18.php:638
 msgid "Cannot update image."
 msgstr "无法更新图片."
 
@@ -2425,7 +2425,7 @@ msgstr "无法更新巨集"
 msgid "Cannot update maintenance"
 msgstr "无法更新维修"
 
-#: include/classes/import/CXmlImport18.php:808
+#: include/classes/import/CXmlImport18.php:806
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "无法更新拓拓墣图\"%s\"."
@@ -2459,7 +2459,7 @@ msgstr "无法更新正规表示式"
 msgid "Cannot update screen"
 msgstr "无法更新筛选"
 
-#: include/classes/import/CXmlImport18.php:1698
+#: include/classes/import/CXmlImport18.php:1696
 msgid "Cannot update screen."
 msgstr "无法更新筛选."
 
@@ -3128,7 +3128,7 @@ msgstr "复制所选的到 ..."
 msgid "Correct login \"%s\"."
 msgstr "正确登录 \"%s\"."
 
-#: api/classes/CImage.php:452
+#: api/classes/CImage.php:451
 msgid "Could not save image!"
 msgstr "不能储存图片!"
 
@@ -4757,7 +4757,7 @@ msgstr ""
 msgid "Empty name."
 msgstr "事件历史"
 
-#: api/classes/CImage.php:470 api/rpc/class.czbxrpc.php:38
+#: api/classes/CImage.php:469 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
 msgstr "空参数"
 
@@ -5019,7 +5019,7 @@ msgstr "除外"
 msgid "Execute"
 msgstr "执行"
 
-#: api/classes/CImage.php:290
+#: api/classes/CImage.php:289
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "执行SQL错误[%1$s]于[%2$s]."
@@ -5236,7 +5236,7 @@ msgstr "栏位\"host\"是必要的"
 msgid "Field \"name\" is required."
 msgstr "栏位\"name\"是所要的."
 
-#: api/classes/CImage.php:550
+#: api/classes/CImage.php:549
 msgid "File format is unsupported."
 msgstr "Only super admins can create groups"
 
@@ -5569,8 +5569,8 @@ msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目."
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "图形 \"%1$s\"不存在于模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1555
-#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1553
+#: include/classes/import/CXmlImport18.php:1557
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "略过图形\"%1$s\"-用户规则."
@@ -6043,7 +6043,7 @@ msgstr "主机 \"%1$s\" 已存在."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "主机\"%1$s\"是以系统代理程式\"%2$s\"来监控的."
 
-#: include/classes/import/CXmlImport18.php:928
+#: include/classes/import/CXmlImport18.php:926
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "主机 \"%s\" 有 \"useipmi\" 参数已检验,  但是没有 \"ipmi_ip\" 参数! 使用主机IP位址为IPMI介面的位址."
@@ -6671,7 +6671,7 @@ msgstr "假如您认为这个信息是错的, 请谘询您的管理者关于如�
 msgid "Image"
 msgstr "图片"
 
-#: api/classes/CImage.php:257 api/classes/CImage.php:373
+#: api/classes/CImage.php:256 api/classes/CImage.php:372
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "图片\"%1$s\"已经存在"
@@ -6688,12 +6688,12 @@ msgstr "图片已删除"
 msgid "Image label type"
 msgstr "图片标示类型"
 
-#: api/classes/CImage.php:294
+#: api/classes/CImage.php:293
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "图片加载错误[%1$s] in [%2$s]"
 
-#: api/classes/CImage.php:545 include/classes/helpers/CUploadFile.php:129
+#: api/classes/CImage.php:544 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
 msgstr "图片尺寸必须小于1MB"
 
@@ -7457,12 +7457,12 @@ msgstr "不正确的值用于代理服务器状态 \"%1$s\"."
 msgid "Incorrect working time."
 msgstr "不正确的工作时间."
 
-#: include/classes/import/CXmlImport18.php:1587
+#: include/classes/import/CXmlImport18.php:1585
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "图形\"%1$s\"的不正确y max项目."
 
-#: include/classes/import/CXmlImport18.php:1574
+#: include/classes/import/CXmlImport18.php:1572
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "图形\"%1$s\"的不正确y min项目."
@@ -7656,15 +7656,10 @@ msgstr "无效的参数."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "无效的回应编码 \"%1$s\"."
-
-#: api/classes/CHttpTest.php:633
-#, c-format
-msgid "Invalid response code range \"%1$s\"."
-msgstr "无效的回应编码范围 \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
@@ -7755,7 +7750,7 @@ msgstr "项目\"%1$s\"不能填入一个不存在的主机资产纪录栏位号�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "项目\"%1$s\"不存在于模板\"%2$s\"中."
 
-#: include/classes/import/CXmlImport18.php:1522
+#: include/classes/import/CXmlImport18.php:1520
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "项目 \"%1$s\"不存在."
@@ -7765,8 +7760,8 @@ msgstr "项目 \"%1$s\"不存在."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的项目\"%1$s\" : 应用集\"%3$s\"不存在."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1271
+#: include/classes/import/CXmlImport18.php:1275
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略过项目\"%1$s\"-用户规则."
@@ -8650,7 +8645,7 @@ msgstr "手动登出"
 msgid "Map"
 msgstr "拓墣图"
 
-#: include/classes/import/CXmlImport18.php:668
+#: include/classes/import/CXmlImport18.php:666
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "略过拓墣图\"%1$s\"-用户规则."
@@ -8660,12 +8655,12 @@ msgstr "略过拓墣图\"%1$s\"-用户规则."
 msgid "Map \"%s\""
 msgstr "拓墣图\"%s\""
 
-#: include/classes/import/CXmlImport18.php:820
+#: include/classes/import/CXmlImport18.php:818
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "拓墣图\"%s\"已创建."
 
-#: include/classes/import/CXmlImport18.php:811
+#: include/classes/import/CXmlImport18.php:809
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "拓墣图\"%s\"已更新."
@@ -9064,8 +9059,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "缺少图形的\"名称\"栏位"
 
-#: include/classes/import/CXmlImport18.php:1578
-#: include/classes/import/CXmlImport18.php:1591
+#: include/classes/import/CXmlImport18.php:1576
+#: include/classes/import/CXmlImport18.php:1589
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "主机 \"%2$s\"缺少了项目\"%1$s\"."
@@ -9430,12 +9425,12 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1568
+#: include/classes/import/CXmlImport18.php:1566
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "图形 \"%s\"并无栏位 \"ymax_type\"."
 
-#: include/classes/import/CXmlImport18.php:1564
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "图形 \"%s\"并无栏位 \"ymin_type\"."
@@ -9820,27 +9815,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1549
+#: include/classes/import/CXmlImport18.php:1547
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "不具图形 \"%1$s\"的许可权."
 
-#: include/classes/import/CXmlImport18.php:963
+#: include/classes/import/CXmlImport18.php:961
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "不具主机 \"%1$s\"的许可权."
 
-#: include/classes/import/CXmlImport18.php:1513
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "无项目\"%s\"的许可权"
 
-#: include/classes/import/CXmlImport18.php:1144
+#: include/classes/import/CXmlImport18.php:1142
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "没有模板\"%s\"的许可权"
 
-#: include/classes/import/CXmlImport18.php:1424
+#: include/classes/import/CXmlImport18.php:1422
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "不具触发器 \"%s\"的许可权."
@@ -9849,12 +9844,12 @@ msgstr "不具触发器 \"%s\"的许可权."
 msgid "No permissions"
 msgstr "没有许可权"
 
-#: include/classes/import/CXmlImport18.php:1024
+#: include/classes/import/CXmlImport18.php:1022
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "不具群组 \"%1$s\"的许可权."
 
-#: include/classes/import/CXmlImport18.php:661
+#: include/classes/import/CXmlImport18.php:659
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "不具拓墣图\"%1$s\"的许可权."
@@ -9888,8 +9883,8 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:243 api/classes/CImage.php:357
-#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:181
+#: api/classes/CImage.php:242 api/classes/CImage.php:356
+#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
@@ -10552,7 +10547,7 @@ msgstr "只有超级管理员可以用改变户示警媒介."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超级管理员可以移除用户示警媒介."
 
-#: api/classes/CHttpTest.php:657
+#: api/classes/CHttpTest.php:662
 msgid "Only characters are allowed."
 msgstr "仅能使用字元."
 
@@ -10966,7 +10961,7 @@ msgstr "上层触发器"
 msgid "Parent web scenarios"
 msgstr "上层 web 场景"
 
-#: api/classes/CImage.php:284
+#: api/classes/CImage.php:283
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "解析SQL错误[%1$s]于[%2$s]之中."
@@ -12143,7 +12138,7 @@ msgid "Screen"
 msgstr "筛选"
 
 #: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1707
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "筛选 \"%1$s\" 已添加."
@@ -12183,14 +12178,14 @@ msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1640
-#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1638
+#: include/classes/import/CXmlImport18.php:1642
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "略过筛选\"%1$s\"-用户规则."
 
 #: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1699
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "筛选\"%1$s\"已更新."
@@ -13392,13 +13387,13 @@ msgstr ""
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: api/classes/CImage.php:493
+#: api/classes/CImage.php:492
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 
-#: api/classes/CImage.php:519
+#: api/classes/CImage.php:518
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -13662,8 +13657,8 @@ msgstr "触发器\"%1$s\"已存在于\"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1431
-#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1429
+#: include/classes/import/CXmlImport18.php:1433
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略过触发器\"%1$s\"-用户规则."
@@ -15132,12 +15127,12 @@ msgstr "错误的组件栏位."
 msgid "Wrong fields for host \"%s\"."
 msgstr "错误的主机栏位\"%s\"."
 
-#: api/classes/CImage.php:254
+#: api/classes/CImage.php:253
 #, c-format
 msgid "Wrong fields for image \"%1$s\"."
 msgstr "错误的图像栏位\"%1$s\"."
 
-#: api/classes/CImage.php:362
+#: api/classes/CImage.php:361
 msgid "Wrong fields for image."
 msgstr "错误的图像栏位"
 
