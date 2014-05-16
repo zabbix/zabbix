@@ -38,11 +38,11 @@ if (hasRequest('save')) {
 }
 
 if (hasRequest('stepid')) {
-	$followRedirects = getRequest('follow_redirects', false);
+	$followRedirects = getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
 	$retrieveMode = getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 }
 else {
-	$followRedirects = true;
+	$followRedirects = HTTPTEST_STEP_FOLLOW_REDIRECTS_ON;
 	$retrieveMode = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 }
 
