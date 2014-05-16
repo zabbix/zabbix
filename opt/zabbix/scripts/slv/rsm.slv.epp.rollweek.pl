@@ -33,12 +33,11 @@ foreach (@$tlds_ref)
     my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
     next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    my $fails = get_down_count($itemid_in, $from, $till);
-    $fails *= $interval / 60 if ($interval > 60);
+    my $downtime = get_downtime($itemid_in, $from, $till);
+    my $perc = sprintf("%.3f", $downtime * 100 / $cfg_sla);
 
-    my $perc = sprintf("%.3f", $fails * 100 / $cfg_sla);
+    info("result: $perc% (down: $downtime minutes, sla: $cfg_sla, ", ts_str($value_ts), ")");
 
-    info("fails:$fails perc:$perc");
     push_value($tld, $cfg_key_out, $value_ts, $perc);
 }
 

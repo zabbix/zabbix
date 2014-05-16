@@ -57,7 +57,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
 		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_item_values check_lastclock get_down_count avail_result_msg
+		get_item_values check_lastclock get_downtime avail_result_msg
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str);
 
 my $probe_group_name = 'Probes';
@@ -1058,7 +1058,7 @@ sub check_lastclock
     return SUCCESS;
 }
 
-sub get_down_count
+sub get_downtime
 {
     my $itemid = shift;
     my $from = shift;
@@ -1070,21 +1070,41 @@ sub get_down_count
 
     my $total = scalar(@$eventtimes);
     my $i = 0;
+    my $downtime = 0;
+
     while ($i < $total)
     {
 	my $event_from = $eventtimes->[$i++];
 	my $event_till = $eventtimes->[$i++];
 
-	my $res = db_select("select count(*) from history_uint where itemid=$itemid and clock between $event_from and $event_till and value=" . DOWN);
+	my $res = db_select(
+	    "select value,clock".
+	    " from history_uint".
+	    " where itemid=$itemid".
+	    	" and clock between $event_from and $event_till".
+	    " order by clock,ns desc");
 
-	my $n = ($res->fetchrow_array)[0];
+	my $prevclock = 0;
 
-	info("  $n down between $event_from and $event_till");
+	while (my @row = $res->fetchrow_array)
+	{
+	    my $value = $row[0];
+	    my $clock = $row[1];
 
-	$count += $n;
+	    $downtime += $clock - $prevclock if ($prevclock != 0);
+
+	    if ($value == DOWN)
+	    {
+		$prevclock = $clock;
+	    }
+	    else
+	    {
+		$prevclock = 0;
+	    }
+	}
     }
 
-    return $count;
+    return $downtime / 60; # minutes
 }
 
 sub avail_result_msg
