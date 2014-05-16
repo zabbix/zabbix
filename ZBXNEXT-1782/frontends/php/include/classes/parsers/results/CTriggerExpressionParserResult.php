@@ -26,9 +26,11 @@ class CTriggerExpressionParserResult extends CParserResult {
 	const TOKEN_TYPE_OPEN_BRACE = 0;
 	const TOKEN_TYPE_CLOSE_BRACE = 1;
 	const TOKEN_TYPE_OPERATOR = 2;
-	const TOKEN_TYPE_EXPRESSION = 3;
+	const TOKEN_TYPE_NUMBER = 3;
 	const TOKEN_TYPE_FUNCTION_MACRO = 4;
-	const TOKEN_TYPE_NUMBER = 5;
+	const TOKEN_TYPE_MACRO = 5;
+	const TOKEN_TYPE_USER_MACRO = 6;
+	const TOKEN_TYPE_LLD_MACRO = 7;
 
 	/**
 	 * Array of expression tokens.
@@ -36,6 +38,8 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 * Each token contains the following values:
 	 * - type   - token type
 	 * - value  - the token string itself
+	 * - pos    - position of the token in the source string
+	 * - length - length of the token
 	 * - data   - an array containing additional information about the token
 	 *
 	 * The following "data" information can be available depending on the type of the token.
@@ -45,6 +49,8 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 * - function       - the function string, e.g., "function(param1, param2)"
 	 * - functionName   - function name without parameters
 	 * - functionParams - array of function parameters
+	 * For self::TOKEN_TYPE_NUMBER tokens:
+	 * - suffix         - a time or byte suffix
 	 *
 	 * @var array
 	 */
@@ -64,14 +70,18 @@ class CTriggerExpressionParserResult extends CParserResult {
 	/**
 	 * Add a token to the result.
 	 *
-	 * @param string    $type   token type
-	 * @param string    $value  token string
-	 * @param array     $data   additional token information
+	 * @param string    $type       token type
+	 * @param string    $value      token string
+	 * @param string    $pos        position of the token in the source string
+	 * @param string    $length     length of the token
+	 * @param array     $data       additional token information
 	 */
-	public function addToken($type, $value, array $data = array()) {
+	public function addToken($type, $value, $pos, $length, array $data = array()) {
 		$this->tokens[] = array(
 			'type' => $type,
 			'value' => $value,
+			'pos' => $pos,
+			'length' => $length,
 			'data' => $data
 		);
 	}

@@ -43,16 +43,16 @@ class CSetParserTest extends PHPUnit_Framework_TestCase {
 			array('or', 0, 'or', 2),
 			array('or this', 0, 'or', 2),
 
-			array('prefix<', 6, '<', 7),
-			array('prefix<=', 6, '<', 7),
-			array('prefix>', 6, '>', 7),
-			array('prefix>=', 6, '>', 7),
-			array('prefix<>', 6, '<>', 8),
-			array('prefix<>=', 6, '<>', 8),
-			array('prefixand', 6, 'and', 9),
-			array('prefixand this', 6, 'and', 9),
-			array('prefixor', 6, 'or', 8),
-			array('prefixor this', 6, 'or', 8),
+			array('prefix<', 6, '<', 1),
+			array('prefix<=', 6, '<', 1),
+			array('prefix>', 6, '>', 1),
+			array('prefix>=', 6, '>', 1),
+			array('prefix<>', 6, '<>', 2),
+			array('prefix<>=', 6, '<>', 2),
+			array('prefixand', 6, 'and', 3),
+			array('prefixand this', 6, 'and', 3),
+			array('prefixor', 6, 'or', 2),
+			array('prefixor this', 6, 'or', 2),
 
 			array('><', 0, '>', 1),
 		);
@@ -64,15 +64,15 @@ class CSetParserTest extends PHPUnit_Framework_TestCase {
 	 * @param $string
 	 * @param $pos
 	 * @param $expectedMatch
-	 * @param $expectedEndPos
+	 * @param $expectedLength
 	 */
-	public function testParseValid($string, $pos, $expectedMatch, $expectedEndPos) {
+	public function testParseValid($string, $pos, $expectedMatch, $expectedLength) {
 		$result = $this->parser->parse($string, $pos);
 
 		$this->assertSame($expectedMatch, $result->match);
-		$this->assertSame($expectedEndPos, $result->endPos);
+		$this->assertSame($expectedLength, $result->length);
 		$this->assertSame($string, $result->source);
-		$this->assertSame($pos, $result->startPos);
+		$this->assertSame($pos, $result->pos);
 	}
 
 	public function invalidProvider() {

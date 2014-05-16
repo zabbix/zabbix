@@ -134,39 +134,41 @@ $resultTable->setHeader(array(_('Expression'), _('Result')));
 ksort($rplcts, SORT_NUMERIC);
 
 foreach ($eHTMLTree as $e) {
-	$result = array('result' => '-', 'error' => '');
+	$result = '-';
+	$style = 'text-align: center;';
 
 	if ($allowedTesting && $test && isset($e['expression'])) {
-		$result = evalExpressionData($e['expression']['value'], $macrosData);
+		if (evalExpressionData($e['expression']['value'], $macrosData)) {
+			$result = 'TRUE';
+			$style = 'background-color: #ccf; color: #00f;';
+		}
+		else {
+			$result = 'FALSE';
+			$style = 'background-color: #fcc; color: #f00;';
+		}
 	}
 
-	$style = 'text-align: center;';
-	if ($result['result'] != '-') {
-		$style = ($result['result'] == 'TRUE')
-			? 'background-color: #ccf; color: #00f;'
-			: 'background-color: #fcc; color: #f00;';
-	}
-
-	$col = new CCol(array($result['result'], SPACE, $result['error']));
+	$col = new CCol($result);
 	$col->setAttribute('style', $style);
 
 	$resultTable->addRow(new CRow(array($e['list'], $col)));
 }
 
-$result = array('result' => '-', 'error' => '');
+$result = '-';
+$style = 'text-align: center;';
 
 if ($allowedTesting && $test) {
-	$result = evalExpressionData($expression, $macrosData);
+	if (evalExpressionData($expression, $macrosData)) {
+		$result = 'TRUE';
+		$style = 'background-color: #ccf; color: #00f;';
+	}
+	else {
+		$result = 'FALSE';
+		$style = 'background-color: #fcc; color: #f00;';
+	}
 }
 
-$style = 'text-align: center;';
-if ($result['result'] != '-') {
-	$style = ($result['result'] == 'TRUE')
-		? 'background-color: #ccf; color: #00f;'
-		: 'background-color: #fcc; color: #f00;';
-}
-
-$col = new CCol(array($result['result'], SPACE, $result['error']));
+$col = new CCol($result);
 $col->setAttribute('style', $style);
 
 $resultTable->setFooter(array($outline, $col), $resultTable->headerClass);
