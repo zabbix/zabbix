@@ -448,7 +448,7 @@ sub get_rollweek_bounds
     my $till = int($t / 60) * 60 - ROLLWEEK_SHIFT_BACK;
 
     # mind the rollweek threshold setting
-    my $rollweek_seconds = __get_macro('{$RSM_ROLLWEEK_SECONDS}');
+    my $rollweek_seconds = __get_macro('{$RSM.ROLLWEEK.SECONDS}');
 
     my $from = $till - $rollweek_seconds;
 
