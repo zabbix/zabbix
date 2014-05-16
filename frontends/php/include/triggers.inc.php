@@ -2361,61 +2361,58 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Execute expression and return array with keys 'result' as 'TRUE' or 'FALSE' and 'error' as error text
- * if there is one.
+ * Substitute macros in the expression with the given values and evaluate it's result.
  *
- * @param string $expression
- * @param array  $rplcts
+ * @param string $expression                a trigger expression
+ * @param array  $replaceFunctionMacros     an array of macro - value pairs
  *
- * @return array
+ * @return bool     the calculated value of the expression
  */
-function evalExpressionData($expression, $rplcts) {
-	$result = false;
+function evalExpressionData($expression, $replaceFunctionMacros) {
+	// replace function macros with their values
+	$expression = str_replace(array_keys($replaceFunctionMacros), array_values($replaceFunctionMacros), $expression);
 
-	$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
-	preg_match_all('/[0-9\.]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?/', $evStr, $arr, PREG_OFFSET_CAPTURE);
+	$parser = new CTriggerExpression();
+	$parseResult = $parser->parse($expression);
 
-	for ($i = count($arr[0]) - 1; $i >= 0; $i--) {
-		$evStr = substr_replace($evStr, convert($arr[0][$i][0]), $arr[0][$i][1], strlen($arr[0][$i][0]));
+	// The $replaceFunctionMacros array may contain string values which after substitution
+	// will result in an invalid expression. In such cases we should just return false.
+	if (!$parseResult) {
+		return false;
 	}
 
-	if (!preg_match("/^[0-9.\s=#()><+*\/&E|\-]+$/is", $evStr)) {
-		return 'FALSE';
+	// turn the expression into valid PHP code
+	$evStr = '';
+	$replaceOperators = array('not' => '!', '=' => '==');
+	foreach ($parseResult->getTokens() as $token) {
+		$value = $token['value'];
+
+		switch ($token['type']) {
+			case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+				// replace specific operators with their PHP analogues
+				if (isset($replaceOperators[$token['value']])) {
+					$value = $replaceOperators[$token['value']];
+				}
+
+				break;
+			case CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER:
+				// convert numeric values with suffixes
+				if ($token['data']['suffix'] !== null) {
+					$value = convert($value);
+				}
+
+				$value = '((float) "'.$value.'")';
+
+				break;
+		}
+
+		$evStr .= ' '.$value;
 	}
-
-	$evStr = preg_replace('/(-?[0-9]*\.?[0-9]+) *(\=|\#|\!=|\<|\>) *(-?[0-9]*\.?[0-9]+)/', '((float) "$1" $2 (float) "$3")', $evStr);
-
-	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
-	$evStr = str_replace(array_keys($switch), array_values($switch), $evStr);
 
 	// execute expression
 	eval('$result = ('.trim($evStr).');');
 
-	$result = ($result === true || $result && $result != '-') ? 'TRUE' : 'FALSE';
-	$error = '';
-
-	// remove eval() generated error message
-	global $ZBX_MESSAGES;
-	if (!empty($ZBX_MESSAGES)) {
-		$messageList = array();
-
-		foreach ($ZBX_MESSAGES as $zbxMessage) {
-			if (strpos($zbxMessage['message'], 'eval()') !== false) {
-				$error = substr($zbxMessage['message'], 0, strpos($zbxMessage['message'], '['));
-				$result = 'NULL';
-			}
-			else {
-				$messageList[] = $zbxMessage;
-			}
-		}
-
-		$ZBX_MESSAGES = $messageList;
-	}
-
-	return array(
-		'result' => $result,
-		'error' => $error
-	);
+	return $result;
 }
 
 /**

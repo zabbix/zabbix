@@ -42,12 +42,12 @@ class CParserResult {
 	 *
 	 * @var
 	 */
-	public $startPos;
+	public $pos;
 
 	/**
-	 * Position of the next character after the matched string in the source string.
+	 * Length of the matched string in bytes.
 	 *
 	 * @var string
 	 */
-	public $endPos;
+	public $length;
 }

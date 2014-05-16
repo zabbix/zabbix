@@ -3245,78 +3245,124 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testTokens() {
-		$exp = '(-1 + {host:item.last(0)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD})';
+		$exp = '(-12 + {host:item.str(ГУГЛ)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD} or 10m)';
 		$tokens = array(
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
 				'value' => '(',
 				'data' => array(),
+				'pos' => 0,
+				'length' => 1
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => '-',
 				'data' => array(),
+				'pos' => 1,
+				'length' => 1
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
-				'value' => '1',
+				'value' => '12',
 				'data' => array(),
+				'pos' => 2,
+				'length' => 2,
+				'data' => array(
+					'suffix' => null
+				)
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => '+',
 				'data' => array(),
+				'pos' => 5,
+				'length' => 1
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
-				'value' => '{host:item.last(0)}',
+				'value' => '{host:item.str(ГУГЛ)}',
+				'pos' => 7,
+				'length' => 25,
 				'data' => array(
 					'host' => 'host',
 					'item' => 'item',
-					'function' => 'last(0)',
-					'functionName' => 'last',
-					'functionParams' => array('0')
+					'function' => 'str(ГУГЛ)',
+					'functionName' => 'str',
+					'functionParams' => array('ГУГЛ')
 				),
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'or',
 				'data' => array(),
+				'pos' => 33,
+				'length' => 2
 			),
 			array(
-				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO,
 				'value' => '{$USERMACRO}',
 				'data' => array(),
+				'pos' => 36,
+				'length' => 12
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'and',
 				'data' => array(),
+				'pos' => 49,
+				'length' => 3
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'not',
 				'data' => array(),
+				'pos' => 53,
+				'length' => 3
 			),
 			array(
-				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_MACRO,
 				'value' => '{TRIGGER.VALUE}',
 				'data' => array(),
+				'pos' => 57,
+				'length' => 15
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'or',
 				'data' => array(),
+				'pos' => 73,
+				'length' => 2
 			),
 			array(
-				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_EXPRESSION,
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
 				'value' => '{#LLD}',
 				'data' => array(),
+				'pos' => 76,
+				'length' => 6
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'or',
+				'data' => array(),
+				'pos' => 83,
+				'length' => 2
+			),
+			array(
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
+				'value' => '10m',
+				'data' => array(),
+				'pos' => 86,
+				'length' => 3,
+				'data' => array(
+					'suffix' => 'm'
+				)
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
 				'value' => ')',
 				'data' => array(),
+				'pos' => 89,
+				'length' => 1
 			),
 		);
 
