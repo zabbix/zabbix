@@ -912,6 +912,7 @@ define('RSM_EPP',			3);
 
 // SLA monitoring macros
 define('RSM_PAGE_SLV',			'{$RSM.ROLLWEEK.THRESHOLDS}');
+define('RSM_ROLLWEEK_SECONDS',	'{$RSM.ROLLWEEK.SECONDS}');
 define('RSM_MIN_DNS_COUNT',		'{$RSM.DNS.AVAIL.MINNS}');
 define('RSM_DNS_UDP_DELAY',		'{$RSM.DNS.UDP.DELAY}');
 define('RSM_RDDS_DELAY',		'{$RSM.RDDS.DELAY}');

@@ -42,7 +42,7 @@ $filterStatus->addItem(1, _('fail'));
 $filterStatus->addItem(2, _('disabled'));
 
 $filterValue = new CComboBox('filter_slv', isset($this->data['filter_slv']) ? $this->data['filter_slv'] : null);
-$slvs = explode(',', $this->data['slv']['value']);
+$slvs = explode(',', $this->data['slv']);
 foreach ($slvs as $slv) {
 	$filterValue->addItem($slv, $slv.'%');
 }
@@ -105,7 +105,7 @@ $table->setHeader(array(
 ));
 
 if (isset($this->data['tld'])) {
-	$from = date('YmdHis', time() - SEC_PER_WEEK);
+	$from = date('YmdHis', time() - $this->data['rollWeekSeconds']);
 	$till = date('YmdHis', time());
 	foreach ($this->data['tld'] as $key => $tld) {
 
@@ -142,7 +142,7 @@ if (isset($this->data['tld'])) {
 			$dnsGraph = ($tld['dns']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
-					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dns']['itemid'],
+					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['dns']['itemid'],
 					'cell-value'
 				)
 				: null;
@@ -186,7 +186,7 @@ if (isset($this->data['tld'])) {
 			$dnssecGraph = ($tld['dnssec']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
-					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['dnssec']['itemid'],
+					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['dnssec']['itemid'],
 					'cell-value'
 				)
 				: null;
@@ -228,7 +228,7 @@ if (isset($this->data['tld'])) {
 			$rddsGraph = ($tld['rdds']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
-					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['rdds']['itemid'],
+					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['rdds']['itemid'],
 					'cell-value'
 				)
 				: null;
@@ -270,7 +270,7 @@ if (isset($this->data['tld'])) {
 			$eppGraph = ($tld['epp']['lastvalue'] > 0)
 				? new CLink(
 					'graph',
-					'history.php?action=showgraph&period='.SEC_PER_WEEK.'&itemid='.$tld['epp']['itemid'],
+					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['epp']['itemid'],
 					'cell-value'
 				)
 				: null;

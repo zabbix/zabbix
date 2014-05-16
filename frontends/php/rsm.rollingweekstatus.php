@@ -100,19 +100,26 @@ $macro = API::UserMacro()->get(array(
 	'globalmacro' => true,
 	'output' => API_OUTPUT_EXTEND,
 	'filter' => array(
-		'macro' => RSM_PAGE_SLV
+		'macro' => array(RSM_PAGE_SLV, RSM_ROLLWEEK_SECONDS)
 	)
 ));
 
-$data['slv'] = reset($macro);
+foreach ($macro as $macros) {
+	if ($macros['macro'] === RSM_PAGE_SLV) {
+		$data['slv'] = $macros['value'];
+	}
+	else {
+		$data['rollWeekSeconds'] = $macros['value'];
+	}
+}
 
-if (!$macro) {
-	show_error_message(_s('Macros "%1$s" not exit.', RSM_PAGE_SLV));
+if (!isset($data['slv'])) {
+	show_error_message(_s('Macro "%1$s" doesn\'t not exist.', RSM_ROLLWEEK_SECONDS));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
-elseif (!isset($data['slv']['value']) || !$data['slv']['value']) {
-	show_error_message(_s('Macros "%1$s" is empty.', RSM_PAGE_SLV));
+if (!isset($data['rollWeekSeconds'])) {
+	show_error_message(_s('Macro "%1$s" doesn\'t not exist.', RSM_ROLLWEEK_SECONDS));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
@@ -132,7 +139,7 @@ if ($data['filter_slv'] > 0
 		&& ($data['filter_dns'] || $data['filter_dnssec'] || $data['filter_rdds']
 			|| $data['filter_epp'])) {
 
-	$slvValues = explode(',', $data['slv']['value']);
+	$slvValues = explode(',', $data['slv']);
 	if (!in_array($data['filter_slv'], $slvValues)) {
 		show_error_message(_('Not allowed value for "Exceeding or equal to" field'));
 	}

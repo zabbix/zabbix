@@ -111,6 +111,22 @@ if (isset($_REQUEST['mark_incident']) && CWebUser::getType() >= USER_TYPE_ZABBIX
 $host = get_request('host');
 $data = array();
 
+$macro = API::UserMacro()->get(array(
+	'globalmacro' => true,
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array(
+		'macro' => RSM_ROLLWEEK_SECONDS
+	)
+));
+
+if (!$macro) {
+	show_error_message(_s('Macro "%1$s" doesn\'t not exist.', RSM_ROLLWEEK_SECONDS));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
+$rollWeekSeconds = reset($macro);
+
 /*
  * Filter
  */
@@ -123,7 +139,7 @@ else {
 }
 
 if (get_request('filter_rolling_week')) {
-	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
+	$data['filter_from'] = date('YmdHis', time() - $rollWeekSeconds['value']);
 	$data['filter_to'] = date('YmdHis', time());
 	CProfile::update('web.rsm.incidents.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
 	CProfile::update('web.rsm.incidents.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
@@ -131,10 +147,10 @@ if (get_request('filter_rolling_week')) {
 else {
 	if (get_request('filter_set')) {
 		if (get_request('filter_from') == get_request('original_from')) {
-			$data['filter_from'] = date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK));
+			$data['filter_from'] = date('YmdHis', get_request('filter_from', time() - $rollWeekSeconds['value']));
 		}
 		else {
-			$data['filter_from'] = get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+			$data['filter_from'] = get_request('filter_from', date('YmdHis', time() - $rollWeekSeconds['value']));
 		}
 		if (get_request('filter_to') == get_request('original_to')) {
 			$data['filter_to'] = date('YmdHis', get_request('filter_to', time()));
@@ -148,7 +164,7 @@ else {
 	else {
 		$data['filter_from'] = CProfile::get(
 			'web.rsm.incidents.filter_from',
-			date('YmdHis', time() - SEC_PER_WEEK)
+			date('YmdHis', time() - $rollWeekSeconds['value'])
 		);
 		$data['filter_to'] = CProfile::get('web.rsm.incidents.filter_to', date('YmdHis', time()));
 	}
@@ -833,7 +849,7 @@ if ($host || $data['filter_search']) {
 				));
 
 				// set rolling week time
-				$weekTimeFrom = time() - SEC_PER_WEEK;
+				$weekTimeFrom = time() - $rollWeekSeconds['value'];
 				$weekTimeTill = time();
 
 				// get SLA items
@@ -923,7 +939,9 @@ if ($host || $data['filter_search']) {
 							}
 
 							// get failed tests count
-							$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom, $getFailedTill);
+							$failedTests = getFailedRollingWeekTestsCount($service['itemId'], $getFailedFrom,
+								$getFailedTill
+							);
 
 							// get percent
 

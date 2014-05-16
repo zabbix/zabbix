@@ -62,6 +62,22 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 
 $data['tests'] = array();
 
+$macro = API::UserMacro()->get(array(
+	'globalmacro' => true,
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array(
+		'macro' => RSM_ROLLWEEK_SECONDS
+	)
+));
+
+if (!$macro) {
+	show_error_message(_s('Macro "%1$s" doesn\'t not exist.', RSM_ROLLWEEK_SECONDS));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
+$rollWeekSeconds = reset($macro);
+
 /*
  * Filter
  */
@@ -71,8 +87,8 @@ if (get_request('filter_set')) {
 	$data['slvItemId'] = get_request('slvItemId');
 
 	$data['filter_from'] = (get_request('filter_from') == get_request('original_from'))
-		? date('YmdHis', get_request('filter_from', time() - SEC_PER_WEEK))
-		: get_request('filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+		? date('YmdHis', get_request('filter_from', time() - $rollWeekSeconds['value']))
+		: get_request('filter_from', date('YmdHis', time() - $rollWeekSeconds['value']));
 
 	$data['filter_to'] = (get_request('filter_to') == get_request('original_to'))
 		? date('YmdHis', get_request('filter_to', time()))
@@ -90,7 +106,7 @@ elseif (get_request('filter_rolling_week')) {
 	$data['slvItemId'] = CProfile::get('web.rsm.tests.slvItemId');
 
 	// set new filter from and filter to
-	$data['filter_from'] = date('YmdHis', time() - SEC_PER_WEEK);
+	$data['filter_from'] = date('YmdHis', time() - $rollWeekSeconds['value']);
 	$data['filter_to'] = date('YmdHis', time());
 
 	CProfile::update('web.rsm.tests.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
@@ -100,7 +116,9 @@ else {
 	$data['host'] = CProfile::get('web.rsm.tests.host');
 	$data['type'] = CProfile::get('web.rsm.tests.type');
 	$data['slvItemId'] = CProfile::get('web.rsm.tests.slvItemId');
-	$data['filter_from'] = CProfile::get('web.rsm.tests.filter_from', date('YmdHis', time() - SEC_PER_WEEK));
+	$data['filter_from'] = CProfile::get('web.rsm.tests.filter_from',
+		date('YmdHis', time() - $rollWeekSeconds['value'])
+	);
 	$data['filter_to'] = CProfile::get('web.rsm.tests.filter_to', date('YmdHis', time()));
 }
 
