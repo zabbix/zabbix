@@ -741,7 +741,8 @@ elseif ($srctbl == 'templates') {
 
 			$data[$template['templateid']] = array(
 				'id' => $template['templateid'],
-				'name' => $template['name']
+				'name' => $template['name'],
+				'prefix' => get_node_name_by_elid($template['templateid'], null, NAME_DELIMITER)
 			);
 		}
 
@@ -817,7 +818,8 @@ elseif ($srctbl == 'hosts') {
 
 			$data[$host['hostid']] = array(
 				'id' => $host['hostid'],
-				'name' => $host['name']
+				'name' => $host['name'],
+				'prefix' => get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER)
 			);
 		}
 
@@ -894,7 +896,8 @@ elseif ($srctbl == 'host_templates') {
 
 			$data[$host['hostid']] = array(
 				'id' => $host['hostid'],
-				'name' => $host['name']
+				'name' => $host['name'],
+				'prefix' => get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER)
 			);
 		}
 
@@ -944,7 +947,7 @@ elseif ($srctbl == 'host_groups') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hostgroups as &$hostgroup) {
-		$name = new CSpan(get_node_name_by_elid($hostgroup['groupid'], null, NAME_DELIMITER).$hostgroup['name'], 'link');
+		$name = new CSpan($hostgroup['name'], 'link');
 		$name->attr('id', 'spanid'.$hostgroup['groupid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
@@ -966,7 +969,8 @@ elseif ($srctbl == 'host_groups') {
 
 			$data[$hostgroup['groupid']] = array(
 				'id' => $hostgroup['groupid'],
-				'name' => $hostgroup['name']
+				'name' => $hostgroup['name'],
+				'prefix' => get_node_name_by_elid($hostgroup['groupid'], null, NAME_DELIMITER)
 			);
 		}
 
@@ -1100,6 +1104,7 @@ elseif ($srctbl == 'triggers') {
 			$jsTriggers[$trigger['triggerid']] = array(
 				'id' => $trigger['triggerid'],
 				'name' => $trigger['description'],
+				'prefix' => get_node_name_by_elid($trigger['triggerid'], null, NAME_DELIMITER),
 				'triggerid' => $trigger['triggerid'],
 				'description' => $trigger['description'],
 				'expression' => $trigger['expression'],
@@ -1383,7 +1388,8 @@ elseif ($srctbl == 'applications') {
 
 		$data[$app['applicationid']] = array(
 			'id' => $app['applicationid'],
-			'name' => $app['name']
+			'name' => $app['name'],
+			'prefix' => get_node_name_by_elid($app['applicationid'], null, NAME_DELIMITER)
 		);
 
 		$table->addRow(array($multiselect ? $checkBox : null, $name));

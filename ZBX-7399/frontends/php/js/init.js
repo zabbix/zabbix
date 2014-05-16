@@ -95,7 +95,8 @@ jQuery(function($) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
 						'id': data.values[i].id,
-						'name': data.values[i].name
+						'name': data.values[i].name,
+						'prefix': data.values[i].prefix
 					};
 					jQuery('#' + data.parentId).multiSelect.addData(item, data.parentId);
 				}
