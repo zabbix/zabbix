@@ -128,6 +128,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Romanian, Russian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-8101] fixed exporting maps from Oracle database (Eduard, Ivo)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 ...G...PS. [ZBX-7729] added data alignment to prevent crash on non x86 processors; thanks to Pablo Ruiz for patch (Nikolaj)
 .......PS. [ZBX-8202] fixed queue calculation for unavailable hosts which are monitored through a proxy (Nikolaj)
