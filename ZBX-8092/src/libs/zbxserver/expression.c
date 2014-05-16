@@ -3775,7 +3775,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 				continue;
 			}
 
-
 			if (HOST_STATUS_MONITORED != items[i].host.status)
 			{
 				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"

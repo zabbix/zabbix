@@ -5793,7 +5793,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
 	int	i;
 
 	for (i = 0; i < queue->values_num; i++)
-		free(queue->values[i]);
+		zbx_free(queue->values[i]);
 }
 
 /******************************************************************************
