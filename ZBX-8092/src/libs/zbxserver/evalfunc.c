@@ -2209,22 +2209,6 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		goto out;
 	}
 
-	if (ITEM_STATUS_ACTIVE != item.status)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,
-				"cannot evaluate function \"%s:%s.%s(%s)\": item is disabled",
-				host, key, function, parameter);
-		goto out;
-	}
-
-	if (HOST_STATUS_MONITORED != item.host.status)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,
-				"cannot evaluate function \"%s:%s.%s(%s)\": item belongs to a disabled host",
-				host, key, function, parameter);
-		goto out;
-	}
-
 	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))

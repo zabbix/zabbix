@@ -1393,9 +1393,6 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
 		goto out;
 
-	if (ITEM_STATUS_ACTIVE != item.status)
-		goto out;
-
 	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value, &found) || 1 != found)
 		goto out;
 

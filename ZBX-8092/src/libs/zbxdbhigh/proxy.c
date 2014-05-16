@@ -1764,13 +1764,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1872,13 +1873,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1929,7 +1931,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(errcodes)) * data_num);
+	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
 	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);

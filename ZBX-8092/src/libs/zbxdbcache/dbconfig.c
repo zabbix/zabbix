@@ -969,9 +969,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->mtime = atoi(row[32]);
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
-
 			item->location = ZBX_LOC_NOWHERE;
-			item->poller_type = ZBX_NO_POLLER;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -998,18 +996,19 @@ static void	DCsync_items(DB_RESULT result)
 		}
 
 		old_poller_type = item->poller_type;
-		item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
-
-		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
-				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
-				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
-				ZBX_POLLER_TYPE_JAVA == item->poller_type))
-		{
-			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-		}
 
 		if (ITEM_STATUS_ACTIVE == item->status)
 		{
+			item->poller_type = poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags);
+
+			if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
+					(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
+					ZBX_POLLER_TYPE_IPMI == item->poller_type ||
+					ZBX_POLLER_TYPE_JAVA == item->poller_type))
+			{
+				item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+			}
+
 			if (0 == found)
 			{
 				old_nextcheck = 0;
@@ -1036,6 +1035,8 @@ static void	DCsync_items(DB_RESULT result)
 				}
 			}
 		}
+		else
+			item->poller_type = ZBX_NO_POLLER;
 
 		item->delay = delay;
 
@@ -1120,31 +1121,28 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* items with flexible intervals */
 
-		if (ITEM_STATUS_ACTIVE == item->status)
+		if ('\0' != *row[16])
 		{
-			if ('\0' != *row[16])
-			{
-				flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
+			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
-				if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
-						ITEM_STATE_NOTSUPPORTED != item->state)
-				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-							item->delay, flexitem->delay_flex, now);
-				}
+			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
+					ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
+			{
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+						item->delay, flexitem->delay_flex, now);
 			}
-			else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+		}
+		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+		{
+			/* remove delay_flex parameter for non-flexible item and update nextcheck */
+
+			zbx_strpool_release(flexitem->delay_flex);
+			zbx_hashset_remove(&config->flexitems, &itemid);
+
+			if (ITEM_STATUS_ACTIVE == item->status && ITEM_STATE_NOTSUPPORTED != item->state)
 			{
-				/* remove delay_flex parameter for non-flexible item and update nextcheck */
-
-				zbx_strpool_release(flexitem->delay_flex);
-				zbx_hashset_remove(&config->flexitems, &itemid);
-
-				if (ITEM_STATE_NOTSUPPORTED != item->state)
-				{
-					item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
-							item->delay, NULL, now);
-				}
+				item->nextcheck = calculate_item_nextcheck(get_item_nextcheck_seed(item), item->type,
+						item->delay, NULL, now);
 			}
 		}
 
@@ -1256,7 +1254,7 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else if (NULL != (simpleitem = zbx_hashset_search(&config->simpleitems, &itemid)))
 		{
-			/* remove Simple item parameters */
+			/* remove simple item parameters */
 
 			zbx_strpool_release(simpleitem->username);
 			zbx_strpool_release(simpleitem->password);
@@ -1317,11 +1315,10 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->calcitems, &itemid);
 		}
 
-		if (ITEM_STATUS_ACTIVE == item->status)
-			DCupdate_item_queue(item, old_poller_type, old_nextcheck);
+		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
-	/* remove deleted or disabled items from buffer */
+	/* remove deleted items from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2732,11 +2729,9 @@ void	DCsync_configuration(void)
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
-				" and i.status in (%d,%d)"
 				" and i.flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("i.itemid"))))
 	{
@@ -4025,7 +4020,7 @@ void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const 
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)) && ITEM_STATUS_ACTIVE == dc_item->status)
+	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)))
 	{
 		dc_item->db_state = state;
 		DCstrpool_replace(1, &dc_item->db_error, error);
@@ -4139,11 +4134,8 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 
 	for (i = 0; i < itemids_num; i++)
 	{
-		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers ||
-				ITEM_STATUS_ACTIVE != dc_item->status)
-		{
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
 			continue;
-		}
 
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 		{
@@ -4211,11 +4203,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 	for (i = 0; i < itemids_num; i++)
 	{
-		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers ||
-				ITEM_STATUS_ACTIVE != dc_item->status)
-		{
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
 			continue;
-		}
 
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 		{
@@ -4330,34 +4319,34 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 		for (p = dc_trigger->expression; '\0' != *p; p++)
 		{
-			if ('{' == *p)
+			if ('{' != *p)
+				continue;
+
+			for (q = p + 1; '}' != *q && '\0' != *q; q++)
 			{
-				for (q = p + 1; '}' != *q && '\0' != *q; q++)
-				{
-					if ('0' > *q || '9' < *q)
-						break;
-				}
-
-				if ('}' == *q)
-				{
-					sscanf(p + 1, ZBX_FS_UI64, &functionid);
-
-					if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
-							SUCCEED == is_time_function(dc_function->function) &&
-							NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
-							NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
-							ITEM_STATUS_ACTIVE == dc_item->status &&
-							HOST_STATUS_MONITORED == dc_host->status &&
-							!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-							MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
-					{
-						found = 1;
-						break;
-					}
-
-					p = q;
-				}
+				if ('0' > *q || '9' < *q)
+					break;
 			}
+
+			if ('}' != *q)
+				continue;
+
+			sscanf(p + 1, ZBX_FS_UI64, &functionid);
+
+			if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
+					SUCCEED == is_time_function(dc_function->function) &&
+					NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
+					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
+					ITEM_STATUS_ACTIVE == dc_item->status &&
+					HOST_STATUS_MONITORED == dc_host->status &&
+					!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
+			{
+				found = 1;
+				break;
+			}
+
+			p = q;
 		}
 
 		if (1 == found)
@@ -4621,9 +4610,6 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		dc_item->location = ZBX_LOC_NOWHERE;
 
 		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
