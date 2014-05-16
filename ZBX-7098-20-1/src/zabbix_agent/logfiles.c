@@ -1083,9 +1083,10 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
 
 /******************************************************************************
  *                                                                            *
- * Function: pick_logfiles                                                    *
+ * Function: pick_logfile                                                     *
  *                                                                            *
- * Purpose: a helper function for make_logfile_list()                         *
+ * Purpose: checks if the specified file meets requirements and adds it to    *
+ *          the logfile list                                                  *
  *                                                                            *
  * Parameters:                                                                *
  *     directory      - [IN] directory where the logfiles reside              *
@@ -1099,8 +1100,10 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *                                                                            *
+ * Comments: This is a helper function for make_logfile_list()                *
+ *                                                                            *
  ******************************************************************************/
-static void	pick_logfiles(const char *directory, const char *filename, int mtime, const regex_t *re,
+static void	pick_logfile(const char *directory, const char *filename, int mtime, const regex_t *re,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	char		*logfile_candidate = NULL;
@@ -1220,7 +1223,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 		do
 		{
-			pick_logfiles(directory, find_data.name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
+			pick_logfile(directory, find_data.name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
 		}
 		while (0 == _findnext(find_handle, &find_data));
 
@@ -1238,7 +1241,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 
 		while (NULL != (d_ent = readdir(dir)))
 		{
-			pick_logfiles(directory, d_ent->d_name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
+			pick_logfile(directory, d_ent->d_name, *mtime, &re, logfiles, logfiles_alloc, logfiles_num);
 		}
 
 		if (-1 == closedir(dir))
@@ -1375,7 +1378,7 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 		goto out;
 	}
 
-	start_idx = (1 == *skip_old_data) ? logfiles_num - 1 : 0;
+	start_idx = (1 == *skip_old_data ? logfiles_num - 1 : 0);
 
 	/* mark files to be skipped as processed (in case of 'skip_old_data' was set) */
 	for (i = 0; i < start_idx; i++)
