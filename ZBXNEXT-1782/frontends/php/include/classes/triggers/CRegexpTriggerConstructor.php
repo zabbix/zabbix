@@ -108,7 +108,7 @@ class CRegexpTriggerConstructor {
 			// split an expression into separate tokens
 			// start from the first part of the expression, then move to the next one
 			while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-				$arr[6] = zbx_strtolower($arr[6]);
+				$arr[6] = strtolower($arr[6]);
 				if (!isset($functions[$arr[6]])) {
 					error(_('Incorrect function is used').'. ['.$expression['value'].']');
 					return false;
