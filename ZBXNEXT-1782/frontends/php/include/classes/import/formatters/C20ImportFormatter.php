@@ -24,6 +24,20 @@
  */
 class C20ImportFormatter extends CImportFormatter {
 
+	/**
+	 * Converter for trigger expressions.
+	 *
+	 * @var C24TriggerExpressionConverter
+	 */
+	protected $triggerExpressionConverter;
+
+	/**
+	 * @param C24TriggerExpressionConverter $triggerExpressionConverter
+	 */
+	public function __construct(C24TriggerExpressionConverter $triggerExpressionConverter) {
+		$this->triggerExpressionConverter = $triggerExpressionConverter;
+	}
+
 	public function getGroups() {
 		if (!isset($this->data['groups'])) {
 			return array();
@@ -228,6 +242,8 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['triggers'] as $trigger) {
 				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
 
+				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
+
 				$triggersData[] = $this->renameTriggerFields($trigger);
 			}
 		}
@@ -352,6 +368,8 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($discoveryRule['trigger_prototypes'])) {
 			foreach ($discoveryRule['trigger_prototypes'] as &$trigger) {
+				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
+
 				$trigger = $this->renameTriggerFields($trigger);
 			}
 			unset($trigger);
