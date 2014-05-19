@@ -50,6 +50,9 @@ extern int	CONFIG_HTTPPOLLER_FORKS;
 
 #ifdef HAVE_LIBCURL
 
+#define ZBX_RETRIEVE_MODE_CONTENT	0
+#define ZBX_RETRIEVE_MODE_HEADERS	1
+
 static zbx_httppage_t	page;
 
 static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
@@ -353,7 +356,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects,"
-				"headers"
+				"retrieve_mode,headers"
 			" from httpstep"
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
@@ -411,7 +414,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		httpstep.variables = row[8];
 		httpstep.follow_redirects = atoi(row[9]);
 
-		httpstep.headers = zbx_strdup(NULL, row[10]);
+		httpstep.retrieve_mode = atoi(row[10]);
+
+		httpstep.headers = zbx_strdup(NULL, row[11]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL,
 				&httpstep.headers, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
@@ -419,7 +424,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		http_substitute_variables(httptest, &httpstep.url);
 		http_substitute_variables(httptest, &httpstep.posts);
-		http_substitute_variables(httptest, &httpstep.headers);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, httpstep.name);
 
@@ -449,14 +453,23 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 		}
 
+		http_substitute_variables(httptest, &httpstep.headers);
+
 		/* collect headers defined in a scenario */
 		zbx_add_headers(httptest->httptest.headers, &headers_slist);
 
 		/* collect headers defined in a step */
 		zbx_add_headers(httpstep.headers, &headers_slist);
 
-		if (NULL != headers_slist && CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
-				headers_slist)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		/* enable/disable fetching the body */
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
+				(ZBX_RETRIEVE_MODE_HEADERS == httpstep.retrieve_mode) ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -518,8 +531,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
-			char	*var_err_str = NULL;
-
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
@@ -548,38 +559,43 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				speed_download_num++;
 			}
 
-			/* required pattern */
-			if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
-					httpstep.required, NULL))
+			if (ZBX_RETRIEVE_MODE_CONTENT == httpstep.retrieve_mode)
 			{
-				err_str = zbx_strdup(err_str, "required pattern not found");
+				char	*var_err_str = NULL;
+
+				/* required pattern */
+				if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
+						httpstep.required, NULL))
+				{
+					err_str = zbx_strdup(err_str, "required pattern not found");
+				}
+
+				/* variables defined in scenario */
+				if (NULL == err_str && FAIL == http_process_variables(httptest,
+						httptest->httptest.variables, page.data, &var_err_str))
+				{
+					char	*variables;
+
+					variables = string_replace(httptest->httptest.variables, "\r\n", " ");
+					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
+							variables, var_err_str);
+					zbx_free(variables);
+				}
+
+				/* variables defined in a step */
+				if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables,
+						page.data, &var_err_str))
+				{
+					char	*variables;
+
+					variables = string_replace(httpstep.variables, "\r\n", " ");
+					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
+							variables, var_err_str);
+					zbx_free(variables);
+				}
+
+				zbx_free(var_err_str);
 			}
-
-			/* variables defined in scenario */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, httptest->httptest.variables,
-					page.data, &var_err_str))
-			{
-				char	*variables;
-
-				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
-				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
-						variables, var_err_str);
-				zbx_free(variables);
-			}
-
-			/* variables defined in a step */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables, page.data,
-					&var_err_str))
-			{
-				char	*variables;
-
-				variables = string_replace(httpstep.variables, "\r\n", " ");
-				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
-						variables, var_err_str);
-				zbx_free(variables);
-			}
-
-			zbx_free(var_err_str);
 		}
 		else
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
@@ -661,7 +677,7 @@ clean:
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: number of processed httptests                                *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
