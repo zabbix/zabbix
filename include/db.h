@@ -388,6 +388,7 @@ typedef struct
 	int		timeout;
 	char		*variables;
 	int		follow_redirects;
+	int		retrieve_mode;
 	char		*headers;
 }
 DB_HTTPSTEP;
