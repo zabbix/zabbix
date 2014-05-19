@@ -54,6 +54,8 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 		return SYSINFO_RET_FAIL;
 	}
 
+	memset(result, 0, sizeof(net_stat_t));
+
 	while (NULL != fgets(line, sizeof(line), f))
 	{
 		if (NULL == (p = strstr(line, ":")))
@@ -91,8 +93,6 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 		*error = zbx_strdup(NULL, "Cannot find information for this network interface in /proc/net/dev.");
 		return SYSINFO_RET_FAIL;
 	}
-
-	memset(result, 0, sizeof(net_stat_t));
 
 	return SYSINFO_RET_OK;
 }
