@@ -19,14 +19,15 @@ class CServicesSlaCalculator {
 	 * - dt;
 	 * - ut.
 	 *
-	 * @param array $service
-	 * @param integer $periodStart
-	 * @param integer $periodEnd
-	 * @param mixed $prevAlarm        the value of the last service alarm
+	 * @param array $serviceAlarms
+	 * @param array $serviceTimes
+	 * @param int   $periodStart
+	 * @param int   $periodEnd
+	 * @param int   $startValue        the value of the last service alarm
 	 *
 	 * @return array
 	 */
-	public function calculateSla(array $service, $periodStart, $periodEnd, $prevAlarm) {
+	public function calculateSla(array $serviceAlarms, array $serviceTimes, $periodStart, $periodEnd, $startValue) {
 		/**
 		 * structure of "$data":
 		 * - key	- time stamp
@@ -36,7 +37,7 @@ class CServicesSlaCalculator {
 		 * - ut_s	- count of uptime starts
 		 * - ut_e	- count of uptime ends
 		 */
-		foreach ($service['alarms'] as $alarm) {
+		foreach ($serviceAlarms as $alarm) {
 			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
 				$data[$alarm['clock']]['alarm'] = $alarm['value'];
 			}
@@ -44,7 +45,7 @@ class CServicesSlaCalculator {
 
 		$unmarkedPeriodType = 'ut';
 
-		foreach ($service['times'] as $time) {
+		foreach ($serviceTimes as $time) {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'ut');
 
@@ -123,7 +124,7 @@ class CServicesSlaCalculator {
 			}
 
 			// state=0,1 [OK] (1 - information severity of trigger), >1 [PROBLEMS] (trigger severity)
-			if ($prevAlarm > 1) {
+			if ($startValue > 1) {
 				$slaTime[$periodType]['problemTime'] += $ts - $prevTime;
 			}
 			else {
@@ -143,7 +144,7 @@ class CServicesSlaCalculator {
 				$dtCnt -= $val['dt_e'];
 			}
 			if (isset($val['alarm'])) {
-				$prevAlarm = $val['alarm'];
+				$startValue = $val['alarm'];
 			}
 
 			$prevTime = $ts;
@@ -167,19 +168,17 @@ class CServicesSlaCalculator {
 	}
 
 	/**
-	 * @see calculateSla()
+	 * Adds information about a weekly scheduled uptime or downtime to the $data array.
 	 *
-	 * @param $data
-	 * @param $period_start
-	 * @param $period_end
-	 * @param $ts_from
-	 * @param $ts_to
-	 * @param $type
-	 *
-	 * @return void
+	 * @param array $data
+	 * @param int   $period_start     start of the SLA calculation period
+	 * @param int   $period_end       end of the SLA calculation period
+	 * @param int   $ts_from          start of the scheduled uptime or downtime
+	 * @param int   $ts_to            end of the scheduled uptime or downtime
+	 * @param int   $type             SERVICE_TIME_TYPE_UPTIME or SERVICE_TIME_TYPE_DOWNTIME
 	 */
-	function expandPeriodicalTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
-		$weekStartDate = new \DateTime();
+	protected function expandPeriodicalTimes(array &$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
+		$weekStartDate = new DateTime();
 		$weekStartDate->setTimestamp($period_start);
 
 		$days = $weekStartDate->format('w');
@@ -231,13 +230,13 @@ class CServicesSlaCalculator {
 
 	/**
 	 * Return seconds in next week relative to given week start timestamp.
+	 *
 	 * @param int $currentWeekStartTimestamp
 	 *
 	 * @return int
 	 */
 	protected function secondsPerNextWeek($currentWeekStartTimestamp) {
-
-		$currentWeekStartDate = new \DateTime();
+		$currentWeekStartDate = new DateTime();
 		$currentWeekStartDate->setTimestamp($currentWeekStartTimestamp);
 
 		$currentWeekStartDate->modify('+7 day');
