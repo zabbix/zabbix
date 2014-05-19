@@ -22,7 +22,7 @@
 class CMacrosResolverGeneral {
 
 	const PATTERN_HOST = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)}';
-	const PATTERN_HOST_ID = '{(HOST.ID)}';
+	const PATTERN_HOST_ID = '{(HOST\.ID)}';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_HOST_INTERNAL = 'HOST\.HOST|HOSTNAME';
 	const PATTERN_MACRO_PARAM = '[1-9]?';
