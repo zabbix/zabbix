@@ -449,9 +449,9 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *                         1 - use up to 64-bit inodes in comparison,         *
  *                         2 - use 128-bit inodes in comparison.              *
  *                                                                            *
- * Return value: 0 - it is not the same file,                                 *
- *               1 - it could be the same file,                               *
- *               2 - error.                                                   *
+ * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
+ *               ZBX_SAME_FILE_YES - it could be the same file,               *
+ *               ZBX_SAME_FILE_ERROR - error.                                 *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -460,50 +460,52 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  ******************************************************************************/
 static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
 {
+	int	ret = ZBX_SAME_FILE_NO;
+
 	if (1 == use_ino || 2 == use_ino)
 	{
 		if (old->ino_lo != new->ino_lo || old->dev != new->dev)
 		{
 			/* File's inode and device id cannot differ. */
-			goto not_same;
+			goto out;
 		}
 	}
 
 	if (2 == use_ino && old->ino_hi != new->ino_hi)
 	{
 		/* File's inode (older 64-bits) cannot differ. */
-		goto not_same;
+		goto out;
 	}
 
 	if (old->mtime > new->mtime)
 	{
 		/* File's mtime cannot decrease unless manipulated. */
-		goto not_same;
+		goto out;
 	}
 
 	if (old->size > new->size)
 	{
 		/* File's size cannot decrease. Truncating or replacing a file with a smaller one */
 		/* counts as 2 different files. */
-		goto not_same;
+		goto out;
 	}
 
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
 		/* File's mtime cannot increase without changing size unless manipulated. */
-		goto not_same;
+		goto out;
 	}
 
 	if (-1 == old->md5size || -1 == new->md5size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
-		goto not_same;
+		goto out;
 	}
 
 	if (old->md5size > new->md5size)
 	{
 		/* File's initial block size from which MD5 sum is calculated cannot decrease. */
-		goto not_same;
+		goto out;
 	}
 
 	if (old->md5size == new->md5size)
@@ -511,7 +513,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 		if (0 != memcmp(old->md5buf, new->md5buf, sizeof(new->md5buf)))
 		{
 			/* MD5 sums differ */
-			goto not_same;
+			goto out;
 		}
 	}
 	else
@@ -520,14 +522,15 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 		{
 			/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
-			int		f, ret;
+			int		f;
 			md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
 
 			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", new->filename,
 						zbx_strerror(errno));
-				return ZBX_SAME_FILE_ERROR;
+				ret = ZBX_SAME_FILE_ERROR;
+				goto out;
 			}
 
 			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename))
@@ -545,13 +548,13 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 				ret = ZBX_SAME_FILE_ERROR;
 			}
 
-			return ret;
+			goto out;
 		}
 	}
 
-	return ZBX_SAME_FILE_YES;
-not_same:
-	return ZBX_SAME_FILE_NO;
+	ret = ZBX_SAME_FILE_YES;
+out:
+	return ret;
 }
 
 /******************************************************************************
