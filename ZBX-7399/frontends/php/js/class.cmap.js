@@ -488,15 +488,25 @@ ZABBIX.apps.map = (function($) {
 					var obj = $(this);
 
 					// clean element id and name
+					$('.select-popup-map-element').remove();
+
 					switch (obj.val()) {
 						// host
 						case '0':
 							$('#elementNameHost').multiSelectHelper({
+								id: 'elementNameHost',
 								objectName: 'hosts',
 								name: 'elementValue',
 								selectedLimit: 1,
 								objectOptions: {
 									editable: true
+								},
+								popup: {
+									parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
+										'&srcfld1=hostid&writeonly=1',
+									width: 450,
+									height: 450,
+									buttonClass: 'input link_menu select-popup-map-element'
 								}
 							});
 							break;
@@ -504,11 +514,19 @@ ZABBIX.apps.map = (function($) {
 						// host group
 						case '3':
 							$('#elementNameHostGroup').multiSelectHelper({
+								id: 'elementNameHostGroup',
 								objectName: 'hostGroup',
 								name: 'elementValue',
 								selectedLimit: 1,
 								objectOptions: {
 									editable: true
+								},
+								popup: {
+									parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
+										'&srcfld1=groupid&writeonly=1',
+									width: 450,
+									height: 450,
+									buttonClass: 'input link_menu select-popup-map-element'
 								}
 							});
 							break;
@@ -1332,12 +1350,20 @@ ZABBIX.apps.map = (function($) {
 					// host
 					case '0':
 						$('#elementNameHost').multiSelectHelper({
+							id: 'elementNameHost',
 							objectName: 'hosts',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
 							selectedLimit: 1,
 							objectOptions: {
 								editable: true
+							},
+							popup: {
+								parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
+									'&srcfld1=hostid&writeonly=1',
+								width: 450,
+								height: 450,
+								buttonClass: 'input link_menu select-popup-map-element'
 							}
 						});
 						break;
@@ -1345,12 +1371,20 @@ ZABBIX.apps.map = (function($) {
 					// host group
 					case '3':
 						$('#elementNameHostGroup').multiSelectHelper({
+							id: 'elementNameHostGroup',
 							objectName: 'hostGroup',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
 							selectedLimit: 1,
 							objectOptions: {
 								editable: true
+							},
+							popup: {
+								parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
+									'&srcfld1=groupid&writeonly=1',
+								width: 450,
+								height: 450,
+								buttonClass: 'input link_menu select-popup-map-element'
 							}
 						});
 						break;

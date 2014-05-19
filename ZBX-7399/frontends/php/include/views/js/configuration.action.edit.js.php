@@ -397,20 +397,35 @@
 
 		// multiselect
 		if (opCmdTarget != 'current') {
-			jQuery('#opCmdTargetObject').remove();
+			jQuery('#multiselectWrapper').remove();
+
+			var opCmdTargetWrapper = jQuery('<div>', {
+				id: 'multiselectWrapper',
+				'class': 'multiselect-wrapper'
+			});
 
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
 				'class': 'multiselect'
 			});
 
-			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);
+			jQuery('#opCmdTargetSelect').append(opCmdTargetWrapper.append(opCmdTargetObject));
+
+			var srctbl = (opCmdTarget == 'host') ? 'hosts' : 'host_groups',
+				srcfld1 = (opCmdTarget == 'host') ? 'hostid' : 'groupid';
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
+				id: 'opCmdTargetObject',
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {
 					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=' + srctbl + '&dstfrm=action.edit&dstfld1=opCmdTargetObject&srcfld1=' +
+						srcfld1 + '&writeonly=1&multiselect=1',
+					width: 450,
+					height: 450
 				}
 			});
 		}

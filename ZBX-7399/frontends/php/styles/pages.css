@@ -154,6 +154,7 @@
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
+#selementForm .multiselect .selected ul { margin: 0;}
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {
@@ -256,3 +257,5 @@ div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px
 div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
 div.setup_wizard .requirements .notice { color: #EE6000; border-color: #EE6000; }
 div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }
+
+.action-edit .formlist .formrow .formElementTable .multiselect-wrapper { overflow: auto; }

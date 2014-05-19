@@ -90,16 +90,16 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div style="position: absolute;">
-						<div id="elementNameHostGroup" class="multiselect" style="top: -20px; width: 312px;"></div>
+					<div style="position: absolute;" class="multiselect-wrapper">
+						<div id="elementNameHostGroup" class="multiselect" style="top: -10px; width: 312px;"></div>
 					</div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<div style="position: absolute;">
-						<div id="elementNameHost" class="multiselect" style="top: -20px; width: 312px;"></div>
+					<div style="position: absolute;" class="multiselect-wrapper">
+						<div id="elementNameHost" class="multiselect" style="top: -10px; width: 312px;"></div>
 					</div>
 				</td>
 			</tr>
