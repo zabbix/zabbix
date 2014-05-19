@@ -438,6 +438,10 @@ class CHttpTest extends CApiService {
 	protected function validateCreate(array $httpTests) {
 		$this->checkNames($httpTests);
 
+		if (!API::Host()->isWritable(zbx_objectValues($httpTests, 'hostid'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		foreach ($httpTests as $httpTest) {
 			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
 			if (!empty($missingKeys)) {
