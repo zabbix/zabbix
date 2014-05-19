@@ -54,8 +54,6 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 		return SYSINFO_RET_FAIL;
 	}
 
-	memset(result, 0, sizeof(net_stat_t));
-
 	while (NULL != fgets(line, sizeof(line), f))
 	{
 		if (NULL == (p = strstr(line, ":")))
