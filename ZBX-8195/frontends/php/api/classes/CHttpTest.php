@@ -591,6 +591,12 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		foreach ($httpTest['steps'] as $step) {
+			if (isset($step['httpstepid'])
+				? isset($step['name']) && ($step['name'] == '')
+				: !isset($step['name']) || ($step['name'] == '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name can not be empty.'));
+			}
+
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
