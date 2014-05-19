@@ -28,6 +28,10 @@
 
 #define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
 
+#define ZBX_SAME_FILE_ERROR	-1
+#define ZBX_SAME_FILE_NO	0
+#define ZBX_SAME_FILE_YES	1
+
 /******************************************************************************
  *                                                                            *
  * Function: split_string                                                     *
@@ -523,28 +527,31 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", new->filename,
 						zbx_strerror(errno));
-				return 2;
+				return ZBX_SAME_FILE_ERROR;
 			}
 
 			if (SUCCEED == file_start_md5(f, old->md5size, md5tmp, new->filename))
-				ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? 1 : 0;
+			{
+				ret = (0 == memcmp(old->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
+						ZBX_SAME_FILE_NO;
+			}
 			else
-				ret = 2;
+				ret = ZBX_SAME_FILE_ERROR;
 
 			if (0 != close(f))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", new->filename,
 						zbx_strerror(errno));
-				ret = 2;
+				ret = ZBX_SAME_FILE_ERROR;
 			}
 
 			return ret;
 		}
 	}
 
-	return 1;
+	return ZBX_SAME_FILE_YES;
 not_same:
-	return 0;
+	return ZBX_SAME_FILE_NO;
 }
 
 /******************************************************************************
@@ -582,11 +589,11 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 		{
 			rc = is_same_file(old + i, new + j, use_ino);
 
-			if (0 == rc)
+			if (ZBX_SAME_FILE_NO == rc)
 				p[j] = '0';
-			else if (1 == rc)
+			else if (ZBX_SAME_FILE_YES == rc)
 				p[j] = '1';
-			else if (2 == rc)
+			else if (ZBX_SAME_FILE_ERROR == rc)
 				return FAIL;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
