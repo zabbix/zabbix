@@ -410,12 +410,16 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		httpstep.variables = row[8];
 		httpstep.follow_redirects = atoi(row[9]);
+
 		httpstep.headers = zbx_strdup(NULL, row[10]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL,
+				&httpstep.headers, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		memset(&stat, 0, sizeof(stat));
 
 		http_substitute_variables(httptest, &httpstep.url);
 		http_substitute_variables(httptest, &httpstep.posts);
+		http_substitute_variables(httptest, &httpstep.headers);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, httpstep.name);
 
@@ -710,6 +714,8 @@ int	process_httptests(int httppoller_num, int now)
 				&httptest.httptest.variables, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.httptest.headers = zbx_strdup(NULL, row[6]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.headers, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.httptest.agent = zbx_strdup(NULL, row[7]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
