@@ -28,7 +28,6 @@
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_sdr.h>
 #include <OpenIPMI/ipmi_msgbits.h>
-#include <OpenIPMI/internal/ipmi_int.h>
 
 typedef struct
 {
@@ -367,15 +366,6 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		goto out;
 	}
 
-	if (0 != states->__states)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "IPMI sensor in 'not supported' state."
-				" State value: %i", states->__states);
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		goto out;
-	}
-
 	s = get_ipmi_sensor(h, sensor);
 
 	if (NULL == s)
@@ -396,7 +386,6 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 			break;
 		case IPMI_BOTH_VALUES_PRESENT:
 			s->value = val;
-			h->ret = SUCCEED;
 
 			/* next lines only for debug logging */
 			ent = ipmi_sensor_get_entity(sensor);
