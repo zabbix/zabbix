@@ -782,6 +782,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	}
 
 	$submapApplications = array();
+	$submapsWithoutApplicationFilter = array();
 
 	$selements = $sysmap['selements'];
 	foreach ($selements as $selementId => $selement) {
@@ -812,11 +813,17 @@ function getSelementsInfo($sysmap, array $options = array()) {
 									if ($sel['application'] !== '') {
 										$submapApplications[$selementId][] = $sel['application'];
 									}
+									else {
+										$submapsWithoutApplicationFilter[] = $selementId;
+									}
 									break;
 								case SYSMAP_ELEMENT_TYPE_HOST:
 									$hosts_map[$sel['elementid']][$selementId] = $selementId;
 									if ($sel['application'] !== '') {
 										$submapApplications[$selementId][] = $sel['application'];
+									}
+									else {
+										$submapsWithoutApplicationFilter[] = $selementId;
 									}
 									break;
 								case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -843,6 +850,14 @@ function getSelementsInfo($sysmap, array $options = array()) {
 				$triggers_map[$selement['elementid']][$selement['selementid']] = $selement['selementid'];
 				break;
 		}
+	}
+
+	/*
+	 * Reset application filters collected for submaps if there is even one host or
+	 * hosts group without application filter in that submap.
+	 */
+	foreach ($submapsWithoutApplicationFilter as $submapSelementId) {
+		unset($submapApplications[$submapSelementId]);
 	}
 
 	// get host inventories
