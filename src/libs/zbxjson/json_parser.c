@@ -24,7 +24,6 @@
 
 #include "log.h"
 
-static int	json_parse_value(const char *start, char **error);
 static int	json_parse_object(const char *start, char **error);
 
 /******************************************************************************
@@ -298,7 +297,7 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int	json_parse_value(const char *start, char **error)
+int	json_parse_value(const char *start, char **error)
 {
 	const char	*ptr = start;
 	int		len = 0;
