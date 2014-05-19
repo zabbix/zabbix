@@ -837,6 +837,7 @@ class CXmlImport18 {
 	}
 
 	public static function parseMain($rules) {
+		$triggerExpressionConverter = new C24TriggerExpressionConverter(new CFunctionMacroParser());
 		$triggersForDependencies = array();
 
 		if (!empty($rules['hosts']['updateExisting'])
@@ -1427,7 +1428,7 @@ class CXmlImport18 {
 						$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['hostid'] = $current_hostid;
 
-						$currentTrigger = false;
+						$trigger_db['expression'] = $triggerExpressionConverter->convert($trigger_db['expression']);
 
 						$currentTrigger = API::Trigger()->get(array(
 							'output' => array('triggerid'),
