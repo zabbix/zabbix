@@ -38,6 +38,8 @@ class CFunctionMacroParserResult extends CParserResult {
 	 *     'functionParamList' => array (0 => '0')
 	 *   )
 	 *
+	 * @deprecated  implement tokens instead
+	 *
 	 * @var array
 	 */
 	public $expression = array();
