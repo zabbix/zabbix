@@ -666,13 +666,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				move_out = 0, move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
-	char			*buf, *esc;
+	char			*buf = NULL, *esc;
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;
 	char			*sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
-				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
+				buf_alloc = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t           h_id_offsets, h_del;
@@ -723,11 +724,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		goto out;
 	}
 
-	buf = zbx_malloc(NULL, MAX_BUFFER_LEN);
-
 	p = NULL;
 	/* iterate column names (lines 4-6 in T1) */
-	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, MAX_BUFFER_LEN, NULL)))
+	while (NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)))
 	{
 		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
 		{
@@ -820,7 +819,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_row) ||
-				NULL == (pf = zbx_json_next_value(&jp_row, NULL, buf, MAX_BUFFER_LEN, NULL)))
+				NULL == (pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto clean2;
@@ -849,7 +848,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 				/* find the field requiring special preprocessing in JSON record */
 				f = 1;
-				while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, MAX_BUFFER_LEN, &is_null)))
+				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null)))
 				{
 					/* parse values for the entry (lines 10-12 in T1) */
 
@@ -960,7 +959,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		size_t	tmp_offset = sql_offset, last_pos = 0;
 
 		zbx_json_brackets_open(p, &jp_row);
-		pf = zbx_json_next_value(&jp_row, NULL, buf, MAX_BUFFER_LEN, NULL);
+		pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL);
 
 		/* check whether we need to insert a new entry or update an existing one */
 		ZBX_STR2UINT64(recid, buf);
@@ -978,7 +977,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_ptr_append(&values, value);
 
 			/* add the rest of fields */
-			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, MAX_BUFFER_LEN, &is_null)); f++)
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+					f++)
 			{
 				if (f == fields_count)
 				{
@@ -1070,7 +1070,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
 
-			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, MAX_BUFFER_LEN, &is_null)); f++)
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+					f++)
 			{
 				int	field_differ = 1;
 
@@ -1168,8 +1169,9 @@ clean2:
 		zbx_vector_uint64_destroy(&moves);
 	zbx_free(sql);
 	zbx_free(recs);
-	zbx_free(buf);
 out:
+	zbx_free(buf);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
