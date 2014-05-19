@@ -396,6 +396,8 @@ class CScreenBuilder {
 						'screenitem' => $screenitem
 					));
 
+					$screenBase->screenitem['templated'] = ($this->screen['templateid']);
+
 					if (!empty($screenBase)) {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
 							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
