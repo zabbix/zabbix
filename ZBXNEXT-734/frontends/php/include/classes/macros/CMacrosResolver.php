@@ -76,6 +76,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => array('host', 'hostId', 'interfaceWithoutPort', 'user'),
 			'source' => 'url',
 			'method' => 'resolveTexts'
+		),
+		'screenElementURLUser' => array(
+			'types' => array('user'),
+			'source' => 'url',
+			'method' => 'resolveTexts'
 		)
 	);
 
@@ -138,10 +143,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		if ($this->isTypeAvailable('hostId')) {
 			foreach ($data as $hostId => $texts) {
-				$hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts);
-				if ($hostIdMacros) {
-					foreach ($hostIdMacros as $hostMacro) {
-						$macros[$hostId][$hostMacro] = ($hostId === '') ? UNRESOLVED_MACRO_STRING : $hostId;
+				if ($hostId != 0) {
+					$hostIdMacros = $this->findMacros(self::PATTERN_HOST_ID, $texts);
+					if ($hostIdMacros) {
+						foreach ($hostIdMacros as $hostMacro) {
+							$macros[$hostId][$hostMacro] = $hostId;
+						}
 					}
 				}
 			}

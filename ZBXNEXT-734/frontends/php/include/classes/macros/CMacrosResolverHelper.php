@@ -535,8 +535,12 @@ class CMacrosResolverHelper {
 		self::init();
 
 		$macros = self::$macrosResolver->resolve(array(
-			'config' => 'screenElementURL',
-			'data' => $screenElement
+			'config' => $screenElement['config'],
+			'data' => array(
+				$screenElement['hostid'] => array(
+					'url' => $screenElement['url']
+				)
+			)
 		));
 		$macros = reset($macros);
 
