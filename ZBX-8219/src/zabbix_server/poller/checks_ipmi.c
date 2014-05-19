@@ -1235,10 +1235,14 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 		*val = 1;
 	else if (0 == strcasecmp(p, "off"))
 		*val = 0;
-	else if (SUCCEED == is_uint31(p, (uint32_t*)val))
-		ret = SUCCEED;
-	else
+	else if (SUCCEED != is_uint31(p, (uint32_t *)val))
+	{
 		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
+		goto fail;
+	}
+
+	ret = SUCCEED;
+
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
