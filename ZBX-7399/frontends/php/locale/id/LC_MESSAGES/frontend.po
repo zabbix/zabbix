@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-12 03:02+0300\n"
+"POT-Creation-Date: 2014-05-17 00:37+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1322,7 +1322,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Tidak dapat menambah gambar"
 
-#: include/classes/import/CXmlImport18.php:633
+#: include/classes/import/CXmlImport18.php:631
 msgid "Cannot add image."
 msgstr "Tidak dapat menambah gambar."
 
@@ -1521,7 +1521,7 @@ msgstr "Tidak dapat membuat ikon peta"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Tidak dapat membuat ikon pemetaan dengan nama yang mirip \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:817
+#: include/classes/import/CXmlImport18.php:815
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Tidak dapat membuat peta \"%s\"."
@@ -1534,7 +1534,7 @@ msgstr ""
 msgid "Cannot create new element"
 msgstr "Tidak dapat membuat elemen baru"
 
-#: include/classes/import/CXmlImport18.php:1706
+#: include/classes/import/CXmlImport18.php:1704
 msgid "Cannot create screen."
 msgstr "Tidak dapat membuat layar."
 
@@ -1907,20 +1907,20 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
-#: include/classes/import/CXmlImport18.php:677
+#: include/classes/import/CXmlImport18.php:675
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan gambar latar \"%1$s\" used in map \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1663
+#: include/classes/import/CXmlImport18.php:1661
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grrafik \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:724
+#: include/classes/import/CXmlImport18.php:722
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1932,7 +1932,7 @@ msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan di peta \"%2$s\"."
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:735
+#: include/classes/import/CXmlImport18.php:733
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -1962,7 +1962,7 @@ msgstr "Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:768
+#: include/classes/import/CXmlImport18.php:766
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1994,13 +1994,13 @@ msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for gr
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1676
+#: include/classes/import/CXmlImport18.php:1674
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan item \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:713
+#: include/classes/import/CXmlImport18.php:711
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor.Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
@@ -2031,8 +2031,8 @@ msgstr "Tidak dapat menemukan layar \"%1$s\" yang digunakan pada layar \"%2$s\".
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/CXmlImport18.php:789
+#: include/classes/import/CXmlImport18.php:744
+#: include/classes/import/CXmlImport18.php:787
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2388,7 +2388,7 @@ msgstr "Tidak dapat perbarui icon map"
 msgid "Cannot update image"
 msgstr "Tidak dapat perbarui gambar"
 
-#: include/classes/import/CXmlImport18.php:640
+#: include/classes/import/CXmlImport18.php:638
 msgid "Cannot update image."
 msgstr "Tidak dapat perbarui gambar."
 
@@ -2421,7 +2421,7 @@ msgstr "Tidak dapat perbarui macro"
 msgid "Cannot update maintenance"
 msgstr "Tidak dapat perbarui pemeliharaan"
 
-#: include/classes/import/CXmlImport18.php:808
+#: include/classes/import/CXmlImport18.php:806
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Tidak dapat perbarui map \"%s\"."
@@ -2455,7 +2455,7 @@ msgstr "Tidak dapat perbarui ekspresi regular"
 msgid "Cannot update screen"
 msgstr "Tidak dapat perbarui layar"
 
-#: include/classes/import/CXmlImport18.php:1698
+#: include/classes/import/CXmlImport18.php:1696
 msgid "Cannot update screen."
 msgstr "Tidak dapat perbarui layar."
 
@@ -3123,7 +3123,7 @@ msgstr "Salin yang dipilih ke ..."
 msgid "Correct login \"%s\"."
 msgstr "Login yang bernar \"%s\"."
 
-#: api/classes/CImage.php:452
+#: api/classes/CImage.php:451
 msgid "Could not save image!"
 msgstr "Tidak dapat menyimpan gambar!"
 
@@ -4752,7 +4752,7 @@ msgstr ""
 msgid "Empty name."
 msgstr "Nama kosong."
 
-#: api/classes/CImage.php:470 api/rpc/class.czbxrpc.php:38
+#: api/classes/CImage.php:469 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
 msgstr "Parameter kosong"
 
@@ -5014,7 +5014,7 @@ msgstr "Kecuali"
 msgid "Execute"
 msgstr "Jalankan"
 
-#: api/classes/CImage.php:290
+#: api/classes/CImage.php:289
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Jalankan error SQL [%1$s] pada [%2$s]."
@@ -5231,7 +5231,7 @@ msgstr "Field \"host\" adalah wajib"
 msgid "Field \"name\" is required."
 msgstr "Field \"name\" diperlukan."
 
-#: api/classes/CImage.php:550
+#: api/classes/CImage.php:549
 msgid "File format is unsupported."
 msgstr ""
 
@@ -5564,8 +5564,8 @@ msgstr "Grafik \"%1$s\" tidak dapat mewarisi. Tidak ada item yang dibutuhkan pad
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Grafik \"%1$s\" tidak ada pada template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1555
-#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1553
+#: include/classes/import/CXmlImport18.php:1557
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Grafik \"%1$s\" diabaikan - aturan user."
@@ -6037,7 +6037,7 @@ msgstr "Host \"%1$s\" sudah ada."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" dipantau dengan proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:928
+#: include/classes/import/CXmlImport18.php:926
 #, fuzzy, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Host \"%s\" setelah diperiksa memiliki parameter \"useipmi\", tetapi tidka memiliki parameter \"ipmi_ip\"! Gunakan alamat IP host sebagai alamat untuk antarmuka IPMI."
@@ -6665,7 +6665,7 @@ msgstr "Jika menurut Anda pesan ini salah, mohon hubungi administrator Anda untu
 msgid "Image"
 msgstr "Gambar"
 
-#: api/classes/CImage.php:257 api/classes/CImage.php:373
+#: api/classes/CImage.php:256 api/classes/CImage.php:372
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr ""
@@ -6682,12 +6682,12 @@ msgstr "Gambar dihapus"
 msgid "Image label type"
 msgstr "Gambar tipe label"
 
-#: api/classes/CImage.php:294
+#: api/classes/CImage.php:293
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr ""
 
-#: api/classes/CImage.php:545 include/classes/helpers/CUploadFile.php:129
+#: api/classes/CImage.php:544 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
 msgstr ""
 
@@ -7451,12 +7451,12 @@ msgstr ""
 msgid "Incorrect working time."
 msgstr "Kesalahan waktu kerja."
 
-#: include/classes/import/CXmlImport18.php:1587
+#: include/classes/import/CXmlImport18.php:1585
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Kesalahan item y max untuk grafik \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1574
+#: include/classes/import/CXmlImport18.php:1572
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Kesalahan item y min untuk grafik \"%1$s\"."
@@ -7650,15 +7650,10 @@ msgstr "Params tidak sah."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Kode respon \"%1$s\" tidak sah."
-
-#: api/classes/CHttpTest.php:633
-#, c-format
-msgid "Invalid response code range \"%1$s\"."
-msgstr "Range kode respon \"%1$s\" tidak sah."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
@@ -7749,7 +7744,7 @@ msgstr "Item \"%1$s\" tidak bisa diisi field nomor \"%2$d\" inventori host hilan
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" tidak ada di template \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1522
+#: include/classes/import/CXmlImport18.php:1520
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Item \"%1$s\" tidak ada."
@@ -7759,8 +7754,8 @@ msgstr "Item \"%1$s\" tidak ada."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" pada \"%2$s\": aplikasi \"%3$s\" tidak ada."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1271
+#: include/classes/import/CXmlImport18.php:1275
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" diabaikan - aturan user."
@@ -8644,7 +8639,7 @@ msgstr "Manual Logout"
 msgid "Map"
 msgstr "Peta"
 
-#: include/classes/import/CXmlImport18.php:668
+#: include/classes/import/CXmlImport18.php:666
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Peta \"%1$s\" diabaikan - aturan user."
@@ -8654,12 +8649,12 @@ msgstr "Peta \"%1$s\" diabaikan - aturan user."
 msgid "Map \"%s\""
 msgstr "Peta \"%s\""
 
-#: include/classes/import/CXmlImport18.php:820
+#: include/classes/import/CXmlImport18.php:818
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Peta \"%s\" dibuat."
 
-#: include/classes/import/CXmlImport18.php:811
+#: include/classes/import/CXmlImport18.php:809
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Peta \"%s\" diperbarui."
@@ -9058,8 +9053,8 @@ msgstr ""
 msgid "Missing \"name\" field for graph."
 msgstr "Hilangnya field \"nama\" untuk grafik."
 
-#: include/classes/import/CXmlImport18.php:1578
-#: include/classes/import/CXmlImport18.php:1591
+#: include/classes/import/CXmlImport18.php:1576
+#: include/classes/import/CXmlImport18.php:1589
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Hilangnya item \"%1$s\" untuk host \"%2$s\"."
@@ -9424,12 +9419,12 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1568
+#: include/classes/import/CXmlImport18.php:1566
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymax_type\" untuk grafik \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1564
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymix_type\" untuk grafik \"%s\"."
@@ -9814,27 +9809,27 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1549
+#: include/classes/import/CXmlImport18.php:1547
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Tidak ada izin untuk grafik \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:963
+#: include/classes/import/CXmlImport18.php:961
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Tidak ada izin untuk host \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1513
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Tidak ada izin untuk item \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1144
+#: include/classes/import/CXmlImport18.php:1142
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Tidak ada permission untuk template \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1424
+#: include/classes/import/CXmlImport18.php:1422
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Tidak ada izin untuk trigger \"%s\"."
@@ -9843,12 +9838,12 @@ msgstr "Tidak ada izin untuk trigger \"%s\"."
 msgid "No permissions"
 msgstr "Tidak ada izin"
 
-#: include/classes/import/CXmlImport18.php:1024
+#: include/classes/import/CXmlImport18.php:1022
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Tidak ada izin untuk grup \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:661
+#: include/classes/import/CXmlImport18.php:659
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Tidak ada izin untuk peta \"%1$s\"."
@@ -9882,8 +9877,8 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:243 api/classes/CImage.php:357
-#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:181
+#: api/classes/CImage.php:242 api/classes/CImage.php:356
+#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
@@ -10546,7 +10541,7 @@ msgstr "Hanya Zabbix Admin yang dapat merubah media user."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Hanya Zabbix Admin yang dapat menghapus media user."
 
-#: api/classes/CHttpTest.php:657
+#: api/classes/CHttpTest.php:662
 msgid "Only characters are allowed."
 msgstr "Hanya karakter yang diperbolehkan."
 
@@ -10960,7 +10955,7 @@ msgstr "Trigger induk"
 msgid "Parent web scenarios"
 msgstr ""
 
-#: api/classes/CImage.php:284
+#: api/classes/CImage.php:283
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "SQL parse error [%1$s] dalam [%2$s]."
@@ -12137,7 +12132,7 @@ msgid "Screen"
 msgstr "Layar"
 
 #: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1707
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Layar \"%1$s\" ditambah."
@@ -12177,14 +12172,14 @@ msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1640
-#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1638
+#: include/classes/import/CXmlImport18.php:1642
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Layar \"%1$s\" diabaikan - aturan user."
 
 #: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1699
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Layar \"%1$s\" diperbarui."
@@ -13386,13 +13381,13 @@ msgstr ""
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: api/classes/CImage.php:493
+#: api/classes/CImage.php:492
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 
-#: api/classes/CImage.php:519
+#: api/classes/CImage.php:518
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -13656,8 +13651,8 @@ msgstr "Trigger \"%1$s\" sudah ada pada \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger \"%1$s\" tergantung pada trigger \"%2$s\", yang tidak ada."
 
-#: include/classes/import/CXmlImport18.php:1431
-#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1429
+#: include/classes/import/CXmlImport18.php:1433
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" diabaikan - aturan user."
@@ -15125,12 +15120,12 @@ msgstr "Field yang salah untuk elemen."
 msgid "Wrong fields for host \"%s\"."
 msgstr "Field yang salah untuk host \"%s\"."
 
-#: api/classes/CImage.php:254
+#: api/classes/CImage.php:253
 #, c-format
 msgid "Wrong fields for image \"%1$s\"."
 msgstr ""
 
-#: api/classes/CImage.php:362
+#: api/classes/CImage.php:361
 msgid "Wrong fields for image."
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-12 03:02+0300\n"
+"POT-Creation-Date: 2014-05-17 00:37+0300\n"
 "PO-Revision-Date: 2014-04-23 06:25+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1323,7 +1323,7 @@ msgstr "ホストのプロトタイプを追加できません"
 msgid "Cannot add image"
 msgstr "イメージを追加できません"
 
-#: include/classes/import/CXmlImport18.php:633
+#: include/classes/import/CXmlImport18.php:631
 msgid "Cannot add image."
 msgstr "イメージを追加できません。"
 
@@ -1522,7 +1522,7 @@ msgstr "アイコンのマッピングを作成できません"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "\"%s\"と同名のアイコンのマッピングは作成できません。"
 
-#: include/classes/import/CXmlImport18.php:817
+#: include/classes/import/CXmlImport18.php:815
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "マップ\"%s\"を作成できません。"
@@ -1535,7 +1535,7 @@ msgstr "新規アプリケーションを作成できません。Webシナリオ
 msgid "Cannot create new element"
 msgstr "新しい要素を作成できません"
 
-#: include/classes/import/CXmlImport18.php:1706
+#: include/classes/import/CXmlImport18.php:1704
 msgid "Cannot create screen."
 msgstr "スクリーンを作成できません。"
 
@@ -1906,20 +1906,20 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Webシナリオを有効にできません"
 
-#: include/classes/import/CXmlImport18.php:677
+#: include/classes/import/CXmlImport18.php:675
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で利用されている背景画像\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1663
+#: include/classes/import/CXmlImport18.php:1661
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているグラフ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:724
+#: include/classes/import/CXmlImport18.php:722
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1931,7 +1931,7 @@ msgstr "マップ\"%2$s\"で利用されているグループ\"%1$s\"が見つ�
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているグループ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:735
+#: include/classes/import/CXmlImport18.php:733
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -1961,7 +1961,7 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に�
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "グラフ\"%2$s\"で利用されているホストまたはテンプレート\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:768
+#: include/classes/import/CXmlImport18.php:766
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -1993,13 +1993,13 @@ msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for gr
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"がみつかりません。"
 
 #: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1676
+#: include/classes/import/CXmlImport18.php:1674
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で利用されているアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CXmlImport18.php:713
+#: include/classes/import/CXmlImport18.php:711
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "エクスポートされたマップ\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
@@ -2030,8 +2030,8 @@ msgstr "スクリーン\"%2$s\"で利用されているスクリーン\"%1$s\"�
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのテンプレート\"%1$s\"がみつかりません。"
 
-#: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/CXmlImport18.php:789
+#: include/classes/import/CXmlImport18.php:744
+#: include/classes/import/CXmlImport18.php:787
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2387,7 +2387,7 @@ msgstr "アイコンのマッピングを更新できません"
 msgid "Cannot update image"
 msgstr "イメージを更新できません"
 
-#: include/classes/import/CXmlImport18.php:640
+#: include/classes/import/CXmlImport18.php:638
 msgid "Cannot update image."
 msgstr "イメージを更新できません。"
 
@@ -2420,7 +2420,7 @@ msgstr "マクロを更新できません"
 msgid "Cannot update maintenance"
 msgstr "メンテナンスを更新できません"
 
-#: include/classes/import/CXmlImport18.php:808
+#: include/classes/import/CXmlImport18.php:806
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "マップ\"%s\"を更新できません。"
@@ -2454,7 +2454,7 @@ msgstr "正規表現を更新できません"
 msgid "Cannot update screen"
 msgstr "スクリーンを更新できません"
 
-#: include/classes/import/CXmlImport18.php:1698
+#: include/classes/import/CXmlImport18.php:1696
 msgid "Cannot update screen."
 msgstr "スクリーンを更新できません。"
 
@@ -3123,7 +3123,7 @@ msgstr "選択をコピー..."
 msgid "Correct login \"%s\"."
 msgstr "ユーザー\"%s\"のログイン"
 
-#: api/classes/CImage.php:452
+#: api/classes/CImage.php:451
 msgid "Could not save image!"
 msgstr "イメージを保存できませんでした!"
 
@@ -4752,7 +4752,7 @@ msgstr "スクリプトの名前が空白です。"
 msgid "Empty name."
 msgstr "名前が空白です。"
 
-#: api/classes/CImage.php:470 api/rpc/class.czbxrpc.php:38
+#: api/classes/CImage.php:469 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
 msgstr "パラメータが空白です"
 
@@ -5014,7 +5014,7 @@ msgstr "含めない"
 msgid "Execute"
 msgstr "実行"
 
-#: api/classes/CImage.php:290
+#: api/classes/CImage.php:289
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "SQL実行エラー [%2$s]内の[%1$s]。"
@@ -5231,7 +5231,7 @@ msgstr "フィールド\"host\"は必須です"
 msgid "Field \"name\" is required."
 msgstr "フィールド\"name\"を指定してください"
 
-#: api/classes/CImage.php:550
+#: api/classes/CImage.php:549
 msgid "File format is unsupported."
 msgstr "ファイルフォーマットがサポートされていません。"
 
@@ -5564,8 +5564,8 @@ msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテム�
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "グラフ\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1555
-#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1553
+#: include/classes/import/CXmlImport18.php:1557
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "グラフ\"%1$s\"はスキップされました - ユーザの指定。"
@@ -6037,7 +6037,7 @@ msgstr "ホスト\"%1$s\"はすでに存在しています。"
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "ホスト\"%1$s\"はプロキシ\"%2$s\"経由で監視されています。"
 
-#: include/classes/import/CXmlImport18.php:928
+#: include/classes/import/CXmlImport18.php:926
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "ホスト\"%s\"は\"IPMIを使用\"にチェックが入っていますが、\"IPMI IP\"にIPアドレスが入力されていません。IPMIインターフェースとしてホストのIPを利用します。"
@@ -6665,7 +6665,7 @@ msgstr "このメッセージが間違っている場合は、必要な権限を
 msgid "Image"
 msgstr "イメージ"
 
-#: api/classes/CImage.php:257 api/classes/CImage.php:373
+#: api/classes/CImage.php:256 api/classes/CImage.php:372
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "イメージ\"%1$s\"はすでに存在しています。"
@@ -6682,12 +6682,12 @@ msgstr "イメージを削除しました"
 msgid "Image label type"
 msgstr "イメージラベルのタイプ"
 
-#: api/classes/CImage.php:294
+#: api/classes/CImage.php:293
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "[%2$s]内の[%1$s]のイメージの読み込みエラー。"
 
-#: api/classes/CImage.php:545 include/classes/helpers/CUploadFile.php:129
+#: api/classes/CImage.php:544 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
 msgstr "イメージのサイズは1MB未満にしてください。"
 
@@ -7451,12 +7451,12 @@ msgstr "プロキシのステータス\"%1$s\"に利用されている値が正�
 msgid "Incorrect working time."
 msgstr "ワーキングタイムの設定が正しくありません。"
 
-#: include/classes/import/CXmlImport18.php:1587
+#: include/classes/import/CXmlImport18.php:1585
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のY軸の最大値のアイテムが正しくありません。"
 
-#: include/classes/import/CXmlImport18.php:1574
+#: include/classes/import/CXmlImport18.php:1572
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"のY軸の最小値のアイテムが正しくありません。"
@@ -7650,15 +7650,10 @@ msgstr "パラメータが正しくありません。"
 msgid "Invalid period for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の期間が正しくありません。"
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "レスポンスコード\"%1$s\"が正しくありません。"
-
-#: api/classes/CHttpTest.php:633
-#, c-format
-msgid "Invalid response code range \"%1$s\"."
-msgstr "レスポンスコードの範囲\"%1$s\"が正しくありません。"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
@@ -7749,7 +7744,7 @@ msgstr "アイテム\"%1$s\"はフィールド番号が存在しないホスト�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1522
+#: include/classes/import/CXmlImport18.php:1520
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "アイテム\"%1$s\"は存在しません。"
@@ -7759,8 +7754,8 @@ msgstr "アイテム\"%1$s\"は存在しません。"
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1271
+#: include/classes/import/CXmlImport18.php:1275
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "アイテム\"%1$s\"はスキップされました - ユーザの指定。"
@@ -8644,7 +8639,7 @@ msgstr "手動ログアウト"
 msgid "Map"
 msgstr "マップ"
 
-#: include/classes/import/CXmlImport18.php:668
+#: include/classes/import/CXmlImport18.php:666
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "マップ\"%1$s\"はスキップされました - ユーザの指定。"
@@ -8654,12 +8649,12 @@ msgstr "マップ\"%1$s\"はスキップされました - ユーザの指定。"
 msgid "Map \"%s\""
 msgstr "マップ\"%s\""
 
-#: include/classes/import/CXmlImport18.php:820
+#: include/classes/import/CXmlImport18.php:818
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "マップ\"%s\"を作成しました。"
 
-#: include/classes/import/CXmlImport18.php:811
+#: include/classes/import/CXmlImport18.php:809
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "マップ\"%s\"を更新しました。"
@@ -9056,8 +9051,8 @@ msgstr "グラフのプロトタイプの\"name\"フィールドが存在しま�
 msgid "Missing \"name\" field for graph."
 msgstr "グラフの\"name\"フィールドが存在しません。"
 
-#: include/classes/import/CXmlImport18.php:1578
-#: include/classes/import/CXmlImport18.php:1591
+#: include/classes/import/CXmlImport18.php:1576
+#: include/classes/import/CXmlImport18.php:1589
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "ホスト\"%2$s\"のアイテム\"%1$s\"が存在しません。"
@@ -9422,12 +9417,12 @@ msgstr "テンプレートスクリーンに\"%1$s\"が定義されていませ�
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "ホストのプロトタイプ\"%1$s\"に\"%2$s\"が定義されていません。"
 
-#: include/classes/import/CXmlImport18.php:1568
+#: include/classes/import/CXmlImport18.php:1566
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "グラフ\"%s\"のフィールド\"ymax_type\"がありません。"
 
-#: include/classes/import/CXmlImport18.php:1564
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "グラフ\"%s\"のフィールド\"ymin_type\"がありません。"
@@ -9812,27 +9807,27 @@ msgstr "アクションの実行内容が設定されていません。"
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1549
+#: include/classes/import/CXmlImport18.php:1547
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "グラフ\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:963
+#: include/classes/import/CXmlImport18.php:961
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1513
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1144
+#: include/classes/import/CXmlImport18.php:1142
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "テンプレート\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:1424
+#: include/classes/import/CXmlImport18.php:1422
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "トリガー\"%s\"への権限がありません。"
@@ -9841,12 +9836,12 @@ msgstr "トリガー\"%s\"への権限がありません。"
 msgid "No permissions"
 msgstr "権限がありません"
 
-#: include/classes/import/CXmlImport18.php:1024
+#: include/classes/import/CXmlImport18.php:1022
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "グループ\"%1$s\"への権限がありません。"
 
-#: include/classes/import/CXmlImport18.php:661
+#: include/classes/import/CXmlImport18.php:659
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "マップ\"%1$s\"への権限がありません。"
@@ -9880,8 +9875,8 @@ msgstr "システムへのアクセス権がありません。"
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:243 api/classes/CImage.php:357
-#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:181
+#: api/classes/CImage.php:242 api/classes/CImage.php:356
+#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
@@ -10544,7 +10539,7 @@ msgstr "特権管理者のみがユーザーのメディアを変更できます
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
-#: api/classes/CHttpTest.php:657
+#: api/classes/CHttpTest.php:662
 msgid "Only characters are allowed."
 msgstr "文字列のみ使用することができます。"
 
@@ -10958,7 +10953,7 @@ msgstr "親トリガー"
 msgid "Parent web scenarios"
 msgstr "親Webシナリオ"
 
-#: api/classes/CImage.php:284
+#: api/classes/CImage.php:283
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "SQLパースエラー [%2$s]内の[%1$s]。"
@@ -12135,7 +12130,7 @@ msgid "Screen"
 msgstr "スクリーン"
 
 #: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1707
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "スクリーン\"%1$s\"を追加しました。"
@@ -12175,14 +12170,14 @@ msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr "スクリーン\"%1$s\"のセル X - %2$s Y - %3$s の行の高さが大きすぎます。"
 
 #: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1640
-#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1638
+#: include/classes/import/CXmlImport18.php:1642
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "スクリーン\"%1$s\"はスキップされました - ユーザの指定。"
 
 #: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1699
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "スクリーン\"%1$s\"を更新しました。"
@@ -13384,13 +13379,13 @@ msgstr "ホストグループが発見されなくなったため%1$sに削除�
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "ホストが発見されなくなったため%1$sに削除されます。 (日時 %2$s at %3$s)"
 
-#: api/classes/CImage.php:493
+#: api/classes/CImage.php:492
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] "イメージはアイコンのマッピング%1$sに利用されています。"
 
-#: api/classes/CImage.php:519
+#: api/classes/CImage.php:518
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -13654,8 +13649,8 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
 
-#: include/classes/import/CXmlImport18.php:1431
-#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1429
+#: include/classes/import/CXmlImport18.php:1433
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "トリガー\"%1$s\"はスキップされました - ユーザの指定。"
@@ -15123,12 +15118,12 @@ msgstr "要素の設定が正しくありません。"
 msgid "Wrong fields for host \"%s\"."
 msgstr "ホスト\"%s\"の設定が正しくありません。"
 
-#: api/classes/CImage.php:254
+#: api/classes/CImage.php:253
 #, c-format
 msgid "Wrong fields for image \"%1$s\"."
 msgstr "イメージ\"%1$s\"のフィールドが正しくありません。"
 
-#: api/classes/CImage.php:362
+#: api/classes/CImage.php:361
 msgid "Wrong fields for image."
 msgstr "イメージのフィールドが正しくありません。"
 
