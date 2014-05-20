@@ -319,6 +319,7 @@ class CHttpTest extends CApiService {
 		// add hostid if missing
 		// add test name and steps names if it's empty or test is templated
 		// unset steps no for templated tests
+		// unset required text if retrieving only headers
 		foreach($httpTests as $tnum => $httpTest) {
 			$test =& $httpTests[$tnum];
 			$dbTest = $dbHttpTests[$httpTest['httptestid']];
@@ -335,6 +336,9 @@ class CHttpTest extends CApiService {
 					}
 					if (!empty($dbTest['templateid'])) {
 						unset($test['steps'][$snum]['no']);
+					}
+					if(isset($step['retrieve_mode']) && ($step['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
+						$test['steps'][$snum]['required'] = '';
 					}
 				}
 			}
