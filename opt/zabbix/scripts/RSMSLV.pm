@@ -1077,6 +1077,10 @@ sub get_downtime
 	my $event_from = $eventtimes->[$i++];
 	my $event_till = $eventtimes->[$i++];
 
+	next if (($event_from < $from) and ($event_till < $from));
+
+	$event_from = $from if ($event_from < $from);
+
 	my $res = db_select(
 	    "select value,clock".
 	    " from history_uint".
