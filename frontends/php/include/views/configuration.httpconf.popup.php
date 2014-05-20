@@ -89,12 +89,10 @@ else {
 	$httpPopupFormList->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')));
 
 	$httpPopupFormList->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')));
+
 	$httpPopupFormList->addRow(_('Follow redirects'), new CCheckBox('follow_redirects', $followRedirects, null, true));
 
-	$retrieveModeRadioButtonList = new CRadioButtonList('retrieve_mode', $retrieveMode);
-	$retrieveModeRadioButtonList->addValue(_('page content'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-	$retrieveModeRadioButtonList->addValue(_('page headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS);
-	$httpPopupFormList->addRow(_('Retrieve'), $retrieveModeRadioButtonList);
+	$httpPopupFormList->addRow(_('Retrieve only headers'), new CCheckBox('retrieve_mode', $retrieveMode, null, true));
 
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5));
 	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', getRequest('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));

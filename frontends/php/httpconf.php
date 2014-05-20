@@ -205,6 +205,9 @@ elseif (isset($_REQUEST['save'])) {
 				$step['follow_redirects'] = $step['follow_redirects']
 					? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
 					: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
+				$step['retrieve_mode'] = $step['retrieve_mode']
+					? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
+					: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 			}
 			unset($step);
 		}

@@ -52,4 +52,15 @@
 		close_window();
 		return true;
 	}
+
+	jQuery(document).ready(function() {
+		var retrieveModeCheckbox = jQuery('#retrieve_mode');
+		var requiredTextInput = jQuery('#required');
+
+		requiredTextInput.attr('disabled', retrieveModeCheckbox.attr('checked'));
+
+		retrieveModeCheckbox.on('change', function() {
+			requiredTextInput.attr('disabled', this.checked);
+		});
+	});
 </script>
