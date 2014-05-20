@@ -282,7 +282,7 @@ function make_system_status($filter) {
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
 			'eventids' => $eventIds,
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => array('eventid', 'clock', 'message', 'alias', 'name', 'surname'),
 			'preservekeys' => true
 		));
 	}
