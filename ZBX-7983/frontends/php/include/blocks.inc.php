@@ -214,6 +214,7 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	));
 
+	$sortOptions = array();
 	if ($showAllNodes) {
 		$groupNodeNames = getNodeNamesByElids(zbx_objectValues($groups, 'groupid'));
 
@@ -221,12 +222,13 @@ function make_system_status($filter) {
 			$group['nodename'] = $groupNodeNames[$group['groupid']];
 		}
 		unset($group);
+
+		$sortOptions[] = array('field' => 'nodename', 'order' => ZBX_SORT_UP);
 	}
 
-	CArrayHelper::sort($groups, array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	));
+	$sortOptions[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+
+	CArrayHelper::sort($groups, $sortOptions);
 
 	$groupIds = array();
 	foreach ($groups as $group) {

@@ -1012,38 +1012,21 @@ class CZBXAPI {
 			$allElements = array();
 
 			do {
-				// create object of fixed size
-				$elements = new SplFixedArray($limit);
-
-				// fetch group of elements and put them in created object, count result and free memory
-				$tmp = DBfetchArray(DBselect($query, $limit, $offset));
-				$elements = SplFixedArray::fromArray($tmp);
-				$elemCount = count($tmp);
-				unset($tmp);
+				// fetch group of elements
+				$elements = DBfetchArray(DBselect($query, $limit, $offset));
 
 				// we have potentially more elements
-				$hasMore = ($limit && $elemCount === $limit);
+				$hasMore = ($limit && count($elements) === $limit);
 
-				// apply post filtering using elements as array, count result and free memory
-				$tmp = $this->applyPostSqlFiltering($elements->toArray(), $options);
-				$elements = SplFixedArray::fromArray($tmp);
-				$elemCount = count($tmp);
-				unset($tmp);
-
-				// count all elements
-				$allElemCount = count($allElements);
+				$elements = $this->applyPostSqlFiltering($elements, $options);
 
 				// truncate element set after post SQL filtering, if enough elements or more retrieved via SQL query
-				if ($options['limit'] && $allElemCount + $elemCount >= $options['limit']) {
-					$allElements += array_slice($elements->toArray(), 0, $options['limit'] - $allElemCount, true);
+				if ($options['limit'] && count($allElements) + count($elements) >= $options['limit']) {
+					$allElements += array_slice($elements, 0, $options['limit'] - count($allElements), true);
 					break;
 				}
 
-				// convert to array
-				$allElements += $elements->toArray();
-
-				// strip empty values created by SplFixedArray
-				$allElements = array_filter($allElements);
+				$allElements += $elements;
 
 				// calculate $limit and $offset for next query
 				if ($limit) {
@@ -1051,11 +1034,11 @@ class CZBXAPI {
 					$minLimit *= 2;
 
 					// take care of division by zero
-					$elemCount = $elemCount ? $elemCount : 1;
-					$allElemCount = count($allElements);
+					$elemCount = count($elements) ? count($elements) : 1;
+
 					// we take $limit as $minLimit or reasonable estimate to get all necessary data in two queries
 					// with high probability
-					$limit = max($minLimit, round($limit / $elemCount * ($options['limit'] - $allElemCount) * 2));
+					$limit = max($minLimit, round($limit / $elemCount * ($options['limit'] - count($allElements)) * 2));
 				}
 			} while ($hasMore);
 

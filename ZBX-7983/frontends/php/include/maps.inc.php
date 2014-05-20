@@ -1153,20 +1153,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 
 	// triggers from all hosts/hostgroups, skip dependent
 	if (!empty($monitored_hostids)) {
-		// get only trigger count
-		$triggerCount = API::Trigger()->get(array(
-			'hostids' => $monitored_hostids,
-			'output' => API_OUTPUT_COUNT,
-			'selectHosts' => array('hostid'),
-			'nopermissions' => true,
-			'filter' => array('state' => null),
-			'nodeids' => get_current_nodeid(true),
-			'monitored' => true,
-			'skipDependent' => true,
-			'countOutput' => true
-		));
-
-		// get triggers with known limit
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $monitored_hostids,
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
@@ -1175,8 +1161,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
-			'skipDependent' => true,
-			'limit' => $triggerCount
+			'skipDependent' => true
 		));
 		$all_triggers = array_merge($all_triggers, $triggers);
 
