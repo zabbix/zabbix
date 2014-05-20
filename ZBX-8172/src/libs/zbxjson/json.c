@@ -38,18 +38,17 @@ static char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
 const char	*zbx_json_strerror(void)
 {
-	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR - 1] = '\0'; /* force terminate string */
-	return (&zbx_json_strerror_message[0]);
+	return zbx_json_strerror_message;
 }
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_set_json_strerror(fmt, ...) __zbx_zbx_set_json_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_set_json_strerror __zbx_zbx_set_json_strerror
-#endif /* HAVE___VA_ARGS__ */
+#endif
 static void	__zbx_zbx_set_json_strerror(const char *fmt, ...)
 {
-	va_list args;
+	va_list	args;
 
 	va_start(args, fmt);
 
@@ -928,4 +927,3 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 
 	return num;
 }
-
