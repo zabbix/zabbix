@@ -144,7 +144,7 @@ class CScreenBase {
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
-		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : null;
+		$this->hostid = isset($options['hostid']) ? $options['hostid'] : 0;
 		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
 
 		// get page file
@@ -176,7 +176,7 @@ class CScreenBase {
 			$this->screenitem = $options['screenitem'];
 		}
 		elseif (!empty($options['screenitemid'])) {
-			if (!empty($this->hostid)) {
+			if ($this->hostid != 0) {
 				$this->screenitem = API::TemplateScreenItem()->get(array(
 					'screenitemids' => $options['screenitemid'],
 					'hostids' => $this->hostid,

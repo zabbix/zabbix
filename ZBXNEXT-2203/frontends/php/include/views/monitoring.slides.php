@@ -19,10 +19,6 @@
 **/
 
 
-if ($this->data['elementId']) {
-	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
-}
-
 $slideshowWidget = new CWidget('hat_slides');
 
 // create header form
@@ -108,6 +104,10 @@ else {
 	);
 	$slideshowWidget->addItem(BR());
 	$slideshowWidget->addItem(new CTableInfo(_('No slide shows found.')));
+}
+
+if ($this->data['elementId']) {
+	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 }
 
 return $slideshowWidget;
