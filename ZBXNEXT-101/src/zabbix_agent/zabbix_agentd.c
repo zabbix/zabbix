@@ -754,6 +754,11 @@ void	zbx_sigusr_handler(zbx_task_t task)
 }
 #endif
 
+unsigned char get_process_type_by_server_num(int server_num)
+{
+	/* nothing to do */
+}
+
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;

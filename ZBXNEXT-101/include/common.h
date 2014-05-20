@@ -375,6 +375,8 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_START_HTTP_DEBUG	"start_http_debug"
+#define ZBX_STOP_HTTP_DEBUG	"stop_http_debug"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -585,6 +587,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
+#define HTTP_DEBUG_ENABLED	1
+#define HTTP_DEBUG_DISABLED	0
+
 /* user permissions */
 typedef enum
 {
@@ -708,7 +713,9 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CONFIG_CACHE_RELOAD
+	ZBX_TASK_CONFIG_CACHE_RELOAD,
+	ZBX_TASK_START_HTTP_DEBUG,
+	ZBX_TASK_STOP_HTTP_DEBUG
 }
 zbx_task_t;
 

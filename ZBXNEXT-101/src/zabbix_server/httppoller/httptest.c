@@ -48,6 +48,13 @@ zbx_httpstat_t;
 
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
+int	HTTP_DEBUG_STATE = HTTP_DEBUG_DISABLED;
+
+void set_http_debug(int value)
+{
+	HTTP_DEBUG_STATE = value;
+}
+
 #ifdef HAVE_LIBCURL
 
 static zbx_httppage_t	page;
@@ -478,6 +485,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					httpstep.required, NULL))
 			{
 				err_str = zbx_strdup(err_str, "required pattern not found");
+
+				if (HTTP_DEBUG_ENABLED == HTTP_DEBUG_STATE)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'."
+							" Required pattern \"%s\" not found on %s",
+							__function_name, httptest->httptest.httptestid,
+							httptest->httptest.name, httpstep.required, httpstep.url);
+					zabbix_log(LOG_LEVEL_INFORMATION, "page data: %s", page.data);
+				}
 			}
 
 			/* variables defined in scenario */
