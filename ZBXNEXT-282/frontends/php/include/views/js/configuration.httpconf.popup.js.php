@@ -53,14 +53,11 @@
 		return true;
 	}
 
-	jQuery(document).ready(function() {
-		var retrieveModeCheckbox = jQuery('#retrieve_mode');
-		var requiredTextInput = jQuery('#required');
-
-		requiredTextInput.attr('disabled', retrieveModeCheckbox.attr('checked'));
-
-		retrieveModeCheckbox.on('change', function() {
-			requiredTextInput.attr('disabled', this.checked);
-		});
+	jQuery(function() {
+		jQuery('#retrieve_mode')
+			.on('change', function() {
+				jQuery('#required').attr('disabled', this.checked);
+			})
+			.trigger('change');
 	});
 </script>
