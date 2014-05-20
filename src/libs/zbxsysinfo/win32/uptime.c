@@ -39,11 +39,17 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_free(request_tmp.params);
 
 	if (SYSINFO_RET_FAIL == ret)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/* result must be integer to correctly interpret it in frontend (uptime) */
 	if (!GET_UI64_RESULT(result))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
 
