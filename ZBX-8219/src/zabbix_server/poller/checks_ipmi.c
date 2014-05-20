@@ -1242,7 +1242,6 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 	}
 
 	ret = SUCCEED;
-
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
