@@ -277,6 +277,7 @@ class CHttpTest extends CApiService {
 
 			check_db_fields($defaultValues, $httpTest);
 		}
+		unset($httpTest);
 
 		$this->validateCreate($httpTests);
 
@@ -581,6 +582,14 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
+		$followRedirectsValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		);
+
+		$retrieveModeValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+		);
+
 		foreach ($httpTest['steps'] as $step) {
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
@@ -590,35 +599,23 @@ class CHttpTest extends CApiService {
 			}
 
 			if (isset($step['follow_redirects'])) {
-				$followRedirectsValidator = new CSetValidator(
-					array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+				$followRedirectsValidator->messageInvalid = _s(
+					'Incorrect follow redirects value for step "%1$s" of web scenario "%2$s".',
+					$step['name'],
+					$httpTest['name']
 				);
-				if (!$followRedirectsValidator->validate($step['follow_redirects'])) {
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s(
-							'Incorrect follow redirects value for step "%1$s" of web scenario "%2$s".',
-							$step['name'],
-							$httpTest['name']
-						)
-					);
-				}
+
+				$this->checkValidator($step['follow_redirects'], $followRedirectsValidator);
 			}
 
 			if (isset($step['retrieve_mode'])) {
-				$retrieveModeValidator = new CSetValidator(
-					array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+				$retrieveModeValidator->messageInvalid = _s(
+					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
+					$step['name'],
+					$httpTest['name']
 				);
-				if (!$retrieveModeValidator->validate($step['retrieve_mode'])) {
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s(
-							'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
-							$step['name'],
-							$httpTest['name']
-						)
-					);
-				}
+
+				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
 			}
 		}
 	}
@@ -803,24 +800,22 @@ class CHttpTest extends CApiService {
 	protected function checkSslParameters($httpTest) {
 
 		$verifyPeerValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF))
+			array(
+				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
+				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
+			)
 		);
-		if (!$verifyPeerValidator->validate($httpTest['verify_peer'])) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect SSL verify peer value for web scenario "%1$s".', $httpTest['name'])
-			);
-		}
+		$verifyPeerValidator->setObjectName($httpTest['name']);
+		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
 
 		$verifyHostValidator = new CSetValidator(
-			array('values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF))
+			array(
+				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
+				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
+			)
 		);
-		if (!$verifyHostValidator->validate($httpTest['verify_host'])) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect SSL verify host value for web scenario "%1$s".', $httpTest['name'])
-			);
-		}
+		$verifyHostValidator->setObjectName($httpTest['name']);
+		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
 
 		if (($httpTest['ssl_cert_file'] != '') && ($httpTest['ssl_key_file'] == '')) {
 			self::exception(
