@@ -32,7 +32,7 @@ function getImageByIdent($ident) {
 		$images = array();
 
 		$dbImages = API::Image()->get(array(
-			'output' => API_OUTPUT_EXTEND
+			'output' => array('imageid', 'name')
 		));
 
 		foreach ($dbImages as $image) {
