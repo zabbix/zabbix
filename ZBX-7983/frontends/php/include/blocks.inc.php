@@ -216,7 +216,7 @@ function make_system_status($filter) {
 
 	$sortOptions = array();
 	if ($showAllNodes) {
-		$groupNodeNames = getNodeNamesByElids(zbx_objectValues($groups, 'groupid'));
+		$groupNodeNames = getNodeNamesByElids(array_keys($groups));
 
 		foreach ($groups as &$group) {
 			$group['nodename'] = $groupNodeNames[$group['groupid']];
