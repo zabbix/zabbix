@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 typedef struct
 {
@@ -33,21 +34,25 @@ typedef struct
 }
 net_stat_t;
 
-static int	get_net_stat(const char *if_name, net_stat_t *ns)
+static int	get_net_stat(const char *if_name, net_stat_t *ns, char **error)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_id_t		ps_id;
 	perfstat_netinterface_t	ps_netif;
-#endif
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		*error = zbx_strdup(NULL, "Network interface name cannot be empty.");
 		return SYSINFO_RET_FAIL;
+	}
 
-#if defined(HAVE_LIBPERFSTAT)
 	strscpy(ps_id.name, if_name);
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
+	}
 
 	ns->ibytes = (zbx_uint64_t)ps_netif.ibytes;
 	ns->ipackets = (zbx_uint64_t)ps_netif.ipackets;
@@ -61,114 +66,138 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 
 	return SYSINFO_RET_OK;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif
 }
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 	net_stat_t	ns;
-	int		ret = SYSINFO_RET_OK;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-			SET_UI64_RESULT(result, ns.ibytes);
-		else if (0 == strcmp(mode, "packets"))
-			SET_UI64_RESULT(result, ns.ipackets);
-		else if (0 == strcmp(mode, "errors"))
-			SET_UI64_RESULT(result, ns.ierr);
-		else
-			ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
-	else
-		ret = SYSINFO_RET_FAIL;
 
-	return ret;
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, ns.ibytes);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, ns.ipackets);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, ns.ierr);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 	net_stat_t	ns;
-	int		ret = SYSINFO_RET_OK;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-			SET_UI64_RESULT(result, ns.obytes);
-		else if (0 == strcmp(mode, "packets"))
-			SET_UI64_RESULT(result, ns.opackets);
-		else if (0 == strcmp(mode, "errors"))
-			SET_UI64_RESULT(result, ns.oerr);
-		else
-			ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
-	else
-		ret = SYSINFO_RET_FAIL;
 
-	return ret;
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, ns.obytes);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, ns.opackets);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, ns.oerr);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		*if_name, *mode, *error;
 	net_stat_t	ns;
-	int		ret = SYSINFO_RET_OK;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
-		else if (0 == strcmp(mode, "packets"))
-			SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
-		else if (0 == strcmp(mode, "errors"))
-			SET_UI64_RESULT(result, ns.ierr + ns.oerr);
-		else
-			ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
-	else
-		ret = SYSINFO_RET_FAIL;
 
-	return ret;
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, ns.ierr + ns.oerr);
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*if_name;
+	char		*if_name, *error;
 	net_stat_t	ns;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 
-	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
+	if (SYSINFO_RET_FAIL == get_net_stat(if_name, &ns, &error))
 	{
-		SET_UI64_RESULT(result, ns.colls);
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	return SYSINFO_RET_FAIL;
+	SET_UI64_RESULT(result, ns.colls);
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -181,7 +210,10 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	/* check how many perfstat_netinterface_t structures are available */
 	if (-1 == (rc = perfstat_netinterface(NULL, NULL, sizeof(perfstat_netinterface_t), 0)))
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -221,6 +253,7 @@ end:
 
 	return ret;
 #else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif
 }

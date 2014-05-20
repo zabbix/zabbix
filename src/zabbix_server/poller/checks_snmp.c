@@ -479,7 +479,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	{
 		SOCK_CLEANUP;
 
-		zbx_strlcpy(error, "Cannot open snmp session", max_error_len);
+		zbx_strlcpy(error, "Cannot open SNMP session", max_error_len);
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
