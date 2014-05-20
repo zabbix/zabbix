@@ -599,8 +599,11 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 			else if (ZBX_SAME_FILE_ERROR == rc)
 				return FAIL;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
-					old[i].filename, new[j].filename, p[j]);
+			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
+						old[i].filename, new[j].filename, p[j]);
+			}
 		}
 		p += (size_t)num_new;
 	}
@@ -1545,18 +1548,21 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 
 	zbx_free(old2new);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
-	if (NULL != *logfiles_old)
-		print_logfile_list(*logfiles_old, *logfiles_num_old);
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() old file list:");
+		if (NULL != *logfiles_old)
+			print_logfile_list(*logfiles_old, *logfiles_num_old);
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
-			" start_idx:%d)", *mtime, *lastlogsize, start_idx);
-	if (NULL != logfiles)
-		print_logfile_list(logfiles, logfiles_num);
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+		zabbix_log(LOG_LEVEL_DEBUG, "process_logrt() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
+				" start_idx:%d)", *mtime, *lastlogsize, start_idx);
+		if (NULL != logfiles)
+			print_logfile_list(logfiles, logfiles_num);
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
+	}
 
 	/* forget the old logfile list */
 	if (NULL != *logfiles_old)
