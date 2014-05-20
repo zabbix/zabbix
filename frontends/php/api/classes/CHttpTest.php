@@ -337,7 +337,7 @@ class CHttpTest extends CApiService {
 					if (!empty($dbTest['templateid'])) {
 						unset($test['steps'][$snum]['no']);
 					}
-					if(isset($step['retrieve_mode']) && ($step['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
+					if (isset($step['retrieve_mode']) && ($step['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
 						$test['steps'][$snum]['required'] = '';
 					}
 				}
