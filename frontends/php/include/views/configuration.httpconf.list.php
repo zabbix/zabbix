@@ -70,12 +70,6 @@ $httpTable->setHeader(array(
 	$this->data['showInfoColumn'] ? _('Info') : null
 ));
 
-$authTypeLabels = array(
-	HTTPTEST_AUTH_BASIC => _('Basic'),
-	HTTPTEST_AUTH_NONE => _('None'),
-	HTTPTEST_AUTH_NTLM => _('NTLM')
-);
-
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $httpTests = $this->data['httpTests'];
 
@@ -122,7 +116,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['stepscnt'],
 		$httpTest['delay'],
 		$httpTest['retries'],
-		$authTypeLabels[$httpTest['authentication']],
+		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
 		($httpTest['application_name'] !== '') ? $httpTest['application_name'] : '-',
 		new CLink(
