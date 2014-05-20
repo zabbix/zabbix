@@ -214,12 +214,14 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	));
 
-	$groupNodeNames = getNodeNamesByElids(zbx_objectValues($groups, 'groupid'));
+	if ($showAllNodes) {
+		$groupNodeNames = getNodeNamesByElids(zbx_objectValues($groups, 'groupid'));
 
-	foreach ($groups as &$group) {
-		$group['nodename'] = $groupNodeNames[$group['groupid']];
+		foreach ($groups as &$group) {
+			$group['nodename'] = $groupNodeNames[$group['groupid']];
+		}
+		unset($group);
 	}
-	unset($group);
 
 	CArrayHelper::sort($groups, array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
