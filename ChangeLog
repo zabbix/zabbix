@@ -129,6 +129,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8213] fixed library loading code on Windows to prevent potential crash condition (Juris)
 ...G...... [ZBX-8223] fixed compilation of dummy module on 64-bit platforms by adding "-fPIC" (asaveljevs)
 .........T [ZBX-7387] changed default memory usage graph display method for operating system templates (Juris)
 A.F....... [ZBX-8101] fixed exporting maps from Oracle database (Eduard, Ivo)
