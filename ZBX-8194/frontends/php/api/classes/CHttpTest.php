@@ -436,17 +436,20 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function validateCreate(array $httpTests) {
-		$this->checkNames($httpTests);
-
-		if (!API::Host()->isWritable(zbx_objectValues($httpTests, 'hostid'))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		foreach ($httpTests as $httpTest) {
 			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
+		}
+
+		if (!API::Host()->isWritable(zbx_objectValues($httpTests, 'hostid'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$this->checkNames($httpTests);
+
+		foreach ($httpTests as $httpTest) {
 
 			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
 				' WHERE ht.name='.zbx_dbstr($httpTest['name']).
@@ -474,20 +477,20 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function validateUpdate(array $httpTests) {
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
-		if (!$this->isWritable($httpTestIds)) {
+		$this->checkObjectIds($httpTests, 'httptestid',
+			_('No "%1$s" given for web scenario.'),
+			_('Empty web scenario ID.'),
+			_('Incorrect web scenario ID.')
+		);
+
+		if (!$this->isWritable(zbx_objectValues($httpTests, 'httptestid'))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
 		}
 
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('httptestid'));
-			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
-			}
-
 			if (isset($httpTest['name'])) {
 				// get hostid from db if it's not provided
 				if (isset($httpTest['hostid'])) {
@@ -506,10 +509,6 @@ class CHttpTest extends CApiService {
 				if ($nameExists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 				}
-			}
-
-			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (isset($httpTest['steps'])) {
@@ -557,6 +556,8 @@ class CHttpTest extends CApiService {
 	 * Check web scenario steps.
 	 *  - check status_codes field
 	 *  - check name characters
+	 *  - check that name and url is present and valid if creating new step
+	 *  - check that name and url are valid if updating step
 	 *
 	 * @param array $httpTest
 	 */
@@ -567,6 +568,18 @@ class CHttpTest extends CApiService {
 		}
 
 		foreach ($httpTest['steps'] as $step) {
+			if (isset($step['httpstepid'])
+				? isset($step['name']) && ($step['name'] == '')
+				: !isset($step['name']) || ($step['name'] == '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name can not be empty.'));
+			}
+
+			if (isset($step['httpstepid'])
+				? isset($step['url']) && ($step['url'] == '')
+				: !isset($step['url']) || ($step['url'] == '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step url can not be empty.'));
+			}
+
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
