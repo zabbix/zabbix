@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -28,7 +29,10 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned long	value;
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/stat: %s", zbx_strerror(errno)));
 		return ret;
+	}
 
 	/* find boot time entry "btime [boot time]" */
 	while (NULL != fgets(buf, MAX_STRING_LEN, f))
@@ -42,8 +46,10 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 			break;
 		}
 	}
-
 	zbx_fclose(f);
+
+	if (SYSINFO_RET_FAIL == ret)
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find a line with \"btime\" in /proc/stat."));
 
 	return ret;
 }
