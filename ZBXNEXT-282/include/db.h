@@ -372,6 +372,8 @@ typedef struct
 	char		*http_proxy;
 	int		authentication;
 	int		retries;
+	int		verify_peer;
+	int		verify_host;
 }
 DB_HTTPTEST;
 

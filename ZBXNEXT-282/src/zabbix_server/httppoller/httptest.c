@@ -374,8 +374,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
+			0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
+			0 == httptest->httptest.verify_host ? 0L : 1L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -469,7 +471,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* enable/disable fetching the body */
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
-				(ZBX_RETRIEVE_MODE_HEADERS == httpstep.retrieve_mode) ? 1L : 0L)))
+				ZBX_RETRIEVE_MODE_HEADERS == httpstep.retrieve_mode ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -701,7 +703,8 @@ int	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.headers,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.verify_peer,"
+				"t.verify_host"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -753,6 +756,8 @@ int	process_httptests(int httppoller_num, int now)
 				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.httptest.retries = atoi(row[12]);
+		httptest.httptest.verify_peer = atoi(row[13]);
+		httptest.httptest.verify_host = atoi(row[14]);
 
 		/* add httptest varriables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
