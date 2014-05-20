@@ -31,53 +31,12 @@
 #	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
 #endif
 
-/* validation functions for tcp_expect() */
-int	validate_smtp(const char *line)
-{
-	if (0 == strncmp(line, "220", 3))
-	{
-		if ('-' == line[3])
-			return TCP_EXPECT_IGNORE;
-
-		if ('\0' == line[3] || ' ' == line[3])
-			return TCP_EXPECT_OK;
-	}
-
-	return TCP_EXPECT_FAIL;
-}
-
-int	validate_ftp(const char *line)
-{
-	if (0 == strncmp(line, "220 ", 4))
-		return TCP_EXPECT_OK;
-
-	return TCP_EXPECT_IGNORE;
-}
-
-int	validate_pop(const char *line)
-{
-	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
-}
-
-int	validate_nntp(const char *line)
-{
-	if (0 == strncmp(line, "200 ", 4))
-		return TCP_EXPECT_OK;
-
-	return TCP_EXPECT_IGNORE;
-}
-
-int	validate_imap(const char *line)
-{
-	return 0 == strncmp(line, "+OK", 3) ? TCP_EXPECT_OK : TCP_EXPECT_FAIL;
-}
-
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int(*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
-	int		net, val = TCP_EXPECT_OK;
+	int		net, val = ZBX_TCP_EXPECT_OK;
 
 	*value_int = 0;
 
@@ -89,14 +48,14 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		if (NULL != validate_func && SUCCEED == net)
 		{
 			while (SUCCEED == (net = zbx_tcp_recv_line(&s, &buf, 0)) &&
-				TCP_EXPECT_IGNORE == (val = validate_func(buf)))
+				ZBX_TCP_EXPECT_IGNORE == (val = validate_func(buf)))
 				;
 		}
 
-		if (NULL != sendtoclose && SUCCEED == net && TCP_EXPECT_OK == val)
+		if (NULL != sendtoclose && SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
 			zbx_tcp_send_raw(&s, sendtoclose);
 
-		if (SUCCEED == net && TCP_EXPECT_OK == val)
+		if (SUCCEED == net && ZBX_TCP_EXPECT_OK == val)
 			*value_int = 1;
 
 		zbx_tcp_close(&s);
