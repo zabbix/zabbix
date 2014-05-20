@@ -21,5 +21,6 @@
 #define ZABBIX_HTTPTEST_H
 
 int	process_httptests(int httppoller_num, int now);
+void	set_http_debug(int value);
 
 #endif

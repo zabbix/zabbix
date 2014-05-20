@@ -39,6 +39,7 @@
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
+#include "../zabbix_server/httppoller/httptest.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
@@ -70,6 +71,8 @@ const char	*help_message[] = {
 	"",
 	"Runtime control options:",
 	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"  " ZBX_START_HTTP_DEBUG "                Start http debug",
+	"  " ZBX_STOP_HTTP_DEBUG "                 Stop http debug",
 	"",
 	"Other options:",
 	"  -h --help                       Give this help",
@@ -194,6 +197,46 @@ char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
+
+unsigned char get_process_type_by_server_num(int server_num)
+{
+	int	server_count = 0;
+
+	if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
+		return ZBX_PROCESS_TYPE_CONFSYNCER;
+	else if (server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
+		return ZBX_PROCESS_TYPE_HEARTBEAT;
+	else if (server_num <= (server_count += CONFIG_DATASENDER_FORKS))
+		return ZBX_PROCESS_TYPE_DATASENDER;
+	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
+		return ZBX_PROCESS_TYPE_POLLER;
+	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
+		return ZBX_PROCESS_TYPE_UNREACHABLE;
+	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
+		return ZBX_PROCESS_TYPE_TRAPPER;
+	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
+		return ZBX_PROCESS_TYPE_PINGER;
+	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
+		return ZBX_PROCESS_TYPE_HOUSEKEEPER;
+	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
+		return ZBX_PROCESS_TYPE_HTTPPOLLER;
+	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
+		return ZBX_PROCESS_TYPE_DISCOVERER;
+	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
+		return ZBX_PROCESS_TYPE_HISTSYNCER;
+	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
+		return ZBX_PROCESS_TYPE_SNMPTRAPPER;
+	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
+		return ZBX_PROCESS_TYPE_JAVAPOLLER;
+	else if (server_num <= (server_count += CONFIG_SNMPTRAPPER_FORKS))
+		return ZBX_PROCESS_TYPE_SNMPTRAPPER;
+	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
+		return ZBX_PROCESS_TYPE_SELFMON;
+	else if (server_num <= (server_count += CONFIG_VMWARE_FORKS))
+		return ZBX_PROCESS_TYPE_VMWARE;
+
+	assert(0);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -489,6 +532,22 @@ void	zbx_sigusr_handler(zbx_task_t task)
 				zbx_wakeup();
 			}
 			break;
+		case ZBX_TASK_START_HTTP_DEBUG:
+			if (ZBX_PROCESS_TYPE_HTTPPOLLER == process_type)
+			{
+				set_http_debug(HTTP_DEBUG_ENABLED);
+				zabbix_log(LOG_LEVEL_WARNING, "enabled extended http debug for %s #%d",
+						get_process_type_string(process_type), process_num);
+			}
+			break;
+		case ZBX_TASK_STOP_HTTP_DEBUG:
+			if (ZBX_PROCESS_TYPE_HTTPPOLLER == process_type)
+			{
+				set_http_debug(HTTP_DEBUG_DISABLED);
+				zabbix_log(LOG_LEVEL_WARNING, "disabled extended http debug for %s #%d",
+						get_process_type_string(process_type), process_num);
+			}
+			break;
 		default:
 			break;
 	}
@@ -537,6 +596,10 @@ int	main(int argc, char **argv)
 			case 'R':
 				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
 					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
+				else if (0 == strcmp(zbx_optarg, ZBX_START_HTTP_DEBUG))
+					task = ZBX_TASK_START_HTTP_DEBUG;
+				else if (0 == strcmp(zbx_optarg, ZBX_STOP_HTTP_DEBUG))
+					task = ZBX_TASK_STOP_HTTP_DEBUG;
 				else
 				{
 					printf("invalid runtime control option: %s\n", zbx_optarg);
@@ -566,8 +629,11 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
-		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
+	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task || ZBX_TASK_START_HTTP_DEBUG == task ||
+			ZBX_TASK_STOP_HTTP_DEBUG == task)
+	{
+		exit(SUCCEED == zbx_sigusr_send(task) ? EXIT_SUCCESS : EXIT_FAILURE);
+	}
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

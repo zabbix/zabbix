@@ -32,6 +32,10 @@
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
 
+extern pid_t	*threads;
+extern int	threads_num;
+extern unsigned char get_process_type_by_server_num(int server_num);
+
 /******************************************************************************
  *                                                                            *
  * Function: user1_signal_handler                                             *
@@ -41,6 +45,8 @@ static int	parent_pid = -1;
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	zbx_task_t	task;
+
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
@@ -49,13 +55,16 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			SIG_CHECKED_FIELD(siginfo, si_uid),
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
+
+	task = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
+
 	if (!SIG_PARENT_PROCESS)
 	{
 		extern void	zbx_sigusr_handler(zbx_task_t task);
 
-		zbx_sigusr_handler(SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
+		zbx_sigusr_handler(task);
 	}
-	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT))
+	else if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 	{
 		extern unsigned char	daemon_type;
 
@@ -67,9 +76,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		else
 		{
 			union sigval	s;
-			extern pid_t	*threads;
 
-			s.ZBX_SIVAL_INT = ZBX_TASK_CONFIG_CACHE_RELOAD;
+			s.ZBX_SIVAL_INT = task;
 
 			/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
 			if (NULL != threads && -1 != sigqueue(threads[0], SIGUSR1, s))
@@ -84,9 +92,32 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			}
 		}
 	}
+	else if (ZBX_TASK_START_HTTP_DEBUG == task || ZBX_TASK_STOP_HTTP_DEBUG == task)
+	{
+		union sigval	s;
+		int 		i;
+
+		s.ZBX_SIVAL_INT = task;
+
+		for (i = 0; i < threads_num; i++)
+		{
+			if (ZBX_PROCESS_TYPE_HTTPPOLLER == get_process_type_by_server_num(i+1))
+			{
+				if (NULL != threads && -1 != sigqueue(threads[i], SIGUSR1, s))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
+							" the http poller (pid: %d)", threads[i]);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
+							zbx_strerror(errno));
+				}
+			}
+		}
+	}
 #endif
 }
-
 
 /******************************************************************************
  *                                                                            *
