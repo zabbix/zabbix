@@ -247,7 +247,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
 	{
-		const char *source = values.values[0].value.log->source;
+		const char	*source = values.values[0].value.log->source;
 
 		if (0 == strcmp(NULL == source ? "" : source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
