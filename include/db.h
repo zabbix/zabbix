@@ -370,6 +370,9 @@ typedef struct
 	char		*http_user;
 	char		*http_password;
 	char		*http_proxy;
+	char		*ssl_cert_file;
+	char		*ssl_key_file;
+	char		*ssl_key_password;
 	int		authentication;
 	int		retries;
 	int		verify_peer;

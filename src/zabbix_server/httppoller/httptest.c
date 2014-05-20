@@ -703,8 +703,8 @@ int	process_httptests(int httppoller_num, int now)
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.headers,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.verify_peer,"
-				"t.verify_host"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
+				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -756,14 +756,30 @@ int	process_httptests(int httppoller_num, int now)
 				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.httptest.retries = atoi(row[12]);
-		httptest.httptest.verify_peer = atoi(row[13]);
-		httptest.httptest.verify_host = atoi(row[14]);
+
+		httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[13]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.ssl_cert_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[14]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[15]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+				&httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
+
+		httptest.httptest.verify_peer = atoi(row[16]);
+		httptest.httptest.verify_host = atoi(row[17]);
 
 		/* add httptest varriables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
 
 		process_httptest(&host, &httptest);
 
+		zbx_free(httptest.httptest.ssl_key_password);
+		zbx_free(httptest.httptest.ssl_key_file);
+		zbx_free(httptest.httptest.ssl_cert_file);
 		zbx_free(httptest.httptest.http_proxy);
 		if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
 		{
