@@ -696,6 +696,8 @@ static size_t	zbx_json_value_size(const char *p, zbx_json_type_t jt)
 			return zbx_json_string_size(p);
 		case ZBX_JSON_TYPE_INT:
 			return zbx_json_int_size(p);
+		case ZBX_JSON_TYPE_NULL:
+			return 0;
 		default:
 			return (size_t)(-1);
 	}
@@ -723,7 +725,7 @@ static const char	*zbx_json_decodevalue(const char *p, char *string, size_t len,
 	}
 }
 
-static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc)
+static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, int *is_null)
 {
 	zbx_json_type_t	jt;
 	size_t		sz;
@@ -742,9 +744,18 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	switch (jt)
 	{
 		case ZBX_JSON_TYPE_STRING:
+			if (NULL != is_null)
+				*is_null = 0;
 			return zbx_json_decodestring(p, *string, *string_alloc);
 		case ZBX_JSON_TYPE_INT:
+			if (NULL != is_null)
+				*is_null = 0;
 			return zbx_json_decodeint(p, *string, *string_alloc);
+		case ZBX_JSON_TYPE_NULL:
+			if (NULL != is_null)
+				*is_null = 1;
+			**string = '\0';
+			return zbx_json_decodenull(p);
 		default:
 			return NULL;
 	}
@@ -815,6 +826,20 @@ const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_json_next_value_dyn                                          *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
+		size_t *string_alloc, int *is_null)
+{
+	if (NULL == (p = zbx_json_next(jp, p)))
+		return NULL;
+
+	return zbx_json_decodevalue_dyn(p, string, string_alloc, is_null);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_json_value_by_name                                           *
  *                                                                            *
  * Purpose: return value by pair name                                         *
@@ -855,7 +880,7 @@ int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;
 
-	if (NULL == zbx_json_decodevalue_dyn(p, string, string_alloc))
+	if (NULL == zbx_json_decodevalue_dyn(p, string, string_alloc, NULL))
 		return FAIL;
 
 	return SUCCEED;
