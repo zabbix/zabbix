@@ -204,10 +204,12 @@ switch ($data['method']) {
 
 		$screenBase = CScreenBuilder::getScreen($options);
 		if (!empty($screenBase)) {
-			$screenBase->screenitem['templated'] = (bool) API::TemplateScreen()->get(array(
-				'screenids' => array($data['screenid']),
-				'output' => array('templateid')
-			));
+			if (isset($data['screenid']) && $data['screenid']) {
+				$screenBase->screenitem['templated'] = (bool) API::TemplateScreen()->get(array(
+					'screenids' => array($data['screenid']),
+					'output' => array('templateid')
+				));
+			}
 
 			$screen = $screenBase->get();
 		}
