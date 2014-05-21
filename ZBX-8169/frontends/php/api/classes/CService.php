@@ -620,7 +620,9 @@ class CService extends CApiService {
 						// only calculate the sla for services which require it
 						if (isset($usedSeviceIds[$serviceId])) {
 							$latestValue = (isset($latestValues[$serviceId])) ? $latestValues[$serviceId] : 0;
-							$intervalSla = $slaCalculator->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+							$intervalSla = $slaCalculator->calculateSla($service['alarms'], $service['times'],
+								$interval['from'], $interval['to'], $latestValue
+							);
 						}
 						else {
 							$intervalSla = array(

@@ -37,6 +37,7 @@ class CServicesSlaCalculator {
 		 * - ut_s	- count of uptime starts
 		 * - ut_e	- count of uptime ends
 		 */
+		$data = array();
 		foreach ($serviceAlarms as $alarm) {
 			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
 				$data[$alarm['clock']]['alarm'] = $alarm['value'];
