@@ -29,14 +29,20 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*swapdev, *mode;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	/* only 'all' parameter supported */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	/***************************************************************************
 	 *                                                                         *
@@ -105,7 +111,10 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "used"))
 		SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }

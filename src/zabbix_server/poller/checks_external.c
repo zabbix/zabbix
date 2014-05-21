@@ -52,7 +52,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (ZBX_COMMAND_ERROR == (rc = parse_command(item->key, key, sizeof(key), params, sizeof(params))))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
 	}
 
@@ -72,7 +72,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == (n = num_param(params)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
 			goto notsupported;
 		}
 

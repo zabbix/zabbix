@@ -314,7 +314,7 @@ class CMap extends CMapElement {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('map.exists method is deprecated.');
+		$this->deprecated('map.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),

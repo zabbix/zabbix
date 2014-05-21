@@ -82,6 +82,8 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	processAreasCoordinates($sysmap, $areas, $mapInfo);
 
 	$hostIds = array();
+	$triggerIds = array();
+
 	foreach ($sysmap['selements'] as $id => &$selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$hostIds[$selement['elementid']] = $selement['elementid'];
@@ -91,6 +93,9 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 			foreach ($selement['urls'] as $urlId => $url) {
 				$selement['urls'][$urlId]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
 			}
+		}
+		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+			$triggerIds[$selement['elementid']] = $selement['elementid'];
 		}
 
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
@@ -103,11 +108,19 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 	$hosts = API::Host()->get(array(
 		'hostids' => $hostIds,
-		'output' => array('status'),
+		'output' => array('hostid', 'status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT
+	));
+
+	$triggers = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'triggerids' => $triggerIds,
+		'selectHosts' => array('status'),
+		'preservekeys' => true,
+		'nopermissions' => true
 	));
 
 	foreach ($sysmap['selements'] as $elem) {
@@ -135,28 +148,22 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 					$hostId = $elem['elementid'];
 					$scripts = $hostScripts[$elem['elementid']];
 				}
-				if ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED) {
-					$gotos['triggerStatus'] = array(
-						'hostid' => $elem['elementid'],
-						'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
-					);
-				}
-				if ($host['graphs']) {
-					$gotos['graphs'] = array(
-						'hostid' => $host['hostid']
-					);
-				}
-				if ($host['screens']) {
-					$gotos['screens'] = array(
-						'hostid' => $host['hostid']
-					);
-				}
-				$gotos['inventory'] = array(
-					'hostid' => $host['hostid']
+
+				$gotos['triggerStatus'] = array(
+					'hostid' => $elem['elementid'],
+					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				);
-				$gotos['latestData'] = array(
-					'hostid' => $host['hostid']
-				);
+				$gotos['showTriggers'] = ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED);
+
+				$gotos['graphs'] = array('hostid' => $host['hostid']);
+				$gotos['showGraphs'] = (bool) $host['graphs'];
+
+				$gotos['screens'] = array('hostid' => $host['hostid']);
+				$gotos['showScreens'] = (bool) $host['screens'];
+
+				$gotos['inventory'] = array('hostid' => $host['hostid']);
+
+				$gotos['latestData'] = array('hostid' => $host['hostid']);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
@@ -172,6 +179,16 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
 					'period' => SEC_PER_WEEK
 				);
+
+				$gotos['showEvents'] = false;
+				if (isset($triggers[$elem['elementid']])) {
+					foreach ($triggers[$elem['elementid']]['hosts'] as $host) {
+						if ($host['status'] == HOST_STATUS_MONITORED) {
+							$gotos['showEvents'] = true;
+							break;
+						}
+					}
+				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:

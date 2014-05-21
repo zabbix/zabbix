@@ -20,21 +20,33 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
+#include "log.h"
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[16];
+	char			*type;
 	struct pst_dynamic	dyn;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	type = get_rparam(request, 0);
 
 	/* only "online" (default) for parameter "type" is supported */
-	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "online"))
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "online"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, dyn.psd_proc_cnt);
 
@@ -47,14 +59,20 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	cpu_num, state, mode;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 	else
 		cpu_num++;
 
@@ -69,7 +87,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "idle"))
 		state = ZBX_CPU_STATE_IDLE;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 2);
 
@@ -80,7 +101,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return get_cpustat(result, cpu_num, state, mode);
 }
@@ -93,17 +117,26 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int			per_cpu = 1;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	tmp = get_rparam(request, 1);
 
@@ -114,12 +147,18 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg15"))
 		value = dyn.psd_avg_15_min;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (1 == per_cpu)
 	{
 		if (0 >= dyn.psd_proc_cnt)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain number of CPUs."));
 			return SYSINFO_RET_FAIL;
+		}
 		value /= dyn.psd_proc_cnt;
 	}
 

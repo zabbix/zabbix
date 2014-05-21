@@ -118,7 +118,7 @@ lbl_create:
 			{
 				zbx_error("cannot recreate Zabbix semaphores for IPC key 0x%lx Semaphore ID %ld: %s",
 						sem_key, ZBX_SEM_LIST_ID, zbx_strerror(errno));
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 			}
 
 			/* semaphore is successfully removed */
@@ -128,7 +128,7 @@ lbl_create:
 			{
 				zbx_error("cannot recreate Zabbix semaphores for IPC key 0x%lx: too many attempts",
 						sem_key);
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 			}
 
 			if ((ZBX_MAX_ATTEMPTS / 2) < attempts)
@@ -196,7 +196,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	{
 		zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 #else
 	sem_lock.sem_num = *mutex;
@@ -208,7 +208,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 		if (EINTR != errno)
 		{
 			zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -239,7 +239,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 #else
 	sem_unlock.sem_num = *mutex;
@@ -251,7 +251,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 		if (EINTR != errno)
 		{
 			zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 		}
 	}
 #endif

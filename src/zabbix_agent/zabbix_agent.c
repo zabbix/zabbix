@@ -133,7 +133,7 @@ int	main(int argc, char **argv)
 	zbx_sock_t	s_out;
 
 	int		ret;
-	char		**value, *command;
+	char		**value;
 
 	AGENT_RESULT	result;
 
@@ -149,14 +149,14 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(FAIL);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(FAIL);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'p':
 				if (task == ZBX_TASK_START)
@@ -171,7 +171,7 @@ int	main(int argc, char **argv)
 				break;
 			default:
 				usage();
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -235,15 +235,15 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED == (ret = zbx_tcp_check_security(&s_in, CONFIG_HOSTS_ALLOWED, 0)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)))
+		if (SUCCEED == (ret = zbx_tcp_recv(&s_in)))
 		{
-			zbx_rtrim(command, "\r\n");
+			zbx_rtrim(s_in.buffer, "\r\n");
 
-			zabbix_log(LOG_LEVEL_DEBUG, "requested [%s]", command);
+			zabbix_log(LOG_LEVEL_DEBUG, "requested [%s]", s_in.buffer);
 
 			init_result(&result);
 
-			process(command, 0, &result);
+			process(s_in.buffer, 0, &result);
 
 			if (NULL == (value = GET_TEXT_RESULT(&result)))
 				value = GET_MSG_RESULT(&result);
@@ -279,5 +279,5 @@ void	zbx_on_exit()
 	free_metrics();
 	alias_list_free();
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }
