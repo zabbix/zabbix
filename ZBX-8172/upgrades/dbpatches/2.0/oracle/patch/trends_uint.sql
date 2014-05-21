@@ -1,0 +1,1 @@
+ALTER TABLE trends_uint MODIFY itemid DEFAULT NULL;
