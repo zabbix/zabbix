@@ -123,7 +123,7 @@ class CFunctionMacroParser extends CParser {
 	 */
 	protected function parseItem() {
 		$startPos = $this->pos;
-		
+
 		while (isset($this->source[$this->pos]) && $this->isKeyChar($this->source[$this->pos])) {
 			$this->pos++;
 		}
