@@ -1030,8 +1030,7 @@ class CService extends CApiService {
 	protected function fetchChildDependencies(array $parentServiceIds, $output) {
 		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', array(
 			'output' => $output,
-			'filter' => array('serviceupid' => $parentServiceIds),
-			'nodeids' => get_current_nodeid(true)
+			'filter' => array('serviceupid' => $parentServiceIds)
 		));
 
 		// sort by sortorder
@@ -1063,8 +1062,7 @@ class CService extends CApiService {
 	protected function fetchParentDependencies(array $childServiceIds, $output, $soft = null) {
 		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', array(
 			'output' => $output,
-			'filter' => array('servicedownid' => $childServiceIds),
-			'nodeids' => get_current_nodeid(true)
+			'filter' => array('servicedownid' => $childServiceIds)
 		));
 
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
@@ -1556,8 +1554,7 @@ class CService extends CApiService {
 			$serviceTimes = API::getApiService()->select('services_times', array(
 				'output' => $this->outputExtend($options['selectTimes'], array('serviceid', 'timeid')),
 				'filter' => array('serviceid' => $serviceIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($serviceTimes, 'serviceid', 'timeid');
 
@@ -1570,8 +1567,7 @@ class CService extends CApiService {
 			$serviceAlarms = API::getApiService()->select('service_alarms', array(
 				'output' => $this->outputExtend($options['selectAlarms'], array('serviceid', 'servicealarmid')),
 				'filter' => array('serviceid' => $serviceIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($serviceAlarms, 'serviceid', 'servicealarmid');
 
@@ -1587,8 +1583,7 @@ class CService extends CApiService {
 			$triggers = API::getApiService()->select('triggers', array(
 				'output' => $options['selectTrigger'],
 				'triggerids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $triggers, 'trigger');
 		}

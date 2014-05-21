@@ -1922,7 +1922,7 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
 				$legend->addCell($rowNum, array('text' => $itemCaption));
-				$legend->addCell($rowNum, array('text' => '[ '._('no data').' ]'));
+				$legend->addCell($rowNum, array('text' => '['._('no data').']'));
 			}
 
 			$rowNum++;

@@ -19,10 +19,6 @@
 **/
 
 
-if ($this->data['elementId']) {
-	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
-}
-
 $slideshowWidget = new CWidget('hat_slides');
 
 // create header form
@@ -75,10 +71,7 @@ if ($this->data['slideshows']) {
 
 	$slideshowsComboBox = new CComboBox('elementid', $this->data['elementId'], 'submit()');
 	foreach ($this->data['slideshows'] as $slideshow) {
-		$slideshowsComboBox->addItem(
-			$slideshow['slideshowid'],
-			get_node_name_by_elid($slideshow['slideshowid'], null, NAME_DELIMITER).$slideshow['name']
-		);
+		$slideshowsComboBox->addItem($slideshow['slideshowid'], $slideshow['name']);
 	}
 	$slideshowForm->addItem(array(_('Slide show').SPACE, $slideshowsComboBox));
 
@@ -111,6 +104,10 @@ else {
 	);
 	$slideshowWidget->addItem(BR());
 	$slideshowWidget->addItem(new CTableInfo(_('No slide shows found.')));
+}
+
+if ($this->data['elementId']) {
+	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 }
 
 return $slideshowWidget;

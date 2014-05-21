@@ -7,13 +7,11 @@ SUBDIRS = \
 	discoverer \
 	housekeeper \
 	httppoller \
-	nodewatcher \
 	pinger \
 	poller \
 	snmptrapper \
 	timer \
 	trapper \
-	utils \
 	watchdog \
 	escalator \
 	proxypoller \
@@ -40,8 +38,6 @@ zabbix_server_LDADD = \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
 	snmptrapper/libzbxsnmptrapper.a \
-	nodewatcher/libzbxnodewatcher.a \
-	utils/libzbxutils.a \
 	httppoller/libzbxhttppoller.a \
 	watchdog/libzbxwatchdog.a \
 	escalator/libzbxescalator.a \
@@ -49,7 +45,6 @@ zabbix_server_LDADD = \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \

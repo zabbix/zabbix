@@ -134,8 +134,10 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 	'Lynx/2.8.4rel.1 libwww-FM/2.14' => 'Lynx 2.8.4rel.1',
 	'Links (2.3pre1; Linux 2.6.35.10 i686; 225x51)' => 'Links 2.3pre1',
 	'Links (2.2; Linux 2.6.37.6-0.7-desktop i686; 225x51)' => 'Links 2.2',
-	'Googlebot/2.1 (+http://www.google.com/bot.html)' => 'Googlebot'
+	'Googlebot/2.1 (+http://www.google.com/bot.html)' => 'Googlebot',
+	-1 => _('other').' ...'
 ));
+
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append HTTP proxy to form list
@@ -195,8 +197,10 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		'name_step' => $stepid
 	));
 
-	if (zbx_strlen($step['url']) > 70) {
-		$url = new CSpan(substr($step['url'], 0, 35).SPACE.'...'.SPACE.substr($step['url'], zbx_strlen($step['url']) - 25, 25));
+	if (mb_strlen($step['url']) > 70) {
+		$start = mb_substr($step['url'], 0, 35);
+		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
+		$url = new CSpan($start.SPACE.'...'.SPACE.$end);
 		$url->setHint($step['url']);
 	}
 	else {
@@ -248,6 +252,7 @@ if (!empty($this->data['httptestid'])) {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
+			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?')),
 			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
 			new CButtonCancel(url_param('hostid'))
 		)

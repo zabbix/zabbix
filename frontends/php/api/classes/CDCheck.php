@@ -32,7 +32,6 @@ class CDCheck extends CApiService {
 
 	public function get($options) {
 		$result = array();
-		$nodeCheck = false;
 		$userType = self::$userData['type'];
 
 		$sqlParts = array(
@@ -45,7 +44,6 @@ class CDCheck extends CApiService {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'dcheckids'					=> null,
 			'druleids'					=> null,
 			'dserviceids'				=> null,
@@ -80,18 +78,10 @@ class CDCheck extends CApiService {
 			return array();
 		}
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // dcheckids
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
 			$sqlParts['where']['dcheckid'] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.dcheckid', $nodeids);
-			}
 		}
 
 // druleids
@@ -102,11 +92,6 @@ class CDCheck extends CApiService {
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['druleid'] = 'dc.druleid';
-			}
-
-			if (!$nodeCheck) {
-				$nodeCheck = true;
-				$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.druleid', $nodeids);
 			}
 		}
 
@@ -124,12 +109,6 @@ class CDCheck extends CApiService {
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
 			}
-		}
-
-		// node check !!!!
-		// should last, after all ****IDS checks
-		if (!$nodeCheck) {
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'dc.dcheckid', $nodeids);
 		}
 
 // filter
@@ -150,7 +129,6 @@ class CDCheck extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -195,7 +173,6 @@ class CDCheck extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'dcheckids' => $ids,
 			'countOutput' => true
 		));
@@ -217,7 +194,6 @@ class CDCheck extends CApiService {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
 			'dcheckids' => $ids,
 			'editable' => true,
 			'countOutput' => true
@@ -247,8 +223,7 @@ class CDCheck extends CApiService {
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
 				'druleids' => $relationMap->getRelatedIds(),
-				'nodeids' => $options['nodeids'],
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');

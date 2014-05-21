@@ -17,14 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <procfs.h>
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
-
-#define DO_SUM 0
-#define DO_MAX 1
-#define DO_MIN 2
-#define DO_AVG 3
+#include "log.h"
 
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
@@ -49,7 +46,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
 	DIR		*dir;
 	struct dirent	*entries;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int		fd = -1;
@@ -59,15 +56,28 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	proccount = 0;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		errno = 0;
+
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -75,20 +85,26 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 2);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
-		do_task = DO_SUM;
+		do_task = ZBX_DO_SUM;
 	else if (0 == strcmp(param, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(param, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(param, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -100,7 +116,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))
@@ -125,9 +141,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			memsize = value;
 		else
 		{
-			if (do_task == DO_MAX)
+			if (ZBX_DO_MAX == do_task)
 				memsize = MAX(memsize, value);
-			else if (do_task == DO_MIN)
+			else if (ZBX_DO_MIN == do_task)
 				memsize = MIN(memsize, value);
 			else
 				memsize += value;
@@ -138,14 +154,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 != fd)
 		close(fd);
 
-	if (do_task == DO_AVG)
-	{
+	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
-	}
 	else
-	{
 		SET_UI64_RESULT(result, memsize);
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -155,7 +167,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
 	DIR		*dir;
 	struct dirent	*entries;
-	struct stat	buf;
+	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int		fd = -1;
@@ -163,15 +175,28 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	proccount = 0;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		errno = 0;
+
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			if (0 == errno)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
+			else
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -187,12 +212,18 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -204,7 +235,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
 
-		if (0 != stat(tmp, &buf))
+		if (0 != zbx_stat(tmp, &buf))
 			continue;
 
 		if (-1 == (fd = open(tmp, O_RDONLY)))

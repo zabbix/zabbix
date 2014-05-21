@@ -128,9 +128,7 @@ $fields = array(
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
-	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	// ajax
-	'filterState' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -166,15 +164,6 @@ if (get_request('parent_discoveryid', false)) {
 }
 else {
 	access_deny();
-}
-
-// ajax
-if (hasRequest('filterState')) {
-	CProfile::update('web.host_discovery.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*

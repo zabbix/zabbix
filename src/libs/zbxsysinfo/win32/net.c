@@ -25,19 +25,19 @@
 /*
  * returns interface description encoded in UTF-8 format
  */
-static LPSTR	get_if_description(MIB_IFROW *pIfRow)
+static char	*get_if_description(MIB_IFROW *pIfRow)
 {
-	static LPTSTR	(*mb_to_unicode)(LPCSTR) = NULL;
-	LPTSTR		wdescr;
-	LPSTR		utf8_descr;
+	static wchar_t *(*mb_to_unicode)(const char *) = NULL;
+	wchar_t 	*wdescr;
+	char		*utf8_descr;
 
 	if (NULL == mb_to_unicode)
 	{
-		OSVERSIONINFO	version_info = {sizeof(OSVERSIONINFO)};
+		const OSVERSIONINFOEX	*vi;
 
 		/* starting with Windows Vista (Windows Server 2008) the interface description */
 		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
-		if (TRUE == GetVersionEx(&version_info) && 6 <= version_info.dwMajorVersion)
+		if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
 			mb_to_unicode = zbx_oemcp_to_unicode;
 		else
 			mb_to_unicode = zbx_acp_to_unicode;
@@ -99,7 +99,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		LPSTR	utf8_descr;
+		char	*utf8_descr;
 
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
 		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
@@ -147,16 +147,25 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets);
@@ -167,7 +176,10 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -178,16 +190,25 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwOutOctets);
@@ -198,7 +219,10 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "dropped"))
 		SET_UI64_RESULT(result, pIfRow.dwOutDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -209,16 +233,25 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFROW	pIfRow;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == if_name || '\0' == *if_name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets + pIfRow.dwOutOctets);
@@ -231,7 +264,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos +
 				pIfRow.dwOutDiscards);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
@@ -244,11 +280,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
-	LPSTR		utf8_descr;
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	char 		*utf8_descr;
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -264,8 +296,14 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
@@ -352,6 +390,8 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain IP address information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -369,6 +409,8 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain network interface information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -378,7 +420,7 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			LPSTR	utf8_descr;
+			char	*utf8_descr;
 
 			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
 			if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))
@@ -431,12 +473,18 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*port_str;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	port_str = get_rparam(request, 0);
 
 	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	dwSize = sizeof(MIB_TCPTABLE);
 	pTcpTable = (MIB_TCPTABLE *)zbx_malloc(pTcpTable, dwSize);
@@ -464,6 +512,8 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "GetTcpTable failed with error: %s", strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 

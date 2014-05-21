@@ -2112,57 +2112,6 @@ size_t	zbx_hex2binary(char *io)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_next_field                                               *
- *                                                                            *
- * Purpose: return current field of character separated string                *
- *                                                                            *
- * Parameters:                                                                *
- *      line - null terminated, character separated string                    *
- *      output - output buffer (current field)                                *
- *      olen - allocated output buffer size                                   *
- *      separator - fields separator                                          *
- *                                                                            *
- * Return value: pointer to the next field                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator)
-{
-	char	*ret;
-	size_t	flen;
-
-	assert(line);
-
-	if (NULL == *line)
-	{
-		(*output)[0] = '\0';
-		return 0;
-	}
-
-	if (NULL != (ret = strchr(*line, separator)))
-	{
-		flen = ret - *line;
-		ret++;
-	}
-	else
-		flen = strlen(*line);
-
-	if (*olen < flen + 1)
-	{
-		*olen = flen * 2;
-		*output = zbx_realloc(*output, *olen);
-	}
-	memcpy(*output, *line, flen);
-	(*output)[flen] = '\0';
-
-	*line = ret;
-
-	return flen;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
@@ -2448,22 +2397,14 @@ int	zbx_mismatch(const char *s1, const char *s2)
 	return i;
 }
 
-int	starts_with(const char *str, const char *prefix)
-{
-	const char	*p, *q;
-
-	for (p = str, q = prefix; *p == *q && *q != '\0'; p++, q++);
-
-	return (*q == '\0' ? SUCCEED : FAIL);
-}
-
 int	cmp_key_id(const char *key_1, const char *key_2)
 {
 	const char	*p, *q;
 
-	for (p = key_1, q = key_2; *p == *q && *q != '\0' && *q != '[' && *q != ','; p++, q++);
+	for (p = key_1, q = key_2; *p == *q && '\0' != *q && '[' != *q; p++, q++)
+		;
 
-	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
+	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
 const char	*zbx_permission_string(int perm)
@@ -2640,19 +2581,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 			return "SNMPv3 agent";
 		case SVC_ICMPPING:
 			return "ICMP ping";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_nodetype_string(unsigned char nodetype)
-{
-	switch (nodetype)
-	{
-		case ZBX_NODE_MASTER:
-			return "master";
-		case ZBX_NODE_SLAVE:
-			return "slave";
 		default:
 			return "unknown";
 	}
@@ -2852,13 +2780,13 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 }
 
 /* convert from selected code page to unicode */
-static LPTSTR	zbx_to_unicode(unsigned int codepage, LPCSTR cp_string)
+static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
 {
-	LPTSTR	wide_string = NULL;
+	wchar_t	*wide_string = NULL;
 	int	wide_size;
 
 	wide_size = MultiByteToWideChar(codepage, 0, cp_string, -1, NULL, 0);
-	wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
+	wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 
 	/* convert from cp_string to wide_string */
 	MultiByteToWideChar(codepage, 0, cp_string, -1, wide_string, wide_size);
@@ -2867,18 +2795,18 @@ static LPTSTR	zbx_to_unicode(unsigned int codepage, LPCSTR cp_string)
 }
 
 /* convert from Windows ANSI code page to unicode */
-LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string)
+wchar_t	*zbx_acp_to_unicode(const char *acp_string)
 {
 	return zbx_to_unicode(CP_ACP, acp_string);
 }
 
 /* convert from Windows OEM code page to unicode */
-LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string)
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string)
 {
 	return zbx_to_unicode(CP_OEMCP, oemcp_string);
 }
 
-int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size)
+int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size)
 {
 	/* convert from acp_string to wide_string */
 	if (0 == MultiByteToWideChar(CP_ACP, 0, acp_string, -1, wide_string, wide_size))
@@ -2888,19 +2816,19 @@ int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_si
 }
 
 /* convert from UTF-8 to unicode */
-LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string)
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string)
 {
 	return zbx_to_unicode(CP_UTF8, utf8_string);
 }
 
 /* convert from unicode to utf8 */
-LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
+char	*zbx_unicode_to_utf8(const wchar_t *wide_string)
 {
-	LPSTR	utf8_string = NULL;
+	char	*utf8_string = NULL;
 	int	utf8_size;
 
 	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, NULL, 0, NULL, NULL);
-	utf8_string = (LPSTR)zbx_malloc(utf8_string, (size_t)utf8_size);
+	utf8_string = (char *)zbx_malloc(utf8_string, (size_t)utf8_size);
 
 	/* convert from wide_string to utf8_string */
 	WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL);
@@ -2909,7 +2837,7 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
 }
 
 /* convert from unicode to utf8 */
-LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
+char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size)
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
@@ -2936,7 +2864,7 @@ void	zbx_strupper(char *str)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
 #define STATIC_SIZE	1024
-	wchar_t	wide_string_static[STATIC_SIZE], *wide_string = NULL;
+	wchar_t		wide_string_static[STATIC_SIZE], *wide_string = NULL;
 	int		wide_size;
 	char		*utf8_string = NULL;
 	int		utf8_size;
@@ -2957,7 +2885,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	{
 		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
 		if (wide_size > STATIC_SIZE)
-			wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
+			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 		else
 			wide_string = wide_string_static;
 
@@ -2971,7 +2899,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	}
 
 	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL);
-	utf8_string = (LPSTR)zbx_malloc(utf8_string, (size_t)utf8_size + 1/* '\0' */);
+	utf8_string = (char *)zbx_malloc(utf8_string, (size_t)utf8_size + 1/* '\0' */);
 
 	/* convert from wide_string to utf8_string */
 	WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string, utf8_size, NULL, NULL);

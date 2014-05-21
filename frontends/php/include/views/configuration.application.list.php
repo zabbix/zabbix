@@ -41,8 +41,8 @@ $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'), $createFor
 
 // create widget header
 $filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
+$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 $applicationWidget->addHeader(_('Applications'), $filterForm);
 $applicationWidget->addHeaderRowNumber();
@@ -57,7 +57,6 @@ $applicationForm->addVar('hostid', $this->data['hostid']);
 $applicationTable = new CTableInfo(_('No applications found.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name'),
 	_('Show')
@@ -91,7 +90,6 @@ foreach ($this->data['applications'] as $application) {
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
-		$this->data['displayNodes'] ? $application['nodename'] : null,
 		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(

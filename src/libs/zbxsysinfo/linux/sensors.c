@@ -20,11 +20,6 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#define DO_ONE	0
-#define DO_AVG	1
-#define DO_MAX	2
-#define DO_MIN	3
-
 #if defined(KERNEL_2_4)
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
@@ -56,24 +51,23 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 #else
 	if (1 == sscanf(line, "%lf", &value))
 	{
-		if(NULL == strstr(filename, "fan"))
+		if (NULL == strstr(filename, "fan"))
 			value = value / 1000;
 #endif
-
 		(*cnt)++;
 
 		switch (do_task)
 		{
-			case DO_ONE:
+			case ZBX_DO_ONE:
 				*aggr = value;
 				break;
-			case DO_AVG:
+			case ZBX_DO_AVG:
 				*aggr += value;
 				break;
-			case DO_MAX:
+			case ZBX_DO_MAX:
 				*aggr = (1 == *cnt ? value : MAX(*aggr, value));
 				break;
-			case DO_MIN:
+			case ZBX_DO_MIN:
 				*aggr = (1 == *cnt ? value : MIN(*aggr, value));
 				break;
 		}
@@ -115,7 +109,7 @@ static char	*sysfs_read_attr(const char *device)
 	return zbx_strdup(NULL, buf);
 }
 
-int	get_device_info(const char *dev_path, const char *dev_name, char *device_info)
+static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info)
 {
 	char		bus_path[MAX_STRING_LEN], linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 	char		*subsys, *prefix, *bus_attr = NULL;
@@ -249,9 +243,9 @@ out:
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
 	char	sensorname[MAX_STRING_LEN];
-#if defined(KERNEL_2_4)
 
-	if (DO_ONE == do_task)
+#if defined(KERNEL_2_4)
+	if (ZBX_DO_ONE == do_task)
 	{
 		zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s/%s", DEVICE_DIR, device, name);
 		count_sensor(do_task, sensorname, aggr, cnt);
@@ -330,14 +324,12 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 				err = SUCCEED;
 			}
 			else
-			{
 				err = get_device_info(devicepath, device_p, device_info);
-			}
 		}
 
 		if (SUCCEED == err && 0 == strcmp(device_info, device))
 		{
-			if (DO_ONE == do_task)
+			if (ZBX_DO_ONE == do_task)
 			{
 				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s_input", devicepath, name);
 				count_sensor(do_task, sensorname, aggr, cnt);
@@ -377,41 +369,59 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	aggr = 0;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	device = get_rparam(request, 0);
 	name = get_rparam(request, 1);
 	function = get_rparam(request, 2);
 
 	if (NULL == device || '\0' == *device)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == function || '\0' == *function)
-		do_task = DO_ONE;
+		do_task = ZBX_DO_ONE;
 	else if (0 == strcmp(function, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(function, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(function, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	if (DO_ONE != do_task && 0 != isdigit(name[strlen(name)-1]))
-		do_task = DO_ONE;
+	if (ZBX_DO_ONE != do_task && 0 != isdigit(name[strlen(name) - 1]))
+		do_task = ZBX_DO_ONE;
 
-	if (DO_ONE != do_task && 0 == isalpha(name[strlen(name)-1]))
+	if (ZBX_DO_ONE != do_task && 0 == isalpha(name[strlen(name) - 1]))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Generic sensor name must be specified for selected mode."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	get_device_sensors(do_task, device, name, &aggr, &cnt);
 
 	if (0 == cnt)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain sensor information."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	if (DO_AVG == do_task)
+	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, aggr / cnt);
 	else
 		SET_DBL_RESULT(result, aggr);

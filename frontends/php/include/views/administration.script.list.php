@@ -35,7 +35,6 @@ $scriptsForm->setAttribute('id', 'scripts');
 $scriptsTable = new CTableInfo(_('No scripts found.'));
 $scriptsTable->setHeader(array(
 	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scripts');"),
-	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Type'),
 	_('Execute on'),
@@ -74,7 +73,6 @@ foreach ($this->data['scripts'] as $script) {
 
 	$scriptsTable->addRow(array(
 		new CCheckBox('scripts['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		$this->data['displayNodes'] ? $script['nodename'] : null,
 		new CLink($script['name'], 'scripts.php?form=1&scriptid='.$script['scriptid']),
 		$scriptType,
 		$scriptExecuteOn,

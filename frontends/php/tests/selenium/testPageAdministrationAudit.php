@@ -50,7 +50,6 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_MAINTENANCE => 'Maintenance',
 		AUDIT_RESOURCE_MAP => 'Map',
 		AUDIT_RESOURCE_MEDIA_TYPE => 'Media type',
-		AUDIT_RESOURCE_NODE => 'Node',
 		AUDIT_RESOURCE_PROXY => 'Proxy',
 		AUDIT_RESOURCE_REGEXP => 'Regular expression',
 		AUDIT_RESOURCE_SCENARIO => 'Scenario',

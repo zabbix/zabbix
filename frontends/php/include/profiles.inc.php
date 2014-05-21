@@ -38,7 +38,6 @@ class CProfile {
 			'SELECT p.*'.
 			' FROM profiles p'.
 			' WHERE p.userid='.self::$userDetails['userid'].
-				andDbNode('p.profileid', false).
 			' ORDER BY p.userid,p.profileid'
 		);
 		while ($profile = DBfetch($db_profiles)) {
@@ -218,6 +217,7 @@ class CProfile {
 		if (!isset(self::$profiles[$idx])) {
 			self::$profiles[$idx] = array();
 		}
+
 		self::$profiles[$idx][$idx2] = $value;
 	}
 
@@ -232,29 +232,22 @@ class CProfile {
 			'type' => $type,
 			'idx2' => $idx2
 		);
+
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}
 
 	private static function updateDB($idx, $value, $type, $idx2) {
-		$sql_cond = '';
+		$sqlIdx2 = ($idx2 > 0) ? ' AND idx2='.zbx_dbstr($idx2) : '';
 
-		if ($idx != 'web.nodes.switch_node') {
-			$sql_cond .= andDbNode('profileid', false);
-		}
-
-		if ($idx2 > 0) {
-			$sql_cond .= ' AND idx2='.$idx2.andDbNode('idx2', false);
-		}
-
-		$value_type = self::getFieldByType($type);
+		$valueType = self::getFieldByType($type);
 
 		return DBexecute(
 			'UPDATE profiles SET '.
-				$value_type.'='.zbx_dbstr($value).','.
+				$valueType.'='.zbx_dbstr($value).','.
 				' type='.$type.
 			' WHERE userid='.self::$userDetails['userid'].
 				' AND idx='.zbx_dbstr($idx).
-				$sql_cond
+				$sqlIdx2
 		);
 	}
 
@@ -270,6 +263,7 @@ class CProfile {
 			default:
 				$field = 'value_id';
 		}
+
 		return $field;
 	}
 
@@ -280,7 +274,7 @@ class CProfile {
 			case PROFILE_TYPE_INT:
 				return zbx_is_int($value);
 			case PROFILE_TYPE_STR:
-				return zbx_strlen($value) <= self::$stringProfileMaxLength;
+				return mb_strlen($value) <= self::$stringProfileMaxLength;
 			default:
 				return true;
 		}
@@ -288,22 +282,16 @@ class CProfile {
 }
 
 /************ CONFIG **************/
-function select_config($cache = true, $nodeid = null) {
-	global $page, $ZBX_LOCALNODEID;
+function select_config($cache = true) {
+	global $page;
 	static $config;
 
 	if ($cache && isset($config)) {
 		return $config;
 	}
-	if (is_null($nodeid)) {
-		$nodeid = $ZBX_LOCALNODEID;
-	}
 
-	$db_config = DBfetch(DBselect(
-			'SELECT c.*'.
-			' FROM config c'.
-			whereDbNode('c.configid', $nodeid)
-	));
+	$db_config = DBfetch(DBselect('SELECT c.* FROM config c'));
+
 	if (!empty($db_config)) {
 		$config = $db_config;
 		return $db_config;
@@ -311,6 +299,7 @@ function select_config($cache = true, $nodeid = null) {
 	elseif (isset($page['title']) && $page['title'] != _('Installation')) {
 		error(_('Unable to select configuration.'));
 	}
+
 	return $db_config;
 }
 
@@ -416,11 +405,7 @@ function update_config($configs) {
 		return null;
 	}
 
-	return DBexecute(
-			'UPDATE config'.
-			' SET '.implode(',', $update).
-			whereDbNode('configid', false)
-	);
+	return DBexecute('UPDATE config SET '.implode(',', $update));
 }
 
 /************ HISTORY **************/
@@ -483,7 +468,8 @@ function getHistoryUrl($page) {
 	// if url length is greater than db field size, skip history update
 	$historyTableSchema = DB::getSchema('user_history');
 
-	return (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
+	// $url is encoded
+	return (strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
 }
 
 function addUserHistory($title, $url) {

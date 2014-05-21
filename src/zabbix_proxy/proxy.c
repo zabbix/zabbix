@@ -119,7 +119,6 @@ int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 0;
-int	CONFIG_NODEWATCHER_FORKS	= 0;
 int	CONFIG_WATCHDOG_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 1;
 
@@ -178,10 +177,6 @@ char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-int	CONFIG_NODEID			= 0;
-int	CONFIG_MASTER_NODEID		= 0;
-int	CONFIG_NODE_NOEVENTS		= 0;
-int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -199,9 +194,6 @@ char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
-
-/* mutex for node syncs; not used in proxy */
-ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -553,15 +545,15 @@ int	main(int argc, char **argv)
 				break;
 			case 'h':
 				help();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
-				exit(-1);
+				exit(EXIT_SUCCESS);
 				break;
 			default:
 				usage();
-				exit(-1);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -683,7 +675,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -890,5 +882,5 @@ void	zbx_on_exit()
 	setproctitle_free_env();
 #endif
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }
