@@ -96,7 +96,9 @@ if ($result) {
 				$control = new CTextBox($fname, $macrosData[$token['value']], 30);
 			}
 
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $token['value']);
+			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})',
+				$token['value']
+			);
 		}
 
 		$resultType = (is_array($info) || !isset($definedErrorPhrases[$info]))
