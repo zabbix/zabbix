@@ -77,6 +77,8 @@ $queueWidget->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
 
 $table = new CTableInfo(_('The queue is empty.'));
 
+$cfg = select_config();
+
 // overview
 if ($config == QUEUE_OVERVIEW) {
 	$itemTypes = array(
@@ -108,6 +110,7 @@ if ($config == QUEUE_OVERVIEW) {
 	));
 
 	$queueData = zbx_toHash($queueData, 'itemtype');
+
 	foreach($itemTypes as $type) {
 		if (isset($queueData[$type])) {
 			$itemTypeData = $queueData[$type];
@@ -125,12 +128,12 @@ if ($config == QUEUE_OVERVIEW) {
 
 		$table->addRow(array(
 			item_type2str($type),
-			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $itemTypeData['delay5'], !$itemTypeData['delay5']),
-			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $itemTypeData['delay10'], !$itemTypeData['delay10']),
-			getSeverityCell(TRIGGER_SEVERITY_WARNING, $itemTypeData['delay30'], !$itemTypeData['delay30']),
-			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $itemTypeData['delay60'], !$itemTypeData['delay60']),
-			getSeverityCell(TRIGGER_SEVERITY_HIGH, $itemTypeData['delay300'], !$itemTypeData['delay300']),
-			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $itemTypeData['delay600'], !$itemTypeData['delay600'])
+			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $itemTypeData['delay5'], !$itemTypeData['delay5'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $itemTypeData['delay10'], !$itemTypeData['delay10'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_WARNING, $itemTypeData['delay30'], !$itemTypeData['delay30'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $itemTypeData['delay60'], !$itemTypeData['delay60'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_HIGH, $itemTypeData['delay300'], !$itemTypeData['delay300'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $itemTypeData['delay600'], !$itemTypeData['delay600'], $cfg)
 		));
 	}
 }
@@ -173,12 +176,12 @@ elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 
 		$table->addRow(array(
 			$proxy['host'],
-			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $proxyData['delay5'], !$proxyData['delay5']),
-			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $proxyData['delay10'], !$proxyData['delay10']),
-			getSeverityCell(TRIGGER_SEVERITY_WARNING, $proxyData['delay30'], !$proxyData['delay30']),
-			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $proxyData['delay60'], !$proxyData['delay60']),
-			getSeverityCell(TRIGGER_SEVERITY_HIGH, $proxyData['delay300'], !$proxyData['delay300']),
-			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $proxyData['delay600'], !$proxyData['delay600'])
+			getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $proxyData['delay5'], !$proxyData['delay5'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $proxyData['delay10'], !$proxyData['delay10'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_WARNING, $proxyData['delay30'], !$proxyData['delay30'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $proxyData['delay60'], !$proxyData['delay60'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_HIGH, $proxyData['delay300'], !$proxyData['delay300'], $cfg),
+			getSeverityCell(TRIGGER_SEVERITY_DISASTER, $proxyData['delay600'], !$proxyData['delay600'], $cfg)
 		));
 	}
 }

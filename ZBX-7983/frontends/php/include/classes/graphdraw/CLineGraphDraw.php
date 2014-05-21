@@ -442,6 +442,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$max = 3;
 		$cnt = 0;
 
+		$config = select_config();
+
 		foreach ($this->items as $inum => $item) {
 			$db_triggers = DBselect(
 				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
@@ -476,7 +478,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->triggers[] = array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY,
-					'color' => getSeverityColor($trigger['priority']),
+					'color' => getSeverityColor($trigger['priority'], TRIGGER_VALUE_TRUE, $config),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 				);

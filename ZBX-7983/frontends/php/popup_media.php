@@ -123,7 +123,10 @@ $frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
 $frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
 
 $frm_row = array();
-foreach (getSeverityCaption() as $i => $caption) {
+$config = select_config();
+$severities = getSeverityCaption(null, $config);
+
+foreach ($severities as $i => $caption) {
 	$frm_row[] = array(
 		new CCheckBox('severity['.$i.']', str_in_array($i, $severity), null, $i),
 		$caption

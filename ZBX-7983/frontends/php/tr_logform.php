@@ -365,8 +365,10 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addRow(SPACE, $keyTable);
 	$frmTRLog->addRow(SPACE, $table);
 
+	$config = select_config();
+
 	$sev_select = new CComboBox('priority', $priority);
-	$sev_select->addItems(getSeverityCaption());
+	$sev_select->addItems(getSeverityCaption(null, $config));
 	$frmTRLog->addRow(_('Severity'), $sev_select);
 	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
 	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));

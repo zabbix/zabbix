@@ -299,7 +299,7 @@ class CPageFilter {
 
 		// severities min
 		if (isset($options['severitiesMin'])) {
-			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin']);
+			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin'], $config);
 		}
 	}
 
@@ -732,7 +732,7 @@ class CPageFilter {
 	 * @param int    $options['default']
 	 * @param string $options['mapId']
 	 */
-	private function _initSeveritiesMin($severityMin, array $options = array()) {
+	private function _initSeveritiesMin($severityMin, array $options = array(), $config) {
 		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		$mapId = isset($options['mapId']) ? $options['mapId'] : 0;
 		$severityMinProfile = isset($this->_profileIds['severityMin']) ? $this->_profileIds['severityMin'] : null;
@@ -750,7 +750,7 @@ class CPageFilter {
 			}
 		}
 
-		$this->data['severitiesMin'] = getSeverityCaption();
+		$this->data['severitiesMin'] = getSeverityCaption(null, $config);
 		$this->data['severitiesMin'][$default] = $this->data['severitiesMin'][$default].SPACE.'('._('default').')';
 		$this->ids['severityMin'] = ($severityMin === null) ? $default : $severityMin;
 	}

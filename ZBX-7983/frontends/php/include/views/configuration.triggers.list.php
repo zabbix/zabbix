@@ -112,6 +112,9 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status', $link),
 	$data['showErrorColumn'] ? _('Error') : null
 ));
+
+$config = select_config();
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
@@ -249,7 +252,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggersTable->addRow(array(
 		$checkBox,
 		$this->data['displayNodes'] ? $trigger['nodename'] : null,
-		getSeverityCell($trigger['priority']),
+		getSeverityCell($trigger['priority'], null, false, $config),
 		$hosts,
 		$description,
 		$expressionColumn,

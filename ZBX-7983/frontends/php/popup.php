@@ -768,7 +768,7 @@ elseif ($srctbl == 'triggers') {
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', null, null, $trigger['triggerid']) : null,
 			$description,
-			getSeverityCell($trigger['priority']),
+			getSeverityCell($trigger['priority'], null, false, $config),
 			new CSpan(
 				triggerIndicator($trigger['status'], $trigger['state']),
 				triggerIndicatorStyle($trigger['status'], $trigger['state'])

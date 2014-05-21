@@ -1469,6 +1469,7 @@ function drawMapSelements(&$im, $map, $mapInfo) {
 
 function drawMapHighligts(&$im, $map, $mapInfo) {
 	$selements = $map['selements'];
+	$config = select_config();
 
 	foreach ($selements as $selementId => $selement) {
 		if (isset($selement['elementsubtype']) && $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
@@ -1486,7 +1487,7 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 			$st_color = null;
 
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
-				$hl_color = hex2rgb(getSeverityColor($elementInfo['priority']));
+				$hl_color = hex2rgb(getSeverityColor($elementInfo['priority'], TRIGGER_VALUE_TRUE, $config));
 			}
 
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) {
@@ -1562,7 +1563,6 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 					imagecolorallocate($im, 120, 120, 120)
 				);
 
-				$config = select_config();
 				if (isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable']) {
 					imagesetthickness($im, 5);
 					imagearc($im,

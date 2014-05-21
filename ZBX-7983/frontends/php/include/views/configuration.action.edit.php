@@ -192,8 +192,9 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
+		$config = select_config();
 		$condition = new CComboBox('new_condition[value]');
-		$condition->addItems(getSeverityCaption());
+		$condition->addItems(getSeverityCaption(null, $config));
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:

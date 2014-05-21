@@ -41,11 +41,11 @@ if ($this->data['type'] == SHOW_TRIGGERS) {
 	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
 }
 
-for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
-}
-
 $config = select_config();
+
+for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
+	$hintTable->addRow(array(getSeverityCell($i, null, false, $config), _('PROBLEM')));
+}
 
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	// blinking preview in help popup (only if blinking is enabled)

@@ -85,7 +85,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-$config = select_config();
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
@@ -300,12 +299,12 @@ $filterForm->addRow(_('Events'), $eventsComboBox);
 
 $severityComboBox = new CComboBox('show_severity', $showSeverity);
 $severityComboBox->addItems(array(
-	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
+	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config),
+	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config),
+	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config),
+	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config),
+	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config),
+	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config)
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
@@ -751,7 +750,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	// severity
-	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value']);
+	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value'], $config);
 	if ($showEventColumn) {
 		$severityColumn->setColSpan(2);
 	}
@@ -808,7 +807,7 @@ foreach ($triggers as $trigger) {
 			$statusSpan = new CCol($eventStatusSpan);
 			$statusSpan->setColSpan(2);
 
-			$ack = getEventAckState($event, true);
+			$ack = getEventAckState($event, true, true, array(), $config);
 
 			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
 				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])

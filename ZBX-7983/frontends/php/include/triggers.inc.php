@@ -40,9 +40,7 @@ function getSeverityStyle($severity, $type = true) {
 	}
 }
 
-function getSeverityCaption($severity = null) {
-	$config = select_config();
-
+function getSeverityCaption($severity = null, $config) {
 	$severities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
 		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
@@ -52,7 +50,7 @@ function getSeverityCaption($severity = null) {
 		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5'])
 	);
 
-	if (is_null($severity)) {
+	if ($severity === null) {
 		return $severities;
 	}
 	elseif (isset($severities[$severity])) {
@@ -63,11 +61,10 @@ function getSeverityCaption($severity = null) {
 	}
 }
 
-function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
+function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE, $config) {
 	if ($value == TRIGGER_VALUE_FALSE) {
 		return 'AAFFAA';
 	}
-	$config = select_config();
 
 	switch ($severity) {
 		case TRIGGER_SEVERITY_DISASTER:
@@ -95,9 +92,9 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 	return $color;
 }
 
-function getSeverityCell($severity, $text = null, $force_normal = false) {
+function getSeverityCell($severity, $text = null, $force_normal = false, $config) {
 	if ($text === null) {
-		$text = CHtml::encode(getSeverityCaption($severity));
+		$text = CHtml::encode(getSeverityCaption($severity, $config));
 	}
 
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
@@ -1613,7 +1610,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	return API::Trigger()->get($options);
 }
 
-function make_trigger_details($trigger) {
+function make_trigger_details($trigger, $config) {
 	$hosts = reset($trigger['hosts']);
 	$hostId = $hosts['hostid'];
 
@@ -1638,7 +1635,7 @@ function make_trigger_details($trigger) {
 
 	$table->addRow(array(_('Host'), $hostName));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
-	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
+	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], null, false, $config)));
 	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));

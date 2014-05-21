@@ -100,8 +100,10 @@ switch ($data['method']) {
 
 		$sortClock = array();
 		$sortEvent = array();
-
 		$usedTriggers = array();
+
+		$config = select_config();
+
 		foreach ($events as $number => $event) {
 			if (count($usedTriggers) < 15) {
 				if (!isset($usedTriggers[$event['objectid']])) {
@@ -130,7 +132,7 @@ switch ($data['method']) {
 						'time' => $event['clock'],
 						'priority' => $priority,
 						'sound' => $sound,
-						'color' => getSeverityColor($trigger['priority'], $event['value']),
+						'color' => getSeverityColor($trigger['priority'], $event['value'], $config),
 						'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 						'body' => array(
 							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',

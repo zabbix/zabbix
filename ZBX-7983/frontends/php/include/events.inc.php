@@ -175,8 +175,7 @@ function get_next_event($currentEvent, array $eventList = array()) {
 	return DBfetch(DBselect($sql, 1));
 }
 
-function make_event_details($event, $trigger) {
-	$config = select_config();
+function make_event_details($event, $trigger, $config) {
 	$table = new CTableInfo();
 
 	$table->addRow(array(_('Event'), CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))));
@@ -185,7 +184,7 @@ function make_event_details($event, $trigger) {
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$ack = getEventAckState($event, true);
+		$ack = getEventAckState($event, true, true, array(), $config);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
 
@@ -249,7 +248,7 @@ function make_small_eventlist($startEvent) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event, true);
+		$ack = getEventAckState($event, true, true, array(), $config);
 
 		$table->addRow(array(
 			new CLink(
@@ -268,9 +267,7 @@ function make_small_eventlist($startEvent) {
 	return $table;
 }
 
-function make_popup_eventlist($triggerId, $eventId) {
-	$config = select_config();
-
+function make_popup_eventlist($triggerId, $eventId, $config) {
 	$table = new CTableInfo();
 	$table->setAttribute('style', 'width: 400px;');
 
@@ -310,7 +307,7 @@ function make_popup_eventlist($triggerId, $eventId) {
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			getEventAckState($event, false, false)
+			getEventAckState($event, false, false, array(), $config)
 		));
 	}
 
@@ -332,9 +329,7 @@ function make_popup_eventlist($triggerId, $eventId) {
  *
  * @return array|CLink|CSpan|null|string
  */
-function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
-	$config = select_config();
-
+function getEventAckState($event, $backUrl = false, $isLink = true, $params = array(), $config) {
 	if (!$config['event_ack_enable']) {
 		return null;
 	}

@@ -73,6 +73,8 @@ $itemTable->setHeader(array(
 	$data['showErrorColumn'] ? _('Error') : null
 ));
 
+$config = select_config();
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -180,7 +182,7 @@ foreach ($this->data['items'] as $item) {
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow(array(
-			getSeverityCell($trigger['priority']),
+			getSeverityCell($trigger['priority'], null, false, $config),
 			$triggerDescription,
 			triggerExpression($trigger, true),
 			new CSpan(

@@ -76,10 +76,12 @@ $dashconfFormList->addRow(_('Hosts'), array($maintenanceCheckBox, _('Show hosts 
 
 // append trigger severities to form list
 $severities = array();
+$config = select_config();
+
 foreach ($this->data['severities'] as $severity) {
 	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']', isset($this->data['severity'][$severity]), '', 1);
 	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
-	$severities[] = array($serverityCheckBox, getSeverityCaption($severity));
+	$severities[] = array($serverityCheckBox, getSeverityCaption($severity, $config));
 	$severities[] = BR();
 }
 array_pop($severities);

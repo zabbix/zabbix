@@ -161,6 +161,8 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 
 	$mediaTableInfo = new CTableInfo(_('No media found.'));
 
+	$config = select_config();
+
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {
 			$status = new CLink(_('Enabled'), '#', 'enabled');
@@ -179,7 +181,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 						'&severity='.$media['severity'].
 						'&active='.$media['active'];
 
-		foreach (getSeverityCaption() as $key => $caption) {
+		foreach (getSeverityCaption(null, $config) as $key => $caption) {
 			$mediaActive = ($media['severity'] & (1 << $key));
 
 			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : null);
@@ -257,6 +259,9 @@ if ($this->data['is_profile']) {
 		TRIGGER_SEVERITY_HIGH,
 		TRIGGER_SEVERITY_DISASTER
 	);
+
+	$config = select_config();
+
 	foreach ($severities as $severity) {
 		$soundList = new CComboBox('messages[sounds.'.$severity.']', $this->data['messages']['sounds.'.$severity]);
 		foreach ($zbxSounds as $filename => $file) {
@@ -265,7 +270,7 @@ if ($this->data['is_profile']) {
 
 		$triggersTable->addRow(array(
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
-			getSeverityCaption($severity),
+			getSeverityCaption($severity, $config),
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
