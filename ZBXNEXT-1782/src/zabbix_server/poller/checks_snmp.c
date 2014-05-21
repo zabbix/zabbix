@@ -479,7 +479,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	{
 		SOCK_CLEANUP;
 
-		zbx_strlcpy(error, "Cannot open snmp session", max_error_len);
+		zbx_strlcpy(error, "Cannot open SNMP session", max_error_len);
 	}
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -597,19 +597,15 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	else if (ASN_INTEGER == var->type)
 #endif
 	{
-		/* negative integer values are converted to double if item value type is not set to unsigned*/
-		if (ITEM_VALUE_TYPE_FLOAT == value_type)
-			SET_DBL_RESULT(result, (double)*var->val.integer);
-		else if (ITEM_VALUE_TYPE_UINT64 == value_type && 0 < *var->val.integer)
-			SET_UI64_RESULT(result, (zbx_uint64_t)*var->val.integer);
-		else
+		if (ITEM_VALUE_TYPE_UINT64 == value_type && 0 > *var->val.integer)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [\"%d\"] is not "
-					"suitable for value type [%s] and data type [ASN_INTEGER]",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%d]"
+					" is not suitable for value type [%s].",
 					*var->val.integer, zbx_item_value_type_string(value_type)));
-
 			ret = NOTSUPPORTED;
 		}
+		else
+			SET_DBL_RESULT(result, *var->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_FLOAT == var->type)
