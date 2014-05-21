@@ -85,7 +85,7 @@ else {
 			'hosts' => array(
 				'monitored_hosts' => true,
 				'with_items' => true,
-				'DDFirstLabel' => _('Default')
+				'DDFirstLabel' => _('not selected')
 			),
 			'hostid' => get_request('hostid', null),
 			'groupid' => get_request('groupid', null)

@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -41,15 +42,21 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	pid_t	curr_pid = getpid();
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -65,12 +72,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "min"))
 		do_task = ZBX_DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -86,7 +99,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
 				goto lbl_skip_procces;
 
-			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
+			/* Self process information. It leads to incorrect results for proc.mem[zabbix_agentd]. */
 			if (psinfo.pr_pid == curr_pid)
 				goto lbl_skip_procces;
 
@@ -104,21 +117,21 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			proccount++;
 
-			if (0 > memsize) /* First inicialization */
+			if (0 > memsize) /* first initialization */
 			{
-				memsize = (double) (psinfo.pr_rssize * pgsize);
+				memsize = (double)(psinfo.pr_rssize * pgsize);
 			}
 			else
 			{
 				if (ZBX_DO_MAX == do_task)
-					memsize = MAX(memsize, (double) (psinfo.pr_rssize * pgsize));
+					memsize = MAX(memsize, (double)(psinfo.pr_rssize * pgsize));
 				else if (ZBX_DO_MIN == do_task)
-					memsize = MIN(memsize, (double) (psinfo.pr_rssize * pgsize));
+					memsize = MIN(memsize, (double)(psinfo.pr_rssize * pgsize));
 				else	/* SUM */
-					memsize +=  (double) (psinfo.pr_rssize * pgsize);
+					memsize += (double)(psinfo.pr_rssize * pgsize);
 			}
 lbl_skip_procces:
-			if (proc)
+			if (-1 != proc)
 				close(proc);
 		}
 	}
@@ -132,7 +145,7 @@ lbl_skip_procces:
 	}
 
 	if (ZBX_DO_AVG == do_task)
-		SET_DBL_RESULT(result, proccount == 0 ? 0 : ((double)memsize/(double)proccount));
+		SET_DBL_RESULT(result, 0 == proccount ? 0 : memsize / (double)proccount);
 	else
 		SET_UI64_RESULT(result, memsize);
 
@@ -157,15 +170,21 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	pid_t	curr_pid = getpid();
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -180,13 +199,21 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_proc_stat = PR_SSLEEP;
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = PR_SZOMB;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
 	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
+	}
 
-	while(NULL != (entries=readdir(dir)))
+	while (NULL != (entries = readdir(dir)))
 	{
 		strscpy(filename, "/proc/");
 		zbx_strlcat(filename, entries->d_name,MAX_STRING_LEN);
@@ -197,10 +224,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (-1 == proc)
 				goto lbl_skip_procces;
 
-			if (-1 == ioctl(proc,PIOCPSINFO,&psinfo))
+			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
 				goto lbl_skip_procces;
 
-			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
+			/* Self process information. It leads to incorrect results for proc.num[zabbix_agentd]. */
 			if (psinfo.pr_pid == curr_pid)
 				goto lbl_skip_procces;
 
@@ -222,7 +249,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			proccount++;
 lbl_skip_procces:
-			if (proc)
+			if (-1 != proc)
 				close(proc);
 		}
 	}
