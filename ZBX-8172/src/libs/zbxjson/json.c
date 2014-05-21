@@ -578,6 +578,12 @@ static char	zbx_json_decode_character(const char **p)
 
 	switch (*(++*p))
 	{
+		case '\\':
+			out = '\\';
+			break;
+		case '/':
+			out = '/';
+			break;
 		case '"':
 			out = '\"';
 			break;
