@@ -66,13 +66,22 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], dns[INTERFACE_DNS_LEN_MAX], port[8], encoding[32];
 
 	if (ZBX_COMMAND_ERROR == parse_command(item->key, cmd, sizeof(cmd), params, sizeof(params)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		return NOTSUPPORTED;
+	}
 
 	if (0 != strcmp(TELNET_RUN_KEY, cmd))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		return NOTSUPPORTED;
+	}
 
 	if (4 < num_param(params))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 2, dns, sizeof(dns)))
 		*dns = '\0';
@@ -92,7 +101,10 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	if ('\0' != *port)
 	{
 		if (FAIL == is_ushort(port, &item->interface.port))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			return NOTSUPPORTED;
+		}
 	}
 	else
 		item->interface.port = ZBX_DEFAULT_TELNET_PORT;

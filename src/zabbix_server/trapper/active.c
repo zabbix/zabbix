@@ -449,7 +449,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_json_addstring(&json, "expression", regexp->expression, ZBX_JSON_TYPE_STRING);
 
 			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->expression_type);
-			zbx_json_addstring(&json, "expression_type",buffer, ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "expression_type", buffer, ZBX_JSON_TYPE_INT);
 
 			zbx_snprintf(buffer, sizeof(buffer), "%c", regexp->exp_delimiter);
 			zbx_json_addstring(&json, "exp_delimiter", buffer, ZBX_JSON_TYPE_STRING);

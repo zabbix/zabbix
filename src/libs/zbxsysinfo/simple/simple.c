@@ -97,29 +97,59 @@ lbl_ret:
 }
 #endif	/* HAVE_LDAP */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: find_ssh_ident_string                                            *
+ *                                                                            *
+ * Purpose: parse recv_buf for ssh identification string as per               *
+ *          RFC 4253, section 4.2                                             *
+ *                                                                            *
+ * Parameters: recv_buf     - [IN] buffer to parse                            *
+ *             remote_major - [OUT] memory pointer where protocol major is    *
+ *                                  to be written to                          *
+ *             remote_minor - [OUT] memory pointer where protocol minor is    *
+ *                                  to be written to                          *
+ *                                                                            *
+ * Returns: SUCCEED - if a string matching the specification is found         *
+ *          FAIL - otherwise                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *remote_minor)
+{
+	const char	*r, *l = recv_buf;
+
+	while (NULL != (r = strchr(l, '\n')))
+	{
+		if (2 == sscanf(l, "SSH-%d.%d-%*s", remote_major, remote_minor))
+			return SUCCEED;
+
+		l = r + 1;
+	}
+
+	return FAIL;
+}
+
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_STRING_LEN], *recv_buf, *ssh_server, *ssh_proto;
+	char		send_buf[MAX_STRING_LEN];
+	int		remote_major, remote_minor;
 
 	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
+		if (SUCCEED == (ret = zbx_tcp_recv(&s)))
 		{
-			if (0 == strncmp(recv_buf, "SSH", 3))
+			if (SUCCEED == find_ssh_ident_string(s.buffer, &remote_major, &remote_minor))
 			{
-				ssh_server = ssh_proto = recv_buf + 4;
-				ssh_server += strspn(ssh_proto, "0123456789-. ");
-				ssh_server[-1] = '\0';
-
-				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%s-%s\n", ssh_proto, "zabbix_agent");
+				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-zabbix_agent\r\n",
+						remote_major, remote_minor);
 				*value_int = 1;
 			}
 			else
-				zbx_snprintf(send_buf, sizeof(send_buf), "0\n");
+				strscpy(send_buf, "0\n");
 
 			ret = zbx_tcp_send_raw(&s, send_buf);
 		}
@@ -221,14 +251,20 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	check_time = zbx_time();
 
 	if (3 < request->nparam)
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	service = get_rparam(request, 0);
 	ip_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
 	if (NULL == service || '\0' == *service)
-		return ret;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == ip_str || '\0' == *ip_str)
 		strscpy(ip, default_addr);
@@ -237,8 +273,8 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 
 	if (NULL != port_str && SUCCEED != is_ushort(port_str, &port))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
-		return ret;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == strcmp(service, "ssh"))
@@ -301,8 +337,8 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Required \"port\" parameter missing"));
-			return ret;
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			return SYSINFO_RET_FAIL;
 		}
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
