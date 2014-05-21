@@ -768,7 +768,7 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name)
 {
 	char		buffer[MAX_STRING_LEN];
-	const char	*p;
+	const char	*p = NULL;
 
 	while (NULL != (p = zbx_json_pair_next(jp, p, buffer, sizeof(buffer))))
 		if (0 == strcmp(name, buffer))
@@ -917,7 +917,7 @@ int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
 int	zbx_json_count(const struct zbx_json_parse *jp)
 {
 	int		num = 0;
-	const char	*p;
+	const char	*p = NULL;
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 		num++;
