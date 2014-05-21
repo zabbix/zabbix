@@ -145,11 +145,11 @@ class CTriggerExpression {
 
 	/**
 	 * Parse a trigger expression and set public variables $this->isValid, $this->error, $this->expressions,
-	 *   $this->macros, $this->usermacros and $this->lldmacros
+	 *   $this->macros
 	 *
 	 * Examples:
 	 *   expression:
-	 *     {Zabbix server:agent.ping.lats(0)}=1 & {TRIGGER.VALUE}={$TRIGGER.VALUE}
+	 *     {Zabbix server:agent.ping.last(0)}=1 and {TRIGGER.VALUE}={$TRIGGER.VALUE}
 	 *   results:
 	 *     $this->isValid : true
 	 *     $this->error : ''
@@ -163,16 +163,6 @@ class CTriggerExpression {
 	 *         'functionName' => 'last',
 	 *         'functionParam' => '0',
 	 *         'functionParamList' => array (0 => '0')
-	 *       )
-	 *     )
-	 *     $this->macros : array(
-	 *       0 => array(
-	 *         'expression' => '{TRIGGER.VALUE}'
-	 *       )
-	 *     )
-	 *     $this->usermacros : array(
-	 *       0 => array(
-	 *         'expression' => '{$TRIGGER.VALUE}'
 	 *       )
 	 *     )
 	 *
