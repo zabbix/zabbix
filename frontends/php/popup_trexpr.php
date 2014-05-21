@@ -580,10 +580,9 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 			$tokens = $result->getTokens();
 			foreach ($tokens as $key => $token) {
 				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-					if (isset($tokens[$key + 1])
+					if (isset($tokens[$key + 2])
 							&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
 							&& in_array($tokens[$key + 1]['value'], array('=', '<>', '>', '<'))
-							&& isset($tokens[$key + 2])
 							&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
 
 						$operator = $tokens[$key + 1]['value'];
@@ -606,8 +605,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 					'host' => $functionMacroToken['data']['host'],
 					'key_' => $functionMacroToken['data']['item'],
 					'flags' => null
-				),
-				'limit' => 1
+				)
 			));
 			$item = reset($item);
 
@@ -637,8 +635,7 @@ else {
 		'selectHosts' => array('host'),
 		'itemids' => $itemId,
 		'webitems' => true,
-		'filter' => array('flags' => null),
-		'limit' => 1
+		'filter' => array('flags' => null)
 	));
 	$item = reset($item);
 }
