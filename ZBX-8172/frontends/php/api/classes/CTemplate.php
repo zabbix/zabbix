@@ -317,7 +317,7 @@ class CTemplate extends CHostGeneral {
 	 * @return bool
 	 */
 	public function exists($object) {
-		self::deprecated('template.exists method is deprecated.');
+		$this->deprecated('template.exists method is deprecated.');
 
 		$objs = $this->get(array(
 			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),

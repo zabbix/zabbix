@@ -155,13 +155,16 @@ $hostFormList->addRow(
 );
 
 // append status to form list
+$statusComboBox = new CComboBox('status', $this->data['status']);
+$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Enabled'));
+$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Disabled'));
 $hostFormList->addRow(
 	array(
-		_('Enabled'),
+		_('Status'),
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($this->data['visible']['status']), 'status', _('Original'))
 	),
-	new CCheckBox('status', (HOST_STATUS_MONITORED == $this->data['status']), null, HOST_STATUS_MONITORED)
+	$statusComboBox
 );
 
 $templatesFormList = new CFormList('templatesFormList');

@@ -532,7 +532,7 @@ else {
 }
 
 if (in_array($resourceType, array(SCREEN_RESOURCE_URL))) {
-	$screenFormList->addRow(_('Url'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
+	$screenFormList->addRow(_('URL'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
 }
 else {
 	$screenFormList->addVar('url', '');
@@ -574,8 +574,12 @@ $screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton,
 $screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
 $screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
+$showDynamic = in_array($resourceType, array(
+	SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL
+));
+
 // dynamic addon
-if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
+if ($this->data['screen']['templateid'] == 0 && $showDynamic) {
 	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
 }
 
