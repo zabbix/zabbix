@@ -3207,21 +3207,21 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
 				'value' => '(',
-				'data' => array(),
+				'data' => null,
 				'pos' => 0,
 				'length' => 1
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => '-',
-				'data' => array(),
+				'data' => null,
 				'pos' => 1,
 				'length' => 1
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
 				'value' => '12',
-				'data' => array(),
+				'data' => null,
 				'pos' => 2,
 				'length' => 2,
 				'data' => array(
@@ -3231,7 +3231,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => '+',
-				'data' => array(),
+				'data' => null,
 				'pos' => 5,
 				'length' => 1
 			),
@@ -3251,63 +3251,62 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'or',
-				'data' => array(),
+				'data' => null,
 				'pos' => 33,
 				'length' => 2
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO,
 				'value' => '{$USERMACRO}',
-				'data' => array(),
+				'data' => null,
 				'pos' => 36,
 				'length' => 12
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'and',
-				'data' => array(),
+				'data' => null,
 				'pos' => 49,
 				'length' => 3
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'not',
-				'data' => array(),
+				'data' => null,
 				'pos' => 53,
 				'length' => 3
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_MACRO,
 				'value' => '{TRIGGER.VALUE}',
-				'data' => array(),
+				'data' => null,
 				'pos' => 57,
 				'length' => 15
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'or',
-				'data' => array(),
+				'data' => null,
 				'pos' => 73,
 				'length' => 2
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
 				'value' => '{#LLD}',
-				'data' => array(),
+				'data' => null,
 				'pos' => 76,
 				'length' => 6
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
 				'value' => 'or',
-				'data' => array(),
+				'data' => null,
 				'pos' => 83,
 				'length' => 2
 			),
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
 				'value' => '10m',
-				'data' => array(),
 				'pos' => 86,
 				'length' => 3,
 				'data' => array(
@@ -3317,7 +3316,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array(
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
 				'value' => ')',
-				'data' => array(),
+				'data' => null,
 				'pos' => 89,
 				'length' => 1
 			),
