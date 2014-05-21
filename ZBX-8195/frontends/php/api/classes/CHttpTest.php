@@ -344,6 +344,9 @@ class CHttpTest extends CZBXAPI {
 			if (!isset($test['name']) || zbx_empty($test['name']) || !empty($dbTest['templateid'])) {
 				$test['name'] = $dbTest['name'];
 			}
+			if (isset($test['steps']) && !$test['steps']) {
+				unset($test['steps']);
+			}
 			if (!empty($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
 					if (isset($step['httpstepid'])
@@ -578,22 +581,6 @@ class CHttpTest extends CZBXAPI {
 	}
 
 	/**
-	 * Checks that step name is valid.
-	 *
-	 * @param $stepName
-	 *
-	 * @return bool
-	 */
-	protected function isValidStepName($stepName) {
-		if($stepName === '' || $stepName === false || $stepName === true || $stepName === null) {
-			return false;
-		}
-		else {
-			return is_scalar($stepName);
-		}
-	}
-
-	/**
 	 * Check web scenario steps.
 	 *  - check status_codes field
 	 *  - check name characters
@@ -607,11 +594,9 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		foreach ($httpTest['steps'] as $step) {
-			$stepNameIsValid = isset($step['httpstepid'])
-				? isset($step['name']) && !$this->isValidStepName($step['name'])
-				: !isset($step['name']) || !$this->isValidStepName($step['name']);
-
-			if ($stepNameIsValid) {
+			if ((isset($step['httpstepid']) && isset($step['name']) && $step['name'] === '')
+				|| (!isset($step['httpstepid']) && (!isset($step['name']) || $step['name'] === ''))
+			) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name can not be empty.'));
 			}
 
