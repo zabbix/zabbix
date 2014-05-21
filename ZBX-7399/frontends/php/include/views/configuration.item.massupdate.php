@@ -479,14 +479,14 @@ if ($this->data['displayApplications']) {
 	}
 
 	$replaceApp = new CMultiSelect(array(
-		'id' => 'replaceApp',
+		'wrapperId' => 'replaceApp',
 		'name' => 'applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
 		'data' => $appToReplace,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-				'&srcfld1=applicationid&multiselect=1&hostid='.$this->data['hostid'],
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
 			'width' => 450,
 			'height' => 450
 		)
@@ -530,7 +530,7 @@ if ($this->data['displayApplications']) {
 	}
 
 	$newApp = new CMultiSelect(array(
-		'id' => 'newApp',
+		'wrapperId' => 'newApp',
 		'name' => 'new_applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
@@ -538,7 +538,7 @@ if ($this->data['displayApplications']) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-				'&srcfld1=applicationid&multiselect=1&hostid='.$this->data['hostid'],
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
 			'width' => 450,
 			'height' => 450
 		)

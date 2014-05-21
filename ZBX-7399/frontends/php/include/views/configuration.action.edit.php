@@ -193,8 +193,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=triggerid&writeonly=1&multiselect=1',
-				'width' => 450,
+					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1',
+				'width' => 600,
 				'height' => 450
 			)
 		));

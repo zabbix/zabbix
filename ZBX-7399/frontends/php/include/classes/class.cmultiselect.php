@@ -30,8 +30,8 @@ class CMultiSelect extends CTag {
 		parent::__construct('div', 'yes');
 		$this->addClass('multiselect-wrapper');
 
-		if (isset($options['id'])) {
-			$this->attr('id', zbx_formatDomId($options['id']));
+		if (isset($options['wrapperId'])) {
+			$this->attr('id', zbx_formatDomId($options['wrapperId']));
 		}
 
 		$multiSelect = new CDiv(null, 'multiselect');

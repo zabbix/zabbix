@@ -494,7 +494,7 @@ ZABBIX.apps.map = (function($) {
 						// host
 						case '0':
 							$('#elementNameHost').multiSelectHelper({
-								id: 'elementNameHost',
+								wrapperId: 'elementNameHost',
 								objectName: 'hosts',
 								name: 'elementValue',
 								selectedLimit: 1,
@@ -514,7 +514,7 @@ ZABBIX.apps.map = (function($) {
 						// host group
 						case '3':
 							$('#elementNameHostGroup').multiSelectHelper({
-								id: 'elementNameHostGroup',
+								wrapperId: 'elementNameHostGroup',
 								objectName: 'hostGroup',
 								name: 'elementValue',
 								selectedLimit: 1,
@@ -1350,7 +1350,7 @@ ZABBIX.apps.map = (function($) {
 					// host
 					case '0':
 						$('#elementNameHost').multiSelectHelper({
-							id: 'elementNameHost',
+							wrapperId: 'elementNameHost',
 							objectName: 'hosts',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
@@ -1371,7 +1371,7 @@ ZABBIX.apps.map = (function($) {
 					// host group
 					case '3':
 						$('#elementNameHostGroup').multiSelectHelper({
-							id: 'elementNameHostGroup',
+							wrapperId: 'elementNameHostGroup',
 							objectName: 'hostGroup',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],

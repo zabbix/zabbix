@@ -49,7 +49,7 @@ if (isset($_REQUEST['groups'])) {
 }
 
 $replaceGroups = new CMultiSelect(array(
-	'id' => 'replaceGroups',
+	'wrapperId' => 'replaceGroups',
 	'name' => 'groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array('editable' => true),
@@ -102,7 +102,7 @@ if (isset($_REQUEST['new_groups'])) {
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$newGroups = new CMultiSelect(array(
-		'id' => 'newGroups',
+		'wrapperId' => 'newGroups',
 		'name' => 'new_groups[]',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
@@ -204,13 +204,13 @@ $templatesDiv = new CDiv(
 	),
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
-$templatesDiv->setAttribute('id', 'templates_div');
+$templatesDiv->setAttribute('id', 'templateDiv');
 
 $templatesFormList->addRow(
 	array(
 		_('Link templates'),
 		SPACE,
-		new CVisibilityBox('visible[templates_div]', !empty($this->data['visible']['templates_div']) ? 'yes' : 'no', 'templates_div', _('Original'))
+		new CVisibilityBox('visible[templateDiv]', !empty($this->data['visible']['templateDiv']) ? 'yes' : 'no', 'templateDiv', _('Original'))
 	),
 	$templatesDiv
 );

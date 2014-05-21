@@ -415,7 +415,7 @@
 				srcfld1 = (opCmdTarget == 'host') ? 'hostid' : 'groupid';
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
-				id: 'opCmdTargetObject',
+				wrapperId: 'opCmdTargetObject',
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {

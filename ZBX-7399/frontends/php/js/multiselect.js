@@ -455,20 +455,20 @@ jQuery(function($) {
 			// draw popup link
 			if (options.popup.parameters != null) {
 				var popupBlock = $('<div>', {
-					class: 'select-popup'
+					'class': 'select-popup'
 				});
 
 				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
 					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&excludeids[' + i + ']=' + i;
+						urlParameters = urlParameters + '&excludeids[]=' + i;
 					});
 				}
 
 				var popupButton = $('<input>', {
 					type: 'button',
-					class: options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
+					'class': options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
 					value: options.labels['Select'],
 					click: function() {
 						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
