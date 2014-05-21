@@ -5814,7 +5814,7 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	const ZBX_DC_ITEM	*item;
 	int			now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
@@ -5826,7 +5826,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*host;
 
 		if (ITEM_STATUS_ACTIVE != item->status)
 			continue;
@@ -5917,7 +5917,7 @@ int	DCget_item_count()
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	const ZBX_DC_ITEM	*item;
 
 	LOCK_CACHE;
 
@@ -5925,9 +5925,12 @@ int	DCget_item_count()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*host;
 
 		if (ITEM_STATUS_ACTIVE != item->status)
+			continue;
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
 			continue;
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
@@ -5936,8 +5939,7 @@ int	DCget_item_count()
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
-			count++;
+		count++;
 	}
 
 	UNLOCK_CACHE;
@@ -5958,7 +5960,7 @@ int	DCget_item_unsupported_count()
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	const ZBX_DC_ITEM	*item;
 
 	LOCK_CACHE;
 
@@ -5966,9 +5968,12 @@ int	DCget_item_unsupported_count()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*host;
 
-		if (ITEM_STATUS_ACTIVE != item->status)
+		if (ITEM_STATUS_ACTIVE != item->status || ITEM_STATE_NOTSUPPORTED != item->state)
+			continue;
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
 			continue;
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
@@ -5977,11 +5982,7 @@ int	DCget_item_unsupported_count()
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == item->state)
-			count++;
+		count++;
 	}
 
 	UNLOCK_CACHE;
@@ -6016,7 +6017,7 @@ int	DCget_host_count()
 {
 	int			nhosts = 0;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 
 	LOCK_CACHE;
 
@@ -6046,7 +6047,7 @@ double	DCget_required_performance()
 {
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
-	ZBX_DC_ITEM		*item;
+	const ZBX_DC_ITEM	*item;
 
 	LOCK_CACHE;
 
@@ -6054,9 +6055,9 @@ double	DCget_required_performance()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		ZBX_DC_HOST	*host;
+		const ZBX_DC_HOST	*host;
 
-		if (ITEM_STATUS_ACTIVE != item->status)
+		if (ITEM_STATUS_ACTIVE != item->status || 0 == item->delay)
 			continue;
 
 		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
@@ -6065,8 +6066,7 @@ double	DCget_required_performance()
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
-		if (0 != item->delay)
-			nvps += 1.0 / item->delay;
+		nvps += 1.0 / item->delay;
 	}
 
 	UNLOCK_CACHE;
