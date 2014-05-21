@@ -70,13 +70,13 @@ class CTriggerExpressionParserResult extends CParserResult {
 	/**
 	 * Add a token to the result.
 	 *
-	 * @param string    $type       token type
-	 * @param string    $value      token string
-	 * @param string    $pos        position of the token in the source string
-	 * @param string    $length     length of the token
-	 * @param array     $data       additional token information
+	 * @param string        $type       token type
+	 * @param string        $value      token string
+	 * @param string        $pos        position of the token in the source string
+	 * @param string        $length     length of the token
+	 * @param array|null    $data       additional token information
 	 */
-	public function addToken($type, $value, $pos, $length, array $data = array()) {
+	public function addToken($type, $value, $pos, $length, array $data = null) {
 		$this->tokens[] = array(
 			'type' => $type,
 			'value' => $value,
