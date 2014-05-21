@@ -582,7 +582,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 				if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
 					if (isset($tokens[$key + 1])
 							&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
-							&& in_array($tokens[$key + 1]['type'], array('=', '<>', '>', '<'))
+							&& in_array($tokens[$key + 1]['value'], array('=', '<>', '>', '<'))
 							&& isset($tokens[$key + 2])
 							&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
 
