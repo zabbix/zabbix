@@ -74,15 +74,21 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		memsize = 0, proccount = 0, value;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -98,7 +104,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "min"))
 		do_task = ZBX_DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 
@@ -149,15 +158,21 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		proccount = 0;
 
 	if (4 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
 	{
-		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 		usrinfo = NULL;
@@ -173,7 +188,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	proccomm = get_rparam(request, 3);
 

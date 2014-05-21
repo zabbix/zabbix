@@ -60,8 +60,8 @@ check_fields($fields);
  */
 $dbSlideshow = null;
 
-if (hasRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))
-		|| hasRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))
+		|| getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
 	access_deny();
 }
 if (hasRequest('elementid')) {
@@ -100,6 +100,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 				'mode' => SCREEN_MODE_PREVIEW,
 				'profileIdx' => 'web.slides',
 				'profileIdx2' => $elementId,
+				'hostid' => getRequest('hostid'),
 				'period' => getRequest('period'),
 				'stime' => getRequest('stime')
 			));
@@ -221,11 +222,14 @@ if ($data['screen']) {
 			'hosts' => array(
 				'monitored_hosts' => true,
 				'with_items' => true,
-				'DDFirstLabel' => _('Default')
+				'DDFirstLabel' => _('not selected')
 			),
 			'hostid' => getRequest('hostid'),
 			'groupid' => getRequest('groupid')
 		));
+
+		$data['groupid'] = $data['pageFilter']->groupid;
+		$data['hostid'] = $data['pageFilter']->hostid;
 	}
 
 	// get element

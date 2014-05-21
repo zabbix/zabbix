@@ -242,7 +242,9 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
 	{
-		if (0 == strcmp(values.values[0].value.log->source, arg1))
+		const char	*source = values.values[0].value.log->source;
+
+		if (0 == strcmp(NULL == source ? "" : source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -1114,7 +1116,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, const char *parameters)
+static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, const char *parameters, char **error)
 {
 	const char			*__function_name = "evaluate_NODATA";
 	int				arg1, flag, now, ret = FAIL;
@@ -1125,10 +1127,18 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 	zbx_history_record_vector_create(&values);
 
 	if (1 < num_param(parameters))
+	{
+		if (NULL != error)
+			*error = zbx_strdup(*error, "too many parameters");
 		goto out;
+	}
 
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag))
+	{
+		if (NULL != error)
+			*error = zbx_strdup(*error, "invalid first parameter");
 		goto out;
+	}
 
 	if (ZBX_FLAG_SEC != flag)
 		goto out;
@@ -1144,8 +1154,22 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 	{
 		int	seconds;
 
-		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds) || seconds + arg1 > now)
+		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
+		{
+			if (NULL != error)
+				*error = zbx_strdup(*error, "item does not exist");
 			goto out;
+		}
+
+		if (seconds + arg1 > now)
+		{
+			if (NULL != error)
+			{
+				*error = zbx_strdup(*error,
+						"item does not have enough data after server start/item creation");
+			}
+			goto out;
+		}
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 	}
@@ -1690,7 +1714,8 @@ clean:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameter, time_t now)
+int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameter, time_t now,
+		char **error)
 {
 	const char	*__function_name = "evaluate_function";
 
@@ -1736,7 +1761,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
-		ret = evaluate_NODATA(value, item, function, parameter);
+		ret = evaluate_NODATA(value, item, function, parameter, error);
 	}
 	else if (0 == strcmp(function, "date"))
 	{
@@ -1809,7 +1834,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "unsupported function:%s", function);
+		*error = zbx_strdup(*error, "function is not supported");
 		ret = FAIL;
 	}
 
@@ -2188,6 +2213,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	zbx_host_key_t	host_key = {host, key};
 	DC_ITEM		item;
+	char		*error = NULL;
 	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
@@ -2200,7 +2226,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		goto out;
 	}
 
-	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
+	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL), &error)))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
@@ -2219,6 +2245,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 			}
 		}
 	}
+
+	zbx_free(error);
 out:
 	DCconfig_clean_items(&item, &errcode, 1);
 

@@ -137,7 +137,6 @@ class CImage extends CApiService {
 			}
 			else {
 				$imageids[$image['imageid']] = $image['imageid'];
-				unset($image['image']);
 
 				$result[$image['imageid']] = $image;
 			}
@@ -599,5 +598,34 @@ class CImage extends CApiService {
 		if (@imageCreateFromString($image) === false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
 		}
+	}
+
+	/**
+	 * Unset "image" field from output.
+	 *
+	 * @param string $tableName
+	 * @param string $tableAlias
+	 * @param array  $options
+	 * @param array  $sqlParts
+	 *
+	 * @return array				The resulting SQL parts array
+	 */
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if ($options['countOutput'] === null) {
+			if ($options['output'] == API_OUTPUT_EXTEND) {
+				$options['output'] = array('imageid', 'imagetype', 'name');
+			}
+			elseif (is_array($options['output']) && in_array('image', $options['output'])) {
+				foreach ($options['output'] as $idx => $field) {
+					if ($field === 'image') {
+						unset($options['output'][$idx]);
+					}
+				}
+			}
+
+			$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }

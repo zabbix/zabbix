@@ -1053,7 +1053,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
+		'selectHosts' => array('hostid', 'name', 'status'),
 		'sortfield' => 'description'
 	));
 
@@ -1484,7 +1484,8 @@ function make_trigger_details($trigger) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
 		'hostids' => $hostIds,
-		'selectScreens' => API_OUTPUT_COUNT
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectGraphs' => API_OUTPUT_COUNT
 	));
 
 	if (count($hosts) > 1) {
