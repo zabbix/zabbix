@@ -171,12 +171,12 @@ class CServicesSlaCalculator {
 	/**
 	 * Adds information about a weekly scheduled uptime or downtime to the $data array.
 	 *
-	 * @param array $data
-	 * @param int   $period_start     start of the SLA calculation period
-	 * @param int   $period_end       end of the SLA calculation period
-	 * @param int   $ts_from          start of the scheduled uptime or downtime
-	 * @param int   $ts_to            end of the scheduled uptime or downtime
-	 * @param int   $type             SERVICE_TIME_TYPE_UPTIME or SERVICE_TIME_TYPE_DOWNTIME
+	 * @param array     $data
+	 * @param int       $period_start     start of the SLA calculation period
+	 * @param int       $period_end       end of the SLA calculation period
+	 * @param int       $ts_from          start of the scheduled uptime or downtime
+	 * @param int       $ts_to            end of the scheduled uptime or downtime
+	 * @param string    $type             "ut" for uptime and "dt" for downtime
 	 */
 	protected function expandPeriodicalTimes(array &$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
 		$weekStartDate = new DateTime();
