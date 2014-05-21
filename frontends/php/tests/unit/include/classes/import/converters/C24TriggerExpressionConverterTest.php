@@ -39,6 +39,9 @@ class C24TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			array('1  & 1',	'1 and 1'),
 			array('1  &  1', '1 and 1'),
 
+			array('{host:item.last()}      |      {host:item.str(#)}', '{host:item.last()} or {host:item.str(#)}'),
+			array('{host:item.last()} > {#MAX}', '{host:item.last()} > {#MAX}'),
+
 			array('{host:item.str(#)} # 1', '{host:item.str(#)} <> 1'),
 			array('{host:item.str(|)} | 1', '{host:item.str(|)} or 1'),
 			array('{host:item.str(&)} & 1', '{host:item.str(&)} and 1'),
