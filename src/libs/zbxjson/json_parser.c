@@ -295,7 +295,7 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
 int	json_parse_value(const char *start, char **error)
 {
 	const char	*ptr = start;
-	int		len = 0;
+	int		len;
 
 	SKIP_WHITESPACE(ptr);
 

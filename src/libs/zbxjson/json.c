@@ -603,7 +603,7 @@ static char	zbx_json_decode_character(const char **p)
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			return NULL;
+			return '\0';
 	}
 
 	++*p;
@@ -632,12 +632,12 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 
 	p++;
 
-	while ('\0' != *p && (out - start < size - 1))
+	while ('\0' != *p && out - start < size - 1)
 	{
 		switch (*p)
 		{
 			case '\\':
-				if (0 != (*out = zbx_json_decode_character(&p)))
+				if ('\0' != (*out = zbx_json_decode_character(&p)))
 					out++;
 				break;
 			case '"':
@@ -710,25 +710,22 @@ static const char	*zbx_json_decodevalue(const char *p, char *string, size_t size
 
 static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc)
 {
-	zbx_json_type_t	jt;
-	size_t		sz;
+	size_t	len;
 
-	jt = __zbx_json_type(p);
-
-	switch (jt)
+	switch (__zbx_json_type(p))
 	{
 		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
-			if (0 == (sz = json_parse_value(p, NULL)))
+			if (0 == (len = json_parse_value(p, NULL)))
 				return NULL;
 
-			if (*string_alloc <= sz)
+			if (*string_alloc <= len)
 			{
-				*string_alloc = sz + 1;
+				*string_alloc = len + 1;
 				*string = zbx_realloc(*string, *string_alloc);
 			}
 
-			return zbx_json_copy_value(p, sz, *string, *string_alloc);
+			return zbx_json_copy_value(p, len, *string, *string_alloc);
 		default:
 			return NULL;
 	}
@@ -771,7 +768,7 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name)
 {
 	char		buffer[MAX_STRING_LEN];
-	const char	*p = NULL;
+	const char	*p;
 
 	while (NULL != (p = zbx_json_pair_next(jp, p, buffer, sizeof(buffer))))
 		if (0 == strcmp(name, buffer))
@@ -920,7 +917,7 @@ int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
 int	zbx_json_count(const struct zbx_json_parse *jp)
 {
 	int		num = 0;
-	const char	*p = NULL;
+	const char	*p;
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 		num++;
