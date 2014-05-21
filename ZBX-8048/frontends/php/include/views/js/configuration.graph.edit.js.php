@@ -119,7 +119,6 @@
 		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
-		initSortable();
 		incrementNextColor();
 		rewriteNameLinks();
 	}
@@ -420,5 +419,7 @@
 
 			$('form[name="graphForm"]').submit();
 		});
+
+		initSortable();
 	});
 </script>

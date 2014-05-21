@@ -116,7 +116,7 @@ $httpdetailsWidget->addPageHeader(
 		_('DETAILS OF SCENARIO'),
 		SPACE,
 		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
-		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTestData['lastcheck']).']' : null
+		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
 	),
 	array(
 		get_icon('reset', array('id' => get_request('httptestid'))),

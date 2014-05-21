@@ -53,9 +53,9 @@ if (isset($_REQUEST['css'])) {
 			' background-image: url("images/general/no_icon.png"); }'."\n";
 
 	$images = API::Image()->get(array(
+		'output' => array('imageid'),
 		'filter' => array('imagetype' => IMAGE_TYPE_ICON),
-		'output' => API_OUTPUT_EXTEND,
-		'select_image' => 1
+		'select_image' => true
 	));
 	foreach ($images as $image) {
 		$image['image'] = base64_decode($image['image']);
@@ -79,8 +79,8 @@ elseif (isset($_REQUEST['iconid'])) {
 
 	if ($iconid > 0) {
 		$image = get_image_by_imageid($iconid);
-		$image = $image['image'];
-		$source = imageFromString($image);
+
+		$source = $image['image'] ? imageFromString($image['image']) : get_default_image();
 	}
 	else {
 		$source = get_default_image();
@@ -89,6 +89,7 @@ elseif (isset($_REQUEST['iconid'])) {
 	if ($resize) {
 		$source = imageThumb($source, $width, $height);
 	}
+
 	imageOut($source);
 }
 elseif (isset($_REQUEST['imageid'])) {

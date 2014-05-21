@@ -75,15 +75,14 @@ if (isset($_REQUEST['save'])) {
 			}
 		}
 
-		if (isset($_REQUEST['imageid'])) {
+		if (hasRequest('imageid')) {
 			$result = API::Image()->update(array(
-				'imageid' => $_REQUEST['imageid'],
-				'name' => $_REQUEST['name'],
-				'imagetype' => $_REQUEST['imagetype'],
+				'imageid' => getRequest('imageid'),
+				'name' => getRequest('name'),
 				'image' => $image
 			));
 
-			$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+			$audit_action = 'Image ['.getRequest('name').'] updated';
 		}
 		else {
 			$result = API::Image()->create(array(
@@ -146,7 +145,10 @@ $generalComboBox->addItems(array(
 $form->addItem($generalComboBox);
 
 if (!isset($_REQUEST['form'])) {
-	$form->addItem(new CSubmit('form', _('Create image')));
+	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
+
+	$form->addVar('imagetype', $imageType);
+	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
 }
 
 $imageWidget = new CWidget();
@@ -154,7 +156,6 @@ $imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array(
 	'form' => get_request('form'),
-	'displayNodes' => is_array(get_current_nodeid()),
 	'widget' => &$imageWidget
 );
 
@@ -167,7 +168,7 @@ if (!empty($data['form'])) {
 	else {
 		$data['imageid'] = null;
 		$data['imagename'] = get_request('name', '');
-		$data['imagetype'] = get_request('imagetype', 1);
+		$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 	}
 
 	$imageForm = new CView('administration.general.image.edit', $data);
@@ -180,14 +181,6 @@ else {
 		'output' => array('imageid', 'imagetype', 'name')
 	));
 	order_result($data['images'], 'name');
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['images'] as &$image) {
-			$image['nodename'] = get_node_name_by_elid($image['imageid'], true).NAME_DELIMITER;
-		}
-		unset($image);
-	}
 
 	$imageForm = new CView('administration.general.image.list', $data);
 }

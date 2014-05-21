@@ -77,7 +77,6 @@ $servicesFormList->addRow(_('Trigger'), array(
 			'&srcfld1=triggerid'.
 			'&srcfld2=description'.
 			'&real_hosts=1'.
-			'&monitored_hosts=1'.
 			'&with_triggers=1");',
 		'formlist'
 	)
@@ -92,9 +91,12 @@ $servicesChildTable->setAttribute('style', 'min-width:500px;');
 $servicesChildTable->setAttribute('id', 'service_children');
 $servicesChildTable->setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
 foreach ($this->data['children'] as $child) {
+	$childrenLink = new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']);
+	$childrenLink->setAttribute('target', '_blank');
+
 	$row = new CRow(array(
 		array(
-			new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']),
+			$childrenLink,
 			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
 			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 		),
@@ -143,8 +145,8 @@ foreach ($this->data['times'] as $serviceTime) {
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
-			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_from']);
-			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_to']);
+			$from = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_from']);
+			$to = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_to']);
 			break;
 	}
 	$row = new CRow(array(

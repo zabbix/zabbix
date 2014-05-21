@@ -77,7 +77,7 @@ ZBX_METRIC	parameters_common[] =
 
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check!"));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check."));
 
 	return SYSINFO_RET_FAIL;
 }
@@ -88,7 +88,10 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*command;
 
 	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	command = get_rparam(request, 0);
 
@@ -126,7 +129,10 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 			command, strlen(cmd_result), cmd_result);
 
 	if ('\0' == *cmd_result)	/* we got whitespace only */
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Non-empty output is expected."));
 		goto lbl_exit;
+	}
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
@@ -145,6 +151,7 @@ int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 	if (NULL == GET_DBL_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Double is expected."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -161,6 +168,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	if (NULL == GET_UI64_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -174,13 +182,19 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*command, *flag;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	command = get_rparam(request, 0);
 	flag = get_rparam(request, 1);
 
 	if (NULL == command || '\0' == *command)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
 		zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", command);
@@ -188,9 +202,22 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+	{
 		return EXECUTE_STR(command, result);
-	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
+	}
+	else if (0 == strcmp(flag, "nowait"))
+	{
+		if (SUCCEED != zbx_execute_nowait(command))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot execute command."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_UI64_RESULT(result, 1);
 

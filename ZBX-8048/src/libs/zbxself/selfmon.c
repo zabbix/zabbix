@@ -65,7 +65,6 @@ extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_DISCOVERER_FORKS;
 extern int	CONFIG_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
-extern int	CONFIG_NODEWATCHER_FORKS;
 extern int	CONFIG_HOUSEKEEPER_FORKS;
 extern int	CONFIG_WATCHDOG_FORKS;
 extern int	CONFIG_DATASENDER_FORKS;
@@ -121,8 +120,6 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_ALERTER_FORKS;
 		case ZBX_PROCESS_TYPE_TIMER:
 			return CONFIG_TIMER_FORKS;
-		case ZBX_PROCESS_TYPE_NODEWATCHER:
-			return CONFIG_NODEWATCHER_FORKS;
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return CONFIG_HOUSEKEEPER_FORKS;
 		case ZBX_PROCESS_TYPE_WATCHDOG:
@@ -188,8 +185,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "alerter";
 		case ZBX_PROCESS_TYPE_TIMER:
 			return "timer";
-		case ZBX_PROCESS_TYPE_NODEWATCHER:
-			return "node watcher";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 			return "housekeeper";
 		case ZBX_PROCESS_TYPE_WATCHDOG:
@@ -243,26 +238,26 @@ void	init_selfmon_collector(void)
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_SELFMON_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for a self-monitoring collector");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
 		zbx_error("unable to create mutex for a self-monitoring collector");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz_total)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for a self-monitoring collector");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if ((void *)(-1) == (p = shmat(shm_id, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for a self-monitoring collector: %s",
 				zbx_strerror(errno));
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	collector = (zbx_selfmon_collector_t *)p; p += sz;

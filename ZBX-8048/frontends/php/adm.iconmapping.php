@@ -133,13 +133,12 @@ $data = array(
 	'form_refresh' => get_request('form_refresh', 0),
 	'iconmapid' => get_request('iconmapid'),
 	'iconList' => array(),
-	'inventoryList' => array(),
-	'displayNodes' => is_array(get_current_nodeid())
+	'inventoryList' => array()
 );
 
 $iconList = API::Image()->get(array(
+	'output' => array('imageid', 'name'),
 	'filter' => array('imagetype' => IMAGE_TYPE_ICON),
-	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ));
 order_result($iconList, 'name');
@@ -182,14 +181,6 @@ else {
 		'selectMappings' => API_OUTPUT_EXTEND
 	));
 	order_result($data['iconmaps'], 'name');
-
-	// nodes
-	foreach ($data['iconmaps'] as &$iconMap) {
-		order_result($iconMap['mappings'], 'sortorder');
-
-		$iconMap['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($iconMap['iconmapid'], true) : '';
-	}
-	unset($iconMap);
 
 	$iconMapView = new CView('administration.general.iconmap.list', $data);
 }

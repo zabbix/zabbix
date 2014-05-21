@@ -291,7 +291,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 		zbx_free(group);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_SQL_NODE, DBand_node_local("h.hostid"));
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 	result = DBselect("%s", sql);
 
@@ -367,7 +367,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	{
 		if (FAIL == is_uint_suffix(param, &seconds))
 		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
+			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto clean2;
 		}
 		count = 0;
@@ -480,7 +480,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (4 != num_param(params))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		return NOTSUPPORTED;
 	}
 
@@ -507,7 +507,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		item_func = ZBX_VALUE_FUNC_LAST;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return NOTSUPPORTED;
 	}
 

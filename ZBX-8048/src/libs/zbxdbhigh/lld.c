@@ -139,6 +139,17 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 	DB_RESULT	result;
 	DB_ROW		row;
 	lld_condition_t	*condition;
+	DC_ITEM		item;
+	int		errcode, ret = FAIL;
+
+	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+
+	if (SUCCEED != errcode)
+	{
+		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].",
+				lld_ruleid);
+		goto out;
+	}
 
 	result = DBselect(
 			"select item_conditionid,macro,value"
@@ -156,7 +167,14 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 		zbx_vector_ptr_create(&condition->regexps);
 
 		if ('@' == *condition->regexp)
+		{
 			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+		}
+		else
+		{
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item,
+					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
+		}
 
 		zbx_vector_ptr_append(&filter->conditions, condition);
 	}
@@ -168,12 +186,16 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, int ev
 	if (CONDITION_EVAL_TYPE_EXPRESSION == evaltype &&
 			FAIL == translate_expression(formula, &filter->expression, error))
 	{
-		return FAIL;
+		goto out;
 	}
 
 	filter->evaltype = evaltype;
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	DCconfig_clean_items(&item, &errcode, 1);
+
+	return ret;
 }
 
 /******************************************************************************

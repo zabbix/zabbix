@@ -31,56 +31,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR					TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'dstfrm' =>		array(T_ZBX_STR, O_MAND,P_SYS, NOT_EMPTY,	null),
-	'permission' =>	array(T_ZBX_INT, O_MAND,P_SYS, IN(PERM_DENY.','.PERM_READ.','.PERM_READ_WRITE), null),
-	'nodeid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null)
+	'permission' =>	array(T_ZBX_INT, O_MAND,P_SYS, IN(PERM_DENY.','.PERM_READ.','.PERM_READ_WRITE), null)
 );
 check_fields($fields);
 
 $dstfrm = getRequest('dstfrm', 0);
 $permission = getRequest('permission', PERM_DENY);
 
-$nodeId = null;
-$availableNodeIds = null;
-
-if (ZBX_DISTRIBUTED) {
-	$nodeId = getRequest('nodeid', CProfile::get('web.popup_right.nodeid.last', get_current_nodeid(false)));
-	$availableNodeIds = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_IDS_ARRAY);
-
-	$profileNodeId = $nodeId;
-
-	if (!isset($availableNodeIds[$nodeId])) {
-		$nodeId = null;
-
-		if ($nodeId != 0) {
-			$profileNodeId = null;
-		}
-	}
-
-	CProfile::update('web.popup_right.nodeid.last', $profileNodeId, PROFILE_TYPE_ID);
-}
-
 /*
  * Display
  */
-// node combobox
-$titleFrom = new CForm();
-$titleFrom->addVar('dstfrm', $dstfrm);
-$titleFrom->addVar('permission', $permission);
-
-if ($availableNodeIds !== null) {
-	$nodeComboBox = new CComboBox('nodeid', $nodeId, 'submit();');
-	$nodeComboBox->addItem(0, _('All'));
-
-	$nodes = DBselect('SELECT n.name,n.nodeid FROM nodes n WHERE '.dbConditionInt('n.nodeid', $availableNodeIds));
-
-	while ($node = DBfetch($nodes)) {
-		$nodeComboBox->addItem($node['nodeid'], $node['name']);
-	}
-
-	$titleFrom->addItem(array(_('Node'), SPACE, $nodeComboBox));
-}
-
-show_table_header(permission2str($permission), $titleFrom);
+show_table_header(permission2str($permission));
 
 // host groups
 $hostGroupForm = new CForm();
@@ -93,16 +54,8 @@ $hostGroupTable->setHeader(new CCol(array(
 )));
 
 $hostGroups = API::HostGroup()->get(array(
-	'output' => array('groupid', 'name'),
-	'nodeids' => ($nodeId === null) ? $availableNodeIds : $nodeId
+	'output' => array('groupid', 'name')
 ));
-
-if ($availableNodeIds && $nodeId === null) {
-	foreach ($hostGroups as $key => $hostGroup) {
-		$hostGroups[$key]['name'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER).
-			$hostGroup['name'];
-	}
-}
 
 order_result($hostGroups, 'name');
 

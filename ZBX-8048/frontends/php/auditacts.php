@@ -35,19 +35,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// filter
-	'filter_rst' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'filter_set' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'alias' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'period' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'dec' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'inc' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'left' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'right' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_rst' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'filter_set' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'alias' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'period' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'dec' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'inc' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'left' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'right' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
+	'stime' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
 	// ajax
-	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
+	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
 
@@ -74,12 +74,13 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-$_REQUEST['alias'] = isset($_REQUEST['filter_rst'])
-	? ''
-	: get_request('alias', CProfile::get('web.auditacts.filter.alias', ''));
-
-if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
-	CProfile::update('web.auditacts.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
+if (hasRequest('filter_set')) {
+	CProfile::update('web.auditacts.filter.alias', getRequest('alias', ''), PROFILE_TYPE_STR);
+}
+elseif (hasRequest('filter_rst')) {
+	DBStart();
+	CProfile::delete('web.auditacts.filter.alias');
+	DBend();
 }
 
 /*
@@ -89,7 +90,7 @@ $effectivePeriod = navigation_bar_calc('web.auditacts.timeline', 0, true);
 
 $data = array(
 	'stime' => getRequest('stime'),
-	'alias' => getRequest('alias'),
+	'alias' => CProfile::get('web.auditacts.filter.alias', ''),
 	'users' => array(),
 	'alerts' => array(),
 	'paging' => null
