@@ -71,7 +71,7 @@ class C24TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedConvertedExpression
 	 */
 	public function testConvert($expression, $expectedConvertedExpression) {
-		$converter = new C24TriggerExpressionConverter(new CFunctionMacroParser());
+		$converter = new C24TriggerExpressionConverter(new CFunctionMacroParser(), new CMacroParser('#'));
 		$this->assertEquals($expectedConvertedExpression, $converter->convert($expression));
 	}
 
