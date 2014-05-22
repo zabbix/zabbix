@@ -218,6 +218,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/triggers',
 			$this->rootDir.'/include/classes/server',
 			$this->rootDir.'/include/classes/screens',
+			$this->rootDir.'/include/classes/services',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
