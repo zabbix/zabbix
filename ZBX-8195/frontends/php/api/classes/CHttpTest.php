@@ -593,16 +593,39 @@ class CHttpTest extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
+		if ($httpTest['httptestid']) {
+			$httpTestStepIds = zbx_objectValues($httpTest['steps'], 'httpstepid');
+
+			$httpTestStepCountInDb = DBfetch(DBselect(
+				'SELECT COUNT(hts.httpstepid)'.
+				' FROM httpstep hts'.
+				' WHERE hts.httptestid = '.zbx_dbstr($httpTest['httptestid']).
+					' AND '.dbConditionInt('hts.httpstepid', $httpTestStepIds)
+			));
+			$httpTestStepCountInDb = reset($httpTestStepCountInDb);
+
+			if ($httpTestStepCountInDb != count($httpTestStepIds)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('If specified, web scenario step ID must belong to the web scenario.'));
+			}
+		}
+
 		foreach ($httpTest['steps'] as $step) {
 			if ((isset($step['httpstepid']) && isset($step['name']) && $step['name'] === '')
 				|| (!isset($step['httpstepid']) && (!isset($step['name']) || $step['name'] === ''))
 			) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name can not be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
+			}
+
+			if ((isset($step['httpstepid']) && isset($step['url']) && $step['url'] === '')
+				|| (!isset($step['httpstepid']) && (!isset($step['url']) || $step['url'] === ''))
+			) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
 			}
 
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
+
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
 			}
