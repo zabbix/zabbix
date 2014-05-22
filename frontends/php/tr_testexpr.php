@@ -55,24 +55,29 @@ $rplcts = array();
 $allowedTesting = true;
 
 $expressionData = new CTriggerExpression();
-if ($expressionData->parse($expression)) {
+$result = $expressionData->parse($expression);
+if ($result) {
 	$macrosData = array();
 
-	$expressions = array_merge($expressionData->expressions, $expressionData->macros, $expressionData->usermacros, $expressionData->lldmacros);
-
-	foreach ($expressions as $exprPart) {
-		if (isset($macrosData[$exprPart['expression']])) {
+	$supportedTokenTypes = array(
+		CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO => 1,
+		CTriggerExpressionParserResult::TOKEN_TYPE_MACRO => 1,
+		CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO => 1,
+		CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO => 1
+	);
+	foreach ($result->getTokens() as $token) {
+		if (!isset($supportedTokenTypes[$token['type']]) || isset($macrosData[$token['value']])) {
 			continue;
 		}
 
-		$fname = 'test_data_'.md5($exprPart['expression']);
-		$macrosData[$exprPart['expression']] = get_request($fname, '');
+		$fname = 'test_data_'.md5($token['value']);
+		$macrosData[$token['value']] = get_request($fname, '');
 
-		$info = get_item_function_info($exprPart['expression']);
+		$info = get_item_function_info($token['value']);
 
 		if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 			$allowedTesting = false;
-			$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+			$control = new CTextBox($fname, $macrosData[$token['value']], 30);
 			$control->setAttribute('disabled', 'disabled');
 		}
 		else {
@@ -81,24 +86,26 @@ if ($expressionData->parse($expression)) {
 			if (substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN) {
 				$end = strlen($validation) - COMBO_PATTERN_LENGTH - 4;
 				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, $end));
-				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
+				$control = new CComboBox($fname, $macrosData[$token['value']]);
 
 				foreach ($vals as $v) {
 					$control->addItem($v, $v);
 				}
 			}
 			else {
-				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
+				$control = new CTextBox($fname, $macrosData[$token['value']], 30);
 			}
 
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $exprPart['expression']);
+			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})',
+				$token['value']
+			);
 		}
 
 		$resultType = (is_array($info) || !isset($definedErrorPhrases[$info]))
 			? $info['value_type']
 			: new CCol($definedErrorPhrases[$info], 'disaster');
 
-		$dataTable->addRow(new CRow(array($exprPart['expression'], $resultType, $control)));
+		$dataTable->addRow(new CRow(array($token['value'], $resultType, $control)));
 	}
 }
 
@@ -134,39 +141,41 @@ $resultTable->setHeader(array(_('Expression'), _('Result')));
 ksort($rplcts, SORT_NUMERIC);
 
 foreach ($eHTMLTree as $e) {
-	$result = array('result' => '-', 'error' => '');
+	$result = '-';
+	$style = 'text-align: center;';
 
 	if ($allowedTesting && $test && isset($e['expression'])) {
-		$result = evalExpressionData($e['expression']['value'], $macrosData);
+		if (evalExpressionData($e['expression']['value'], $macrosData)) {
+			$result = 'TRUE';
+			$style = 'background-color: #ccf; color: #00f;';
+		}
+		else {
+			$result = 'FALSE';
+			$style = 'background-color: #fcc; color: #f00;';
+		}
 	}
 
-	$style = 'text-align: center;';
-	if ($result['result'] != '-') {
-		$style = ($result['result'] == 'TRUE')
-			? 'background-color: #ccf; color: #00f;'
-			: 'background-color: #fcc; color: #f00;';
-	}
-
-	$col = new CCol(array($result['result'], SPACE, $result['error']));
+	$col = new CCol($result);
 	$col->setAttribute('style', $style);
 
 	$resultTable->addRow(new CRow(array($e['list'], $col)));
 }
 
-$result = array('result' => '-', 'error' => '');
+$result = '-';
+$style = 'text-align: center;';
 
 if ($allowedTesting && $test) {
-	$result = evalExpressionData($expression, $macrosData);
+	if (evalExpressionData($expression, $macrosData)) {
+		$result = 'TRUE';
+		$style = 'background-color: #ccf; color: #00f;';
+	}
+	else {
+		$result = 'FALSE';
+		$style = 'background-color: #fcc; color: #f00;';
+	}
 }
 
-$style = 'text-align: center;';
-if ($result['result'] != '-') {
-	$style = ($result['result'] == 'TRUE')
-		? 'background-color: #ccf; color: #00f;'
-		: 'background-color: #fcc; color: #f00;';
-}
-
-$col = new CCol(array($result['result'], SPACE, $result['error']));
+$col = new CCol($result);
 $col->setAttribute('style', $style);
 
 $resultTable->setFooter(array($outline, $col), $resultTable->headerClass);
