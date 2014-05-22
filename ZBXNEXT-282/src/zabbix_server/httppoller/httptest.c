@@ -378,13 +378,46 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 			0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
-			0 == httptest->httptest.verify_host ? 0L : 1L)))
+			0 == httptest->httptest.verify_host ? 0L : 2L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
+	}
+
+	if ('\0' != *httptest->httptest.ssl_cert_file)
+	{
+		char	*file_name;
+
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, httptest->httptest.ssl_cert_file);
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
+		zbx_free(file_name);
+
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERTTYPE, "PEM")))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
+	if ('\0' != *httptest->httptest.ssl_key_file)
+	{
+		char	*file_name;
+
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, httptest->httptest.ssl_key_file);
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
+		zbx_free(file_name);
+
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
+				httptest->httptest.ssl_key_password)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	while (NULL != (row = DBfetch(result)))
