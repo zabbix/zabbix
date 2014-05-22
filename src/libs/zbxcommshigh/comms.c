@@ -62,7 +62,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
 
-	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, protocol, timeout)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
@@ -118,13 +118,13 @@ int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
 	const char		*__function_name = "zbx_recv_response";
 
 	struct zbx_json_parse	jp;
-	char			value[16], *answer, *info_buf = NULL;
+	char			value[16], *info_buf = NULL;
 	size_t			info_buf_alloc = 0;
 	int			ret = SUCCEED, invalid_format = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = zbx_tcp_recv_to(sock, &answer, timeout)))
+	if (SUCCEED != (ret = zbx_tcp_recv_to(sock, timeout)))
 	{
 		/* since we have successfully sent data earlier, we assume the other */
 		/* side is just too busy processing our data if there is no response */
@@ -134,17 +134,17 @@ int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, answer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, sock->buffer);
 
 	/* deal with empty string here because zbx_json_open() does not produce an error message in this case */
-	if ('\0' == *answer)
+	if ('\0' == *sock->buffer)
 	{
 		*error = zbx_dsprintf(*error, "invalid response format: empty string received");
 		invalid_format = 1;
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_open(answer, &jp)))
+	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp)))
 	{
 		*error = zbx_dsprintf(*error, "invalid response format: not a valid JSON: %s", zbx_json_strerror());
 		invalid_format = 1;

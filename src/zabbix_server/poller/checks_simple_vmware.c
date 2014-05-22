@@ -691,7 +691,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 	else if (0 == strcmp(status, "red"))
 		SET_UI64_RESULT(result, 3);
 	else
-		ret =  SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
 
 	zbx_free(status);
 unlock:

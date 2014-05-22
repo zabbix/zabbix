@@ -52,13 +52,13 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
 		goto out;
 	}
 
 	if (0 != strcmp(request.key, "db.odbc.select"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Item key is not supported."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		goto out;
 	}
 
