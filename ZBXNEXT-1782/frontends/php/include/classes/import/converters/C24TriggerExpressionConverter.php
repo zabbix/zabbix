@@ -91,7 +91,6 @@ class C24TriggerExpressionConverter {
 					$foundOperators[$pos] = $expression[$pos];
 
 					break;
-
 			}
 
 			$pos++;
