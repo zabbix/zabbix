@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Trigger form');
 $page['file'] = 'tr_logform.php';
+$page['scripts'] = array('tr_logform.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -62,12 +63,25 @@ if (get_request('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid'])
 
 $itemid = get_request('itemid', 0);
 
-//------------------------ <ACTIONS> ---------------------------
+$item = API::Item()->get(array(
+	'output' => array('key_'),
+	'selectHosts' => array('host'),
+	'itemids' => $itemid,
+	'limit' => 1
+));
+$item = reset($item);
+$host = reset($item['hosts']);
+
+$constructor = new CRegexpTriggerConstructor(new CTriggerExpression());
+
+/**
+ * Save a trigger
+ */
 if (isset($_REQUEST['save_trigger'])) {
 	show_messages();
 
 	$exprs = get_request('expressions', false);
-	if($exprs && ($expression = construct_expression($_REQUEST['itemid'], $exprs))){
+	if($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))){
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
 
 		$now=time();
@@ -157,7 +171,6 @@ if (isset($_REQUEST['save_trigger'])) {
 		}
 	}
 }
-//------------------------ </ACTIONS> --------------------------
 
 //------------------------ <FORM> ---------------------------
 
@@ -169,85 +182,44 @@ if(isset($_REQUEST['sform'])){
 
 	if(isset($_REQUEST['triggerid'])) $frmTRLog->addVar('triggerid',$_REQUEST['triggerid']);
 
-	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
-		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
+	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])) {
+		$frmTRLog->addVar('form_refresh', get_request('form_refresh', 1));
 
-		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
-								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
-					' FROM functions f, triggers t, items i '.
+		$result = DBselect('SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type'.
+					' FROM triggers t'.
 					' WHERE t.triggerid='.zbx_dbstr($_REQUEST['triggerid']).
-						' AND i.itemid=f.itemid '.
-						' AND f.triggerid = t.triggerid '.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')';
+						' AND EXISTS ('.
+							'SELECT NULL'.
+							' FROM functions f,items i'.
+							' WHERE t.triggerid=f.triggerid'.
+								' AND f.itemid=i.itemid '.
+								' AND i.value_type IN ('.
+									ITEM_VALUE_TYPE_LOG.','.ITEM_VALUE_TYPE_TEXT.','.ITEM_VALUE_TYPE_STR.
+								')'.
+						')'
+		);
 
-		$res = DBselect($sql);
-		while($rows = DBfetch($res)){
-			$description = $rows['description'];
-			$expression = $rows['expression'];
-			$type = $rows['type'];
-			$priority = $rows['priority'];
-			$comments = $rows['comments'];
-			$url = $rows['url'];
-			$status = $rows['status'];
-
-			$functionid[] = '/\{'.$rows['functionid'].'\}/Uu';
-			$functions[] = $rows['function'].'('.$rows['parameter'].')';
+		if ($row = DBfetch($result)) {
+			$description = $row['description'];
+			$expression = explode_exp($row['expression']);
+			$type = $row['type'];
+			$priority = $row['priority'];
+			$comments = $row['comments'];
+			$url = $row['url'];
+			$status = $row['status'];
 		}
 
-		$expr_v = $expression;
-		$expression = preg_replace($functionid,$functions,$expression);
-		$expr_incase = $expression;
-
-		$expression = preg_replace('/\(\(\((.+?)\)\) &/i', '(($1) &', $expression);
-		$expression = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expression);
-
-		$expr_v = preg_replace('/\(\(\((.+?)\)\) &/i', '(($1) &', $expr_v);
-		$expr_v = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expr_v);
-
-		$expression = splitByFirstLevel($expression);
-		$expr_v = splitByFirstLevel($expr_v);
-
-		foreach($expression as $id => $expr){
-			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-
-			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value); // removing wrapping parentheses
-
-			$expressions[$id]['value'] = trim($value);
-			$expressions[$id]['type'] = (strpos($expr, '#0', mb_strlen($expr) - 3) === false)
-				? REGEXP_EXCLUDE
-				: REGEXP_INCLUDE;
-		}
-
-		foreach($expr_v as $id => $expr) {
-			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-			$value = preg_replace('/\((.*)\)[=|#]0/U','$1',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
-
-			if (strpos($expr, '#0', mb_strlen($expr) - 3) === false) {
-//REGEXP_EXCLUDE
-				$value = str_replace('&', ' OR ', $value);
-				$value = str_replace('|', ' AND ', $value);
-			} else {
-//EGEXP_INCLUDE
-				$value = str_replace('&', ' AND ', $value);
-				$value = str_replace('|', ' OR ', $value);
-			}
-
-			$value = preg_replace($functionid,$functions,$value);
-			$value = preg_replace('/([=|#]0)/','',$value);
-
-			$expressions[$id]['view'] = trim($value);
-		}
+		// break expression into parts
+		$expressions = $constructor->getPartsFromExpression($expression);
 	}
-	else{
-		$description = get_request('description','');
-		$expressions = get_request('expressions',array());
-		$type = get_request('type',0);
-		$priority = get_request('priority',0);
-		$comments = get_request('comments','');
-		$url = get_request('url','');
-		$status = get_request('status',0);
+	else {
+		$description = get_request('description', '');
+		$expressions = get_request('expressions', array());
+		$type = get_request('type', 0);
+		$priority = get_request('priority', 0);
+		$comments = get_request('comments', '');
+		$url = get_request('url', '');
+		$status = get_request('status', 0);
 	}
 
 	$keys = get_request('keys',array());
@@ -284,10 +256,9 @@ if(isset($_REQUEST['sform'])){
 
 
 	$exp_select = new CComboBox('expr_type');
-	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(REGEXP_INCLUDE,_('Include'));
-		$exp_select->addItem(REGEXP_EXCLUDE,_('Exclude'));
-
+	$exp_select->setAttribute('id', 'expr_type');
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
+	$exp_select->addItem(CRegexpTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
 	$ctb = new CTextBox('expression','',80);
 	$ctb->setAttribute('id','logexpr');
@@ -309,22 +280,6 @@ if(isset($_REQUEST['sform'])){
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 
 	$maxid=0;
-
-	$bExprResult = true;
-	$expressionData = new CTriggerExpression();
-	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !$expressionData->parse(empty($expressions) ? '' : construct_expression($itemid, $expressions))
-			&& !isset($_REQUEST['form_refresh'])) {
-
-		info($expressionData->error);
-
-		unset($expressions);
-		$expressions[0]['value'] = $expr_incase;
-		$expressions[0]['type'] = 0;
-		$expressions[0]['view'] = $expr_incase;
-		$bExprResult = false;
-	}
-
 	foreach($expressions as $id => $expr){
 
 		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
@@ -338,13 +293,17 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(_('Delete'),'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(
+			htmlspecialchars($expr['value']),
+			($expr['type'] == CRegexpTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
+			array($imgup, SPACE, $imgdn),
+			$del_url
+		));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 
 		$frmTRLog->addVar('expressions['.$id.'][value]',$expr['value']);
 		$frmTRLog->addVar('expressions['.$id.'][type]',$expr['type']);
-		$frmTRLog->addVar('expressions['.$id.'][view]',$expr['view']);
 
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}
@@ -377,9 +336,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addItemToBottomRow(SPACE);
 	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 
-	if ($bExprResult) {
-		$frmTRLog->show();
-	}
+	$frmTRLog->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -38,10 +38,10 @@
 					|| jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen'
 					|| jQuery('#expr_type option:selected').val().substr(0, 4) == 'band') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
-					jQuery('#param_0').removeAttr('readonly');
+					jQuery('#params_0').removeAttr('readonly');
 				}
 				else {
-					jQuery('#param_0').attr('readonly', 'readonly');
+					jQuery('#params_0').attr('readonly', 'readonly');
 				}
 			}
 		});
@@ -51,10 +51,10 @@
 					|| jQuery('#expr_type option:selected').val().substr(0, 6) == 'strlen'
 					|| jQuery('#expr_type option:selected').val().substr(0, 4) == 'band') {
 				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
-					jQuery('#param_0').removeAttr('readonly');
+					jQuery('#params_0').removeAttr('readonly');
 				}
 				else {
-					jQuery('#param_0').attr('readonly', 'readonly');
+					jQuery('#params_0').attr('readonly', 'readonly');
 				}
 			}
 		});
