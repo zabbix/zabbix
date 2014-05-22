@@ -21,11 +21,10 @@
 class CConditionFormula {
 
 	// possible parsing states
-	const STATE_INIT = 0;
-	const STATE_AFTER_OPEN_BRACE = 1;
-	const STATE_AFTER_OPERATOR = 2;
-	const STATE_AFTER_CLOSE_BRACE = 3;
-	const STATE_AFTER_CONSTANT = 4;
+	const STATE_AFTER_OPEN_BRACE = 0;
+	const STATE_AFTER_OPERATOR = 1;
+	const STATE_AFTER_CLOSE_BRACE = 2;
+	const STATE_AFTER_CONSTANT = 3;
 
 	/**
 	 * Set to true of the formula is valid.
@@ -84,13 +83,37 @@ class CConditionFormula {
 		$this->pos = 0;
 		$this->formula = $formula;
 
-		$state = self::STATE_INIT;
+		$state = self::STATE_AFTER_OPEN_BRACE;
+		$afterSpace = false;
 		$level = 0;
 
 		while (isset($this->formula[$this->pos])) {
+			if ($this->formula[$this->pos] === ' ') {
+				$afterSpace = true;
+				$this->pos++;
+
+				continue;
+			}
+
 			switch ($state) {
-				case self::STATE_INIT:
 				case self::STATE_AFTER_OPEN_BRACE:
+					switch ($this->formula[$this->pos]) {
+						case ' ':
+							break;
+						case '(':
+							$state = self::STATE_AFTER_OPEN_BRACE;
+							$level++;
+							break;
+						default:
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
+					}
+					break;
+
 				case self::STATE_AFTER_OPERATOR:
 					switch ($this->formula[$this->pos]) {
 						case ' ':
@@ -100,14 +123,40 @@ class CConditionFormula {
 							$level++;
 							break;
 						default:
-							if (!$this->parseConstant()) {
+							if (!$afterSpace) {
 								break 3;
 							}
-							$state = self::STATE_AFTER_CONSTANT;
+
+							if ($this->parseConstant()) {
+								$state = self::STATE_AFTER_CONSTANT;
+							}
+							else {
+								break 3;
+							}
 					}
 					break;
 
 				case self::STATE_AFTER_CLOSE_BRACE:
+					switch ($this->formula[$this->pos]) {
+						case ' ':
+							break;
+						case ')':
+							$state = self::STATE_AFTER_CLOSE_BRACE;
+							if ($level == 0) {
+								break 3;
+							}
+							$level--;
+							break;
+						default:
+							if ($this->parseOperator()) {
+								$state = self::STATE_AFTER_OPERATOR;
+							}
+							else {
+								break 3;
+							}
+					}
+					break;
+
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->formula[$this->pos]) {
 						case ' ':
@@ -120,10 +169,16 @@ class CConditionFormula {
 							$level--;
 							break;
 						default:
-							if (!$this->parseOperator()) {
+							if (!$afterSpace) {
 								break 3;
 							}
-							$state = self::STATE_AFTER_OPERATOR;
+
+							if ($this->parseOperator()) {
+								$state = self::STATE_AFTER_OPERATOR;
+							}
+							else {
+								break 3;
+							}
 					}
 					break;
 			}
