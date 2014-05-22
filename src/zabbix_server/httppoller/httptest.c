@@ -481,11 +481,16 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
+				0 == httpstep.follow_redirects ? 0L : 1L)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
 		if (0 != httpstep.follow_redirects)
 		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1L)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS,
-					ZBX_CURLOPT_MAXREDIRS)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 				goto httpstep_error;
