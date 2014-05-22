@@ -65,6 +65,8 @@ class C24TriggerExpressionConverter {
 			return $expression;
 		}
 
+		// find all the operators that need to be replaced
+		$foundOperators = array();
 		$pos = 0;
 		while (isset($expression[$pos])) {
 			switch ($expression[$pos]) {
@@ -84,24 +86,33 @@ class C24TriggerExpressionConverter {
 					// otherwise just continue as is, other macros don't contain any of these characters
 					break;
 				case '&':
-					$expression = $this->replaceLogicalOperator($expression, 'and', $pos);
-					$pos += 2;
-
-					break;
 				case '|':
-					$expression = $this->replaceLogicalOperator($expression, 'or', $pos);
-					$pos++;
-
-					break;
 				case '#':
-					$expression = substr_replace($expression, '<>', $pos, 1);
-					$pos++;
+					$foundOperators[$pos] = $expression[$pos];
 
 					break;
 
 			}
 
 			$pos++;
+		}
+
+		// replace the operators
+		foreach (array_reverse($foundOperators, true) as $pos => $operator) {
+			switch ($operator) {
+				case '&':
+					$expression = $this->replaceLogicalOperator($expression, 'and', $pos);
+
+					break;
+				case '|':
+					$expression = $this->replaceLogicalOperator($expression, 'or', $pos);
+
+					break;
+				case '#':
+					$expression = substr_replace($expression, '<>', $pos, 1);
+
+					break;
+			}
 		}
 
 		return $expression;
