@@ -256,10 +256,14 @@ else {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-							$data['mediatypes'][$key]['listOfActions'][] = array(
+							$action = array(
 								'actionid' => $actionId,
 								'name' => $action['name']
 							);
+
+							if (!in_array($action, $data['mediatypes'][$key]['listOfActions'])) {
+								$data['mediatypes'][$key]['listOfActions'][] = $action;
+							}
 						}
 					}
 				}
