@@ -1956,9 +1956,23 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#	define ZBX_POST_VCENTER_HV_LIST_CONTINUE								\
+		ZBX_POST_VSPHERE_HEADER										\
+		"<ns0:ContinueRetrievePropertiesEx xsi:type=\"ns0:ContinueRetrievePropertiesExRequestType\">"	\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"			\
+			"<ns0:token>%s</ns0:token>"								\
+		"</ns0:ContinueRetrievePropertiesEx>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN				\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"		\
+		"/*[local-name()='RetrievePropertiesExResponse']"		\
+		"/*[local-name()='returnval']/*[local-name()='token']"
+
 	const char	*__function_name = "vmware_service_get_hv_list";
 
 	int		err, opt, ret = FAIL;
+	char		tmp[MAX_STRING_LEN], *token;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1970,20 +1984,39 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 			goto out;
 		}
 
-		page.offset = 0;
-
-		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		while (1)
 		{
-			*error = zbx_strdup(*error, curl_easy_strerror(err));
-			goto out;
+			page.offset = 0;
+
+			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+			{
+				*error = zbx_strdup(*error, curl_easy_strerror(err));
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
+
+			if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+				goto out;
+
+			zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
+
+			if (NULL == (token = zbx_xml_read_value(page.data, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN)))
+				break;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'",
+					__function_name, token);
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_LIST_CONTINUE, token);
+			zbx_free(token);
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+			{
+				*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt,
+						curl_easy_strerror(err));
+				goto out;
+			}
 		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
-
-		if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-			goto out;
-
-		zbx_xml_read_values(page.data, "//*[@type='HostSystem']", hvs);
 	}
 	else
 	{
