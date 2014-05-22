@@ -38,6 +38,8 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			array('(A)'),
 			array('((A))'),
 			array('A and (B and C)'),
+			array('A and(B and C)'),
+			array('(A and B)and C'),
 		);
 	}
 
@@ -61,6 +63,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 			array('((A)'),
 			array('A and (B and C'),
 			array('AandB'),
+			array('A and BandC'),
 		);
 	}
 

@@ -98,8 +98,6 @@ class CConditionFormula {
 			switch ($state) {
 				case self::STATE_AFTER_OPEN_BRACE:
 					switch ($this->formula[$this->pos]) {
-						case ' ':
-							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
@@ -116,8 +114,6 @@ class CConditionFormula {
 
 				case self::STATE_AFTER_OPERATOR:
 					switch ($this->formula[$this->pos]) {
-						case ' ':
-							break;
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
@@ -138,8 +134,6 @@ class CConditionFormula {
 
 				case self::STATE_AFTER_CLOSE_BRACE:
 					switch ($this->formula[$this->pos]) {
-						case ' ':
-							break;
 						case ')':
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
@@ -159,8 +153,6 @@ class CConditionFormula {
 
 				case self::STATE_AFTER_CONSTANT:
 					switch ($this->formula[$this->pos]) {
-						case ' ':
-							break;
 						case ')':
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							if ($level == 0) {
@@ -182,6 +174,8 @@ class CConditionFormula {
 					}
 					break;
 			}
+
+			$afterSpace = false;
 			$this->pos++;
 		}
 
