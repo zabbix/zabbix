@@ -732,43 +732,34 @@ function getMenuPopupTriggerLog(options) {
 }
 
 /**
- * Get menu popup trigger macro section data.
+ * Get data for the "Insert expression" menu in the trigger expression constructor.
  *
  * @return array
  */
 function getMenuPopupTriggerMacro(options) {
 	var items = [],
-		data = {
-			'TRIGGER.VALUE=0': 0,
-			'TRIGGER.VALUE=1': 1,
-			'TRIGGER.VALUE=2': 2,
-			'TRIGGER.VALUE#0': 10,
-			'TRIGGER.VALUE#1': 11,
-			'TRIGGER.VALUE#2': 12
-		};
+		expressions = [
+			{
+				label: t('Trigger status "OK"'),
+				string: '{TRIGGER.VALUE}=0'
+			},
+			{
+				label: t('Trigger status "Problem"'),
+				string: '{TRIGGER.VALUE}=1'
+			}
+		];
 
-	jQuery.each(data, function(label, value) {
+	jQuery.each(expressions, function(key, expression) {
 		items[items.length] = {
-			label: label,
+			label: expression.label,
 			clickCallback: function() {
-				var expression = jQuery('#expr_temp');
+				var expressionInput = jQuery('#expr_temp');
 
-				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+				if (expressionInput.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 					return false;
 				}
 
-				var sign, valueString;
-
-				if (value >= 10) {
-					valueString = value % 10;
-					sign = '#';
-				}
-				else {
-					valueString = value;
-					sign = '=';
-				}
-
-				expression.val('{TRIGGER.VALUE}' + sign + valueString);
+				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menuPopup').fadeOut(100);
 			}
@@ -776,7 +767,7 @@ function getMenuPopupTriggerMacro(options) {
 	});
 
 	return [{
-		label: t('Insert macro'),
+		label: t('Insert expression'),
 		items: items
 	}];
 }
