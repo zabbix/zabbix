@@ -492,7 +492,7 @@ class CHttpTest extends CApiService {
 		}
 
 		$httpTests = $this->extendFromObjects(zbx_toHash($httpTests, 'httptestid'), $dbHttpTests, array(
-			'ssl_key_file', 'ssl_cert_file', 'verify_host', 'verify_peer'
+			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
 		));
 
 		$this->checkNames($httpTests);
@@ -818,10 +818,17 @@ class CHttpTest extends CApiService {
 		$verifyHostValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
 
-		if (($httpTest['ssl_cert_file'] != '') && ($httpTest['ssl_key_file'] == '')) {
+			if (($httpTest['ssl_key_password'] != '') && ($httpTest['ssl_key_file'] == '')) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_s('Empty SSL key file for web scenario "%1$s".', $httpTest['name'])
+			);
+		}
+
+		if (($httpTest['ssl_key_file'] != '') && ($httpTest['ssl_cert_file'] == '')) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Empty SSL certificate file for web scenario "%1$s".', $httpTest['name'])
 			);
 		}
 	}
