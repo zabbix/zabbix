@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget(null, 'trigger-expression');
+$expressionWidget = new CWidget(null, 'trigger-popup');
 
 // create form
 $expressionForm = new CForm();
@@ -64,7 +64,7 @@ $expressionFormList->addRow(_('Function'), $functionComboBox);
 
 if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) {
 	foreach ($this->data['functions'][$this->data['selectedFunction']]['params'] as $paramId => $paramFunction) {
-		$paramValue = isset($this->data['param'][$paramId]) ? $this->data['param'][$paramId] : null;
+		$paramValue = isset($this->data['params'][$paramId]) ? $this->data['params'][$paramId] : null;
 
 		if ($paramFunction['T'] == T_ZBX_INT) {
 			$paramTypeElement = null;
@@ -92,25 +92,24 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
 				$paramTypeElement = SPACE._('Time');
-				$paramField = new CTextBox('param['.$paramId.']', $paramValue, 10);
+				$paramField = new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 			else {
 				$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
-					? new CNumericBox('param['.$paramId.']', (int) $paramValue, 10)
-					: new CTextBox('param['.$paramId.']', $paramValue, 10);
+					? new CNumericBox('params['.$paramId.']', (int) $paramValue, 10)
+					: new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 
 			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
 		}
 		else {
-			$expressionFormList->addRow($paramFunction['C'], new CTextBox('param['.$paramId.']', $paramValue, 30));
+			$expressionFormList->addRow($paramFunction['C'], new CTextBox('params['.$paramId.']', $paramValue, 30));
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
 }
 else {
 	$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
-	$expressionForm->addVar('param', 0);
 }
 
 $expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
