@@ -66,6 +66,7 @@ class CFunctionMacroParserTest extends PHPUnit_Framework_TestCase {
 
 	public function invalidProvider() {
 		return array(
+			array('', 0,  0),
 			array('{}', 0,  1),
 			array('{host}', 0, 5),
 			array('{host:item}', 0, 10),
