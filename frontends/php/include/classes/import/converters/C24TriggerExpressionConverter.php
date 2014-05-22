@@ -32,10 +32,19 @@ class C24TriggerExpressionConverter {
 	protected $functionMacroParser;
 
 	/**
-	 * @param CFunctionMacroParser $functionMacroParser
+	 * A parser for LLD macros.
+	 *
+	 * @var CMacroParser
 	 */
-	public function __construct(CFunctionMacroParser $functionMacroParser) {
+	protected $lldMacroParser;
+
+	/**
+	 * @param CFunctionMacroParser  $functionMacroParser
+	 * @param CMacroParser          $lldMacroParser
+	 */
+	public function __construct(CFunctionMacroParser $functionMacroParser, CMacroParser $lldMacroParser) {
 		$this->functionMacroParser = $functionMacroParser;
+		$this->lldMacroParser = $lldMacroParser;
 	}
 
 	/**
@@ -62,10 +71,17 @@ class C24TriggerExpressionConverter {
 				case '{':
 					// skip function macros
 					$result = $this->functionMacroParser->parse($expression, $pos);
+
+					// if it's not a function macro, try to parse it as an LLD macro
+					if (!$result) {
+						$result = $this->lldMacroParser->parse($expression, $pos);
+					}
+
 					if ($result) {
 						$pos += $result->length - 1;
 					}
 
+					// otherwise just continue as is, other macros don't contain any of these characters
 					break;
 				case '&':
 					$expression = $this->replaceLogicalOperator($expression, 'and', $pos);

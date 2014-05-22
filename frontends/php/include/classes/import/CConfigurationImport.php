@@ -1297,7 +1297,7 @@ class CConfigurationImport {
 	protected function getFormatter($version) {
 		switch ($version) {
 			case '2.0':
-				$converter = new C24TriggerExpressionConverter(new CFunctionMacroParser());
+				$converter = new C24TriggerExpressionConverter(new CFunctionMacroParser(), new CMacroParser('#'));
 
 				return new C20ImportFormatter($converter);
 			default:

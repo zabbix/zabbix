@@ -114,6 +114,20 @@ class CTriggerExpression {
 	protected $functionMacroParser;
 
 	/**
+	 * Parser for user macros.
+	 *
+	 * @var CMacroParser
+	 */
+	protected $userMacroParser;
+
+	/**
+	 * Parser for LLD macros.
+	 *
+	 * @var CMacroParser
+	 */
+	protected $lldMacroParser;
+
+	/**
 	 * Chars that should be treated as spaces.
 	 *
 	 * @var array
@@ -141,6 +155,8 @@ class CTriggerExpression {
 		$this->notOperatorParser = new CSetParser(array('not'));
 		$this->macroParser = new CSetParser(array('{TRIGGER.VALUE}'));
 		$this->functionMacroParser = new CFunctionMacroParser();
+		$this->userMacroParser = new CMacroParser('$');
+		$this->lldMacroParser = new CMacroParser('#');
 	}
 
 	/**
@@ -508,7 +524,14 @@ class CTriggerExpression {
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber()
 				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)
-				|| $this->parseUserMacro() || $this->parseLLDMacro()) {
+				|| $this->parseUsing($this->userMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
+
+			return true;
+		}
+
+		// LLD macro support for trigger prototypes
+		if (($this->options['lldmacros']
+			&& $this->parseUsing($this->lldMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO))) {
 
 			return true;
 		}
@@ -605,102 +628,5 @@ class CTriggerExpression {
 		$this->pos = $j - 1;
 
 		return true;
-	}
-
-	/**
-	 * Parses an user macro constant in the trigger expression and
-	 * moves a current position ($this->pos) on a last symbol of the macro
-	 *
-	 * @return bool returns true if parsed successfully, false otherwise
-	 */
-	private function parseUserMacro() {
-		$j = $this->pos;
-
-		if ($this->expression[$j++] != '{') {
-			return false;
-		}
-
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != '$') {
-			return false;
-		}
-
-		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
-			return false;
-		}
-
-		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
-			$j++;
-		}
-
-		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
-			return false;
-		}
-
-		$macroLength = $j - $this->pos + 1;
-		$usermacro = substr($this->expression, $this->pos, $macroLength);
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $usermacro,
-			$this->pos, $macroLength
-		);
-
-		$this->pos = $j;
-
-		return true;
-	}
-
-	/**
-	 * Parses a low-level discovery macro constant in the trigger expression and
-	 * moves a current position ($this->pos) on a last symbol of the macro
-	 *
-	 * @return bool returns true if parsed successfully, false otherwise
-	 */
-	private function parseLLDMacro() {
-		if (!$this->options['lldmacros']) {
-			return false;
-		}
-
-		$j = $this->pos;
-
-		if ($this->expression[$j++] != '{') {
-			return false;
-		}
-
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != '#') {
-			return false;
-		}
-
-		if (!isset($this->expression[$j]) || !$this->isMacroChar($this->expression[$j++])) {
-			return false;
-		}
-
-		while (isset($this->expression[$j]) && $this->isMacroChar($this->expression[$j])) {
-			$j++;
-		}
-
-		if (!isset($this->expression[$j]) || $this->expression[$j] != '}') {
-			return false;
-		}
-
-		$macroLength = $j - $this->pos + 1;
-		$lldmacro = substr($this->expression, $this->pos, $j - $this->pos + 1);
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO, $lldmacro,
-			$this->pos, $macroLength
-		);
-
-		$this->pos = $j;
-
-		return true;
-	}
-
-	/**
-	 * Returns true if the char is allowed in the macro, false otherwise
-	 *
-	 * @return bool
-	 */
-	private function isMacroChar($c) {
-		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
-			return true;
-		}
-
-		return false;
 	}
 }

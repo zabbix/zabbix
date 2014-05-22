@@ -837,7 +837,10 @@ class CXmlImport18 {
 	}
 
 	public static function parseMain($rules) {
-		$triggerExpressionConverter = new C24TriggerExpressionConverter(new CFunctionMacroParser());
+		$triggerExpressionConverter = new C24TriggerExpressionConverter(
+			new CFunctionMacroParser(),
+			new CMacroParser('#')
+		);
 		$triggersForDependencies = array();
 
 		if (!empty($rules['hosts']['updateExisting'])

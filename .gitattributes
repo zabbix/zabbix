@@ -269,6 +269,7 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/parsers/CFunctionMacroParserTest.php -text
+frontends/php/tests/unit/include/classes/parsers/CMacroParserTest.php -text
 frontends/php/tests/unit/include/classes/parsers/CSetParserTest.php -text
 frontends/php/tests/unit/include/classes/triggers/CRegexpTriggerConstructorTest.php -text
 man/zabbix_agentd.man -text
