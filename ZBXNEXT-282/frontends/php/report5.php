@@ -114,7 +114,7 @@ $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
 	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
-	'selectHosts' => array('hostid'),
+	'selectHosts' => array('hostid', 'status'),
 	'expandDescription' => true,
 	'expandData' => true,
 	'preservekeys' => true,
@@ -151,7 +151,7 @@ CArrayHelper::sort($triggers, array(
 ));
 
 $hosts = API::Host()->get(array(
-	'output' => array('hostid'),
+	'output' => array('hostid', 'status'),
 	'hostids' => $hostIds,
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
@@ -163,7 +163,10 @@ $scripts = API::Script()->getScriptsByHosts($hostIds);
 foreach ($triggers as $trigger) {
 	$hostId = $trigger['hostid'];
 
-	$hostName = new CSpan($trigger['hostname'], 'link_menu');
+	$hostName = new CSpan($trigger['hostname'],
+		'link_menu menu-host'.(($hosts[$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+	);
+
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');

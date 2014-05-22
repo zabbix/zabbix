@@ -575,7 +575,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		$dltGroupids = getDeletableHostGroups($groupids);
+		$dltGroupids = getDeletableHostGroupIds($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
 				if (isset($dltGroupids[$groupid])) {
@@ -812,7 +812,7 @@ class CHostGroup extends CApiService {
 
 		$objectidsToUnlink = array_merge($hostids, $templateids);
 		if (!empty($objectidsToUnlink)) {
-			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
+			$unlinkable = getUnlinkableHostIds($groupids, $objectidsToUnlink);
 			if (count($objectidsToUnlink) != count($unlinkable)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
@@ -945,7 +945,7 @@ class CHostGroup extends CApiService {
 
 		// validate hosts without groups
 		if ($hostIdsToValidate) {
-			$unlinkable = getUnlinkableHosts($groupIds, $hostIdsToValidate);
+			$unlinkable = getUnlinkableHostIds($groupIds, $hostIdsToValidate);
 
 			if (count($unlinkable) != count($hostIdsToValidate)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));

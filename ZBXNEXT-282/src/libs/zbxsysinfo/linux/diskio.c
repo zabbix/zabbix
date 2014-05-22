@@ -92,11 +92,12 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	}
 
 	if (NULL == (f = fopen(INFO_FILE_NAME, "r")))
-		return ret;
+		return FAIL;
 
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
 		PARSE(tmp);
+
 		if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
 		{
 			if (0 != strcmp(name, devname))
@@ -174,8 +175,11 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
-	if (3 < request->nparam)	/* too many parameters? */
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	devname = get_rparam(request, 0);
 	tmp = get_rparam(request, 1);
@@ -189,15 +193,25 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "operations"))
 		type = ZBX_DSTAT_TYPE_OPER;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (type == ZBX_DSTAT_TYPE_SECT || type == ZBX_DSTAT_TYPE_OPER)
 	{
 		if (request->nparam > 2)
+		{
+			/* Mode is supported only if type is in: operations, sectors. */
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (SUCCEED != get_diskstat(devname, dstats))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (ZBX_DSTAT_TYPE_SECT == type)
 			SET_UI64_RESULT(result, dstats[(ZBX_DEV_READ == rw ? ZBX_DSTAT_R_SECT : ZBX_DSTAT_W_SECT)]);
@@ -216,7 +230,10 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	else if (0 == strcmp(tmp, "avg15"))
 		mode = ZBX_AVG15;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == collector)
 	{
@@ -225,22 +242,34 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		/* the collectors are not available and keys "vfs.dev.read", "vfs.dev.write" with some parameters */
 		/* (e.g. sps, ops) are not supported. */
 
-		SET_MSG_RESULT(result, strdup("This parameter is available only in daemon mode when collectors are started."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "This item is available only in daemon mode when collectors are"
+				" started."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
+	{
 		*kernel_devname = '\0';
+	}
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device name used internally by the kernel."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
 		if (SUCCEED != get_diskstat(kernel_devname, dstats))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
+		}
 
 		if (NULL == (device = collector_diskdevice_add(kernel_devname)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot add disk device to agent collector."));
 			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	if (ZBX_DSTAT_TYPE_SPS == type)
