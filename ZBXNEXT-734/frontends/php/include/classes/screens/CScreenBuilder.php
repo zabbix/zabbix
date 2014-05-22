@@ -163,6 +163,8 @@ class CScreenBuilder {
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenitemid']
 	 * @param int		$options['hostid']
+	 * @param array		$options['screen']
+	 * @param int		$options['screenid']
 	 *
 	 * @return CScreenBase
 	 */
@@ -229,6 +231,16 @@ class CScreenBuilder {
 				return new CScreenDataOverview($options);
 
 			case SCREEN_RESOURCE_URL:
+				if (isset($options['screen'])) {
+					$options['isTemplatedScreen'] = ($options['screen']['templateid']);
+				}
+				elseif (isset($options['screenid'])) {
+					$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
+						'screenids' => array($options['screenid']),
+						'output' => array('templateid')
+					));
+				}
+
 				return new CScreenUrl($options);
 
 			case SCREEN_RESOURCE_ACTIONS:
@@ -383,6 +395,8 @@ class CScreenBuilder {
 				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
 					$screenBase = CScreenBuilder::getScreen(array(
+						'screen' => $this->screen,
+						'screenid' => $this->screen['screenid'],
 						'isFlickerfree' => $this->isFlickerfree,
 						'pageFile' => $this->pageFile,
 						'mode' => $this->mode,
@@ -395,8 +409,6 @@ class CScreenBuilder {
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem
 					));
-
-					$screenBase->screenitem['templated'] = ($this->screen['templateid']);
 
 					if (!empty($screenBase)) {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
