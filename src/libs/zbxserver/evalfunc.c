@@ -1157,7 +1157,10 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
 		{
 			if (NULL != error)
-				*error = zbx_strdup(*error, "item does not exist");
+			{
+				*error = zbx_strdup(*error, "item does not exist, disabled"
+						" or belongs to a disabled host");
+			}
 			goto out;
 		}
 
