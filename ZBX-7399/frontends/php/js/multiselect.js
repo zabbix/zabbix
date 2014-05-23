@@ -860,6 +860,12 @@ jQuery(function($) {
 				'padding-top': top,
 				'padding-left': left
 			});
+
+			// refresh DOM object
+			if (IE8) {
+				$('.multiselect-wrapper').addClass('refreshDomObj');
+				$('.multiselect-wrapper').removeClass('refreshDomObj');
+			}
 		}
 		else {
 			$('input[type="text"]', obj).css({
