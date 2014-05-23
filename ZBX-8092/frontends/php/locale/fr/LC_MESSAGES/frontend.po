@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-27 22:19+0300\n"
+"POT-Creation-Date: 2014-05-17 00:37+0300\n"
 "PO-Revision-Date: 2014-02-03 09:00+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -301,8 +301,8 @@ msgstr "Acquittement désactivé"
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
-#: include/views/configuration.services.edit.php:93
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:92
+#: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
 #: include/views/configuration.template.edit.php:388
 #: include/views/configuration.triggers.edit.php:149
@@ -422,8 +422,8 @@ msgstr "Actif jusqu'à"
 #: include/views/configuration.item.edit.php:315
 #: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
-#: include/views/configuration.services.edit.php:118
-#: include/views/configuration.services.edit.php:266
+#: include/views/configuration.services.edit.php:117
+#: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
 #: include/views/configuration.template.edit.php:427
@@ -1114,7 +1114,7 @@ msgstr "CONFIGURATION DES NŒUDS"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "CONFIGURATION DES PROXIES"
 
-#: adm.regexps.php:212
+#: adm.regexps.php:214
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "CONFIGURATION DES EXPRESSIONS RATIONNELLES"
 
@@ -1333,7 +1333,7 @@ msgstr "Impossible d'ajouter un prototype d'hôte"
 msgid "Cannot add image"
 msgstr "Impossible d'ajouter l'image"
 
-#: include/classes/import/CXmlImport18.php:633
+#: include/classes/import/CXmlImport18.php:631
 msgid "Cannot add image."
 msgstr "Impossible d'ajouter l'image."
 
@@ -1532,7 +1532,7 @@ msgstr "Impossible de créer la correspondance d'icône"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Impossible de créer des correspondances d'icônes avec le même nom \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:817
+#: include/classes/import/CXmlImport18.php:815
 #, c-format
 msgid "Cannot create map \"%s\"."
 msgstr "Impossible de créer la carte \"%s\"."
@@ -1545,7 +1545,7 @@ msgstr "Impossible de créer une nouvelle application, le scénario web est déj
 msgid "Cannot create new element"
 msgstr "Impossible de créer un nouvel élément"
 
-#: include/classes/import/CXmlImport18.php:1706
+#: include/classes/import/CXmlImport18.php:1704
 msgid "Cannot create screen."
 msgstr "Impossible de créer l'écran."
 
@@ -1571,7 +1571,7 @@ msgstr "Impossible de supprimer la dépendance"
 msgid "Cannot delete discovery rule"
 msgstr "Impossible de supprimer la règle de découverte"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Cannot delete discovery rules"
 msgstr "Impossible d'effacer les règles de découverte"
 
@@ -1599,7 +1599,7 @@ msgstr "Impossible de supprimer les graphiques"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Impossible de supprimer des graphiques créés par la découverte de bas niveau."
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Cannot delete group"
 msgstr "Impossible de supprimer le groupe"
 
@@ -1651,7 +1651,7 @@ msgstr "Impossible de supprimer les éléments"
 msgid "Cannot delete items created by low level discovery."
 msgstr "Impossible de supprimer des éléments créés par la découverte de bas niveau."
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Cannot delete maintenance"
 msgstr "Impossible de supprimer une maintenance"
 
@@ -1659,7 +1659,7 @@ msgstr "Impossible de supprimer une maintenance"
 msgid "Cannot delete media type"
 msgstr "Impossible de supprimer le type de média"
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Cannot delete network map"
 msgstr "Impossible de supprimer la carte"
 
@@ -1671,17 +1671,17 @@ msgstr "Impossible de supprimer le nœud"
 msgid "Cannot delete proxy"
 msgstr "Impossible de supprimer le proxy"
 
-#: adm.regexps.php:173
+#: adm.regexps.php:182
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Impossible de supprimer l'expression rationnelle"
 msgstr[1] "Impossible de supprimer les expressions rationnelles"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Cannot delete screen"
 msgstr "Impossible de supprimer l'écran"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Cannot delete script"
 msgstr "Impossible de supprimer le script"
 
@@ -1773,7 +1773,7 @@ msgstr "Impossible de supprimer les déclencheurs"
 msgid "Cannot delete triggers created by low level discovery."
 msgstr "Impossible de supprimer des déclencheurs créés par la découverte de bas niveau."
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "Cannot delete user"
 msgstr "Impossible de supprimer l'utilisateur"
 
@@ -1785,7 +1785,7 @@ msgstr "Impossible de supprimer le média utilisateur."
 msgid "Cannot delete value map"
 msgstr "Impossible de supprimer la table de correspondance"
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Cannot delete web scenario"
 msgstr "Impossible de supprimer le scénario web"
 
@@ -1795,7 +1795,7 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Impossible de désactiver l'action"
 msgstr[1] "Impossible de désactiver les actions"
 
-#: discoveryconf.php:188
+#: discoveryconf.php:190
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Impossible de désactiver la règle de découverte"
@@ -1849,13 +1849,13 @@ msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] "Impossible de désactiver le prototype de déclencheur"
 msgstr[1] "Impossible de désactiver les prototypes de déclencheur"
 
-#: usergrps.php:343
+#: usergrps.php:348
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "Impossible de désactiver le groupe d'utilisateurs"
 msgstr[1] "Impossible de désactiver les groupes d'utilisateurs"
 
-#: httpconf.php:297
+#: httpconf.php:299
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Impossible de désactiver le scénario web"
@@ -1875,7 +1875,7 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Impossible d'activer l'action"
 msgstr[1] "Impossible d'activer les actions"
 
-#: discoveryconf.php:187
+#: discoveryconf.php:189
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Impossible d'activer la règle de découverte"
@@ -1929,32 +1929,32 @@ msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] "Impossible d'activer le prototype de déclencheur"
 msgstr[1] "Impossible d'activer les prototypes de déclencheur"
 
-#: usergrps.php:342
+#: usergrps.php:347
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "Impossible d'activer le groupe d'utilisateurs"
 msgstr[1] "Impossible d'activer les groupes d'utilisateurs"
 
-#: httpconf.php:296
+#: httpconf.php:298
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Impossible d'activer le scénario web"
 msgstr[1] "Impossible d'activer les scénarios web"
 
-#: include/classes/import/CXmlImport18.php:677
+#: include/classes/import/CXmlImport18.php:675
 #: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Impossible de trouver l'image de fond \"%1$s\" utilisée dans la carte \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:508
-#: include/classes/import/CXmlImport18.php:1663
+#: include/classes/import/CXmlImport18.php:1661
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver le graphique \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:724
+#: include/classes/import/CXmlImport18.php:722
 #: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
@@ -1966,7 +1966,7 @@ msgstr "Impossible de trouver le groupe \"%1$s\" utilisé dans la carte \"%2$s\"
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver le groupe \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:735
+#: include/classes/import/CXmlImport18.php:733
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
@@ -1996,7 +1996,7 @@ msgstr "Impossible de trouver l'interface de l'hôte sur \"%1$s\" pour la clé d
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Impossible de trouver l'hôte ou le modèle \"%1$s\" utilisé dans le graphique \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:768
+#: include/classes/import/CXmlImport18.php:766
 #: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2028,13 +2028,13 @@ msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for gr
 msgstr "Impossible de trouver l'élément \"%1$s\" sur \"%2$s\" utilisé comme minimum de l'axe Y pour le prototype de graphique \"%3$s\" de la règle de découverte \"%4$s\" sur \"%5$s\"."
 
 #: include/classes/import/CXmlImport18.php:521
-#: include/classes/import/CXmlImport18.php:1676
+#: include/classes/import/CXmlImport18.php:1674
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver l'élément \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:713
+#: include/classes/import/CXmlImport18.php:711
 #, c-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans la carte exportée \"%2$s\"."
@@ -2065,8 +2065,8 @@ msgstr "Impossible de trouver l'écran \"%1$s\" utilisée dans l'écran \"%2$s\"
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Impossible de trouver le modèle \"%1$s\" pour le prototype d'hôte \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
-#: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/CXmlImport18.php:789
+#: include/classes/import/CXmlImport18.php:744
+#: include/classes/import/CXmlImport18.php:787
 #: include/classes/import/importers/CMapImporter.php:228
 #: include/classes/import/importers/CMapImporter.php:271
 #, c-format
@@ -2239,7 +2239,7 @@ msgstr "Impossible de configurer les champs d'inventaire pour un inventaire dés
 msgid "Cannot switch host for interface."
 msgstr "Impossible de changer d'hôte pour l'interface."
 
-#: users.php:353
+#: users.php:354
 msgid "Cannot unblock users"
 msgstr "Impossible de débloquer les utilisateurs"
 
@@ -2372,7 +2372,7 @@ msgid "Cannot update configuration"
 msgstr "Impossible de mettre à jour la configuration"
 
 # Homogénéisation update = mettre à jour
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Cannot update debug mode"
 msgstr "Impossible de mettre à jour le mode debug"
 
@@ -2380,7 +2380,7 @@ msgstr "Impossible de mettre à jour le mode debug"
 msgid "Cannot update discovery rule"
 msgstr "Impossible de mettre à jour la règle de découverte"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Cannot update frontend access"
 msgstr "Impossible de mettre à jour l'accès à l'interface"
 
@@ -2426,7 +2426,7 @@ msgstr "Impossible de mettre à jour la table de correspondance d'icônes"
 msgid "Cannot update image"
 msgstr "Impossible de mettre à jour l'image"
 
-#: include/classes/import/CXmlImport18.php:640
+#: include/classes/import/CXmlImport18.php:638
 msgid "Cannot update image."
 msgstr "Impossible de mettre à jour l'image."
 
@@ -2459,7 +2459,7 @@ msgstr "Impossible de mettre à jour les macros"
 msgid "Cannot update maintenance"
 msgstr "Impossible de mettre à jour la maintenance"
 
-#: include/classes/import/CXmlImport18.php:808
+#: include/classes/import/CXmlImport18.php:806
 #, c-format
 msgid "Cannot update map \"%s\"."
 msgstr "Impossible de mettre à jour la carte \"%s\"."
@@ -2493,7 +2493,7 @@ msgstr "Impossible de mettre à jour l'expression rationnelle"
 msgid "Cannot update screen"
 msgstr "Impossible de mettre à jour l'écran"
 
-#: include/classes/import/CXmlImport18.php:1698
+#: include/classes/import/CXmlImport18.php:1696
 msgid "Cannot update screen."
 msgstr "Impossible de mettre à jour l'écran."
 
@@ -3162,7 +3162,7 @@ msgstr "Copier les éléments sélectionnés sur ..."
 msgid "Correct login \"%s\"."
 msgstr "Connexion correcte \"%s\"."
 
-#: api/classes/CImage.php:452
+#: api/classes/CImage.php:451
 msgid "Could not save image!"
 msgstr "Impossible de sauvegarder l'image !"
 
@@ -3686,7 +3686,7 @@ msgstr "Debug"
 msgid "Debug mode"
 msgstr "Mode debug"
 
-#: usergrps.php:302
+#: usergrps.php:308
 msgid "Debug mode updated"
 msgstr "Mode debug modifié"
 
@@ -4145,7 +4145,7 @@ msgstr "Delta (vitesse par seconde)"
 msgid "Deny"
 msgstr "Interdit"
 
-#: include/views/configuration.services.edit.php:279
+#: include/views/configuration.services.edit.php:278
 #: include/views/configuration.triggers.edit.php:289
 #: include/views/configuration.triggers.edit.php:306
 msgid "Dependencies"
@@ -4156,7 +4156,7 @@ msgid "Dependent"
 msgstr "Dépendant"
 
 #: include/triggers.inc.php:1398
-#: include/views/configuration.services.edit.php:115
+#: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:759
 #: tr_status.php:596
 msgid "Depends on"
@@ -4474,13 +4474,13 @@ msgstr "Règle de découverte créée"
 msgid "Discovery rule deleted"
 msgstr "Règle de découverte supprimée"
 
-#: discoveryconf.php:185 host_discovery.php:283
+#: discoveryconf.php:187 host_discovery.php:283
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Règle de découverte désactivée"
 msgstr[1] "Règles de découverte désactivées"
 
-#: discoveryconf.php:184 host_discovery.php:282
+#: discoveryconf.php:186 host_discovery.php:282
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Règle de découverte activée"
@@ -4499,7 +4499,7 @@ msgstr "Règle de découverte modifiée"
 msgid "Discovery rules"
 msgstr "Règles de découverte"
 
-#: discoveryconf.php:196 host_discovery.php:294
+#: discoveryconf.php:200 host_discovery.php:294
 msgid "Discovery rules deleted"
 msgstr "Règles de découverte supprimées"
 
@@ -4555,8 +4555,8 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Arrêté"
 
-#: include/views/configuration.services.edit.php:140
-#: include/views/configuration.services.edit.php:259
+#: include/views/configuration.services.edit.php:139
+#: include/views/configuration.services.edit.php:258
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:166 report3.php:83
 msgid "Downtime"
@@ -4794,7 +4794,7 @@ msgstr "Nom du script vide."
 msgid "Empty name."
 msgstr "Nom vide."
 
-#: api/classes/CImage.php:470 api/rpc/class.czbxrpc.php:38
+#: api/classes/CImage.php:469 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
 msgstr "Paramètres vide"
 
@@ -5056,7 +5056,7 @@ msgstr "Exclure"
 msgid "Execute"
 msgstr "Exécuter"
 
-#: api/classes/CImage.php:290
+#: api/classes/CImage.php:289
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Erreur d'exécution SQL [%1$s] dans [%2$s]."
@@ -5273,7 +5273,7 @@ msgstr "Champ \"hôte\" est obligatoire"
 msgid "Field \"name\" is required."
 msgstr "Le champ \"nom\" est obligatoire."
 
-#: api/classes/CImage.php:550
+#: api/classes/CImage.php:549
 msgid "File format is unsupported."
 msgstr "Ce format de fichier n'est pas supporté."
 
@@ -5392,8 +5392,8 @@ msgstr "Vendredi"
 
 #: include/reports.inc.php:70 include/reports.inc.php:392
 #: include/views/configuration.action.edit.php:446
-#: include/views/configuration.services.edit.php:226
-#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:251
 #: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:119
 #: report2.php:377 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
@@ -5407,7 +5407,7 @@ msgstr "De"
 msgid "Frontend access"
 msgstr "Accès à l'interface"
 
-#: usergrps.php:267
+#: usergrps.php:272
 msgid "Frontend access updated"
 msgstr "Accès à l'interface mis à jour"
 
@@ -5450,7 +5450,7 @@ msgid "GSM modem"
 msgstr "Modem GSM"
 
 #: adm.gui.php:95 adm.housekeeper.php:126 adm.iconmapping.php:109
-#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:192
+#: adm.images.php:131 adm.macros.php:158 adm.other.php:110 adm.regexps.php:194
 #: adm.triggerdisplayoptions.php:74 adm.triggerseverities.php:79
 #: adm.valuemapping.php:126 adm.workingtime.php:61
 #: include/views/administration.general.gui.edit.php:51
@@ -5606,8 +5606,8 @@ msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire 
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Le graphique \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1555
-#: include/classes/import/CXmlImport18.php:1559
+#: include/classes/import/CXmlImport18.php:1553
+#: include/classes/import/CXmlImport18.php:1557
 #, c-format
 msgid "Graph \"%1$s\" skipped - user rule."
 msgstr "Graphique \"%1$s\" sauté - règle utilisateur."
@@ -5790,7 +5790,7 @@ msgstr "Le groupe \"%1$s\" pour l'hôte \"%2$s\" n'existe pas."
 msgid "Group added"
 msgstr "Groupe ajouté"
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:234
+#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Group deleted"
 msgstr "Groupe supprimé"
 
@@ -5985,7 +5985,7 @@ msgstr "Historique"
 msgid "History and simple graphs"
 msgstr "Historique et graphiques simples"
 
-#: httpconf.php:320 items.php:499 items.php:504 items.php:736 items.php:742
+#: httpconf.php:329 items.php:499 items.php:504 items.php:736 items.php:742
 msgid "History cleared"
 msgstr "Historique nettoyé"
 
@@ -6079,7 +6079,7 @@ msgstr "L'hôte \"%1$s\" existe déjà."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "L'hôte \"%1$s\" est surveillé par le proxy \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:928
+#: include/classes/import/CXmlImport18.php:926
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "L'hôte \"%s\" a le paramètre \"useipmi\" validé mais n'a pas de paramètre \"ipmi_ip\"! Utilisation de l'adresse IP de l'hôte comme adresse de l'interface IPMI."
@@ -6420,7 +6420,7 @@ msgid "Hours"
 msgstr "Heures"
 
 #: adm.gui.php:96 adm.housekeeper.php:127 adm.iconmapping.php:110
-#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:193
+#: adm.images.php:132 adm.macros.php:159 adm.other.php:111 adm.regexps.php:195
 #: adm.triggerdisplayoptions.php:75 adm.triggerseverities.php:80
 #: adm.valuemapping.php:127 adm.workingtime.php:62
 #: include/views/administration.general.housekeeper.edit.php:163
@@ -6674,7 +6674,7 @@ msgstr "La correspondance d'icône avec l'identifiant \"%s\" n'existe pas."
 
 #: adm.gui.php:98 adm.housekeeper.php:129 adm.iconmapping.php:112
 #: adm.iconmapping.php:176 adm.images.php:134 adm.macros.php:161
-#: adm.other.php:113 adm.regexps.php:195 adm.triggerdisplayoptions.php:77
+#: adm.other.php:113 adm.regexps.php:197 adm.triggerdisplayoptions.php:77
 #: adm.triggerseverities.php:82 adm.valuemapping.php:129
 #: adm.workingtime.php:64
 msgid "Icon mapping"
@@ -6711,7 +6711,7 @@ msgstr "Si vous pensez que ce message n'est pas correct, veuillez consulter votr
 msgid "Image"
 msgstr "Image"
 
-#: api/classes/CImage.php:257 api/classes/CImage.php:373
+#: api/classes/CImage.php:256 api/classes/CImage.php:372
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "L'image \"%1$s\" existe déjà."
@@ -6728,12 +6728,12 @@ msgstr "Image supprimée"
 msgid "Image label type"
 msgstr "Type d'étiquette d'image"
 
-#: api/classes/CImage.php:294
+#: api/classes/CImage.php:293
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Erreur de chargement d'image [%1$s] dans [%2$s]."
 
-#: api/classes/CImage.php:545 include/classes/helpers/CUploadFile.php:129
+#: api/classes/CImage.php:544 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
 msgstr "La taille de l'image doit être inférieure à 1 Mo."
 
@@ -6742,7 +6742,7 @@ msgid "Image updated"
 msgstr "Image modifiée"
 
 #: adm.gui.php:97 adm.housekeeper.php:128 adm.iconmapping.php:111
-#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:194
+#: adm.images.php:133 adm.macros.php:160 adm.other.php:112 adm.regexps.php:196
 #: adm.triggerdisplayoptions.php:76 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:63
 #: include/views/administration.general.image.list.php:29
@@ -7191,35 +7191,35 @@ msgstr "Clé incorrecte."
 msgid "Incorrect list of items."
 msgstr "Liste d'éléments incorrecte."
 
-#: maintenance.php:307
+#: maintenance.php:311
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Maintenance incorrecte - la date doit être entre 1970.01.01 et 2038.01.18"
 
-#: maintenance.php:335
+#: maintenance.php:339
 msgid "Incorrect maintenance date"
 msgstr "Date de maintenance incorrecte"
 
-#: maintenance.php:314
+#: maintenance.php:318
 msgid "Incorrect maintenance day period"
 msgstr "Jour de période de maintenance incorrect"
 
-#: maintenance.php:321 maintenance.php:332
+#: maintenance.php:325 maintenance.php:336
 msgid "Incorrect maintenance days of week"
 msgstr "Jours de la semaine de période de maintenance incorrects"
 
-#: maintenance.php:329
+#: maintenance.php:333
 msgid "Incorrect maintenance month period"
 msgstr "Mois de période de maintenance incorrect"
 
-#: maintenance.php:294
+#: maintenance.php:298
 msgid "Incorrect maintenance period"
 msgstr "Période de maintenance incorrecte"
 
-#: maintenance.php:291
+#: maintenance.php:295
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Période de maintenance incorrecte (5 minutes minimum)"
 
-#: maintenance.php:318
+#: maintenance.php:322
 msgid "Incorrect maintenance week period"
 msgstr "Semaine de période de maintenance incorrecte"
 
@@ -7497,12 +7497,12 @@ msgstr "Valeur incorrecte utilisée pour l'état de proxy \"%1$s\"."
 msgid "Incorrect working time."
 msgstr "Heures ouvrées incorrectes."
 
-#: include/classes/import/CXmlImport18.php:1587
+#: include/classes/import/CXmlImport18.php:1585
 #, c-format
 msgid "Incorrect y max item for graph \"%1$s\"."
 msgstr "Élément pour la valeur y maximale pour le graphique \"%1$s\" incorrect."
 
-#: include/classes/import/CXmlImport18.php:1574
+#: include/classes/import/CXmlImport18.php:1572
 #, c-format
 msgid "Incorrect y min item for graph \"%1$s\"."
 msgstr "Élément pour la valeur y minimale pour le graphique \"%1$s\" incorrect."
@@ -7613,7 +7613,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/configuration.services.edit.php:129 latest.php:353
+#: include/views/configuration.services.edit.php:128 latest.php:353
 #: latest.php:354
 msgid "Interval"
 msgstr "Intervalle"
@@ -7669,7 +7669,7 @@ msgstr "Clé \"%1$s\" invalide pour le prototype d'élément \"%2$s\" sur \"%3$s
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Clé \"%1$s\" invalide : %2$s."
 
-#: maintenance.php:302
+#: maintenance.php:306
 msgid "Invalid maintenance period"
 msgstr "Période de maintenance invalide"
 
@@ -7696,15 +7696,10 @@ msgstr "Paramètres invalides."
 msgid "Invalid period for field \"%1$s\"."
 msgstr "Période invalide pour le champ \"%1$s\"."
 
-#: api/classes/CHttpTest.php:638
+#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Code de réponse \"%1$s\" invalide."
-
-#: api/classes/CHttpTest.php:633
-#, c-format
-msgid "Invalid response code range \"%1$s\"."
-msgstr "Intervalle de code de réponse \"%1$s\" invalide."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:267
 msgid "Invalid second parameter."
@@ -7795,7 +7790,7 @@ msgstr "L'élément \"%1$s\" ne peut pas remplir le champ d'inventair numéro \"
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "L'élément \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
 
-#: include/classes/import/CXmlImport18.php:1522
+#: include/classes/import/CXmlImport18.php:1520
 #, c-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "L'élément \"%1$s\" n'existe pas."
@@ -7805,8 +7800,8 @@ msgstr "L'élément \"%1$s\" n'existe pas."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
 
-#: include/classes/import/CXmlImport18.php:1273
-#: include/classes/import/CXmlImport18.php:1277
+#: include/classes/import/CXmlImport18.php:1271
+#: include/classes/import/CXmlImport18.php:1275
 #, c-format
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Élément \"%1$s\" sauté - règle utilisateur."
@@ -8598,7 +8593,7 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "La macro avec l'identifiant (hostmacroid) \"%1$s\" n'existe pas."
 
 #: adm.gui.php:100 adm.housekeeper.php:131 adm.iconmapping.php:114
-#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:197
+#: adm.images.php:136 adm.macros.php:163 adm.other.php:115 adm.regexps.php:199
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
@@ -8636,7 +8631,7 @@ msgstr "La valeur de la condition d'action de maintenance doit être vide."
 msgid "Maintenance added"
 msgstr "Maintenance ajoutée"
 
-#: maintenance.php:228
+#: maintenance.php:232
 msgid "Maintenance deleted"
 msgstr "Maintenance supprimée"
 
@@ -8695,7 +8690,7 @@ msgstr "Déconnexion manuelle"
 msgid "Map"
 msgstr "Carte"
 
-#: include/classes/import/CXmlImport18.php:668
+#: include/classes/import/CXmlImport18.php:666
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
 msgstr "Carte \"%1$s\" sautée - règle utilisateur."
@@ -8705,12 +8700,12 @@ msgstr "Carte \"%1$s\" sautée - règle utilisateur."
 msgid "Map \"%s\""
 msgstr "Carte \"%s\""
 
-#: include/classes/import/CXmlImport18.php:820
+#: include/classes/import/CXmlImport18.php:818
 #, c-format
 msgid "Map \"%s\" created."
 msgstr "Carte \"%s\" créée."
 
-#: include/classes/import/CXmlImport18.php:811
+#: include/classes/import/CXmlImport18.php:809
 #, c-format
 msgid "Map \"%s\" updated."
 msgstr "Carte \"%s\" mise à jour."
@@ -9115,8 +9110,8 @@ msgstr "Le champ \"nom\" manque dans le prototype de graphique."
 msgid "Missing \"name\" field for graph."
 msgstr "Champ \"nom\" manquant pour le graphique."
 
-#: include/classes/import/CXmlImport18.php:1578
-#: include/classes/import/CXmlImport18.php:1591
+#: include/classes/import/CXmlImport18.php:1576
+#: include/classes/import/CXmlImport18.php:1589
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
 msgstr "Élément \"%1$s\" manquant pour l'hôte \"%2$s\"."
@@ -9255,7 +9250,7 @@ msgid "NTLM authentication"
 msgstr "Authentification NTLM"
 
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
-#: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
+#: adm.regexps.php:172 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
 #: include/hosts.inc.php:115 include/reports.inc.php:174
@@ -9319,7 +9314,7 @@ msgstr "Authentification NTLM"
 #: include/views/inventory.host.list.php:79
 #: include/views/js/configuration.sysmaps.js.php:181 items.php:44
 #: latest.php:339 latest.php:340 maintenance.php:44 maintenance.php:200
-#: maintenance.php:223 popup_httpstep.php:36 popup.php:557 popup.php:616
+#: maintenance.php:225 popup_httpstep.php:36 popup.php:557 popup.php:616
 #: popup.php:678 popup.php:701 popup.php:815 popup.php:925 popup.php:934
 #: popup.php:1018 popup.php:1053 popup.php:1082 popup.php:1176 popup.php:1179
 #: popup.php:1249 popup.php:1252 popup.php:1315 popup.php:1319 popup.php:1370
@@ -9362,7 +9357,7 @@ msgstr ""
 msgid "Network map added"
 msgstr "Carte ajoutée"
 
-#: sysmaps.php:194
+#: sysmaps.php:207
 msgid "Network map deleted"
 msgstr "Carte réseau supprimée"
 
@@ -9426,11 +9421,11 @@ msgstr "Nouvel élément pour le graphique"
 msgid "New media"
 msgstr "Nouveau média"
 
-#: adm.regexps.php:208
+#: adm.regexps.php:210
 msgid "New regular expression"
 msgstr "Nouvelle expression rationnelle"
 
-#: include/views/configuration.services.edit.php:262
+#: include/views/configuration.services.edit.php:261
 msgid "New service time"
 msgstr "Nouvelle période de maintenance"
 
@@ -9481,12 +9476,12 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "\"%2$s\" non fourni dans le prototype d'hôte \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1568
+#: include/classes/import/CXmlImport18.php:1566
 #, c-format
 msgid "No \"ymax_type\" field for graph \"%s\"."
 msgstr "Aucun champ \"ymax_type\" pour le graphique \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:1564
+#: include/classes/import/CXmlImport18.php:1562
 #, c-format
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Aucun champ \"ymin_type\" pour le graphique \"%s\"."
@@ -9605,7 +9600,7 @@ msgstr "Si aucune donnée n'est reçue pendant la période T, alors N n'est PAS 
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Aucune interface par défaut pour le type \"%1$s\" sur \"%2$s\"."
 
-#: include/views/configuration.services.edit.php:90
+#: include/views/configuration.services.edit.php:89
 #: include/views/configuration.triggers.edit.php:273
 #: include/views/configuration.triggers.massupdate.php:84
 msgid "No dependencies defined."
@@ -9820,7 +9815,7 @@ msgid "No items defined."
 msgstr "Aucun élément défini."
 
 #: include/items.inc.php:702 include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:114 popup.php:810
+#: include/views/monitoring.overview.php:116 popup.php:810
 msgid "No items found."
 msgstr "Aucun élément trouvé."
 
@@ -9871,27 +9866,27 @@ msgstr "Aucune opération définie."
 
 #: include/classes/import/CConfigurationImport.php:954
 #: include/classes/import/CConfigurationImport.php:1068
-#: include/classes/import/CXmlImport18.php:1549
+#: include/classes/import/CXmlImport18.php:1547
 #, c-format
 msgid "No permission for graph \"%1$s\"."
 msgstr "Aucune permission pour le graphique \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:963
+#: include/classes/import/CXmlImport18.php:961
 #, c-format
 msgid "No permission for host \"%1$s\"."
 msgstr "Aucune permission pour l'hôte \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1513
+#: include/classes/import/CXmlImport18.php:1511
 #, c-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Aucune permission pour l'élément \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1144
+#: include/classes/import/CXmlImport18.php:1142
 #, c-format
 msgid "No permission for template \"%1$s\"."
 msgstr "Aucune permission pour le modèle \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1424
+#: include/classes/import/CXmlImport18.php:1422
 #, c-format
 msgid "No permission for trigger \"%s\"."
 msgstr "Aucune permission pour le déclencheur \"%1$s\"."
@@ -9900,12 +9895,12 @@ msgstr "Aucune permission pour le déclencheur \"%1$s\"."
 msgid "No permissions"
 msgstr "Aucune permission"
 
-#: include/classes/import/CXmlImport18.php:1024
+#: include/classes/import/CXmlImport18.php:1022
 #, c-format
 msgid "No permissions for group \"%1$s\"."
 msgstr "Aucune permission pour le groupe \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:661
+#: include/classes/import/CXmlImport18.php:659
 #, c-format
 msgid "No permissions for map \"%1$s\"."
 msgstr "Aucune permission pour la carte \"%1$s\"."
@@ -9939,8 +9934,8 @@ msgstr "Aucune permission pour l'accès au système."
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:243 api/classes/CImage.php:357
-#: api/classes/CImage.php:474 api/classes/CItemGeneral.php:181
+#: api/classes/CImage.php:242 api/classes/CImage.php:356
+#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
 #: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
@@ -10062,7 +10057,7 @@ msgstr "Aucun modèle trouvé."
 msgid "No templates linked."
 msgstr "Aucun modèle lié."
 
-#: include/views/configuration.services.edit.php:127
+#: include/views/configuration.services.edit.php:126
 msgid "No times defined. Work 24x7."
 msgstr "Aucune heure ouvrée définie. Travail 24h/24 7j/7."
 
@@ -10240,8 +10235,8 @@ msgstr "Non surveillé"
 msgid "Not supported"
 msgstr "Non supporté"
 
-#: include/views/configuration.services.edit.php:129
-#: include/views/configuration.services.edit.php:225
+#: include/views/configuration.services.edit.php:128
+#: include/views/configuration.services.edit.php:224
 #: include/views/configuration.services.parent.list.php:48
 msgid "Note"
 msgstr "Note"
@@ -10544,8 +10539,8 @@ msgstr ""
 msgid "One time only"
 msgstr "Une fois uniquement"
 
-#: include/views/configuration.services.edit.php:145
-#: include/views/configuration.services.edit.php:260
+#: include/views/configuration.services.edit.php:144
+#: include/views/configuration.services.edit.php:259
 msgid "One-time downtime"
 msgstr "Temps d'arrêt unique"
 
@@ -10603,7 +10598,7 @@ msgstr "Seuls les administrateurs Zabbix peuvent changer les médias utilisateur
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Seuls les administrateurs Zabbix peuvent supprimer des médias utilisateurs."
 
-#: api/classes/CHttpTest.php:657
+#: api/classes/CHttpTest.php:662
 msgid "Only characters are allowed."
 msgstr "Seuls des caractères sont autorisés."
 
@@ -10720,7 +10715,7 @@ msgstr "Opérateur"
 #: include/views/configuration.item.massupdate.php:535
 #: include/views/configuration.item.massupdate.php:548
 #: include/views/configuration.triggers.massupdate.php:76
-#: include/views/configuration.triggers.massupdate.php:138
+#: include/views/configuration.triggers.massupdate.php:137
 msgid "Original"
 msgstr "Original"
 
@@ -10729,7 +10724,7 @@ msgid "Original blue"
 msgstr "Bleu original"
 
 #: adm.gui.php:105 adm.housekeeper.php:136 adm.iconmapping.php:119
-#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:202
+#: adm.images.php:141 adm.macros.php:168 adm.other.php:120 adm.regexps.php:204
 #: adm.triggerdisplayoptions.php:84 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:71
 #: include/classes/class.ctweenbox.php:76
@@ -11017,7 +11012,7 @@ msgstr "Déclencheurs parents"
 msgid "Parent web scenarios"
 msgstr "Scénarios web parents"
 
-#: api/classes/CImage.php:284
+#: api/classes/CImage.php:283
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Erreur d'analyse SQL [%1$s] dans [%2$s]."
@@ -11534,7 +11529,7 @@ msgstr "Si la dernière valeur dans la période T correspond à l'expression rat
 msgid "Regular expression added"
 msgstr "Expression rationnelle ajoutée"
 
-#: adm.regexps.php:172
+#: adm.regexps.php:181
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Expression rationnelle supprimée"
@@ -11549,7 +11544,7 @@ msgid "Regular expression updated"
 msgstr "Expression rationnelle modifiée"
 
 #: adm.gui.php:99 adm.housekeeper.php:130 adm.iconmapping.php:113
-#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:196
+#: adm.images.php:135 adm.macros.php:162 adm.other.php:114 adm.regexps.php:198
 #: adm.triggerdisplayoptions.php:78 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:65
 #: include/views/administration.general.regularexpressions.list.php:22
@@ -11579,8 +11574,8 @@ msgstr "Commande à distance"
 #: include/views/configuration.item.edit.php:289
 #: include/views/configuration.item.massupdate.php:334
 #: include/views/configuration.maintenance.edit.php:114
-#: include/views/configuration.services.edit.php:108
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:107
+#: include/views/configuration.services.edit.php:159
 #: include/views/configuration.slideconf.edit.php:68
 #: include/views/configuration.sysmap.edit.php:147
 #: include/views/configuration.sysmap.edit.php:165
@@ -11651,7 +11646,7 @@ msgstr "Remplacer"
 msgid "Replace applications"
 msgstr "Remplacer les applications"
 
-#: include/views/configuration.triggers.massupdate.php:132
+#: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace depenencies"
 msgstr "Remplacer les dépendances"
 
@@ -11815,7 +11810,7 @@ msgid "Retries left (descending)"
 msgstr "Essais restats (décroissant)"
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
-#: include/views/general.warning.php:42
+#: include/views/general.warning.php:40
 msgid "Retry"
 msgstr "Réessayer"
 
@@ -12141,14 +12136,14 @@ msgstr "Samedi"
 #: include/views/configuration.maintenance.edit.php:199
 #: include/views/configuration.screen.constructor.edit.php:630
 #: include/views/configuration.screen.edit.php:52
-#: include/views/configuration.services.edit.php:291
+#: include/views/configuration.services.edit.php:290
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
 #: include/views/configuration.template.edit.php:457
 #: include/views/configuration.triggers.edit.php:328
-#: include/views/configuration.triggers.massupdate.php:152
+#: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:107
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
 #: popup_media.php:141 tr_logform.php:374
@@ -12195,7 +12190,7 @@ msgid "Screen"
 msgstr "Écran"
 
 #: include/classes/import/CXmlImport18.php:577
-#: include/classes/import/CXmlImport18.php:1709
+#: include/classes/import/CXmlImport18.php:1707
 #, c-format
 msgid "Screen \"%1$s\" added."
 msgstr "Écran \"%1$s\" ajouté."
@@ -12235,14 +12230,14 @@ msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:460
-#: include/classes/import/CXmlImport18.php:1640
-#: include/classes/import/CXmlImport18.php:1644
+#: include/classes/import/CXmlImport18.php:1638
+#: include/classes/import/CXmlImport18.php:1642
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
 msgstr "Écran \"%1$s\" sauté - règle utilisateur."
 
 #: include/classes/import/CXmlImport18.php:574
-#: include/classes/import/CXmlImport18.php:1701
+#: include/classes/import/CXmlImport18.php:1699
 #, c-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Écran \"%1$s\" mis à jour."
@@ -12255,7 +12250,7 @@ msgstr "Écran ajouté"
 msgid "Screen cell configuration"
 msgstr "Configuration cellule écran"
 
-#: screenconf.php:221
+#: screenconf.php:225
 msgid "Screen deleted"
 msgstr "Écran supprimé"
 
@@ -12285,7 +12280,7 @@ msgstr "Écrans"
 #: include/views/administration.script.edit.php:47
 #: include/views/administration.script.edit.php:109
 #: include/views/administration.script.list.php:51 scripts.php:146
-#: scripts.php:163
+#: scripts.php:165
 msgid "Script"
 msgstr "Script"
 
@@ -12299,7 +12294,7 @@ msgstr ""
 msgid "Script added"
 msgstr "Script ajouté"
 
-#: scripts.php:149 scripts.php:167
+#: scripts.php:149 scripts.php:171
 msgid "Script deleted"
 msgstr "Script supprimé"
 
@@ -12540,7 +12535,7 @@ msgstr "Temps serveur"
 
 #: events.php:548 include/actions.inc.php:105
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:277
 #: include/views/configuration.services.parent.list.php:36 services.php:466
 #: srv_status.php:138
 msgid "Service"
@@ -12586,7 +12581,7 @@ msgstr "Port du service"
 msgid "Service start time must be less than end time."
 msgstr "L'heure de démarrage du service doit être antérieure à l'heure de fin."
 
-#: include/views/configuration.services.edit.php:167
+#: include/views/configuration.services.edit.php:166
 msgid "Service times"
 msgstr "Périodes de maintenance"
 
@@ -12598,7 +12593,7 @@ msgstr "Type de service"
 msgid "Service updated"
 msgstr "Service mis à jour"
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Services"
 msgstr "Services"
 
@@ -12859,7 +12854,7 @@ msgstr "Slovaque (sk_SK)"
 msgid "Snooze"
 msgstr "Reporter"
 
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 msgid "Soft"
 msgstr "Souple"
 
@@ -12905,7 +12900,7 @@ msgstr ""
 msgid "Sort by"
 msgstr "Trié par"
 
-#: include/views/configuration.services.edit.php:85 services.php:45
+#: include/views/configuration.services.edit.php:84 services.php:45
 msgid "Sort order (0->999)"
 msgstr "Ordre de tri (0->999)"
 
@@ -13444,14 +13439,14 @@ msgstr ""
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: api/classes/CImage.php:493
+#: api/classes/CImage.php:492
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: api/classes/CImage.php:519
+#: api/classes/CImage.php:518
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -13529,8 +13524,8 @@ msgid "Thursday"
 msgstr "Jeudi"
 
 #: include/reports.inc.php:74 include/reports.inc.php:396
-#: include/views/configuration.services.edit.php:227
-#: include/views/configuration.services.edit.php:253 popup_period.php:123
+#: include/views/configuration.services.edit.php:226
+#: include/views/configuration.services.edit.php:252 popup_period.php:123
 #: report2.php:379 report3.php:143 report4.php:184 services.php:192
 #: services.php:198
 msgid "Till"
@@ -13549,9 +13544,9 @@ msgstr "À"
 #: include/events.inc.php:282
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
+#: include/views/configuration.services.edit.php:251
 #: include/views/configuration.services.edit.php:252
-#: include/views/configuration.services.edit.php:253
-#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:279
 #: include/views/configuration.triggers.expression.php:86
 #: include/views/configuration.triggers.expression.php:94 jsLoader.php:139
 #: popup_trexpr.php:43
@@ -13696,7 +13691,7 @@ msgstr "Tendances"
 #: include/maps.inc.php:26 include/triggers.inc.php:1640
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
-#: include/views/configuration.services.edit.php:93
+#: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
@@ -13717,8 +13712,8 @@ msgstr "Le déclencheur \"%1$s\" existe déjà sur \"%2$s\"."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe pas."
 
-#: include/classes/import/CXmlImport18.php:1431
-#: include/classes/import/CXmlImport18.php:1435
+#: include/classes/import/CXmlImport18.php:1429
+#: include/classes/import/CXmlImport18.php:1433
 #, c-format
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Déclencheur \"%1$s\" sauté - règle utilisateur."
@@ -13755,7 +13750,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: adm.gui.php:104 adm.housekeeper.php:135 adm.iconmapping.php:118
-#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:201
+#: adm.images.php:140 adm.macros.php:167 adm.other.php:119 adm.regexps.php:203
 #: adm.triggerdisplayoptions.php:83 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:70
 #: include/views/administration.general.triggerDisplayOptions.edit.php:114
@@ -13877,7 +13872,7 @@ msgid "Trigger prototypes updated"
 msgstr ""
 
 #: adm.gui.php:103 adm.housekeeper.php:134 adm.iconmapping.php:117
-#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:200
+#: adm.images.php:139 adm.macros.php:166 adm.other.php:118 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:82 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.workingtime.php:69
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -13929,7 +13924,7 @@ msgstr "Déclencheurs supprimés"
 msgid "Triggers info"
 msgstr "Informations des déclencheurs"
 
-#: include/views/configuration.triggers.massupdate.php:147
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Triggers massupdate"
 msgstr "Modification collective des déclencheurs"
 
@@ -14002,7 +13997,7 @@ msgstr "Deux éléments (\"%1$s\" et \"%2$s\") ne peuvent pas remplir un champ d
 #: include/views/configuration.item.massupdate.php:45
 #: include/views/configuration.item.prototype.list.php:56
 #: include/views/configuration.maintenance.list.php:46
-#: include/views/configuration.services.edit.php:129
+#: include/views/configuration.services.edit.php:128
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
 #: include/views/js/configuration.sysmaps.js.php:393
@@ -14431,8 +14426,8 @@ msgstr "Téléverser"
 msgid "Upper level maps"
 msgstr "Cartes de niveau supérieur"
 
-#: include/views/configuration.services.edit.php:135
-#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:134
+#: include/views/configuration.services.edit.php:257
 #: include/views/monitoring.discovery.php:43
 #: include/views/monitoring.discovery.php:163
 msgid "Uptime"
@@ -14504,7 +14499,7 @@ msgstr "Un utilisateur ne peut pas changer son propre état"
 msgid "User cannot change status of himself."
 msgstr "Un utilisateur ne peut pas changer son propre état."
 
-#: users.php:277 users.php:385
+#: users.php:277 users.php:386
 msgid "User deleted"
 msgstr "Utilisateur supprimé"
 
@@ -14537,13 +14532,13 @@ msgstr "Le groupe d'utilisateurs \"%1$s\" est utilisé dans le script \"%2$s\"."
 msgid "User group \"%s\" already exists."
 msgstr "Le groupe d'utilisateurs \"%s\" existe déjà."
 
-#: usergrps.php:340
+#: usergrps.php:345
 msgid "User group disabled"
 msgid_plural "User groups disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: usergrps.php:339
+#: usergrps.php:344
 msgid "User group enabled"
 msgid_plural "User groups enabled"
 msgstr[0] ""
@@ -14648,7 +14643,7 @@ msgstr "Utilisateurs"
 msgid "Users (online)"
 msgstr "Utilisateurs (en ligne)"
 
-#: users.php:353
+#: users.php:354
 msgid "Users unblocked"
 msgstr "Utilisateurs débloqués"
 
@@ -14933,7 +14928,7 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "La table de correspondance avec l'identifiant (valuemapid) \"%1$s\" n'existe pas."
 
 #: adm.gui.php:101 adm.housekeeper.php:132 adm.iconmapping.php:115
-#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:198
+#: adm.images.php:137 adm.macros.php:164 adm.other.php:116 adm.regexps.php:200
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.valuemapping.php:199 adm.workingtime.php:67
 #: include/views/administration.general.valuemapping.edit.php:55
@@ -15015,6 +15010,7 @@ msgstr "M"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
+#: include/views/general.warning.php:22
 msgid "Warning"
 msgstr "Avertissement"
 
@@ -15052,17 +15048,17 @@ msgstr ""
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
 
-#: httpconf.php:122 httpconf.php:326
+#: httpconf.php:122 httpconf.php:335
 msgid "Web scenario deleted"
 msgstr ""
 
-#: httpconf.php:294
+#: httpconf.php:296
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: httpconf.php:293
+#: httpconf.php:295
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
@@ -15162,7 +15158,7 @@ msgid "Wizard"
 msgstr "Assistant"
 
 #: adm.gui.php:102 adm.housekeeper.php:133 adm.iconmapping.php:116
-#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:199
+#: adm.images.php:138 adm.macros.php:165 adm.other.php:117 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:81 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:68
 #: include/views/administration.general.workingtime.edit.php:25
@@ -15194,12 +15190,12 @@ msgstr "Champs incorrects pour l'élément."
 msgid "Wrong fields for host \"%s\"."
 msgstr "Champs incorrects pour l'hôte \"%s\"."
 
-#: api/classes/CImage.php:254
+#: api/classes/CImage.php:253
 #, c-format
 msgid "Wrong fields for image \"%1$s\"."
 msgstr ""
 
-#: api/classes/CImage.php:362
+#: api/classes/CImage.php:361
 msgid "Wrong fields for image."
 msgstr ""
 
@@ -15665,8 +15661,8 @@ msgid "d M Y"
 msgstr "d M Y"
 
 #: include/translateDefines.inc.php:43 include/translateDefines.inc.php:44
-#: include/views/configuration.services.edit.php:146
-#: include/views/configuration.services.edit.php:147 report3.php:159
+#: include/views/configuration.services.edit.php:145
+#: include/views/configuration.services.edit.php:146 report3.php:159
 msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
@@ -15780,8 +15776,8 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/html.inc.php:647 include/views/configuration.services.edit.php:241
-#: include/views/configuration.services.edit.php:247
+#: include/html.inc.php:647 include/views/configuration.services.edit.php:240
+#: include/views/configuration.services.edit.php:246
 msgid "hh"
 msgstr "hh"
 
@@ -15888,8 +15884,8 @@ msgid "minimum 60 seconds"
 msgstr "60 secondes minimum"
 
 #: include/html.inc.php:643 include/html.inc.php:649
-#: include/views/configuration.services.edit.php:244
-#: include/views/configuration.services.edit.php:250
+#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:249
 msgid "mm"
 msgstr "mm"
 
@@ -15995,9 +15991,10 @@ msgstr "ou"
 msgid "other"
 msgstr "autre"
 
-#: include/page_header.php:125
-msgid "refreshed every"
-msgstr "rafraichir tous les"
+#: include/page_header.php:125 include/views/general.warning.php:22
+#, c-format
+msgid "refreshed every %1$s sec."
+msgstr ""
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
@@ -16020,7 +16017,6 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/page_header.php:125
 #: include/views/configuration.httpconf.edit.php:220
 msgid "sec"
 msgstr "sec"
@@ -16035,7 +16031,7 @@ msgstr "secondes"
 msgid "sent"
 msgstr "envoyé"
 
-#: include/views/configuration.services.edit.php:224
+#: include/views/configuration.services.edit.php:223
 msgid "short description"
 msgstr "description courte"
 
