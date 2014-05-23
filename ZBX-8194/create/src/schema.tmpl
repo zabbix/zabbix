@@ -245,7 +245,7 @@ FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
@@ -1267,4 +1267,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2030092	|2030092
+ROW		|2030095	|2030095

@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.3.0');
 define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030092);
+define('ZABBIX_DB_VERSION',	 2030095);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -746,9 +746,6 @@ define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
-
-define('REGEXP_INCLUDE', 0);
-define('REGEXP_EXCLUDE', 1);
 
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');

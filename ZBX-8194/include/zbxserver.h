@@ -25,8 +25,6 @@
 #include "dbcache.h"
 #include "zbxjson.h"
 
-#define TRIGGER_EPSILON	0.000001
-
 #define MACRO_TYPE_MESSAGE_NORMAL	0x0001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x0002
 #define MACRO_TYPE_TRIGGER_URL		0x0004
@@ -54,7 +52,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
-int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
@@ -66,7 +63,5 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 		char *error, size_t max_error_len);
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t mexerrlen);
-
-int	translate_expression(const char *expression, char **opcode, char **error);
 
 #endif
