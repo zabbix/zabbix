@@ -655,7 +655,8 @@ elseif ($srctbl == 'triggers') {
 		'output' => array('triggerid', 'description', 'expression', 'priority', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name'),
 		'selectDependencies' => API_OUTPUT_EXTEND,
-		'expandDescription' => true
+		'expandDescription' => true,
+		'templated' => false
 	);
 	if (is_null($hostid)) {
 		$options['groupids'] = $groupid;
