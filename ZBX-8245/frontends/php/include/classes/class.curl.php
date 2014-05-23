@@ -171,8 +171,13 @@ class Curl {
 		$this->query = implode('&', $query);
 	}
 
-	public function formatGetArguments() {
+	public function formatGetArguments($exclude = array()) {
 		$this->arguments = $_GET;
+		foreach ($this->arguments as $key => $val) {
+			if (in_array($key, $exclude)) {
+				unset($this->arguments[$key]);
+			}
+		}
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
 		}

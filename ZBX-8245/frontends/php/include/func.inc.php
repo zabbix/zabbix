@@ -1527,19 +1527,15 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 
 	$link = new Curl($url);
 	if (empty($url)) {
-		$link->formatGetArguments();
+		// go parameters are skipped to prevent any action to repeat on sort
+		$link->formatGetArguments(array('go'));
 	}
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
 
 	$url = $link->getUrl();
 
-	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
-		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
-	}
-	else {
-		$script = 'javascript: redirect("'.$url.'");';
-	}
+	$script = 'javascript: redirect("'.$url.'");';
 
 	zbx_value2array($obj);
 	$cont = new CSpan();
