@@ -215,7 +215,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
 			$sqlParts['where']['a'] = dbConditionInt('ia.applicationid', $options['applicationids']);
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=ia.itemid';
+			$sqlParts['where']['fia'] = 'f.itemid=ia.itemid';
 		}
 
 		// functions

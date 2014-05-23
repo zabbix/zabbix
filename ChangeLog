@@ -2,7 +2,10 @@
 Changes for 2.3.0
 
 New features:
-...G...PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
+A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">=", "<=", "<>", "and", "or" and "not"; removed existing "#", "|" and "&" (asaveljevs, Pavels)
+...GI..PS. [ZBXNEXT-2203] added information on the reason items become not supported (Alexei, asaveljevs)
+..F....... [ZBXNEXT-734] implemented support for URL as dynamic screen element and added macro support (Ivo)
+...GI..PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
 ...G...... [ZBXNEXT-1506] added support for vfs.dev.read[] and vfs.dev.write[] on AIX; thanks to Jairo Lopez and Boris Manojlovic for patches (asaveljevs)
 ..F....... [ZBX-5430] implemented ISO 8601 standard date format "YYYY-MM-DD hh:mm:ss" as default (Ivo)
 A......... [ZBX-7981] deprecated "exists" API methods (Ivo)
@@ -51,6 +54,10 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+A......... [ZBX-8227] fixed the "applicationids" parameter in trigger.get overriding the "groupids" parameter (Pavels)
+A......... [ZBX-8169] fixed SLA period calculation to account for DST changes (Krists)
+...G...PS. [ZBX-8172] fixed numeric value extraction from json data to ensure compatibility with third party tools that sends data as numeric values instead of strings (wiper).
+.......P.. [ZBX-8048] fixed bug where proxy would truncate execute scripts of telnet, ssh and database monitoring items to 2kB (Juris)
 A......... [ZBX-8193] changed web scenario default timeout to 15 (Nikolaj)
 ........S. [ZBX-6190] added a more informative message to return when an item does not have enough information to perform nodata() calculations (Juris)
 ..F....... [ZBX-8157] fixed size and style of custom user agent in web scenario edit form and fixed IE displaying input field on second click (Ivo)
@@ -128,6 +135,12 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
+...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
+........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
+........S. [ZBX-8219] fixed regression in ipmi checks to support on/off values for sent commands (Juris)
+...G...... [ZBX-8213] fixed library loading code on Windows to prevent potential crash condition (Juris)
+...G...... [ZBX-8223] fixed compilation of dummy module on 64-bit platforms by adding "-fPIC" (asaveljevs)
 .........T [ZBX-7387] changed default memory usage graph display method for operating system templates (Juris)
 A.F....... [ZBX-8101] fixed exporting maps from Oracle database (Eduard, Ivo)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
@@ -1066,6 +1079,7 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 ...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
 
