@@ -56,7 +56,7 @@
 
 #ifdef HAVE_WINDOWS_H
 /* to speed build process and reduce size of the Win32 header files */
-#define WIN32_LEAN_AND_MEAN	1
+#	define WIN32_LEAN_AND_MEAN	1
 #	include <windows.h>
 #endif
 
@@ -131,9 +131,9 @@
 #endif
 
 #ifdef HAVE_ARPA_NAMESER_H
-#ifdef MAC_OS_X
-#	define BIND_8_COMPAT 1
-#endif
+#	ifdef MAC_OS_X
+#		define BIND_8_COMPAT 1
+#	endif
 #	include <arpa/nameser.h>
 #endif
 
