@@ -54,6 +54,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+..F....... [ZBX-8212] it is not possible to add triggers from templates to maps anymore (Andrejs)
 A......... [ZBX-8227] fixed the "applicationids" parameter in trigger.get overriding the "groupids" parameter (Pavels)
 A......... [ZBX-8169] fixed SLA period calculation to account for DST changes (Krists)
 ...G...PS. [ZBX-8172] fixed numeric value extraction from json data to ensure compatibility with third party tools that sends data as numeric values instead of strings (wiper).
