@@ -361,7 +361,7 @@ class CHttpTest extends CZBXAPI {
 			unset($test);
 		}
 
-		$this->validateUpdate($httpTests);
+		$this->validateUpdate($httpTests, $dbHttpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
@@ -500,7 +500,7 @@ class CHttpTest extends CZBXAPI {
 	 *
 	 * @param array $httpTests
 	 */
-	protected function validateUpdate(array $httpTests) {
+	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
 		if (!$this->isWritable($httpTestIds)) {
@@ -540,7 +540,9 @@ class CHttpTest extends CZBXAPI {
 			}
 
 			if (isset($httpTest['steps'])) {
-				$this->checkSteps($httpTest);
+				$dbHttpTest = isset($httpTest['httptestid']) ? $dbHttpTests[$httpTest['httptestid']] : null;
+
+				$this->checkSteps($httpTest, $dbHttpTest);
 				$this->checkDuplicateSteps($httpTest);
 			}
 		}
@@ -584,39 +586,39 @@ class CHttpTest extends CZBXAPI {
 	 * Check web scenario steps.
 	 *  - check status_codes field
 	 *  - check name characters
+	 *  - check if httpstepid values are from current web scenario
+	 *  - check if name is valid
+	 *  - check if url is valid
 	 *
 	 * @param array $httpTest
+	 * @param array|null $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = null) {
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
-		if ($httpTest['httptestid']) {
+		if ($dbHttpTest) {
 			$httpTestStepIds = zbx_objectValues($httpTest['steps'], 'httpstepid');
 
-			$httpTestStepCountInDb = DBfetch(DBselect(
-				'SELECT COUNT(hts.httpstepid)'.
-				' FROM httpstep hts'.
-				' WHERE hts.httptestid = '.zbx_dbstr($httpTest['httptestid']).
-					' AND '.dbConditionInt('hts.httpstepid', $httpTestStepIds)
-			));
-			$httpTestStepCountInDb = reset($httpTestStepCountInDb);
+			if ($httpTestStepIds) {
+				$dbHttpTestStepIds = zbx_objectValues($dbHttpTest['steps'], 'httpstepid');
 
-			if ($httpTestStepCountInDb != count($httpTestStepIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('If specified, web scenario step ID must belong to the web scenario.'));
+				if (array_diff($httpTestStepIds, $dbHttpTestStepIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
 			}
 		}
 
 		foreach ($httpTest['steps'] as $step) {
-			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && $step['name'] == '')
-						|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || $step['name'] == ''))) {
+			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && (zbx_empty($step['name']) || ($step['name'] === false)))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name']) || ($step['name'] === false)))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
 			}
 
-			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && $step['url'] == '')
-						|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || $step['url'] == ''))) {
+			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && (zbx_empty($step['url']) || ($step['url'] === false)))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url']) || ($step['url'] === false)))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
 			}
 
