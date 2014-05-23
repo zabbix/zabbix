@@ -303,7 +303,7 @@ class CHttpTest extends CApiService {
 
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 
-		$this->validateUpdate($httpTests);
+		$httpTests = $this->validateUpdate($httpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
@@ -460,8 +460,11 @@ class CHttpTest extends CApiService {
 	 *  - check permissions
 	 *  - check if web scenario with same name already exists
 	 *  - check that each web scenario object has httptestid defined
+	 *  - return array of web scenarios, if validation was successful
 	 *
 	 * @param array $httpTests
+	 *
+	 * @return array $httpTests
 	 */
 	protected function validateUpdate(array $httpTests) {
 		if (!$this->isWritable(array_keys($httpTests))) {
@@ -512,8 +515,10 @@ class CHttpTest extends CApiService {
 					}
 				}
 			}
-			elseif ($dbHttpTest['templateid']) {
+
+			if ($dbHttpTest['templateid']) {
 				$httpTest['name'] = $dbHttpTest['name'];
+				$httpTest['hostid'] = $dbHttpTest['hostid'];
 			}
 
 			if (!empty($httpTest['steps'])) {
@@ -549,6 +554,8 @@ class CHttpTest extends CApiService {
 		}
 
 		$this->checkApplicationHost($httpTests);
+
+		return $httpTests;
 	}
 
 	/**
