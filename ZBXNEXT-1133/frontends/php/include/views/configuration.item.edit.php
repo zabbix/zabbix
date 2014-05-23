@@ -384,10 +384,7 @@ else {
 	$valuemapComboBox = new CComboBox('valuemapid', $this->data['valuemapid']);
 	$valuemapComboBox->addItem(0, _('As is'));
 	foreach ($this->data['valuemaps'] as $valuemap) {
-		$valuemapComboBox->addItem(
-			$valuemap['valuemapid'],
-			get_node_name_by_elid($valuemap['valuemapid'], null, NAME_DELIMITER).CHtml::encode($valuemap['name'])
-		);
+		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
 	}
 }
 $link = new CLink(_('show value mappings'), 'adm.valuemapping.php');

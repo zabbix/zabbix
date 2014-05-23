@@ -25,7 +25,6 @@ class CTriggersInfo extends CTable {
 
 	public $style;
 	public $show_header;
-	private $nodeid;
 	private $groupid;
 	private $hostid;
 
@@ -108,13 +107,6 @@ class CTriggersInfo extends CTable {
 
 		if ($this->show_header) {
 			$header_str = _('Triggers info').SPACE;
-
-			if (!is_null($this->nodeid)) {
-				$node = get_node_by_nodeid($this->nodeid);
-				if ($node > 0) {
-					$header_str .= '('.$node['name'].')'.SPACE;
-				}
-			}
 
 			if ($this->groupid != 0) {
 				$group = get_hostgroup_by_groupid($this->groupid);

@@ -183,11 +183,9 @@ if ($data['sysmap']['iconmapid']) {
 
 // get icon list
 $icons = DBselect(
-	'SELECT i.imageid,i.name'.
-	' FROM images i'.
-	' WHERE i.imagetype='.IMAGE_TYPE_ICON.
-		andDbNode('i.imageid')
+	'SELECT i.imageid,i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON
 );
+
 while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = array(
 		'imageid' => $icon['imageid'],

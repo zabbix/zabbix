@@ -221,8 +221,7 @@ if (isset($_REQUEST['form'])) {
 		$regExp = DBfetch(DBSelect(
 			'SELECT re.name,re.test_string'.
 			' FROM regexps re'.
-			' WHERE re.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
-				andDbNode('re.regexpid')
+			' WHERE re.regexpid='.zbx_dbstr($_REQUEST['regexpid'])
 		));
 
 		$data['name'] = $regExp['name'];
@@ -232,7 +231,6 @@ if (isset($_REQUEST['form'])) {
 			'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 			' FROM expressions e'.
 			' WHERE e.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
-				andDbNode('e.expressionid').
 			' ORDER BY e.expression_type'
 		);
 		$data['expressions'] = DBfetchArray($dbExpressions);
@@ -247,16 +245,15 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
 		'cnf_wdgt' => &$regExpWidget,
 		'regexps' => array(),
 		'regexpids' => array()
 	);
 
-	$dbRegExp = DBselect('SELECT re.* FROM regexps re '.whereDbNode('re.regexpid'));
+	$dbRegExp = DBselect('SELECT re.* FROM regexps re');
+
 	while ($regExp = DBfetch($dbRegExp)) {
 		$regExp['expressions'] = array();
-		$regExp['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($regExp['regexpid'], true) : '';
 
 		$data['regexps'][$regExp['regexpid']] = $regExp;
 		$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
@@ -268,7 +265,6 @@ else {
 		'SELECT e.*'.
 		' FROM expressions e'.
 		' WHERE '.dbConditionInt('e.regexpid', $data['regexpids']).
-			andDbNode('e.expressionid').
 		' ORDER BY e.expression_type'
 	));
 

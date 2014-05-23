@@ -93,20 +93,21 @@
 </script>
 <script type="text/javascript">
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
-		var item = [];
-		item['number'] = number;
-		item['number_nr'] = number + 1;
-		item['gitemid'] = gitemid;
-		item['graphid'] = graphid;
-		item['itemid'] = itemid;
-		item['type'] = type;
-		item['calc_fnc'] = calc_fnc;
-		item['drawtype'] = drawtype;
-		item['yaxisside'] = yaxisside;
-		item['color'] = color;
-		item['sortorder'] = number;
-		item['flags'] = flags;
-		item['name'] = name;
+		var item = {
+			number: number,
+			number_nr: number + 1,
+			gitemid: gitemid,
+			graphid: graphid,
+			itemid: itemid,
+			type: type,
+			calc_fnc: calc_fnc,
+			drawtype: drawtype,
+			yaxisside: yaxisside,
+			color: color,
+			sortorder: number,
+			flags: flags,
+			name: name
+		};
 
 		var itemTpl = new Template(jQuery('#itemTpl').html());
 		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -118,7 +119,6 @@
 		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
-		initSortable();
 		incrementNextColor();
 		rewriteNameLinks();
 	}
@@ -129,20 +129,22 @@
 		}
 
 		for (var i = 0; i < list.values.length; i++) {
-			var item = [];
-			item['number'] = jQuery('#itemsTable tr.sortable').length;
-			item['number_nr'] = item['number'] + 1;
-			item['gitemid'] = null;
-			item['graphid'] = <?php echo $this->data['graphid']; ?>;
-			item['itemid'] = list.values[i].itemid;
-			item['type'] = null;
-			item['calc_fnc'] = null;
-			item['drawtype'] = 0;
-			item['yaxisside'] = 0;
-			item['sortorder'] = item['number'];
-			item['flags'] = typeof(list.values[i].flags) != 'undefined' ? list.values[i].flags : 0;
-			item['color'] = getNextColor(1);
-			item['name'] = list.values[i].name;
+			var number = jQuery('#itemsTable tr.sortable').length,
+				item = {
+				number: number,
+				number_nr: number + 1,
+				gitemid: null,
+				graphid: <?php echo $this->data['graphid']; ?>,
+				itemid: list.values[i].itemid,
+				type: null,
+				calc_fnc: null,
+				drawtype: 0,
+				yaxisside: 0,
+				sortorder: number,
+				flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
+				color: getNextColor(1),
+				name: list.values[i].name
+			};
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -166,6 +168,7 @@
 
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
+
 		for (var i = 0; i < size; i++) {
 			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
 				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name'
@@ -181,6 +184,7 @@
 
 	function removeItem(obj) {
 		var number = jQuery(obj).data('remove');
+
 		jQuery('#items_' + number).find('*').remove();
 		jQuery('#items_' + number).remove();
 
@@ -193,47 +197,58 @@
 
 		// rewrite ids, set "tmp" prefix
 		jQuery('#itemsTable tr.sortable').find('*[id]').each(function() {
-			jQuery(this).attr('id', 'tmp' + jQuery(this).attr('id'));
+			var obj = jQuery(this);
+
+			obj.attr('id', 'tmp' + obj.attr('id'));
 		});
+
 		jQuery('#itemsTable tr.sortable').each(function() {
-			jQuery(this).attr('id', 'tmp' + jQuery(this).attr('id'));
+			var obj = jQuery(this);
+
+			obj.attr('id', 'tmp' + obj.attr('id'));
 		});
 
 		// rewrite ids to new order
 		jQuery('#itemsTable tr.sortable').each(function() {
+			var obj = jQuery(this);
+
 			// rewrite ids in input fields
-			jQuery(this).find('*[id]').each(function() {
-				var id = jQuery(this).attr('id').substring(3);
-				var part1 = id.substring(0, id.indexOf('items_') + 5);
-				var part2 = id.substring(id.indexOf('items_') + 6);
+			obj.find('*[id]').each(function() {
+				var obj = jQuery(this),
+					id = obj.attr('id').substring(3),
+					part1 = id.substring(0, id.indexOf('items_') + 5),
+					part2 = id.substring(id.indexOf('items_') + 6);
+
 				part2 = part2.substring(part2.indexOf('_') + 1);
 
-				jQuery(this).attr('id', part1 + '_' + i + '_' + part2);
-				jQuery(this).attr('name', part1 + '[' + i + '][' + part2 + ']');
+				obj.attr('id', part1 + '_' + i + '_' + part2);
+				obj.attr('name', part1 + '[' + i + '][' + part2 + ']');
 
 				// set sortorder
-				if (part2 == 'sortorder') {
-					jQuery(this).val(i);
+				if (part2 === 'sortorder') {
+					obj.val(i);
 				}
 
 				// rewrite color action
-				if (part1.substring(0, 3) == 'lbl') {
-					jQuery(this).attr('onclick', 'javascript: show_color_picker("items_' + i + '_color");');
+				if (part1.substring(0, 3) === 'lbl') {
+					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color");');
 				}
-				else if (part2 == 'color') {
-					jQuery(this).attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
+				else if (part2 === 'color') {
+					obj.attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
 				}
 			});
 
 			// rewrite ids in <tr>
-			var id = jQuery(this).attr('id').substring(3);
-			var part1 = id.substring(0, id.indexOf('items_') + 5);
-			jQuery(this).attr('id', part1 + '_' + i);
+			var id = obj.attr('id').substring(3),
+				part1 = id.substring(0, id.indexOf('items_') + 5);
+
+			obj.attr('id', part1 + '_' + i);
 
 			i++;
 		});
 
 		i = 0;
+
 		jQuery('#itemsTable tr.sortable').each(function() {
 			// set row number
 			jQuery('.items_number', this).text((i + 1) + ':');
@@ -266,7 +281,7 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function () {
+			create: function() {
 				// force not to change table width
 				itemsTable.width(itemsTableWidth);
 			},
@@ -338,6 +353,7 @@
 				.attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif')
 				.width(80)
 				.height(12);
+
 			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
 				$('#previewChar img').remove();
 				$('#previewChar').append($(this));
@@ -351,6 +367,7 @@
 			});
 
 			var size = $('#itemsTable tr.sortable').length;
+
 			for (var i = 0; i < size; i++) {
 				$('.ui-icon').attr('class', 'ui-icon ui-icon-arrowthick-2-n-s state-disabled');
 				$('#items_' + i + '_name').removeAttr('onclick');
@@ -360,5 +377,49 @@
 				$('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
 			}
 		<?php endif; ?>
+
+		// Y axis min clean unused fields
+		$('#ymin_type').change(function() {
+			switch ($(this).val()) {
+				case '<?php echo GRAPH_YAXIS_TYPE_CALCULATED; ?>':
+					$('#yaxismin').val('');
+					$('#ymin_name').val('');
+					$('#ymin_itemid').val('0');
+					break;
+
+				case '<?php echo GRAPH_YAXIS_TYPE_FIXED; ?>':
+					$('#ymin_name').val('');
+					$('#ymin_itemid').val('0');
+					break;
+
+				default:
+					$('#yaxismin').val('');
+			}
+
+			$('form[name="graphForm"]').submit();
+		});
+
+		// Y axis max clean unused fields
+		$('#ymax_type').change(function() {
+			switch ($(this).val()) {
+				case '<?php echo GRAPH_YAXIS_TYPE_CALCULATED; ?>':
+					$('#yaxismax').val('');
+					$('#ymax_name').val('');
+					$('#ymax_itemid').val('0');
+					break;
+
+				case '<?php echo GRAPH_YAXIS_TYPE_FIXED; ?>':
+					$('#ymax_name').val('');
+					$('#ymax_itemid').val('0');
+					break;
+
+				default:
+					$('#yaxismax').val('');
+			}
+
+			$('form[name="graphForm"]').submit();
+		});
+
+		initSortable();
 	});
 </script>

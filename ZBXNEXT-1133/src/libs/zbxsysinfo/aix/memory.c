@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 #ifdef HAVE_LIBPERFSTAT
 
@@ -26,10 +27,14 @@ static perfstat_memory_total_t	m;
 
 #define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
 
-#define ZBX_PERFSTAT_MEMORY_TOTAL()					\
-									\
-	if (-1 == perfstat_memory_total(NULL, &m, sizeof(m), 1))	\
-		return SYSINFO_RET_FAIL
+#define ZBX_PERFSTAT_MEMORY_TOTAL()									\
+													\
+	if (-1 == perfstat_memory_total(NULL, &m, sizeof(m), 1))					\
+	{												\
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",	\
+				zbx_strerror(errno)));							\
+		return SYSINFO_RET_FAIL;								\
+	}
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
@@ -72,7 +77,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	if (0 == m.real_total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, m.real_inuse / (double)m.real_total * 100);
 
@@ -93,7 +101,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	if (0 == m.real_total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	SET_DBL_RESULT(result, m.real_free / (double)m.real_total * 100);
 
@@ -113,13 +124,15 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-
 #ifdef HAVE_LIBPERFSTAT
+	int	ret;
 	char	*mode;
 
 	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mode = get_rparam(request, 0);
 
@@ -140,7 +153,14 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "cached"))
 		ret = VM_MEMORY_CACHED(result);
 	else
-		ret = SYSINFO_RET_FAIL;
-#endif
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
 	return ret;
+#else
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+	return SYSINFO_RET_FAIL;
+#endif
 }

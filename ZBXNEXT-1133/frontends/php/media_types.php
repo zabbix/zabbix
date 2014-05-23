@@ -142,7 +142,7 @@ if (isset($_REQUEST['save'])) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
-	$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
+	$result = API::Mediatype()->delete(array(getRequest('mediatypeid')));
 
 	if ($result) {
 		unset($_REQUEST['form']);
@@ -226,9 +226,7 @@ if (!empty($_REQUEST['form'])) {
 	$mediaTypeView->show();
 }
 else {
-	$data = array(
-		'displayNodes' => is_array(get_current_nodeid())
-	);
+	$data = array();
 
 	// get media types
 	$data['mediatypes'] = API::Mediatype()->get(array(
@@ -273,13 +271,6 @@ else {
 		// sorting & paging
 		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
 		$data['paging'] = getPagingLine($data['mediatypes'], array('mediatypeid'));
-
-		// nodes
-		if ($data['displayNodes']) {
-			foreach ($data['mediatypes'] as $key => $mediaType) {
-				$data['mediatypes'][$key]['nodename'] = get_node_name_by_elid($mediaType['mediatypeid'], true);
-			}
-		}
 	}
 	else {
 		$arr = array();

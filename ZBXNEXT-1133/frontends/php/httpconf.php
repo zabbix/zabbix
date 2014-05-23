@@ -60,6 +60,7 @@ $fields = array(
 	// actions
 	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'del_history'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
 	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
@@ -123,7 +124,7 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 
 	$httptestData = get_httptest_by_httptestid($_REQUEST['httptestid']);
 	if ($httptestData) {
-		$result = API::HttpTest()->delete($_REQUEST['httptestid']);
+		$result = API::HttpTest()->delete(array(getRequest('httptestid')));
 
 		if ($result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
@@ -140,6 +141,35 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	unset($_REQUEST['httptestid']);
 	unset($_REQUEST['templated']);
 	$_REQUEST['form'] = 'clone';
+}
+elseif (hasRequest('del_history') && hasRequest('httptestid')) {
+	$dbResult = true;
+
+	DBstart();
+
+	$httptestId = getRequest('httptestid');
+
+	$httpTest = get_httptest_by_httptestid($httptestId);
+	if ($httpTest) {
+		$dbResult = delete_history_by_httptestid($httptestId);
+		if ($dbResult) {
+
+			$dbResult = DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestId));
+
+			$host = DBfetch(DBselect(
+				'SELECT h.host FROM hosts h,httptest ht WHERE ht.hostid=h.hostid AND ht.httptestid='.zbx_dbstr($httptestId)
+			));
+
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
+				'Scenario ['.$httpTest['name'].'] ['.$httptestId.'] Host ['.$host['host'].'] history cleared'
+			);
+		}
+	}
+
+	$dbResult = DBend($dbResult);
+
+	show_messages($dbResult, _('History cleared'), _('Cannot clear history'));
+	clearCookies($dbResult, getRequest('hostid'));
 }
 elseif (isset($_REQUEST['save'])) {
 	try {
@@ -467,8 +497,7 @@ else {
 		'pageFilter' => $pageFilter,
 		'showDisabled' => $showDisabled,
 		'httpTests' => array(),
-		'paging' => null,
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
+		'paging' => null
 	);
 
 	if ($data['pageFilter']->hostsSelected) {
@@ -520,14 +549,6 @@ else {
 		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
 
 		$data['httpTests'] = $httpTests;
-	}
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['httpTests'] as &$httpTest) {
-			$httpTest['nodename'] = get_node_name_by_elid($httpTest['httptestid'], true);
-		}
-		unset($httpTest);
 	}
 
 	// render view

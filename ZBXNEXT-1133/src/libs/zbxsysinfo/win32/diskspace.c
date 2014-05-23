@@ -24,22 +24,29 @@
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*path, *mode;
-	LPTSTR		wpath;
+	wchar_t 	*wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
 	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	path = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL == path || '\0' == *path)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	wpath = zbx_utf8_to_unicode(path);
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
 	{
 		zbx_free(wpath);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain filesystem information."));
 		return SYSINFO_RET_FAIL;
 	}
 	zbx_free(wpath);
@@ -56,15 +63,18 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_DBL_RESULT(result, (double)((__int64)totalBytes.QuadPart - (__int64)freeBytes.QuadPart) * 100. /
 				(double)(__int64)totalBytes.QuadPart);
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	TCHAR		fsName[MAX_PATH + 1];
-	LPTSTR		buffer = NULL, p;
+	wchar_t		fsName[MAX_PATH + 1];
+	wchar_t 	*buffer = NULL, *p;
 	char		*utf8;
 	DWORD		dwSize;
 	size_t		sz;
@@ -73,15 +83,19 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* Make an initial call to GetLogicalDriveStrings to
 	   get the necessary size into the dwSize variable */
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain necessary buffer size from system."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	buffer = (LPTSTR)zbx_malloc(buffer, (dwSize + 1) * sizeof(TCHAR));
+	buffer = (wchar_t *)zbx_malloc(buffer, (dwSize + 1) * sizeof(wchar_t));
 
 	/* Make a second call to GetLogicalDriveStrings to get
 	   the actual data we require */
 	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
 	{
 		zbx_free(buffer);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -102,7 +116,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8);
 
-		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, sizeof(fsName) / sizeof(TCHAR)))
+		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, ARRSIZE(fsName)))
 		{
 			utf8 = zbx_unicode_to_utf8(fsName);
 			zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
@@ -118,7 +132,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 

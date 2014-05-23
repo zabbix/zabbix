@@ -34,10 +34,8 @@ function addValueMap(array $valueMap, array $mappings) {
 	checkValueMapMappings($mappings);
 
 	// check duplicate name
-	$sql = 'SELECT v.valuemapid'.
-			' FROM valuemaps v'.
-			' WHERE v.name='.zbx_dbstr($valueMap['name']).
-			' '.andDbNode('v.valuemapid');
+	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']);
+
 	if (DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
 	}
@@ -66,7 +64,8 @@ function updateValueMap(array $valueMap, array $mappings) {
 	unset($valueMap['valuemapid']);
 
 	// check existence
-	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($valueMapId).' '.andDbNode('v.valuemapid');
+	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($valueMapId);
+
 	if (!DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
@@ -75,8 +74,7 @@ function updateValueMap(array $valueMap, array $mappings) {
 	$dbValueMap = DBfetch(DBselect(
 		'SELECT v.valuemapid'.
 		' FROM valuemaps v'.
-		' WHERE v.name='.zbx_dbstr($valueMap['name']).
-			' '.andDbNode('v.valuemapid')
+		' WHERE v.name='.zbx_dbstr($valueMap['name'])
 	));
 	if ($dbValueMap && bccomp($valueMapId, $dbValueMap['valuemapid']) != 0) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
@@ -262,8 +260,7 @@ function getValueMapMappings($valueMapId) {
 	$dbMappings = DBselect(
 		'SELECT m.mappingid,m.value,m.newvalue'.
 		' FROM mappings m'.
-		' WHERE m.valuemapid='.zbx_dbstr($valueMapId).
-			' '.andDbNode('m.mappingid')
+		' WHERE m.valuemapid='.zbx_dbstr($valueMapId)
 	);
 	while ($mapping = DBfetch($dbMappings)) {
 		$mappings[$mapping['mappingid']] = $mapping;
@@ -296,8 +293,7 @@ function getMappedValue($value, $valueMapId) {
 		'SELECT m.newvalue'.
 		' FROM mappings m'.
 		' WHERE m.valuemapid='.zbx_dbstr($valueMapId).
-			' AND m.value='.zbx_dbstr($value).
-			' '.andDbNode('m.mappingid')
+			' AND m.value='.zbx_dbstr($value)
 	);
 	if ($mapping = DBfetch($dbMappings)) {
 		$valueMaps[$valueMapId][$value] = $mapping['newvalue'];

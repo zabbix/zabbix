@@ -20,15 +20,11 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 #include <sys/sensors.h>
 
 #ifdef HAVE_SENSORDEV
-
-#define DO_ONE	0
-#define DO_AVG	1
-#define DO_MAX	2
-#define DO_MIN	3
 
 static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr, int *cnt)
 {
@@ -56,16 +52,16 @@ static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr,
 
 	switch (do_task)
 	{
-		case DO_ONE:
+		case ZBX_DO_ONE:
 			*aggr = value;
 			break;
-		case DO_AVG:
+		case ZBX_DO_AVG:
 			*aggr += value;
 			break;
-		case DO_MAX:
+		case ZBX_DO_MAX:
 			*aggr = (1 == *cnt ? value : MAX(*aggr, value));
 			break;
-		case DO_MIN:
+		case ZBX_DO_MIN:
 			*aggr = (1 == *cnt ? value : MIN(*aggr, value));
 			break;
 	}
@@ -73,7 +69,7 @@ static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr,
 
 static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name, double *aggr, int *cnt)
 {
-	if (DO_ONE == do_task)
+	if (ZBX_DO_ONE == do_task)
 	{
 		int		i, len = 0;
 		struct sensor	sensor;
@@ -136,25 +132,40 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	aggr = 0;
 
 	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	device = get_rparam(request, 0);
 	name = get_rparam(request, 1);
 	function = get_rparam(request, 2);
 
-	if (NULL == device || NULL == name)
+	if (NULL == device || '\0' == *device)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (NULL == function || '\0' == *function)
-		do_task = DO_ONE;
+		do_task = ZBX_DO_ONE;
 	else if (0 == strcmp(function, "avg"))
-		do_task = DO_AVG;
+		do_task = ZBX_DO_AVG;
 	else if (0 == strcmp(function, "max"))
-		do_task = DO_MAX;
+		do_task = ZBX_DO_MAX;
 	else if (0 == strcmp(function, "min"))
-		do_task = DO_MIN;
+		do_task = ZBX_DO_MIN;
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;
+	}
 
 	mib[0] = CTL_HW;
 	mib[1] = HW_SENSORS;
@@ -173,21 +184,29 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (errno == ENOENT)
 				break;
 
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+					zbx_strerror(errno)));
 			return SYSINFO_RET_FAIL;
 		}
 
-		if ((DO_ONE == do_task && 0 == strcmp(sensordev.xname, device)) ||
-				(DO_ONE != do_task && NULL != zbx_regexp_match(sensordev.xname, device, NULL)))
+		if ((ZBX_DO_ONE == do_task && 0 == strcmp(sensordev.xname, device)) ||
+				(ZBX_DO_ONE != do_task && NULL != zbx_regexp_match(sensordev.xname, device, NULL)))
 		{
 			if (SUCCEED != get_device_sensors(do_task, mib, &sensordev, name, &aggr, &cnt))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain sensor information."));
 				return SYSINFO_RET_FAIL;
+			}
 		}
 	}
 
 	if (0 == cnt)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain sensor information."));
 		return SYSINFO_RET_FAIL;
+	}
 
-	if (DO_AVG == do_task)
+	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, aggr / cnt);
 	else
 		SET_DBL_RESULT(result, aggr);
@@ -199,6 +218,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"sensordev\" structure."));
 	return SYSINFO_RET_FAIL;
 }
 

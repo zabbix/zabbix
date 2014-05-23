@@ -54,7 +54,6 @@
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
 #define ZBX_PROTO_TAG_HOSTID		"hostid"
-#define ZBX_PROTO_TAG_NODEID		"nodeid"
 #define ZBX_PROTO_TAG_AVAILABLE		"available"
 #define ZBX_PROTO_TAG_SNMP_AVAILABLE	"snmp_available"
 #define ZBX_PROTO_TAG_IPMI_AVAILABLE	"ipmi_available"
@@ -139,6 +138,8 @@ int	zbx_json_close(struct zbx_json *j);
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
 const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p);
 const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null);
+const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
+		size_t *string_alloc, int *is_null);
 const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len);

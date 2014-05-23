@@ -51,7 +51,6 @@ static void	process_configuration_sync(size_t *data_size)
 	const char	*__function_name = "process_configuration_sync";
 
 	zbx_sock_t	sock;
-	char		*data;
 	struct		zbx_json_parse jp;
 	char		value[16];
 
@@ -62,16 +61,16 @@ static void	process_configuration_sync(size_t *data_size)
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG))
 		goto out;
 
-	if ('\0' == *data)
+	if ('\0' == *sock.buffer)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
 		goto out;
 	}
 
-	if (SUCCEED != zbx_json_open(data, &jp))
+	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
 		goto out;
@@ -89,13 +88,13 @@ static void	process_configuration_sync(size_t *data_size)
 
 		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain configuration data from server. " ZBX_PROTO_TAG_INFO
-				":\"%s\"", ZBX_NULL2EMPTY_STR(info));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
+				ZBX_NULL2EMPTY_STR(info));
 		zbx_free(info);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server. Datalen " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server, datalen " ZBX_FS_SIZE_T,
 			(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);

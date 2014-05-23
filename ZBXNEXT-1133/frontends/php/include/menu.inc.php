@@ -25,7 +25,6 @@ $ZBX_MENU = array(
 	'view' => array(
 		'label'				=> _('Monitoring'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -80,7 +79,6 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'srv_status.php',
 				'label' => _('IT services'),
-				'force_disable_all_nodes' => true,
 				'sub_pages' => array('report3.php', 'chart5.php')
 			),
 			array(
@@ -100,7 +98,6 @@ $ZBX_MENU = array(
 	'cm' => array(
 		'label'				=> _('Inventory'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -116,7 +113,6 @@ $ZBX_MENU = array(
 	'reports' => array(
 		'label'				=> _('Reports'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -143,14 +139,12 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'popup_right.php'
 			)
-		),
+		)
 	),
 	'config' => array(
 		'label'				=> _('Configuration'),
 		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
-		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
-		'force_disable_all_nodes' => true,
 		'pages' => array(
 			array(
 				'url' => 'conf.import.php'
@@ -211,15 +205,13 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'services.php',
 				'label' => _('IT services')
-			),
+			)
 		)
 	),
 	'admin' => array(
 		'label'				=> _('Administration'),
 		'user_type'			=> USER_TYPE_SUPER_ADMIN,
-		'node_perm'			=> PERM_READ_WRITE,
-		'default_page_id'	=> 1,
-		'force_disable_all_nodes'=> true,
+		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
 				'url' => 'adm.gui.php',
@@ -239,8 +231,7 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'proxies.php',
-				'label' => _('DM'),
-				'sub_pages' => array('nodes.php')
+				'label' => _('Proxies')
 			),
 			array(
 				'url' => 'authentication.php',
@@ -282,8 +273,6 @@ $ZBX_MENU = array(
 		'label'					=> _('Login'),
 		'user_type'				=> 0,
 		'default_page_id'		=> 0,
-		'hide_node_selection'	=> 1,
-		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
 				'url' => 'index.php',
@@ -325,6 +314,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 		$menu_class = 'horizontal_menu_n';
 		$sub_menus[$label] = array();
+
 		foreach ($menu['pages'] as $sub_page) {
 			$show_sub_menu = true;
 
@@ -367,10 +357,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 			}
 		}
 
-		if ($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') && (isset($menu['force_disable_all_nodes']) || isset($sub_page['force_disable_all_nodes']))) {
-			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-		}
-
 		if ($page_exists && $deny) {
 			$denied_page_requested = true;
 		}
@@ -394,20 +380,4 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	}
 
 	return $denied_page_requested;
-}
-
-function zbx_define_menu_restrictions($page, $ZBX_MENU) {
-	foreach ($ZBX_MENU as $section) {
-		foreach ($section['pages'] as $menu_page) {
-			if ($menu_page['url'] == $page['file'] || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
-				if (isset($section['force_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
-					define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-				}
-				if (isset($section['hide_node_selection']) && !defined('ZBX_HIDE_NODE_SELECTION')) {
-					define('ZBX_HIDE_NODE_SELECTION', 1);
-				}
-				return null;
-			}
-		}
-	}
 }

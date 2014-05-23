@@ -271,36 +271,35 @@ else {
 		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
-	if (!empty($data['drules'])) {
-		foreach ($data['drules'] as $druleid => $drule) {
+
+	if ($data['drules']) {
+		foreach ($data['drules'] as $druleId => $drule) {
 			// checks
 			$checks = array();
+
 			foreach ($drule['dchecks'] as $check) {
 				$checks[$check['type']] = discovery_check_type2str($check['type']);
 			}
+
 			order_result($checks);
-			$data['drules'][$druleid]['checks'] = $checks;
+
+			$data['drules'][$druleId]['checks'] = $checks;
 
 			// description
-			$data['drules'][$druleid]['description'] = array();
-			if (!empty($drule['proxy_hostid'])) {
+			$data['drules'][$druleId]['description'] = array();
+
+			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
-				array_push($data['drules'][$druleid]['description'], $proxy['host'].NAME_DELIMITER);
+
+				array_push($data['drules'][$druleId]['description'], $proxy['host'].NAME_DELIMITER);
 			}
 		}
-		order_result($data['drules'], getPageSortOrder());
+
+		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
 	}
 
 	// get paging
 	$data['paging'] = getPagingLine($data['drules'], array('druleid'));
-
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($data['drules'] as &$drule) {
-			$drule['nodename'] = get_node_name_by_elid($drule['druleid'], true);
-		}
-		unset($drule);
-	}
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

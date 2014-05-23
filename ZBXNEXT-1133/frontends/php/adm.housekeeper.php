@@ -30,37 +30,37 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hk_events_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_events_trigger' => 	array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_events_trigger' => 	array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Trigger event and alert data storage period')
 	),
-	'hk_events_internal' => array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_events_internal' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Internal event and alert data storage period')
 	),
-	'hk_events_discovery' =>array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_events_discovery' =>array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Network discovery event and alert data storage period')
 	),
-	'hk_events_autoreg' => 	array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_events_autoreg' => 	array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Auto-registration event and alert data storage period')
 	),
 	'hk_services_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_services' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_services' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('IT service data storage period')
 	),
 	'hk_audit_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_audit' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_audit' => 			array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Audit data storage period')
 	),
 	'hk_sessions_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_sessions' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
+	'hk_sessions' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), null,
 		_('User session data storage period')),
 	'hk_history_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_history_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_history' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
+	'hk_history' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999), null,
 		_('History data storage period')
 	),
 	'hk_trends_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_trends_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'hk_trends' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
+	'hk_trends' => 			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999), null,
 		_('Trend data storage period')
 	),
 	'save' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),

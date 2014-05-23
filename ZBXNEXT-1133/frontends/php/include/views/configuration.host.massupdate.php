@@ -71,7 +71,7 @@ if (isset($_REQUEST['new_groups'])) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'] . ' (new)',
+				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
 				'isNew' => true
 			);
 		}
@@ -156,8 +156,8 @@ $hostFormList->addRow(
 
 // append status to form list
 $statusComboBox = new CComboBox('status', $this->data['status']);
-$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Monitored'));
-$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
+$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Enabled'));
+$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Disabled'));
 $hostFormList->addRow(
 	array(
 		_('Status'),
@@ -300,7 +300,7 @@ if ($this->data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 $hostTab = new CTabView();
 
 // reset the tab when opening the form for the first time
-if (!hasRequest('masssave')) {
+if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
 $hostTab->addTab('hostTab', _('Host'), $hostFormList);

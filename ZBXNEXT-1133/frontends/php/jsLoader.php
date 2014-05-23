@@ -84,6 +84,7 @@ $availableJScripts = array(
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'tr_logform.js' => 'pages/',
 );
 
 $tranStrings = array(
@@ -97,7 +98,7 @@ $tranStrings = array(
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
+		'S_DATE_FORMAT' => DATE_TIME_FORMAT
 	),
 	'functions.js' => array(
 		'Cancel' => _('Cancel'),
@@ -191,7 +192,9 @@ $tranStrings = array(
 		'Favourite screens' => _('Favourite screens'),
 		'Favourite simple graphs' => _('Favourite simple graphs'),
 		'Favourite slide shows' => _('Favourite slide shows'),
-		'Insert macro' => _('Insert macro'),
+		'Insert expression' => _('Insert expression'),
+		'Trigger status "OK"' => _('Trigger status "OK"'),
+		'Trigger status "Problem"' => _('Trigger status "Problem"'),
 		'Item "%1$s"' => _('Item "%1$s"'),
 		'Go to' => _('Go to'),
 		'Graphs' => _('Graphs'),
