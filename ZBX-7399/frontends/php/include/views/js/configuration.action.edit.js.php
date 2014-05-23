@@ -399,23 +399,19 @@
 		if (opCmdTarget != 'current') {
 			jQuery('#multiselectWrapper').remove();
 
-			var opCmdTargetWrapper = jQuery('<div>', {
-				id: 'multiselectWrapper',
-				'class': 'multiselect-wrapper'
-			});
-
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
 				'class': 'multiselect'
 			});
 
-			jQuery('#opCmdTargetSelect').append(opCmdTargetWrapper.append(opCmdTargetObject));
+			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);
 
 			var srctbl = (opCmdTarget == 'host') ? 'hosts' : 'host_groups',
 				srcfld1 = (opCmdTarget == 'host') ? 'hostid' : 'groupid';
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				id: 'opCmdTargetObject',
+				wrapperId: 'multiselectWrapper',
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {

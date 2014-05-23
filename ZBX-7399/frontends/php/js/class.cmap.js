@@ -495,6 +495,7 @@ ZABBIX.apps.map = (function($) {
 						case '0':
 							$('#elementNameHost').multiSelectHelper({
 								id: 'elementNameHost',
+								wrapperId: 'multiselectWrapper',
 								objectName: 'hosts',
 								name: 'elementValue',
 								selectedLimit: 1,
@@ -515,6 +516,7 @@ ZABBIX.apps.map = (function($) {
 						case '3':
 							$('#elementNameHostGroup').multiSelectHelper({
 								id: 'elementNameHostGroup',
+								wrapperId: 'multiselectWrapper',
 								objectName: 'hostGroup',
 								name: 'elementValue',
 								selectedLimit: 1,
@@ -664,6 +666,9 @@ ZABBIX.apps.map = (function($) {
 					this.selements[id].toggleSelect(false);
 					delete this.selection.selements[id];
 				}
+
+				// clean element id and name
+				$('.select-popup-map-element').remove();
 			},
 
 			selectElements: function(ids, addSelection) {
@@ -1351,6 +1356,7 @@ ZABBIX.apps.map = (function($) {
 					case '0':
 						$('#elementNameHost').multiSelectHelper({
 							id: 'elementNameHost',
+							wrapperId: 'multiselectWrapper',
 							objectName: 'hosts',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
@@ -1372,6 +1378,7 @@ ZABBIX.apps.map = (function($) {
 					case '3':
 						$('#elementNameHostGroup').multiSelectHelper({
 							id: 'elementNameHostGroup',
+							wrapperId: 'multiselectWrapper',
 							objectName: 'hostGroup',
 							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],

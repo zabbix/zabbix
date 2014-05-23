@@ -52,6 +52,14 @@ jQuery(function($) {
 			'Select': t('Select')
 		};
 
+		// add wrap
+		var multiselectWrapper = jQuery('<div>', {
+			id: options.wrapperId,
+			'class': 'multiselect-wrapper'
+		});
+
+		$('#' + options.id).wrap(multiselectWrapper);
+
 		return this.each(function() {
 			$(this).empty().multiSelect(options);
 		});
@@ -861,10 +869,9 @@ jQuery(function($) {
 				'padding-left': left
 			});
 
-			// refresh DOM object
+			// IE8 hack to fix inline-block container resizing
 			if (IE8) {
-				$('.multiselect-wrapper').addClass('refreshDomObj');
-				$('.multiselect-wrapper').removeClass('refreshDomObj');
+				$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 			}
 		}
 		else {
