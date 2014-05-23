@@ -24,7 +24,7 @@
  *
  * @package API
  */
-class CScreen extends CZBXAPI {
+class CScreen extends CApiService {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
@@ -34,7 +34,6 @@ class CScreen extends CZBXAPI {
 	 * Get screen data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['nodeids']		node IDs
 	 * @param bool   $options['editable']		only with read-write permission. Ignored for SuperAdmins
 	 * @param int    $options['count']			count Hosts, returned column name is rowscount
 	 * @param string $options['pattern']		search hosts by pattern in host names
@@ -57,7 +56,6 @@ class CScreen extends CZBXAPI {
 		);
 
 		$defOptions = array(
-			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'editable'					=> null,
@@ -114,7 +112,6 @@ class CScreen extends CZBXAPI {
 		$screenIds = array();
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
 			if ($options['countOutput'] !== null) {
@@ -193,7 +190,6 @@ class CScreen extends CZBXAPI {
 			// group
 			$allowedGroups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
-				'nodeids' => $options['nodeids'],
 				'groupids' => $groupsToCheck,
 				'editable' => $options['editable']
 			));
@@ -202,7 +198,6 @@ class CScreen extends CZBXAPI {
 			// host
 			$allowedHosts = API::Host()->get(array(
 				'output' => array('hostid'),
-				'nodeids' => $options['nodeids'],
 				'hostids' => $hostsToCheck,
 				'editable' => $options['editable']
 			));
@@ -211,7 +206,6 @@ class CScreen extends CZBXAPI {
 			// graph
 			$allowedGraphs = API::Graph()->get(array(
 				'output' => array('graphid'),
-				'nodeids' => $options['nodeids'],
 				'graphids' => $graphsToCheck,
 				'editable' => $options['editable']
 			));
@@ -220,7 +214,6 @@ class CScreen extends CZBXAPI {
 			// item
 			$allowedItems = API::Item()->get(array(
 				'output' => array('itemid'),
-				'nodeids' => $options['nodeids'],
 				'itemids' => $itemsToCheck,
 				'webitems' => true,
 				'editable' => $options['editable']
@@ -230,7 +223,6 @@ class CScreen extends CZBXAPI {
 			// map
 			$allowedMaps = API::Map()->get(array(
 				'output' => array('sysmapid'),
-				'nodeids' => $options['nodeids'],
 				'sysmapids' => $mapsToCheck,
 				'editable' => $options['editable']
 			));
@@ -239,7 +231,6 @@ class CScreen extends CZBXAPI {
 			// screen
 			$allowedScreens = API::Screen()->get(array(
 				'output' => array('screenid'),
-				'nodeids' => $options['nodeids'],
 				'screenids' => $screensToCheck,
 				'editable' => $options['editable']
 			));
@@ -330,23 +321,24 @@ class CScreen extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Check if screen exists.
+	 *
+	 * @deprecated	As of version 2.4, use get method instead.
+	 *
+	 * @param array	$object
+	 *
+	 * @return bool
+	 */
 	public function exists($data) {
-		$keyFields = array(array('screenid', 'name'));
+		$this->deprecated('screen.exists method is deprecated.');
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $data),
+		$screens = $this->get(array(
+			'filter' => zbx_array_mintersect(array(array('screenid', 'name')), $data),
 			'preservekeys' => true,
 			'output' => array('screenid'),
-			'nopermissions' => true,
 			'limit' => 1
-		);
-		if (isset($data['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($data['node']);
-		}
-		elseif (isset($data['nodeids'])) {
-			$options['nodeids'] = $data['nodeids'];
-		}
-		$screens = $this->get($options);
+		));
 
 		return !empty($screens);
 	}
@@ -378,7 +370,7 @@ class CScreen extends CZBXAPI {
 		}
 		unset($screen);
 
-		$dbScreens = API::getApi()->select('screens', array(
+		$dbScreens = API::getApiService()->select('screens', array(
 			'filter' => array('name' => zbx_objectValues($screens, 'name')),
 			'output' => array('name')
 		));
@@ -450,7 +442,7 @@ class CScreen extends CZBXAPI {
 			}
 
 			if (isset($screen['name'])) {
-				$dbScreenExist = API::getApi()->select('screens', array(
+				$dbScreenExist = API::getApiService()->select('screens', array(
 					'filter' => array('name' => $screen['name']),
 					'output' => array('screenid')
 				));
@@ -620,9 +612,7 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete($screenIds) {
-		$screenIds = zbx_toArray($screenIds);
-
+	public function delete(array $screenIds) {
 		$this->validateDelete($screenIds);
 
 		DB::delete('screens_items', array('screenid' => $screenIds));
@@ -685,15 +675,6 @@ class CScreen extends CZBXAPI {
 		}
 	}
 
-	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only apply the node option if no specific ids are given
-		if ($options['screenids'] === null && $options['screenitemids'] === null) {
-			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
-		}
-
-		return $sqlParts;
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -701,11 +682,10 @@ class CScreen extends CZBXAPI {
 
 		// adding ScreenItems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', array(
 				'output' => $this->outputExtend($options['selectScreenItems'], array('screenid', 'screenitemid')),
 				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true,
-				'nodeids' => get_current_nodeid(true)
+				'preservekeys' => true
 			));
 
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');

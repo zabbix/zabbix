@@ -182,6 +182,8 @@ static void	zbx_tcp_clean(zbx_sock_t *s)
 	assert(s);
 
 	memset(s, 0, sizeof(zbx_sock_t));
+
+	s->buf_type = ZBX_BUF_TYPE_STAT;
 }
 
 /******************************************************************************
@@ -423,9 +425,9 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 #define ZBX_TCP_HEADER			ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
 #define ZBX_TCP_HEADER_LEN		5
 
-int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout)
+int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
-	zbx_uint64_t	len64;
+	zbx_uint64_t	len64_le;
 	ssize_t		i = 0, written = 0;
 	int		ret = SUCCEED;
 
@@ -444,11 +446,10 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 			goto cleanup;
 		}
 
-		len64 = (zbx_uint64_t)strlen(data);
-		len64 = zbx_htole_uint64(len64);
+		len64_le = zbx_htole_uint64((zbx_uint64_t)len);
 
 		/* write data length */
-		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64, sizeof(len64)))
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64_le, sizeof(len64_le)))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -456,9 +457,9 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		}
 	}
 
-	while (written < (ssize_t)strlen(data))
+	while (written < (ssize_t)len)
 	{
-		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(strlen(data) - written))))
+		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(len - written))))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -898,7 +899,8 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  ******************************************************************************/
 void	zbx_tcp_free(zbx_sock_t *s)
 {
-	zbx_free(s->buf_dyn);
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+		zbx_free(s->buffer);
 }
 
 /******************************************************************************
@@ -913,7 +915,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
+ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	(ZBX_STAT_BUF_LEN * 8)
 	ssize_t		nbytes, left, total_bytes;
@@ -925,13 +927,13 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	zbx_free(s->buf_dyn);
+	zbx_tcp_free(s);
 
 	total_bytes = 0;
 	read_bytes = 0;
-	s->buf_type = ZBX_BUF_TYPE_STAT;
 
-	*data = s->buf_stat;
+	s->buf_type = ZBX_BUF_TYPE_STAT;
+	s->buffer = s->buf_stat;
 
 	left = ZBX_TCP_HEADER_LEN;
 
@@ -1025,9 +1027,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 	{
 		allocated = ZBX_BUF_LEN;
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
+		s->buffer = zbx_malloc(NULL, allocated);
 
-		memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
+		memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
 
 		offset = read_bytes;
 
@@ -1035,7 +1037,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		while (read_bytes < expected_len &&
 				ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat))))
 		{
-			zbx_strncpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat, nbytes);
+			zbx_strncpy_alloc(&s->buffer, &allocated, &offset, s->buf_stat, nbytes);
 			read_bytes += nbytes;
 
 			if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
@@ -1048,10 +1050,10 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 				{
 					/* XML protocol? */
-					if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
+					if (0 == strncmp(s->buffer, "<req>", sizeof("<req>") - 1))
 					{
 						/* closing tag received in the last 10 bytes? */
-						if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
+						if (NULL != strstr(s->buffer + read_bytes - 10, "</req>"))
 							break;
 					}
 					else
@@ -1059,8 +1061,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				}
 			}
 		}
-
-		*data = s->buf_dyn;
 	}
 out:
 	if (ZBX_TCP_ERROR == nbytes)
@@ -1073,7 +1073,10 @@ cleanup:
 		zbx_tcp_timeout_cleanup(s);
 
 	if (FAIL != total_bytes)
+	{
 		total_bytes += read_bytes;
+		s->read_bytes = read_bytes;
+	}
 
 	return total_bytes;
 }
@@ -1082,7 +1085,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	sa;
 	ZBX_SOCKLEN_T	sz = sizeof(sa);
-	static char	buffer[64];
+	static char	host[64];
 	char		*error_message = NULL;
 
 	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
@@ -1093,23 +1096,23 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 	}
 
 #if defined(HAVE_IPV6)
-	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), buffer, sizeof(buffer), NULL, 0, NI_NUMERICHOST))
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 	{
 		error_message = strerror_from_system(zbx_sock_last_error());
 		zbx_set_tcp_strerror("connection rejected, getnameinfo() failed: %s", error_message);
 	}
 #else
-	zbx_snprintf(buffer, sizeof(buffer), "%s", inet_ntoa(sa.sin_addr));
+	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
 #endif
 
 out:
 	if (NULL != error_message)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
-		strscpy(buffer, "unknown IP");
+		strscpy(host, "unknown IP");
 	}
 
-	return buffer;
+	return host;
 }
 
 #if defined(HAVE_IPV6)
@@ -1271,12 +1274,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
+	if (0 == zbx_getnameinfo((struct sockaddr *)&name, tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
 		zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, ip_list);
 	else
 		zbx_set_tcp_strerror("connection rejected, allowed hosts: \"%s\"", ip_list);
 #else
 	zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", inet_ntoa(name.sin_addr), ip_list);
 #endif
-	return	FAIL;
+	return FAIL;
 }

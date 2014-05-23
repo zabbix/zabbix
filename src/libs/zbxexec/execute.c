@@ -169,7 +169,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
 				__function_name, zbx_strerror(errno));
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
@@ -178,7 +178,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 
 	/* execl() returns only when an error occurs */
 	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 /******************************************************************************
@@ -261,19 +261,19 @@ exit:
  ******************************************************************************/
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout)
 {
-	size_t					buf_size = PIPE_BUFFER_SIZE, offset = 0;
-	int					ret = FAIL;
+	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
+	int			ret = FAIL;
 #ifdef _WINDOWS
-	STARTUPINFO				si;
-	PROCESS_INFORMATION			pi;
-	SECURITY_ATTRIBUTES			sa;
-	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
-	char					*cmd = NULL;
-	LPTSTR					wcmd = NULL;
-	struct _timeb				start_time, current_time;
+	STARTUPINFO		si;
+	PROCESS_INFORMATION	pi;
+	SECURITY_ATTRIBUTES	sa;
+	HANDLE			job = NULL, hWrite = NULL, hRead = NULL;
+	char			*cmd = NULL;
+	wchar_t			*wcmd = NULL;
+	struct _timeb		start_time, current_time;
 #else
-	pid_t					pid;
-	int					fd;
+	pid_t			pid;
+	int			fd;
 #endif
 
 	*error = '\0';
@@ -436,7 +436,7 @@ close:
 #endif	/* _WINDOWS */
 
 	if (TIMEOUT_ERROR == ret)
-		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+		zbx_strlcpy(error, "Timeout while executing a shell script.", max_error_len);
 	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
@@ -466,7 +466,7 @@ int	zbx_execute_nowait(const char *command)
 	char			*full_command;
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
-	LPTSTR			wcommand;
+	wchar_t			*wcommand;
 
 	full_command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
 	wcommand = zbx_utf8_to_unicode(full_command);
@@ -551,6 +551,6 @@ int	zbx_execute_nowait(const char *command)
 	}
 
 	/* always exit, parent has already returned */
-	exit(0);
+	exit(EXIT_SUCCESS);
 #endif
 }

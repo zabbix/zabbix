@@ -21,10 +21,7 @@
 
 function get_maintenance_by_maintenanceid($maintenanceid) {
 	return DBfetch(DBselect(
-			'SELECT m.*'.
-			' FROM maintenances m'.
-			' WHERE m.maintenanceid='.zbx_dbstr($maintenanceid).
-				andDbNode('m.maintenanceid')
+		'SELECT m.* FROM maintenances m WHERE m.maintenanceid='.zbx_dbstr($maintenanceid)
 	));
 }
 
@@ -53,11 +50,7 @@ function shedule2str($timeperiod) {
 	}
 
 	if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-		$str = _s('At %1$s:%2$s on %3$s',
-			date('H', $timeperiod['start_date']),
-			date('i', $timeperiod['start_date']),
-			zbx_date2str(_('d M Y'), $timeperiod['start_date'])
-		);
+		$str = zbx_date2str(DATE_TIME_FORMAT, $timeperiod['start_date']);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
 		$str = _n('At %1$s:%2$s on every day',
@@ -70,7 +63,7 @@ function shedule2str($timeperiod) {
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$days = '';
 		$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'], true);
-		$length = zbx_strlen($dayofweek);
+		$length = strlen($dayofweek);
 		for ($i = 0; $i < $length; $i++) {
 			if ($dayofweek[$i] == 1) {
 				if (!zbx_empty($days)) {
@@ -91,7 +84,7 @@ function shedule2str($timeperiod) {
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$months = '';
 		$month = zbx_num2bitstr($timeperiod['month'], true);
-		$length = zbx_strlen($month);
+		$length = strlen($month);
 		for ($i = 0; $i < $length; $i++) {
 			if ($month[$i] == 1) {
 				if (!zbx_empty($months)) {
@@ -103,7 +96,7 @@ function shedule2str($timeperiod) {
 		if ($timeperiod['dayofweek'] > 0) {
 			$days = '';
 			$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'], true);
-			$length = zbx_strlen($dayofweek);
+			$length = strlen($dayofweek);
 			for ($i = 0; $i < $length; $i++) {
 				if ($dayofweek[$i] == 1) {
 					if (!zbx_empty($days)) {

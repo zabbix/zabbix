@@ -126,7 +126,6 @@ $_REQUEST['itemid'] = array_unique(zbx_toArray($_REQUEST['itemid']));
  * Display
  */
 $items = API::Item()->get(array(
-	'nodeids' => get_current_nodeid(),
 	'itemids' => $_REQUEST['itemid'],
 	'webitems' => true,
 	'selectHosts' => array('name'),

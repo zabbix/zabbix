@@ -1059,8 +1059,17 @@ class CHttpTestManager {
 		$history = Manager::History()->getLast($httpItems);
 
 		$data = array();
+
 		foreach ($httpItems as $httpItem) {
 			if (isset($history[$httpItem['itemid']])) {
+				if (!isset($data[$httpItem['httptestid']])) {
+					$data[$httpItem['httptestid']] = array(
+						'lastcheck' => null,
+						'lastfailedstep' => null,
+						'error' => null
+					);
+				}
+
 				$itemHistory = $history[$httpItem['itemid']][0];
 
 				if ($httpItem['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {

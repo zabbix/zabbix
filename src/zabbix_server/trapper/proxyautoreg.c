@@ -30,28 +30,20 @@
  *                                                                            *
  * Purpose: receive auto-registration data from proxy                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "recv_areg_data";
+	const char	*__function_name = "recv_areg_data";
 
-	int			ret;
-	zbx_uint64_t		proxy_hostid;
-	char			host[HOST_HOST_LEN_MAX], error[256];
+	int		ret;
+	zbx_uint64_t	proxy_hostid;
+	char		host[HOST_HOST_LEN_MAX], *error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	error[0] = '\0';
-
-	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, error, sizeof(error))))
+	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "autoregistration data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
@@ -62,6 +54,8 @@ void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
+	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
@@ -71,13 +65,7 @@ out:
  *                                                                            *
  * Purpose: send auto-registration data from proxy to a server                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	send_areg_data(zbx_sock_t *sock)

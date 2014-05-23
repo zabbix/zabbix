@@ -134,6 +134,11 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 	$curl->removeArgument('stime');
 
 	ob_end_clean();
+
+	DBstart();
+	CProfile::flush();
+	DBend();
+
 	redirect($curl->getUrl());
 }
 

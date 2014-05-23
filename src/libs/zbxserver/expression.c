@@ -56,10 +56,6 @@
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID	207
 
-/* DBget_node_value() */
-#define ZBX_REQUEST_NODE_ID		301
-#define ZBX_REQUEST_NODE_NAME		302
-
 /******************************************************************************
  *                                                                            *
  * Function: get_N_functionid                                                 *
@@ -178,193 +174,6 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_simple                                                  *
- *                                                                            *
- * Purpose: evaluate simple expression                                        *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result - value of the      *
- *                         expression                                         *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: format: <double> or <double> <operator> <double>                 *
- *                                                                            *
- *           It is recursive function!                                        *
- *                                                                            *
- ******************************************************************************/
-static int	evaluate_simple(double *result, char *expression, char *error, int maxerrlen)
-{
-	double	value1, value2;
-	char	*p, c;
-
-	zbx_lrtrim(expression, " ");
-
-	/* compress repeating - and + and add prefix N to negative numbers */
-	compress_signs(expression);
-
-	/* we should process negative prefix, i.e. N123 == -123 */
-	if ('N' == *expression && SUCCEED == is_double_suffix(expression + 1))
-	{
-		/* str2double supports suffixes */
-		*result = -str2double(expression + 1);
-		return SUCCEED;
-	}
-	else if ('N' != *expression && SUCCEED == is_double_suffix(expression))
-	{
-		/* str2double supports suffixes */
-		*result = str2double(expression);
-		return SUCCEED;
-	}
-
-	/* operators with lowest priority come first */
-	/* HIGHEST / * - + < > # = & | LOWEST */
-	if (NULL != (p = strchr(expression, '|')) || NULL != (p = strchr(expression, '&')) ||
-			NULL != (p = strchr(expression, '=')) || NULL != (p = strchr(expression, '#')) ||
-			NULL != (p = strchr(expression, '>')) || NULL != (p = strchr(expression, '<')) ||
-			NULL != (p = strchr(expression, '+')) || NULL != (p = strrchr(expression, '-')) ||
-			NULL != (p = strchr(expression, '*')) || NULL != (p = strrchr(expression, '/')))
-	{
-		c = *p;
-		*p = '\0';
-
-		if (SUCCEED != evaluate_simple(&value1, expression, error, maxerrlen) ||
-				SUCCEED != evaluate_simple(&value2, p + 1, error, maxerrlen))
-		{
-			*p = c;
-			return FAIL;
-		}
-
-		*p = c;
-	}
-	else
-	{
-		zbx_snprintf(error, maxerrlen, "Format error or unsupported operator. Exp: [%s]", expression);
-		return FAIL;
-	}
-
-	switch (c)
-	{
-		case '|':
-			*result = (SUCCEED != cmp_double(value1, 0) || SUCCEED != cmp_double(value2, 0));
-			break;
-		case '&':
-			*result = (SUCCEED != cmp_double(value1, 0) && SUCCEED != cmp_double(value2, 0));
-			break;
-		case '=':
-			*result = (SUCCEED == cmp_double(value1, value2));
-			break;
-		case '#':
-			*result = (SUCCEED != cmp_double(value1, value2));
-			break;
-		case '>':
-			*result = (value1 >= value2 + TRIGGER_EPSILON);
-			break;
-		case '<':
-			*result = (value1 <= value2 - TRIGGER_EPSILON);
-			break;
-		case '+':
-			*result = value1 + value2;
-			break;
-		case '-':
-			*result = value1 - value2;
-			break;
-		case '*':
-			*result = value1 * value2;
-			break;
-		case '/':
-			if (SUCCEED == cmp_double(value2, 0))
-			{
-				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", expression);
-				return FAIL;
-			}
-
-			*result = value1 / value2;
-			break;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: evaluate                                                         *
- *                                                                            *
- * Purpose: evaluate simplified expression                                    *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result - value of the      *
- *                         expression                                         *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: example: ({15}>10)|({123}=1)                                     *
- *                                                                            *
- ******************************************************************************/
-int	evaluate(double *value, char *expression, char *error, int maxerrlen)
-{
-	const char	*__function_name = "evaluate";
-	char		*res = NULL, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			value_str[MAX_STRING_LEN], c;
-	int		i, l, r;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
-
-	strscpy(tmp, expression);
-
-	while (NULL != strchr(tmp, ')'))
-	{
-		l = -1;
-		r = strchr(tmp, ')') - tmp;
-
-		for (i = r; i >= 0; i--)
-		{
-			if ('(' == tmp[i])
-			{
-				l = i;
-				break;
-			}
-		}
-
-		if (-1 == l)
-		{
-			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", tmp);
-			return FAIL;
-		}
-
-		for (i = l + 1; i < r; i++)
-			simple[i - l - 1] = tmp[i];
-
-		simple[r - l - 1] = '\0';
-
-		if (SUCCEED != evaluate_simple(value, simple, error, maxerrlen))
-			return FAIL;
-
-		c = tmp[l];
-		tmp[l] = '\0';
-		res = zbx_strdcat(res, tmp);
-		tmp[l] = c;
-
-		zbx_snprintf(value_str, sizeof(value_str), ZBX_FS_DBL, *value);
-		res = zbx_strdcat(res, value_str);
-		res = zbx_strdcat(res, tmp + r + 1);
-
-		zbx_remove_spaces(res);
-		strscpy(tmp, res);
-
-		zbx_free(res);
-	}
-
-	if (SUCCEED != evaluate_simple(value, tmp, error, maxerrlen))
-		return FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1761,69 +1570,6 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_node_value                                                 *
- *                                                                            *
- * Purpose: request node value by object identificator                        *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_node_value(zbx_uint64_t objectid, char **replace_to, int request)
-{
-	const char	*__function_name = "DBget_node_value";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		nodeid, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	nodeid = get_nodeid_by_id(objectid);
-
-	switch (request)
-	{
-		case ZBX_REQUEST_NODE_ID:
-			*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
-			ret = SUCCEED;
-			break;
-		case ZBX_REQUEST_NODE_NAME:
-			result = DBselect("select name from nodes where nodeid=%d", nodeid);
-
-			if (NULL != (row = DBfetch(result)))
-			{
-				*replace_to = zbx_strdup(*replace_to, row[0]);
-				ret = SUCCEED;
-			}
-			DBfree_result(result);
-			break;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_node_value                                                   *
- *                                                                            *
- * Purpose: request node value by trigger expression and number of function   *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED, otherwise FAIL    *
- *                                                                            *
- ******************************************************************************/
-static int	get_node_value(const char *expression, char **replace_to, int N_functionid, int request)
-{
-	zbx_uint64_t	functionid;
-
-	if (FAIL == get_N_functionid(expression, N_functionid, &functionid, NULL))
-		return FAIL;
-
-	return DBget_node_value(functionid, replace_to, request);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_autoreg_value_by_event                                       *
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
@@ -2030,9 +1776,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_PROFILE_LOCATION		MVAR_PROFILE "LOCATION}"
 #define MVAR_PROFILE_NOTES		MVAR_PROFILE "NOTES}"
 
-#define MVAR_NODE_ID			"{NODE.ID}"
-#define MVAR_NODE_NAME			"{NODE.NAME}"
-
 #define MVAR_DISCOVERY_RULE_NAME	"{DISCOVERY.RULE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_NAME	"{DISCOVERY.SERVICE.NAME}"
 #define MVAR_DISCOVERY_SERVICE_PORT	"{DISCOVERY.SERVICE.PORT}"
@@ -2081,7 +1824,6 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-	MVAR_NODE_ID, MVAR_NODE_NAME,
 	NULL
 };
 
@@ -2745,16 +2487,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns);
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -2948,16 +2680,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = get_node_value(c_event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3108,14 +2830,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 								zbx_age2str(time(NULL) - atoi(replace_to)));
 					}
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
@@ -3185,14 +2899,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
 					ret = get_autoreg_value_by_event(c_event, &replace_to, "listen_ip");
-				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_PORT))
 				{
@@ -3331,14 +3037,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
@@ -3446,14 +3144,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
 				}
-				else if (0 == strcmp(m, MVAR_NODE_ID))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_ID);
-				}
-				else if (0 == strcmp(m, MVAR_NODE_NAME))
-				{
-					ret = DBget_node_value(c_event->objectid, &replace_to, ZBX_REQUEST_NODE_NAME);
-				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
@@ -3546,7 +3236,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
-		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD)))
+		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
@@ -3779,8 +3469,8 @@ typedef struct
 {
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
-	char		function[FUNCTION_FUNCTION_LEN_MAX];
-	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	char		*function;
+	char		*parameter;
 	zbx_timespec_t	timespec;
 	char		*value;
 	char		*error;
@@ -3804,7 +3494,7 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	DC_FUNCTION	*functions = NULL;
 	int		*errcodes = NULL;
 	zbx_ifunc_t	*ifunc = NULL;
-	zbx_func_t	*func = NULL;
+	zbx_func_t	*func;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -3836,10 +3526,11 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 		}
 
 		func = zbx_malloc(NULL, sizeof(zbx_func_t));
+
 		func->functionid = functions[i].functionid;
 		func->triggerid = functions[i].triggerid;
-		strscpy(func->function, functions[i].function);
-		strscpy(func->parameter, functions[i].parameter);
+		func->function = zbx_strdup(NULL, functions[i].function);
+		func->parameter = zbx_strdup(NULL, functions[i].parameter);
 		func->timespec.sec = 0;
 		func->timespec.ns = 0;
 		func->value = NULL;
@@ -3875,87 +3566,78 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	char		*sql = NULL, value[MAX_BUFFER_LEN];
-	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
+	DC_ITEM		*items = NULL;
+	char		value[MAX_BUFFER_LEN], *error = NULL;
+	int		i, k;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	host_status, item_status;
+	int		*errcodes = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select %s,h.status,i.status"
-			" from %s"
-			" where i.hostid=h.hostid"
-				" and",
-			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->values_num);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->values_num);
 
 	zbx_free(itemids);
 
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < ifuncs->values_num; i++)
 	{
-		DBget_item_from_db(&item, row);
-
-		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
-		item_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 1]);
-
-		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (i = 0; i < ifunc->functions.values_num; i++)
+		for (k = 0; k < ifunc->functions.values_num; k++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[i];
+			func = (zbx_func_t *)ifunc->functions.values[k];
 
-			if (ITEM_STATUS_DISABLED == item_status)
+			if (SUCCEED != errcodes[i])
 			{
-				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (ITEM_STATE_NOTSUPPORTED == item.state)
-			{
-				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (HOST_STATUS_NOT_MONITORED == host_status)
-			{
-				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-
-			if (NULL != func->error)
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]:"
+						" item does not exist, is disabled or belongs to a disabled host.",
+						func->function, func->parameter);
 				continue;
+			}
 
-			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec))
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
 			{
-				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
+				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter,
+					func->timespec.sec, &error))
+			{
+				if (NULL != error)
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter,
+						error);
+					zbx_free(error);
+				}
+				else
+				{
+					func->error = zbx_dsprintf(func->error,
+						"Cannot evaluate function \"%s:%s.%s(%s)\".",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				}
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
 	}
-	DBfree_result(result);
+
+	DCconfig_clean_items(items, errcodes, ifuncs->values_num);
+
+	zbx_free(errcodes);
+	zbx_free(items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4081,6 +3763,8 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 		{
 			func = (zbx_func_t *)ifunc->functions.values[j];
 
+			zbx_free(func->function);
+			zbx_free(func->parameter);
 			zbx_free(func->value);
 			zbx_free(func->error);
 			zbx_free(func);
@@ -4100,7 +3784,7 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
- * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)"             *
+ * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_functions(zbx_vector_ptr_t *triggers)
@@ -4175,8 +3859,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		/* when evaluating trigger expression                                                 */
 		event.trigger.expression = tr->expression_orig;
 
-		zbx_remove_whitespace(tr->expression);
-
 		if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL,
 				&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
@@ -4199,7 +3881,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 		}
-		else if (SUCCEED == cmp_double(expr_result, 0))
+		else if (SUCCEED == zbx_double_compare(expr_result, 0))
 		{
 			tr->new_value = TRIGGER_VALUE_OK;
 		}
@@ -4484,198 +4166,6 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
-
-	return ret;
-}
-
-#define ZBX_OPCODE_AND		'&'
-#define ZBX_OPCODE_OR		'|'
-#define ZBX_OPCODE_OPEN		'('
-#define ZBX_OPCODE_CLOSE	')'
-
-#define ZBX_OPCODE_CLASS_NONE		0
-#define ZBX_OPCODE_CLASS_OP_BINARY	1
-#define ZBX_OPCODE_CLASS_VALUE		2
-
-/******************************************************************************
- *                                                                            *
- * Function: expression_get_token                                             *
- *                                                                            *
- * Purpose: return the first token from an expression                         *
- *                                                                            *
- * Parameters: expression  - [IN] the source expression                       *
- *             start       - [OUT] a pointer to the token start (the first    *
- *                                 token character)                           *
- *             end         - [OUT] a pointer to the token end (the next after *
- *                                 last token character)                      *
- *                                                                            *
- * Comments: A token is either a sequence of alphanumeric and '_', '{', '}'   *
- *           characters or any other non whitespace character.                *
- *                                                                            *
- ******************************************************************************/
-static void	expression_get_token(const char *expression, char const **start, char const **end)
-{
-	const char	*pstart = expression, *pend;
-	int		token_class;
-
-	/* strip leading whitespace */
-	while (' ' == *pstart)
-		pstart++;
-
-	pend = pstart;
-
-	if ('\0' == *pend)
-		goto out;
-
-	/* get the token class */
-	if ('{' == *pend)
-		token_class = ZBX_OPCODE_CLASS_VALUE;
-	else if (0 != islower(*pend))
-		token_class = ZBX_OPCODE_CLASS_OP_BINARY;
-	else
-		token_class = ZBX_OPCODE_CLASS_NONE;
-
-	pend++;
-
-	/* find the next token */
-	while('\0' != *pend)
-	{
-		switch (token_class)
-		{
-			case ZBX_OPCODE_CLASS_NONE:
-				goto out;
-			case ZBX_OPCODE_CLASS_VALUE:
-				if ('}' == *pend)
-				{
-					pend++;
-					goto out;
-				}
-				if (0 == isdigit(*pend))
-					goto out;
-				break;
-			case ZBX_OPCODE_CLASS_OP_BINARY:
-				if (0 == islower(*pend))
-					goto out;
-		}
-		pend++;
-	}
-out:
-	*start = pstart;
-	*end = pend;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: translate_expression                                             *
- *                                                                            *
- * Purpose: translate logical expression containing AND/OR operators into     *
- *          internal format with &/| operators and remove whitespace.         *
- *                                                                            *
- * Parameters: expression  - [IN] the source expression                       *
- *             out         - [OUT] the resulting expression                   *
- *             error       - [OUT] a short error description                  *
- *                                                                            *
- * Return value: SUCCEED - the expression was translated successfully         *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: This function allocates memory for output expression which must  *
- *           be freed by the caller.                                          *
- *           In the case of failure the error description is allocated by     *
- *           this function and must be freed by the caller.                   *
- *                                                                            *
- ******************************************************************************/
-int	translate_expression(const char *expression, char **out, char **error)
-{
-	const char	*__function_name = "translate_expression";
-
-	const char	*start, *end = expression;
-	int		level = 0, last_op = 0, ret = FAIL;
-	size_t		token_len, out_offset = 0, out_alloc = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	while ('\0' != *end)
-	{
-		expression_get_token(end, &start, &end);
-
-		token_len = end - start;
-
-		if (3 == token_len && 0 == strncmp(start, "and", token_len))
-		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-				goto out;
-
-			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_AND);
-			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
-		}
-		else if (2 == token_len && 0 == strncmp(start, "or", token_len))
-		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-				goto out;
-
-			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OR);
-			last_op = ZBX_OPCODE_CLASS_OP_BINARY;
-		}
-		else if (1 == token_len && '(' == *start)
-		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE == last_op)
-				goto out;
-
-			level++;
-
-			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_OPEN);
-			last_op = ZBX_OPCODE_CLASS_NONE;
-		}
-		else if (1 == token_len && ')' == *start)
-		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE != last_op)
-				goto out;
-
-			/* check for matching parentheses */
-			if (0 >= level)
-				goto out;
-
-			level--;
-
-			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ZBX_OPCODE_CLOSE);
-			last_op = ZBX_OPCODE_CLASS_VALUE;
-		}
-		else if (2 < token_len && '{' == *start && '}' == start[token_len - 1])
-		{
-			/* check if the previous op was a logical value */
-			if (ZBX_OPCODE_CLASS_VALUE == last_op)
-				goto out;
-
-			zbx_strncpy_alloc(out, &out_alloc, &out_offset, start, token_len);
-			last_op = ZBX_OPCODE_CLASS_VALUE;
-		}
-		else
-		{
-			if (start != end)
-				goto out;
-		}
-	}
-
-	/* check for matching parentheses */
-	if (0 != level)
-		goto out;
-
-	zbx_strncpy_alloc(out, &out_alloc, &out_offset, "", 0);
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid expression '%s': error at position " ZBX_FS_SIZE_T,
-				expression, (zbx_fs_size_t)(start - expression));
-		*error = zbx_strdup(*error, "Invalid formula expression.");
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

@@ -153,13 +153,11 @@ class CProfiler {
 			list($class, $method, $params, $result, $file, $line) = $apiCall;
 			// api method
 			$debug_str .= '<div style="padding-bottom: 10px;">';
-			$debug_str .= ($i + 1).'. <b>'.$class.'->'.$method.'</b> ['.$file.':'.$line.']';
+			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b> ['.$file.':'.$line.']';
 			$debug_str .= '</div>';
 			// parameters
 			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
-			foreach ($params as $p) {
-				$debug_str .= '<pre>'.print_r(CHtml::encode($p), true).'</pre>';
-			}
+			$debug_str .= '<pre>'.print_r(CHtml::encode($params), true).'</pre>';
 			$debug_str .= '</td>';
 			// result
 			$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';

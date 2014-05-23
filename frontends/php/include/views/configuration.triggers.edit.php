@@ -88,10 +88,16 @@ if ($this->data['limited'] == 'yes') {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
 $expressionRow = array($expressionTextBox, $addExpressionButton);
-if (!empty($this->data['expression_macro_button'])) {
-	array_push($expressionRow, $this->data['expression_macro_button']);
-}
+
 if ($this->data['input_method'] == IM_TREE) {
+	// insert macro button
+	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'formlist');
+	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
+	if ($this->data['limited']) {
+		$insertMacroButton->setAttribute('disabled', 'disabled');
+	}
+	$expressionRow[] = $insertMacroButton;
+
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
 		// add button
@@ -103,14 +109,14 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 	else {
 		// add button
-		$addExpressionButton = new CSubmit('and_expression', _('AND'), null, 'formlist');
+		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'formlist');
 		if ($this->data['limited'] == 'yes') {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
-		$orExpressionButton = new CSubmit('or_expression', _('OR'), null, 'formlist');
+		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'formlist');
 		if ($this->data['limited'] == 'yes') {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
@@ -278,10 +284,29 @@ if (empty($this->data['parent_discoveryid'])) {
 	foreach ($this->data['db_dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-		$row = new CRow(array(
-			$dependency['host'].NAME_DELIMITER.$dependency['description'],
-			new CButton('remove', _('Remove'), 'javascript: removeDependency("'.$dependency['triggerid'].'");', 'link_menu')
-		));
+		$hostNames = array();
+		foreach ($dependency['hosts'] as $host) {
+			$hostNames[] = CHtml::encode($host['name']);
+			$hostNames[] = ', ';
+		}
+		array_pop($hostNames);
+
+		if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			$description = new CLink(
+				array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
+				'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
+			);
+			$description->setAttribute('target', '_blank');
+		}
+		else {
+			$description = array($hostNames, NAME_DELIMITER, $dependency['description']);
+		}
+
+		$row = new CRow(array($description, new CButton('remove', _('Remove'),
+			'javascript: removeDependency("'.$dependency['triggerid'].'");',
+			'link_menu'
+		)));
+
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}

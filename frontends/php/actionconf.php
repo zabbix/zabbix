@@ -69,9 +69,7 @@ $fields = array(
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 
 $dataValid = check_fields($fields);
@@ -84,16 +82,6 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = getRequest('go', 'none');
 
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.audit.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
 if (isset($_REQUEST['actionid'])) {
 	$actionPermissions = API::Action()->get(array(
 		'output' => array('actionid'),
@@ -172,7 +160,7 @@ elseif (hasRequest('save')) {
 	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	$result = API::Action()->delete($_REQUEST['actionid']);
+	$result = API::Action()->delete(array(getRequest('actionid')));
 
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 
@@ -491,8 +479,7 @@ if (hasRequest('form')) {
 }
 else {
 	$data = array(
-		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
-		'displayNodes' => is_array(get_current_nodeid())
+		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS))
 	);
 
 	$sortfield = getPageSortField('name');
@@ -510,14 +497,6 @@ else {
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions'], array('actionid'));
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['actions'] as &$action) {
-			$action['nodename'] = get_node_name_by_elid($action['actionid'], true);
-		}
-		unset($action);
-	}
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

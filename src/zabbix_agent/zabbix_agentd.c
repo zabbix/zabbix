@@ -169,14 +169,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 			case 'h':
 				help();
-				exit(EXIT_FAILURE);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(EXIT_FAILURE);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'p':
 				if (ZBX_TASK_START == t->task)
@@ -579,7 +579,7 @@ int	MAIN_ZABBIX_ENTRY()
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -595,6 +595,16 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
+
+#ifdef _WINDOWS
+	if (MAXIMUM_WAIT_OBJECTS < threads_num)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
+				" parameter or the number of active servers in ServerActive configuration parameter.");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start the collector thread */
@@ -734,7 +744,7 @@ void	zbx_on_exit(void)
 	setproctitle_free_env();
 #endif
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }
 
 #if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
@@ -798,7 +808,7 @@ int	main(int argc, char **argv)
 
 			ret = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
-			exit(ret);
+			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
 		case ZBX_TASK_TEST_METRIC:
@@ -832,7 +842,7 @@ int	main(int argc, char **argv)
 #endif
 			free_metrics();
 			alias_list_free();
-			exit(SUCCEED);
+			exit(EXIT_SUCCESS);
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
@@ -843,5 +853,5 @@ int	main(int argc, char **argv)
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
 
-	exit(SUCCEED);
+	exit(EXIT_SUCCESS);
 }

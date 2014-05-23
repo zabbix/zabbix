@@ -119,27 +119,23 @@ if (isset($_REQUEST['rules'])) {
 }
 
 if (isset($_FILES['import_file'])) {
+	$result = false;
+
+	// CUploadFile throws exceptions, so we need to catch them
 	try {
 		$file = new CUploadFile($_FILES['import_file']);
 
-		DBstart();
-
-		$importFormat = CImportReaderFactory::fileExt2ImportFormat($file->getExtension());
-		$importReader = CImportReaderFactory::getReader($importFormat);
-
-		$configurationImport = new CConfigurationImport($file->getContent(), $data['rules']);
-		$configurationImport->setReader($importReader);
-		$configurationImport->import();
-
-		DBend();
-
-		show_messages(true, _('Imported successfully'));
+		$result = API::Configuration()->import(array(
+			'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
+			'source' => $file->getContent(),
+			'rules' => $data['rules']
+		));
 	}
 	catch (Exception $e) {
-		DBend(false);
 		error($e->getMessage());
-		show_messages(false, null, _('Import failed'));
 	}
+
+	show_messages($result, _('Imported successfully'), _('Import failed'));
 }
 
 $view = new CView('conf.import', $data);

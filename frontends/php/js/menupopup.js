@@ -206,8 +206,9 @@ function getMenuPopupHistory(options) {
  * @param string options[]['name']			script name
  * @param string options[]['scriptid']		script id
  * @param string options[]['confirmation']	confirmation text
- * @param bool   options['hasGraphs']		link to host graphs page
- * @param bool   options['hasScreens']		link to host screen page
+ * @param bool   options['showGraphs']		link to host graphs page
+ * @param bool   options['showScreens']		link to host screen page
+ * @param bool   options['showTriggers']	link to "Status of triggers" page
  * @param bool   options['hasGoTo']			"Go to" block in popup
  *
  * @return array
@@ -239,27 +240,26 @@ function getMenuPopupHost(options) {
 			url: new Curl('latest.php?hostid=' + options.hostid).getUrl()
 		};
 
-		// trigger status
+		// triggers
 		gotos[gotos.length] = {
 			label: t('Triggers'),
+			css: options.showTriggers ? '' : 'ui-state-disabled',
 			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
 		};
 
 		// graphs
-		if (options.hasGraphs) {
-			gotos[gotos.length] = {
-				label: t('Graphs'),
-				url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Graphs'),
+			css: options.showGraphs ? '' : 'ui-state-disabled',
+			url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
+		};
 
 		// screens
-		if (options.hasScreens) {
-			gotos[gotos.length] = {
-				label: t('Host screens'),
-				url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-			};
-		}
+		gotos[gotos.length] = {
+			label: t('Host screens'),
+			css: options.showScreens ?  '' : 'ui-state-disabled',
+			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
+		};
 
 		sections[sections.length] = {
 			label: t('Go to'),
@@ -282,10 +282,14 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['latestData']		link to latest data page
  * @param array  options['gotos']['inventory']		link to host inventory page
  * @param array  options['gotos']['graphs']			link to host graph page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showGraphs']		display "Graphs" link enabled or disabled
  * @param array  options['gotos']['screens']		link to host screen page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showScreens']	display "Screens" link enabled or disabled
  * @param array  options['gotos']['triggerStatus']	link to trigger status page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
+ * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
@@ -339,7 +343,7 @@ function getMenuPopupMap(options) {
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1');
+			var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
 
 			jQuery.each(options.gotos.triggerStatus, function(name, value) {
 				url.setArgument(name, value);
@@ -347,6 +351,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Triggers'),
+				css: options.gotos.showTriggers ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -361,6 +366,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Graphs'),
+				css: options.gotos.showGraphs ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -375,6 +381,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Host screens'),
+				css: options.gotos.showScreens ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -403,6 +410,7 @@ function getMenuPopupMap(options) {
 
 			gotos[gotos.length] = {
 				label: t('Latest events'),
+				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
 		}
@@ -579,14 +587,14 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?triggerid=' + options.triggerid);
-
+	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
 	items[items.length] = {
 		label: t('Events'),
+		css: options.showEvents ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -607,7 +615,7 @@ function getMenuPopupTrigger(options) {
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
 		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update&switch_node=' + options.configuration.switchNode);
+				+ '&form=update');
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -724,43 +732,34 @@ function getMenuPopupTriggerLog(options) {
 }
 
 /**
- * Get menu popup trigger macro section data.
+ * Get data for the "Insert expression" menu in the trigger expression constructor.
  *
  * @return array
  */
 function getMenuPopupTriggerMacro(options) {
 	var items = [],
-		data = {
-			'TRIGGER.VALUE=0': 0,
-			'TRIGGER.VALUE=1': 1,
-			'TRIGGER.VALUE=2': 2,
-			'TRIGGER.VALUE#0': 10,
-			'TRIGGER.VALUE#1': 11,
-			'TRIGGER.VALUE#2': 12
-		};
+		expressions = [
+			{
+				label: t('Trigger status "OK"'),
+				string: '{TRIGGER.VALUE}=0'
+			},
+			{
+				label: t('Trigger status "Problem"'),
+				string: '{TRIGGER.VALUE}=1'
+			}
+		];
 
-	jQuery.each(data, function(label, value) {
+	jQuery.each(expressions, function(key, expression) {
 		items[items.length] = {
-			label: label,
+			label: expression.label,
 			clickCallback: function() {
-				var expression = jQuery('#expr_temp');
+				var expressionInput = jQuery('#expr_temp');
 
-				if (expression.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+				if (expressionInput.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 					return false;
 				}
 
-				var sign, valueString;
-
-				if (value >= 10) {
-					valueString = value % 10;
-					sign = '#';
-				}
-				else {
-					valueString = value;
-					sign = '=';
-				}
-
-				expression.val('{TRIGGER.VALUE}' + sign + valueString);
+				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menuPopup').fadeOut(100);
 			}
@@ -768,7 +767,7 @@ function getMenuPopupTriggerMacro(options) {
 	});
 
 	return [{
-		label: t('Insert macro'),
+		label: t('Insert expression'),
 		items: items
 	}];
 }

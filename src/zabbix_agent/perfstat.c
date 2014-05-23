@@ -334,19 +334,6 @@ void	collect_perfstat()
 			continue;
 		}
 
-		if (PERF_COUNTER_INITIALIZED < cptr->status)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() counterpath:'%s' old first:%I64d second:%I64d",
-					__function_name, cptr->counterpath,
-					cptr->rawValues[(cptr->olderRawValue + 1) & 1].FirstValue,
-					cptr->rawValues[(cptr->olderRawValue + 1) & 1].SecondValue);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() counterpath:'%s' new first:%I64d second:%I64d",
-					__function_name, cptr->counterpath,
-					cptr->rawValues[cptr->olderRawValue].FirstValue,
-					cptr->rawValues[cptr->olderRawValue].SecondValue);
-		}
-
 		cptr->olderRawValue = (cptr->olderRawValue + 1) & 1;
 
 		pdh_status = PdhCalculateCounterFromRawValue(cptr->handle, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100,
@@ -393,9 +380,6 @@ void	collect_perfstat()
 
 		if (ERROR_SUCCESS == pdh_status)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s' calculated value:" ZBX_FS_DBL, __function_name,
-					cptr->counterpath, value.doubleValue);
-
 			cptr->status = PERF_COUNTER_ACTIVE;
 			cptr->value_current = (cptr->value_current + 1) % cptr->interval;
 			if (cptr->value_count == cptr->interval)

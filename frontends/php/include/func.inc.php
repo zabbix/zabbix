@@ -92,11 +92,13 @@ function get_request($name, $def = null) {
 function countRequest($str = null) {
 	if (!empty($str)) {
 		$count = 0;
+
 		foreach ($_REQUEST as $name => $value) {
-			if (strstr($name, $str)) {
+			if (strpos($name, $str) !== false) {
 				$count++;
 			}
 		}
+
 		return $count;
 	}
 	else {
@@ -286,14 +288,14 @@ function zbx_date2str($format, $value = null) {
 	);
 
 	$output = $part = '';
-	$length = zbx_strlen($format);
+	$length = strlen($format);
 
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
-		$char = zbx_substr($format, $i, 1);
+		$pchar = ($i > 0) ? substr($format, $i - 1, 1) : '';
+		$char = substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
-			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
+			$output .= (strlen($part) ? date($part, $value) : '').$rplcs[$char];
 			$part = '';
 		}
 		else {
@@ -301,7 +303,7 @@ function zbx_date2str($format, $value = null) {
 		}
 	}
 
-	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+	$output .= (strlen($part) > 0) ? date($part, $value) : '';
 
 	return $prefix.$output;
 }
@@ -351,7 +353,7 @@ function rgb2hex($color) {
 		dechex($color[2])
 	);
 	foreach ($HEX as $id => $value) {
-		if (zbx_strlen($value) != 2) {
+		if (strlen($value) != 2) {
 			$HEX[$id] = '0'.$value;
 		}
 	}
@@ -364,10 +366,10 @@ function hex2rgb($color) {
 		$color = substr($color, 1);
 	}
 
-	if (zbx_strlen($color) == 6) {
+	if (strlen($color) == 6) {
 		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
 	}
-	elseif (zbx_strlen($color) == 3) {
+	elseif (strlen($color) == 3) {
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	}
 	else {
@@ -601,7 +603,7 @@ function convert_units($options = array()) {
 
 	// special processing for unix timestamps
 	if ($options['units'] == 'unixtime') {
-		return zbx_date2str(_('Y.m.d H:i:s'), $options['value']);
+		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $options['value']);
 	}
 
 	// special processing of uptime
@@ -950,152 +952,23 @@ function zbx_formatDomId($value) {
 	return str_replace(array('[', ']'), array('_', ''), $value);
 }
 
-function zbx_strlen($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strlen($str);
-	}
-	else {
-		return strlen($str);
-	}
-}
-
-function zbx_strstr($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$pos = mb_strpos($haystack, $needle);
-		if ($pos !== false) {
-			return mb_substr($haystack, $pos);
-		}
-		else {
-			return false;
-		}
-	}
-	else {
-		return strstr($haystack, $needle);
-	}
-}
-
-function zbx_stristr($haystack, $needle) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$haystack_B = mb_strtoupper($haystack);
-		$needle = mb_strtoupper($needle);
-
-		$pos = mb_strpos($haystack_B, $needle);
-		if ($pos !== false) {
-			$pos = mb_substr($haystack, $pos);
-		}
-		return $pos;
-	}
-	else {
-		return stristr($haystack, $needle);
-	}
-}
-
-function zbx_substring($haystack, $start, $end = null) {
-	if (!is_null($end) && $end < $start) {
-		return '';
-	}
-
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		if (is_null($end)) {
-			$result = mb_substr($haystack, $start);
-		}
-		else {
-			$result = mb_substr($haystack, $start, ($end - $start));
-		}
-	}
-	else {
-		if (is_null($end)) {
-			$result = substr($haystack, $start);
-		}
-		else {
-			$result = substr($haystack, $start, ($end - $start));
-		}
-	}
-
-	return $result;
-}
-
-function zbx_substr($string, $start, $length = null) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		if (is_null($length)) {
-			$result = mb_substr($string, $start);
-		}
-		else {
-			$result = mb_substr($string, $start, $length);
-		}
-	}
-	else {
-		if (is_null($length)) {
-			$result = substr($string, $start);
-		}
-		else {
-			$result = substr($string, $start, $length);
-		}
-	}
-
-	return $result;
-}
-
-function zbx_str_revert($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$result = '';
-		$stop = mb_strlen($str);
-		for ($idx = 0; $idx < $stop; $idx++) {
-			$result = mb_substr($str, $idx, 1).$result;
-		}
-	}
-	else {
-		$result = strrev($str);
-	}
-
-	return $result;
-}
-
-function zbx_strtoupper($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strtoupper($str);
-	}
-	else {
-		return strtoupper($str);
-	}
-}
-
-function zbx_strtolower($str) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strtolower($str);
-	}
-	else {
-		return strtolower($str);
-	}
-}
-
-function zbx_strpos($haystack, $needle, $offset = 0) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_strpos($haystack, $needle, $offset);
-	}
-	else {
-		return strpos($haystack, $needle, $offset);
-	}
-}
-
-function zbx_stripos($haystack, $needle, $offset = 0) {
-	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$haystack = mb_convert_case($haystack, MB_CASE_LOWER);
-		$needle = mb_convert_case($needle, MB_CASE_LOWER);
-		return mb_strpos($haystack, $needle, $offset);
-	}
-	else {
-		return stripos($haystack, $needle, $offset);
-	}
-}
-
-/************* SELECT *************/
-function selectByPattern(&$table, $column, $pattern, $limit) {
+/**
+ * Sort an array of objects so that the objects whose $column value matches $pattern are at the top.
+ * Return the first $limit objects.
+ *
+ * @param array 	$table		array of objects to sort
+ * @param string 	$column		name of the $column to search
+ * @param string 	$pattern	string to match the value of $column against
+ * @param int		$limit		number of objects to return
+ *
+ * @return array
+ */
+function selectByPattern(array $table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();
 	foreach ($table as $num => $row) {
-		if (zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern)) {
+		if (mb_strtolower($row[$column]) === mb_strtolower($pattern)) {
 			$rsTable = array($num => $row) + $rsTable;
 		}
 		elseif ($limit > 0) {
@@ -1510,11 +1383,11 @@ function zbx_str2links($text) {
 
 	$start = 0;
 	foreach ($matches[0] as $match) {
-		$result[] = zbx_substr($text, $start, $match[1] - $start);
+		$result[] = mb_substr($text, $start, $match[1] - $start);
 		$result[] = new CLink($match[0], $match[0], null, null, true);
-		$start = $match[1] + zbx_strlen($match[0]);
+		$start = $match[1] + mb_strlen($match[0]);
 	}
-	$result[] = zbx_substr($text, $start, zbx_strlen($text));
+	$result[] = mb_substr($text, $start, mb_strlen($text));
 
 	return $result;
 }
@@ -2048,7 +1921,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$lst_error = new CList(null,'messages');
 			foreach ($ZBX_MESSAGES as $msg) {
 				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && 'error' != zbx_strtolower($msg['type']));
+				$bool = ($bool && 'error' !== strtolower($msg['type']));
 			}
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);
@@ -2326,20 +2199,16 @@ function get_status() {
 			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect(
-			'SELECT COUNT(*) AS usr_cnt'.
-			' FROM users u'.
-			whereDbNode('u.userid')
-	));
+	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u'));
+
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
 	$db_sessions = DBselect(
-			'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-			' FROM sessions s'.
-			' WHERE s.status='.ZBX_SESSION_ACTIVE.
-				andDbNode('s.userid').
-			' GROUP BY s.userid,s.status'
+		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+		' FROM sessions s'.
+		' WHERE s.status='.ZBX_SESSION_ACTIVE.
+		' GROUP BY s.userid,s.status'
 	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
@@ -2350,12 +2219,12 @@ function get_status() {
 	// comments: !!! Don't forget sync code with C !!!
 	$row = DBfetch(DBselect(
 		'SELECT SUM(1.0/i.delay) AS qps'.
-				' FROM items i,hosts h'.
-				' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0'.
-				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
+		' FROM items i,hosts h'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+		' AND i.hostid=h.hostid'.
+		' AND h.status='.HOST_STATUS_MONITORED.
+		' AND i.delay<>0'.
+		' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	$status['qps_total'] = round($row['qps'], 2);
 
@@ -2421,12 +2290,6 @@ function imageOut(&$image, $format = null) {
 		default:
 			echo $imageId;
 	}
-}
-
-function encode_log($data) {
-	return (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
-			? mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT)
-			: $data;
 }
 
 /**

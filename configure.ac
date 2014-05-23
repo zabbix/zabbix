@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([Zabbix],[2.3.0])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -54,7 +54,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h arpa/inet.h \
   sys/vmmeter.h strings.h vm/vm_param.h \
-  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
+  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
   nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
@@ -877,18 +877,6 @@ darwin*|rhapsody*)
 	;;
 *solaris*)
 	ARCH="solaris"
-	dnl Forcing a 64-bit application for a 64-bit Solaris
-	dnl A 32-bit program that uses /proc is able to look at 32-bit processes,
-	dnl but is not able to understand all attributes of a 64-bit process.
-	AC_MSG_CHECKING(for -m64 compilation flag)
-	saved_CFLAGS="$CFLAGS"
-	CFLAGS="-m64"
-	AC_TRY_RUN(
-	[int main(void) {return 0;}],
-	CFLAGS="-m64 $saved_CFLAGS"
-	AC_MSG_RESULT(yes),
-	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT(no))
 	;;
 hpux*)
 	ARCH="hpux"
@@ -933,19 +921,47 @@ if test "x$ARCH" = "xlinux"; then
 	esac
 fi
 
-dnl Low Level Discovery needs a way to get the list of network
-dnl interfaces available on the monitored system. On HP-UX systems
-dnl that way depends on the OS version.
+if test "x$ARCH" = "xsolaris"; then
+	dnl Forcing a 64-bit application for a 64-bit Solaris
+	dnl A 32-bit program that uses /proc is able to look at 32-bit processes,
+	dnl but is not able to understand all attributes of a 64-bit process.
+	AC_MSG_CHECKING(for -m64 compilation flag)
+	saved_CFLAGS="$CFLAGS"
+	CFLAGS="-m64"
+	AC_TRY_RUN(
+	[int main(void) {return 0;}],
+	CFLAGS="-m64 $saved_CFLAGS"
+	AC_MSG_RESULT(yes),
+	CFLAGS="$saved_CFLAGS"
+	AC_MSG_RESULT(no))
+fi
+
 if test "x$ARCH" = "xhpux"; then
+	dnl Low Level Discovery needs a way to get the list of network
+	dnl interfaces available on the monitored system. On HP-UX systems
+	dnl that way depends on the OS version.
 	hpux_version=${host_os#hpux}
 	hpux_major=${hpux_version%.*}
 	hpux_minor=${hpux_version#*.}
 
 	AC_DEFINE_UNQUOTED([HPUX_VERSION], $hpux_major$hpux_minor, [Define to HP-UX version])
+
+	dnl This API level is needed so that "utsname.nodename" is not truncated.
+	AC_MSG_CHECKING(for -D_HPUX_API_LEVEL=20040821 compilation flag)
+	saved_CFLAGS="$CFLAGS"
+	CFLAGS="-D_HPUX_API_LEVEL=20040821"
+	AC_TRY_RUN(
+	[int main(void) {return 0;}],
+	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
+	AC_MSG_RESULT(yes),
+	CFLAGS="$saved_CFLAGS"
+	AC_MSG_RESULT(no))
 fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
+
+AC_CHECK_SIZEOF([void *])
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1417,13 +1433,11 @@ AC_OUTPUT([
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/nodewatcher/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
