@@ -498,6 +498,7 @@ class CHttpTest extends CApiService {
 			unset($httpTest['templateid']);
 
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
+			$httpTest['hostid'] = $dbHttpTest['hostid'];
 
 			// validate name on update
 			if (isset($httpTest['name'])) {
@@ -515,10 +516,8 @@ class CHttpTest extends CApiService {
 					}
 				}
 			}
-
-			if ($dbHttpTest['templateid']) {
+			elseif ($dbHttpTest['templateid']) {
 				$httpTest['name'] = $dbHttpTest['name'];
-				$httpTest['hostid'] = $dbHttpTest['hostid'];
 			}
 
 			if (!empty($httpTest['steps'])) {
