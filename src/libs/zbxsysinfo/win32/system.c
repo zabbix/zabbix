@@ -361,8 +361,6 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (vi = zbx_win_getversion()))
 	{
-		SET_MSG_RESULT(result, "cannot retrieve system version");
-	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}

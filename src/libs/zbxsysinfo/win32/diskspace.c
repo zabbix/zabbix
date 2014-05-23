@@ -46,7 +46,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
 	{
 		zbx_free(wpath);
-		SET_MSG_RESULT(result, "Cannot obtain filesystem information.");
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain filesystem information."));
 		return SYSINFO_RET_FAIL;
 	}
 	zbx_free(wpath);
@@ -132,7 +132,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 
