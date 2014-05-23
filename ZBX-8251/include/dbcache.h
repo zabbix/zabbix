@@ -102,6 +102,7 @@ typedef struct
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
 	char		inventory_mode;
+	unsigned char	status;
 }
 DC_HOST;
 
@@ -125,6 +126,7 @@ typedef struct
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
+	unsigned char	status;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
@@ -368,7 +370,7 @@ int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();
 
-void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids);
+void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
