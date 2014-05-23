@@ -234,7 +234,7 @@ foreach ($hosts as $hnum => $host) {
 
 $searchHostWidget = new CCollapsibleUIWidget('search_hosts', $table);
 $searchHostWidget->open = (bool) CProfile::get('web.search.hats.search_hosts.state', true);
-$searchHostWidget->setHeader(_('Hosts'), SPACE);
+$searchHostWidget->setHeader(_('Hosts'));
 $searchHostWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
 $searchWidget->addItem(new CDiv($searchHostWidget));
@@ -336,7 +336,7 @@ foreach ($hostGroups as $hnum => $group) {
 
 $searchHostGroupWidget = new CCollapsibleUIWidget('search_hostgroup', $table);
 $searchHostGroupWidget->open = (bool) CProfile::get('web.search.hats.search_hostgroup.state', true);
-$searchHostGroupWidget->setHeader(_('Host groups'), SPACE);
+$searchHostGroupWidget->setHeader(_('Host groups'));
 $searchHostGroupWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
 $searchWidget->addItem(new CDiv($searchHostGroupWidget));
@@ -482,7 +482,7 @@ if ($admin) {
 
 	$searchTemplateWidget = new CCollapsibleUIWidget('search_templates', $table);
 	$searchTemplateWidget->open = (bool) CProfile::get('web.search.hats.search_templates.state', true);
-	$searchTemplateWidget->setHeader(_('Templates'), SPACE);
+	$searchTemplateWidget->setHeader(_('Templates'));
 	$searchTemplateWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
 	$searchWidget->addItem(new CDiv($searchTemplateWidget));
