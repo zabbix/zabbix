@@ -1651,7 +1651,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_name_esc, *field_name_esc;
+	char		*table_schema_esc, *table_name_esc, *table_schema_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
 	char		*table_name_esc;
@@ -1706,6 +1706,8 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+			"public" : CONFIG_DBSCHEMA);
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
 
@@ -1713,11 +1715,13 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 			"select 1"
 			" from information_schema.columns"
 			" where table_name='%s'"
-				" and column_name='%s'",
-			table_name_esc, field_name_esc);
+				" and column_name='%s'"
+				" and table_schema='%s'",
+			table_name_esc, field_name_esc, table_schema_esc);
 
 	zbx_free(field_name_esc);
 	zbx_free(table_name_esc);
+	zbx_free(table_schema_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
