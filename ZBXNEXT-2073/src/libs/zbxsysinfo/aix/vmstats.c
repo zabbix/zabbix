@@ -77,7 +77,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else if (0 == collector->vmstat.shared_enabled)
 		{
-			SET_MSG_RESULT(result, strdup("No data available in collector."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "No data available in collector."));
 			return SYSINFO_RET_FAIL;
 		}
 		else
