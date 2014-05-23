@@ -33,6 +33,10 @@ class Curl {
 	protected $query;
 	protected $arguments;
 
+	protected $skippedArguments = array(
+		'__default' => array('go', 'form', 'delete')
+	);
+
 	public function __construct($url = null) {
 		$this->url = null;
 		$this->port = null;
@@ -171,13 +175,13 @@ class Curl {
 		$this->query = implode('&', $query);
 	}
 
-	public function formatGetArguments($exclude = array()) {
+	public function formatGetArguments() {
 		$this->arguments = $_GET;
-		foreach ($this->arguments as $key => $val) {
-			if (in_array($key, $exclude)) {
-				unset($this->arguments[$key]);
-			}
+
+		foreach ($this->getSkippedArguments() as $argument) {
+			$this->removeArgument($argument);
 		}
+
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
 		}
@@ -317,5 +321,18 @@ class Curl {
 
 	public function toString() {
 		return $this->getUrl();
+	}
+
+	protected function getSkippedArguments()
+	{
+		global $page;
+
+		$file = isset($page['file']) ? $page['file'] : null;
+
+		if (isset($this->skippedArguments[$file])) {
+			return $this->skippedArguments[$file];
+		} else {
+			return $this->skippedArguments['__default'];
+		}
 	}
 }

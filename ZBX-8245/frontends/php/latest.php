@@ -30,8 +30,6 @@ $page['scripts'] = array();
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-define('ZBX_PAGE_MAIN_HAT','hat_latest');
-
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
@@ -173,7 +171,6 @@ if(isset($showAll)){
 		url_param('hostid').
 		url_param('select');
 	$link = new CLink(new CImg('images/general/minus.png'),$url);
-//		$link = new CLink(new CImg('images/general/minus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 else{
 	$url = '?open=1'.
@@ -181,7 +178,6 @@ else{
 		url_param('hostid').
 		url_param('select');
 	$link = new CLink(new CImg('images/general/plus.png'),$url);
-//		$link = new CLink(new CImg('images/general/plus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 
 $table = new CTableInfo(_('No values found.'));
