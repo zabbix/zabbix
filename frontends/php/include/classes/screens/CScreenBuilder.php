@@ -237,7 +237,7 @@ class CScreenBuilder {
 				elseif (isset($options['screenid'])) {
 					$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
 						'screenids' => array($options['screenid']),
-						'output' => array('templateid')
+						'output' => array()
 					));
 				}
 
