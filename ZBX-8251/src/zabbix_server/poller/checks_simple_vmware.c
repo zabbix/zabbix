@@ -391,7 +391,7 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 				"Unknown VMware service error"));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service: %s",
-				(NULL == service->data->error ? "unknown error" : service->data->error));
+				NULL != service->data->error ? service->data->error : "unknown error");
 
 		*ret = SYSINFO_RET_FAIL;
 		service = NULL;
@@ -928,7 +928,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NAME}", name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
-				(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
+				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 
 		zbx_free(name);
@@ -1661,7 +1661,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.NAME}", vm_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.NAME}", hv_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
-					(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
+					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json_data);
 
 			zbx_free(hv_name);
@@ -2521,7 +2521,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 	else if (0 == strcmp(mode, "used"))
 		SET_UI64_RESULT(result, value_total - value_free);
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+		SET_DBL_RESULT(result, 0 != value_total ? (double)(100.0 * value_free) / value_total : 0);
 	else if (0 == strcmp(mode, "pused"))
 		SET_DBL_RESULT(result, 100.0 - (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
 	else
