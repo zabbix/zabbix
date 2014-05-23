@@ -390,7 +390,7 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 		SET_MSG_RESULT(result, zbx_strdup(NULL, NULL != service->data->error ? service->data->error :
 				"Unknown VMware service error"));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service at %s: %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to query VMware service: %s",
 				(NULL == service->data->error ? "unknown error" : service->data->error));
 
 		*ret = SYSINFO_RET_FAIL;
