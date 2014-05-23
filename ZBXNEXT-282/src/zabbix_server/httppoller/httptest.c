@@ -280,7 +280,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 }
 
 #ifdef HAVE_LIBCURL
-static void	zbx_add_headers(char *headers, struct curl_slist **headers_slist)
+static void	zbx_add_headers(const char *headers, struct curl_slist **headers_slist)
 {
 	const char	*p_start;
 	char		*p;
@@ -380,9 +380,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
-			0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
+					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
-			0 == httptest->httptest.verify_host ? 0L : 2L)))
+					0 == httptest->httptest.verify_host ? 0L : 2L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -413,7 +413,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
-				httptest->httptest.ssl_key_password)))
+						httptest->httptest.ssl_key_password)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto clean;
@@ -452,7 +452,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		httpstep.variables = row[8];
 		httpstep.follow_redirects = atoi(row[9]);
-
 		httpstep.retrieve_mode = atoi(row[10]);
 
 		httpstep.headers = zbx_strdup(NULL, row[11]);
@@ -646,11 +645,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		zbx_free(page.data);
 httpstep_error:
+		zbx_free(httpstep.headers);
 		zbx_free(httpstep.status_codes);
 		zbx_free(httpstep.required);
 		zbx_free(httpstep.posts);
 		zbx_free(httpstep.url);
-		zbx_free(httpstep.headers);
 
 		zbx_timespec(&ts);
 		process_step_data(httpstep.httpstepid, &stat, &ts);
@@ -814,7 +813,7 @@ int	process_httptests(int httppoller_num, int now)
 		httptest.httptest.verify_peer = atoi(row[16]);
 		httptest.httptest.verify_host = atoi(row[17]);
 
-		/* add httptest varriables to the current test macro cache */
+		/* add httptest variables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
 
 		process_httptest(&host, &httptest);
