@@ -516,7 +516,7 @@ class CHttpTest extends CApiService {
 					}
 				}
 			}
-			elseif ($dbHttpTest['templateid']) {
+			elseif (!isset($httpTest['name']) || $dbHttpTest['templateid']) {
 				$httpTest['name'] = $dbHttpTest['name'];
 			}
 
@@ -533,8 +533,8 @@ class CHttpTest extends CApiService {
 				}
 				unset($httpTestStep);
 
-				$this->checkSteps($httpTest);
-				$this->checkDuplicateSteps($httpTest);
+				$this->checkSteps($httpTest, $dbHttpTest);
+				$this->checkDuplicateSteps($httpTest, $dbHttpTest);
 			}
 		}
 		unset($httpTest);
@@ -594,9 +594,12 @@ class CHttpTest extends CApiService {
 	 *  - check status_codes field
 	 *  - check name characters
 	 *
+	 * throws APIException if incorrect characters are passed, incorrect step numbers step is missing.
+	 *
 	 * @param array $httpTest
+	 * @param array $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
@@ -610,16 +613,43 @@ class CHttpTest extends CApiService {
 				$this->checkStatusCode($step['status_codes']);
 			}
 		}
+
+		// check if step still exists on update
+		if ($dbHttpTest) {
+			foreach ($httpTest['steps'] as $step) {
+				if (isset($step['httpstepid']) && !isset($dbHttpTest['steps'][$step['httpstepid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+			}
+		}
 	}
 
 	/**
 	 * Check duplicate step names.
 	 *
+	 * @throws APIException if duplicate step name is found.
+	 *
 	 * @param array $httpTest
+	 * @param array $dbHttpTest
 	 */
-	protected function checkDuplicateSteps(array $httpTest) {
+	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = array()) {
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
+		}
+
+		// check if name exists on update
+		if ($dbHttpTest) {
+			$dbHttpTestStepNames = zbx_toHash($dbHttpTest['steps'], 'name');
+
+			foreach ($httpTest['steps'] as $step) {
+				if (!isset($step['httpstepid']) && isset($dbHttpTestStepNames[$step['name']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Web scenario step "%1$s" already exists.', $step['name'])
+					);
+				}
+			}
 		}
 	}
 
