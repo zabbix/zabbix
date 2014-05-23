@@ -449,7 +449,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	if (NULL == (vi = zbx_win_getversion()))
 	{
-		SET_MSG_RESULT(result, "cannot retrieve system version");
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
 		return SYSINFO_RET_FAIL;
 	}
 
