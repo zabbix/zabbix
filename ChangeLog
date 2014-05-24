@@ -145,6 +145,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 
 Bug fixes:
 .......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
+........S. [ZBX-8092] added disabled hosts, disabled items and active items of disabled hosts to the configuration cache (igors)
 ........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
 ...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
