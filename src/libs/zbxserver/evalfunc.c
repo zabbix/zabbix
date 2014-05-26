@@ -1158,7 +1158,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdup(*error, "item does not exist, disabled"
+				*error = zbx_strdup(*error, "item does not exist, is disabled"
 						" or belongs to a disabled host");
 			}
 			goto out;
@@ -1168,8 +1168,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdup(*error,
-						"item does not have enough data after server start/item creation");
+				*error = zbx_strdup(*error, "item does not have enough data"
+						" after server start or item creation");
 			}
 			goto out;
 		}
