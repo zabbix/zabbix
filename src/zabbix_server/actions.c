@@ -1289,17 +1289,23 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid, unsigned char evaltype)
+static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid, unsigned char evaltype,
+		const char *formula)
 {
 	const char	*__function_name = "check_action_conditions";
 
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_CONDITION	condition;
-	int		cond, exit = 0, ret = SUCCEED;	/* SUCCEED required for CONDITION_EVAL_TYPE_AND_OR */
+	int		condition_result, ret = SUCCEED, id_len;
 	unsigned char	old_type = 0xff;
+	char		*expression = NULL, tmp[32], *ptr, error[256];
+	double		eval_result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
+
+	if (evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+		expression = zbx_strdup(expression, formula);
 
 	result = DBselect(
 			"select conditionid,conditiontype,operator,value"
@@ -1308,7 +1314,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 			" order by conditiontype",
 			actionid);
 
-	while (NULL != (row = DBfetch(result)) && 0 == exit)
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(condition.conditionid, row[0]);
 		condition.actionid = actionid;
@@ -1316,56 +1322,75 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 		condition.operator = (unsigned char)atoi(row[2]);
 		condition.value = row[3];
 
+		condition_result = check_action_condition(event, &condition);
+
 		switch (evaltype)
 		{
 			case CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition.conditiontype)	/* OR conditions */
+				if (old_type == condition.conditiontype)
 				{
-					if (SUCCEED == check_action_condition(event, &condition))
+					if (SUCCEED == condition_result)
 						ret = SUCCEED;
 				}
-				else						/* AND conditions */
+				else
 				{
-					if (FAIL == ret)	/* break if PREVIOUS AND condition is FALSE */
-						exit = 1;
-					else if (FAIL == check_action_condition(event, &condition))
-						ret = FAIL;
-				}
+					if (FAIL == ret)
+						goto out;
 
-				old_type = condition.conditiontype;
+					ret = condition_result;
+					old_type = condition.conditiontype;
+				}
 
 				break;
 			case CONDITION_EVAL_TYPE_AND:
-				cond = check_action_condition(event, &condition);
-
-				if (FAIL == cond)	/* break if any AND condition is FALSE */
+				if (FAIL == condition_result)	/* break if any AND condition is FALSE */
 				{
 					ret = FAIL;
-					exit = 1;
+					goto clean;
 				}
 				else
 					ret = SUCCEED;
 
 				break;
 			case CONDITION_EVAL_TYPE_OR:
-				cond = check_action_condition(event, &condition);
-
-				if (SUCCEED == cond)	/* break if any OR condition is TRUE */
+				if (SUCCEED == condition_result)	/* break if any OR condition is TRUE */
 				{
 					ret = SUCCEED;
-					exit = 1;
+					goto clean;
 				}
-				else
-					ret = FAIL;
+				ret = FAIL;
+
+				break;
+			case CONDITION_EVAL_TYPE_EXPRESSION:
+				zbx_snprintf(tmp, sizeof(tmp), "{" ZBX_FS_UI64 "}", condition.conditionid);
+				id_len = strlen(tmp);
+				ptr = expression;
+
+				while (NULL != (ptr = strstr(ptr, tmp)))
+				{
+					*ptr = (SUCCEED == condition_result ? '1' : '0');
+					memset(ptr + 1, ' ', id_len - 1);
+					ptr += id_len;
+				}
 
 				break;
 			default:
 				ret = FAIL;
-				exit = 1;
+				goto clean;
 		}
 	}
-	DBfree_result(result);
 
+	if (evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
+	{
+		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error)))
+			ret = zbx_double_compare(eval_result, 1.0);
+
+		zbx_free(expression);
+	}
+
+clean:
+	DBfree_result(result);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1553,7 +1578,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 	{
 		event = &events[i];
 
-		result = DBselect("select actionid,evaltype"
+		result = DBselect("select actionid,evaltype,formula"
 				" from actions"
 				" where status=%d"
 					" and eventsource=%d",
@@ -1564,7 +1589,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			ZBX_STR2UINT64(actionid, row[0]);
 			evaltype = (unsigned char)atoi(row[1]);
 
-			if (SUCCEED == check_action_conditions(event, actionid, evaltype))
+			if (SUCCEED == check_action_conditions(event, actionid, evaltype, row[2]))
 			{
 				escalation_add_values(&db_insert, escalations_num++, actionid, event, 0);
 

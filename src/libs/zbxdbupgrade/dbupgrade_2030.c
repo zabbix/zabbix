@@ -1053,7 +1053,6 @@ static int	DBpatch_2030096(void)
 	return DBadd_field("actions", &field);
 }
 
-
 #endif
 
 DBPATCH_START(2030)
