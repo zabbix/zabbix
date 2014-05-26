@@ -1,3 +1,11 @@
+Changes for 2.3.1
+
+New features:
+A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-8221] corrected labels while copying items (Andrejs)
+
 --------------------------------------------------------------------------------
 Changes for 2.3.0
 
@@ -136,6 +144,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
 ........S. [ZBX-8092] added disabled hosts, disabled items and active items of disabled hosts to the configuration cache (igors)
 ........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
 ...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
