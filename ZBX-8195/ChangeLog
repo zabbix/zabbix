@@ -6,6 +6,14 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
+........S. [ZBX-8092] added disabled hosts, disabled items and active items of disabled hosts to the configuration cache (igors)
+........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
+...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
+........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
+........S. [ZBX-8219] fixed regression in ipmi checks to support on/off values for sent commands (Juris)
+...G...... [ZBX-8213] fixed library loading code on Windows to prevent potential crash condition (Juris)
+...G...... [ZBX-8223] fixed compilation of dummy module on 64-bit platforms by adding "-fPIC" (asaveljevs)
 .........T [ZBX-7387] changed default memory usage graph display method for operating system templates (Juris)
 A.F....... [ZBX-8101] fixed exporting maps from Oracle database (Eduard, Ivo)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
@@ -944,6 +952,7 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 ...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
 
