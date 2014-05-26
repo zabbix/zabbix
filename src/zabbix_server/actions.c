@@ -1299,7 +1299,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 	DB_CONDITION	condition;
 	int		condition_result, ret = SUCCEED, id_len;
 	unsigned char	old_type = 0xff;
-	char		*expression = NULL, tmp[32], *ptr, error[256];
+	char		*expression = NULL, tmp[ZBX_MAX_UINT64_LEN + 2], *ptr, error[256];
 	double		eval_result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
@@ -1348,8 +1348,6 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 					ret = FAIL;
 					goto clean;
 				}
-				else
-					ret = SUCCEED;
 
 				break;
 			case CONDITION_EVAL_TYPE_OR:
@@ -1364,13 +1362,11 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 			case CONDITION_EVAL_TYPE_EXPRESSION:
 				zbx_snprintf(tmp, sizeof(tmp), "{" ZBX_FS_UI64 "}", condition.conditionid);
 				id_len = strlen(tmp);
-				ptr = expression;
 
-				while (NULL != (ptr = strstr(ptr, tmp)))
+				for (ptr = expression; NULL != (ptr = strstr(ptr, tmp)); ptr += id_len)
 				{
 					*ptr = (SUCCEED == condition_result ? '1' : '0');
 					memset(ptr + 1, ' ', id_len - 1);
-					ptr += id_len;
 				}
 
 				break;
@@ -1383,11 +1379,10 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_uint64_t actionid,
 	if (evaltype == CONDITION_EVAL_TYPE_EXPRESSION)
 	{
 		if (SUCCEED == evaluate(&eval_result, expression, error, sizeof(error)))
-			ret = zbx_double_compare(eval_result, 1.0);
+			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
 
 		zbx_free(expression);
 	}
-
 clean:
 	DBfree_result(result);
 out:
@@ -1587,7 +1582,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(actionid, row[0]);
-			evaltype = (unsigned char)atoi(row[1]);
+			ZBX_STR2UCHAR(evaltype, row[1]);
 
 			if (SUCCEED == check_action_conditions(event, actionid, evaltype, row[2]))
 			{
