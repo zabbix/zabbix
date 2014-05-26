@@ -3598,15 +3598,32 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 
 			if (SUCCEED != errcodes[i])
 			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function [%s(%s)]:"
-						" item does not exist, is disabled or belongs to a disabled host.",
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
+						" item does not exist.",
 						func->function, func->parameter);
+				continue;
+			}
+
+			if (ITEM_STATUS_ACTIVE != items[i].status)
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item is disabled.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item belongs to a disabled host.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 				continue;
 			}
 
 			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
 			{
-				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}.",
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item is not supported.",
 						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 				continue;
 			}
@@ -3617,16 +3634,17 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 				if (NULL != error)
 				{
 					func->error = zbx_dsprintf(func->error,
-						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter,
-						error);
+							"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
+							items[i].host.host, items[i].key_orig, func->function,
+							func->parameter, error);
 					zbx_free(error);
 				}
 				else
 				{
 					func->error = zbx_dsprintf(func->error,
-						"Cannot evaluate function \"%s:%s.%s(%s)\".",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+							"Cannot evaluate function \"%s:%s.%s(%s)\".",
+							items[i].host.host, items[i].key_orig,
+							func->function, func->parameter);
 				}
 			}
 			else
