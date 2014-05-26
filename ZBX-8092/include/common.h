@@ -452,7 +452,6 @@ const char	*zbx_alert_type_string(unsigned char type);
 /* item statuses */
 #define ITEM_STATUS_ACTIVE		0
 #define ITEM_STATUS_DISABLED		1
-#define ITEM_STATUS_DELETED		2
 
 /* item states */
 #define ITEM_STATE_NORMAL		0
@@ -518,7 +517,7 @@ zbx_maintenance_type_t;
 #define HOST_STATUS_NOT_MONITORED	1
 /*#define HOST_STATUS_UNREACHABLE	2*/
 #define HOST_STATUS_TEMPLATE		3
-#define HOST_STATUS_DELETED		4
+/*#define HOST_STATUS_DELETED		4*/
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
 

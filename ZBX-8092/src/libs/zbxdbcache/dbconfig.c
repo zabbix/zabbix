@@ -105,7 +105,6 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
-	unsigned char	old_status;
 }
 ZBX_DC_ITEM;
 
@@ -250,7 +249,6 @@ typedef struct
 	unsigned char	ipmi_available;
 	unsigned char	jmx_available;
 	unsigned char	status;
-	unsigned char	old_status;
 }
 ZBX_DC_HOST;
 
@@ -876,6 +874,7 @@ static void	DCsync_items(DB_RESULT result)
 
 	time_t			now;
 	unsigned char		old_poller_type;
+	unsigned char		old_item_status;
 	int			delay, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
@@ -954,6 +953,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->history = atoi(row[36]);
 		ZBX_STR2UCHAR(item->inventory_link, row[38]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
+		old_item_status = item->status;
 		item->status = (unsigned char)atoi(row[42]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
@@ -972,7 +972,6 @@ static void	DCsync_items(DB_RESULT result)
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
-			item->old_status = ITEM_STATUS_DELETED;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -988,10 +987,8 @@ static void	DCsync_items(DB_RESULT result)
 			item->triggers[0] = NULL;
 		}
 
-		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != item->old_status)
+		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_item_status)
 			item->data_expected_from = now;
-
-		item->old_status = item->status;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1836,6 +1833,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
 	unsigned char		status;
+	unsigned char		old_host_status;
 	time_t			now;
 	signed char		ipmi_authtype;
 	unsigned char		ipmi_privilege;
@@ -1891,6 +1889,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
+		old_host_status = host->status;
 		host->status = status;
 
 		if (0 == found)
@@ -1912,13 +1911,10 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
-			host->old_status = HOST_STATUS_DELETED;
 		}
 
-		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != host->old_status)
+		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != old_host_status)
 			host->data_expected_from = 0;
-
-		host->old_status = host->status;
 
 		/* update hosts_h index using new data, if not done already */
 
