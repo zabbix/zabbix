@@ -632,7 +632,7 @@ else {
 	// fetch item
 	$item = API::Item()->get(array(
 		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-		'selectHosts' => array('host'),
+		'selectHosts' => array('host', 'name'),
 		'itemids' => $itemId,
 		'webitems' => true,
 		'filter' => array('flags' => null)
@@ -646,8 +646,8 @@ if ($itemId) {
 
 	$itemValueType = $item['value_type'];
 	$itemKey = $item['key_'];
-	$itemHost = reset($item['hosts']);
-	$itemHost = $itemHost['host'];
+	$itemHostData = reset($item['hosts']);
+	$itemHost = !empty($itemHostData['name']) ? $itemHostData['name'] : $itemHostData['host'];
 	$description = $itemHost.NAME_DELIMITER.$item['name_expanded'];
 }
 else {
@@ -726,7 +726,7 @@ if (isset($data['insert'])) {
 			}
 
 			$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
-				$data['item_host'],
+				$itemHostData['host'],
 				$data['item_key'],
 				$function,
 				rtrim(implode(',', $quotedParams), ','),
