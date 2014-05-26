@@ -280,40 +280,39 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 }
 
 #ifdef HAVE_LIBCURL
-static void	zbx_add_headers(const char *headers, struct curl_slist **headers_slist)
+static void	add_headers(char *headers, struct curl_slist **headers_slist)
 {
-	const char	*p_start;
-	char		*p;
+	char      *p_begin;
 
-	if ('\0' == *headers)
-		return;
+	p_begin = headers;
 
-	p_start = headers;
-
-	while (NULL != (p = strstr(p_start, "\r\n")) || '\0' != *p_start)
+	while ('\0' != *p_begin)
 	{
-		if (p_start != p)
-		{
-			char	*line;
+		char    c, *p_end, *line;
 
-			if (NULL != p)
-				*p = '\0';
-			line = zbx_strdup(NULL, p_start);
-			if (NULL != p)
-				*p = '\r';
+		while ('\r' == *p_begin || '\n' == *p_begin)
+			p_begin++;
 
-			zbx_lrtrim(line, ZBX_WHITESPACE);
-			if ('\0' != *line)
-				*headers_slist = curl_slist_append(*headers_slist, line);
-			zbx_free(line);
-		}
+		p_end = p_begin;
 
-		if (NULL == p)
+		while ('\0' != *p_end && '\r' != *p_end && '\n' != *p_end)
+			p_end++;
+
+		if (p_begin == p_end)
 			break;
 
-		p_start = p + 2;	/* \r\n */
-		while ('\0' != *p_start && 0 != isspace(*p_start))
-			p_start++;
+		if ('\0' != (c = *p_end))
+			*p_end = '\0';
+		line = zbx_strdup(NULL, p_begin);
+		if ('\0' != c)
+			*p_end = c;
+
+		zbx_lrtrim(line, ZBX_WHITESPACE);
+		if ('\0' != *line)
+			*headers_slist = curl_slist_append(*headers_slist, line);
+		zbx_free(line);
+
+		p_begin = p_end;
 	}
 }
 #endif
@@ -499,10 +498,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		http_substitute_variables(httptest, &httpstep.headers);
 
 		/* collect headers defined in a scenario */
-		zbx_add_headers(httptest->httptest.headers, &headers_slist);
+		add_headers(httptest->httptest.headers, &headers_slist);
 
 		/* collect headers defined in a step */
-		zbx_add_headers(httpstep.headers, &headers_slist);
+		add_headers(httpstep.headers, &headers_slist);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 		{
