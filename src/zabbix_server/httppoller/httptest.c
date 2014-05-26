@@ -567,7 +567,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
 		}
-		while (0 != --httptest->httptest.retries);
+		while (0 < --httptest->httptest.retries);
 
 		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 
