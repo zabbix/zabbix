@@ -42,5 +42,6 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/services',
 	__DIR__.'/../../api/classes',
 	__DIR__.'/include/classes/validators',
+	__DIR__.'/include/classes/parsers',
 ));
 $autoloader->register();
