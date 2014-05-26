@@ -506,8 +506,7 @@ ZABBIX.apps.map = (function($) {
 									parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 										'&srcfld1=hostid&writeonly=1',
 									width: 450,
-									height: 450,
-									buttonClass: 'input link_menu select-popup-map-element'
+									height: 450
 								}
 							});
 							break;
@@ -527,8 +526,7 @@ ZABBIX.apps.map = (function($) {
 									parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 										'&srcfld1=groupid&writeonly=1',
 									width: 450,
-									height: 450,
-									buttonClass: 'input link_menu select-popup-map-element'
+									height: 450
 								}
 							});
 							break;
@@ -1368,8 +1366,7 @@ ZABBIX.apps.map = (function($) {
 								parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 									'&srcfld1=hostid&writeonly=1',
 								width: 450,
-								height: 450,
-								buttonClass: 'input link_menu select-popup-map-element'
+								height: 450
 							}
 						});
 						break;
@@ -1390,8 +1387,7 @@ ZABBIX.apps.map = (function($) {
 								parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 									'&srcfld1=groupid&writeonly=1',
 								width: 450,
-								height: 450,
-								buttonClass: 'input link_menu select-popup-map-element'
+								height: 450
 							}
 						});
 						break;
