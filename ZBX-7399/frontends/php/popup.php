@@ -254,7 +254,7 @@ $withApplications = get_request('with_applications', 0);
 $withGraphs = get_request('with_graphs', 0);
 $withItems = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
-$excludeids = getRequest('excludeids', array());
+$excludeids = zbx_toHash(getRequest('excludeids', array()));
 $reference = get_request('reference', get_request('srcfld1', 'unknown'));
 $realHosts = get_request('real_hosts', 0);
 $monitoredHosts = get_request('monitored_hosts', 0);
@@ -449,8 +449,8 @@ if ($value_types) {
 if ($normalOnly) {
 	$frmTitle->addVar('normal_only', $normalOnly);
 }
-if (!is_null($excludeids)) {
-	$frmTitle->addVar('excludeids', $excludeids);
+if (hasRequest('excludeids')) {
+	$frmTitle->addVar('excludeids', getRequest('excludeids'));
 }
 if (isset($onlyHostid)) {
 	$frmTitle->addVar('only_hostid', $onlyHostid);
@@ -729,7 +729,7 @@ elseif ($srctbl == 'templates') {
 		}
 
 		// check for existing
-		if (in_array($template['templateid'], $excludeids)) {
+		if (isset($excludeids[$template['templateid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
@@ -806,7 +806,7 @@ elseif ($srctbl == 'hosts') {
 		}
 
 		// check for existing
-		if (in_array($host['hostid'], $excludeids)) {
+		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
@@ -884,7 +884,7 @@ elseif ($srctbl == 'host_templates') {
 		}
 
 		// check for existing
-		if (in_array($host['hostid'], $excludeids)) {
+		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
@@ -957,7 +957,7 @@ elseif ($srctbl == 'host_groups') {
 		}
 
 		// check for existing
-		if (in_array($hostgroup['groupid'], $excludeids)) {
+		if (isset($excludeids[$hostgroup['groupid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled('disabled');
@@ -1546,8 +1546,6 @@ elseif ($srctbl == 'sysmaps') {
 
 	$table->setHeader($header);
 
-	$excludeids = zbx_toHash($excludeids);
-
 	$options = array(
 		'nodeids' => $nodeId,
 		'output' => API_OUTPUT_EXTEND,
@@ -1574,7 +1572,7 @@ elseif ($srctbl == 'sysmaps') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		if (in_array($sysmap['sysmapid'], $excludeids)) {
+		if (isset($excludeids[$sysmap['sysmapid']])) {
 			$description->removeAttr('class');
 		}
 		else {
