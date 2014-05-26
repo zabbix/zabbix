@@ -105,6 +105,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	old_status;
 }
 ZBX_DC_ITEM;
 
@@ -249,6 +250,7 @@ typedef struct
 	unsigned char	ipmi_available;
 	unsigned char	jmx_available;
 	unsigned char	status;
+	unsigned char	old_status;
 }
 ZBX_DC_HOST;
 
@@ -970,6 +972,7 @@ static void	DCsync_items(DB_RESULT result)
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
+			item->old_status = ITEM_STATUS_DELETED;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -984,6 +987,11 @@ static void	DCsync_items(DB_RESULT result)
 
 			item->triggers[0] = NULL;
 		}
+
+		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != item->old_status)
+			item->data_expected_from = now;
+
+		item->old_status = item->status;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -1904,7 +1912,13 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
+			host->old_status = HOST_STATUS_DELETED;
 		}
+
+		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != host->old_status)
+			host->data_expected_from = 0;
+
+		host->old_status = host->status;
 
 		/* update hosts_h index using new data, if not done already */
 
