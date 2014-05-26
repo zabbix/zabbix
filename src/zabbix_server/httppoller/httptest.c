@@ -307,7 +307,7 @@ static void	add_headers(char *headers, struct curl_slist **headers_slist)
 		if ('\0' != c)
 			*p_end = c;
 
-		zbx_lrtrim(line, ZBX_WHITESPACE);
+		zbx_lrtrim(line, " \t");
 		if ('\0' != *line)
 			*headers_slist = curl_slist_append(*headers_slist, line);
 		zbx_free(line);
