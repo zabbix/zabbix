@@ -210,7 +210,7 @@ $templatesFormList->addRow(
 	array(
 		_('Link templates'),
 		SPACE,
-		new CVisibilityBox('visible[templateDiv]', !empty($this->data['visible']['templateDiv']) ? 'yes' : 'no', 'templateDiv', _('Original'))
+		new CVisibilityBox('visible[templates]', isset($this->data['visible']['templates']), 'templateDiv', _('Original'))
 	),
 	$templatesDiv
 );
