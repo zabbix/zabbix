@@ -488,7 +488,7 @@ ZABBIX.apps.map = (function($) {
 					var obj = $(this);
 
 					// clean element id and name
-					$('.select-popup-map-element').remove();
+					$('.select-popup').remove();
 
 					switch (obj.val()) {
 						// host
@@ -666,7 +666,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// clean element id and name
-				$('.select-popup-map-element').remove();
+				$('.select-popup').remove();
 			},
 
 			selectElements: function(ids, addSelection) {
