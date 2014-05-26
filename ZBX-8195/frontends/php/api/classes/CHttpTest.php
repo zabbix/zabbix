@@ -593,7 +593,7 @@ class CHttpTest extends CZBXAPI {
 	 * @param array $httpTest
 	 * @param array|null $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest, array $dbHttpTest = null) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
@@ -612,13 +612,13 @@ class CHttpTest extends CZBXAPI {
 		}
 
 		foreach ($httpTest['steps'] as $step) {
-			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && (zbx_empty($step['name']) || ($step['name'] === false)))
-					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name']) || ($step['name'] === false)))) {
+			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
 			}
 
-			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && (zbx_empty($step['url']) || ($step['url'] === false)))
-					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url']) || ($step['url'] === false)))) {
+			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && zbx_empty($step['url']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url'])))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
 			}
 
