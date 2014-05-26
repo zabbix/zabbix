@@ -163,7 +163,7 @@ typedef struct
 }
 DC_FUNCTION;
 
-typedef struct _dc_trigger
+typedef struct _DC_TRIGGER
 {
 	zbx_uint64_t	triggerid;
 	char		*description;

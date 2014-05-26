@@ -53,8 +53,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_ROW			row;
 	char			failed_type_buf[8];
 	char			*sql = NULL;
-	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	DC_TRIGGER		*trigger;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DC_TRIGGER		trigger;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
@@ -153,29 +153,37 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_STATE_NORMAL,
 			HOST_STATUS_MONITORED);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger = zbx_malloc(NULL, sizeof(DC_TRIGGER));
-		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->description = zbx_strdup(NULL, row[1]);
-		trigger->expression_orig = zbx_strdup(NULL, row[2]);
-		trigger->priority = (unsigned char)atoi(row[3]);
-		trigger->type = (unsigned char)atoi(row[4]);
-		trigger->value = atoi(row[5]);
-		trigger->state = atoi(row[6]);
-		trigger->error = zbx_strdup(NULL, row[7]);
-		trigger->lastchange = atoi(row[8]);
-		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-		trigger->new_error = reason;
-		trigger->timespec = *ts;
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		trigger.description = row[1];
+		trigger.expression_orig = row[2];
+		trigger.priority = (unsigned char)atoi(row[3]);
+		trigger.type = (unsigned char)atoi(row[4]);
+		trigger.value = atoi(row[5]);
+		trigger.state = atoi(row[6]);
+		trigger.error = row[7];
+		trigger.lastchange = atoi(row[8]);
+		trigger.new_value = TRIGGER_VALUE_UNKNOWN;
+		trigger.new_error = reason;
+		trigger.timespec = *ts;
 
-		process_trigger(&sql, &sql_alloc, &sql_offset, trigger);
+		sql_offset = 0;
+
+		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, &trigger))
+		{
+			DBbegin();
+			DBexecute("%s", sql);
+			DBcommit();
+		}
 	}
 
 	zbx_free(sql);
 	DBfree_result(result);
+
+	DBbegin();
+	process_events();
+	DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
