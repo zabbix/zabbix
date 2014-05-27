@@ -28,14 +28,8 @@ class CMultiSelect extends CTag {
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->addClass('multiselect-wrapper');
-
-		if (isset($options['wrapperId'])) {
-			$this->attr('id', zbx_formatDomId($options['wrapperId']));
-		}
-
-		$multiSelect = new CDiv(null, 'multiselect');
-		$multiSelect->attr('id', zbx_formatDomId($options['name']));
+		$this->addClass('multiselect');
+		$this->attr('id', zbx_formatDomId($options['name']));
 
 		// url
 		$url = new Curl('jsrpc.php');
@@ -50,7 +44,7 @@ class CMultiSelect extends CTag {
 		}
 
 		$params = array(
-			'id' => $multiSelect->getAttribute('id'),
+			'id' => $this->getAttribute('id'),
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
 			'labels' => array(
@@ -73,7 +67,7 @@ class CMultiSelect extends CTag {
 				'buttonClass' => isset($options['popup']['buttonClass']) ? $options['popup']['buttonClass'] : null
 			)
 		);
-		$this->addItem($multiSelect);
-		zbx_add_post_js('jQuery("#'.$multiSelect->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
+
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
 	}
 }

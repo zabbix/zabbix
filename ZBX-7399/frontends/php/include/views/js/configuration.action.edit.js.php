@@ -397,7 +397,7 @@
 
 		// multiselect
 		if (opCmdTarget != 'current') {
-			jQuery('#multiselectWrapper').remove();
+			jQuery('.multiselect-wrapper').remove();
 
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
@@ -411,7 +411,6 @@
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				id: 'opCmdTargetObject',
-				wrapperId: 'multiselectWrapper',
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {

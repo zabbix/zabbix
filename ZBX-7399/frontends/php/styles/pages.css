@@ -171,6 +171,7 @@
 
 /* action edit */
 .action-edit .newActionConditionTable tr td { vertical-align: top; }
+#opTemplateListFooter .multiselect-wrapper, #opGroupListFooter .multiselect-wrapper { overflow: auto; }
 
 /* administration of triggers */
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
@@ -257,5 +258,3 @@ div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px
 div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
 div.setup_wizard .requirements .notice { color: #EE6000; border-color: #EE6000; }
 div.setup_wizard .requirements .fail { color: #DC0000; border-color: #DC0000; }
-
-.action-edit .formlist .formrow .formElementTable .multiselect-wrapper { overflow: auto; }

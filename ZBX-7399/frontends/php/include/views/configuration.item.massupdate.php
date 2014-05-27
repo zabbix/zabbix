@@ -478,8 +478,7 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$replaceApp = new CMultiSelect(array(
-		'wrapperId' => 'replaceApp',
+	$replaceApp = new CDiv(new CMultiSelect(array(
 		'name' => 'applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
@@ -490,7 +489,7 @@ if ($this->data['displayApplications']) {
 			'width' => 450,
 			'height' => 450
 		)
-	));
+	)), null, 'replaceApp');
 
 	$itemFormList->addRow(
 		array(_('Replace applications'), SPACE, new CVisibilityBox('visible[applications]',
@@ -529,8 +528,7 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$newApp = new CMultiSelect(array(
-		'wrapperId' => 'newApp',
+	$newApp = new CDiv(new CMultiSelect(array(
 		'name' => 'new_applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => array('hostid' => $this->data['hostid']),
@@ -542,7 +540,7 @@ if ($this->data['displayApplications']) {
 			'width' => 450,
 			'height' => 450
 		)
-	));
+	)), null, 'newApp');
 
 	$itemFormList->addRow(
 		array(_('Add new or existing applications'), SPACE, new CVisibilityBox('visible[new_applications]',

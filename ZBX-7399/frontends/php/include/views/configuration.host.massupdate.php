@@ -48,8 +48,7 @@ if (isset($_REQUEST['groups'])) {
 	}
 }
 
-$replaceGroups = new CMultiSelect(array(
-	'wrapperId' => 'replaceGroups',
+$replaceGroups = new CDiv(new CMultiSelect(array(
 	'name' => 'groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array('editable' => true),
@@ -60,7 +59,7 @@ $replaceGroups = new CMultiSelect(array(
 		'width' => 450,
 		'height' => 450
 	)
-));
+)), null, 'replaceGroups');
 
 $hostFormList->addRow(
 	array(
@@ -101,8 +100,7 @@ if (isset($_REQUEST['new_groups'])) {
 	}
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$newGroups = new CMultiSelect(array(
-		'wrapperId' => 'newGroups',
+	$newGroups = new CDiv(new CMultiSelect(array(
 		'name' => 'new_groups[]',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
@@ -114,7 +112,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			'width' => 450,
 			'height' => 450
 		)
-	));
+	)), null, 'newGroups');
 
 	$hostFormList->addRow(
 		array(

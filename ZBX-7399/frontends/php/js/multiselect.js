@@ -52,14 +52,6 @@ jQuery(function($) {
 			'Select': t('Select')
 		};
 
-		// add wrap
-		var multiselectWrapper = jQuery('<div>', {
-			id: options.wrapperId,
-			'class': 'multiselect-wrapper'
-		});
-
-		$('#' + options.id).wrap(multiselectWrapper);
-
 		return this.each(function() {
 			$(this).empty().multiSelect(options);
 		});
@@ -217,6 +209,13 @@ jQuery(function($) {
 				values = ms.values;
 
 			ms.values.width = parseInt(obj.css('width'));
+
+			// add wrap
+			var multiselectWrapper = jQuery('<div>', {
+				'class': 'multiselect-wrapper'
+			});
+
+			$('#' + options.id).wrap(multiselectWrapper);
 
 			// search input
 			if (!options.disabled) {
