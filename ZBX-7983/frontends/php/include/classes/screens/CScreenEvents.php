@@ -55,7 +55,7 @@ class CScreenEvents extends CScreenBase {
 			$statusSpan = new CSpan(trigger_value2str($event['value']));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged']);
+			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
 
 			$item->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $event['clock']),

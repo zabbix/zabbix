@@ -243,7 +243,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// config
-	$data['config'] = select_config();
+	$data['config'] = $config;
 
 	// advanced labels
 	$data['labelTypes'] = sysmapElementLabel();

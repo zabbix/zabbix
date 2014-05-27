@@ -105,7 +105,18 @@ function get_tr_event_by_eventid($eventid) {
 	return DBfetch(DBselect($sql));
 }
 
-function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false) {
+/**
+ * Get unacknowledged event count
+ *
+ * @param array $db_element		sysmap element
+ * @param int	$value_trigger	trigger value
+ * @param int	$value_event	event value
+ * @param bool	$ack			is event acknowledged
+ * @param array $config			system configuration
+ *
+ * @return int
+ */
+function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false, $config) {
 	$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 	get_map_elements($db_element, $elements);
 
@@ -113,7 +124,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 		return 0;
 	}
 
-	$config = select_config();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'output' => array('triggerid'),
@@ -241,12 +251,7 @@ function make_small_eventlist($startEvent) {
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$eventStatusSpan,
-			$event['value'],
-			$event['clock'],
-			$event['acknowledged']
-		);
+		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
 
 		$ack = getEventAckState($event, true, true, array(), $config);
 
@@ -300,7 +305,7 @@ function make_popup_eventlist($triggerId, $eventId, $config) {
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
+		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
 
 		$table->addRow(array(
 			zbx_date2str(_('d M Y H:i:s'), $event['clock']),

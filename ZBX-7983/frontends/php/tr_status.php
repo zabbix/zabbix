@@ -85,7 +85,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
-
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
 		'monitored_hosts' => true,
@@ -692,7 +691,8 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$trigger['value'],
 		$trigger['lastchange'],
-		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
+		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false,
+		$config
 	);
 
 	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
@@ -797,12 +797,7 @@ foreach ($triggers as $trigger) {
 			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle(
-				$eventStatusSpan,
-				$event['value'],
-				$event['clock'],
-				$event['acknowledged']
-			);
+			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
 
 			$statusSpan = new CCol($eventStatusSpan);
 			$statusSpan->setColSpan(2);

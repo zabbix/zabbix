@@ -41,15 +41,13 @@ if ($this->data['type'] == SHOW_TRIGGERS) {
 	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
 }
 
-$config = select_config();
-
 for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-	$hintTable->addRow(array(getSeverityCell($i, null, false, $config), _('PROBLEM')));
+	$hintTable->addRow(array(getSeverityCell($i, null, false, $this->data['config']), _('PROBLEM')));
 }
 
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	// blinking preview in help popup (only if blinking is enabled)
-	if ($config['blink_period'] > 0) {
+	if ($this->data['config']['blink_period'] > 0) {
 		$row = new CRow(null);
 		$row->addItem(new CCol(SPACE, 'normal'));
 		for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
@@ -61,7 +59,7 @@ if ($this->data['type'] == SHOW_TRIGGERS) {
 		// double div necassary for FireFox
 		$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));
 
-		$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($config['blink_period']))));
+		$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))));
 	}
 
 	$hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
@@ -91,7 +89,7 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
+if ($this->data['config']['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
 	if ($this->data['type'] == SHOW_DATA) {
 		$dataTable = getItemsDataOverview(
 			array_keys($this->data['pageFilter']->hosts),

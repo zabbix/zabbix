@@ -104,18 +104,15 @@ function get_user_auth($userid) {
 	return $result;
 }
 
-/* Function: get_user_system_auth()
+/**
+ * Returns overal user authentication type in system with INTERNAL auth as default
  *
- * Description:
- * 		Returns overal user authentication type in system
+ * @param int   $userid		User ID
+ * @param array $config		system configuration
  *
- * Comments:
- *		default is INTERNAL auth
- *
- * Author: Aly
+ * @return int
  */
-function get_user_system_auth($userid) {
-	$config = select_config();
+function get_user_system_auth($userid, $config) {
 	$result = get_user_auth($userid);
 	switch ($result) {
 		case GROUP_GUI_ACCESS_SYSTEM:

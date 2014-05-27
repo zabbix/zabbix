@@ -284,10 +284,6 @@ if ($items) {
 	}
 }
 
-if ($filterShowDetails) {
-	$config = select_config();
-}
-
 /*
  * Display
  */

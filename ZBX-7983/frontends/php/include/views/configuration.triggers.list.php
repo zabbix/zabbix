@@ -113,8 +113,6 @@ $triggersTable->setHeader(array(
 	$data['showErrorColumn'] ? _('Error') : null
 ));
 
-$config = select_config();
-
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
@@ -252,7 +250,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggersTable->addRow(array(
 		$checkBox,
 		$this->data['displayNodes'] ? $trigger['nodename'] : null,
-		getSeverityCell($trigger['priority'], null, false, $config),
+		getSeverityCell($trigger['priority'], null, false, $this->data['config']),
 		$hosts,
 		$description,
 		$expressionColumn,

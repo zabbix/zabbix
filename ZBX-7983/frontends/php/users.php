@@ -141,9 +141,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (isset($_REQUEST['save'])) {
-	$config = select_config();
-
-	$authType = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+	$authType = get_user_system_auth(getRequest('userid', $config['authentication_type']), $config);
 
 	if (isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
 		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
@@ -365,7 +363,7 @@ CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROF
 if (!empty($_REQUEST['form'])) {
 	$userId = get_request('userid');
 
-	$data = getUserFormData($userId);
+	$data = getUserFormData($userId, false, $config);
 
 	$data['userid'] = $userId;
 	$data['form'] = get_request('form');
@@ -378,7 +376,8 @@ if (!empty($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid())
+		'displayNodes' => is_array(get_current_nodeid()),
+		'config' => $config
 	);
 
 	// get user groups

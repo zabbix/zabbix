@@ -342,7 +342,8 @@ else {
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
 		'triggers' => array(),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid'])),
+		'config' => $config
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 

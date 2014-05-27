@@ -56,7 +56,8 @@ if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['gro
  * Display
  */
 $data = array(
-	'fullscreen' => $_REQUEST['fullscreen']
+	'fullscreen' => getRequest('fullscreen'),
+	'config' => $config
 );
 
 $data['view_style'] = get_request('view_style', CProfile::get('web.overview.view.style', STYLE_TOP));

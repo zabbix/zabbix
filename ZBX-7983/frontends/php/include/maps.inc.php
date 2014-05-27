@@ -259,15 +259,16 @@ function convertColor($im, $color) {
 /**
  * Resolve all kinds of macros in map labels
  *
- * @param array $selement
- * @param string $selement['label'] label to expand
- * @param int $selement['elementtype'] type of element: trigger, host, ...
- * @param int $selement['elementid'] element id in DB
- * @param string $selement['elementExpressionTrigger'] if type is trigger, then trigger expression
+ * @param array  $selement								array of sysmap data
+ * @param string $selement['label']						label to expand
+ * @param int	 $selement['elementtype']				type of element: trigger, host, ...
+ * @param int	 $selement['elementid']					element id in DB
+ * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
+ * @param array  $config								system configuration
  *
  * @return string expanded label
  */
-function resolveMapLabelMacrosAll(array $selement) {
+function resolveMapLabelMacrosAll(array $selement, $config) {
 	$label = $selement['label'];
 	// for host and trigger items expand macros if they exists
 	if (($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
@@ -374,34 +375,64 @@ function resolveMapLabelMacrosAll(array $selement) {
 		case SYSMAP_ELEMENT_TYPE_TRIGGER:
 		case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 			if (zbx_strpos($label, '{TRIGGERS.UNACK}') !== false) {
-				$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($selement), $label);
+				$label = str_replace('{TRIGGERS.UNACK}',
+					get_triggers_unacknowledged($selement, null, false, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGERS.PROBLEM.UNACK}') !== false) {
-				$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($selement, true), $label);
+				$label = str_replace('{TRIGGERS.PROBLEM.UNACK}',
+					get_triggers_unacknowledged($selement, true, false, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.EVENTS.UNACK}') !== false) {
-				$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($selement), $label);
+				$label = str_replace('{TRIGGER.EVENTS.UNACK}',
+					get_events_unacknowledged($selement, null, null, false, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}') !== false) {
-				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE), $label);
+				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}',
+					get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, false, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}') !== false) {
-				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
+				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}',
+					get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, false, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGERS.ACK}') !== false) {
-				$label = str_replace('{TRIGGERS.ACK}', get_triggers_unacknowledged($selement, null, true), $label);
+				$label = str_replace('{TRIGGERS.ACK}',
+					get_triggers_unacknowledged($selement, null, true, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGERS.PROBLEM.ACK}') !== false) {
-				$label = str_replace('{TRIGGERS.PROBLEM.ACK}', get_triggers_unacknowledged($selement, true, true), $label);
+				$label = str_replace('{TRIGGERS.PROBLEM.ACK}',
+					get_triggers_unacknowledged($selement, true, true, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.EVENTS.ACK}') !== false) {
-				$label = str_replace('{TRIGGER.EVENTS.ACK}', get_events_unacknowledged($selement, null, null, true), $label);
+				$label = str_replace('{TRIGGER.EVENTS.ACK}',
+					get_events_unacknowledged($selement, null, null, true, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.EVENTS.PROBLEM.ACK}') !== false) {
-				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true), $label);
+				$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}',
+					get_events_unacknowledged($selement, null, TRIGGER_VALUE_TRUE, true, $config),
+					$label
+				);
 			}
 			if (zbx_strpos($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}') !== false) {
-				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
+				$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
+					get_events_unacknowledged($selement, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true, $config),
+					$label
+				);
 			}
 			break;
 	}
@@ -1234,8 +1265,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						$i['problem_unack']++;
 					}
 
-					$config = select_config();
-
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 				}
 			}
@@ -1858,6 +1887,8 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 		}
 	}
 
+	$config = select_config();
+
 	foreach ($selements as $selementId => $selement) {
 		if (!isset($labelLines[$selementId])) {
 			$labelLines[$selementId] = array();
@@ -1866,7 +1897,7 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 			$statusLines[$selementId] = array();
 		}
 
-		$msg = $resolveMacros ? resolveMapLabelMacrosAll($selement) : $selement['label'];
+		$msg = $resolveMacros ? resolveMapLabelMacrosAll($selement, $config) : $selement['label'];
 
 		$allStrings .= $msg;
 		$msgs = explode("\n", $msg);

@@ -116,15 +116,15 @@ function get_service_status_of_trigger($triggerid) {
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
  *
- * @param mixed $object             object like CSpan, CDiv, etc.
- * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
- * @param int $triggerLastChange
- * @param bool $isAcknowledged
+ * @param mixed $object					object like CSpan, CDiv, etc.
+ * @param int   $triggerValue			TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
+ * @param int   $triggerLastChange
+ * @param bool  $isAcknowledged
+ * @param array $config					system configuration
+ *
  * @return void
  */
-function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
-	$config = select_config();
-
+function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged, $config) {
 	// color of text and blinking depends on trigger value and whether event is acknowledged
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
 		$color = $config['problem_unack_color'];
@@ -1254,6 +1254,8 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 	order_result($hostNames);
 
+	$config = select_config();
+
 	if ($viewMode == STYLE_TOP) {
 		// header
 		$header = array(new CCol(_('Triggers'), 'center'));
@@ -1272,7 +1274,8 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
 					$pageFile,
-					$screenId
+					$screenId,
+					$config
 				);
 			}
 
@@ -1301,7 +1304,8 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
 					$pageFile,
-					$screenId
+					$screenId,
+					$config
 				);
 			}
 
@@ -1320,16 +1324,15 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
  * @param array  $trigger
  * @param string $pageFile		the page where the element is displayed
  * @param string $screenId
+ * @paran array  config
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenId = null, $config) {
 	$ack = $css = $style = null;
 	$desc = $menuPopup = $triggerItems = $acknowledge = array();
 
 	// for how long triggers should blink on status change (set by user in administration->general)
-	$config = select_config();
-
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
 
@@ -1565,7 +1568,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	return $ret;
 }
 
-function get_triggers_unacknowledged($db_element, $count_problems = null, $ack = false) {
+function get_triggers_unacknowledged($db_element, $count_problems = null, $ack = false, $config) {
 	$elements = array(
 		'hosts' => array(),
 		'hosts_groups' => array(),
@@ -1576,8 +1579,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	if (empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])) {
 		return 0;
 	}
-
-	$config = select_config();
 
 	$options = array(
 		'nodeids' => get_current_nodeid(),

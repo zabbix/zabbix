@@ -441,7 +441,6 @@ if (!$firstEvent) {
 }
 else {
 	$showAllNodes = is_show_all_nodes();
-	$config = select_config();
 	$starttime = $firstEvent['clock'];
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
@@ -725,12 +724,7 @@ else {
 				$statusSpan = new CSpan(trigger_value2str($event['value']));
 
 				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle(
-					$statusSpan,
-					$event['value'],
-					$event['clock'],
-					$event['acknowledged']
-				);
+				addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
 
 				// host JS menu link
 				$hostName = null;
