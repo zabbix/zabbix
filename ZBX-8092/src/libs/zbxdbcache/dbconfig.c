@@ -873,8 +873,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		old_poller_type;
-	unsigned char		old_item_status;
+	unsigned char		old_poller_type, old_status;
 	int			delay, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
@@ -953,7 +952,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->history = atoi(row[36]);
 		ZBX_STR2UCHAR(item->inventory_link, row[38]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[39]);
-		old_item_status = item->status;
+		old_status = item->status;
 		item->status = (unsigned char)atoi(row[42]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
@@ -987,7 +986,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->triggers[0] = NULL;
 		}
 
-		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_item_status)
+		if (1 == found && ITEM_STATUS_ACTIVE == item->status && ITEM_STATUS_ACTIVE != old_status)
 			item->data_expected_from = now;
 
 		/* update items_hk index using new data, if not done already */
@@ -1832,8 +1831,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-	unsigned char		status;
-	unsigned char		old_host_status;
+	unsigned char		status, old_status;
 	time_t			now;
 	signed char		ipmi_authtype;
 	unsigned char		ipmi_privilege;
@@ -1889,7 +1887,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
-		old_host_status = host->status;
+		old_status = host->status;
 		host->status = status;
 
 		if (0 == found)
@@ -1897,7 +1895,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->maintenance_status = (unsigned char)atoi(row[7]);
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
-			host->data_expected_from = 0;
+			host->data_expected_from = now;
 
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
@@ -1913,8 +1911,8 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_disable_until = atoi(row[21]);
 		}
 
-		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != old_host_status)
-			host->data_expected_from = 0;
+		if (1 == found && HOST_STATUS_MONITORED == host->status && HOST_STATUS_MONITORED != old_status)
+			host->data_expected_from = now;
 
 		/* update hosts_h index using new data, if not done already */
 
