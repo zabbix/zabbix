@@ -523,23 +523,25 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*              |                                                                                 */
 	/*  ------------+------------------------------------------------------                           */
 	/*              |                                                                                 */
-	/*  OK          |   no           T            T+E         -                                       */
+	/*  OK          |   no           T+I          T+E         I                                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T            T(e)         T+E         -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          -            T(m)+E(m)   T                                       */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E          -            T+E(m)      T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
 	/*                                                                                                */
+	/*  ?   - unknown state                                                                           */
 	/*  -   - should never happen                                                                     */
 	/*  no  - do nothing                                                                              */
 	/*  T   - update a trigger                                                                        */
 	/*  E   - generate an event                                                                       */
 	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
+	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
 	/**************************************************************************************************/
 

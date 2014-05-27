@@ -55,7 +55,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DC_TRIGGER		trigger;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
@@ -158,8 +157,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		ZBX_STR2UINT64(trigger.triggerid, row[0]);
 		trigger.description = row[1];
 		trigger.expression_orig = row[2];
-		trigger.priority = (unsigned char)atoi(row[3]);
-		trigger.type = (unsigned char)atoi(row[4]);
+		ZBX_STR2UCHAR(trigger.priority, row[3]);
+		ZBX_STR2UCHAR(trigger.type, row[4]);
 		trigger.value = atoi(row[5]);
 		trigger.state = atoi(row[6]);
 		trigger.error = row[7];
