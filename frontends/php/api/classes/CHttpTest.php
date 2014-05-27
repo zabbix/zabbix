@@ -512,7 +512,7 @@ class CHttpTest extends CApiService {
 						));
 					}
 					else {
-						$httpTestNamesChanged[$httpTest['name']] = $httpTest['name'];
+						$httpTestNamesChanged[$httpTest['name']] = $httpTest['hostid'];
 					}
 				}
 			}
@@ -542,7 +542,7 @@ class CHttpTest extends CApiService {
 		if ($httpTestNamesChanged) {
 			$httpTest = API::getApiService()->select($this->tableName(), array(
 				'output' => array('name'),
-				'filter' => array('name' => $httpTestNamesChanged),
+				'filter' => array('name' => array_keys($httpTestNamesChanged), 'hostid' => $httpTestNamesChanged),
 				'limit' => 1
 			));
 
@@ -637,19 +637,6 @@ class CHttpTest extends CApiService {
 	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = array()) {
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
-		}
-
-		// check if name exists on update
-		if ($dbHttpTest) {
-			$dbHttpTestStepNames = zbx_toHash($dbHttpTest['steps'], 'name');
-
-			foreach ($httpTest['steps'] as $step) {
-				if (!isset($step['httpstepid']) && isset($dbHttpTestStepNames[$step['name']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Web scenario step "%1$s" already exists.', $step['name'])
-					);
-				}
-			}
 		}
 	}
 
