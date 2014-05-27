@@ -91,7 +91,7 @@ $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChan
 
 // show details
 if (!$overview) {
-	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', getRequest('show_details'), null, 1));
+	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
 }
 
 // name
