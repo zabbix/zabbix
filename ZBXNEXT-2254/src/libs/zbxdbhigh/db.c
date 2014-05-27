@@ -1651,7 +1651,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_schema_esc, *table_name_esc, *table_schema_esc;
+	char		*table_name_esc, *field_name_esc, *table_schema_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
 	char		*table_name_esc;
