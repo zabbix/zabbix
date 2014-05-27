@@ -277,10 +277,11 @@ if ($items) {
 				'countOutput' => true,
 				'groupCount' => true
 			));
-
-			foreach ($screens as $screen) {
-				$hosts[$screen['hostid']]['screens'] = $screen['rowscount'];
+			$screens = zbx_toHash($screens, 'hostid');
+			foreach ($hosts as &$host) {
+				$host['screens'] = isset($screens[$host['hostid']]);
 			}
+			unset($host);
 		}
 	}
 }
