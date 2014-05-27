@@ -1072,7 +1072,7 @@ elseif ($srctbl == 'triggers') {
 			if (isset($srcfld3)) {
 				$values[$dstfld3] = $trigger[$srcfld3];
 			}
-			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.$parentId.'); return false;';
+			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
