@@ -29,7 +29,8 @@ class CScreenTriggersOverview extends CScreenBase {
 	public function get() {
 		// fetch hosts
 		$hosts = API::Host()->get(array(
-			'output' => array('name', 'hostid'),
+			'output' => array('name', 'hostid', 'status'),
+			'selectGraphs' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 			'selectScreens' => ($this->screenitem['style'] == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 			'groupids' => $this->screenitem['resourceid'],
 			'preservekeys' => true
@@ -49,7 +50,7 @@ class CScreenTriggersOverview extends CScreenBase {
 			'output' => array(
 				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 			),
-			'selectHosts' => array('hostid', 'name'),
+			'selectHosts' => array('hostid', 'name', 'status'),
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
 			'monitored' => true,
