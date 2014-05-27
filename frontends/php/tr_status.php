@@ -254,6 +254,7 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'showSeverity' => $showSeverity,
 		'statusChange' => $showChange,
 		'statusChangeDays' => $statusChangeBydays,
+		'showDetails' => $showDetails,
 		'txtSelect' => $txtSelect,
 		'application' => $filter['application'],
 		'inventory' => $filter['inventory'],
