@@ -744,7 +744,7 @@ foreach ($triggers as $trigger) {
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], '', 'on');
+		$unknown->setHint($trigger['error'], 'on');
 	}
 
 	// comments

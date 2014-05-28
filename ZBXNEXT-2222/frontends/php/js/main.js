@@ -632,7 +632,7 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, width, className, isStatic) {
+	createBox: function(e, target, hintText, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (typeof hintText === 'string') {
@@ -644,10 +644,6 @@ var hintBox = {
 		}
 		else {
 			box.html(hintText);
-		}
-
-		if (!empty(width)) {
-			box.css('width', width + 'px');
 		}
 
 		if (isStatic) {
@@ -667,14 +663,14 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, width, className) {
+	HintWraper: function(e, target, hintText, className) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
 				e = d;
 			}
-			hintBox.showHint(e, target, hintText, width, className, false);
+			hintBox.showHint(e, target, hintText, className, false);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
@@ -687,13 +683,13 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, className, resizeAfterLoad) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, width, className, true);
+			hintBox.showHint(e, target, hint, className, true);
 
 			if (resizeAfterLoad) {
 				hint.one('load', function(e) {
@@ -703,12 +699,12 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, width, className, isStatic) {
+	showHint: function(e, target, hintText, className, isStatic) {
 		if (target.hintBoxItem) {
 			return;
 		}
 
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
 	},

@@ -39,7 +39,7 @@ for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
 $help = new CHelp();
-$help->setHint($hintTable, '', '', true, false);
+$help->setHint($hintTable);
 
 // header right
 $overviewWidget->addPageHeader(_('OVERVIEW'), array(

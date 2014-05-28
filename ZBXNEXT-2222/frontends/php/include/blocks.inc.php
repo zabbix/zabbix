@@ -1044,7 +1044,7 @@ function make_latest_issues(array $filter = array()) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// trigger has events
@@ -1082,8 +1082,7 @@ function make_latest_issues(array $filter = array()) {
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
-				'', '', false
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false
 			);
 		}
 
@@ -1303,7 +1302,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
+			$unknown->setHint($trigger['error'], 'on');
 		}
 
 		// ack
