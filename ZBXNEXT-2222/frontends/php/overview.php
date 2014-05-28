@@ -77,24 +77,35 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-// show triggers
-// the state of this filter must not be remembered in the profiles because setting it's value to "All" may render the
-// whole page inaccessible on large installations.
-$showTriggers = getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
-
 $config = select_config();
 if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.overview.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		PROFILE_TYPE_INT
 	);
-	CProfile::update('web.overview.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.overview.filter.txt_select', getRequest('txt_select'), PROFILE_TYPE_STR);
+	CProfile::update('web.overview.filter.status_change', getRequest('status_change', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.status_change_days', getRequest('status_change_days', 14),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
+	// show triggers
+	// when this filter is set to "All" it must not be remembered in the profiles because it may render the
+	// whole page inaccessible on large installations.
+	if (getRequest('show_triggers') != TRIGGERS_OPTION_ALL) {
+		CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers'), PROFILE_TYPE_INT);
+	}
+
 	// ack status
-	if (($config['event_ack_enable'] == EVENT_ACK_ENABLED) && hasRequest('ack_status')) {
-		CProfile::update('web.overview.filter.ack_status', getRequest('ack_status'), PROFILE_TYPE_INT);
+	$ackStatus = getRequest('ack_status', ZBX_ACK_STS_ANY);
+
+	if (hasRequest('ack_status')) {
+		if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
+			$ackStatus = ZBX_ACK_STS_ANY;
+		}
+
+		CProfile::update('web.overview.filter.ack_status', $ackStatus, PROFILE_TYPE_INT);
 	}
 
 	// status change days
@@ -127,8 +138,8 @@ if (hasRequest('filter_set')) {
 	CProfile::delete('web.overview.filter.inventory.value', $idx2);
 }
 elseif (hasRequest('filter_rst')) {
-	$showTriggers = TRIGGERS_OPTION_RECENT_PROBLEM;
-
+	DBStart();
+	CProfile::delete('web.overview.filter.show_triggers');
 	CProfile::delete('web.overview.filter.show_maintenance');
 	CProfile::delete('web.overview.filter.ack_status');
 	CProfile::delete('web.overview.filter.show_severity');
@@ -136,15 +147,9 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.overview.filter.status_change');
 	CProfile::delete('web.overview.filter.status_change_days');
 	CProfile::delete('web.overview.filter.application');
-
-	// reset inventory filters
-	$i = 0;
-	while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
-		CProfile::delete('web.overview.filter.inventory.field', $i);
-		CProfile::delete('web.overview.filter.inventory.value', $i);
-
-		$i++;
-	}
+	CProfile::deleteIdx('web.overview.filter.inventory.field');
+	CProfile::deleteIdx('web.overview.filter.inventory.value');
+	DBend();
 }
 
 // overview type
@@ -158,6 +163,13 @@ if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
 $viewStyle = CProfile::get('web.overview.view_style', SHOW_TRIGGERS);
+
+if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {
+	$showTriggers = TRIGGERS_OPTION_ALL;
+}
+else {
+	$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+}
 
 /*
  * Display
