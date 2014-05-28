@@ -56,6 +56,7 @@ typedef struct
 	unsigned char	value;
 	unsigned char	state;
 	unsigned char	locked;
+	unsigned char	status;
 }
 ZBX_DC_TRIGGER;
 
@@ -1543,12 +1544,13 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		trigger->value = (unsigned char)atoi(row[6]);
 		trigger->state = (unsigned char)atoi(row[7]);
 		trigger->lastchange = atoi(row[8]);
+		trigger->status = atoi(row[9]);
 
 		if (0 == found)
 			trigger->locked = 0;
 	}
 
-	/* remove deleted or disabled triggers from buffer */
+	/* remove deleted triggers from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1793,7 +1795,7 @@ static void	DCsync_functions(DB_RESULT result)
 
 	zbx_vector_ptr_pair_destroy(&itemtrigs);
 
-	/* remove deleted or disabled functions from buffer */
+	/* remove deleted functions from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2750,19 +2752,15 @@ void	DCsync_configuration(void)
 	sec = zbx_time();
 	if (NULL == (trig_result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,"
-				"t.priority,t.type,t.value,t.state,t.lastchange"
+				"t.priority,t.type,t.value,t.state,t.lastchange,t.status"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
-				" and h.status=%d"
-				" and i.status=%d"
-				" and t.status=%d"
+				" and h.status in (%d,%d)"
 				" and t.flags<>%d"
 				ZBX_SQL_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			TRIGGER_STATUS_ENABLED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"))))
 	{
@@ -2789,14 +2787,10 @@ void	DCsync_configuration(void)
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
-				" and h.status=%d"
-				" and i.status=%d"
-				" and t.status=%d"
+				" and h.status in (%d,%d)"
 				" and t.flags<>%d"
 				ZBX_SQL_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			TRIGGER_STATUS_ENABLED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"))))
 	{
@@ -3927,6 +3921,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	dst_trigger->lastchange = src_trigger->lastchange;
+	dst_trigger->status = src_trigger->status;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -4135,6 +4130,7 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 	int			i, j;
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
+	const ZBX_DC_HOST	*dc_host;
 
 	triggerids->values_num = 0;
 
@@ -4145,8 +4141,20 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
 			continue;
 
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 		{
+			if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
+				continue;
+
 			if (1 == dc_trigger->locked)
 			{
 				itemids[i] = 0;
@@ -4194,7 +4202,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
  *                                                                            *
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
- * Purpose: get triggers for specified items                                  *
+ * Purpose: get enabled triggers for specified enabled items of enabled hosts *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -4206,6 +4214,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_TRIGGER	*dc_trigger;
 	DC_TRIGGER		*trigger;
+	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
@@ -4214,8 +4223,20 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
 			continue;
 
+		if (ITEM_STATUS_ACTIVE != dc_item->status)
+			continue;
+
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 		{
+			if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
+				continue;
+
 			trigger = DCfind_id(trigger_info, dc_trigger->triggerid, sizeof(DC_TRIGGER), &found);
 
 			if (0 == found)
@@ -4347,6 +4368,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 					ITEM_STATUS_ACTIVE == dc_item->status &&
 					HOST_STATUS_MONITORED == dc_host->status &&
+					TRIGGER_STATUS_ENABLED == dc_trigger->status &&
 					!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
 					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
 			{
