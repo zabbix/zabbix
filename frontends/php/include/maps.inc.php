@@ -1042,7 +1042,10 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						$filteredApplicationNames = $selement['hostApplicationFilters'][$hostId];
 
 						foreach($triggers as $trigger) {
-							$applicationNamesForTrigger = array_keys($triggerApps[$trigger['triggerid']]);
+
+							$applicationNamesForTrigger =  isset($triggerApps[$trigger['triggerid']])
+								? array_keys($triggerApps[$trigger['triggerid']])
+								:array();
 
 							if(!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
 								unset($selement['triggers'][$trigger['triggerid']]);
