@@ -421,7 +421,6 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$httpTestNames = array();
 		foreach ($httpTests as $httpTest) {
 			if (zbx_empty($httpTest['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
@@ -433,24 +432,18 @@ class CHttpTest extends CApiService {
 
 			$this->checkSteps($httpTest);
 			$this->checkDuplicateSteps($httpTest);
-
-			if (isset($httpTestNames[$httpTest['name']])
-					&& idcmp($httpTestNames[$httpTest['name']], $httpTest['hostid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $httpTest['name']));
-			}
-			$httpTestNames[$httpTest['name']] = $httpTest['hostid'];
 		}
 
-		$dbHttpTests = API::getApiService()->select($this->tableName(), array(
-			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($httpTests, 'name'), 'hostid' => $hostIds),
-			'limit' => 1
+		// check input array for duplicate names
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'hostid',
+			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
 		));
+		$this->checkValidator($httpTests, $collectionValidator);
 
-		if ($dbHttpTests) {
-			$dbHttpTest = reset($dbHttpTests);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $dbHttpTest['name']));
-		}
+		// check database for duplicate names
+		$this->checkDuplicates($httpTests);
 
 		$this->checkApplicationHost($httpTests);
 	}
@@ -490,33 +483,14 @@ class CHttpTest extends CApiService {
 			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
 		}
 
-		$httpTestNamesChanged = array();
-
-		// add test name and steps names if it's empty or test is templated
-		// unset step number for templated tests
 		foreach ($httpTests as &$httpTest) {
 			unset($httpTest['templateid']);
 
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
+
 			$httpTest['hostid'] = $dbHttpTest['hostid'];
 
-			// validate name on update
-			if (isset($httpTest['name'])) {
-				if (zbx_empty($httpTest['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
-				}
-				elseif ($dbHttpTest['name'] !== $httpTest['name']) {
-					if (isset($httpTestNamesChanged[$httpTest['name']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.',
-							$httpTest['name']
-						));
-					}
-					else {
-						$httpTestNamesChanged[$httpTest['name']] = $httpTest['hostid'];
-					}
-				}
-			}
-			elseif (!isset($httpTest['name']) || $dbHttpTest['templateid']) {
+			if (!isset($httpTest['name']) || $dbHttpTest['templateid']) {
 				$httpTest['name'] = $dbHttpTest['name'];
 			}
 
@@ -539,22 +513,61 @@ class CHttpTest extends CApiService {
 		}
 		unset($httpTest);
 
-		if ($httpTestNamesChanged) {
-			$httpTest = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
-				'filter' => array('name' => array_keys($httpTestNamesChanged), 'hostid' => $httpTestNamesChanged),
-				'limit' => 1
-			));
+		// check input array for duplicate names
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'hostid',
+			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
+		));
+		$this->checkValidator($httpTests, $collectionValidator);
 
-			if ($httpTest) {
-				$httpTest = reset($httpTest);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $httpTest['name']));
-			}
-		}
+		// check database for duplicate names
+		$this->checkDuplicates($httpTests, $dbHttpTests);
 
 		$this->checkApplicationHost($httpTests);
 
 		return $httpTests;
+	}
+
+	/**
+	 * Check DB for duplicate names on hosts
+	 *
+	 * @throws APIException if same name on some host is found.
+	 *
+	 * @param array $httpTests		array of web screnarios
+	 * @param array $dbHttpTests	array of DB web screnarios
+	 */
+	protected function checkDuplicates(array $httpTests, array $dbHttpTests = array()) {
+		$httpTestNames = array();
+
+		foreach ($httpTests as $httpTest) {
+			if (isset($httpTest['name'])) {
+				if (zbx_empty($httpTest['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
+				}
+				elseif (($dbHttpTests && $dbHttpTests[$httpTest['httptestid']]['name'] !== $httpTest['name'])
+						|| !$dbHttpTests) {
+					$httpTestNames[$httpTest['hostid']][] = $httpTest['name'];
+				}
+			}
+		}
+
+		if ($httpTestNames) {
+			foreach ($httpTestNames as $hostId => $httpTestName) {
+				$nameExists = API::getApiService()->select($this->tableName(), array(
+					'output' => array('name'),
+					'filter' => array('name' => $httpTestName, 'hostid' => $hostId),
+					'limit' => 1
+				));
+
+				if ($nameExists) {
+					$nameExists = reset($nameExists);
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Web scenario "%1$s" already exists.', $nameExists['name'])
+					);
+				}
+			}
+		}
 	}
 
 	/**
