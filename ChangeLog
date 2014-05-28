@@ -5,6 +5,8 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-7535] trivial change from 'Link' to 'URL' in error messages (Andrejs)
+..F....... [ZBX-8259] fixed padding for widgets in screen (Andrejs)
 ........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
 .......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
 ..F....... [ZBX-8221] corrected labels while copying items (Andrejs)
