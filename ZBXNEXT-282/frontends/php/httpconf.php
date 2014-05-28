@@ -568,7 +568,7 @@ else {
 
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
-				'ht.authentication,ht.http_proxy,a.name AS application_name'.
+				'ht.authentication,ht.http_proxy,a.applicationid,a.name AS application_name'.
 				' FROM httptest ht'.
 				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
 				' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
