@@ -1,9 +1,14 @@
 Changes for 2.3.1
 
 New features:
+.......PS. [ZBXNEXT-2254] DBSchema configuration parameter now applies to PostgreSQL as well as IBM DB2 (Juris)
+A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
 ..F....... [ZBX-8221] corrected labels while copying items (Andrejs)
+........S. [ZBX-8092] added disabled hosts, disabled items and enabled items of disabled hosts to the configuration cache for correct macro expansion in notifications (igors)
 
 --------------------------------------------------------------------------------
 Changes for 2.3.0
@@ -61,6 +66,7 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+........S. [ZBX-8014] fixed evaluation of calculated item and trigger expressions not being precise enough (asaveljevs)
 ..F....... [ZBX-8212] it is not possible to add triggers from templates to maps anymore (Andrejs)
 A......... [ZBX-8227] fixed the "applicationids" parameter in trigger.get overriding the "groupids" parameter (Pavels)
 A......... [ZBX-8169] fixed SLA period calculation to account for DST changes (Krists)
@@ -143,7 +149,10 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
 .......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
+........S. [ZBX-8092] added disabled hosts, disabled items and enabled items of disabled hosts to the configuration cache for correct macro expansion in notifications (igors)
 ........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
 ...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
