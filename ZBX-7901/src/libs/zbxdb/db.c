@@ -38,6 +38,14 @@ static zbx_ibm_db2_handle_t	ibm_db2;
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
 static zbx_oracle_db_handle_t	oracle;
+
+/* 64-bit integer binding is supported only starting with Oracle 11.2 */
+/* so for compatibility reasons we must convert 64-bit values to      */
+/* Oracle numbers before binding.                                     */
+static OCINumber	*oci_ids = NULL;
+static int		oci_ids_alloc = 0;
+static int		oci_ids_num = 0;
+
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
@@ -764,6 +772,8 @@ int	zbx_db_txn_error()
 #ifdef HAVE_ORACLE
 static sword	zbx_oracle_statement_prepare(const char *sql)
 {
+	oci_ids_num = 0;
+
 	return OCIStmtPrepare(oracle.stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql), (ub4)OCI_NTV_SYNTAX,
 			(ub4)OCI_DEFAULT);
 }
@@ -835,16 +845,25 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	switch (type)
 	{
 		case ZBX_TYPE_ID:
-			if ( 0 != *(zbx_uint64_t *)buffer)
+			if (0 == *(zbx_uint64_t *)buffer)
 			{
-				err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(zbx_uint64_t),
-						SQLT_INT);
+				err = zbx_oracle_bind_parameter((ub4)position, NULL, 0, SQLT_VNU);
+				break;
 			}
-			else
-				err = zbx_oracle_bind_parameter((ub4)position, NULL, 0, SQLT_INT);
-			break;
+			/* break; is not missing here */
 		case ZBX_TYPE_UINT:
-			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(zbx_uint64_t), SQLT_INT);
+			if (oci_ids_num >= oci_ids_alloc)
+			{
+				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
+				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber));
+			}
+
+			if (OCI_SUCCESS == (err = OCINumberFromInt(oracle.errhp, buffer, sizeof(zbx_uint64_t),
+					OCI_NUMBER_UNSIGNED, &oci_ids[oci_ids_num])))
+			{
+				err = zbx_oracle_bind_parameter((ub4)position, &oci_ids[oci_ids_num++],
+						(sb4)sizeof(OCINumber), SQLT_VNU);
+			}
 			break;
 		case ZBX_TYPE_INT:
 			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(int), SQLT_INT);
@@ -2146,5 +2165,4 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 	return dst;
 }
-
 

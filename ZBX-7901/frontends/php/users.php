@@ -336,7 +336,6 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	DBstart();
 
 	$goResult = unblock_user_login($groupUserId);
-	$goResult = DBend($goResult);
 
 	if ($goResult) {
 		$users = API::User()->get(array(
@@ -349,6 +348,8 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 		}
 	}
+
+	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Users unblocked'), _('Cannot unblock users'));
 	clearCookies($goResult);

@@ -97,11 +97,44 @@ lbl_ret:
 }
 #endif	/* HAVE_LDAP */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: find_ssh_ident_string                                            *
+ *                                                                            *
+ * Purpose: parse recv_buf for ssh identification string as per               *
+ *          RFC 4253, section 4.2                                             *
+ *                                                                            *
+ * Parameters: recv_buf     - [IN] buffer to parse                            *
+ *             remote_major - [OUT] memory pointer where protocol major is    *
+ *                                  to be written to                          *
+ *             remote_minor - [OUT] memory pointer where protocol minor is    *
+ *                                  to be written to                          *
+ *                                                                            *
+ * Returns: SUCCEED - if a string matching the specification is found         *
+ *          FAIL - otherwise                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *remote_minor)
+{
+	const char	*r, *l = recv_buf;
+
+	while (NULL != (r = strchr(l, '\n')))
+	{
+		if (2 == sscanf(l, "SSH-%d.%d-%*s", remote_major, remote_minor))
+			return SUCCEED;
+
+		l = r + 1;
+	}
+
+	return FAIL;
+}
+
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_STRING_LEN], *recv_buf, *ssh_server, *ssh_proto;
+	char		send_buf[MAX_STRING_LEN], *recv_buf;
+	int		remote_major, remote_minor;
 
 	*value_int = 0;
 
@@ -109,17 +142,14 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	{
 		if (SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)))
 		{
-			if (0 == strncmp(recv_buf, "SSH", 3))
+			if (SUCCEED == find_ssh_ident_string(recv_buf, &remote_major, &remote_minor))
 			{
-				ssh_server = ssh_proto = recv_buf + 4;
-				ssh_server += strspn(ssh_proto, "0123456789-. ");
-				ssh_server[-1] = '\0';
-
-				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%s-%s\n", ssh_proto, "zabbix_agent");
+				zbx_snprintf(send_buf, sizeof(send_buf), "SSH-%d.%d-zabbix_agent\r\n",
+						remote_major, remote_minor);
 				*value_int = 1;
 			}
 			else
-				zbx_snprintf(send_buf, sizeof(send_buf), "0\n");
+				strscpy(send_buf, "0\n");
 
 			ret = zbx_tcp_send_raw(&s, send_buf);
 		}

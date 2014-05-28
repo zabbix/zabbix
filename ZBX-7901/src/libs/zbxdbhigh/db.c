@@ -488,7 +488,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger)
 {
 	const char	*__function_name = "process_trigger";
 
@@ -523,23 +523,25 @@ static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	/*              |                                                                                 */
 	/*  ------------+------------------------------------------------------                           */
 	/*              |                                                                                 */
-	/*  OK          |   no           T            T+E         -                                       */
+	/*  OK          |   no           T+I          T+E         I                                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T            T(e)         T+E         -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          -            T(m)+E(m)   T                                       */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E          -            T+E(m)      T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
 	/*                                                                                                */
+	/*  ?   - unknown state                                                                           */
 	/*  -   - should never happen                                                                     */
 	/*  no  - do nothing                                                                              */
 	/*  T   - update a trigger                                                                        */
 	/*  E   - generate an event                                                                       */
 	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
+	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
 	/**************************************************************************************************/
 
@@ -1213,22 +1215,6 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
 		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
 	DBfree_result(result);
-
-	return buf_string;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_host_key_string_by_item                                      *
- *                                                                            *
- * Return value: <host>:<key>                                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_host_key_string_by_item(DB_ITEM *item)
-{
-	zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", item->host_name, item->key);
 
 	return buf_string;
 }

@@ -1764,13 +1764,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1872,13 +1873,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1929,7 +1931,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(errcodes)) * data_num);
+	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
 	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
@@ -1937,6 +1939,12 @@ try_again:
 	for (i = 0; i < data_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != dc_items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
 		zbx_json_addobject(j, NULL);
@@ -2105,11 +2113,20 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		keys[i].key = values[i].key;
 	}
 
-	DCconfig_get_items_by_keys(items, proxy_hostid, keys, errcodes, values_num);
+	DCconfig_get_items_by_keys(items, keys, errcodes, values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (proxy_hostid != items[i].host.proxy_hostid)
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
