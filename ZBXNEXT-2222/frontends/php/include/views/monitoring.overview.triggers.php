@@ -34,8 +34,7 @@ $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 $overviewWidget->addHeader(_('Overview'), $headerForm);
 
 // hint table
-$hintTable = new CTableInfo();
-$hintTable->setAttribute('style', 'width: 200px');
+$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
 $hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
 for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
@@ -61,7 +60,7 @@ if ($config['blink_period'] > 0) {
 
 $hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
 
-$help = new CHelp('web.view.php', 'right');
+$help = new CHelp();
 $help->setHint($hintTable, '', '', true, false);
 
 // header right
