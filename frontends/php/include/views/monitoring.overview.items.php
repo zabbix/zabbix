@@ -32,14 +32,13 @@ $headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
 $overviewWidget->addHeader(_('Overview'), $headerForm);
 
 // hint table
-$hintTable = new CTableInfo();
-$hintTable->setAttribute('style', 'width: 200px');
+$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
 for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
-$help = new CHelp('web.view.php', 'right');
+$help = new CHelp();
 $help->setHint($hintTable, '', '', true, false);
 
 // header right
