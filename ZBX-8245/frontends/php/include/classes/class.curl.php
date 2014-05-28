@@ -33,10 +33,6 @@ class Curl {
 	protected $query;
 	protected $arguments;
 
-	protected $skippedArguments = array(
-		'__default' => array('go', 'form', 'delete')
-	);
-
 	public function __construct($url = null) {
 		$this->url = null;
 		$this->port = null;
@@ -178,7 +174,7 @@ class Curl {
 	public function formatGetArguments() {
 		$this->arguments = $_GET;
 
-		foreach ($this->getSkippedArguments() as $argument) {
+		foreach (array('go', 'form', 'delete') as $argument) {
 			$this->removeArgument($argument);
 		}
 
@@ -321,18 +317,5 @@ class Curl {
 
 	public function toString() {
 		return $this->getUrl();
-	}
-
-	protected function getSkippedArguments()
-	{
-		global $page;
-
-		$file = isset($page['file']) ? $page['file'] : null;
-
-		if (isset($this->skippedArguments[$file])) {
-			return $this->skippedArguments[$file];
-		} else {
-			return $this->skippedArguments['__default'];
-		}
 	}
 }
