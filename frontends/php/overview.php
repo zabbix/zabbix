@@ -174,33 +174,10 @@ else {
 /*
  * Display
  */
-// filter data
-$filter = array(
-	'showTriggers' => $showTriggers,
-	'ackStatus' => CProfile::get('web.overview.filter.ack_status', 0),
-	'showSeverity' => CProfile::get('web.overview.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-	'statusChange' => CProfile::get('web.overview.filter.status_change', 0),
-	'statusChangeDays' => CProfile::get('web.overview.filter.status_change_days', 14),
-	'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
-	'application' => CProfile::get('web.overview.filter.application', ''),
-	'showMaintenance' => CProfile::get('web.overview.filter.show_maintenance', 1),
-	'inventory' => array()
-);
-$i = 0;
-while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
-	$filter['inventory'][] = array(
-		'field' => CProfile::get('web.overview.filter.inventory.field', null, $i),
-		'value' => CProfile::get('web.overview.filter.inventory.value', null, $i)
-	);
-
-	$i++;
-}
-
 $data = array(
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'type' => $type,
-	'view_style' => $viewStyle,
-	'filter' => $filter
+	'view_style' => $viewStyle
 );
 
 $data['pageFilter'] = new CPageFilter(array(
@@ -220,6 +197,28 @@ $data['hostid'] = $data['pageFilter']->hostid;
 
 // fetch trigger data
 if ($type == SHOW_TRIGGERS) {
+	// filter data
+	$filter = array(
+		'showTriggers' => $showTriggers,
+		'ackStatus' => CProfile::get('web.overview.filter.ack_status', 0),
+		'showSeverity' => CProfile::get('web.overview.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+		'statusChange' => CProfile::get('web.overview.filter.status_change', 0),
+		'statusChangeDays' => CProfile::get('web.overview.filter.status_change_days', 14),
+		'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
+		'application' => CProfile::get('web.overview.filter.application', ''),
+		'showMaintenance' => CProfile::get('web.overview.filter.show_maintenance', 1),
+		'inventory' => array()
+	);
+	$i = 0;
+	while (CProfile::get('web.overview.filter.inventory.field', null, $i) !== null) {
+		$filter['inventory'][] = array(
+			'field' => CProfile::get('web.overview.filter.inventory.field', null, $i),
+			'value' => CProfile::get('web.overview.filter.inventory.value', null, $i)
+		);
+
+		$i++;
+	}
+
 	// fetch hosts
 	$inventoryFilter = array();
 	foreach ($filter['inventory'] as $field) {
@@ -263,11 +262,19 @@ if ($type == SHOW_TRIGGERS) {
 		'sortfield' => 'description'
 	));
 
+	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
 	$data['triggers'] = $triggers;
+
+	$overviewView = new CView('monitoring.overview.triggers', $data);
 }
 // fetch item data
 else {
+	// filter data
+	$filter = array(
+		'application' => CProfile::get('web.overview.filter.application', '')
+	);
+
 	// application filter
 	$applicationIds = null;
 	if ($filter['application'] !== '') {
@@ -279,12 +286,13 @@ else {
 		$applicationIds = zbx_objectValues($applications, 'applicationid');
 	}
 
+	$data['filter'] = $filter;
 	$data['applicationIds'] = $applicationIds;
+
+	$overviewView = new CView('monitoring.overview.items', $data);
 }
 
-
 // render view
-$overviewView = new CView('monitoring.overview', $data);
 $overviewView->render();
 $overviewView->show();
 
