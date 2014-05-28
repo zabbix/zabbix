@@ -22,7 +22,7 @@
 /**
  * Trigger expression converter from 2.2 to 2.4.
  */
-class C24TriggerExpressionConverter {
+class C24TriggerConverter {
 
 	/**
 	 * A parser for function macros.
