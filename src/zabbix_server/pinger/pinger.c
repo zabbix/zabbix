@@ -71,6 +71,12 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	if (SUCCEED != errcode)
 		goto clean;
 
+	if (ITEM_STATUS_ACTIVE != item.status)
+		goto clean;
+
+	if (HOST_STATUS_MONITORED != item.host.status)
+		goto clean;
+
 	if (NOTSUPPORTED == ping_result)
 	{
 		item.state = ITEM_STATE_NOTSUPPORTED;

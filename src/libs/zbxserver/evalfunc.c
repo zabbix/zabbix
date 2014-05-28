@@ -1157,7 +1157,10 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
 		{
 			if (NULL != error)
-				*error = zbx_strdup(*error, "item does not exist");
+			{
+				*error = zbx_strdup(*error, "item does not exist, is disabled"
+						" or belongs to a disabled host");
+			}
 			goto out;
 		}
 
@@ -1165,8 +1168,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdup(*error,
-						"item does not have enough data after server start/item creation");
+				*error = zbx_strdup(*error, "item does not have enough data"
+						" after server start or item creation");
 			}
 			goto out;
 		}
@@ -2222,7 +2225,9 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item for function [%s:%s.%s(%s)] not found", host, key, function, parameter);
+		zabbix_log(LOG_LEVEL_DEBUG,
+				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
+				host, key, function, parameter);
 		goto out;
 	}
 
