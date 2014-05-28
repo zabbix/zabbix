@@ -1700,6 +1700,9 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 		goto out;
 	}
 
+	if (NULL != mtime)
+		*mtime = (int)buf.st_mtime;
+
 	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
 	{
 		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
@@ -1730,9 +1733,6 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	{
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
-
-		if (NULL != mtime)
-			*mtime = (int)buf.st_mtime;
 
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, regexps_num, pattern,
 				p_count, s_count, process_value, server, port, hostname, key);
