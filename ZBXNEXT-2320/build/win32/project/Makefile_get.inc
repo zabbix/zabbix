@@ -20,7 +20,8 @@ OBJS  = ..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxsys\mutexs.o \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
-	..\..\..\src\zabbix_get\zabbix_get.o
+	..\..\..\src\zabbix_get\zabbix_get.o \
+	..\..\..\src\libs\zbxwin32\fatal.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
 
@@ -77,3 +78,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\zabbix_get\zabbix_get.o: ..\..\..\src\zabbix_get\zabbix_get.c
 	$(CC) ..\..\..\src\zabbix_get\zabbix_get.c /Fo"..\..\..\src\zabbix_get\zabbix_get.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxwin32\fatal.o: ..\..\..\src\libs\zbxwin32\fatal.c
+	$(CC) ..\..\..\src\libs\zbxwin32\fatal.c /Fo"..\..\..\src\libs\zbxwin32\fatal.o" $(CFLAGS)
