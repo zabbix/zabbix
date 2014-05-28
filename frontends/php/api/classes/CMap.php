@@ -459,11 +459,15 @@ class CMap extends CMapElement {
 
 				foreach ($map['urls'] as $url) {
 					if ($url['name'] === '' || $url['url'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link should have both "name" and "url" fields for map "%s".', $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('URL should have both "name" and "url" fields for map "%s".', $dbMap['name'])
+						);
 					}
 
 					if (!isset($urlNames[$url['name']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link name should be unique for map "%s".', $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('URL name should be unique for map "%s".', $dbMap['name'])
+						);
 					}
 
 					unset($urlNames[$url['name']]);
