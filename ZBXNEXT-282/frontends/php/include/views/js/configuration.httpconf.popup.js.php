@@ -56,7 +56,7 @@
 	jQuery(function() {
 		jQuery('#retrieve_mode')
 			.on('change', function() {
-				jQuery('#required').attr('disabled', this.checked);
+				jQuery('#required, #posts').attr('disabled', this.checked);
 			})
 			.trigger('change');
 	});
