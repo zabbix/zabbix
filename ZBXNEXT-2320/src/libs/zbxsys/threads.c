@@ -65,7 +65,27 @@ int	zbx_child_fork()
 
 	return pid;
 }
+
+#else
+int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
+
+static ZBX_THREAD_ENTRY(zbx_thread_common_entry, args)
+{
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_exception_filter(GetExceptionCode(), GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
+}
+
 #endif
+
+
 
 /******************************************************************************
  *                                                                            *
@@ -90,8 +110,9 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 #ifdef _WINDOWS
 	unsigned	thrdaddr;
 
+	thread_args->entry = handler;
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
-	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
+	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_thread_common_entry, thread_args, 0, &thrdaddr)))
 	{
 		zbx_error("failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;

@@ -77,6 +77,9 @@ typedef struct
 	int	thread_num;	/* number of thread in a group of all agent threads */
 	int	thread_num2;	/* number of thread in a specific group of threads (e.g. listeners) */
 	void	*args;
+#ifdef _WINDOWS
+	ZBX_THREAD_ENTRY_POINTER(entry);
+#endif
 }
 zbx_thread_args_t;
 
