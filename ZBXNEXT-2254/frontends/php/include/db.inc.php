@@ -78,10 +78,14 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database.';
 					$result = false;
 				}
-				elseif (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-					if ((int) $pgsql_version >= 9) {
-						// change the output format for values of type bytea from hex (the default) to escape
-						DBexecute('SET bytea_output = escape');
+				else {
+					DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'));
+
+					if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
+						if ((int) $pgsql_version >= 9) {
+							// change the output format for values of type bytea from hex (the default) to escape
+							DBexecute('SET bytea_output = escape');
+						}
 					}
 				}
 
