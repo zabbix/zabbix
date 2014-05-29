@@ -256,7 +256,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, array('applicationid'));
 			foreach ($httpTest['steps'] as $snum => $step) {
-				if (isset($step['httpstepid'])) {
+				if (isset($step['httpstepid']) && isset($dbHttpSteps[$step['httpstepid']])) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
 					$httpTest['steps'][$snum] = $newStep;
 				}

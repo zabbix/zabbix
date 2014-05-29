@@ -257,17 +257,22 @@ class CHttpTest extends CApiService {
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
 
+		if (!$httpTests) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
+		}
+
 		// find hostid by applicationid
-		foreach ($httpTests as $hnum => $httpTest) {
-			unset($httpTests[$hnum]['templateid']);
+		foreach ($httpTests as &$httpTest) {
+			unset($httpTest['templateid']);
 
 			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
 				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
 						' FROM applications a'.
 						' WHERE a.applicationid='.zbx_dbstr($httpTest['applicationid'])));
-				$httpTests[$hnum]['hostid'] = $dbHostId['hostid'];
+				$httpTest['hostid'] = $dbHostId['hostid'];
 			}
 		}
+		unset($httpTest);
 
 		$this->validateCreate($httpTests);
 
@@ -286,51 +291,19 @@ class CHttpTest extends CApiService {
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
 
+		if (!$httpTests) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
+		}
+
+		$this->checkObjectIds($httpTests, 'httptestid',
+			_('No "%1$s" given for web scenario.'),
+			_('Empty web scenario ID.'),
+			_('Incorrect web scenario ID.')
+		);
+
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
-		foreach ($httpTests as $hnum => $httpTest) {
-			unset($httpTests[$hnum]['templateid']);
-		}
 
-		$dbHttpTests = array();
-		$dbCursor = DBselect('SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
-				' FROM httptest ht'.
-				' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests)));
-		while ($dbHttpTest = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
-		}
-		$dbCursor = DBselect('SELECT hs.httpstepid,hs.httptestid,hs.name'.
-				' FROM httpstep hs'.
-				' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests)));
-		while ($dbHttpStep = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
-		}
-
-		// add hostid if missing
-		// add test name and steps names if it's empty or test is templated
-		// unset steps no for templated tests
-		foreach($httpTests as $tnum => $httpTest) {
-			$test =& $httpTests[$tnum];
-			$dbTest = $dbHttpTests[$httpTest['httptestid']];
-			$test['hostid'] = $dbTest['hostid'];
-
-			if (!isset($test['name']) || zbx_empty($test['name']) || !empty($dbTest['templateid'])) {
-				$test['name'] = $dbTest['name'];
-			}
-			if (!empty($test['steps'])) {
-				foreach ($test['steps'] as $snum => $step) {
-					if (isset($step['httpstepid'])
-							&& (!empty($dbTest['templateid']) || !isset($step['name']) || zbx_empty($step['name']))) {
-						$test['steps'][$snum]['name'] = $dbTest['steps'][$step['httpstepid']]['name'];
-					}
-					if (!empty($dbTest['templateid'])) {
-						unset($test['steps'][$snum]['no']);
-					}
-				}
-			}
-			unset($test);
-		}
-
-		$this->validateUpdate($httpTests);
+		$httpTests = $this->validateUpdate($httpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
@@ -436,27 +409,41 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function validateCreate(array $httpTests) {
-		$this->checkNames($httpTests);
-
 		foreach ($httpTests as $httpTest) {
 			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
+		}
 
-			$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
-				' WHERE ht.name='.zbx_dbstr($httpTest['name']).
-					' AND ht.hostid='.zbx_dbstr($httpTest['hostid']), 1));
-			if ($nameExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
+		$hostIds = zbx_objectValues($httpTests, 'hostid');
+		if (!API::Host()->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (zbx_empty($httpTest['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
 			}
 
 			if (empty($httpTest['steps'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 			}
+
 			$this->checkSteps($httpTest);
 			$this->checkDuplicateSteps($httpTest);
 		}
+
+		// check input array for duplicate names
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'hostid',
+			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
+		));
+		$this->checkValidator($httpTests, $collectionValidator);
+
+		// check database for duplicate names
+		$this->checkDuplicates($httpTests);
 
 		$this->checkApplicationHost($httpTests);
 	}
@@ -466,55 +453,121 @@ class CHttpTest extends CApiService {
 	 *  - check permissions
 	 *  - check if web scenario with same name already exists
 	 *  - check that each web scenario object has httptestid defined
+	 *  - return array of web scenarios, if validation was successful
 	 *
 	 * @param array $httpTests
+	 *
+	 * @return array $httpTests
 	 */
 	protected function validateUpdate(array $httpTests) {
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
-
-		if (!$this->isWritable($httpTestIds)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
+		if (!$this->isWritable(array_keys($httpTests))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkNames($httpTests);
+		$dbHttpTests = array();
+		$dbCursor = DBselect(
+			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
+			' FROM httptest ht'.
+			' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests))
+		);
+		while ($dbHttpTest = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
 
-		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('httptestid'));
-			if (!empty($missingKeys)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
+		$dbCursor = DBselect(
+			'SELECT hs.httpstepid,hs.httptestid,hs.name'.
+			' FROM httpstep hs'.
+			' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests))
+		);
+		while ($dbHttpStep = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
+		}
+
+		foreach ($httpTests as &$httpTest) {
+			unset($httpTest['templateid']);
+
+			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
+
+			$httpTest['hostid'] = $dbHttpTest['hostid'];
+
+			if (!isset($httpTest['name']) || $dbHttpTest['templateid']) {
+				$httpTest['name'] = $dbHttpTest['name'];
 			}
 
-			if (isset($httpTest['name'])) {
-				// get hostid from db if it's not provided
-				if (isset($httpTest['hostid'])) {
-					$hostId = $httpTest['hostid'];
-				}
-				else {
-					$hostId = DBfetch(DBselect('SELECT ht.hostid FROM httptest ht'.
-						' WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
-					$hostId = $hostId['hostid'];
-				}
+			if (!empty($httpTest['steps'])) {
+				foreach ($httpTest['steps'] as &$httpTestStep) {
+					if (isset($httpTestStep['httpstepid'])
+							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
+						$httpTestStep['name'] = $dbHttpTest['steps'][$httpTestStep['httpstepid']]['name'];
+					}
 
-				$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht'.
-					' WHERE ht.name='.zbx_dbstr($httpTest['name']).
-						' AND ht.hostid='.zbx_dbstr($hostId).
-						' AND ht.httptestid<>'.zbx_dbstr($httpTest['httptestid']), 1));
-				if ($nameExists) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
+					if ($dbHttpTest['templateid']) {
+						unset($httpTestStep['no']);
+					}
 				}
-			}
+				unset($httpTestStep);
 
-			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if (isset($httpTest['steps'])) {
-				$this->checkSteps($httpTest);
-				$this->checkDuplicateSteps($httpTest);
+				$this->checkSteps($httpTest, $dbHttpTest);
+				$this->checkDuplicateSteps($httpTest, $dbHttpTest);
 			}
 		}
+		unset($httpTest);
+
+		// check input array for duplicate names
+		$collectionValidator = new CCollectionValidator(array(
+			'uniqueField' => 'name',
+			'uniqueField2' => 'hostid',
+			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
+		));
+		$this->checkValidator($httpTests, $collectionValidator);
+
+		// check database for duplicate names
+		$this->checkDuplicates($httpTests, $dbHttpTests);
 
 		$this->checkApplicationHost($httpTests);
+
+		return $httpTests;
+	}
+
+	/**
+	 * Check DB for duplicate names on hosts
+	 *
+	 * @throws APIException if same name on some host is found.
+	 *
+	 * @param array $httpTests		array of web screnarios
+	 * @param array $dbHttpTests	array of DB web screnarios
+	 */
+	protected function checkDuplicates(array $httpTests, array $dbHttpTests = array()) {
+		$httpTestNames = array();
+
+		foreach ($httpTests as $httpTest) {
+			if (isset($httpTest['name'])) {
+				if (zbx_empty($httpTest['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
+				}
+				elseif (($dbHttpTests && $dbHttpTests[$httpTest['httptestid']]['name'] !== $httpTest['name'])
+						|| !$dbHttpTests) {
+					$httpTestNames[$httpTest['hostid']][] = $httpTest['name'];
+				}
+			}
+		}
+
+		if ($httpTestNames) {
+			foreach ($httpTestNames as $hostId => $httpTestName) {
+				$nameExists = API::getApiService()->select($this->tableName(), array(
+					'output' => array('name'),
+					'filter' => array('name' => $httpTestName, 'hostid' => $hostId),
+					'limit' => 1
+				));
+
+				if ($nameExists) {
+					$nameExists = reset($nameExists);
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Web scenario "%1$s" already exists.', $nameExists['name'])
+					);
+				}
+			}
+		}
 	}
 
 	/**
@@ -554,9 +607,12 @@ class CHttpTest extends CApiService {
 	 *  - check status_codes field
 	 *  - check name characters
 	 *
+	 * @throws APIException if incorrect characters are passed, incorrect step numbers step is missing.
+	 *
 	 * @param array $httpTest
+	 * @param array $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
@@ -570,14 +626,28 @@ class CHttpTest extends CApiService {
 				$this->checkStatusCode($step['status_codes']);
 			}
 		}
+
+		// check if step still exists on update
+		if ($dbHttpTest) {
+			foreach ($httpTest['steps'] as $step) {
+				if (isset($step['httpstepid']) && !isset($dbHttpTest['steps'][$step['httpstepid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+			}
+		}
 	}
 
 	/**
 	 * Check duplicate step names.
 	 *
+	 * @throws APIException if duplicate step name is found.
+	 *
 	 * @param array $httpTest
+	 * @param array $dbHttpTest
 	 */
-	protected function checkDuplicateSteps(array $httpTest) {
+	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = array()) {
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
 		}
@@ -618,22 +688,6 @@ class CHttpTest extends CApiService {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check web scenario names.
-	 *
-	 * @param array $httpTests
-	 *
-	 * @return array|null
-	 */
-	protected function checkNames(array $httpTests) {
-		$httpTestsNames = zbx_objectValues($httpTests, 'name');
-		if (!empty($httpTestsNames)) {
-			if (!preg_grep('/^['.ZBX_PREG_PRINT.']+$/u', $httpTestsNames)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-			}
-		}
 	}
 
 	/**
