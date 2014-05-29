@@ -1543,6 +1543,7 @@ sub __get_eventtimes
 	" order by clock,ns desc".
 	" limit 1");
 
+    my $add_event = 0;
     while (my @row = $res->fetchrow_array)
     {
 	my $clock = $row[0];
@@ -1551,7 +1552,11 @@ sub __get_eventtimes
 
 	# we cannot add 'value=TRIGGER_VALUE_TRUE' and 'false_positive!=INCIDENT_FALSE_POSITIVE'
 	# to the SQL query above as we need the latest event before $from
-	push(@eventtimes, $clock) if ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE);
+	if ($value == TRIGGER_VALUE_TRUE)
+	{
+	    $add_event = ($false_positive == INCIDENT_FALSE_POSITIVE) ? 0 : 1;
+	}
+	push(@eventtimes, $clock) if ($add_event == 1);
     }
 
     $res = db_select(
@@ -1560,12 +1565,11 @@ sub __get_eventtimes
 	" where object=".EVENT_OBJECT_TRIGGER.
 		" and source=".EVENT_SOURCE_TRIGGERS.
 		" and objectid=$triggerid".
-		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 		" and clock between $from and $till".
+		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 	" order by clock,ns");
 
     my (@unsorted_eventtimes, @row, $add_event);
-    $add_event = 1;
     while (@row = $res->fetchrow_array)
     {
 	my $clock = $row[0];
