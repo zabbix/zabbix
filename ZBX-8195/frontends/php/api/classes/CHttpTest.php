@@ -344,10 +344,8 @@ class CHttpTest extends CZBXAPI {
 			if (!isset($test['name']) || zbx_empty($test['name']) || !empty($dbTest['templateid'])) {
 				$test['name'] = $dbTest['name'];
 			}
-			if (isset($test['steps']) && !$test['steps']) {
-				unset($test['steps']);
-			}
-			if (!empty($test['steps'])) {
+
+			if (array_key_exists('steps', $test) && is_array($test['steps'])) {
 				foreach ($test['steps'] as $snum => $step) {
 					if (isset($step['httpstepid'])
 							&& (!empty($dbTest['templateid']) || !array_key_exists('name', $step))) {
@@ -482,9 +480,6 @@ class CHttpTest extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario "%1$s" already exists.', $nameExists['name']));
 			}
 
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-			}
 			$this->checkSteps($httpTest);
 			$this->checkDuplicateSteps($httpTest);
 		}
@@ -539,7 +534,7 @@ class CHttpTest extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			if (isset($httpTest['steps'])) {
+			if (array_key_exists('steps', $httpTest)) {
 				$dbHttpTest = isset($httpTest['httptestid']) ? $dbHttpTests[$httpTest['httptestid']] : null;
 
 				$this->checkSteps($httpTest, $dbHttpTest);
@@ -594,6 +589,12 @@ class CHttpTest extends CZBXAPI {
 	 * @param array|null $dbHttpTest
 	 */
 	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
+
+		if (array_key_exists('steps', $httpTest)
+				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
+		}
+
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
