@@ -508,7 +508,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		/* headers defined in a step overwrite headers defined in scenario */
 		if ('\0' != httpstep.headers)
 			add_headers(httpstep.headers, &headers_slist);
-		else
+		else if ('\0' != httptest->httptest.headers)
 			add_headers(httptest->httptest.headers, &headers_slist);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
