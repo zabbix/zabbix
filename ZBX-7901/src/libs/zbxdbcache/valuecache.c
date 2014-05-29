@@ -2951,62 +2951,6 @@ finish:
 	return ret;
 }
 
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vc_check_value                                               *
- *                                                                            *
- * Purpose: check if the item has cached values and adds item to the cache    *
- *          if necessary                                                      *
- *                                                                            *
- * Parameters: itemid     - [IN] the item id                                  *
- *             value_type - [IN] the item value type                          *
- *                                                                            *
- * Return value: SUCCEED - the item cached values                             *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vc_check_value(zbx_uint64_t itemid, int value_type)
-{
-	const char	*__function_name = "zbx_vc_check_value";
-
-	zbx_vc_item_t	*item;
-	int 		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d", __function_name, itemid,
-			value_type);
-
-	if (NULL == vc_cache)
-		goto out;
-
-	zbx_vc_lock();
-
-	if (NULL != (item = zbx_hashset_search(&vc_cache->items, &itemid)))
-	{
-		if (NULL != item->head)
-			ret = SUCCEED;
-
-		goto unlock;
-	}
-
-	if (0 == vc_cache->low_memory)
-	{
-		zbx_vc_item_t   new_item = {itemid, value_type};
-
-		item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t));
-
-		/* set the minimal range */
-		item->range = 1;
-		item->last_accessed = time(NULL);
-	}
-unlock:
-	zbx_vc_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_vc_get_statistics                                            *
@@ -3025,7 +2969,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	if (NULL == vc_cache)
 		return FAIL;
 
-	zbx_vc_lock();
+	vc_try_lock();
 
 	stats->hits = vc_cache->hits;
 	stats->misses = vc_cache->misses;
@@ -3034,7 +2978,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	stats->total_size = vc_mem->total_size;
 	stats->free_size = vc_mem->free_size;
 
-	zbx_vc_unlock();
+	vc_try_unlock();
 
 	return SUCCEED;
 }

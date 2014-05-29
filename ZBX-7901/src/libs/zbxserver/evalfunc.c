@@ -1124,7 +1124,7 @@ out:
 static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, const char *parameters)
 {
 	const char			*__function_name = "evaluate_NODATA";
-	int				arg1, flag, now, ret = FAIL, seconds;
+	int				arg1, flag, now, ret = FAIL;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1142,13 +1142,6 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	if (FAIL == zbx_vc_check_value(item->itemid, item->value_type) &&
-			(SUCCEED != DCget_data_expected_from(item->itemid, &seconds) || seconds + arg1 > now))
-	{
-		goto out;
-	}
-
-
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			1 == values.values_num && values.values[0].timestamp.sec + arg1 > now)
 	{
@@ -1156,6 +1149,11 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 	}
 	else
 	{
+		int	seconds;
+
+		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds) || seconds + arg1 > now)
+			goto out;
+
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 	}
 
