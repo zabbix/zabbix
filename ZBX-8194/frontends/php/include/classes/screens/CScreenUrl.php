@@ -37,7 +37,7 @@ class CScreenUrl extends CScreenBase {
 			return $this->getOutput(new CTableInfo(_('No host selected.')));
 		}
 
-		$resolveHostMacros = ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->screenitem['templated']);
+		$resolveHostMacros = ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen);
 
 		$url = CMacrosResolverHelper::resolveScreenElementURL(array(
 			'config' => $resolveHostMacros ? 'screenElementURL' : 'screenElementURLUser',
