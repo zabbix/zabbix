@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
 ...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ..F....... [ZBX-7535] trivial change from 'Link' to 'URL' in error messages (Andrejs)
