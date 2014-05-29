@@ -311,18 +311,18 @@ class CHttpTest extends CApiService {
 			_('Incorrect web scenario ID.')
 		);
 
+		$httpTests = zbx_toHash($httpTests, 'httptestid');
+
 		$dbHttpTests = array();
 		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,ht.hostid,'.
+			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,'.
 				'ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password,ht.verify_peer,ht.verify_host'.
 			' FROM httptest ht'.
-			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+			' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests))
 		);
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
-
-		$httpTests = zbx_toHash($httpTests, 'httptestid');
 
 		$dbCursor = DBselect(
 			'SELECT hs.httpstepid,hs.httptestid,hs.name'.
@@ -337,7 +337,7 @@ class CHttpTest extends CApiService {
 
 		Manager::HttpTest()->persist($httpTests);
 
-		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
+		return array('httptestids' => array_keys($httpTests));
 	}
 
 	/**
@@ -497,7 +497,7 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$httpTests = $this->extendFromObjects(zbx_toHash($httpTests, 'httptestid'), $dbHttpTests, array(
+		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, array(
 			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
 		));
 
@@ -526,7 +526,6 @@ class CHttpTest extends CApiService {
 					// unset required text and POST variables if retrieving only headers
 					if (isset($httpTestStep['retrieve_mode'])
 							&& ($httpTestStep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
-
 						$httpTestStep['required'] = '';
 						$httpTestStep['posts'] = '';
 					}
