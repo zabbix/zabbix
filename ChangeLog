@@ -1,7 +1,25 @@
+Changes for 2.3.1
+
+New features:
+.......PS. [ZBXNEXT-2254] DBSchema configuration parameter now applies to PostgreSQL as well as IBM DB2 (Juris)
+A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+..F....... [ZBX-7535] trivial change from 'Link' to 'URL' in error messages (Andrejs)
+..F....... [ZBX-8259] fixed padding for widgets in screen (Andrejs)
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
+..F....... [ZBX-8221] corrected labels while copying items (Andrejs)
+........S. [ZBX-8092] added disabled hosts, disabled items and enabled items of disabled hosts to the configuration cache for correct macro expansion in notifications (igors)
+
 --------------------------------------------------------------------------------
 Changes for 2.3.0
 
 New features:
+A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">=", "<=", "<>", "and", "or" and "not"; removed existing "#", "|" and "&" (asaveljevs, Pavels)
 ...GI..PS. [ZBXNEXT-2203] added information on the reason items become not supported (Alexei, asaveljevs)
 ..F....... [ZBXNEXT-734] implemented support for URL as dynamic screen element and added macro support (Ivo)
 ...GI..PS. [ZBXNEXT-497] added support for patterns in "Include" configuration directive (asaveljevs)
@@ -53,6 +71,9 @@ A.F.I...S. [ZBXNEXT-581] implemented the ability to filter by multiple LLD macro
 A......... [ZBX-7345] removed deprecated API features (Pavels)
 
 Bug fixes:
+........S. [ZBX-8014] fixed evaluation of calculated item and trigger expressions not being precise enough (asaveljevs)
+..F....... [ZBX-8212] it is not possible to add triggers from templates to maps anymore (Andrejs)
+A......... [ZBX-8227] fixed the "applicationids" parameter in trigger.get overriding the "groupids" parameter (Pavels)
 A......... [ZBX-8169] fixed SLA period calculation to account for DST changes (Krists)
 ...G...PS. [ZBX-8172] fixed numeric value extraction from json data to ensure compatibility with third party tools that sends data as numeric values instead of strings (wiper).
 .......P.. [ZBX-8048] fixed bug where proxy would truncate execute scripts of telnet, ssh and database monitoring items to 2kB (Juris)
@@ -133,6 +154,13 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
+.......P.. [ZBX-7968] fixed bug when proxy stopped sending history data if it had more than 1000 unmonitored item values in history table; thanks to Corey Shaw for identifying the issue and providing a patch (wiper)
+.......PS. [ZBX-8251] fixed possible crash when trying to get item value from a failed vmware service with log level set to debug (wiper)
+........S. [ZBX-8092] added disabled hosts, disabled items and enabled items of disabled hosts to the configuration cache for correct macro expansion in notifications (igors)
+........S. [ZBX-8230] changed maintenance status log messages from warning to debug level (Juris)
 ...G...... [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ........S. [ZBX-8210] fixed crash when attempting to evaluate an eventlog key for items obtained from the value cache (Juris)
 ........S. [ZBX-8219] fixed regression in ipmi checks to support on/off values for sent commands (Juris)
@@ -1076,6 +1104,8 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 ...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
