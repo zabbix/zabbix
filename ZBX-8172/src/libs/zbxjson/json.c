@@ -603,7 +603,7 @@ static char	zbx_json_decode_character(const char **p)
 			out = '\t';
 			break;
 		case 'u':
-			p += 3; /* "u00" */
+			*p += 3; /* "u00" */
 			out = zbx_hex2num(**p) << 4;
 			out += zbx_hex2num(*(++*p));
 			break;
