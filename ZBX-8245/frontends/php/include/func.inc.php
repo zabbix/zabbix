@@ -1439,9 +1439,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 	$link = new Curl($url);
-	if (empty($url)) {
-		$link->formatGetArguments();
-	}
+
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
 
