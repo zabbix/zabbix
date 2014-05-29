@@ -21,6 +21,7 @@
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
 require_once __DIR__.'/../../include/gettextwrapper.inc.php';
+require_once __DIR__.'/../../include/triggers.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
@@ -32,10 +33,14 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api',
 	__DIR__.'/../../include/classes/api/clients',
 	__DIR__.'/../../include/classes/api/wrappers',
+	__DIR__.'/../../include/classes/parsers',
+	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../include/classes/validators',
-	__DIR__.'/../../include/classes/validators/string',
+	__DIR__.'/../../include/classes/triggers',
+	__DIR__.'/../../include/classes/import',
 	__DIR__.'/../../include/classes/services',
 	__DIR__.'/../../api/classes',
 	__DIR__.'/include/classes/validators',
+	__DIR__.'/include/classes/parsers',
 ));
 $autoloader->register();

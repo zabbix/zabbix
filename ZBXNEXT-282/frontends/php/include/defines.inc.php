@@ -19,9 +19,9 @@
 **/
 
 
-define('ZABBIX_VERSION',     '2.3.0');
-define('ZABBIX_API_VERSION', '2.3.0');
-define('ZABBIX_DB_VERSION',	 2030103);
+define('ZABBIX_VERSION',     '2.3.1');
+define('ZABBIX_API_VERSION', '2.3.1');
+define('ZABBIX_DB_VERSION',	 2030105);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2014');
@@ -121,7 +121,6 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_PERIOD',		3);
 define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
@@ -758,9 +757,6 @@ define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
 define('UNKNOWN_VALUE', '-');
-
-define('REGEXP_INCLUDE', 0);
-define('REGEXP_EXCLUDE', 1);
 
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');

@@ -51,6 +51,13 @@ class CScreenBase {
 	public $resourcetype;
 
 	/**
+	 * Is templated screen
+	 *
+	 * @var bool
+	 */
+	public $isTemplatedScreen;
+
+	/**
 	 * Screen id
 	 *
 	 * @var int
@@ -123,6 +130,7 @@ class CScreenBase {
 	 * @param int		$options['mode']
 	 * @param int		$options['timestamp']
 	 * @param int		$options['resourcetype']
+	 * @param bool		$options['isTemplatedScreen']
 	 * @param int		$options['screenid']
 	 * @param array		$options['screenitem']
 	 * @param string	$options['action']
@@ -141,6 +149,7 @@ class CScreenBase {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
+		$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : null;
 		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
