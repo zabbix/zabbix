@@ -505,11 +505,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		http_substitute_variables(httptest, &httpstep.headers);
 
-		/* collect headers defined in a scenario */
-		add_headers(httptest->httptest.headers, &headers_slist);
-
-		/* collect headers defined in a step */
-		add_headers(httpstep.headers, &headers_slist);
+		/* headers defined in a step overwrite headers defined in scenario */
+		if ('\0' != httpstep.headers)
+			add_headers(httpstep.headers, &headers_slist);
+		else
+			add_headers(httptest->httptest.headers, &headers_slist);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 		{
