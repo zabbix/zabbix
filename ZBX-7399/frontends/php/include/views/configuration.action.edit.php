@@ -835,7 +835,7 @@ if (!empty($this->data['new_operation'])) {
 							'height' => 450
 						)
 					)),
-					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
+					new CDiv(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu'), 'add-detail')
 				), null, 2),
 				null,
 				'opGroupListFooter'
@@ -886,7 +886,7 @@ if (!empty($this->data['new_operation'])) {
 							'height' => 450
 						)
 					)),
-					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
+					new CDiv(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu'), 'add-detail')
 				), null, 2),
 				null,
 				'opTemplateListFooter'

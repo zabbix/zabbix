@@ -487,47 +487,15 @@ ZABBIX.apps.map = (function($) {
 				$('#elementType').change(function() {
 					var obj = $(this);
 
-					// clean form
-					$('.multiselect-wrapper .multiselect').unwrap();
-					$('.select-popup').remove();
-
 					switch (obj.val()) {
 						// host
 						case '0':
-							$('#elementNameHost').multiSelectHelper({
-								id: 'elementNameHost',
-								objectName: 'hosts',
-								name: 'elementValue',
-								selectedLimit: 1,
-								objectOptions: {
-									editable: true
-								},
-								popup: {
-									parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
-										'&srcfld1=hostid&writeonly=1',
-									width: 450,
-									height: 450
-								}
-							});
+							jQuery('#elementNameHost').multiSelect.clean('elementNameHost');
 							break;
 
 						// host group
 						case '3':
-							$('#elementNameHostGroup').multiSelectHelper({
-								id: 'elementNameHostGroup',
-								objectName: 'hostGroup',
-								name: 'elementValue',
-								selectedLimit: 1,
-								objectOptions: {
-									editable: true
-								},
-								popup: {
-									parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
-										'&srcfld1=groupid&writeonly=1',
-									width: 450,
-									height: 450
-								}
-							});
+							jQuery('#elementNameHostGroup').multiSelect.clean('elementNameHostGroup');
 							break;
 
 						// others types
@@ -663,10 +631,6 @@ ZABBIX.apps.map = (function($) {
 					this.selements[id].toggleSelect(false);
 					delete this.selection.selements[id];
 				}
-
-				// clean multiselect
-				$('.multiselect-wrapper .multiselect').unwrap();
-				$('.select-popup').remove();
 			},
 
 			selectElements: function(ids, addSelection) {
@@ -1263,6 +1227,40 @@ ZABBIX.apps.map = (function($) {
 					});
 			}
 
+			// hosts
+			$('#elementNameHost').multiSelectHelper({
+				id: 'elementNameHost',
+				objectName: 'hosts',
+				name: 'elementValue',
+				selectedLimit: 1,
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
+						'&srcfld1=hostid&writeonly=1',
+					width: 450,
+					height: 450
+				}
+			});
+
+			// host group
+			$('#elementNameHostGroup').multiSelectHelper({
+				id: 'elementNameHostGroup',
+				objectName: 'hostGroup',
+				name: 'elementValue',
+				selectedLimit: 1,
+				objectOptions: {
+					editable: true
+				},
+				popup: {
+					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
+						'&srcfld1=groupid&writeonly=1',
+					width: 450,
+					height: 450
+				}
+			});
+
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -1348,46 +1346,23 @@ ZABBIX.apps.map = (function($) {
 					$('#use_iconmap').prop('disabled', true);
 				}
 
-				// set element id and name
+				// set multiselect values
+				if (selement.elementtype == 0 || selement.elementtype == 3) {
+					var item = {
+						'id': selement.elementid,
+						'name': selement.elementName
+					};
+				}
+
 				switch (selement.elementtype) {
 					// host
 					case '0':
-						$('#elementNameHost').multiSelectHelper({
-							id: 'elementNameHost',
-							objectName: 'hosts',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1,
-							objectOptions: {
-								editable: true
-							},
-							popup: {
-								parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
-									'&srcfld1=hostid&writeonly=1',
-								width: 450,
-								height: 450
-							}
-						});
+						$('#elementNameHost').multiSelect.addData(item, 'elementNameHost');
 						break;
 
 					// host group
 					case '3':
-						$('#elementNameHostGroup').multiSelectHelper({
-							id: 'elementNameHostGroup',
-							objectName: 'hostGroup',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1,
-							objectOptions: {
-								editable: true
-							},
-							popup: {
-								parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
-									'&srcfld1=groupid&writeonly=1',
-								width: 450,
-								height: 450
-							}
-						});
+						$('#elementNameHostGroup').multiSelect.addData(item, 'elementNameHostGroup');
 						break;
 				}
 			},
