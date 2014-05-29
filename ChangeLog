@@ -3,6 +3,7 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
 ...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
