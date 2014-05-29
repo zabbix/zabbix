@@ -270,9 +270,6 @@ static void	zbx_set_defaults()
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
 #ifdef HAVE_LIBCURL
-	if (NULL == CONFIG_SSL_CA_LOCATION)
-		CONFIG_SSL_CA_LOCATION = zbx_strdup(CONFIG_SSL_CA_LOCATION, DATADIR "/zabbix/ssl/ca");
-
 	if (NULL == CONFIG_SSL_CERT_LOCATION)
 		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
 

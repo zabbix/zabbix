@@ -377,7 +377,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
@@ -385,6 +384,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
+	}
+
+	if (NULL != CONFIG_SSL_CA_LOCATION)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	if ('\0' != *httptest->httptest.ssl_cert_file)
