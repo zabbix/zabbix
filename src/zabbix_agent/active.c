@@ -727,7 +727,8 @@ ret:
  *             port        - port of Zabbix server                            *
  *             host        - name of host in Zabbix database                  *
  *             key         - name of metric                                   *
- *             value       - key value                                        *
+ *             value       - key value or error message why an item became    *
+ *                           NOTSUPPORTED                                     *
  *             state       - ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED     *
  *             lastlogsize - size of read logfile                             *
  *             mtime       - time of last file modification                   *
@@ -913,23 +914,36 @@ static void	process_active_checks(char *server, unsigned short port)
 
 		if (-1 != is_logrt)
 		{
-			int	err;
+			int		err, rc;
+			const char	*err_msg = NULL;
+			char		*err_msg_dyn = NULL;
 
 			ret = FAIL;
 
 			do
 			{
-				if (ZBX_COMMAND_WITH_PARAMS != parse_command(active_metrics[i].key, NULL, 0,
-						params, sizeof(params)))
+				if (ZBX_COMMAND_WITH_PARAMS != (rc = parse_command(active_metrics[i].key, NULL, 0,
+						params, sizeof(params))))
 				{
+					if (ZBX_COMMAND_ERROR == rc)
+						err_msg = "Invalid item key format.";
+					else if (ZBX_COMMAND_WITHOUT_PARAMS == rc)
+						err_msg = "Mandatory first parameter missing.";
+
 					break;
 				}
 
 				if (6 < num_param(params))
+				{
+					err_msg = "Too many parameters.";
 					break;
+				}
 
 				if (0 != get_param(params, 1, filename, sizeof(filename)))
+				{
+					err_msg = "Invalid first parameter.";
 					break;
+				}
 
 				if (0 != get_param(params, 2, pattern, sizeof(pattern)))
 					*pattern = '\0';
@@ -947,6 +961,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				else if (MIN_VALUE_LINES > (maxlines_persec = atoi(maxlines_persec_str)) ||
 						MAX_VALUE_LINES < maxlines_persec)
 				{
+					err_msg = "Invalid 'maxlines' parameter.";
 					break;
 				}
 
@@ -956,7 +971,10 @@ static void	process_active_checks(char *server, unsigned short port)
 				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
 					active_metrics[i].skip_old_data = 0;
 				else if (0 != strcmp(tmp, "skip"))
+				{
+					err_msg = "Invalid 'mode' parameter.";
 					break;
+				}
 
 				if (0 != get_param(params, 6, output_template, sizeof(output_template)))
 					*output_template = '\0';
@@ -972,10 +990,10 @@ static void	process_active_checks(char *server, unsigned short port)
 				ret = process_logrt(is_logrt, filename, &active_metrics[i].lastlogsize,
 						&active_metrics[i].mtime, &active_metrics[i].skip_old_data,
 						&active_metrics[i].big_rec, &active_metrics[i].use_ino,
-						&active_metrics[i].error_count, &active_metrics[i].logfiles,
-						&active_metrics[i].logfiles_num, encoding, &regexps, pattern,
-						output_template, &p_count, &s_count, process_value, server, port,
-						CONFIG_HOSTNAME, active_metrics[i].key_orig);
+						&active_metrics[i].error_count, &err_msg_dyn,
+						&active_metrics[i].logfiles, &active_metrics[i].logfiles_num, encoding,
+						&regexps, pattern, output_template, &p_count, &s_count, process_value,
+						server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig);
 
 				/* reset errors if things have improved */
 				if (0 < active_metrics[i].error_count && SUCCEED == ret
@@ -992,18 +1010,23 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (FAIL == ret)
 			{
+				const char	*p;
+
+				p = (NULL != err_msg) ? err_msg : ((NULL != err_msg_dyn) ? err_msg_dyn :
+						ZBX_NOTSUPPORTED);
 				active_metrics[i].error_count = 0;
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 
-				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
-						active_metrics[i].key);
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s",
+						active_metrics[i].key, p);
 
-				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						ZBX_NOTSUPPORTED, ITEM_STATE_NOTSUPPORTED,
-						&active_metrics[i].lastlogsize,
+				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig, p,
+						ITEM_STATE_NOTSUPPORTED, &active_metrics[i].lastlogsize,
 						(1 == is_logrt) ? &active_metrics[i].mtime : NULL, NULL, NULL, NULL,
 						NULL, 0);
 			}
+
+			zbx_free(err_msg_dyn);
 		}
 		/* special processing for eventlog */
 		else if (0 == strncmp(active_metrics[i].key, "eventlog[", 9))
