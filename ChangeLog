@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
 ...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
@@ -154,6 +155,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
 ...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ........S. [ZBX-8143] triggers are now committed to the database individually when setting to an unknown state to avoid potential locking between the poller and history syncer (Juris)
@@ -1104,6 +1106,7 @@ Changes for 2.0.13rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
 ...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
 ...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
