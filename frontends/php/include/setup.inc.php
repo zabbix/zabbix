@@ -304,7 +304,7 @@ class CSetupWizard extends CForm {
 					$database
 				));
 
-				if ($DB['TYPE'] == ZBX_DB_DB2) {
+				if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 					$schema = new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''));
 					$schema->attr('onchange', "disableSetupStepButton('#next_2')");
 					$table->addRow(array(
@@ -422,7 +422,7 @@ class CSetupWizard extends CForm {
 				$table->addRow(array(new CCol(_('Database name'), 'header'), $this->getConfig('DB_DATABASE')));
 				$table->addRow(array(new CCol(_('Database user'), 'header'), $this->getConfig('DB_USER')));
 				$table->addRow(array(new CCol(_('Database password'), 'header'), preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'))));
-				if ($dbType == ZBX_DB_DB2) {
+				if ($dbType == ZBX_DB_DB2 || $dbType == ZBX_DB_POSTGRESQL) {
 					$table->addRow(array(new CCol(_('Database schema'), 'header'), $this->getConfig('DB_SCHEMA')));
 				}
 				break;
@@ -482,7 +482,8 @@ class CSetupWizard extends CForm {
 			elseif ($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')) {
 				$error = true;
 			}
-			elseif ($this->getConfig('DB_TYPE') == ZBX_DB_DB2 && $config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA')) {
+			elseif (($this->getConfig('DB_TYPE') == ZBX_DB_DB2 || $this->getConfig('DB_TYPE') == ZBX_DB_POSTGRESQL)
+					&& $config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA')) {
 				$error = true;
 			}
 			elseif ($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')) {
@@ -563,6 +564,11 @@ class CSetupWizard extends CForm {
 			$result = true;
 			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_DB2) {
 				$db_schema = DBselect('SELECT schemaname FROM syscat.schemata WHERE schemaname=\''.db2_escape_string($DB['SCHEMA']).'\'');
+				$result = DBfetch($db_schema);
+			}
+
+			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+				$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.pg_escape_string($DB['SCHEMA']).'\';');
 				$result = DBfetch($db_schema);
 			}
 
