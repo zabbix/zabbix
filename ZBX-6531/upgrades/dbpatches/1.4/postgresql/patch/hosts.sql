@@ -1,0 +1,1 @@
+-- See hosts_templates.sql
