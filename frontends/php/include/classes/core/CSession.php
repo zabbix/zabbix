@@ -20,6 +20,12 @@ class CSession implements ArrayAccess {
 		}
 	}
 
+	public function clear()
+	{
+		$_SESSION = array();
+		session_write_close();
+	}
+
 	public function offsetSet($offset, $value) {
 		$_SESSION[$offset] = $value;
 	}
