@@ -247,7 +247,9 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
 	{
-		if (0 == strcmp(values.values[0].value.log->source, arg1))
+		const char	*source = values.values[0].value.log->source;
+
+		if (0 == strcmp(NULL == source ? "" : source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -2203,7 +2205,9 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item for function [%s:%s.%s(%s)] not found", host, key, function, parameter);
+		zabbix_log(LOG_LEVEL_DEBUG,
+				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
+				host, key, function, parameter);
 		goto out;
 	}
 
