@@ -627,14 +627,7 @@ else {
 
 	order_result($data['graphs'], $sortfield, $sortorder);
 
-	$data['paging'] = getPagingLine(
-		$data['graphs'],
-		array('graphid'),
-		array(
-			'hostid' => get_request('hostid'),
-			'parent_discoveryid' => get_request('parent_discoveryid')
-		)
-	);
+	$data['paging'] = getPagingLine($data['graphs']);
 
 	// get graphs after paging
 	$options = array(

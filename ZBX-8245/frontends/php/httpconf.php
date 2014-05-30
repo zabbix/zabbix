@@ -521,7 +521,7 @@ else {
 
 		order_result($httpTests, $sortfield, getPageSortOrder());
 
-		$data['paging'] = getPagingLine($httpTests, array('httptestid'));
+		$data['paging'] = getPagingLine($httpTests);
 
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname'.

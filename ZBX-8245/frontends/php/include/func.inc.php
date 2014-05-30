@@ -1438,7 +1438,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 
 	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-	$link = new Curl($url);
+	$link = CUrlFactory::getFilteredUrl($url);
 
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
@@ -1539,7 +1539,7 @@ function getPageNumber() {
  *
  * @return CTable
  */
-function getPagingLine(&$items, array $removeUrlParams = array(), array $urlParams = array()) {
+function getPagingLine(&$items, $removeUrlParams = array(), $urlParams = array()) {
 	global $page;
 
 	$config = select_config();
@@ -1589,18 +1589,7 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 	$table = null;
 
 	if ($pagesCount > 1) {
-		$url = new Curl();
-
-		if (is_array($urlParams) && $urlParams) {
-			foreach ($urlParams as $key => $value) {
-				$url->setArgument($key, $value);
-			}
-		}
-
-		$removeUrlParams = array_merge($removeUrlParams, array('go', 'form', 'delete', 'cancel'));
-		foreach ($removeUrlParams as $param) {
-			$url->removeArgument($param);
-		}
+		$url = CurlFactory::getFilteredUrl(array(), $removeUrlParams, $urlParams);
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);

@@ -1,0 +1,169 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2014 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+class CUrlFactory {
+
+	/**
+	 * Configuration of urlFilters. Top-level key is file name from $page['file'], below goes:
+	 * 'remove' - to remove arguments
+	 * 'add' - key => value array to add arguments, "@value" references $_REQUEST[value]
+	 * 'callable' - callable to apply to argument list
+	 *
+	 * @var array
+	 */
+	protected static $urlConfig = array(
+		'actionconf.php' => array(
+			'remove' => array('actionid')
+		),
+		'applications.php' => array(
+			'remove' => array('applicationid')
+		),
+		'disc_prototypes.php' => array(
+			'remove' => array('itemid'),
+			'add' => array(
+				'hostid' => '@hostid',
+				'parent_discoveryid' => '@parent_discoveryid'
+			)
+		),
+		'discoveryconf.php' => array(
+			'remove' => array('druleid')
+		),
+		'graphs.php' => array(
+			'remove' => array('graphid'),
+			'add' => array(
+				'hostid' => '@hostid',
+				'parent_discoveryid' => '@parent_discoveryid'
+			)
+		),
+		'host_discovery.php' => array(
+			'remove' => array('itemid'),
+			'add' => array('hostid' => '@hostid')
+		),
+		'host_prototypes.php' => array(
+			'remove' => array('hostid'),
+			'add' => array('parent_discoveryid' => '@parent_discoveryid')
+		),
+		'hostgroups.php' => array(
+			'remove' => array('groupid')
+		),
+		'hosts.php' => array(
+			'remove' => array('hostid')
+		),
+		'httpconf.php' => array(
+			'remove' => array('httptestid')
+		),
+		'items.php' => array(
+			'remove' => array('itemid')
+		),
+		'maintenance.php' => array(
+			'remove' => array('maintenanceid')
+		),
+		'media_types.php' => array(
+			'remove' => array('mediatypeid')
+		),
+		'proxies.php' => array(
+			'remove' => array('proxyid')
+		),
+		'screenconf.php' => array(
+			'remove' => array('screenid'),
+			'add' => array('templateid' => '@templateid')
+		),
+		'scripts.php' => array(
+			'remove' => array('scriptid')
+		),
+		'slideconf.php' => array(
+			'remove' => array('slideshowid')
+		),
+		'sysmaps.php' => array(
+			'remove' => array('sysmapid')
+		),
+		'templates.php' => array(
+			'remove' => array('templateid')
+		),
+		'trigger_prototypes.php' => array(
+			'remove' =>  array('triggerid'),
+			'add' => array(
+				'parent_discoveryid' => '@parent_discoveryid',
+				'hostid' => '@hostid'
+			)
+		),
+		'triggers.php' => array(
+			'remove' => array('triggerid'),
+			'add' => array('hostid' => '@hostid')
+		),
+		'usergrps.php' => array(
+			'remove' => array('usrgrpid')
+		),
+		'users.php' => array(
+			'remove' => array('userid')
+		),
+		'__default' => array(
+			'remove' => array('go', 'cancel', 'form', 'delete')
+		)
+	);
+
+	/**
+	 * @param null $url
+	 * @param array $remove
+	 * @param array $add
+	 * @return Curl
+	 */
+	public static function getFilteredUrl($url = null, $remove = array(), $add = array()) {
+		$config = self::resolveConfig();
+
+		$url = new Curl($url = null);
+
+		if (isset($config['remove'])) {
+			$remove = array_merge($config['remove'], $remove);
+		}
+
+		foreach ($remove as $key) {
+			$url->removeArgument($key);
+		}
+
+		if (isset($config['add'])) {
+			$add = array_merge($config['add'], $add);
+		}
+
+		foreach ($add as $item => $value) {
+			if ($value[0] == '@') {
+				$value = getRequest(substr($value, 1));
+			}
+
+			$url->setArgument($item, $value);
+		}
+
+		if (isset($config['callable']) && is_callable($config['callable'])) {
+			$url->setArguments(call_user_func($config['callable'], $url->getArguments()));
+		}
+
+		return $url;
+	}
+
+	protected static function resolveConfig() {
+		global $page;
+
+		if (isset($page['file']) && isset(self::$urlConfig[$page['file']])) {
+			return self::$urlConfig[$page['file']];
+		}
+
+		return self::$urlConfig['__default'];
+	}
+}
