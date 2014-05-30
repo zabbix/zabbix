@@ -41,7 +41,6 @@ $frmHost = new CForm();
 $frmHost->setName('tpl_for');
 
 $frmHost->addVar('form', get_request('form', 1));
-$frmHost->addVar('clear_templates', $clear_templates);
 $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
 if ($templateid) {
