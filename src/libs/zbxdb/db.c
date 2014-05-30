@@ -209,13 +209,14 @@ static int	is_recoverable_mysql_error(void)
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int		rc, ret = ZBX_DB_OK;
+	int		ret = ZBX_DB_OK;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
+	int		rc;
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
