@@ -6013,7 +6013,57 @@ int	DCget_item_unsupported_count()
  ******************************************************************************/
 int	DCget_trigger_count()
 {
-	return config->triggers.num_data;
+	zbx_hashset_iter_t	iter;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_TRIGGER	*trigger;
+	int			count = 0;
+	const char		*p, *q;
+	zbx_uint64_t		functionid;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+
+	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
+	{
+		if (TRIGGER_STATUS_ENABLED != trigger->status)
+			continue;
+
+		for (p = trigger->expression; '\0' != *p; p++)
+		{
+			if ('{' != *p)
+				continue;
+
+			for (q = p + 1; '}' != *q && '\0' != *q; q++)
+			{
+				if ('0' > *q || '9' < *q)
+					break;
+			}
+
+			if ('}' != *q)
+				continue;
+
+			sscanf(p + 1, ZBX_FS_UI64, &functionid);
+
+			if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)) ||
+					NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) ||
+					NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) ||
+					ITEM_STATUS_ACTIVE != dc_item->status ||
+					HOST_STATUS_MONITORED != dc_host->status)
+			{
+				goto next;
+			}
+
+			p = q;
+		}
+			count++;
+next:;
+	}
+	UNLOCK_CACHE;
+
+	return count;
 }
 
 /******************************************************************************
