@@ -120,34 +120,28 @@ class CUrlFactory {
 	);
 
 	/**
-	 * @param null $url
-	 * @param array $remove
-	 * @param array $add
+	 * @param null $sourceUrl
 	 * @return Curl
 	 */
-	public static function getFilteredUrl($url = null, $remove = array(), $add = array()) {
+	public static function getFilteredUrl($sourceUrl = null) {
 		$config = self::resolveConfig();
 
-		$url = new Curl($url = null);
+		$url = new Curl($sourceUrl);
 
 		if (isset($config['remove'])) {
-			$remove = array_merge($config['remove'], $remove);
-		}
-
-		foreach ($remove as $key) {
-			$url->removeArgument($key);
+			foreach ($config['remove'] as $key) {
+				$url->removeArgument($key);
+			}
 		}
 
 		if (isset($config['add'])) {
-			$add = array_merge($config['add'], $add);
-		}
+			foreach ($config['add'] as $item => $value) {
+				if ($value[0] == '@') {
+					$value = getRequest(substr($value, 1));
+				}
 
-		foreach ($add as $item => $value) {
-			if ($value[0] == '@') {
-				$value = getRequest(substr($value, 1));
+				$url->setArgument($item, $value);
 			}
-
-			$url->setArgument($item, $value);
 		}
 
 		if (isset($config['callable']) && is_callable($config['callable'])) {
