@@ -367,12 +367,18 @@ typedef struct
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*variables;
+	char		*headers;
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
 	char		*http_proxy;
+	char		*ssl_cert_file;
+	char		*ssl_key_file;
+	char		*ssl_key_password;
 	int		authentication;
 	int		retries;
+	int		verify_peer;
+	int		verify_host;
 }
 DB_HTTPTEST;
 
@@ -388,6 +394,9 @@ typedef struct
 	int		no;
 	int		timeout;
 	char		*variables;
+	int		follow_redirects;
+	int		retrieve_mode;
+	char		*headers;
 }
 DB_HTTPSTEP;
 
