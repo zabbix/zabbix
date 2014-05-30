@@ -371,7 +371,7 @@ elseif (getRequest('go') == 'delete' && hasRequest('group_graphid')) {
  */
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
-		'not_proxy_hosts' => true,
+		'with_hosts_and_templates' => true,
 		'editable' => true
 	),
 	'hosts' => array(
