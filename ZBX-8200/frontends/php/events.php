@@ -611,13 +611,13 @@ else {
 				'output' => array('triggerid'),
 				'monitored' => true
 			);
-			if (getRequest('triggerid', 0) > 0) {
+			if (getRequest('triggerid', 0)) {
 				$triggerOptions['triggerids'] = getRequest('triggerid');
 			}
-			else if ($pageFilter->hostid > 0) {
+			elseif ($pageFilter->hostid > 0) {
 				$triggerOptions['hostids'] = $pageFilter->hostid;
 			}
-			else if ($pageFilter->groupid > 0) {
+			elseif ($pageFilter->groupid > 0) {
 				$triggerOptions['groupids'] = $pageFilter->groupid;
 			}
 
@@ -640,18 +640,29 @@ else {
 			 */
 			$knownTriggerIds = array();
 			$validTriggerIds = array();
+			$filterTriggerId = getRequest('triggerid', null);
 			$events = array();
+
 			while (true) {
 				$allEventsSlice = API::Event()->get($eventOptions);
 
-				$triggerIdsFromSlice = array_unique(zbx_objectValues($allEventsSlice, 'objectid'));
+				if($filterTriggerId) {
+					$triggerIdsFromSlice = array($filterTriggerId);
+				}
+				else {
+					$triggerIdsFromSlice = array_unique(zbx_objectValues($allEventsSlice, 'objectid'));
+				}
 
 				$unknownTriggerIds = array_diff($triggerIdsFromSlice, $knownTriggerIds);
+
 				if ($unknownTriggerIds) {
 					$triggerOptions['triggerids'] = $unknownTriggerIds;
 					$validTriggers = API::Trigger()->get($triggerOptions);
-					$validTriggerIds = $validTriggerIds + array_map('intval', zbx_objectValues($validTriggers, 'triggerid'));
-					$knownTriggerIds = $knownTriggerIds + $unknownTriggerIds;
+
+					$validTriggerIdsFromSlice = array_map('intval', zbx_objectValues($validTriggers, 'triggerid'));
+
+					$validTriggerIds = array_unique(array_merge($validTriggerIds, $validTriggerIdsFromSlice));
+					$knownTriggerIds = array_unique(array_merge($knownTriggerIds, $unknownTriggerIds));
 				}
 
 				foreach ($allEventsSlice as $event) {
@@ -673,6 +684,11 @@ else {
 				$lastEvent = end($allEventsSlice);
 				$eventOptions['eventid_till'] = $lastEvent['eventid'] - 1;
 			}
+			/*
+			 * At this point it is possible that more than $config['search_limit'] events are selected,
+			 * therefore at most only first $config['search_limit'] + 1 events will be used for pagination.
+			 */
+			$events = array_slice($events, 0, $config['search_limit'] + 1);
 
 			// get paging
 			$paging = getPagingLine($events);
