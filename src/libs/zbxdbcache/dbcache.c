@@ -1079,7 +1079,8 @@ notsupported:
 	{
 		if (ITEM_STATE_NOTSUPPORTED == item->db_state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\" became supported", item->host.host, item->key_orig);
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became supported",
+					item->host.host, item->key_orig);
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
