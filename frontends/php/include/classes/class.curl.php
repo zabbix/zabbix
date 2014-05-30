@@ -65,7 +65,7 @@ class Curl {
 	}
 
 	public function formatGetArguments() {
-		$this->arguments = CUrlFilter::filter($_GET);
+		$this->arguments = $_GET;
 
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
@@ -143,5 +143,15 @@ class Curl {
 
 	public function toString() {
 		return $this->getUrl();
+	}
+
+	public function getArguments()
+	{
+		return $this->arguments;
+	}
+
+	public function setArguments($arguments)
+	{
+		$this->arguments = $arguments;
 	}
 }
