@@ -23,7 +23,7 @@ class CUrlFactory {
 	/**
 	 * Configuration of urlFilters. Top-level key is file name from $page['file'], below goes:
 	 * 'remove' - to remove arguments
-	 * 'add' - key => value array to add arguments, "@value" references $_REQUEST[value]
+	 * 'add' - name of $_REQUEST keys to be kept as arguments
 	 * 'callable' - callable to apply to argument list
 	 *
 	 * @var array
@@ -37,28 +37,22 @@ class CUrlFactory {
 		),
 		'disc_prototypes.php' => array(
 			'remove' => array('itemid'),
-			'add' => array(
-				'hostid' => '@hostid',
-				'parent_discoveryid' => '@parent_discoveryid'
-			)
+			'add' => array('hostid', 'parent_discoveryid')
 		),
 		'discoveryconf.php' => array(
 			'remove' => array('druleid')
 		),
 		'graphs.php' => array(
 			'remove' => array('graphid'),
-			'add' => array(
-				'hostid' => '@hostid',
-				'parent_discoveryid' => '@parent_discoveryid'
-			)
+			'add' => array('hostid', 'parent_discoveryid')
 		),
 		'host_discovery.php' => array(
 			'remove' => array('itemid'),
-			'add' => array('hostid' => '@hostid')
+			'add' => array('hostid')
 		),
 		'host_prototypes.php' => array(
 			'remove' => array('hostid'),
-			'add' => array('parent_discoveryid' => '@parent_discoveryid')
+			'add' => array('parent_discoveryid')
 		),
 		'hostgroups.php' => array(
 			'remove' => array('groupid')
@@ -83,7 +77,7 @@ class CUrlFactory {
 		),
 		'screenconf.php' => array(
 			'remove' => array('screenid'),
-			'add' => array('templateid' => '@templateid')
+			'add' => array('templateid')
 		),
 		'scripts.php' => array(
 			'remove' => array('scriptid')
@@ -99,14 +93,11 @@ class CUrlFactory {
 		),
 		'trigger_prototypes.php' => array(
 			'remove' =>  array('triggerid'),
-			'add' => array(
-				'parent_discoveryid' => '@parent_discoveryid',
-				'hostid' => '@hostid'
-			)
+			'add' => array('parent_discoveryid', 'hostid')
 		),
 		'triggers.php' => array(
 			'remove' => array('triggerid'),
-			'add' => array('hostid' => '@hostid')
+			'add' => array('hostid')
 		),
 		'usergrps.php' => array(
 			'remove' => array('usrgrpid')
@@ -135,12 +126,8 @@ class CUrlFactory {
 		}
 
 		if (isset($config['add'])) {
-			foreach ($config['add'] as $item => $value) {
-				if ($value[0] == '@') {
-					$value = getRequest(substr($value, 1));
-				}
-
-				$url->setArgument($item, $value);
+			foreach ($config['add'] as $key) {
+				$url->setArgument($key, getRequest($key));
 			}
 		}
 
@@ -155,7 +142,7 @@ class CUrlFactory {
 		global $page;
 
 		if (isset($page['file']) && isset(self::$urlConfig[$page['file']])) {
-			return self::$urlConfig[$page['file']];
+			return array_merge_recursive(self::$urlConfig['__default'], self::$urlConfig[$page['file']]);
 		}
 
 		return self::$urlConfig['__default'];
