@@ -187,7 +187,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	/* get the list of mounted filesystems */
 	/* return code is number of filesystems returned */
-	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vm)))
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
 		goto error;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
