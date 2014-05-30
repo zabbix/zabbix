@@ -220,7 +220,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	/* get the list of mounted filesystems */
 	/* return code is number of filesystems returned */
-	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vm)))
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		goto error;

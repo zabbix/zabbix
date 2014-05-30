@@ -6,6 +6,7 @@ A.F....PS. [ZBXNEXT-282] implemented additional options and HTTP header support 
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...PS. [ZBX-8172] fixed translation of \uxxxx sequences in JSON string values (wiper)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
@@ -157,6 +158,9 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
+........S. [ZBX-8243] added log message when the reason for an item being in an unsupported state changes (Juris)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)

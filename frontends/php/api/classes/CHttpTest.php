@@ -512,7 +512,7 @@ class CHttpTest extends CApiService {
 
 			$this->checkSslParameters($httpTest);
 
-			if (!empty($httpTest['steps'])) {
+			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as &$httpTestStep) {
 					if (isset($httpTestStep['httpstepid'])
 							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
@@ -640,6 +640,11 @@ class CHttpTest extends CApiService {
 	 * @param array $dbHttpTest
 	 */
 	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
+		if (array_key_exists('steps', $httpTest)
+				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
+		}
+
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
@@ -654,6 +659,16 @@ class CHttpTest extends CApiService {
 		);
 
 		foreach ($httpTest['steps'] as $step) {
+			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
+			}
+
+			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && zbx_empty($step['url']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
+			}
+
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
