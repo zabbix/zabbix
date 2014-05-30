@@ -195,6 +195,13 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+/* web monitoring */
+#ifdef HAVE_LIBCURL
+char	*CONFIG_SSL_CA_LOCATION		= NULL;
+char	*CONFIG_SSL_CERT_LOCATION	= NULL;
+char	*CONFIG_SSL_KEY_LOCATION	= NULL;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_defaults                                                 *
@@ -253,18 +260,22 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_FPING_LOCATION)
 		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
-
 #ifdef HAVE_IPV6
 	if (NULL == CONFIG_FPING6_LOCATION)
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
-
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+#ifdef HAVE_LIBCURL
+	if (NULL == CONFIG_SSL_CERT_LOCATION)
+		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DATADIR "/zabbix/ssl/certs");
 
+	if (NULL == CONFIG_SSL_KEY_LOCATION)
+		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DATADIR "/zabbix/ssl/keys");
+#endif
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
 
@@ -464,6 +475,14 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
+#ifdef HAVE_LIBCURL
+		{"SSLCALocation",		&CONFIG_SSL_CA_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"SSLCertLocation",		&CONFIG_SSL_CERT_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
 		{NULL}
 	};
 
