@@ -7,6 +7,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 
 Bug fixes:
 A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
+........S. [ZBX-8243] added log message when the reason for an item being in an unsupported state changes (Juris)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
