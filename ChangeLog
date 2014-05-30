@@ -6,6 +6,7 @@ A.F....PS. [ZBXNEXT-282] implemented additional options and HTTP header support 
 A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8276] fixed latest data filtering by name (Ivo)
 A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...PS. [ZBX-8172] fixed translation of \uxxxx sequences in JSON string values (wiper)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
