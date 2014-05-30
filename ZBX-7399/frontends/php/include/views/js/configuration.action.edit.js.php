@@ -307,7 +307,7 @@
 
 		// host group
 		if (object.target == 'hostGroup') {
-			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
+			var values = jQuery('#opCmdTargetObject').multiSelect.getData('opCmdTargetObject');
 
 			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -341,7 +341,7 @@
 
 		// host
 		else if (object.target == 'host') {
-			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
+			var values = jQuery('#opCmdTargetObject').multiSelect.getData('opCmdTargetObject');
 
 			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -556,7 +556,7 @@
 	}
 
 	function addDiscoveryTemplates() {
-		var values = jQuery('#discoveryTemplates').multiSelect.getData();
+		var values = jQuery('#discoveryTemplates').multiSelect.getData('discoveryTemplates');
 
 		for (var key in values) {
 			var data = values[key];
@@ -576,7 +576,7 @@
 	}
 
 	function addDiscoveryHostGroup() {
-		var values = jQuery('#discoveryHostGroup').multiSelect.getData();
+		var values = jQuery('#discoveryHostGroup').multiSelect.getData('discoveryHostGroup');
 
 		for (var key in values) {
 			var data = values[key];

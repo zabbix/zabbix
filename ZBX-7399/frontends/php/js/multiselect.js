@@ -136,14 +136,17 @@ jQuery(function($) {
 			 *
 			 * @return array
 			 */
-			$.fn.multiSelect.getData = function() {
-				var data = [];
+			$.fn.multiSelect.getData = function(msId) {
+				var ms = window.multiSelect[msId],
+					data = [];
 
-				for (var id in values.selected) {
+				for (var id in ms.values.selected) {
 					data[data.length] = {
 						id: id,
-						name: $('input[value="' + id + '"]', obj).data('name'),
-						prefix: $('input[value="' + id + '"]', obj).data('prefix')
+						name: $('input[value="' + id + '"]', ms.obj).data('name'),
+						prefix: typeof $('input[value="' + id + '"]', ms.obj).data('prefix') === 'undefined'
+							? ''
+							: $('input[value="' + id + '"]', ms.obj).data('prefix')
 					};
 				}
 

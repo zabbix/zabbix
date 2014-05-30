@@ -1401,7 +1401,7 @@ ZABBIX.apps.map = (function($) {
 				switch (data.elementtype) {
 					// host
 					case '0':
-						var elementData = $('#elementNameHost').multiSelect.getData();
+						var elementData = $('#elementNameHost').multiSelect.getData('elementNameHost');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
@@ -1415,7 +1415,7 @@ ZABBIX.apps.map = (function($) {
 
 					// host group
 					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect.getData();
+						var elementData = $('#elementNameHostGroup').multiSelect.getData('elementNameHostGroup');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
