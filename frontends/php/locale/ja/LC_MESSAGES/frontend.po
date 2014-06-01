@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-02 01:20+0300\n"
-"PO-Revision-Date: 2014-04-23 06:32+0300\n"
+"POT-Creation-Date: 2014-06-02 01:26+0300\n"
+"PO-Revision-Date: 2014-05-30 04:19+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1398227566.0\n"
+"X-POOTLE-MTIME: 1401416376.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -73,7 +73,7 @@ msgstr[0] "%1$s分"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
+msgstr[0] "リトライ残り%1$s回"
 
 #: jsLoader.php:221 jsLoader.php:222
 #, c-format
@@ -1602,7 +1602,6 @@ msgid "Cannot delete graphs created by low level discovery."
 msgstr "ローレベルディスカバリによって作成されたグラフは削除できません。"
 
 #: hostgroups.php:168 hostgroups.php:186 usergrps.php:215 usergrps.php:243
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "グループを削除できません"
@@ -2302,7 +2301,7 @@ msgstr "トリガー\"%2$s\"の\"%1$s\"を更新できません。"
 #: api/classes/CImage.php:553
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
-msgstr ""
+msgstr "イメージ\"%1$s\"の\"imagetype\"を更新できません。"
 
 #: api/classes/CApplication.php:317
 #, c-format
@@ -2362,7 +2361,7 @@ msgstr "デバッグモードを更新できません"
 
 #: tr_comments.php:82
 msgid "Cannot update description"
-msgstr ""
+msgstr "説明を更新できません"
 
 #: discoveryconf.php:137 host_discovery.php:286
 msgid "Cannot update discovery rule"
@@ -3136,7 +3135,7 @@ msgstr "コピー"
 #, c-format
 msgid "Copy %1$s element to..."
 msgid_plural "Copy %1$s elements to..."
-msgstr[0] ""
+msgstr[0] "項目%1$sをコピー ..."
 
 #: include/views/configuration.graph.list.php:155
 #: include/views/configuration.item.list.php:271
@@ -3175,7 +3174,7 @@ msgstr "アプリケーションの作成 (先にホストを選択)"
 
 #: adm.images.php:151
 msgid "Create background"
-msgstr ""
+msgstr "背景の作成"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:28
@@ -3209,7 +3208,7 @@ msgstr "ホストのプロトタイプの作成"
 
 #: adm.images.php:151
 msgid "Create icon"
-msgstr ""
+msgstr "アイコンの作成"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -4158,11 +4157,11 @@ msgstr "説明"
 #: include/views/monitoring.triggerComment.php:43
 #, c-format
 msgid "Description for \"%s\"."
-msgstr ""
+msgstr "\"%s\"の説明。"
 
 #: tr_comments.php:82
 msgid "Description updated"
-msgstr ""
+msgstr "説明を更新しました"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:800
 #: include/func.inc.php:1886
@@ -4447,7 +4446,7 @@ msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在しま�
 #: api/classes/CDRule.php:491 api/classes/CDRule.php:510
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"はすでに存在します。"
 
 #: api/classes/CDiscoveryRule.php:903
 #, c-format
@@ -4730,12 +4729,12 @@ msgstr "色の設定が空白です。"
 #: api/classes/CDiscoveryRule.php:886
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件式IDが空白です。"
 
 #: api/classes/CDiscoveryRule.php:878
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件マクロが空白です。"
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
@@ -5831,7 +5830,6 @@ msgid "Group added"
 msgstr "グループを追加しました"
 
 #: hostgroups.php:168 hostgroups.php:185 usergrps.php:215 usergrps.php:243
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "グループを削除しました"
@@ -5998,7 +5996,7 @@ msgstr "無効なトリガーを非表示"
 
 #: include/classes/class.cwidget.php:128
 msgid "Hide filter"
-msgstr ""
+msgstr "非表示フィルター"
 
 #: include/views/monitoring.history.php:115
 msgid "Hide selected"
@@ -6857,7 +6855,7 @@ msgstr "マップ\"%2$s\"のラベルタイプの値%1$sが正しくありませ
 #: include/classes/api/clients/CLocalApiClient.php:61
 #, c-format
 msgid "Incorrect API \"%1$s\"."
-msgstr ""
+msgstr "API\"%1$s\"が正しくありません。"
 
 #: api/classes/CDRule.php:211
 #, c-format
@@ -7074,7 +7072,7 @@ msgstr "テンプレート名\"%1$s\"に利用されている文字列が正し�
 #: api/classes/CDiscoveryRule.php:852
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の条件式が正しくありません。"
 
 #: api/classes/CDiscoveryRule.php:857
 #, c-format
@@ -7123,17 +7121,17 @@ msgstr "アップロードされたファイルが正しくありません。"
 #: api/classes/CDiscoveryRule.php:887
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件式IDが正しくありません。"
 
 #: api/classes/CDiscoveryRule.php:879
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件マクロが正しくありません。"
 
 #: api/classes/CDiscoveryRule.php:891
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"のフィルター条件演算子が正しくありません。"
 
 #: api/classes/CItemGeneral.php:838
 #, c-format
@@ -7307,7 +7305,7 @@ msgstr "スクリプト\"%1$s\"のメニューパスが正しくありません�
 #: include/classes/api/clients/CLocalApiClient.php:69
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
-msgstr ""
+msgstr "メソッド\"%1$s.%2$s\"が正しくありません。"
 
 #: api/classes/CEvent.php:370
 msgid "Incorrect object value."
@@ -7510,7 +7508,7 @@ msgstr "asort_by_keyのタイプが正しくありません。"
 #: api/classes/CDiscoveryRule.php:845
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の計算のタイプが正しくありません。"
 
 #: include/profiles.inc.php:318
 msgid "Incorrect user group."
@@ -7607,7 +7605,7 @@ msgstr "挿入"
 
 #: include/views/configuration.triggers.edit.php:94 jsLoader.php:195
 msgid "Insert expression"
-msgstr ""
+msgstr "条件式の挿入"
 
 #: include/menu.inc.php:268 include/profiles.inc.php:299 setup.php:103
 msgid "Installation"
@@ -8678,7 +8676,7 @@ msgstr "メンテナンス"
 #: api/classes/CMaintenance.php:480 api/classes/CMaintenance.php:501
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
-msgstr ""
+msgstr "メンテナンス\"%1$s\"はすでに存在します。"
 
 #: api/classes/CMaintenance.php:386 api/classes/CMaintenance.php:523
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
@@ -9783,7 +9781,7 @@ msgstr "ホストプロトタイプが設定されていません。"
 
 #: include/classes/screens/CScreenUrl.php:37
 msgid "No host selected."
-msgstr ""
+msgstr "ホストが選択されていません。"
 
 #: include/hosts.inc.php:536
 #, c-format
@@ -9933,7 +9931,7 @@ msgstr "テンプレート\"%1$s\"への権限がありません。"
 #: include/classes/import/CXmlImport18.php:1460
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s\"への権限がありません。"
 
 #: slides.php:91
 msgid "No permissions"
@@ -9942,7 +9940,7 @@ msgstr "権限がありません"
 #: include/classes/import/CXmlImport18.php:1066
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
-msgstr ""
+msgstr "ホストグループ\"%1$s\"への権限がありません。"
 
 #: include/classes/import/CXmlImport18.php:675
 #, c-format
@@ -10180,7 +10178,7 @@ msgstr "ゲストユーザーはパスワードを設定できません。"
 
 #: include/classes/api/clients/CLocalApiClient.php:146
 msgid "Not authorised."
-msgstr ""
+msgstr "権限がありません。"
 
 #: include/classes/class.chostsinfo.php:119
 msgid "Not available"
@@ -10250,7 +10248,7 @@ msgstr "有効なプロセッサー数。"
 
 #: include/blocks.inc.php:811 include/blocks.inc.php:813
 msgid "Number of hosts (enabled/disabled/templates)"
-msgstr ""
+msgstr "ホスト数 (有効/無効/テンプレート)"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:543
@@ -10259,7 +10257,7 @@ msgstr "指定されたボリュームのinode数。modeが指定されなかっ
 
 #: include/blocks.inc.php:820
 msgid "Number of items (enabled/disabled/not supported)"
-msgstr ""
+msgstr "アイテム数 (有効/無効/取得不可)"
 
 #: include/classes/items/CHelpItems.php:827
 msgid "Number of items in Zabbix database."
@@ -10906,7 +10904,7 @@ msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:328
 msgid "PHP string function overloading must be disabled."
-msgstr ""
+msgstr "PHP文字列関数のオーバーロードは無効に設定する必要があります。"
 
 #: include/classes/class.frontendsetup.php:201
 msgid "PHP time zone"
@@ -11034,7 +11032,7 @@ msgstr "パスワード(確認)"
 #: users.php:165
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "ユーザーのパスワードに%1$sは利用できません。"
 
 #: api/classes/CMediatype.php:198 api/classes/CMediatype.php:262
 msgid "Password required for media type."
@@ -11428,7 +11426,7 @@ msgstr "受信した値"
 
 #: tr_status.php:259
 msgid "Recent problem"
-msgstr ""
+msgstr "最近の障害"
 
 #: include/views/administration.auditacts.list.php:41
 msgid "Recipient"
@@ -12688,7 +12686,7 @@ msgstr "イベントの表示期間(日) \"%1$s\""
 
 #: include/classes/class.cwidget.php:129
 msgid "Show filter"
-msgstr ""
+msgstr "フィルターの表示"
 
 #: include/views/monitoring.dashconf.php:75 tr_status.php:343
 msgid "Show hosts in maintenance"
@@ -12919,7 +12917,7 @@ msgstr "次によるソート"
 
 #: include/views/configuration.screen.constructor.edit.php:334
 msgid "Sort entries by"
-msgstr ""
+msgstr "次による項目のソート"
 
 #: include/views/configuration.services.edit.php:84 services.php:45
 msgid "Sort order (0->999)"
@@ -13226,7 +13224,7 @@ msgstr "合計"
 
 #: include/views/monitoring.triggerComment.php:25
 msgid "TRIGGER DESCRIPTION"
-msgstr ""
+msgstr "トリガーの説明"
 
 #: include/views/js/adm.regexprs.edit.js.php:360
 #: include/views/js/adm.regexprs.edit.js.php:369
@@ -13753,7 +13751,7 @@ msgstr "トリガーを削除しました"
 
 #: tr_comments.php:26
 msgid "Trigger description"
-msgstr ""
+msgstr "トリガーの説明"
 
 #: triggers.php:274
 msgid "Trigger disabled"
@@ -13897,7 +13895,7 @@ msgstr ""
 
 #: jsLoader.php:197
 msgid "Trigger status \"Problem\""
-msgstr ""
+msgstr "トリガーのステータス \"障害\""
 
 #: triggers.php:180 triggers.php:238 tr_logform.php:125
 msgid "Trigger updated"
@@ -14162,7 +14160,7 @@ msgstr "障害対応コメント未入力のみ"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "ユーザーに%1$sは利用できません。"
 
 #: include/views/administration.users.list.php:150
 msgid "Unblock selected"
@@ -14216,7 +14214,7 @@ msgstr "不明なサービスの計算アルゴリズム"
 #: httpdetails.php:160 httpdetails.php:233 httpmon.php:142
 #: include/views/configuration.httpconf.list.php:97
 msgid "Unknown error"
-msgstr ""
+msgstr "不明なエラー"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14241,7 +14239,7 @@ msgstr "不明なリソース"
 #: httpmon.php:154 include/views/configuration.httpconf.list.php:99
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "不明なステップ失敗: %1$s"
 
 #: include/items.inc.php:888
 msgid "Unknown value type"
@@ -14538,7 +14536,7 @@ msgstr "ユーザーグループ"
 #: api/classes/CUserGroup.php:245
 #, c-format
 msgid "User group \"%1$s\" already exists."
-msgstr ""
+msgstr "ユーザーグループ\"%1$s\"はすでに存在します。"
 
 #: api/classes/CUserGroup.php:678
 #, c-format
@@ -14888,7 +14886,7 @@ msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2
 #: include/validate.inc.php:326 include/validate.inc.php:350
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありません。"
 
 #: include/validate.inc.php:336 include/validate.inc.php:352
 #, c-format
@@ -15007,7 +15005,7 @@ msgstr "縦位置"
 
 #: include/locales.inc.php:81
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "ベトナム語 (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15959,7 +15957,7 @@ msgstr "その他"
 #: include/page_header.php:114 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "%1$s秒ごとに更新。"
 
 #: include/views/configuration.host.discovery.edit.php:327
 #: include/views/js/configuration.host.discovery.edit.js.php:27
