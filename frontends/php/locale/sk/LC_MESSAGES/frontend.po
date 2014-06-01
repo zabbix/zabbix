@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-02 00:10+0300\n"
-"PO-Revision-Date: 2014-05-04 08:12+0300\n"
+"POT-Creation-Date: 2014-06-02 00:37+0300\n"
+"PO-Revision-Date: 2014-05-29 21:11+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1399183943.0\n"
+"X-POOTLE-MTIME: 1401390693.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -15403,7 +15403,7 @@ msgstr "Označenie osi Y"
 
 #: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
-msgstr "d-m-Y H:i:s"
+msgstr "d. m. Y H:i:s"
 
 #: include/classes/screens/CScreenHistory.php:217
 #: include/translateDefines.inc.php:29 include/translateDefines.inc.php:30

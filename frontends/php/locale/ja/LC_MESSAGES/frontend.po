@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-02 00:10+0300\n"
-"PO-Revision-Date: 2014-04-23 06:25+0300\n"
+"POT-Creation-Date: 2014-06-02 00:37+0300\n"
+"PO-Revision-Date: 2014-05-26 05:03+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1398227120.0\n"
+"X-POOTLE-MTIME: 1401073408.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -10994,7 +10994,7 @@ msgstr "パスワード(確認)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "ユーザーのパスワードに%1$sは利用できません。"
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
@@ -14075,7 +14075,7 @@ msgstr "障害対応コメント未入力のみ"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "ユーザーに%1$sは利用できません。"
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
@@ -14791,7 +14791,7 @@ msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2
 #: include/validate.inc.php:333 include/validate.inc.php:357
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありません。"
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
@@ -14911,7 +14911,7 @@ msgstr "縦位置"
 
 #: include/locales.inc.php:79
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "ベトナム語 (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15930,7 +15930,7 @@ msgstr "その他"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "%1$s秒ごとに更新。"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
