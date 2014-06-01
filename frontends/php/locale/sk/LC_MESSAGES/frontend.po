@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-17 00:37+0300\n"
+"POT-Creation-Date: 2014-06-02 00:10+0300\n"
 "PO-Revision-Date: 2014-05-04 08:12+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -98,7 +98,7 @@ msgstr "(0 - donekonečna)"
 
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:123
+#: include/views/configuration.template.edit.php:122
 msgid "(Only super admins can create groups)"
 msgstr "(Skupiny môžu vytvárať iba super administrátori)"
 
@@ -310,7 +310,7 @@ msgstr "Potvrdzovanie vypnuté"
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:388
+#: include/views/configuration.template.edit.php:387
 #: include/views/configuration.triggers.edit.php:149
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:303
@@ -434,7 +434,7 @@ msgstr "Aktívny do"
 #: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:427
+#: include/views/configuration.template.edit.php:426
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:98
 #: include/views/configuration.triggers.edit.php:293
@@ -666,7 +666,7 @@ msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
 #: include/views/configuration.item.edit.php:451
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:57
-#: include/views/configuration.template.edit.php:196
+#: include/views/configuration.template.edit.php:195
 #: include/views/inventory.host.view.php:227 popup.php:40 search.php:140
 #: search.php:166 search.php:192 search.php:382 search.php:405 search.php:435
 #: templates.php:488 templates.php:548
@@ -1755,7 +1755,7 @@ msgstr "Nie je možné zmazať položky patriace šablóne."
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nie je možné zmazať spúšťač \"%1$s:%2$s\" patriaci šablóne."
 
-#: api/classes/CHttpTest.php:391
+#: api/classes/CHttpTest.php:392
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Nie je možné zmazať web scenár \"%1$s\" patriaci šablóne."
@@ -2809,7 +2809,7 @@ msgstr "Hodiny"
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:450
+#: include/views/configuration.template.edit.php:449
 #: include/views/configuration.triggers.edit.php:315
 msgid "Clone"
 msgstr "Klonovať"
@@ -3805,7 +3805,7 @@ msgstr "Oneskorené o"
 msgid "Delete"
 msgstr "Zmazať"
 
-#: include/views/configuration.template.edit.php:453
+#: include/views/configuration.template.edit.php:452
 msgid "Delete and clear"
 msgstr "Zmazať a vyčistiť"
 
@@ -3813,7 +3813,7 @@ msgstr "Zmazať a vyčistiť"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Zmazať a vyčistiť zvolené šablóny? (Pozor: všetky prepojené hosty budú tiež vyčistené!)"
 
-#: include/views/configuration.template.edit.php:453
+#: include/views/configuration.template.edit.php:452
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Zmazať a vyčistiť šablónu? (Pozor: všetky prepojené hosty budú tiež vyčistené!)"
 
@@ -4084,7 +4084,7 @@ msgstr "Zmazať službu"
 msgid "Delete slide show?"
 msgstr "Zmazať prezentáciu?"
 
-#: include/views/configuration.template.edit.php:452
+#: include/views/configuration.template.edit.php:451
 msgid "Delete template?"
 msgstr "Zmazať šablónu?"
 
@@ -4159,7 +4159,7 @@ msgstr "Zmazané: Spúšťač \"%1$s\" na \"%2$s\"."
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Zmazané: Prototyp spúšťača \"%1$s\" na \"%2$s\"."
 
-#: api/classes/CHttpTest.php:451
+#: api/classes/CHttpTest.php:452
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Zmazané: Web scenár \"%1$s\" na \"%2$s\"."
@@ -4533,7 +4533,7 @@ msgstr "Zisťovacie pravidlo aktualizované"
 #: include/html.inc.php:512 include/html.inc.php:516
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
-#: include/views/configuration.template.edit.php:286
+#: include/views/configuration.template.edit.php:285
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:92
 msgid "Discovery rules"
@@ -5456,7 +5456,7 @@ msgid "Frontend messaging"
 msgstr "Frontend správy"
 
 #: include/views/configuration.host.edit.php:844
-#: include/views/configuration.template.edit.php:451
+#: include/views/configuration.template.edit.php:450
 msgid "Full clone"
 msgstr "Vytvoriť úplnú kópiu"
 
@@ -5716,7 +5716,7 @@ msgstr "Prototyp grafu aktualizovaný"
 #: include/html.inc.php:464 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:120
 #: include/views/configuration.host.edit.php:614
-#: include/views/configuration.template.edit.php:351
+#: include/views/configuration.template.edit.php:350
 msgid "Graph prototypes"
 msgstr "Prototypy grafov"
 
@@ -5757,7 +5757,7 @@ msgstr "Graf s totožným menom, ale iným typom už existuje."
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:514
-#: include/views/configuration.template.edit.php:262
+#: include/views/configuration.template.edit.php:261
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:216
 #: include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:241 popup.php:76 search.php:137
@@ -5875,7 +5875,7 @@ msgstr "Zoskupovať podľa"
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.host.prototype.edit.php:177
 #: include/views/configuration.host.prototype.edit.php:205
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 #: include/views/conf.import.php:26
 msgid "Groups"
 msgstr "Skupiny"
@@ -6429,7 +6429,7 @@ msgstr "Hosty a skupiny"
 msgid "Hosts (m/n/t)"
 msgstr "Hosty (m/n/t)"
 
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:171
 msgid "Hosts / templates"
 msgstr "Hosty / šablóny"
 
@@ -6832,7 +6832,7 @@ msgstr "Nie je možné zmazať posledný riadok a stĺpec."
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:171
 msgid "In"
 msgstr "V"
 
@@ -6841,7 +6841,7 @@ msgid "In group"
 msgstr "V skupine"
 
 #: include/views/configuration.host.edit.php:194
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 msgid "In groups"
 msgstr "V skupinách"
 
@@ -7032,7 +7032,7 @@ msgid "Incorrect arguments passed to function"
 msgstr "Funkcii boli predané neplatné argumenty"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
-#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:536
+#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:534
 #: api/classes/CItemGeneral.php:197
 msgid "Incorrect arguments passed to function."
 msgstr "Funkcii boli predané neplatné argumenty."
@@ -7740,7 +7740,7 @@ msgstr "Neplatné parametre."
 msgid "Invalid period for field \"%1$s\"."
 msgstr "Neplatná perióda pre pole \"%1$s\"."
 
-#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
+#: api/classes/CHttpTest.php:668 api/classes/CHttpTest.php:674
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Neplatný návratový kód \"%1$s\"."
@@ -7936,7 +7936,7 @@ msgstr "Prototyp položky aktualizovaný"
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:106
 #: include/views/configuration.host.edit.php:563
-#: include/views/configuration.template.edit.php:309
+#: include/views/configuration.template.edit.php:308
 msgid "Item prototypes"
 msgstr "Prototypy položky"
 
@@ -8008,7 +8008,7 @@ msgstr "Položka s kľúčom \"%1$s\" už existuje."
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.host.edit.php:456
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:220
+#: include/views/configuration.template.edit.php:219
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:229
 #: include/views/inventory.host.view.php:239 latest.php:300 popup.php:56
 #: queue.php:101 report6.php:44 search.php:141 search.php:170 search.php:193
@@ -8365,7 +8365,7 @@ msgstr "Meno spojnice musí byť jedinečné v rámci mapy \"%s\"."
 
 #: include/views/configuration.host.edit.php:691
 #: include/views/configuration.host.prototype.edit.php:250
-#: include/views/configuration.template.edit.php:431
+#: include/views/configuration.template.edit.php:430
 msgid "Link new templates"
 msgstr "Pripojiť nové šablóny"
 
@@ -8403,8 +8403,8 @@ msgstr "Prepojiť so šablónami"
 #: include/views/configuration.host.edit.php:676
 #: include/views/configuration.host.edit.php:700
 #: include/views/configuration.host.prototype.edit.php:229
-#: include/views/configuration.template.edit.php:412
-#: include/views/configuration.template.edit.php:433 templates.php:495
+#: include/views/configuration.template.edit.php:411
+#: include/views/configuration.template.edit.php:432 templates.php:495
 msgid "Linked templates"
 msgstr "Pripojené šablóny"
 
@@ -8648,7 +8648,7 @@ msgstr "Makro s hostmacroid \"%1$s\" neexistuje."
 #: include/views/administration.general.macros.edit.php:31
 #: include/views/configuration.host.edit.php:750
 #: include/views/configuration.host.prototype.edit.php:275
-#: include/views/configuration.template.edit.php:443
+#: include/views/configuration.template.edit.php:442
 msgid "Macros"
 msgstr "Makrá"
 
@@ -9363,7 +9363,7 @@ msgstr "NTLM autentifikácia"
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:44
-#: include/views/configuration.template.edit.php:388
+#: include/views/configuration.template.edit.php:387
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.list.php:110
@@ -9462,7 +9462,7 @@ msgid "New flexible interval"
 msgstr "Nový flexibilný interval"
 
 #: include/views/configuration.host.edit.php:198
-#: include/views/configuration.template.edit.php:121
+#: include/views/configuration.template.edit.php:120
 msgid "New group"
 msgstr "Nová skupina"
 
@@ -9990,30 +9990,30 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
-#: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:242 api/classes/CImage.php:356
-#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
-#: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
-#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
-#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
-#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:60
-#: api/classes/CMapElement.php:119 api/classes/CMapElement.php:190
-#: api/classes/CMap.php:389 api/classes/CProxy.php:172
-#: api/classes/CProxy.php:213 api/classes/CProxy.php:285
-#: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
-#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:445
-#: api/classes/CScreen.php:619 api/classes/CService.php:1255
-#: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:573
-#: api/classes/CTemplateScreen.php:624 api/classes/CTemplateScreen.php:676
-#: api/classes/CTemplateScreen.php:682 api/classes/CTrigger.php:636
-#: api/classes/CTrigger.php:981 api/classes/CTrigger.php:1002
-#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:553
-#: api/classes/CTriggerPrototype.php:644 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
-#: api/classes/CUser.php:859 api/classes/CUser.php:879
-#: api/classes/CUser.php:938 api/classes/CUser.php:1363
-#: include/func.inc.php:2076
+#: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
+#: api/classes/CIconMap.php:319 api/classes/CImage.php:242
+#: api/classes/CImage.php:356 api/classes/CImage.php:473
+#: api/classes/CItemGeneral.php:181 api/classes/CItemGeneral.php:234
+#: api/classes/CItem.php:690 api/classes/CItemPrototype.php:509
+#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
+#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
+#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
+#: api/classes/CMapElement.php:60 api/classes/CMapElement.php:119
+#: api/classes/CMapElement.php:190 api/classes/CMap.php:389
+#: api/classes/CProxy.php:172 api/classes/CProxy.php:213
+#: api/classes/CProxy.php:285 api/classes/CProxy.php:551
+#: api/classes/CScreenItem.php:362 api/classes/CScreenItem.php:445
+#: api/classes/CScreen.php:445 api/classes/CScreen.php:619
+#: api/classes/CService.php:1255 api/classes/CService.php:1270
+#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
+#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTrigger.php:636 api/classes/CTrigger.php:981
+#: api/classes/CTrigger.php:1002 api/classes/CTrigger.php:1878
+#: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
+#: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
+#: api/classes/CUser.php:680 api/classes/CUser.php:859
+#: api/classes/CUser.php:879 api/classes/CUser.php:938
+#: api/classes/CUser.php:1363 include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -10110,7 +10110,7 @@ msgstr "Nenájdené žiadne šablóny."
 #: include/views/configuration.host.edit.php:642
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:233
-#: include/views/configuration.template.edit.php:385
+#: include/views/configuration.template.edit.php:384
 msgid "No templates linked."
 msgstr "Žiadne pripojené šablóny."
 
@@ -10655,7 +10655,7 @@ msgstr "Len Zabbix administrátori môžu zmeniť používateľské médiá."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Len Zabbix administrátori môžu zmazať používateľské médiá."
 
-#: api/classes/CHttpTest.php:662
+#: api/classes/CHttpTest.php:695
 msgid "Only characters are allowed."
 msgstr "Len písmená sú povolené."
 
@@ -10797,7 +10797,7 @@ msgstr "Ďalšie konfiguračné parametre"
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 msgid "Other groups"
 msgstr "Ďalšie skupiny"
 
@@ -10815,7 +10815,7 @@ msgstr "Ďalšie hosty | Skupiny"
 msgid "Other parameters"
 msgstr "Ďalšie parametre"
 
-#: include/views/configuration.template.edit.php:173
+#: include/views/configuration.template.edit.php:172
 msgid "Other | group"
 msgstr "Ďalšie | skupina"
 
@@ -12199,7 +12199,7 @@ msgstr "Sobota"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:457
+#: include/views/configuration.template.edit.php:456
 #: include/views/configuration.triggers.edit.php:328
 #: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:107
@@ -12323,7 +12323,7 @@ msgstr "Obrazovka aktualizovaná"
 #: dashboard.php:326 include/blocks.inc.php:1460 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:372
+#: include/views/configuration.template.edit.php:371
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:217
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
@@ -13315,7 +13315,7 @@ msgstr "Telnet"
 #: include/actions.inc.php:62 include/audit.inc.php:51
 #: include/forms.inc.php:613 include/forms.inc.php:932
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
-#: include/views/configuration.template.edit.php:376
+#: include/views/configuration.template.edit.php:375
 #: include/views/configuration.triggers.list.php:126 report2.php:259
 msgid "Template"
 msgstr "Šablóna"
@@ -13359,7 +13359,7 @@ msgstr "Pripojenia šablón"
 msgid "Template list"
 msgstr "Zoznam šablón"
 
-#: include/views/configuration.template.edit.php:97 templates.php:55
+#: include/views/configuration.template.edit.php:96 templates.php:55
 msgid "Template name"
 msgstr "Meno šablóny"
 
@@ -13920,7 +13920,7 @@ msgstr "Prototyp spúšťača aktualizovaný"
 #: include/html.inc.php:439 include/html.inc.php:443
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.host.edit.php:590
-#: include/views/configuration.template.edit.php:330
+#: include/views/configuration.template.edit.php:329
 msgid "Trigger prototypes"
 msgstr "Prototypy spúšťačov"
 
@@ -13964,7 +13964,7 @@ msgstr "Hodnota spúšťača"
 #: include/views/configuration.host.edit.php:483
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.list.php:197
-#: include/views/configuration.template.edit.php:241
+#: include/views/configuration.template.edit.php:240
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:230
@@ -14294,12 +14294,12 @@ msgstr "Neznámy typ hodnoty"
 
 #: include/views/configuration.host.edit.php:662
 #: include/views/configuration.host.prototype.edit.php:223
-#: include/views/configuration.template.edit.php:398
+#: include/views/configuration.template.edit.php:397
 msgid "Unlink"
 msgstr "Odpojiť"
 
 #: include/views/configuration.host.edit.php:666
-#: include/views/configuration.template.edit.php:402
+#: include/views/configuration.template.edit.php:401
 msgid "Unlink and clear"
 msgstr "Odpojiť a vyčistiť"
 
@@ -15060,7 +15060,7 @@ msgstr "Štatistiky virtuálnej pamäti."
 
 #: include/views/configuration.host.edit.php:180
 #: include/views/configuration.host.prototype.edit.php:70
-#: include/views/configuration.template.edit.php:101
+#: include/views/configuration.template.edit.php:100
 #: include/views/inventory.host.view.php:48
 msgid "Visible name"
 msgstr "Zobrazované meno"
@@ -15109,7 +15109,7 @@ msgstr "Monitorovanie webov"
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Web scenár \"%1$s\" už existuje na hoste \"%2$s\"."
 
-#: api/classes/CHttpTest.php:479 api/classes/CHttpTest.php:531
+#: api/classes/CHttpTest.php:480 api/classes/CHttpTest.php:529
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Web scenár \"%1$s\" už existuje."
@@ -15132,25 +15132,33 @@ msgstr[0] "Scenár povolený"
 msgstr[1] "Scenáre povolené"
 msgstr[2] "Scenáre povolené"
 
-#: api/classes/CHttpTest.php:472 api/classes/CHttpTest.php:512
+#: api/classes/CHttpTest.php:473 api/classes/CHttpTest.php:510
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr "Chýbajúce parametre vo web scenári: %1$s"
 
-#: api/classes/CHttpTest.php:483
+#: api/classes/CHttpTest.php:595
 msgid "Web scenario must have at least one step."
 msgstr "Web scenár musí mať najmenej jeden krok."
 
-#: api/classes/CHttpTest.php:610
+#: api/classes/CHttpTest.php:643
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr "Krok web scenára \"%1$s\" už existuje."
 
-#: api/classes/CHttpTest.php:590
+#: api/classes/CHttpTest.php:623
+msgid "Web scenario step URL cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:618
+msgid "Web scenario step name cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
 msgstr "Meno kroku web scenára by malo obsahovať len tlačiteľné znaky."
 
-#: api/classes/CHttpTest.php:595
+#: api/classes/CHttpTest.php:627
 msgid "Web scenario step number cannot be less than 1."
 msgstr "Číslo kroku web scenára nemôže byť menšie ako 1."
 
@@ -15475,7 +15483,7 @@ msgstr "Nešpecifikovali ste ciele pre akciu globálneho skriptu \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:504
+#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437
