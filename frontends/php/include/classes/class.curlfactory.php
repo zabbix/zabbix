@@ -21,14 +21,14 @@
 class CUrlFactory {
 
 	/**
-	 * Configuration of urlFilters. Top-level key is file name from $page['file'], below goes:
+	 * Configuration of context configurations. Top-level key is file name from $page['file'], below goes:
 	 * 'remove' - to remove arguments
 	 * 'add' - name of $_REQUEST keys to be kept as arguments
 	 * 'callable' - callable to apply to argument list
 	 *
 	 * @var array
 	 */
-	protected static $urlConfig = array(
+	protected static $contextConfigs = array(
 		'actionconf.php' => array(
 			'remove' => array('actionid')
 		),
@@ -111,10 +111,14 @@ class CUrlFactory {
 	);
 
 	/**
-	 * @param null $sourceUrl
+	 * Creates new CUrl object based on giver URL (or $_GET if null is given),
+	 * and adds/removes parameters based on current page context.
+	 *
+	 * @param string $sourceUrl
+	 *
 	 * @return Curl
 	 */
-	public static function getFilteredUrl($sourceUrl = null) {
+	public static function getContextUrl($sourceUrl = null) {
 		$config = self::resolveConfig();
 
 		$url = new Curl($sourceUrl);
@@ -131,20 +135,21 @@ class CUrlFactory {
 			}
 		}
 
-		if (isset($config['callable']) && is_callable($config['callable'])) {
-			$url->setArguments(call_user_func($config['callable'], $url->getArguments()));
-		}
-
 		return $url;
 	}
 
+	/**
+	 * Resolves context configuration for current file (based on $page['file'] global variable)
+	 *
+	 * @return array
+	 */
 	protected static function resolveConfig() {
 		global $page;
 
-		if (isset($page['file']) && isset(self::$urlConfig[$page['file']])) {
-			return array_merge_recursive(self::$urlConfig['__default'], self::$urlConfig[$page['file']]);
+		if (isset(self::$contextConfigs[$page['file']])) {
+			return array_merge_recursive(self::$contextConfigs['__default'], self::$contextConfigs[$page['file']]);
 		}
 
-		return self::$urlConfig['__default'];
+		return self::$contextConfigs['__default'];
 	}
 }

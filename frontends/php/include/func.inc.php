@@ -1438,7 +1438,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 
 	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-	$link = CUrlFactory::getFilteredUrl($url);
+	$link = CUrlFactory::getContextUrl($url);
 
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
@@ -1589,7 +1589,7 @@ function getPagingLine(&$items, $removeUrlParams = array(), $urlParams = array()
 	$table = null;
 
 	if ($pagesCount > 1) {
-		$url = CurlFactory::getFilteredUrl(array(), $removeUrlParams, $urlParams);
+		$url = CurlFactory::getContextUrl(array(), $removeUrlParams, $urlParams);
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
