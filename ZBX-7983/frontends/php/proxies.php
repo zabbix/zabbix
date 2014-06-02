@@ -284,6 +284,7 @@ else {
 			' AND i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
+			' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
 			' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
 		' GROUP BY h.proxy_hostid'
 	);

@@ -167,7 +167,7 @@ class GlobalRegExp {
 	 */
 	private static function _matchRegular(array $expression, $string) {
 		$pattern = '/'.$expression['expression'].'/';
-		if ($expression['case_sensitive']) {
+		if (!$expression['case_sensitive']) {
 			$pattern .= 'i';
 		}
 

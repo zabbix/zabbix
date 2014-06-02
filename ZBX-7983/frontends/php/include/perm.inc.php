@@ -36,6 +36,23 @@ function permission2str($permission) {
 	return isset($permissions[$permission]) ? $permissions[$permission] : _('Unknown');
 }
 
+/**
+ * Get authentication label.
+ *
+ * @param int $type
+ *
+ * @return string
+ */
+function authentication2str($type) {
+	$authentications = array(
+		ZBX_AUTH_INTERNAL => _('Zabbix internal authentication'),
+		ZBX_AUTH_LDAP => _('LDAP authentication'),
+		ZBX_AUTH_HTTP => _('HTTP authentication')
+	);
+
+	return isset($authentications[$type]) ? $authentications[$type] : _('Unknown');
+}
+
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS
 ************************************************/
@@ -61,77 +78,102 @@ function check_perm2system($userid) {
 	return true;
 }
 
-/* Function: check_perm2login()
+/**
+ * Checking user permissions to login in frontend.
  *
- * Description:
- * 		Checking user permissions to Login in frontend
+ * @param string $userId
  *
- * Comments:
- *		return true if permission is positive
- *
- * Author: Aly
+ * @return bool
  */
-function check_perm2login($userid) {
-	return GROUP_GUI_ACCESS_DISABLED == get_user_auth($userid) ? false : true;
-}
-
-/* Function: get_user_auth()
- *
- * Description:
- * 		Returns user authentication type
- *
- * Comments:
- *		default is SYSTEM auth
- *
- * Author: Aly
- */
-function get_user_auth($userid) {
-	if (bccomp($userid, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
-		return CWebUser::$data['gui_access'];
-	}
-	else {
-		$result = GROUP_GUI_ACCESS_SYSTEM;
-	}
-
-	$sql = 'SELECT MAX(g.gui_access) AS gui_access'.
-			' FROM usrgrp g,users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userid).
-				' AND g.usrgrpid=ug.usrgrpid';
-	$db_access = DBfetch(DBselect($sql));
-	if (!zbx_empty($db_access['gui_access'])) {
-		$result = $db_access['gui_access'];
-	}
-	return $result;
+function check_perm2login($userId) {
+	return (getUserGuiAccess($userId) != GROUP_GUI_ACCESS_DISABLED);
 }
 
 /**
- * Returns overal user authentication type in system with INTERNAL auth as default
+ * Get user gui access.
  *
- * @param int   $userid		User ID
- * @param array $config		system configuration
+ * @param string $userId
+ * @param int    $maxGuiAccess
  *
  * @return int
  */
-function get_user_system_auth($userid, $config) {
-	$result = get_user_auth($userid);
-	switch ($result) {
-		case GROUP_GUI_ACCESS_SYSTEM:
-			$result = $config['authentication_type'];
-			break;
-		case GROUP_GUI_ACCESS_INTERNAL:
-			if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-				$result = ZBX_AUTH_HTTP;
-			}
-			else {
-				$result = ZBX_AUTH_INTERNAL;
-			}
-			break;
-		case GROUP_GUI_ACCESS_DISABLED:
-			$result = $config['authentication_type'];
-		default:
-			break;
+function getUserGuiAccess($userId, $maxGuiAccess = null) {
+	if (bccomp($userId, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
+		return CWebUser::$data['gui_access'];
 	}
-	return $result;
+
+	$guiAccess = DBfetch(DBselect(
+		'SELECT MAX(g.gui_access) AS gui_access'.
+		' FROM usrgrp g,users_groups ug'.
+		' WHERE ug.userid='.zbx_dbstr($userId).
+			' AND g.usrgrpid=ug.usrgrpid'.
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
+	));
+
+	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+}
+
+/**
+ * Get user authentication type.
+ *
+ * @param string $userId
+ * @param int    $maxGuiAccess
+ * @param array  $config
+ *
+ * @return int
+ */
+function getUserAuthenticationType($userId, $maxGuiAccess = null, $config) {
+	switch (getUserGuiAccess($userId, $maxGuiAccess)) {
+		case GROUP_GUI_ACCESS_SYSTEM:
+			return $config['authentication_type'];
+
+		case GROUP_GUI_ACCESS_INTERNAL:
+			return ($config['authentication_type'] == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
+
+		default:
+			return $config['authentication_type'];
+	}
+}
+
+/**
+ * Get groups gui access.
+ *
+ * @param array $groupIds
+ * @param int   $maxGuiAccess
+ *
+ * @return int
+ */
+function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
+	$guiAccess = DBfetch(DBselect(
+		'SELECT MAX(g.gui_access) AS gui_access'.
+		' FROM usrgrp g'.
+		' WHERE '.dbConditionInt('g.usrgrpid', $groupIds).
+			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.$maxGuiAccess)
+	));
+
+	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+}
+
+/**
+ * Get group authentication type.
+ *
+ * @param array $groupIds
+ * @param int   $maxGuiAccess
+ * @param array $config
+ *
+ * @return int
+ */
+function getGroupAuthenticationType($groupIds, $maxGuiAccess = null, $config) {
+	switch (getGroupsGuiAccess($groupIds, $maxGuiAccess)) {
+		case GROUP_GUI_ACCESS_SYSTEM:
+			return $config['authentication_type'];
+
+		case GROUP_GUI_ACCESS_INTERNAL:
+			return ($config['authentication_type'] == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
+
+		default:
+			return $config['authentication_type'];
+	}
 }
 
 /**

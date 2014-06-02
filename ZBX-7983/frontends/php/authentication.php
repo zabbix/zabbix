@@ -211,22 +211,10 @@ $data = array(
 );
 
 // get tab title
-switch ($config['authentication_type']) {
-	case ZBX_AUTH_INTERNAL:
-		$data['title'] = _('Zabbix internal authentication');
-		break;
-	case ZBX_AUTH_LDAP:
-		$data['title'] = _('LDAP authentication');
-		break;
-	case ZBX_AUTH_HTTP:
-		$data['title'] = _('HTTP authentication');
-		break;
-	default:
-		$data['title'] = '';
-}
+$data['title'] = authentication2str($config['authentication_type']);
 
 // get user list
-if (get_user_auth(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
+if (getUserGuiAccess(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['user_list'] = DBfetchArray(DBselect(
 		'SELECT u.alias,u.userid'.
 		' FROM users u'.
