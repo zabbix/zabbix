@@ -366,17 +366,9 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		goto out;
 	}
 
-	if (0 == ipmi_is_sensor_scanning_enabled(states))
+	if (0 == ipmi_is_sensor_scanning_enabled(states) || 0 != ipmi_is_initial_update_in_progress(states))
 	{
-		h->err = zbx_strdup(h->err, "sensor scanning is not enabled");
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		goto out;
-	}
-
-	if (0 != ipmi_is_initial_update_in_progress(states))
-	{
-		h->err = zbx_strdup(h->err, "initial update is in progress");
+		h->err = zbx_strdup(h->err, "sensor data is not available");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		goto out;
