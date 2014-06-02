@@ -1,6 +1,7 @@
 Changes for 2.2.4rc1
 
 New features:
+..F....... [ZBX-7399] improved multiselect, added popup select window (Oleg)
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian, Russian, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
