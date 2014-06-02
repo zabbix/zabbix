@@ -129,7 +129,11 @@ if (!$this->data['config']['event_ack_enable']) {
 $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 
 // append severity min to form list
-$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(array('name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min'])));
+$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(array(
+	'name' => 'severity_min',
+	'value' => $this->data['sysmap']['severity_min'],
+	'config' => $this->data['config']
+)));
 
 // create url table
 $urlTable = new CTable(_('No URLs defined.'), 'formElementTable');

@@ -261,12 +261,12 @@ elseif (getRequest('go') == 'delete' && hasRequest('g_triggerid')) {
  * Display
  */
 if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
+	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData($config));
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
+	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($config));
 	$triggersView->render();
 	$triggersView->show();
 }

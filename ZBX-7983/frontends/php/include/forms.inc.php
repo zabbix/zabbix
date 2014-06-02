@@ -1341,7 +1341,7 @@ function getCopyElementsFormData($elementsField, $title = null) {
 	return $data;
 }
 
-function getTriggerMassupdateFormData() {
+function getTriggerMassupdateFormData($config) {
 	$data = array(
 		'visible' => get_request('visible', array()),
 		'priority' => get_request('priority', ''),
@@ -1351,7 +1351,7 @@ function getTriggerMassupdateFormData() {
 		'go' => get_request('go', 'massupdate'),
 		'g_triggerid' => get_request('g_triggerid', array()),
 		'priority' => get_request('priority', 0),
-		'config' => select_config(),
+		'config' => $config,
 		'hostid' => get_request('hostid', 0)
 	);
 
@@ -1373,7 +1373,7 @@ function getTriggerMassupdateFormData() {
 	return $data;
 }
 
-function getTriggerFormData() {
+function getTriggerFormData($config) {
 	$data = array(
 		'form' => get_request('form'),
 		'form_refresh' => get_request('form_refresh'),
@@ -1392,7 +1392,8 @@ function getTriggerFormData() {
 		'input_method' => get_request('input_method', IM_ESTABLISHED),
 		'limited' => null,
 		'templates' => array(),
-		'hostid' => get_request('hostid', 0)
+		'hostid' => get_request('hostid', 0),
+		'config' => $config
 	);
 
 	if (!empty($data['triggerid'])) {

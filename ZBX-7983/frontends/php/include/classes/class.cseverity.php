@@ -39,7 +39,7 @@ class CSeverity extends CTag {
 		$jsIds = '';
 		$jsLabels = '';
 
-		foreach (getSeverityCaption() as $severity => $caption) {
+		foreach (getSeverityCaption(null, $options['config']) as $severity => $caption) {
 			$items[] = new CRadioButton(
 				$options['name'],
 				$severity,

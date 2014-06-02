@@ -94,7 +94,12 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
+			get_condition_desc(
+				$condition['conditiontype'],
+				$condition['operator'],
+				$condition['value'],
+				$this->data['config']
+			),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
@@ -192,9 +197,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
-		$config = select_config();
 		$condition = new CComboBox('new_condition[value]');
-		$condition->addItems(getSeverityCaption(null, $config));
+		$condition->addItems(getSeverityCaption(null, $this->data['config']));
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
@@ -917,7 +921,12 @@ if (!empty($this->data['new_operation'])) {
 			$operationConditionsTable->addRow(
 				array(
 					'('.$label.')',
-					get_condition_desc($opcondition['conditiontype'], $opcondition['operator'], $opcondition['value']),
+					get_condition_desc(
+						$opcondition['conditiontype'],
+						$opcondition['operator'],
+						$opcondition['value'],
+						$this->data['config']
+					),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),

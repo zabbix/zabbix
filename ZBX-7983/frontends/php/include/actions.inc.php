@@ -116,7 +116,7 @@ function discovery_object2str($object = null) {
 	}
 }
 
-function condition_value2str($conditiontype, $value) {
+function condition_value2str($conditiontype, $value, $config) {
 	switch ($conditiontype) {
 		case CONDITION_TYPE_HOST_GROUP:
 			$groups = API::HostGroup()->get(array(
@@ -185,7 +185,7 @@ function condition_value2str($conditiontype, $value) {
 			$str_val = trigger_value2str($value);
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			$str_val = getSeverityCaption($value);
+			$str_val = getSeverityCaption($value, $config);
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
 			$str_val = $value;
@@ -274,16 +274,17 @@ function condition_value2str($conditiontype, $value) {
  * @param $conditiontype
  * @param $operator
  * @param $value
+ * @param $config
  *
  * @return array
  */
-function get_condition_desc($conditiontype, $operator, $value) {
+function get_condition_desc($conditiontype, $operator, $value, $config) {
 	return array(
 		condition_type2str($conditiontype),
 		SPACE,
 		condition_operator2str($operator),
 		SPACE,
-		italic(CHtml::encode(condition_value2str($conditiontype, $value)))
+		italic(CHtml::encode(condition_value2str($conditiontype, $value, $config)))
 	);
 }
 

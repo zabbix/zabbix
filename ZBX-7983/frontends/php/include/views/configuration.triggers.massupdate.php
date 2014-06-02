@@ -62,7 +62,8 @@ $triggersFormList = new CFormList('triggersFormList');
 $severityDiv = new CSeverity(array(
 	'id' => 'priority_div',
 	'name' => 'priority',
-	'value' => $this->data['priority']
+	'value' => $this->data['priority'],
+	'config' => $this->data['config']
 ));
 
 $triggersFormList->addRow(
