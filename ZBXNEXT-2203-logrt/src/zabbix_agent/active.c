@@ -961,7 +961,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				else if (MIN_VALUE_LINES > (maxlines_persec = atoi(maxlines_persec_str)) ||
 						MAX_VALUE_LINES < maxlines_persec)
 				{
-					err_msg = "Invalid 'maxlines' parameter.";
+					err_msg = "Invalid fourth parameter.";
 					break;
 				}
 
@@ -972,7 +972,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					active_metrics[i].skip_old_data = 0;
 				else if (0 != strcmp(tmp, "skip"))
 				{
-					err_msg = "Invalid 'mode' parameter.";
+					err_msg = "Invalid fifth parameter.";
 					break;
 				}
 
