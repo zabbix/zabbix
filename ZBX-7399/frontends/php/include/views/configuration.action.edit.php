@@ -823,7 +823,7 @@ if (!empty($this->data['new_operation'])) {
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
 			$groupList->addRow(new CRow(
-				new CCol(array(
+				new CCol(
 					new CMultiSelect(array(
 						'name' => 'discoveryHostGroup',
 						'objectName' => 'hostGroup',
@@ -835,10 +835,13 @@ if (!empty($this->data['new_operation'])) {
 							'height' => 450
 						)
 					)),
-					new CDiv(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu'), 'add-detail')
-				), null, 2),
+					null, 2
+				),
 				null,
 				'opGroupListFooter'
+			));
+			$groupList->addRow(new CCol(
+				new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu'), null, 2
 			));
 
 			// load host groups
@@ -874,7 +877,7 @@ if (!empty($this->data['new_operation'])) {
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
 			$templateList->addRow(new CRow(
-				new CCol(array(
+				new CCol(
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
 						'objectName' => 'templates',
@@ -886,10 +889,13 @@ if (!empty($this->data['new_operation'])) {
 							'height' => 450
 						)
 					)),
-					new CDiv(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu'), 'add-detail')
-				), null, 2),
+					null, 2
+				),
 				null,
 				'opTemplateListFooter'
+			));
+			$templateList->addRow(new CCol(
+				new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu'), null, 2
 			));
 
 			// load templates
