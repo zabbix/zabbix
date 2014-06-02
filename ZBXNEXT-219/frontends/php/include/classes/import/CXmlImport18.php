@@ -1190,7 +1190,9 @@ class CXmlImport18 {
 // }}} TEMPLATES
 
 // ITEMS {{{
-				if (!empty($rules['items']['updateExisting']) || !empty($rules['items']['createMissing'])) {
+				if ($rules['items']['updateExisting']
+						|| $rules['items']['createMissing']
+						|| $rules['items']['deleteMissing']) {
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
@@ -1239,6 +1241,21 @@ class CXmlImport18 {
 						}
 					}
 
+					// get items all from DB, to compare DB items and XML items
+					if ($rules['items']['deleteMissing']) {
+						$dbItems = API::Item()->get(array(
+							'output' => array('itemid'),
+							'webitems' => true,
+							'nopermissions' => true,
+							'preservekeys' => true,
+							'filter' => array('hostid' => $current_hostid),
+						));
+						$dbItems = array_keys($dbItems);
+
+						$itemsToPreserve = array();
+					}
+
+					// cycle each XML item
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						$item_db['hostid'] = $current_hostid;
@@ -1298,15 +1315,17 @@ class CXmlImport18 {
 						));
 						$current_item = reset($current_item);
 
+						// if item does not exist and there is no need to create it, skip item creation
 						if (!$current_item && empty($rules['items']['createMissing'])) {
 							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue; // break if not update updateExisting
-						}
-						if ($current_item && empty($rules['items']['updateExisting'])) {
-							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
-							continue; // break if not update updateExisting
+							continue;
 						}
 
+						// if item exists, but there there is no need for update, skip item update
+						if ($current_item && empty($rules['items']['updateExisting'])) {
+							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
+							continue;
+						}
 
 // ITEM APPLICATIONS {{{
 						$applications = $xpath->query('applications/application', $item);
@@ -1347,9 +1366,6 @@ class CXmlImport18 {
 
 						if (!empty($applications_to_add)) {
 							$result = API::Application()->create($applications_to_add);
-							if (!$result) {
-								throw new Exception();
-							}
 
 							$options = array(
 								'applicationids' => $result['applicationids'],
@@ -1364,9 +1380,6 @@ class CXmlImport18 {
 						if ($current_item && !empty($rules['items']['updateExisting'])) {
 							$item_db['itemid'] = $current_item['itemid'];
 							$result = API::Item()->update($item_db);
-							if (!$result) {
-								throw new Exception();
-							}
 
 							$current_item = API::Item()->get(array(
 								'itemids' => $result['itemids'],
@@ -1377,9 +1390,6 @@ class CXmlImport18 {
 
 						if (!$current_item && !empty($rules['items']['createMissing'])) {
 							$result = API::Item()->create($item_db);
-							if (!$result) {
-								throw new Exception();
-							}
 
 							$current_item = API::Item()->get(array(
 								'itemids' => $result['itemids'],
@@ -1389,13 +1399,24 @@ class CXmlImport18 {
 						}
 
 						if (!empty($item_applications)) {
-							$r = API::Application()->massAdd(array(
+							API::Application()->massAdd(array(
 								'applications' => $item_applications,
 								'items' => $current_item
 							));
-							if ($r === false) {
-								throw new Exception();
-							}
+						}
+
+						// these items will be preserved. They are updated or created, but others will be deleted
+						if ($rules['items']['deleteMissing']) {
+							$current_item = reset($current_item);
+							$itemsToPreserve[] = $current_item['itemid'];
+						}
+					}
+
+					// compare items left in DB and XML and delete items missing from XML
+					if ($rules['items']['deleteMissing']) {
+						$itemsToDelete = array_diff($dbItems, $itemsToPreserve);
+						if ($itemsToDelete) {
+							API::Item()->delete($itemsToDelete);
 						}
 					}
 				}

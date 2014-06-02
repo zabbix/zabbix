@@ -131,8 +131,10 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 
 	}
 }
+
 if (isset($_REQUEST['rules'])) {
-	$requestRules = get_request('rules', array());
+	$requestRules = getRequest('rules', array());
+
 	// if form was submitted with some checkboxes unchecked, those values are not submitted
 	// so that we set missing values to false
 	foreach ($data['rules'] as $ruleName => $rule) {
@@ -140,23 +142,29 @@ if (isset($_REQUEST['rules'])) {
 			if (isset($rule['updateExisting'])) {
 				$requestRules[$ruleName]['updateExisting'] = false;
 			}
+
 			if (isset($rule['createMissing'])) {
 				$requestRules[$ruleName]['createMissing'] = false;
 			}
+
 			if (isset($rule['deleteMissing'])) {
 				$requestRules[$ruleName]['deleteMissing'] = false;
 			}
 		}
-		elseif (!isset($requestRules[$ruleName]['updateExisting']) && isset($rule['updateExisting'])){
+
+		if (!isset($requestRules[$ruleName]['updateExisting']) && isset($rule['updateExisting'])) {
 			$requestRules[$ruleName]['updateExisting'] = false;
 		}
-		elseif (!isset($requestRules[$ruleName]['createMissing']) && isset($rule['createMissing'])){
+
+		if (!isset($requestRules[$ruleName]['createMissing']) && isset($rule['createMissing'])) {
 			$requestRules[$ruleName]['createMissing'] = false;
 		}
-		elseif (!isset($requestRules[$ruleName]['deleteMissing']) && isset($rule['deleteMissing'])){
+
+		if (!isset($requestRules[$ruleName]['deleteMissing']) && isset($rule['deleteMissing'])) {
 			$requestRules[$ruleName]['deleteMissing'] = false;
 		}
 	}
+
 	$data['rules'] = $requestRules;
 }
 
