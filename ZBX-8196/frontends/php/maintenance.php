@@ -81,7 +81,7 @@ $fields = array(
 
 check_fields($fields);
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, API::Maintenance()->sortColumns());
 
 /*
  * Permissions
