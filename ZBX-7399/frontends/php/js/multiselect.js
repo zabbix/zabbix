@@ -483,7 +483,7 @@ jQuery(function($) {
 				});
 
 				if (options.disabled) {
-					popupButton.attr('disabled', 'disabled');
+					popupButton.attr('disabled', true);
 				}
 				else {
 					popupButton.click(function() {
