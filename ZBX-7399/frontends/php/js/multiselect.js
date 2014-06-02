@@ -482,7 +482,10 @@ jQuery(function($) {
 					value: options.labels['Select']
 				});
 
-				if (!options.disabled) {
+				if (options.disabled) {
+					popupButton.attr('disabled', 'disabled');
+				}
+				else {
 					popupButton.click(function() {
 						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
 					});
