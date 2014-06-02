@@ -296,7 +296,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 	if (-1 == (h = _get_osfhandle(f)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file handle from file descriptor for \"%s\".",
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain handle from descriptor of file \"%s\".",
 				filename);
 		return ret;
 	}
@@ -313,7 +313,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		}
 		else
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information for \"%s\": %s",
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information about file \"%s\": %s",
 					filename, strerror_from_system(GetLastError()));
 			return ret;
 		}
@@ -330,7 +330,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			}
 			else
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended file information for "
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended information for file "
 						"\"%s\": %s", filename, strerror_from_system(GetLastError()));
 				return ret;
 			}
@@ -372,7 +372,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 	if (0 == GetVolumePathName(path_uni, mount_point,
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for \"%s\": %s", path,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for file \"%s\": %s", path,
 				strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
@@ -385,7 +385,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 			sizeof(fs_type) / sizeof(wchar_t)))
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for \"%s\": %s", utf8,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for directory \"%s\": %s", utf8,
 				strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
@@ -1199,7 +1199,7 @@ static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, in
 clean:
 	if (-1 == _findclose(find_handle))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot close the find directory handle for \"%s\": %s", find_path,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close the find handle for directory \"%s\": %s", find_path,
 				zbx_strerror(errno));
 		ret = FAIL;
 	}
@@ -1268,7 +1268,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 	{
 		if (0 != zbx_stat(filename, &file_buf))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information \"%s\": %s", filename,
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information about file \"%s\": %s", filename,
 					zbx_strerror(errno));
 			ret = FAIL;
 			goto clean;
@@ -2008,7 +2008,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information \"%s\": %s", filename,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information about file \"%s\": %s", filename,
 				zbx_strerror(errno));
 		goto out;
 	}
@@ -2052,7 +2052,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	}
 	else
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " for \"%s\": %s",
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
 				l_size, filename, zbx_strerror(errno));
 	}
 
