@@ -90,9 +90,7 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div>
-						<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
-					</div>
+					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
