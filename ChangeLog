@@ -3,6 +3,7 @@ Changes for 2.3.2
 New features:
 
 Bug fixes:
+..F....... [ZBX-8271] fixed importing of maps with LLD discovered hosts (Andrejs)
 
 --------------------------------------------------------------------------------
 Changes for 2.3.1
