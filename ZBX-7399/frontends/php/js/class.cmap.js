@@ -1352,19 +1352,20 @@ ZABBIX.apps.map = (function($) {
 						'id': selement.elementid,
 						'name': selement.elementName
 					};
+
+					switch (selement.elementtype) {
+						// host
+						case '0':
+							$('#elementNameHost').multiSelect.addData(item, 'elementNameHost');
+							break;
+
+						// host group
+						case '3':
+							$('#elementNameHostGroup').multiSelect.addData(item, 'elementNameHostGroup');
+							break;
+					}
 				}
 
-				switch (selement.elementtype) {
-					// host
-					case '0':
-						$('#elementNameHost').multiSelect.addData(item, 'elementNameHost');
-						break;
-
-					// host group
-					case '3':
-						$('#elementNameHostGroup').multiSelect.addData(item, 'elementNameHostGroup');
-						break;
-				}
 			},
 
 			/**
