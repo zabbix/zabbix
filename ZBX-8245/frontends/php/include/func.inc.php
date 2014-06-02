@@ -1433,12 +1433,12 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
 }
 
 // creates header col for sorting in table header
-function make_sorting_header($obj, $tabfield, $url = '') {
+function make_sorting_header($obj, $tabfield) {
 	global $page;
 
 	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-	$link = CUrlFactory::getContextUrl($url);
+	$link = CUrlFactory::getContextUrl();
 
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
