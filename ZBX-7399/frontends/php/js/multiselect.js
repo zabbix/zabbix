@@ -479,11 +479,14 @@ jQuery(function($) {
 				var popupButton = $('<input>', {
 					type: 'button',
 					'class': options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
-					value: options.labels['Select'],
-					click: function() {
-						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
-					}
+					value: options.labels['Select']
 				});
+
+				if (!options.disabled) {
+					popupButton.click(function() {
+						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
+					});
+				}
 
 				obj.parent().append(popupButton);
 			}
