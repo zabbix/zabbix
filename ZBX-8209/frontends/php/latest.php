@@ -331,6 +331,7 @@ if (getRequest('hostid')) {
 else {
 	$hostHeader = make_sorting_header(_('Host'), 'host');
 	$hostHeader->addClass('latest-host');
+	$hostHeader->addClass($filterShowDetails ? 'with-details' : 'no-details');
 	$hostHeader->setAttribute('title', _('Host'));
 
 	$hostColumn = SPACE;
