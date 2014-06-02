@@ -116,12 +116,12 @@ class CUrlFactory {
 	 *
 	 * @param string $sourceUrl
 	 *
-	 * @return Curl
+	 * @return CUrl
 	 */
 	public static function getContextUrl($sourceUrl = null) {
 		$config = self::resolveConfig();
 
-		$url = new Curl($sourceUrl);
+		$url = new CUrl($sourceUrl);
 
 		if (isset($config['remove'])) {
 			foreach ($config['remove'] as $key) {
