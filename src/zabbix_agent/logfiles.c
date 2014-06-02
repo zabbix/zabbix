@@ -126,7 +126,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 
 	if (NULL == filename || '\0' == *filename)
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot split empty path");
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot split empty path.");
 		goto out;
 	}
 
@@ -143,7 +143,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, format))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot split '%s'", filename);
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot split \"%s\".", filename);
 			goto out;
 		}
 
@@ -152,7 +152,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 		/* Windows world verification */
 		if (sz + 1 > MAX_PATH)
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot proceed: directory path is too long (%s)", *directory);
+			*err_msg = zbx_dsprintf(*err_msg, "Directory path is too long \"%s\".", *directory);
 			zbx_free(*directory);
 			zbx_free(*format);
 			goto out;
@@ -185,19 +185,19 @@ static int	split_filename(const char *filename, char **directory, char **format,
 #else	/* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "filename '%s' does not contain any path separator '%c'", filename,
-				PATH_SEPARATOR);
+		*err_msg = zbx_dsprintf(*err_msg, "Filename \"%s\" does not contain any path separator \"%c\".",
+				filename, PATH_SEPARATOR);
 		goto out;
 	}
 	if (SUCCEED != split_string(filename, separator, directory, format))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot split filename '%s' by '%c'", filename, PATH_SEPARATOR);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot split filename \"%s\" by \"%c\".", filename, PATH_SEPARATOR);
 		goto out;
 	}
 
 	if (-1 == zbx_stat(*directory, &buf))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot find directory '%s' on the file system", *directory);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot find directory \"%s\" on the file system.", *directory);
 		zbx_free(*directory);
 		zbx_free(*format);
 		goto out;
@@ -205,7 +205,7 @@ static int	split_filename(const char *filename, char **directory, char **format,
 
 	if (0 == S_ISDIR(buf.st_mode))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot proceed: directory '%s' is a file", *directory);
+		*err_msg = zbx_dsprintf(*err_msg, "Directory \"%s\" is a file.", *directory);
 		zbx_free(*directory);
 		zbx_free(*format);
 		goto out;
@@ -247,14 +247,14 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 
 	if ((zbx_offset_t)-1 == zbx_lseek(f, 0, SEEK_SET))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot set position to 0 for file \"%s\": %s", filename,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to 0 for file \"%s\": %s", filename,
 				zbx_strerror(errno));
 		return FAIL;
 	}
 
 	if (length != (int)read(f, buf, (size_t)length))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot read " ZBX_FS_SIZE_T " bytes from file \"%s\": %s",
 				(zbx_fs_size_t)length, filename, zbx_strerror(errno));
 		return FAIL;
 	}
@@ -296,7 +296,8 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 	if (-1 == (h = _get_osfhandle(f)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot get file handle from file descriptor for '%s'", filename);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file handle from file descriptor for \"%s\".",
+				filename);
 		return ret;
 	}
 
@@ -312,7 +313,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		}
 		else
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot get file information for \"%s\": %s",
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information for \"%s\": %s",
 					filename, strerror_from_system(GetLastError()));
 			return ret;
 		}
@@ -329,7 +330,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			}
 			else
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "cannot get extended file information for "
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended file information for "
 						"\"%s\": %s", filename, strerror_from_system(GetLastError()));
 				return ret;
 			}
@@ -371,7 +372,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 	if (0 == GetVolumePathName(path_uni, mount_point,
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot get volume mount point for \"%s\": %s", path,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for \"%s\": %s", path,
 				strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
@@ -384,7 +385,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 			sizeof(fs_type) / sizeof(wchar_t)))
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
-		*err_msg = zbx_dsprintf(*err_msg, "cannot get volume information for \"%s\": %s", utf8,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for \"%s\": %s", utf8,
 				strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
@@ -532,7 +533,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "cannot open \"%s\"': %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", new->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 				goto out;
@@ -548,7 +549,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (0 != close(f))
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "cannot close file '%s': %s", new->filename,
+				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 			}
@@ -1176,7 +1177,7 @@ static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, in
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot open directory \"%s\" for reading: %s", directory,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
 		zbx_free(find_wpath);
 		zbx_free(find_path);
@@ -1198,7 +1199,7 @@ static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, in
 clean:
 	if (-1 == _findclose(find_handle))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot close the find directory handle for '%s': %s", find_path,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close the find directory handle for \"%s\": %s", find_path,
 				zbx_strerror(errno));
 		ret = FAIL;
 	}
@@ -1213,7 +1214,7 @@ clean:
 
 	if (NULL == (dir = opendir(directory)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot open directory '%s' for reading: %s", directory,
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open directory \"%s\" for reading: %s", directory,
 				zbx_strerror(errno));
 		return FAIL;
 	}
@@ -1228,7 +1229,7 @@ clean:
 
 	if (-1 == closedir(dir))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close directory \"%s\": %s", directory, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -1267,15 +1268,16 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 	{
 		if (0 != zbx_stat(filename, &file_buf))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information \"%s\": %s", filename,
+					zbx_strerror(errno));
 			ret = FAIL;
 			goto clean;
 		}
 
 		if (!S_ISREG(file_buf.st_mode))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "'%s' is not a regular file, it cannot be used in log[] item",
-					filename);
+			*err_msg = zbx_dsprintf(*err_msg, "\"%s\" is not a regular file, it cannot be used in log[] "
+					"item", filename);
 			ret = FAIL;
 			goto clean;
 		}
@@ -1310,8 +1312,8 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 			char	err_buf[MAX_STRING_LEN];
 
 			regerror(reg_error, &re, err_buf, sizeof(err_buf));
-			*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regexp describing filename pattern '%s' for"
-					" a logrt[] item: %s", format, err_buf);
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regexp describing filename pattern \"%s\" "
+					"for a logrt[] item: %s", format, err_buf);
 			ret = FAIL;
 			goto clean1;
 		}
@@ -1350,7 +1352,8 @@ clean1:
 
 		if (-1 == (f = zbx_open(p->filename, O_RDONLY)))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot open \"%s\"': %s", p->filename, zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", p->filename,
+					zbx_strerror(errno));
 			ret = FAIL;
 			break;
 		}
@@ -1369,7 +1372,7 @@ clean1:
 clean3:
 		if (0 != close(f))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "cannot close file '%s': %s", p->filename,
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", p->filename,
 					zbx_strerror(errno));
 			ret = FAIL;
 			break;
@@ -1749,7 +1752,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 		if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		{
 			*big_rec = 0;
-			*err_msg = zbx_dsprintf(*err_msg, "cannot set position in file: %s", zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot set position in file: %s", zbx_strerror(errno));
 			ret = FAIL;
 			goto out;
 		}
@@ -1760,7 +1763,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 		{
 			/* error on read */
 			*big_rec = 0;
-			*err_msg = zbx_dsprintf(*err_msg, "cannot read file: %s", zbx_strerror(errno));
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read file: %s", zbx_strerror(errno));
 			ret = FAIL;
 			goto out;
 		}
@@ -1917,7 +1920,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
 						ret = FAIL;
-						*err_msg = zbx_dsprintf(*err_msg, "cannot set position in file: %s",
+						*err_msg = zbx_dsprintf(*err_msg, "Cannot set position in file: %s",
 								zbx_strerror(errno));
 						goto out;
 					}
@@ -2005,7 +2008,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (0 != zbx_stat(filename, &buf))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain file information \"%s\": %s", filename,
+				zbx_strerror(errno));
 		goto out;
 	}
 
@@ -2022,7 +2026,7 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", filename, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -2048,13 +2052,13 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned 
 	}
 	else
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot set position to " ZBX_FS_UI64 " for '%s': %s",
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " for \"%s\": %s",
 				l_size, filename, zbx_strerror(errno));
 	}
 
 	if (0 != close(f))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", filename, zbx_strerror(errno));
 		ret = FAIL;
 	}
 out:
