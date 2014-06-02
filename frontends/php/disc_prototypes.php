@@ -131,7 +131,7 @@ $fields = array(
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, API::ItemPrototype()->sortColumns());
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');

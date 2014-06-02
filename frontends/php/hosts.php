@@ -104,7 +104,7 @@ $fields = array(
 	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, API::Host()->sortColumns());
 
 $_REQUEST['go'] = get_request('go', 'none');
 

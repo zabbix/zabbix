@@ -83,7 +83,7 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, API::Graph()->sortColumns());
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());

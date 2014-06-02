@@ -60,7 +60,7 @@ check_fields($fields);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'command'));
 
 /*
  * Permissions

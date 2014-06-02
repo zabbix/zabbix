@@ -1411,10 +1411,11 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @param string $sort
  * @param string $sortorder
+ * @param array $allowedColumns
  *
- * @retur void
+ * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, $allowedColumns = array()) {
 	global $page;
 
 	$_REQUEST['sort'] = getPageSortField($sort);
@@ -1422,6 +1423,13 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
 
 	if (!is_null($_REQUEST['sort'])) {
 		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
+
+		if (count($allowedColumns) > 0 && !in_array($_REQUEST['sort'], $allowedColumns)) {
+			invalid_url(_s('Sorting by field "%1$s" not allowed.', $_REQUEST['sort']));
+			// we do not want the profile to be updated with wrong value
+			return;
+		}
+
 		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
 

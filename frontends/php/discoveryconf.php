@@ -54,7 +54,7 @@ $fields = array(
 	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP, API::DRule()->sortColumns());
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 $_REQUEST['dchecks'] = get_request('dchecks', array());

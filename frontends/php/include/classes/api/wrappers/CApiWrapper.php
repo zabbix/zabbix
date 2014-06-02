@@ -79,7 +79,10 @@ class CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	public function __call($method, array $params) {
-		return $this->callMethod($method, reset($params));
+		return $this->callMethod(
+			$method,
+			is_array($params) && count($params) != 0 ? reset($params) : array()
+		);
 	}
 
 	/**
