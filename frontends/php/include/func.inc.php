@@ -1534,12 +1534,10 @@ function getPageNumber() {
  * Returns paging line.
  *
  * @param array $items				list of items
- * @param array $removeUrlParams	params to remove from URL
- * @param array $urlParams			params to add in URL
  *
  * @return CTable
  */
-function getPagingLine(&$items, $removeUrlParams = array(), $urlParams = array()) {
+function getPagingLine(&$items) {
 	global $page;
 
 	$config = select_config();
@@ -1589,7 +1587,7 @@ function getPagingLine(&$items, $removeUrlParams = array(), $urlParams = array()
 	$table = null;
 
 	if ($pagesCount > 1) {
-		$url = CurlFactory::getContextUrl(array(), $removeUrlParams, $urlParams);
+		$url = CurlFactory::getContextUrl();
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
