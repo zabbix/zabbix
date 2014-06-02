@@ -38,7 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = new Curl($url);
+	$curl = new CUrl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
 	exit;
@@ -1587,7 +1587,7 @@ function getPagingLine(&$items) {
 	$table = null;
 
 	if ($pagesCount > 1) {
-		$url = CurlFactory::getContextUrl();
+		$url = CUrlFactory::getContextUrl();
 
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);

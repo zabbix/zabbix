@@ -19,7 +19,7 @@
 **/
 
 
-class Curl {
+class CUrl {
 
 	private $url;
 	protected $reference;
