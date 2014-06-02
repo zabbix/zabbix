@@ -4348,8 +4348,8 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 			if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
 					SUCCEED == is_time_function(dc_function->function) &&
 					NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
-					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 					ITEM_STATUS_ACTIVE == dc_item->status &&
+					NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
 					HOST_STATUS_MONITORED == dc_host->status &&
 					!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
 					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
@@ -6006,32 +6006,32 @@ int	DCget_item_unsupported_count()
  *                                                                            *
  * Function: DCget_trigger_count                                              *
  *                                                                            *
- * Purpose: return the number of triggers                                     *
+ * Purpose: return the number of active triggers                              *
  *                                                                            *
- * Return value: the number of triggers                                       *
+ * Return value: the number of active triggers                                *
  *                                                                            *
  ******************************************************************************/
 int	DCget_trigger_count()
 {
 	zbx_hashset_iter_t	iter;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_TRIGGER	*trigger;
-	int			count = 0;
-	const char		*p, *q;
 	zbx_uint64_t		functionid;
+	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_TRIGGER	*dc_trigger;
 	const ZBX_DC_HOST	*dc_host;
+	const char		*p, *q;
+	int			count = 0;
 
 	LOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 
-	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
 	{
-		if (TRIGGER_STATUS_ENABLED != trigger->status)
+		if (TRIGGER_STATUS_ENABLED != dc_trigger->status)
 			continue;
 
-		for (p = trigger->expression; '\0' != *p; p++)
+		for (p = dc_trigger->expression; '\0' != *p; p++)
 		{
 			if ('{' != *p)
 				continue;
@@ -6049,8 +6049,8 @@ int	DCget_trigger_count()
 
 			if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)) ||
 					NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) ||
-					NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) ||
 					ITEM_STATUS_ACTIVE != dc_item->status ||
+					NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) ||
 					HOST_STATUS_MONITORED != dc_host->status)
 			{
 				goto next;
@@ -6058,9 +6058,11 @@ int	DCget_trigger_count()
 
 			p = q;
 		}
-			count++;
+
+		count++;
 next:;
 	}
+
 	UNLOCK_CACHE;
 
 	return count;
