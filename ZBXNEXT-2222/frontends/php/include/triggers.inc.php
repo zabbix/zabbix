@@ -1047,27 +1047,33 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	$hostNames = array();
 
 	foreach ($triggers as $trigger) {
-		$host = reset($trigger['hosts']);
-
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
-		$hostNames[$host['hostid']] = $host['name'];
 
-		// a little tricky check for attempt to overwrite active trigger (value=1) with
-		// inactive or active trigger with lower priority.
-		if (!isset($data[$trigger['description']][$host['name']])
-				|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-					|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-						&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
-			$data[$trigger['description']][$host['name']] = array(
-				'hostid' => $host['hostid'],
-				'triggerid' => $trigger['triggerid'],
-				'value' => $trigger['value'],
-				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority'],
-				'flags' => $trigger['flags'],
-				'url' => $trigger['url'],
-				'hosts' => array($host)
-			);
+		foreach ($trigger['hosts'] as $host) {
+			// triggers may belong to hosts that are filtered out and shouldn't be displayed, skip them
+			if (!isset($hosts[$host['hostid']])) {
+				continue;
+			}
+
+			$hostNames[$host['hostid']] = $host['name'];
+
+			// a little tricky check for attempt to overwrite active trigger (value=1) with
+			// inactive or active trigger with lower priority.
+			if (!isset($data[$trigger['description']][$host['name']])
+					|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
+						|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
+							&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
+				$data[$trigger['description']][$host['name']] = array(
+					'hostid' => $host['hostid'],
+					'triggerid' => $trigger['triggerid'],
+					'value' => $trigger['value'],
+					'lastchange' => $trigger['lastchange'],
+					'priority' => $trigger['priority'],
+					'flags' => $trigger['flags'],
+					'url' => $trigger['url'],
+					'hosts' => array($host)
+				);
+			}
 		}
 	}
 
