@@ -722,6 +722,9 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	{
 		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
+			if (NULL != is_null)
+				*is_null = 0;
+
 			if (0 == (len = json_parse_value(p, NULL)))
 				return NULL;
 
