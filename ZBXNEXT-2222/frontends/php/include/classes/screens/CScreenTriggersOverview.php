@@ -36,12 +36,14 @@ class CScreenTriggersOverview extends CScreenBase {
 			'preservekeys' => true
 		));
 
+		$hostIds = zbx_objectValues($hosts, 'hostid');
+
 		// application filter
 		$applications = array();
 		if ($this->screenitem['application'] !== '') {
 			$applications = API::Application()->get(array(
 				'output' => array('applicationid'),
-				'hostids' => zbx_objectValues($hosts, 'hostid'),
+				'hostids' => $hostIds,
 				'search' => array('name' => $this->screenitem['application'])
 			));
 		}
@@ -51,7 +53,7 @@ class CScreenTriggersOverview extends CScreenBase {
 				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 			),
 			'selectHosts' => array('hostid', 'name', 'status'),
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'hostids' => $hostIds,
 			'applicationids' => $applications ? zbx_objectValues($applications, 'applicationid') : null,
 			'monitored' => true,
 			'skipDependent' => true,
