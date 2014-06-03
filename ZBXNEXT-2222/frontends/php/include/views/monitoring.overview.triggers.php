@@ -113,7 +113,7 @@ if ($config['dropdown_first_entry']) {
 	);
 }
 else {
-	$dataTable = new CTableInfo(_('No items found.'));
+	$dataTable = new CTableInfo(_('No triggers found.'));
 }
 
 $overviewWidget->addItem($dataTable);
