@@ -181,6 +181,7 @@ switch ($data['method']) {
 			'mode' => !empty($data['mode']) ? $data['mode'] : null,
 			'timestamp' => !empty($data['timestamp']) ? $data['timestamp'] : time(),
 			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
+			'screenid' => (isset($data['screenid']) && $data['screenid'] != 0) ? $data['screenid'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
 			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,

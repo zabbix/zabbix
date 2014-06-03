@@ -1297,7 +1297,9 @@ class CConfigurationImport {
 	protected function getFormatter($version) {
 		switch ($version) {
 			case '2.0':
-				return new C20ImportFormatter;
+				$converter = new C24TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
+
+				return new C20ImportFormatter($converter);
 			default:
 				throw new InvalidArgumentException('Unknown import version.');
 		}

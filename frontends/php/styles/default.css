@@ -578,5 +578,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .ui-widget-overlay { z-index: 1000; }
 .ui-dialog { z-index: 1001; opacity: 1; }
 
+/* trigger expression */
+.trigger-expression, table.tableinfo .trigger-expression { white-space: pre-wrap; }
+
 /* server name */
 .server-name { padding-right: 5px; }

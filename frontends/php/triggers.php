@@ -105,21 +105,22 @@ if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid'])
 /*
  * Actions
  */
+$exprAction = null;
 if (isset($_REQUEST['add_expression'])) {
 	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
 	$_REQUEST['expr_temp'] = '';
 }
 elseif (isset($_REQUEST['and_expression'])) {
-	$_REQUEST['expr_action'] = '&';
+	$exprAction = 'and';
 }
 elseif (isset($_REQUEST['or_expression'])) {
-	$_REQUEST['expr_action'] = '|';
+	$exprAction = 'or';
 }
 elseif (isset($_REQUEST['replace_expression'])) {
-	$_REQUEST['expr_action'] = 'r';
+	$exprAction = 'r';
 }
 elseif (getRequest('remove_expression')) {
-	$_REQUEST['expr_action'] = 'R';
+	$exprAction = 'R';
 	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
@@ -330,7 +331,7 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
+	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
 	$triggersView->render();
 	$triggersView->show();
 }
@@ -349,7 +350,7 @@ else {
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
@@ -382,7 +383,7 @@ else {
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers'], array('triggerid'), array('hostid' => $_REQUEST['hostid']));
+	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
@@ -441,14 +442,10 @@ else {
 
 	// determine, show or not column of errors
 	if ($data['hostid'] > 0) {
-		$host = API::Host()->get(array(
-			'hostids' => $_REQUEST['hostid'],
-			'output' => array('status'),
-			'templated_hosts' => true,
-			'editable' => true
+		$data['showInfoColumn'] = (bool) API::Host()->get(array(
+			'hostids' => $data['hostid'],
+			'output' => array('status')
 		));
-		$host = reset($host);
-		$data['showInfoColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
 		$data['showInfoColumn'] = true;

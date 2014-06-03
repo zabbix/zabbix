@@ -60,7 +60,6 @@ class CHostGroup extends CApiService {
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'real_hosts'				=> null,
-			'not_proxy_hosts'			=> null,
 			'with_hosts_and_templates'	=> null,
 			'with_items'				=> null,
 			'with_simple_graph_items'	=> null,
@@ -176,7 +175,7 @@ class CHostGroup extends CApiService {
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
-		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
+		// monitored_hosts, real_hosts, templated_hosts, with_hosts_and_templates
 		if (!is_null($options['monitored_hosts'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
@@ -200,13 +199,6 @@ class CHostGroup extends CApiService {
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sqlParts['where'][] = 'h.hostid=hg.hostid';
 			$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
-		}
-		elseif (!is_null($options['not_proxy_hosts'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'h.status NOT IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 		elseif (!is_null($options['with_hosts_and_templates'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -575,7 +567,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		$dltGroupids = getDeletableHostGroups($groupids);
+		$dltGroupids = getDeletableHostGroupIds($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
 				if (isset($dltGroupids[$groupid])) {
@@ -812,7 +804,7 @@ class CHostGroup extends CApiService {
 
 		$objectidsToUnlink = array_merge($hostids, $templateids);
 		if (!empty($objectidsToUnlink)) {
-			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
+			$unlinkable = getUnlinkableHostIds($groupids, $objectidsToUnlink);
 			if (count($objectidsToUnlink) != count($unlinkable)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));
 			}
@@ -945,7 +937,7 @@ class CHostGroup extends CApiService {
 
 		// validate hosts without groups
 		if ($hostIdsToValidate) {
-			$unlinkable = getUnlinkableHosts($groupIds, $hostIdsToValidate);
+			$unlinkable = getUnlinkableHostIds($groupIds, $hostIdsToValidate);
 
 			if (count($unlinkable) != count($hostIdsToValidate)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('One of the objects is left without a host group.'));

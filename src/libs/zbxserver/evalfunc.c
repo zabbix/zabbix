@@ -25,11 +25,6 @@
 #include "evalfunc.h"
 #include "zbxregexp.h"
 
-int	cmp_double(double a, double b)
-{
-	return fabs(a - b) < TRIGGER_EPSILON ? SUCCEED : FAIL;
-}
-
 static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *parameters, int Nparam,
 		int *value, int *flag, int defaults_on_empty, int def_value, int def_flag)
 {
@@ -247,7 +242,9 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
 	{
-		if (0 == strcmp(values.values[0].value.log->source, arg1))
+		const char	*source = values.values[0].value.log->source;
+
+		if (0 == strcmp(NULL == source ? "" : source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -380,33 +377,33 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
 			switch (op)
 			{
 				case OP_EQ:
-					if (value->dbl > arg2_double - TRIGGER_EPSILON &&
-							value->dbl < arg2_double + TRIGGER_EPSILON)
+					if (value->dbl > arg2_double - ZBX_DOUBLE_EPSILON &&
+							value->dbl < arg2_double + ZBX_DOUBLE_EPSILON)
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_NE:
-					if (!(value->dbl > arg2_double - TRIGGER_EPSILON &&
-							value->dbl < arg2_double + TRIGGER_EPSILON))
+					if (!(value->dbl > arg2_double - ZBX_DOUBLE_EPSILON &&
+							value->dbl < arg2_double + ZBX_DOUBLE_EPSILON))
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_GT:
-					if (value->dbl >= arg2_double + TRIGGER_EPSILON)
+					if (value->dbl >= arg2_double + ZBX_DOUBLE_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_GE:
-					if (value->dbl > arg2_double - TRIGGER_EPSILON)
+					if (value->dbl > arg2_double - ZBX_DOUBLE_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LT:
-					if (value->dbl <= arg2_double - TRIGGER_EPSILON)
+					if (value->dbl <= arg2_double - ZBX_DOUBLE_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LE:
-					if (value->dbl < arg2_double + TRIGGER_EPSILON)
+					if (value->dbl < arg2_double + ZBX_DOUBLE_EPSILON)
 						return SUCCEED;
 					break;
 			}
@@ -1160,7 +1157,10 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		if (SUCCEED != DCget_data_expected_from(item->itemid, &seconds))
 		{
 			if (NULL != error)
-				*error = zbx_strdup(*error, "item does not exist");
+			{
+				*error = zbx_strdup(*error, "item does not exist, is disabled"
+						" or belongs to a disabled host");
+			}
 			goto out;
 		}
 
@@ -1168,8 +1168,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdup(*error,
-						"item does not have enough data after server start/item creation");
+				*error = zbx_strdup(*error, "item does not have enough data"
+						" after server start or item creation");
 			}
 			goto out;
 		}
@@ -1357,11 +1357,10 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			if (SUCCEED == cmp_double(values.values[0].value.dbl, values.values[1].value.dbl))
+			if (SUCCEED == zbx_double_compare(values.values[0].value.dbl, values.values[1].value.dbl))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-			break;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (values.values[0].value.ui64 == values.values[1].value.ui64)
@@ -1375,7 +1374,6 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const char *function, const
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
-
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
@@ -2044,7 +2042,7 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
 		value_double /= base * base * base * base;
 	}
 
-	if (SUCCEED != cmp_double((int)(value_double + 0.5), value_double))
+	if (SUCCEED != zbx_double_compare((int)(value_double + 0.5), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
 		del_zeroes(tmp);
@@ -2227,7 +2225,9 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item for function [%s:%s.%s(%s)] not found", host, key, function, parameter);
+		zabbix_log(LOG_LEVEL_DEBUG,
+				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
+				host, key, function, parameter);
 		goto out;
 	}
 

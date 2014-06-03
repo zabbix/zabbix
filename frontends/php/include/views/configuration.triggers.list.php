@@ -94,7 +94,7 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$link = new Curl();
+$link = new CUrl();
 if (!empty($this->data['parent_discoveryid'])) {
 	$link->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -266,16 +266,12 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
-	// expression
-	$expressionColumn = new CCol(triggerExpression($trigger, true));
-	$expressionColumn->setAttribute('style', 'white-space: normal;');
-
 	$triggersTable->addRow(array(
 		$checkBox,
 		getSeverityCell($trigger['priority']),
 		$hosts,
 		$description,
-		$expressionColumn,
+		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
 		$status,
 		$info
 	));

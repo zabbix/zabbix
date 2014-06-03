@@ -674,13 +674,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				move_out = 0, move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
-	char			buf[MAX_STRING_LEN], *esc;
+	char			*buf = NULL, *esc;
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;
 	char			*sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
-				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
+				buf_alloc = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t           h_id_offsets, h_del;
@@ -733,7 +734,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	p = NULL;
 	/* iterate column names (lines 4-6 in T1) */
-	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
+	while (NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)))
 	{
 		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
 		{
@@ -826,7 +827,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_row) ||
-				NULL == (pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL)))
+				NULL == (pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto clean2;
@@ -855,7 +856,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 				/* find the field requiring special preprocessing in JSON record */
 				f = 1;
-				while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
+				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null)))
 				{
 					/* parse values for the entry (lines 10-12 in T1) */
 
@@ -966,7 +967,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		size_t	tmp_offset = sql_offset, last_pos = 0;
 
 		zbx_json_brackets_open(p, &jp_row);
-		pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL);
+		pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL);
 
 		/* check whether we need to insert a new entry or update an existing one */
 		ZBX_STR2UINT64(recid, buf);
@@ -984,7 +985,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_ptr_append(&values, value);
 
 			/* add the rest of fields */
-			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)); f++)
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+					f++)
 			{
 				if (f == fields_count)
 				{
@@ -1076,7 +1078,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
 
-			for (f = 1; NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)); f++)
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+					f++)
 			{
 				int	field_differ = 1;
 
@@ -1175,6 +1178,8 @@ clean2:
 	zbx_free(sql);
 	zbx_free(recs);
 out:
+	zbx_free(buf);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1757,13 +1762,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1865,13 +1871,14 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
-						" retrying.", __function_name, *lastid - id - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__function_name, *lastid - id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1922,7 +1929,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(errcodes)) * data_num);
+	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
 	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
@@ -1930,6 +1937,12 @@ try_again:
 	for (i = 0; i < data_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != dc_items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
 		zbx_json_addobject(j, NULL);
@@ -2106,6 +2119,12 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 
 		if (proxy_hostid != items[i].host.proxy_hostid)
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

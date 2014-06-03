@@ -27,6 +27,28 @@ class CScreenUrl extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		return $this->getOutput(new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto'));
+		// prevent from resolving macros in configuration page
+		if ($this->mode != SCREEN_MODE_PREVIEW && $this->mode != SCREEN_MODE_SLIDESHOW) {
+			return $this->getOutput(
+				new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
+			);
+		}
+		elseif ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid == 0) {
+			return $this->getOutput(new CTableInfo(_('No host selected.')));
+		}
+
+		$resolveHostMacros = ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen);
+
+		$url = CMacrosResolverHelper::resolveScreenElementURL(array(
+			'config' => $resolveHostMacros ? 'screenElementURL' : 'screenElementURLUser',
+			'url' => $this->screenitem['url'],
+			'hostid' => $resolveHostMacros ? $this->hostid : 0
+		));
+
+		$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
+
+		return $this->getOutput(
+			new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
+		);
 	}
 }

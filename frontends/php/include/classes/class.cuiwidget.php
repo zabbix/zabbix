@@ -44,21 +44,21 @@ class CUIWidget extends CDiv {
 	 *
 	 * @var CDiv
 	 */
-	private $header;
+	protected $header;
 
 	/**
 	 * Body div.
 	 *
 	 * @var array
 	 */
-	private $body;
+	protected $body;
 
 	/**
 	 * Footer div.
 	 *
 	 * @var CDiv
 	 */
-	private $footer;
+	protected $footer;
 
 	/**
 	 * Construct widget.
@@ -68,25 +68,11 @@ class CUIWidget extends CDiv {
 	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
-		$this->open = true;
-		$this->header = null;
 		$this->body = $body ? array($body) : array();
-		$this->footer = null;
 
-		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
+		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
 
 		$this->setAttribute('id', $this->id.'_widget');
-	}
-
-	/**
-	 * Add element to widget body.
-	 *
-	 * @param string|array|CTag $item
-	 */
-	public function addItem($item) {
-		if ($item !== null) {
-			$this->body[] = $item;
-		}
 	}
 
 	/**
@@ -104,14 +90,7 @@ class CUIWidget extends CDiv {
 
 		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
 
-		$icon = new CIcon(
-			_('Show').'/'._('Hide'),
-			$this->open ? 'arrowup' : 'arrowdown',
-			'changeWidgetState(this, "'.$this->id.'");'
-		);
-		$icon->setAttribute('id', $this->id.'_icon');
-
-		$this->header->addItem(array($icon, $icons, $caption));
+		$this->header->addItem(array($icons, $caption));
 	}
 
 	/**
@@ -151,19 +130,11 @@ class CUIWidget extends CDiv {
 		$body = new CDiv($this->body, 'body');
 		$body->setAttribute('id', $this->id);
 
-		if (!$this->open) {
-			$body->setAttribute('style', 'display: none;');
-
-			if ($this->footer) {
-				$this->footer->setAttribute('style', 'display: none;');
-			}
-		}
-
 		$this->cleanItems();
 
-		parent::addItem($this->header);
-		parent::addItem($body);
-		parent::addItem($this->footer);
+		$this->addItem($this->header);
+		$this->addItem($body);
+		$this->addItem($this->footer);
 	}
 
 	/**
