@@ -1151,6 +1151,7 @@ static void	process_active_checks(char *server, unsigned short port)
 								/* buffer is full, stop processing active checks*/
 								/* till the buffer is cleared */
 								lastlogsize = active_metrics[i].lastlogsize;
+								finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 								goto ret;
 							}
 
