@@ -3903,6 +3903,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	dst_trigger->lastchange = src_trigger->lastchange;
+	dst_trigger->topoindex = src_trigger->topoindex;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -4173,8 +4174,8 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
  ******************************************************************************/
 static int	__config_trigger_topoindex_compare(const void *d1, const void *d2)
 {
-	const ZBX_DC_TRIGGER	*t1 = (const ZBX_DC_TRIGGER *)d1;
-	const ZBX_DC_TRIGGER	*t2 = (const ZBX_DC_TRIGGER *)d2;
+	const DC_TRIGGER	*t1 = *(const DC_TRIGGER **)d1;
+	const DC_TRIGGER	*t2 = *(const DC_TRIGGER **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
 
