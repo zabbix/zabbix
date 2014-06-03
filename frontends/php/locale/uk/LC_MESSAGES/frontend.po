@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-24 21:11+0300\n"
+"POT-Creation-Date: 2014-06-02 01:20+0300\n"
 "PO-Revision-Date: 2013-11-05 18:31+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -132,7 +132,7 @@ msgstr "(0 - нескінченно)"
 
 #: include/views/configuration.host.edit.php:219
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:124
+#: include/views/configuration.template.edit.php:123
 msgid "(Only super admins can create groups)"
 msgstr "(Тільки супер адміністратори можуть створювати групи)"
 
@@ -339,7 +339,7 @@ msgstr "Підтвердження відключено"
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:131
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:391
+#: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.edit.php:155
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:276
@@ -462,8 +462,8 @@ msgstr "Активно до"
 #: include/views/configuration.host.edit.php:706
 #: include/views/configuration.host.prototype.edit.php:190
 #: include/views/configuration.host.prototype.edit.php:247
-#: include/views/configuration.httpconf.edit.php:235
-#: include/views/configuration.httpconf.popup.php:93
+#: include/views/configuration.httpconf.edit.php:269
+#: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
@@ -471,7 +471,7 @@ msgstr "Активно до"
 #: include/views/configuration.services.edit.php:268
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:432
+#: include/views/configuration.template.edit.php:431
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:104
 #: include/views/configuration.triggers.edit.php:318
@@ -572,7 +572,7 @@ msgid "Age less than %s"
 msgstr "З віком менше ніж %s"
 
 #: include/items.inc.php:280 include/views/administration.script.list.php:63
-#: include/views/configuration.httpconf.edit.php:141 popup.php:1442
+#: include/views/configuration.httpconf.edit.php:132 popup.php:1442
 msgid "Agent"
 msgstr "Агент"
 
@@ -671,6 +671,7 @@ msgstr "Містить будь-який рядок символів"
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.httpconf.edit.php:64
 #: include/views/configuration.httpconf.edit.php:69
+#: include/views/configuration.httpconf.list.php:68
 #: include/views/configuration.screen.constructor.edit.php:382
 #: include/views/inventory.host.view.php:226
 #: include/views/js/configuration.sysmaps.js.php:120
@@ -716,7 +717,7 @@ msgstr "Група елементів даних з ID \"%1$s\" недоступ
 #: include/views/configuration.item.edit.php:406
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.list.php:57
-#: include/views/configuration.template.edit.php:199
+#: include/views/configuration.template.edit.php:198
 #: include/views/inventory.host.view.php:215 popup.php:39 search.php:140
 #: search.php:169 search.php:197 search.php:394 search.php:422 search.php:454
 #: templates.php:496 templates.php:557
@@ -848,7 +849,9 @@ msgstr "Сер"
 msgid "August"
 msgstr "Серпень"
 
-#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:80
+#: include/menu.inc.php:238 include/views/configuration.httpconf.edit.php:156
+#: include/views/configuration.httpconf.edit.php:281
+#: include/views/configuration.httpconf.list.php:66
 msgid "Authentication"
 msgstr "Аутентиф."
 
@@ -997,8 +1000,8 @@ msgid "Base DN"
 msgstr "База для пошуку (BaseDN)"
 
 #: include/httptest.inc.php:28
-msgid "Basic authentication"
-msgstr "Звичайна аутентифікація"
+msgid "Basic"
+msgstr ""
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
@@ -1018,7 +1021,7 @@ msgstr "Побітове AND останнього (найбільш свіжог
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
 msgstr "Побітове AND останнього (найбільш свіжого) значення T та маска НЕ є N"
 
-#: include/classes/core/ZBase.php:245
+#: include/classes/core/ZBase.php:244
 msgid "Black & Blue"
 msgstr "Бірюзові сутінки"
 
@@ -1421,7 +1424,7 @@ msgstr "Неможливо додати більше одного елемент
 msgid "Cannot add network map"
 msgstr "Не вдалося додати карту мережі"
 
-#: httpconf.php:233
+#: httpconf.php:253
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Не вдалося додати нову групу елементів даних \"%1$s\"."
@@ -1478,7 +1481,7 @@ msgstr "Не вдалося додати користувачів."
 msgid "Cannot add value map"
 msgstr "Не вдалося додати перетворення значення"
 
-#: httpconf.php:186
+#: httpconf.php:190
 msgid "Cannot add web scenario"
 msgstr "Не вдалося додати веб-сценарій"
 
@@ -1498,7 +1501,7 @@ msgstr "Не вдалося змінити метод аутентифікаці
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "Не вдалося змінити метод аутентифікації на внутрішній Zabbix"
 
-#: httpconf.php:171 httpconf.php:372 items.php:506
+#: httpconf.php:177 httpconf.php:392 items.php:506
 msgid "Cannot clear history"
 msgstr "Не вдалося очистити історію"
 
@@ -1574,7 +1577,7 @@ msgstr "Не вдалося створити призначення іконок
 msgid "Cannot create map \"%s\"."
 msgstr "Не вдалося створити карту мережі \"%s\"."
 
-#: httpconf.php:190
+#: httpconf.php:197
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не вдалося створити нову групу елементів даних, веб-сценарій вже приєднано до групи елементів даних."
 
@@ -1793,7 +1796,7 @@ msgstr "Не вдалося видалити шаблонні елементи �
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Не вдалося видалити шаблонний тригер \"%1$s:%2$s\"."
 
-#: api/classes/CHttpTest.php:363
+#: api/classes/CHttpTest.php:366
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Не вдалося видалити шаблонний веб-сценарій \"%1$s\"."
@@ -1834,7 +1837,7 @@ msgstr "Не вдалось видалити метод повідомлень."
 msgid "Cannot delete value map"
 msgstr "Не вдалося видалити перетворення значення"
 
-#: httpconf.php:138 httpconf.php:378
+#: httpconf.php:144 httpconf.php:398
 msgid "Cannot delete web scenario"
 msgstr "Не вдалося видалити веб-сценарій"
 
@@ -1927,7 +1930,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:340
+#: httpconf.php:360
 #, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
@@ -2033,7 +2036,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:339
+#: httpconf.php:359
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
@@ -2665,7 +2668,7 @@ msgstr "Не вдалося оновити дані користувача. Об
 msgid "Cannot update value map"
 msgstr "Не вдалося оновити перетворення значення"
 
-#: httpconf.php:181
+#: httpconf.php:185
 msgid "Cannot update web scenario"
 msgstr ""
 
@@ -2842,7 +2845,7 @@ msgstr "Посилання, утворююче кільце, в шаблонах
 msgid "Circular template linkage is not allowed."
 msgstr "Приєднання шаблону, утворююче кільце, не дозволено."
 
-#: include/classes/core/ZBase.php:243
+#: include/classes/core/ZBase.php:242
 msgid "Classic"
 msgstr "Класична"
 
@@ -2850,12 +2853,12 @@ msgstr "Класична"
 msgid "Clear"
 msgstr "Очистити"
 
-#: include/views/configuration.httpconf.edit.php:255
+#: include/views/configuration.httpconf.edit.php:291
 #: include/views/configuration.item.edit.php:455
 msgid "Clear history and trends"
 msgstr "Очистити історію та динаміку змін"
 
-#: include/views/configuration.httpconf.list.php:103
+#: include/views/configuration.httpconf.list.php:143
 #: include/views/configuration.item.list.php:274
 msgid "Clear history for selected"
 msgstr "Очистити історію для вибраних"
@@ -2880,13 +2883,13 @@ msgstr "Годинник"
 #: include/views/configuration.host.edit.php:862
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:323
-#: include/views/configuration.httpconf.edit.php:254
+#: include/views/configuration.httpconf.edit.php:290
 #: include/views/configuration.item.edit.php:451
 #: include/views/configuration.maintenance.edit.php:201
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:455
+#: include/views/configuration.template.edit.php:454
 #: include/views/configuration.triggers.edit.php:340
 msgid "Clone"
 msgstr "Клонувати"
@@ -3623,7 +3626,7 @@ msgstr "НЕДОСТУПНИЙ"
 msgid "Daily"
 msgstr "Щодня"
 
-#: include/classes/core/ZBase.php:246
+#: include/classes/core/ZBase.php:245
 msgid "Dark orange"
 msgstr "Помаранчева ніч"
 
@@ -3880,7 +3883,7 @@ msgstr "Затримується на"
 msgid "Delete"
 msgstr "Видалити"
 
-#: include/views/configuration.template.edit.php:458
+#: include/views/configuration.template.edit.php:457
 msgid "Delete and clear"
 msgstr "Видалити та очистити"
 
@@ -3888,7 +3891,7 @@ msgstr "Видалити та очистити"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Видалити та очистити вибрані шаблони? (УВАГА: всі приєднані вузли мережі буде очищено!)"
 
-#: include/views/configuration.template.edit.php:458
+#: include/views/configuration.template.edit.php:457
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Видалити та очистити шаблон? (УВАГА: всі приєднані вузли мережі буде очищено!)"
 
@@ -3918,7 +3921,7 @@ msgstr ""
 msgid "Delete graph?"
 msgstr "Видалити графік?"
 
-#: include/views/configuration.httpconf.list.php:104
+#: include/views/configuration.httpconf.list.php:144
 msgid "Delete history of selected WEB scenarios?"
 msgstr "Видалити історію вибраних ВЕБ сценаріїв?"
 
@@ -3962,7 +3965,7 @@ msgstr "Видалити проксі?"
 msgid "Delete regular expression?"
 msgstr "Видалити регулярний вираз?"
 
-#: include/views/configuration.httpconf.edit.php:256
+#: include/views/configuration.httpconf.edit.php:292
 msgid "Delete scenario?"
 msgstr "Видалити сценарій?"
 
@@ -3994,7 +3997,7 @@ msgstr "Видалити скрипт?"
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.hostgroups.list.php:161
 #: include/views/configuration.host.prototype.list.php:127
-#: include/views/configuration.httpconf.list.php:107
+#: include/views/configuration.httpconf.list.php:147
 #: include/views/configuration.item.list.php:278
 #: include/views/configuration.item.prototype.list.php:120
 #: include/views/configuration.maintenance.list.php:80
@@ -4005,7 +4008,7 @@ msgstr "Видалити скрипт?"
 msgid "Delete selected"
 msgstr "Видалити вибрані"
 
-#: include/views/configuration.httpconf.list.php:108
+#: include/views/configuration.httpconf.list.php:148
 msgid "Delete selected WEB scenarios?"
 msgstr "Видалити вибрані ВЕБ сценарії?"
 
@@ -4157,7 +4160,7 @@ msgstr ""
 msgid "Delete slide show?"
 msgstr "Видалити слайд-шоу?"
 
-#: include/views/configuration.template.edit.php:457
+#: include/views/configuration.template.edit.php:456
 msgid "Delete template?"
 msgstr "Видалити шаблон?"
 
@@ -4228,7 +4231,7 @@ msgstr "Видалено: Тригер \"%1$s\" із \"%2$s\"."
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Прототип тригера \"%1$s\" із \"%2$s\"."
 
-#: api/classes/CHttpTest.php:423
+#: api/classes/CHttpTest.php:426
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -4284,7 +4287,7 @@ msgstr "Статус розгортання"
 #: include/views/configuration.item.massupdate.php:546
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
-#: include/views/configuration.template.edit.php:178
+#: include/views/configuration.template.edit.php:177
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:189
 #: include/views/monitoring.triggerComment.php:39 popup.php:1003
@@ -4429,14 +4432,14 @@ msgstr "Дезактивувати вузли мережі, які моніто�
 #: include/views/configuration.host.discovery.list.php:144
 #: include/views/configuration.hostgroups.list.php:158
 #: include/views/configuration.host.prototype.list.php:123
-#: include/views/configuration.httpconf.list.php:99
+#: include/views/configuration.httpconf.list.php:139
 #: include/views/configuration.item.list.php:264
 #: include/views/configuration.item.prototype.list.php:116
 #: include/views/configuration.triggers.list.php:289
 msgid "Disable selected"
 msgstr "Дезактивувати вибране"
 
-#: include/views/configuration.httpconf.list.php:100
+#: include/views/configuration.httpconf.list.php:140
 msgid "Disable selected WEB scenarios?"
 msgstr "Дезактивувати вибрані ВЕБ сценарії?"
 
@@ -4622,7 +4625,7 @@ msgstr "Правило виявлення оновлено"
 #: include/html.inc.php:472 include/html.inc.php:476
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:555
-#: include/views/configuration.template.edit.php:289
+#: include/views/configuration.template.edit.php:288
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:87
 msgid "Discovery rules"
@@ -4845,6 +4848,16 @@ msgstr "Email"
 msgid "Empty"
 msgstr "Пусто"
 
+#: api/classes/CHttpTest.php:906
+#, c-format
+msgid "Empty SSL certificate file for web scenario \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHttpTest.php:899
+#, c-format
+msgid "Empty SSL key file for web scenario \"%1$s\"."
+msgstr ""
+
 #: api/classes/CAction.php:1520 api/classes/CAction.php:1527
 #: api/classes/CAction.php:1534 api/classes/CAction.php:1541
 #: api/classes/CAction.php:1548 api/classes/CAction.php:1555
@@ -4895,7 +4908,8 @@ msgstr ""
 msgid "Empty input parameter."
 msgstr "Вхідний параметр пустий."
 
-#: api/classes/CApplication.php:471
+#: api/classes/CApplication.php:471 api/classes/CHttpTest.php:261
+#: api/classes/CHttpTest.php:305
 msgid "Empty input parameters."
 msgstr ""
 
@@ -4950,6 +4964,10 @@ msgstr ""
 msgid "Empty time period."
 msgstr "Пустий період часу."
 
+#: api/classes/CHttpTest.php:310
+msgid "Empty web scenario ID."
+msgstr ""
+
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
 msgstr "Активувати"
@@ -5000,14 +5018,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:140
 #: include/views/configuration.hostgroups.list.php:155
 #: include/views/configuration.host.prototype.list.php:119
-#: include/views/configuration.httpconf.list.php:95
+#: include/views/configuration.httpconf.list.php:135
 #: include/views/configuration.item.list.php:260
 #: include/views/configuration.item.prototype.list.php:112
 #: include/views/configuration.triggers.list.php:282
 msgid "Enable selected"
 msgstr "Активувати вибрані"
 
-#: include/views/configuration.httpconf.list.php:96
+#: include/views/configuration.httpconf.list.php:136
 msgid "Enable selected WEB scenarios?"
 msgstr "Активувати вибрані веб-сценарії?"
 
@@ -5077,7 +5095,7 @@ msgstr "Активувати вибрані тригери?"
 #: include/views/configuration.host.edit.php:427
 #: include/views/configuration.host.massupdate.php:159
 #: include/views/configuration.host.prototype.edit.php:159
-#: include/views/configuration.httpconf.edit.php:150
+#: include/views/configuration.httpconf.edit.php:146
 #: include/views/configuration.item.edit.php:441
 #: include/views/configuration.triggers.edit.php:262
 #: include/views/monitoring.dashconf.php:37 popup_media.php:132
@@ -5271,7 +5289,7 @@ msgstr "Помилка в синтаксисі виразу."
 msgid "Expression Variable Elements"
 msgstr "Значення елементів Виразу"
 
-#: include/classes/triggers/CRegexpTriggerConstructor.php:63
+#: include/classes/triggers/CTextTriggerConstructor.php:63
 #: include/views/js/adm.regexprs.edit.js.php:215
 msgid "Expression cannot be empty"
 msgstr "Вираз не може бути пустим"
@@ -5531,6 +5549,10 @@ msgstr "Фіксоване"
 msgid "Flexible intervals"
 msgstr "Гнучкі інтервали"
 
+#: include/views/configuration.httpconf.popup.php:93
+msgid "Follow redirects"
+msgstr ""
+
 #: profile.php:117 users.php:196
 msgid "For guest, password must be empty"
 msgstr "Для Гостя пароль повинен бути пустим"
@@ -5582,7 +5604,7 @@ msgid "Frontend messaging"
 msgstr "Повідомлення у веб-інтерфейсі"
 
 #: include/views/configuration.host.edit.php:863
-#: include/views/configuration.template.edit.php:456
+#: include/views/configuration.template.edit.php:455
 msgid "Full clone"
 msgstr "Клонувати повністю"
 
@@ -5699,7 +5721,7 @@ msgstr "Глобальні скрипти"
 #: include/views/configuration.host.discovery.list.php:152
 #: include/views/configuration.hostgroups.list.php:164
 #: include/views/configuration.host.prototype.list.php:131
-#: include/views/configuration.httpconf.list.php:111
+#: include/views/configuration.httpconf.list.php:151
 #: include/views/configuration.item.list.php:282
 #: include/views/configuration.item.prototype.list.php:124
 #: include/views/configuration.maintenance.list.php:83
@@ -5719,7 +5741,7 @@ msgstr "Перейти до"
 msgid "Go to dashboard"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:122
+#: include/views/configuration.httpconf.edit.php:113
 msgid "Google Chrome"
 msgstr "Google Chrome"
 
@@ -5842,7 +5864,7 @@ msgstr ""
 #: include/html.inc.php:424 include/html.inc.php:428
 #: include/views/configuration.host.discovery.list.php:124
 #: include/views/configuration.host.edit.php:629
-#: include/views/configuration.template.edit.php:354
+#: include/views/configuration.template.edit.php:353
 msgid "Graph prototypes"
 msgstr "Прототипи графіків"
 
@@ -5882,7 +5904,7 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:529
-#: include/views/configuration.template.edit.php:265
+#: include/views/configuration.template.edit.php:264
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:206
 #: include/views/inventory.host.view.php:219
 #: include/views/inventory.host.view.php:229 jsLoader.php:200 popup.php:75
@@ -6004,7 +6026,7 @@ msgstr "Згруповано по"
 #: include/views/configuration.host.edit.php:232
 #: include/views/configuration.host.prototype.edit.php:174
 #: include/views/configuration.host.prototype.edit.php:202
-#: include/views/configuration.template.edit.php:117
+#: include/views/configuration.template.edit.php:116
 #: include/views/conf.import.php:26
 msgid "Groups"
 msgstr "Групи"
@@ -6054,7 +6076,8 @@ msgstr "HTTP"
 msgid "HTTP authentication"
 msgstr "HTTP аутентифікація"
 
-#: include/views/configuration.httpconf.edit.php:146
+#: include/views/configuration.httpconf.edit.php:137
+#: include/views/configuration.httpconf.list.php:67
 msgid "HTTP proxy"
 msgstr ""
 
@@ -6074,6 +6097,11 @@ msgstr "Апаратна конфігурація"
 #: include/hosts.inc.php:175
 msgid "Hardware (Full details)"
 msgstr "Апаратна частина (повні деталі)"
+
+#: include/views/configuration.httpconf.edit.php:143
+#: include/views/configuration.httpconf.popup.php:91
+msgid "Headers"
+msgstr ""
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:57
 #: include/views/configuration.graph.list.php:79
@@ -6144,12 +6172,12 @@ msgstr "Висока"
 msgid "History"
 msgstr "Історія"
 
-#: httpconf.php:171 httpconf.php:372 items.php:501 items.php:506 items.php:738
+#: httpconf.php:177 httpconf.php:392 items.php:501 items.php:506 items.php:738
 #: items.php:744
 msgid "History cleared"
 msgstr "Історію очищено"
 
-#: include/views/configuration.httpconf.edit.php:255
+#: include/views/configuration.httpconf.edit.php:291
 #: include/views/configuration.item.edit.php:455
 msgid "History clearing can take a long time. Continue?"
 msgstr "Очистка журналу може забрати багато часу. Продовжувати?"
@@ -6550,7 +6578,7 @@ msgstr "Вузли мережі & Групи вузлів мережі"
 msgid "Hosts (m/n/t)"
 msgstr "Вузли мережі (Пс/Бс/ш)"
 
-#: include/views/configuration.template.edit.php:173
+#: include/views/configuration.template.edit.php:172
 msgid "Hosts / templates"
 msgstr "Вузли мережі / шаблони"
 
@@ -6950,7 +6978,7 @@ msgstr "Неможливо видалити останній рядок та с�
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
-#: include/views/configuration.template.edit.php:173
+#: include/views/configuration.template.edit.php:172
 msgid "In"
 msgstr "В"
 
@@ -6959,7 +6987,7 @@ msgid "In group"
 msgstr "В групі"
 
 #: include/views/configuration.host.edit.php:213
-#: include/views/configuration.template.edit.php:117
+#: include/views/configuration.template.edit.php:116
 msgid "In groups"
 msgstr "В групах"
 
@@ -7010,6 +7038,16 @@ msgstr "Некоректний SNMP OID."
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "Некоректне SNMP community."
+
+#: api/classes/CHttpTest.php:890
+#, c-format
+msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
+msgstr ""
+
+#: api/classes/CHttpTest.php:881
+#, c-format
+msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
+msgstr ""
 
 #: api/classes/CService.php:959
 #, c-format
@@ -7155,8 +7193,7 @@ msgid "Incorrect arguments passed to function"
 msgstr "Функції передано некоректні параметри"
 
 #: api/classes/CApplication.php:297 api/classes/CHostInterface.php:259
-#: api/classes/CHostInterface.php:458 api/classes/CHttpTest.php:508
-#: api/classes/CItemGeneral.php:197
+#: api/classes/CHostInterface.php:458 api/classes/CItemGeneral.php:197
 msgid "Incorrect arguments passed to function."
 msgstr "Функції передано некоректні параметри."
 
@@ -7273,7 +7310,12 @@ msgstr "Некоректний гнучкий інтервал \"%1$s\"."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некоректний гнучкий інтервал в елементі даних \"%1$s\". Гнучкий інтервал має бути рядком."
 
-#: include/classes/triggers/CRegexpTriggerConstructor.php:113
+#: api/classes/CHttpTest.php:681
+#, c-format
+msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
+msgstr ""
+
+#: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1653 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Використано некоректну функцію"
@@ -7508,6 +7550,10 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr ""
 
+#: api/classes/CHttpTest.php:691
+msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
+msgstr ""
+
 #: api/classes/CScreenItem.php:676
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
@@ -7591,7 +7637,7 @@ msgstr "Некоректний період часу \"%1$s\"."
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Некоректний ID тригера для послуги \"%1$s\"."
 
-#: include/classes/triggers/CRegexpTriggerConstructor.php:126
+#: include/classes/triggers/CTextTriggerConstructor.php:126
 msgid "Incorrect trigger expression"
 msgstr "Некоректний вираз тригера"
 
@@ -7680,6 +7726,10 @@ msgstr "Значення \"%s\" є некоректним для setMessage()."
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr ""
 
+#: api/classes/CHttpTest.php:311
+msgid "Incorrect web scenario ID."
+msgstr ""
+
 #: include/profiles.inc.php:312
 msgid "Incorrect working time."
 msgstr "Некоректний робочий час."
@@ -7704,6 +7754,7 @@ msgstr "Індонезійська (id_ID)"
 #: include/views/administration.auditacts.list.php:75
 #: include/views/configuration.host.discovery.list.php:59
 #: include/views/configuration.hostgroups.list.php:53
+#: include/views/configuration.httpconf.list.php:70
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.triggers.list.php:112 latest.php:356
 #: latest.php:357 tr_status.php:388
@@ -7796,7 +7847,7 @@ msgstr ""
 msgid "Internal event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:94
+#: include/views/configuration.httpconf.edit.php:85
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
@@ -7891,7 +7942,7 @@ msgstr "Помилкові параметри."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:607 api/classes/CHttpTest.php:613
+#: api/classes/CHttpTest.php:747 api/classes/CHttpTest.php:753
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Помилковий код відповіді \"%1$s\"."
@@ -8095,7 +8146,7 @@ msgstr ""
 #: include/html.inc.php:374 include/html.inc.php:378
 #: include/views/configuration.host.discovery.list.php:110
 #: include/views/configuration.host.edit.php:578
-#: include/views/configuration.template.edit.php:312
+#: include/views/configuration.template.edit.php:311
 msgid "Item prototypes"
 msgstr "Прототипи елементів даних"
 
@@ -8153,8 +8204,8 @@ msgstr "Елемент даних з ключем \"%1$s\" вже існує в 
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:712
+#: api/classes/managers/CHttpTestManager.php:843
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -8167,7 +8218,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.host.edit.php:471
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:223
+#: include/views/configuration.template.edit.php:222
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:217
 #: include/views/inventory.host.view.php:227 latest.php:301 popup.php:55
 #: queue.php:101 report6.php:44 search.php:141 search.php:173 search.php:198
@@ -8520,31 +8571,21 @@ msgstr "Лінк"
 msgid "Link indicators"
 msgstr "Індикатори лінка"
 
-#: api/classes/CMap.php:466
-#, c-format
-msgid "Link name should be unique for map \"%s\"."
-msgstr "Ім'я посилання має бути унікальним для карти мережі \"%s\"."
-
 #: include/views/configuration.host.edit.php:708
 #: include/views/configuration.host.prototype.edit.php:249
-#: include/views/configuration.template.edit.php:436
+#: include/views/configuration.template.edit.php:435
 msgid "Link new templates"
 msgstr ""
 
-#: api/classes/CMap.php:480
+#: api/classes/CMap.php:484
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле лінку selementid1 вказує на не існуючий selement ID \"%1$s\" для карти мережі \"%2$s\"."
 
-#: api/classes/CMap.php:487
+#: api/classes/CMap.php:491
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле лінку selementid2 вказує на не існуючий selement ID \"%1$s\" для карти мережі \"%2$s\"."
-
-#: api/classes/CMap.php:462
-#, c-format
-msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr "У посилання мають бути заповнені обидва поля \"Ім'я\" та \"URL-запит\" для карти мережі \"%s\"."
 
 #: include/views/configuration.host.massupdate.php:199
 msgid "Link templates"
@@ -8565,8 +8606,8 @@ msgstr "Зв'язок з шаблонами"
 #: include/views/configuration.host.edit.php:693
 #: include/views/configuration.host.edit.php:720
 #: include/views/configuration.host.prototype.edit.php:228
-#: include/views/configuration.template.edit.php:417
-#: include/views/configuration.template.edit.php:438 templates.php:503
+#: include/views/configuration.template.edit.php:416
+#: include/views/configuration.template.edit.php:437 templates.php:503
 msgid "Linked templates"
 msgstr "Приєднані шаблони"
 
@@ -8798,7 +8839,7 @@ msgstr "Макросу з hostmacroid \"%1$s\" не існує."
 #: include/views/administration.general.macros.edit.php:31
 #: include/views/configuration.host.edit.php:770
 #: include/views/configuration.host.prototype.edit.php:274
-#: include/views/configuration.template.edit.php:448
+#: include/views/configuration.template.edit.php:447
 msgid "Macros"
 msgstr "Макроси"
 
@@ -8921,7 +8962,7 @@ msgstr "Тип позначки карти мережі"
 msgid "Map save operation failed."
 msgstr "Помилка в операції збережнення карти."
 
-#: api/classes/CMap.php:505
+#: api/classes/CMap.php:509
 #, c-format
 msgid "Map with name \"%s\" already exists."
 msgstr ""
@@ -9409,7 +9450,7 @@ msgstr "Більше ніж один графік з ім'ям \"%1$s\" у ву�
 msgid "Most busy triggers top 100"
 msgstr "100 найбільш активних тригерів"
 
-#: include/views/configuration.httpconf.edit.php:101
+#: include/views/configuration.httpconf.edit.php:92
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
@@ -9439,8 +9480,8 @@ msgid "NO DATA"
 msgstr "НЕМАЄ ДАНИХ"
 
 #: include/httptest.inc.php:29
-msgid "NTLM authentication"
-msgstr "NTLM аутентифікація"
+msgid "NTLM"
+msgstr ""
 
 #: actionconf.php:37 actionconf.php:154 adm.regexps.php:37 adm.regexps.php:138
 #: adm.regexps.php:171 applications.php:38 disc_prototypes.php:42
@@ -9481,9 +9522,9 @@ msgstr "NTLM аутентифікація"
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.host.prototype.list.php:52
 #: include/views/configuration.httpconf.edit.php:59
-#: include/views/configuration.httpconf.edit.php:164
+#: include/views/configuration.httpconf.edit.php:198
 #: include/views/configuration.httpconf.list.php:62
-#: include/views/configuration.httpconf.popup.php:77
+#: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:52
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.list.php:145
@@ -9498,7 +9539,7 @@ msgstr "NTLM аутентифікація"
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:43
-#: include/views/configuration.template.edit.php:391
+#: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.list.php:109
@@ -9598,7 +9639,7 @@ msgid "New flexible interval"
 msgstr "Створення гнучкого інтервалу"
 
 #: include/views/configuration.host.edit.php:217
-#: include/views/configuration.template.edit.php:122
+#: include/views/configuration.template.edit.php:121
 msgid "New group"
 msgstr "Нова група"
 
@@ -9635,6 +9676,7 @@ msgstr "Наступна"
 #: include/func.inc.php:2118 include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
+#: include/views/configuration.httpconf.list.php:120
 #: include/views/js/adm.regexprs.edit.js.php:142
 msgid "No"
 msgstr "Ні"
@@ -9662,6 +9704,11 @@ msgstr ""
 #: api/classes/CTemplateScreen.php:584
 #, c-format
 msgid "No \"%1$s\" given for template screen."
+msgstr ""
+
+#: api/classes/CHttpTest.php:309
+#, c-format
+msgid "No \"%1$s\" given for web scenario."
 msgstr ""
 
 #: api/classes/CDiscoveryRule.php:895
@@ -10136,31 +10183,32 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CHost.php:526 api/classes/CHost.php:609
 #: api/classes/CHost.php:1663 api/classes/CHostPrototype.php:1019
 #: api/classes/CHostPrototype.php:1034 api/classes/CHostPrototype.php:1047
-#: api/classes/CHostPrototype.php:1060 api/classes/CHttpTest.php:366
-#: api/classes/CIconMap.php:304 api/classes/CImage.php:410
-#: api/classes/CImage.php:482 api/classes/CImage.php:529
-#: api/classes/CImage.php:547 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:630
-#: api/classes/CItemPrototype.php:469 api/classes/CMaintenance.php:290
-#: api/classes/CMaintenance.php:315 api/classes/CMaintenance.php:328
-#: api/classes/CMaintenance.php:456 api/classes/CMaintenance.php:473
-#: api/classes/CMaintenance.php:563 api/classes/CMapElement.php:60
-#: api/classes/CMapElement.php:119 api/classes/CMapElement.php:190
-#: api/classes/CMap.php:367 api/classes/CProxy.php:161
-#: api/classes/CProxy.php:202 api/classes/CProxy.php:275
-#: api/classes/CProxy.php:536 api/classes/CScreenItem.php:360
-#: api/classes/CScreenItem.php:443 api/classes/CScreen.php:428
-#: api/classes/CScreen.php:603 api/classes/CService.php:1051
-#: api/classes/CService.php:1066 api/classes/CTemplateScreen.php:556
-#: api/classes/CTemplateScreen.php:607 api/classes/CTemplateScreen.php:659
-#: api/classes/CTemplateScreen.php:665 api/classes/CTrigger.php:596
-#: api/classes/CTrigger.php:939 api/classes/CTrigger.php:960
-#: api/classes/CTrigger.php:1813 api/classes/CTriggerPrototype.php:504
-#: api/classes/CTriggerPrototype.php:592 api/classes/CUserMacro.php:540
-#: api/classes/CUserMacro.php:649 api/classes/CUser.php:625
-#: api/classes/CUser.php:804 api/classes/CUser.php:824
-#: api/classes/CUser.php:883 api/classes/CUser.php:1277
-#: include/func.inc.php:1758
+#: api/classes/CHostPrototype.php:1060 api/classes/CHttpTest.php:369
+#: api/classes/CHttpTest.php:451 api/classes/CHttpTest.php:497
+#: api/classes/CHttpTest.php:705 api/classes/CIconMap.php:304
+#: api/classes/CImage.php:410 api/classes/CImage.php:482
+#: api/classes/CImage.php:529 api/classes/CImage.php:547
+#: api/classes/CItemGeneral.php:181 api/classes/CItemGeneral.php:234
+#: api/classes/CItem.php:630 api/classes/CItemPrototype.php:469
+#: api/classes/CMaintenance.php:290 api/classes/CMaintenance.php:315
+#: api/classes/CMaintenance.php:328 api/classes/CMaintenance.php:456
+#: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:563
+#: api/classes/CMapElement.php:60 api/classes/CMapElement.php:119
+#: api/classes/CMapElement.php:190 api/classes/CMap.php:367
+#: api/classes/CProxy.php:161 api/classes/CProxy.php:202
+#: api/classes/CProxy.php:275 api/classes/CProxy.php:536
+#: api/classes/CScreenItem.php:360 api/classes/CScreenItem.php:443
+#: api/classes/CScreen.php:428 api/classes/CScreen.php:603
+#: api/classes/CService.php:1051 api/classes/CService.php:1066
+#: api/classes/CTemplateScreen.php:556 api/classes/CTemplateScreen.php:607
+#: api/classes/CTemplateScreen.php:659 api/classes/CTemplateScreen.php:665
+#: api/classes/CTrigger.php:596 api/classes/CTrigger.php:939
+#: api/classes/CTrigger.php:960 api/classes/CTrigger.php:1813
+#: api/classes/CTriggerPrototype.php:504 api/classes/CTriggerPrototype.php:592
+#: api/classes/CUserMacro.php:540 api/classes/CUserMacro.php:649
+#: api/classes/CUser.php:625 api/classes/CUser.php:804
+#: api/classes/CUser.php:824 api/classes/CUser.php:883
+#: api/classes/CUser.php:1277 include/func.inc.php:1758
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Немає прав доступу до запитуваного об'єкту або він не існує!"
 
@@ -10249,7 +10297,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:657
 #: include/views/configuration.host.prototype.edit.php:208
 #: include/views/configuration.host.prototype.edit.php:232
-#: include/views/configuration.template.edit.php:388
+#: include/views/configuration.template.edit.php:387
 msgid "No templates linked."
 msgstr ""
 
@@ -10722,10 +10770,6 @@ msgstr "Тільки Zabbix Адміністратори можуть зміню
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Тільки Zabbix Адміністратори можуть видаляти оповіщення користувачам."
 
-#: api/classes/CHttpTest.php:634
-msgid "Only characters are allowed."
-msgstr "Дозволено тільки символи."
-
 #: include/blocks.inc.php:821
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Підраховуються елементи даних тільки у вузлів мережі Під спостереженням"
@@ -10751,7 +10795,7 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Підраховуються тригери тільки у вузлів мережі Під спостереженням та які залежать від активних елементів даних"
 
-#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.httpconf.edit.php:101
 msgid "Opera"
 msgstr "Opera"
 
@@ -10852,7 +10896,7 @@ msgstr ""
 msgid "Original"
 msgstr "Оригінальне"
 
-#: include/classes/core/ZBase.php:244
+#: include/classes/core/ZBase.php:243
 msgid "Original blue"
 msgstr "Оригінальна блакитна"
 
@@ -10873,7 +10917,7 @@ msgstr "Інші параметри налаштувань"
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:117
+#: include/views/configuration.template.edit.php:116
 msgid "Other groups"
 msgstr "Інші групи"
 
@@ -10891,11 +10935,11 @@ msgstr "Інші вузли мережі | Група"
 msgid "Other parameters"
 msgstr "Інші параметри"
 
-#: include/views/configuration.template.edit.php:174
+#: include/views/configuration.template.edit.php:173
 msgid "Other | group"
 msgstr "Інші | Група"
 
-#: include/views/configuration.httpconf.edit.php:130
+#: include/views/configuration.httpconf.edit.php:121
 msgid "Others"
 msgstr "Інші"
 
@@ -11179,7 +11223,7 @@ msgstr "Пасивний"
 #: include/views/configuration.host.discovery.edit.php:176
 #: include/views/configuration.host.edit.php:756
 #: include/views/configuration.host.prototype.edit.php:266
-#: include/views/configuration.httpconf.edit.php:83
+#: include/views/configuration.httpconf.edit.php:159
 #: include/views/configuration.item.edit.php:170
 #: include/views/configuration.item.edit.php:182
 #: include/views/configuration.item.massupdate.php:246
@@ -11345,7 +11389,7 @@ msgstr "Португальська (pt_PT)"
 msgid "Position"
 msgstr "Позиція"
 
-#: include/views/configuration.httpconf.popup.php:79
+#: include/views/configuration.httpconf.popup.php:88
 msgid "Post"
 msgstr "Змінні і дані для HTTP Post"
 
@@ -11716,7 +11760,7 @@ msgstr "Віддалена команда"
 #: include/views/configuration.action.edit.php:910
 #: include/views/configuration.host.discovery.edit.php:211
 #: include/views/configuration.host.discovery.edit.php:330
-#: include/views/configuration.httpconf.edit.php:215
+#: include/views/configuration.httpconf.edit.php:249
 #: include/views/configuration.item.edit.php:278
 #: include/views/configuration.item.massupdate.php:334
 #: include/views/configuration.maintenance.edit.php:114
@@ -11827,7 +11871,7 @@ msgstr "Звіт 3"
 msgid "Reports"
 msgstr "Звіти"
 
-#: include/setup.inc.php:187 include/views/configuration.httpconf.edit.php:167
+#: include/setup.inc.php:187 include/views/configuration.httpconf.edit.php:201
 msgid "Required"
 msgstr "Вимагається текст-відповідь"
 
@@ -11859,11 +11903,11 @@ msgstr ""
 msgid "Required server performance, new values per second"
 msgstr "Необхідна потужність сервера, нових значень в секунду"
 
-#: include/views/configuration.httpconf.popup.php:83
+#: include/views/configuration.httpconf.popup.php:99
 msgid "Required status codes"
 msgstr "Необхідні коди статусу"
 
-#: include/views/configuration.httpconf.popup.php:82
+#: include/views/configuration.httpconf.popup.php:98
 msgid "Required string"
 msgstr "Необхідна строка"
 
@@ -11943,13 +11987,18 @@ msgstr "Результат для \"%s\""
 msgid "Result type"
 msgstr "Тип результату"
 
-#: httpconf.php:46 include/views/configuration.httpconf.edit.php:90
+#: httpconf.php:46 include/views/configuration.httpconf.edit.php:81
+#: include/views/configuration.httpconf.list.php:65
 msgid "Retries"
 msgstr ""
 
 #: include/actions.inc.php:822
 msgid "Retries left"
 msgstr "Залишилось повторних спроб"
+
+#: include/views/configuration.httpconf.popup.php:95
+msgid "Retrieve only headers"
+msgstr ""
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
 #: include/views/general.warning.php:40
@@ -12220,6 +12269,26 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSH агент"
 
+#: include/views/configuration.httpconf.edit.php:170
+msgid "SSL certificate file"
+msgstr ""
+
+#: include/views/configuration.httpconf.edit.php:176
+msgid "SSL key file"
+msgstr ""
+
+#: include/views/configuration.httpconf.edit.php:182
+msgid "SSL key password"
+msgstr ""
+
+#: include/views/configuration.httpconf.edit.php:166
+msgid "SSL verify host"
+msgstr ""
+
+#: include/views/configuration.httpconf.edit.php:163
+msgid "SSL verify peer"
+msgstr ""
+
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
 msgstr "СТАН ВИЯВЛЕННЯ"
@@ -12236,7 +12305,7 @@ msgstr "СТАН ВЕБ МОНІТОРИНГУ"
 msgid "STATUS OF ZABBIX"
 msgstr "СТАН ZABBIX"
 
-#: include/views/configuration.httpconf.edit.php:116
+#: include/views/configuration.httpconf.edit.php:107
 msgid "Safari"
 msgstr "Safari"
 
@@ -12283,8 +12352,8 @@ msgstr "Субота"
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:328
-#: include/views/configuration.httpconf.edit.php:252
-#: include/views/configuration.httpconf.edit.php:263
+#: include/views/configuration.httpconf.edit.php:288
+#: include/views/configuration.httpconf.edit.php:299
 #: include/views/configuration.item.edit.php:466
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
@@ -12296,7 +12365,7 @@ msgstr "Субота"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:462
+#: include/views/configuration.template.edit.php:461
 #: include/views/configuration.triggers.edit.php:353
 #: include/views/configuration.triggers.massupdate.php:165
 #: include/views/monitoring.dashconf.php:107
@@ -12313,15 +12382,15 @@ msgstr "Зберегти і повернутися"
 msgid "Scale"
 msgstr "Період"
 
-#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:245
+#: include/audit.inc.php:42 include/views/configuration.httpconf.edit.php:279
 msgid "Scenario"
 msgstr "Сценарій"
 
-#: httpconf.php:185
+#: httpconf.php:189
 msgid "Scenario added"
 msgstr "Сценарій додано"
 
-#: httpconf.php:180
+#: httpconf.php:184
 msgid "Scenario updated"
 msgstr "Сценарій оновлено"
 
@@ -12420,7 +12489,7 @@ msgstr "Комплексний екран оновлено"
 #: dashboard.php:347 include/html.inc.php:460 include/html.inc.php:464
 #: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:375
+#: include/views/configuration.template.edit.php:374
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:207
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
@@ -13132,7 +13201,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:58
 #: include/views/configuration.host.massupdate.php:163
 #: include/views/configuration.host.prototype.list.php:54
-#: include/views/configuration.httpconf.list.php:65
+#: include/views/configuration.httpconf.list.php:69
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.list.php:147
 #: include/views/configuration.item.massupdate.php:405
@@ -13160,7 +13229,7 @@ msgstr "Підрахунок статусу"
 msgid "Status calculation algorithm"
 msgstr "Алгоритм підрахунку статусу"
 
-#: include/views/configuration.httpconf.edit.php:168
+#: include/views/configuration.httpconf.edit.php:202
 msgid "Status codes"
 msgstr "Коди станів"
 
@@ -13190,7 +13259,7 @@ msgstr "Тільки статус"
 msgid "Step"
 msgstr "Крок"
 
-#: httpmon.php:146
+#: httpmon.php:146 include/views/configuration.httpconf.list.php:93
 #, c-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Крок \"%1$s\" [%2$s з %3$s] помилковий: %4$s"
@@ -13199,18 +13268,18 @@ msgstr "Крок \"%1$s\" [%2$s з %3$s] помилковий: %4$s"
 msgid "Step duration"
 msgstr "Тривалість кроку"
 
-#: include/views/configuration.httpconf.popup.php:87 popup_httpstep.php:24
+#: include/views/configuration.httpconf.popup.php:103 popup_httpstep.php:24
 msgid "Step of scenario"
 msgstr "Крок сценарію"
 
-#: include/views/configuration.httpconf.popup.php:32
+#: include/views/configuration.httpconf.popup.php:33
 #, c-format
 msgid "Step with name \"%1$s\" already exists."
 msgstr ""
 
 #: httpconf.php:50 include/views/configuration.action.edit.php:325
-#: include/views/configuration.httpconf.edit.php:238
-#: include/views/configuration.httpconf.edit.php:246
+#: include/views/configuration.httpconf.edit.php:272
+#: include/views/configuration.httpconf.edit.php:280
 msgid "Steps"
 msgstr "Кроки"
 
@@ -13411,7 +13480,7 @@ msgstr "Telnet"
 #: include/actions.inc.php:62 include/audit.inc.php:50
 #: include/forms.inc.php:583 include/forms.inc.php:900
 #: include/html.inc.php:323 include/views/configuration.template.edit.php:35
-#: include/views/configuration.template.edit.php:379
+#: include/views/configuration.template.edit.php:378
 #: include/views/configuration.triggers.list.php:128 report2.php:267
 #: search.php:393
 msgid "Template"
@@ -13456,7 +13525,7 @@ msgstr "Зв'язки з шаблонами"
 msgid "Template list"
 msgstr "Список шаблонів"
 
-#: include/views/configuration.template.edit.php:98 templates.php:55
+#: include/views/configuration.template.edit.php:97 templates.php:55
 msgid "Template name"
 msgstr "Ім'я шаблону"
 
@@ -13630,7 +13699,7 @@ msgstr "Отриманий JSON не являється правильним з�
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Запитувана віддалена процедура не існує / недоступна"
 
-#: api/classes/CHttpTest.php:545
+#: api/classes/CHttpTest.php:625
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
@@ -13746,8 +13815,8 @@ msgstr "Тип часу"
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:165
-#: include/views/configuration.httpconf.popup.php:81 popup_httpstep.php:40
+#: include/views/configuration.httpconf.edit.php:199
+#: include/views/configuration.httpconf.popup.php:97 popup_httpstep.php:43
 msgid "Timeout"
 msgstr "Час очікування"
 
@@ -14024,7 +14093,7 @@ msgstr ""
 #: include/html.inc.php:399 include/html.inc.php:403
 #: include/views/configuration.host.discovery.list.php:117
 #: include/views/configuration.host.edit.php:605
-#: include/views/configuration.template.edit.php:333
+#: include/views/configuration.template.edit.php:332
 msgid "Trigger prototypes"
 msgstr "Прототипи тригерів"
 
@@ -14076,7 +14145,7 @@ msgstr "Значення тригера"
 #: include/views/configuration.host.edit.php:498
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.list.php:203
-#: include/views/configuration.template.edit.php:244
+#: include/views/configuration.template.edit.php:243
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:199
 #: include/views/inventory.host.view.php:218
@@ -14234,8 +14303,8 @@ msgid "UP"
 msgstr "ДОСТУПНИЙ"
 
 #: include/screens.inc.php:44
-#: include/views/configuration.httpconf.edit.php:166
-#: include/views/configuration.httpconf.popup.php:78
+#: include/views/configuration.httpconf.edit.php:200
+#: include/views/configuration.httpconf.popup.php:87
 #: include/views/configuration.screen.constructor.edit.php:535
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:252
@@ -14260,12 +14329,22 @@ msgstr "URL B"
 msgid "URL C"
 msgstr "URL C"
 
+#: api/classes/CMap.php:469
+#, c-format
+msgid "URL name should be unique for map \"%s\"."
+msgstr ""
+
 #: include/html.inc.php:112
 msgid "URL parameter cannot be array."
 msgstr ""
 
 #: include/html.inc.php:118
 msgid "URL parameter name is empty."
+msgstr ""
+
+#: api/classes/CMap.php:463
+#, c-format
+msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:180
@@ -14365,6 +14444,7 @@ msgid "Unknown calculation algorithm of service status"
 msgstr "Невідомий алгоритм розрахунку статусу послуги"
 
 #: httpdetails.php:160 httpdetails.php:233 httpmon.php:142
+#: include/views/configuration.httpconf.list.php:97
 msgid "Unknown error"
 msgstr ""
 
@@ -14388,7 +14468,7 @@ msgstr "Невідомий тип інтерфейсу."
 msgid "Unknown resource"
 msgstr "Невідомий ресурс"
 
-#: httpmon.php:154
+#: httpmon.php:154 include/views/configuration.httpconf.list.php:99
 #, c-format
 msgid "Unknown step failed: %1$s"
 msgstr ""
@@ -14399,12 +14479,12 @@ msgstr "Невідомий тип"
 
 #: include/views/configuration.host.edit.php:679
 #: include/views/configuration.host.prototype.edit.php:222
-#: include/views/configuration.template.edit.php:403
+#: include/views/configuration.template.edit.php:402
 msgid "Unlink"
 msgstr "Від'єднати"
 
 #: include/views/configuration.host.edit.php:683
-#: include/views/configuration.template.edit.php:407
+#: include/views/configuration.template.edit.php:406
 msgid "Unlink and clear"
 msgstr "Від'єднати та очистити"
 
@@ -14518,7 +14598,7 @@ msgstr "Доступний"
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/configuration.action.edit.php:993
 #: include/views/configuration.host.massupdate.php:313
-#: include/views/configuration.httpconf.popup.php:93
+#: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/js/adm.regexprs.edit.js.php:255
 #: include/views/js/configuration.discovery.edit.js.php:348
@@ -14537,7 +14617,7 @@ msgstr "Інтервал оновлення"
 
 #: disc_prototypes.php:47 host_discovery.php:54 httpconf.php:45
 #: include/views/configuration.host.discovery.edit.php:192
-#: include/views/configuration.httpconf.edit.php:87
+#: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.massupdate.php:310 items.php:49
 msgid "Update interval (in sec)"
@@ -14640,7 +14720,7 @@ msgstr "Використовується в діях"
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:341
 #: include/views/configuration.action.edit.php:516
-#: include/views/configuration.httpconf.edit.php:82
+#: include/views/configuration.httpconf.edit.php:158
 msgid "User"
 msgstr "Користувач"
 
@@ -15135,8 +15215,8 @@ msgstr "Значення: немає даних"
 msgid "Values"
 msgstr "Значення"
 
-#: include/views/configuration.httpconf.edit.php:149
-#: include/views/configuration.httpconf.popup.php:80
+#: include/views/configuration.httpconf.edit.php:140
+#: include/views/configuration.httpconf.popup.php:89
 msgid "Variables"
 msgstr "Змінні"
 
@@ -15176,7 +15256,7 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:199
 #: include/views/configuration.host.prototype.edit.php:71
-#: include/views/configuration.template.edit.php:102
+#: include/views/configuration.template.edit.php:101
 #: include/views/inventory.host.view.php:44
 msgid "Visible name"
 msgstr "Видиме ім'я"
@@ -15219,22 +15299,23 @@ msgstr "Веб"
 msgid "Web monitoring"
 msgstr "Веб моніторинг"
 
-#: api/classes/managers/CHttpTestManager.php:383
-#: api/classes/managers/CHttpTestManager.php:391
+#: api/classes/managers/CHttpTestManager.php:385
+#: api/classes/managers/CHttpTestManager.php:393
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:451 api/classes/CHttpTest.php:503
+#: api/classes/CHttpTest.php:473 api/classes/CHttpTest.php:547
+#: api/classes/CHttpTest.php:593
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
 
-#: httpconf.php:138 httpconf.php:378
+#: httpconf.php:144 httpconf.php:398
 msgid "Web scenario deleted"
 msgstr ""
 
-#: httpconf.php:337
+#: httpconf.php:357
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] ""
@@ -15242,7 +15323,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: httpconf.php:336
+#: httpconf.php:356
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
@@ -15250,25 +15331,37 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: api/classes/CHttpTest.php:444 api/classes/CHttpTest.php:484
+#: api/classes/CHttpTest.php:445
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr ""
 
-#: api/classes/CHttpTest.php:455
+#: api/classes/CHttpTest.php:462 api/classes/CHttpTest.php:645
 msgid "Web scenario must have at least one step."
 msgstr ""
 
-#: api/classes/CHttpTest.php:582
+#: api/classes/CHttpTest.php:456 api/classes/CHttpTest.php:573
+msgid "Web scenario name cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:722
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr ""
 
-#: api/classes/CHttpTest.php:562
+#: api/classes/CHttpTest.php:669
+msgid "Web scenario step URL cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:664
+msgid "Web scenario step name cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:650
 msgid "Web scenario step name should contain only printable characters."
 msgstr ""
 
-#: api/classes/CHttpTest.php:567
+#: api/classes/CHttpTest.php:673
 msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 
@@ -15528,6 +15621,7 @@ msgstr "Щороку"
 #: include/events.inc.php:376 include/func.inc.php:2118
 #: include/triggers.inc.php:1522
 #: include/views/administration.users.list.php:75
+#: include/views/configuration.httpconf.list.php:120
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
 msgstr "Так"
@@ -15573,13 +15667,13 @@ msgstr "Ви не вказали цілі глобального скрипта 
 
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:553
 #: api/classes/CHost.php:906 api/classes/CHost.php:963
-#: api/classes/CHttpTest.php:476 api/classes/CMaintenance.php:550
-#: api/classes/CMaintenance.php:656 api/classes/CMaintenance.php:668
-#: api/classes/CScript.php:287 api/classes/CScript.php:384
-#: api/classes/CScript.php:424 api/classes/CScript.php:487
-#: api/classes/CTemplate.php:426 api/classes/CTemplate.php:562
-#: api/classes/CTemplate.php:589 api/classes/CTemplate.php:740
-#: api/classes/CTemplate.php:973 api/classes/CTemplate.php:1077
+#: api/classes/CMaintenance.php:550 api/classes/CMaintenance.php:656
+#: api/classes/CMaintenance.php:668 api/classes/CScript.php:287
+#: api/classes/CScript.php:384 api/classes/CScript.php:424
+#: api/classes/CScript.php:487 api/classes/CTemplate.php:426
+#: api/classes/CTemplate.php:562 api/classes/CTemplate.php:589
+#: api/classes/CTemplate.php:740 api/classes/CTemplate.php:973
+#: api/classes/CTemplate.php:1077
 msgid "You do not have permission to perform this operation."
 msgstr "У вас немає повноважень для виконання цієї операції."
 
@@ -16100,7 +16194,7 @@ msgstr ""
 msgid "on"
 msgstr "в"
 
-#: include/views/configuration.httpconf.edit.php:138
+#: include/views/configuration.httpconf.edit.php:129
 msgid "other"
 msgstr "інший"
 
@@ -16135,7 +16229,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "с"
 
-#: include/views/configuration.httpconf.edit.php:224
+#: include/views/configuration.httpconf.edit.php:258
 msgid "sec"
 msgstr "сек."
 

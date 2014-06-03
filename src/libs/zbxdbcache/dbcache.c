@@ -1064,6 +1064,7 @@ notsupported:
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
+			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: \"%s\"", item->host.host, item->key_orig, h->value_orig.err);
 			zbx_free(value_esc);
 
 			update_cache = 1;
@@ -1078,7 +1079,8 @@ notsupported:
 	{
 		if (ITEM_STATE_NOTSUPPORTED == item->db_state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\" became supported", item->host.host, item->key_orig);
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became supported",
+					item->host.host, item->key_orig);
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
@@ -1215,6 +1217,12 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != items[i].status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		for (j = 0; j < history_num; j++)
