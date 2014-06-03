@@ -89,14 +89,6 @@ jQuery(function($) {
 	 * add.popup event
 	 */
 	$(document).on('add.popup', function(e, data) {
-		// detect multiselect by parentId
-		if (data.parentId === null) {
-			// execute function if they exist
-			if (typeof addPopupValues !== 'undefined') {
-				addPopupValues(data);
-			}
-		}
-		else {
 			// multiselect check
 			if ($('#' + data.parentId).hasClass('multiselect')) {
 				for (var i = 0; i < data.values.length; i++) {
@@ -110,8 +102,11 @@ jQuery(function($) {
 					}
 				}
 			}
-		}
-
-
+			else {
+				// execute function if they exist
+				if (typeof addPopupValues !== 'undefined') {
+					addPopupValues(data);
+				}
+			}
 	});
 });
