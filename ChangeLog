@@ -1,11 +1,21 @@
+Changes for 2.3.2
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-8271] fixed importing of maps with LLD discovered hosts (Andrejs)
+
+--------------------------------------------------------------------------------
 Changes for 2.3.1
 
 New features:
 A.F....PS. [ZBXNEXT-282] implemented additional options and HTTP header support for web scenarios (dimir, Krists)
 .......PS. [ZBXNEXT-2254] DBSchema configuration parameter now applies to PostgreSQL as well as IBM DB2 (Juris)
-A.F....... [ZBX-1357] updated Spanish translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Japanese, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8276] fixed latest data filtering by name (Ivo)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...PS. [ZBX-8172] fixed translation of \uxxxx sequences in JSON string values (wiper)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, Krists)
@@ -152,11 +162,14 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc1
 
 New features:
+..F....... [ZBX-7399] improved multiselect, added popup select window (Oleg)
 .......... [ZBX-7811] added example robots.txt file (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian, Russian, Slovak and Spanish translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-8243] added log message when the reason for an item being in an unsupported state changes (Juris)
+A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
 ...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
@@ -1107,6 +1120,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.13rc1
 
 New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)

@@ -1064,6 +1064,7 @@ notsupported:
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
+			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: \"%s\"", item->host.host, item->key_orig, h->value_orig.err);
 			zbx_free(value_esc);
 
 			update_cache = 1;
