@@ -109,9 +109,16 @@ class CTableInfo extends CTable {
 								width = cell.width();
 
 							if (width > 30) {
-								cell.children().css({
-									position: "relative",
-									left: width / 2 - 12
+								cell.children().each(function () {
+									var child = $(this);
+
+									var leftInPixels = cell.width() / 2 - cell.height() / 2 + child.width() / 2;
+									var leftInPercents = leftInPixels / cell.width() * 100;
+
+									child.css({
+										position: "relative",
+										left: leftInPercents + "%"
+									});
 								});
 							}
 						});
