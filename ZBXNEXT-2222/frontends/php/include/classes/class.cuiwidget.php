@@ -70,7 +70,7 @@ class CUIWidget extends CDiv {
 		$this->id = $id;
 		$this->body = $body ? array($body) : array();
 
-		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
+		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
 
 		$this->setAttribute('id', $this->id.'_widget');
 	}
