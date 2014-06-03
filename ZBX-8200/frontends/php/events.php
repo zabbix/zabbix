@@ -659,14 +659,14 @@ else {
 					$triggerOptions['triggerids'] = $unknownTriggerIds;
 					$validTriggers = API::Trigger()->get($triggerOptions);
 
-					$validTriggerIdsFromSlice = array_map('intval', zbx_objectValues($validTriggers, 'triggerid'));
+					$validTriggerIdsFromSlice = zbx_objectValues($validTriggers, 'triggerid');
 
 					$validTriggerIds = array_unique(array_merge($validTriggerIds, $validTriggerIdsFromSlice));
 					$knownTriggerIds = array_unique(array_merge($knownTriggerIds, $unknownTriggerIds));
 				}
 
 				foreach ($allEventsSlice as $event) {
-					if (in_array(intval($event['objectid']), $validTriggerIds)) {
+					if (in_array($event['objectid'], $validTriggerIds)) {
 						$events[] = array('eventid' => $event['eventid']);
 					}
 				}
