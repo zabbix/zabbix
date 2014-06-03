@@ -607,11 +607,13 @@ else {
 
 		if ($pageFilter->hostsSelected) {
 			$triggerOptions = array(
-				'nodeids' => get_current_nodeid(),
 				'output' => array('triggerid'),
+				'nodeids' => get_current_nodeid(),
+				'preservekeys' => true,
 				'monitored' => true
 			);
-			if (getRequest('triggerid', 0)) {
+
+			if (getRequest('triggerid')) {
 				$triggerOptions['triggerids'] = getRequest('triggerid');
 			}
 			elseif ($pageFilter->hostid > 0) {
@@ -635,12 +637,10 @@ else {
 				'limit' => $allEventsSliceLimit + 1
 			);
 
-			/*
-			 * Load all trigger events in slices and check if event triggers are valid.
-			 */
+			// load all trigger events in slices and check if event triggers are valid
 			$knownTriggerIds = array();
 			$validTriggerIds = array();
-			$filterTriggerId = getRequest('triggerid', null);
+			$filterTriggerId = getRequest('triggerid');
 			$events = array();
 
 			while (true) {
@@ -657,12 +657,14 @@ else {
 
 				if ($unknownTriggerIds) {
 					$triggerOptions['triggerids'] = $unknownTriggerIds;
-					$validTriggers = API::Trigger()->get($triggerOptions);
+					$validTriggerIdsFromSlice = API::Trigger()->get($triggerOptions);
+					$validTriggerIdsFromSlice = array_keys($validTriggerIdsFromSlice);
 
-					$validTriggerIdsFromSlice = zbx_objectValues($validTriggers, 'triggerid');
+					$validTriggerIds += $validTriggerIdsFromSlice;
+					$validTriggerIds = array_unique($validTriggerIds);
 
-					$validTriggerIds = array_unique(array_merge($validTriggerIds, $validTriggerIdsFromSlice));
-					$knownTriggerIds = array_unique(array_merge($knownTriggerIds, $unknownTriggerIds));
+					$knownTriggerIds += $unknownTriggerIds;
+					$knownTriggerIds = array_unique($knownTriggerIds);
 				}
 
 				foreach ($allEventsSlice as $event) {
@@ -677,13 +679,13 @@ else {
 				}
 
 				/*
-				 * Because events in slices are sorted by descending by eventid
-				 * (i.e. bigger eventid), first event in next slice must have eventid
-				 * that is previous to last eventid in current slice.
+				 * Because events in slices are sorted descending by eventid (i.e. bigger eventid),
+				 * first event in next slice must have eventid that is previous to last eventid in current slice.
 				 */
 				$lastEvent = end($allEventsSlice);
 				$eventOptions['eventid_till'] = $lastEvent['eventid'] - 1;
 			}
+
 			/*
 			 * At this point it is possible that more than $config['search_limit'] events are selected,
 			 * therefore at most only first $config['search_limit'] + 1 events will be used for pagination.
