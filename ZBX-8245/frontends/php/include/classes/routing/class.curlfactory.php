@@ -111,7 +111,7 @@ class CUrlFactory {
 	);
 
 	/**
-	 * Creates new CUrl object based on giver URL (or $_GET if null is given),
+	 * Creates new CUrl object based on giver URL (or $_REQUEST if null is given),
 	 * and adds/removes parameters based on current page context.
 	 *
 	 * @param string $sourceUrl
