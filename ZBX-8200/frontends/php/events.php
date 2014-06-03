@@ -646,7 +646,7 @@ else {
 			while (true) {
 				$allEventsSlice = API::Event()->get($eventOptions);
 
-				if($filterTriggerId) {
+				if ($filterTriggerId) {
 					$triggerIdsFromSlice = array($filterTriggerId);
 				}
 				else {
