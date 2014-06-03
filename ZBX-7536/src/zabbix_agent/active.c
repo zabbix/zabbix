@@ -862,7 +862,7 @@ out:
 static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
-	int		i, s_count, p_count, is_logrt = -1;
+	int		i, s_count, p_count, is_logrt;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
 	char		params[MAX_STRING_LEN], filename[MAX_STRING_LEN];
@@ -908,6 +908,8 @@ static void	process_active_checks(char *server, unsigned short port)
 			is_logrt = 0;
 		else if (0 == strncmp(active_metrics[i].key, "logrt[", 6))	/* log files with rotation */
 			is_logrt = 1;
+		else
+			is_logrt = -1;
 
 		if (-1 != is_logrt)
 		{

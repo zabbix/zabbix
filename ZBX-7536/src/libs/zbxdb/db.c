@@ -216,6 +216,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
+	int		rc;
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -410,6 +411,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
+
+	if (NULL != dbschema && '\0' != *dbschema)
+	{
+		char	*dbschema_esc;
+
+		dbschema_esc = zbx_db_dyn_escape_string(dbschema);
+		if (ZBX_DB_DOWN == (rc = zbx_db_execute("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
+			ret = rc;
+		zbx_free(dbschema_esc);
+	}
+
+	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
+		goto out;
 
 	result = zbx_db_select("%s", "select oid from pg_type where typname='bytea'");
 

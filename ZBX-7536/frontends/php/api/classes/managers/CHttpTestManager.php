@@ -279,7 +279,8 @@ class CHttpTestManager {
 		$httpTests = array();
 		$dbCursor = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
-				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
+				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid,'.
+				'ht.headers,ht.verify_peer,ht.verify_host,ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password'.
 			' FROM httptest ht'.
 			' WHERE ht.hostid='.zbx_dbstr($templateId)
 		);
@@ -288,7 +289,8 @@ class CHttpTestManager {
 		}
 
 		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.variables,hs.required,hs.status_codes'.
+			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.variables,'.
+				'hs.required,hs.status_codes,hs.headers,hs.follow_redirects,hs.retrieve_mode'.
 			' FROM httpstep hs'.
 			' WHERE '.dbConditionInt('hs.httptestid', array_keys($httpTests))
 		);
