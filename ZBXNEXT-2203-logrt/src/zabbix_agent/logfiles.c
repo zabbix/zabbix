@@ -1277,7 +1277,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		if (!S_ISREG(file_buf.st_mode))
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "\"%s\" is not a regular file, it cannot be used in log[] "
-					"item", filename);
+					"item.", filename);
 			ret = FAIL;
 			goto clean;
 		}
