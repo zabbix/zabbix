@@ -2075,10 +2075,10 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 
 				if (SUCCEED == ret)
 					ret = records.values_num;
-			}
 
-			if (1 == reload_first)
-				item->status = ZBX_ITEM_STATUS_RELOAD_FIRST;
+				if (1 == reload_first)
+					item->status = ZBX_ITEM_STATUS_RELOAD_FIRST;
+			}
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
