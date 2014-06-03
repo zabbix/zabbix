@@ -256,7 +256,7 @@ else {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-							$data['mediatypes'][$key]['listOfActions'][] = array(
+							$data['mediatypes'][$key]['listOfActions'][$actionId] = array(
 								'actionid' => $actionId,
 								'name' => $action['name']
 							);
@@ -270,11 +270,11 @@ else {
 
 		// sorting & paging
 		order_result($data['mediatypes'], getPageSortField('description'), getPageSortOrder());
-		$data['paging'] = getPagingLine($data['mediatypes'], array('mediatypeid'));
+		$data['paging'] = getPagingLine($data['mediatypes']);
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine($arr, array('mediatypeid'));
+		$data['paging'] = getPagingLine($arr);
 	}
 
 	// render view

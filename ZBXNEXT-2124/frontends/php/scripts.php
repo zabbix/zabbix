@@ -302,7 +302,7 @@ else {
 
 	// sorting & paging
 	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['scripts'], array('scriptid'));
+	$data['paging'] = getPagingLine($data['scripts']);
 
 	// render view
 	$scriptView = new CView('administration.script.list', $data);
