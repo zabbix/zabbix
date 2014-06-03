@@ -382,10 +382,6 @@ out:
  *           plus all values in range:                                              *
  *             count_timestamp < <value timestamp> <= read_timestamp                *
  *                                                                                  *
- *           When <direct> is set to 0 this function reads <count> values before    *
- *           <timeshift> plus all values with timestamp seconds matching <count>th  *
- *           value timestamp.                                                       *
- *                                                                                  *
  *           To speed up the reading time with huge data loads, data is read by     *
  *           smaller time segments (hours, day, week, month) and the next (larger)  *
  *           time segment is read only if the requested number of values (<count>)  *
