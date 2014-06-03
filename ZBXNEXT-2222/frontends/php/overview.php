@@ -168,7 +168,7 @@ if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_A
 	$showTriggers = TRIGGERS_OPTION_ALL;
 }
 else {
-	$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
+	$showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_ALL);
 }
 
 /*
