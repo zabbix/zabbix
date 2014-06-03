@@ -89,24 +89,24 @@ jQuery(function($) {
 	 * add.popup event
 	 */
 	$(document).on('add.popup', function(e, data) {
-			// multiselect check
-			if ($('#' + data.parentId).hasClass('multiselect')) {
-				for (var i = 0; i < data.values.length; i++) {
-					if (typeof data.values[i].id !== 'undefined') {
-						var item = {
-							'id': data.values[i].id,
-							'name': data.values[i].name,
-							'prefix': data.values[i].prefix
-						};
-						jQuery('#' + data.parentId).multiSelect.addData(item, data.parentId);
-					}
+		// multiselect check
+		if ($('#' + data.parentId).hasClass('multiselect')) {
+			for (var i = 0; i < data.values.length; i++) {
+				if (typeof data.values[i].id !== 'undefined') {
+					var item = {
+						'id': data.values[i].id,
+						'name': data.values[i].name,
+						'prefix': data.values[i].prefix
+					};
+					jQuery('#' + data.parentId).multiSelect.addData(item, data.parentId);
 				}
 			}
-			else {
-				// execute function if they exist
-				if (typeof addPopupValues !== 'undefined') {
-					addPopupValues(data);
-				}
+		}
+		else {
+			// execute function if they exist
+			if (typeof addPopupValues !== 'undefined') {
+				addPopupValues(data);
 			}
+		}
 	});
 });
