@@ -1,3 +1,25 @@
+Changes for 2.0.13rc1
+
+New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-7188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
+.......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
+...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
+..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
+...G...... [ZBX-8269] fixed processing of active checks in agent (Andris)
+...G...... [ZBX-8238] fixed updating agent 'mtime' for logrt[] items; thanks to Yoshinori Komuro for patch (Andris)
+...G...PS. [ZBX-7098] improved handling of log file rotation/truncation for logrt[] and log[] items (Andris)
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
+...G...... [ZBX-7875] fixed wrongly reported system version for Windows 8.1 and Server 2012 R2 (Nikolaj, wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.12
+
+2.0.12rc3 was released as 2.0.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.12rc3
 
 Bug fixes:
@@ -1539,6 +1561,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
 Changes for 1.8.20

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-24 15:56+0200\n"
-"PO-Revision-Date: 2014-03-24 18:18+0300\n"
+"PO-Revision-Date: 2014-06-01 10:16+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395677927.0\n"
+"X-POOTLE-MTIME: 1401610572.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
@@ -13837,7 +13837,7 @@ msgstr "iné"
 
 #: include/page_header.php:129
 msgid "refreshed every"
-msgstr "obnovené každých"
+msgstr "obnovované každých"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"

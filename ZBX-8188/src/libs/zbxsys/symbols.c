@@ -26,6 +26,7 @@ DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD) = NULL;
 BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;
 BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD) = NULL;
 BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
+BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD) = NULL;
 
 static FARPROC	GetProcAddressAndLog(HMODULE hModule, LPCSTR procName)
 {
@@ -50,6 +51,8 @@ void	import_symbols()
 	{
 		zbx_GetProcessIoCounters = (BOOL (__stdcall *)(HANDLE, PIO_COUNTERS))GetProcAddressAndLog(hModule, "GetProcessIoCounters");
 		zbx_GlobalMemoryStatusEx = (BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule, "GlobalMemoryStatusEx");
+		zbx_GetFileInformationByHandleEx = (BOOL (__stdcall *)(HANDLE, FILE_INFO_BY_HANDLE_CLASS, LPVOID,
+				DWORD))GetProcAddressAndLog(hModule, "GetFileInformationByHandleEx");
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to get handle to KERNEL32.DLL");

@@ -239,7 +239,7 @@ else {
 			if (!empty($action['mediatypeids'])) {
 				foreach ($action['mediatypeids'] as $actionMediaTypeId) {
 					if ($mediatype['mediatypeid'] == $actionMediaTypeId) {
-						$data['mediatypes'][$number]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
+						$data['mediatypes'][$number]['listOfActions'][$actionid] = array('actionid' => $actionid, 'name' => $action['name']);
 					}
 				}
 			}
