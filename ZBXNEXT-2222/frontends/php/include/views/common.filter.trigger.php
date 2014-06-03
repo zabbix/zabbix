@@ -53,10 +53,12 @@ if ($config['event_ack_enable']) {
 if (!$overview) {
 	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, array(
 		EVENTS_OPTION_NOEVENT => _('Hide all'),
-		EVENTS_OPTION_ALL => _('Show all').' ('._n('%1$s day', '%1$s days', $config['event_expire']).')'
+		EVENTS_OPTION_ALL => _n('Show all (%1$s day)', 'Show all (%1$s days)', $config['event_expire'])
 	));
 	if ($config['event_ack_enable']) {
-		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
+		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK,
+			_n('Show unacknowledged (%1$s day)', 'Show unacknowledged (%1$s days)', $config['event_expire'])
+		);
 	}
 	$filterForm->addRow(_('Events'), $eventsComboBox);
 }
