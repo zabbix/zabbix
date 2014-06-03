@@ -120,9 +120,9 @@ typedef struct
 	/* the flag indicating that all data from DB are cached       */
 	unsigned char	cached_all;
 
-	/* The flag indicating that the first (earliest) second       */
+	/* the flag indicating that the first (earliest) second       */
 	/* might not be fully cached and should be reloaded from      */
-	/* database if more data are being requested.                 */
+	/* database if more data are being requested                  */
 	unsigned char	reload_first;
 
 	/* The total number of item values in cache.                  */
@@ -370,11 +370,10 @@ out:
  *                                                                                  *
  * Purpose: reads item history data from database                                   *
  *                                                                                  *
- * Parameters:  itemid          - [IN] the itemid                                   *
- *              value_type      - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
- *              count           - [IN] the number of values to read                 *
- *              read_timestamp  - [IN] the value timestamp to start reading with    *
- *              count_timestamp - [IN] the value timestamp to start counting with   *
+ * Parameters:  itemid        - [IN] the itemid                                     *
+ *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs)    *
+ *              count         - [IN] the number of values to read                   *
+ *              end_timestamp - [IN] the value timestamp to start reading with      *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *
@@ -397,8 +396,8 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		int count, int end_timestamp)
 {
 	char			*sql = NULL;
-	size_t	 		sql_alloc = 0, sql_offset = 0;
-	int			clock_to, clock_from, step = 0, ret = FAIL, values_read = 0;
+	size_t	 		sql_alloc = 0, sql_offset;
+	int			clock_to, clock_from, step = 0, ret = FAIL;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -406,7 +405,7 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 
 	clock_to = end_timestamp;
 
-	while (-1 != periods[step] && values_read < count)
+	while (-1 != periods[step] && 0 < count)
 	{
 		clock_from = clock_to - periods[step];
 
@@ -428,7 +427,7 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		if (NULL == result)
 			goto out;
 
-		while (NULL != (row = DBfetch(result)) && values_read < count)
+		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_history_record_t	value;
 
@@ -438,7 +437,7 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 
 			zbx_vector_history_record_append_ptr(values, &value);
 
-			values_read++;
+			count--;
 		}
 		DBfree_result(result);
 
@@ -481,8 +480,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 	vc_db_read_values_by_time(itemid, value_type, &values, 1, ts->sec);
 	zbx_vector_history_record_sort(&values, (zbx_compare_func_t)vc_history_record_compare_desc_func);
 
-	if (0 == values.values_num ||
-		0 > zbx_timespec_compare(ts, &values.values[values.values_num - 1].timestamp))
+	if (0 == values.values_num || 0 > zbx_timespec_compare(ts, &values.values[values.values_num - 1].timestamp))
 	{
 		/* if the requested second does not contain matching values, */
 		/* get the first older value outside the requested second    */
