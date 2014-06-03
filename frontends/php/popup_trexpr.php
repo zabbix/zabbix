@@ -647,11 +647,12 @@ if ($itemId) {
 	$itemValueType = $item['value_type'];
 	$itemKey = $item['key_'];
 	$itemHostData = reset($item['hosts']);
-	$itemHost = $itemHostData['name'] !== '' ? $itemHostData['name'] : $itemHostData['host'];
-	$description = $itemHost.NAME_DELIMITER.$item['name_expanded'];
+	$description = ($itemHostData['name'] !== '' ? $itemHostData['name'] : $itemHostData['host']) .
+		NAME_DELIMITER .
+		$item['name_expanded'];
 }
 else {
-	$itemKey = $itemHost = $description = '';
+	$itemKey = $description = '';
 	$itemValueType = null;
 }
 
@@ -675,7 +676,6 @@ $data = array(
 	'paramtype' => $paramType,
 	'description' => $description,
 	'functions' => $functions,
-	'item_host' => $itemHost,
 	'item_key' => $itemKey,
 	'itemValueType' => $itemValueType,
 	'selectedFunction' => null,
