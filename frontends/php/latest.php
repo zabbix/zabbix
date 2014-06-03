@@ -204,7 +204,7 @@ if ($items) {
 			$haystack = mb_strtolower($item['name_expanded']);
 			$needle = mb_strtolower($filterSelect);
 
-			if (!mb_strpos($haystack, $needle)) {
+			if (mb_strpos($haystack, $needle) === false) {
 				unset($items[$key]);
 			}
 		}

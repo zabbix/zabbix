@@ -350,7 +350,7 @@ else {
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
@@ -442,14 +442,10 @@ else {
 
 	// determine, show or not column of errors
 	if ($data['hostid'] > 0) {
-		$host = API::Host()->get(array(
-			'hostids' => $_REQUEST['hostid'],
-			'output' => array('status'),
-			'templated_hosts' => true,
-			'editable' => true
+		$data['showInfoColumn'] = (bool) API::Host()->get(array(
+			'hostids' => $data['hostid'],
+			'output' => array('status')
 		));
-		$host = reset($host);
-		$data['showInfoColumn'] = (!$host || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
 		$data['showInfoColumn'] = true;
