@@ -962,6 +962,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
 ...G...... [ZBX-6531] fixed memory leak in filesystem discovery on AIX systems (Juris)
 ..F....... [ZBX-8241] fixed duplicate display of actions in media type list (Andrejs)
