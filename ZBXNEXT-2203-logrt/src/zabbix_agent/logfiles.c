@@ -180,7 +180,10 @@ static int	split_filename(const char *filename, char **directory, char **format,
 	}
 
 	if (separator < filename)
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Non-existing disk or directory \"%s\".", filename);
 		goto out;
+	}
 
 #else	/* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
