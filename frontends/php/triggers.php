@@ -350,7 +350,7 @@ else {
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
 		'triggers' => array('editable' => true),
 		'groupid' => get_request('groupid', null),
