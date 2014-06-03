@@ -274,6 +274,16 @@ class CHttpTest extends CApiService {
 		}
 		unset($httpTest);
 
+		foreach($httpTests as &$httpTest) {
+			$defaultValues = array(
+				'verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'verify_host' => HTTPTEST_VERIFY_HOST_OFF
+			);
+
+			check_db_fields($defaultValues, $httpTest);
+		}
+		unset($httpTest);
+
 		$this->validateCreate($httpTests);
 
 		$httpTests = Manager::HttpTest()->persist($httpTests);
@@ -303,11 +313,31 @@ class CHttpTest extends CApiService {
 
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 
-		$httpTests = $this->validateUpdate($httpTests);
+		$dbHttpTests = array();
+		$dbCursor = DBselect(
+			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,'.
+				'ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password,ht.verify_peer,ht.verify_host'.
+			' FROM httptest ht'.
+			' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests))
+		);
+		while ($dbHttpTest = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		}
+
+		$dbCursor = DBselect(
+			'SELECT hs.httpstepid,hs.httptestid,hs.name'.
+			' FROM httpstep hs'.
+			' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests))
+		);
+		while ($dbHttpStep = DBfetch($dbCursor)) {
+			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
+		}
+
+		$httpTests = $this->validateUpdate($httpTests, $dbHttpTests);
 
 		Manager::HttpTest()->persist($httpTests);
 
-		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
+		return array('httptestids' => array_keys($httpTests));
 	}
 
 	/**
@@ -426,6 +456,8 @@ class CHttpTest extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario name cannot be empty.'));
 			}
 
+			$this->checkSslParameters($httpTest);
+
 			if (empty($httpTest['steps'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 			}
@@ -456,36 +488,20 @@ class CHttpTest extends CApiService {
 	 *  - return array of web scenarios, if validation was successful
 	 *
 	 * @param array $httpTests
+	 * @param array $dbHttpTests
 	 *
 	 * @return array $httpTests
 	 */
-	protected function validateUpdate(array $httpTests) {
+	protected function validateUpdate(array $httpTests, array $dbHttpTests) {
 		if (!$this->isWritable(array_keys($httpTests))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$dbHttpTests = array();
-		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name'.
-			' FROM httptest ht'.
-			' WHERE '.dbConditionInt('ht.httptestid', array_keys($httpTests))
-		);
-		while ($dbHttpTest = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
-		}
-
-		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name'.
-			' FROM httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', array_keys($dbHttpTests))
-		);
-		while ($dbHttpStep = DBfetch($dbCursor)) {
-			$dbHttpTests[$dbHttpStep['httptestid']]['steps'][$dbHttpStep['httpstepid']] = $dbHttpStep;
-		}
+		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, array(
+			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
+		));
 
 		foreach ($httpTests as &$httpTest) {
-			unset($httpTest['templateid']);
-
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
 
 			$httpTest['hostid'] = $dbHttpTest['hostid'];
@@ -494,7 +510,9 @@ class CHttpTest extends CApiService {
 				$httpTest['name'] = $dbHttpTest['name'];
 			}
 
-			if (!empty($httpTest['steps'])) {
+			$this->checkSslParameters($httpTest);
+
+			if (array_key_exists('steps', $httpTest) && is_array($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as &$httpTestStep) {
 					if (isset($httpTestStep['httpstepid'])
 							&& ($dbHttpTest['templateid'] || !isset($httpTestStep['name']))) {
@@ -504,12 +522,21 @@ class CHttpTest extends CApiService {
 					if ($dbHttpTest['templateid']) {
 						unset($httpTestStep['no']);
 					}
+
+					// unset required text and POST variables if retrieving only headers
+					if (isset($httpTestStep['retrieve_mode'])
+							&& ($httpTestStep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
+						$httpTestStep['required'] = '';
+						$httpTestStep['posts'] = '';
+					}
 				}
 				unset($httpTestStep);
 
 				$this->checkSteps($httpTest, $dbHttpTest);
 				$this->checkDuplicateSteps($httpTest, $dbHttpTest);
 			}
+
+			unset($httpTest['templateid']);
 		}
 		unset($httpTest);
 
@@ -613,17 +640,60 @@ class CHttpTest extends CApiService {
 	 * @param array $dbHttpTest
 	 */
 	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
+		if (array_key_exists('steps', $httpTest)
+				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
+		}
+
 		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
 		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
+		$followRedirectsValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
+		);
+
+		$retrieveModeValidator = new CSetValidator(
+			array('values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS))
+		);
+
 		foreach ($httpTest['steps'] as $step) {
+			if ((isset($step['httpstepid']) && array_key_exists('name', $step) && zbx_empty($step['name']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('name', $step) || zbx_empty($step['name'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name cannot be empty.'));
+			}
+
+			if ((isset($step['httpstepid']) && array_key_exists('url', $step) && zbx_empty($step['url']))
+					|| (!isset($step['httpstepid']) && (!array_key_exists('url', $step) || zbx_empty($step['url'])))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step URL cannot be empty.'));
+			}
+
 			if (isset($step['no']) && $step['no'] <= 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step number cannot be less than 1.'));
 			}
 			if (isset($step['status_codes'])) {
 				$this->checkStatusCode($step['status_codes']);
+			}
+
+			if (isset($step['follow_redirects'])) {
+				$followRedirectsValidator->messageInvalid = _s(
+					'Incorrect follow redirects value for step "%1$s" of web scenario "%2$s".',
+					$step['name'],
+					$httpTest['name']
+				);
+
+				$this->checkValidator($step['follow_redirects'], $followRedirectsValidator);
+			}
+
+			if (isset($step['retrieve_mode'])) {
+				$retrieveModeValidator->messageInvalid = _s(
+					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
+					$step['name'],
+					$httpTest['name']
+				);
+
+				$this->checkValidator($step['retrieve_mode'], $retrieveModeValidator);
 			}
 		}
 
@@ -794,5 +864,47 @@ class CHttpTest extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param $httpTest
+	 *
+	 * @throws APIException if bad value for "verify_peer" parameter.
+	 * @throws APIException if bad value for "verify_host" parameter.
+	 * @throws APIException if SSL cert is present but SSL key is not.
+	 */
+	protected function checkSslParameters($httpTest) {
+
+		$verifyPeerValidator = new CSetValidator(
+			array(
+				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
+				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
+			)
+		);
+		$verifyPeerValidator->setObjectName($httpTest['name']);
+		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
+
+		$verifyHostValidator = new CSetValidator(
+			array(
+				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
+				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
+			)
+		);
+		$verifyHostValidator->setObjectName($httpTest['name']);
+		$this->checkValidator($httpTest['verify_host'], $verifyHostValidator);
+
+			if (($httpTest['ssl_key_password'] != '') && ($httpTest['ssl_key_file'] == '')) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Empty SSL key file for web scenario "%1$s".', $httpTest['name'])
+			);
+		}
+
+		if (($httpTest['ssl_key_file'] != '') && ($httpTest['ssl_cert_file'] == '')) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Empty SSL certificate file for web scenario "%1$s".', $httpTest['name'])
+			);
+		}
 	}
 }
