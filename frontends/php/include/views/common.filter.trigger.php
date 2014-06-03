@@ -89,11 +89,6 @@ $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
 $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
 
-// show details
-if (!$overview) {
-	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
-}
-
 // name
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
 
@@ -140,6 +135,11 @@ $filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 $filterForm->addRow(_('Show hosts in maintenance'),
 	new CCheckBox('show_maintenance', $filter['showMaintenance'], null, 1)
 );
+
+// show details
+if (!$overview) {
+	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
+}
 
 // buttons
 $filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
