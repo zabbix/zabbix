@@ -447,7 +447,6 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading threshold sensor", err);
 		h->ret = NETWORK_ERROR;
-		h->done = 1;
 		goto out;
 	}
 
@@ -455,7 +454,6 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	{
 		h->err = zbx_strdup(h->err, "sensor data is not available");
 		h->ret = NOTSUPPORTED;
-		h->done = 1;
 		goto out;
 	}
 
@@ -466,7 +464,6 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_strdup(h->err, "fatal error");
 		h->ret = NOTSUPPORTED;
-		h->done = 1;
 		goto out;
 	}
 
@@ -510,8 +507,9 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 					mod_use, modifier, rate);
 			break;
 	}
-	h->done = 1;
 out:
+	h->done = 1;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
