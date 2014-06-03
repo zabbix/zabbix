@@ -175,7 +175,7 @@ typedef struct _DC_TRIGGER
 	char		*new_error;
 	zbx_timespec_t	timespec;
 	int		lastchange;
-	int		topoindex;
+	unsigned char	topoindex;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
