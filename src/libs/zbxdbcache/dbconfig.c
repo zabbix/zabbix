@@ -51,6 +51,7 @@ typedef struct
 	const char	*expression;
 	const char	*error;
 	int		lastchange;
+	int		topoindex;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
@@ -62,7 +63,7 @@ ZBX_DC_TRIGGER;
 typedef struct zbx_dc_trigger_deplist_s
 {
 	zbx_uint64_t				triggerid;
-	const ZBX_DC_TRIGGER			*trigger;
+	ZBX_DC_TRIGGER				*trigger;
 	const struct zbx_dc_trigger_deplist_s	**dependencies;
 }
 ZBX_DC_TRIGGER_DEPLIST;
@@ -1542,6 +1543,8 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		if (0 == found)
 			trigger->locked = 0;
+
+		trigger->topoindex = 1;
 	}
 
 	/* remove deleted or disabled triggers from buffer */
@@ -1566,6 +1569,8 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+static void	DCconfig_sort_triggers_topologically();
 
 static void	DCsync_trigdeps(DB_RESULT tdep_result)
 {
@@ -1680,6 +1685,8 @@ static void	DCsync_trigdeps(DB_RESULT tdep_result)
 
 	zbx_vector_uint64_destroy(&ids_down);
 	zbx_vector_uint64_destroy(&ids_up);
+
+	DCconfig_sort_triggers_topologically();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4161,6 +4168,21 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 /******************************************************************************
  *                                                                            *
+ * Comments: helper function for DCconfig_get_triggers_by_itemids()           *
+ *                                                                            *
+ ******************************************************************************/
+static int	__config_trigger_topoindex_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_TRIGGER	*t1 = (const ZBX_DC_TRIGGER *)d1;
+	const ZBX_DC_TRIGGER	*t2 = (const ZBX_DC_TRIGGER *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
  * Purpose: get triggers for specified items                                  *
@@ -4207,7 +4229,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 	UNLOCK_CACHE;
 
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_sort(trigger_order, __config_trigger_topoindex_compare);
 }
 
 /******************************************************************************
@@ -5261,7 +5283,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 
 	if (32 < level)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency detected (triggerid:" ZBX_FS_UI64 ")",
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
 				trigdep->triggerid);
 		return SUCCEED;
 	}
@@ -5310,6 +5332,82 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: helper function for DCconfig_sort_triggers_topologically()       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCconfig_sort_triggers_topologically_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int *topoindex,
+		int level)
+{
+	int				i;
+	ZBX_DC_TRIGGER			*trigger;
+	const ZBX_DC_TRIGGER		*next_trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
+
+	if (32 < level)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
+				trigdep->triggerid);
+		return;
+	}
+
+	trigger = trigdep->trigger;
+
+	if (NULL != trigger && 0 == trigger->topoindex)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "trigger dependencies contain a cycle (triggerid:" ZBX_FS_UI64 ")",
+				trigdep->triggerid);
+		return;
+	}
+
+	if (NULL != trigger)
+		trigger->topoindex = 0;
+
+	for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
+	{
+		if (NULL != (next_trigger = next_trigdep->trigger) && 1 < next_trigger->topoindex)
+			continue;
+
+		if (NULL == next_trigdep->dependencies)
+			continue;
+
+		DCconfig_sort_triggers_topologically_rec(next_trigdep, topoindex, level + 1);
+	}
+
+	if (NULL != trigger)
+		trigger->topoindex = ++*topoindex;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_sort_triggers_topologically                             *
+ *                                                                            *
+ * Purpose: assign each trigger an index based on trigger dependency topology *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCconfig_sort_triggers_topologically()
+{
+	int				topoindex = 1;
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_TRIGGER			*trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+
+	zbx_hashset_iter_reset(&config->trigdeps, &iter);
+
+	while (NULL != (trigdep = zbx_hashset_iter_next(&iter)))
+	{
+		trigger = trigdep->trigger;
+
+		if ((NULL != trigger && 1 < trigger->topoindex) || NULL == trigdep->dependencies)
+			continue;
+
+		DCconfig_sort_triggers_topologically_rec(trigdep, &topoindex, 0);
+	}
 }
 
 /******************************************************************************
