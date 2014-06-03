@@ -3,6 +3,7 @@ Changes for 2.3.2
 New features:
 
 Bug fixes:
+A.F....... [ZBX-5567] removed parameter "not_proxy_hosts" from hostgroup.get API method and frontend code (Krists)
 ..F....... [ZBX-8271] fixed importing of maps with LLD discovered hosts (Andrejs)
 
 --------------------------------------------------------------------------------
