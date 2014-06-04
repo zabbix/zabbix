@@ -61,7 +61,7 @@ $fields = array(
 );
 
 // config
-$ZBX_CONFIG = new CSession();
+$ZBX_CONFIG = ZBase::getInstance()->getSession();
 $ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
 if (!isset($ZBX_CONFIG['step'])) {
 	$ZBX_CONFIG['step'] = 0;
