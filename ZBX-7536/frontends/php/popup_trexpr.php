@@ -647,9 +647,7 @@ if ($itemId) {
 	$itemValueType = $item['value_type'];
 	$itemKey = $item['key_'];
 	$itemHostData = reset($item['hosts']);
-	$description = ($itemHostData['name'] !== '' ? $itemHostData['name'] : $itemHostData['host']) .
-		NAME_DELIMITER .
-		$item['name_expanded'];
+	$description = $itemHostData['name'].NAME_DELIMITER.$item['name_expanded'];
 }
 else {
 	$itemKey = $description = '';

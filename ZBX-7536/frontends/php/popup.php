@@ -448,7 +448,7 @@ if (isset($onlyHostid)) {
 	$host = reset($only_hosts);
 
 	$cmbHosts = new CComboBox('hostid', $hostid);
-	$cmbHosts->addItem($hostid, $host['name'] === '' ? $host['host'] : $host['name']);
+	$cmbHosts->addItem($hostid, $host['name']);
 	$cmbHosts->setEnabled('disabled');
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
