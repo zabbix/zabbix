@@ -61,9 +61,10 @@ class CSession implements ArrayAccess {
 	}
 
 	/**
-	 * Check if session values exists (isset() calls).
+	 * Checks if session value exists (isset() calls).
 	 *
 	 * @param mixed $offset
+	 *
 	 * @return bool
 	 */
 	public function offsetExists($offset) {
@@ -83,6 +84,7 @@ class CSession implements ArrayAccess {
 	 * Returns value stored in session.
 	 *
 	 * @param mixed $offset
+	 *
 	 * @return mixed|null
 	 */
 	public function offsetGet($offset) {
