@@ -25,7 +25,7 @@
 	});
 
 	function addPopupValues(data) {
-		if (data.object == 'applicationid') {
+		if (data.object == 'name') {
 			jQuery('#filter_application').val(data.values[0].name);
 		}
 	}

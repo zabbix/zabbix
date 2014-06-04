@@ -118,7 +118,7 @@
 				<td><?php echo _('Application'); ?></td>
 				<td>
 					<input size="50" id="application" name="application" class="input">
-					<span id="application-select" class="link"><?php echo _('Select'); ?></span>
+					<span id="application-select" class="link_menu"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 
@@ -486,4 +486,10 @@ jQuery(document).ready(function() {
 		return false;
 	});
 })
+
+function addPopupValues(data) {
+	if (data.object == 'name') {
+		jQuery('#application').val(data.values[0].name);
+	}
+}
 </script>

@@ -126,7 +126,7 @@ jQuery(function($) {
 						'name': data.values[i].name,
 						'prefix': data.values[i].prefix
 					};
-					jQuery('#' + data.parentId).multiSelect.addData(item, data.parentId);
+					jQuery('#' + data.parentId).multiSelect('addData', item, data.parentId);
 				}
 			}
 		}
