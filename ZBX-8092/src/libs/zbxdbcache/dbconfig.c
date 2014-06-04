@@ -971,7 +971,9 @@ static void	DCsync_items(DB_RESULT result)
 			item->mtime = atoi(row[32]);
 			DCstrpool_replace(found, &item->db_error, row[41]);
 			item->data_expected_from = now;
+
 			item->location = ZBX_LOC_NOWHERE;
+			item->poller_type = ZBX_NO_POLLER;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -1040,8 +1042,6 @@ static void	DCsync_items(DB_RESULT result)
 				}
 			}
 		}
-		else
-			item->poller_type = ZBX_NO_POLLER;
 
 		item->delay = delay;
 
