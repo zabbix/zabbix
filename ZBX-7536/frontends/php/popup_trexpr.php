@@ -650,7 +650,8 @@ if ($itemId) {
 	$description = $itemHostData['name'].NAME_DELIMITER.$item['name_expanded'];
 }
 else {
-	$itemKey = $description = '';
+	$itemKey = '';
+	$description = '';
 	$itemValueType = null;
 }
 
