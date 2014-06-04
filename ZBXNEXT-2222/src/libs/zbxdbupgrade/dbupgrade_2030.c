@@ -1117,6 +1117,14 @@ static int	DBpatch_2030105(void)
 }
 #endif
 
+static int	DBpatch_2030106(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.view.application'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 DBPATCH_START(2030)
 
 /* version, duplicates flag, mandatory flag */
@@ -1226,5 +1234,6 @@ DBPATCH_ADD(2030102, 0, 1)
 DBPATCH_ADD(2030103, 0, 1)
 DBPATCH_ADD(2030104, 0, 1)
 DBPATCH_ADD(2030105, 0, 1)
+DBPATCH_ADD(2030106, 0, 0)
 
 DBPATCH_END()
