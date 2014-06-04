@@ -2014,7 +2014,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  ******************************************************************************/
 static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 {
-	int	ret = SUCCEED, update_seconds = 0, update_end, now, reload_first;
+	int	ret = SUCCEED, update_seconds = 0, update_end, now, reload_first = 0;
 	int	start = ts->sec - 1;
 
 	now = ZBX_VC_TIME();
