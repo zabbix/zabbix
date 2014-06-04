@@ -3,6 +3,7 @@ Changes for 2.3.2
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-8172] fixed null JSON value decoding (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
 ..F....... [ZBX-8216] fixed screen import error (Andrejs)
 ..F....... [ZBX-8245] fixed repeating of actions while sorting / paging (Andrejs)
