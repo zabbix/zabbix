@@ -1042,6 +1042,8 @@ static void	DCsync_items(DB_RESULT result)
 				}
 			}
 		}
+		else
+			item->poller_type = ZBX_NO_POLLER;
 
 		item->delay = delay;
 
