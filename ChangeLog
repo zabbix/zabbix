@@ -3,6 +3,7 @@ Changes for 2.3.2
 New features:
 
 Bug fixes:
+........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
 ...G...PS. [ZBX-8172] fixed null JSON value decoding (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
 ..F....... [ZBX-8216] fixed screen import error (Andrejs)
@@ -173,6 +174,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
 ........S. [ZBX-8243] added log message when the reason for an item being in an unsupported state changes (Juris)
 A......... [ZBX-8195] fixed web scenario step validation for httptest.create and httptest.update API methods (Krists)
