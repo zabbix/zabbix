@@ -346,6 +346,7 @@ else {
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		$filterForm = new CFormTable(null, null, 'get');
+		$filterForm->setTableClass('formtable old-filter');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 		$filterForm->addVar('triggerid', $triggerId);

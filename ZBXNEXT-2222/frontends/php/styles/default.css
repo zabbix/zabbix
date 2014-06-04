@@ -462,7 +462,8 @@ table.filter tr.item-list-row { height: 26px; }
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }
 
-/* old-style trigger filter */
+/* old-style filter */
+.old-filter .form_row_l { text-align: right; }
 .old-filter #inventory-filter td { padding-left: 0; padding-right: 3px; }
 .old-filter .filter-button { height: 16px; }
 

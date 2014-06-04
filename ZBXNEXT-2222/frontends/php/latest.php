@@ -302,6 +302,7 @@ $form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $latestWidget->addHeader(_('Items'), $form);
 
 $filterForm = new CFormTable(null, null, 'get');
+$filterForm->setTableClass('formtable old-filter');
 $filterForm->setAttribute('name',' zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addRow(_('Show items with name like'), new CTextBox('select', $filterSelect, 20));
