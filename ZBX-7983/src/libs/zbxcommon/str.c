@@ -2446,9 +2446,10 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 {
 	const char	*p, *q;
 
-	for (p = key_1, q = key_2; *p == *q && *q != '\0' && *q != '[' && *q != ','; p++, q++);
+	for (p = key_1, q = key_2; *p == *q && '\0' != *q && '[' != *q; p++, q++)
+		;
 
-	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
+	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
 const char	*zbx_permission_string(int perm)

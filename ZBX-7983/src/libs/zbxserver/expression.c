@@ -1509,27 +1509,29 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		unsigned char			value_type;
-		zbx_uint64_t			valuemapid;
-		zbx_vector_history_record_t	values;
+		unsigned char		value_type;
+		zbx_uint64_t		valuemapid;
+		zbx_history_record_t	vc_value;
+		zbx_timespec_t		ts;
+		int			found;
 
-		zbx_history_record_vector_create(&values);
+		ts.sec = time(NULL);
+		ts.ns = 999999999;
 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == zbx_vc_get_value_range(itemid, value_type, &values, 0, 1, time(NULL)) &&
-				0 < values.values_num)
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
 		{
 			char	tmp[MAX_STRING_LEN];
 
-			zbx_vc_history_value2str(tmp, sizeof(tmp), &values.values[0].value, value_type);
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_record_clear(&vc_value, value_type);
 			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
 			ret = SUCCEED;
 		}
-		zbx_history_record_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
 out:
@@ -1544,14 +1546,8 @@ out:
  *                                                                            *
  * Purpose: retrieve item value by trigger expression and number of function  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns)
@@ -3729,87 +3725,82 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	char		*sql = NULL, value[MAX_BUFFER_LEN];
-	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
+	DC_ITEM		*items = NULL;
+	char		value[MAX_BUFFER_LEN];
+	int		i, k;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	host_status, item_status;
+	int		*errcodes = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select %s,h.status,i.status"
-			" from %s"
-			" where i.hostid=h.hostid"
-				" and",
-			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
+	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->values_num);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->values_num);
 
 	zbx_free(itemids);
 
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < ifuncs->values_num; i++)
 	{
-		DBget_item_from_db(&item, row);
-
-		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
-		item_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 1]);
-
-		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (i = 0; i < ifunc->functions.values_num; i++)
+		for (k = 0; k < ifunc->functions.values_num; k++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[i];
+			func = (zbx_func_t *)ifunc->functions.values[k];
 
-			if (ITEM_STATUS_DISABLED == item_status)
+			if (SUCCEED != errcodes[i])
 			{
-				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (ITEM_STATE_NOTSUPPORTED == item.state)
-			{
-				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-			else if (HOST_STATUS_NOT_MONITORED == host_status)
-			{
-				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
-			}
-
-			if (NULL != func->error)
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
+						" item does not exist.",
+						func->function, func->parameter);
 				continue;
+			}
 
-			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec))
+			if (ITEM_STATUS_ACTIVE != items[i].status)
 			{
-				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
-						item.host_name, item.key, func->function, func->parameter);
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item is disabled.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (HOST_STATUS_MONITORED != items[i].host.status)
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item belongs to a disabled host.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
+						" item is not supported.",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				continue;
+			}
+
+			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter, func->timespec.sec))
+			{
+				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\".",
+						items[i].host.host, items[i].key_orig, func->function, func->parameter);
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
 	}
-	DBfree_result(result);
+
+	DCconfig_clean_items(items, errcodes, ifuncs->values_num);
+
+	zbx_free(errcodes);
+	zbx_free(items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
