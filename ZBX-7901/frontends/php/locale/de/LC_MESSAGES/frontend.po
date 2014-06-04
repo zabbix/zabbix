@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-17 00:37+0300\n"
+"POT-Creation-Date: 2014-06-02 00:10+0300\n"
 "PO-Revision-Date: 2013-11-04 19:10+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -93,7 +93,7 @@ msgstr "(0 - unendlich)"
 
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:123
+#: include/views/configuration.template.edit.php:122
 msgid "(Only super admins can create groups)"
 msgstr "(Nur Super-Admins können Gruppen erstellen)"
 
@@ -305,7 +305,7 @@ msgstr "Bestätigungen deaktiviert"
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:388
+#: include/views/configuration.template.edit.php:387
 #: include/views/configuration.triggers.edit.php:149
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:303
@@ -428,7 +428,7 @@ msgstr "Aktiv bis"
 #: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:427
+#: include/views/configuration.template.edit.php:426
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:98
 #: include/views/configuration.triggers.edit.php:293
@@ -661,7 +661,7 @@ msgstr "Kategorie mit ID \"%1$s\" ist nicht verfügbar auf \"%2$s\"."
 #: include/views/configuration.item.edit.php:451
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:57
-#: include/views/configuration.template.edit.php:196
+#: include/views/configuration.template.edit.php:195
 #: include/views/inventory.host.view.php:227 popup.php:40 search.php:140
 #: search.php:166 search.php:192 search.php:382 search.php:405 search.php:435
 #: templates.php:488 templates.php:548
@@ -1757,7 +1757,7 @@ msgstr "Kann vorlagenbasierte Datenpunkte nicht löschen."
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kann vorlagenbasierten Auslöser \"%1$s:%2$s\" nicht löschen."
 
-#: api/classes/CHttpTest.php:391
+#: api/classes/CHttpTest.php:392
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kann vorlagenbasiertes Web-Szenario \"%1$s\" nicht löschen."
@@ -2789,7 +2789,7 @@ msgstr "Uhr"
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:450
+#: include/views/configuration.template.edit.php:449
 #: include/views/configuration.triggers.edit.php:315
 msgid "Clone"
 msgstr "Klonen"
@@ -3790,7 +3790,7 @@ msgstr "Verspätung"
 msgid "Delete"
 msgstr "Löschen"
 
-#: include/views/configuration.template.edit.php:453
+#: include/views/configuration.template.edit.php:452
 msgid "Delete and clear"
 msgstr "Löschen und leeren"
 
@@ -3798,7 +3798,7 @@ msgstr "Löschen und leeren"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Ausgewählte Vorlagen löschen und leeren? (Warnung: leert Daten aller verbundenen Hosts!)"
 
-#: include/views/configuration.template.edit.php:453
+#: include/views/configuration.template.edit.php:452
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Vorlage löschen und leeren? (Achtung: Alle verbundenen Hosts werden geleert!)"
 
@@ -4069,7 +4069,7 @@ msgstr "Dienst löschen"
 msgid "Delete slide show?"
 msgstr "Vorführung löschen?"
 
-#: include/views/configuration.template.edit.php:452
+#: include/views/configuration.template.edit.php:451
 msgid "Delete template?"
 msgstr "Vorlage löschen?"
 
@@ -4144,7 +4144,7 @@ msgstr "Gelöscht: Auslöser \"%1$s\" auf \"%2$s\"."
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Auslöser-Prototyp \"%1$s\" auf \"%2$s\"."
 
-#: api/classes/CHttpTest.php:451
+#: api/classes/CHttpTest.php:452
 #, c-format
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Web-Szenario \"%1$s\" auf \"%2$s\"."
@@ -4519,7 +4519,7 @@ msgstr "Suchlauf geändert"
 #: include/html.inc.php:512 include/html.inc.php:516
 #: include/views/configuration.host.discovery.list.php:32
 #: include/views/configuration.host.edit.php:540
-#: include/views/configuration.template.edit.php:286
+#: include/views/configuration.template.edit.php:285
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:92
 msgid "Discovery rules"
@@ -5450,7 +5450,7 @@ msgstr "Benachrichtigung in Oberfläche"
 
 # Das heißt nicht überall gleich.
 #: include/views/configuration.host.edit.php:844
-#: include/views/configuration.template.edit.php:451
+#: include/views/configuration.template.edit.php:450
 msgid "Full clone"
 msgstr "Vollständig klonen"
 
@@ -5710,7 +5710,7 @@ msgstr ""
 #: include/html.inc.php:464 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:120
 #: include/views/configuration.host.edit.php:614
-#: include/views/configuration.template.edit.php:351
+#: include/views/configuration.template.edit.php:350
 msgid "Graph prototypes"
 msgstr "Diagramm-Prototypen"
 
@@ -5751,7 +5751,7 @@ msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:514
-#: include/views/configuration.template.edit.php:262
+#: include/views/configuration.template.edit.php:261
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:216
 #: include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:241 popup.php:76 search.php:137
@@ -5869,7 +5869,7 @@ msgstr "Gruppiert nach"
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.host.prototype.edit.php:177
 #: include/views/configuration.host.prototype.edit.php:205
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 #: include/views/conf.import.php:26
 msgid "Groups"
 msgstr "Gruppen"
@@ -6425,7 +6425,7 @@ msgstr "Hosts & Gruppen"
 msgid "Hosts (m/n/t)"
 msgstr "Hosts (ü/nü/v)"
 
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:171
 msgid "Hosts / templates"
 msgstr "Hosts / Vorlagen"
 
@@ -6829,7 +6829,7 @@ msgstr "Letzte Zeile und Spalte können nicht gelöscht werden."
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:171
 msgid "In"
 msgstr "In"
 
@@ -6838,7 +6838,7 @@ msgid "In group"
 msgstr "In Gruppe"
 
 #: include/views/configuration.host.edit.php:194
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 msgid "In groups"
 msgstr "In Gruppen"
 
@@ -7029,7 +7029,7 @@ msgid "Incorrect arguments passed to function"
 msgstr "Der Funktion wurden falsche/fehlerhafte Argumente übergeben"
 
 #: api/classes/CApplication.php:322 api/classes/CHostInterface.php:314
-#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:536
+#: api/classes/CHostInterface.php:513 api/classes/CHttpTest.php:534
 #: api/classes/CItemGeneral.php:197
 msgid "Incorrect arguments passed to function."
 msgstr "Falsche/fehlerhafte Argumente an Funktion übergeben."
@@ -7737,7 +7737,7 @@ msgstr "Ungültige Parameter."
 msgid "Invalid period for field \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:635 api/classes/CHttpTest.php:641
+#: api/classes/CHttpTest.php:668 api/classes/CHttpTest.php:674
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Ungültiger Antwort-Code \"%1$s\"."
@@ -7929,7 +7929,7 @@ msgstr ""
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:106
 #: include/views/configuration.host.edit.php:563
-#: include/views/configuration.template.edit.php:309
+#: include/views/configuration.template.edit.php:308
 msgid "Item prototypes"
 msgstr "Elementen-Prototypen"
 
@@ -8001,7 +8001,7 @@ msgstr "Datenpunkt mit Schlüssel \"%1$s\" existiert bereits."
 #: include/views/configuration.host.discovery.list.php:51
 #: include/views/configuration.host.edit.php:456
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:220
+#: include/views/configuration.template.edit.php:219
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:229
 #: include/views/inventory.host.view.php:239 latest.php:300 popup.php:56
 #: queue.php:101 report6.php:44 search.php:141 search.php:170 search.php:193
@@ -8358,7 +8358,7 @@ msgstr "Der Name der Verbindung sollte eindeutig sein für die Karte \"%s\"."
 
 #: include/views/configuration.host.edit.php:691
 #: include/views/configuration.host.prototype.edit.php:250
-#: include/views/configuration.template.edit.php:431
+#: include/views/configuration.template.edit.php:430
 msgid "Link new templates"
 msgstr ""
 
@@ -8396,8 +8396,8 @@ msgstr "Verbinden mit Vorlage"
 #: include/views/configuration.host.edit.php:676
 #: include/views/configuration.host.edit.php:700
 #: include/views/configuration.host.prototype.edit.php:229
-#: include/views/configuration.template.edit.php:412
-#: include/views/configuration.template.edit.php:433 templates.php:495
+#: include/views/configuration.template.edit.php:411
+#: include/views/configuration.template.edit.php:432 templates.php:495
 msgid "Linked templates"
 msgstr "Verbundene Vorlagen"
 
@@ -8641,7 +8641,7 @@ msgstr "Es existiert kein Makro mit hostmacroid \"%1$s\"."
 #: include/views/administration.general.macros.edit.php:31
 #: include/views/configuration.host.edit.php:750
 #: include/views/configuration.host.prototype.edit.php:275
-#: include/views/configuration.template.edit.php:443
+#: include/views/configuration.template.edit.php:442
 msgid "Macros"
 msgstr "Makros"
 
@@ -9351,7 +9351,7 @@ msgstr "NTLM-Authentifizierung"
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:44
-#: include/views/configuration.template.edit.php:388
+#: include/views/configuration.template.edit.php:387
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.list.php:110
@@ -9450,7 +9450,7 @@ msgid "New flexible interval"
 msgstr "Neues flexibles Intervall"
 
 #: include/views/configuration.host.edit.php:198
-#: include/views/configuration.template.edit.php:121
+#: include/views/configuration.template.edit.php:120
 msgid "New group"
 msgstr "Neue Gruppe"
 
@@ -9979,30 +9979,30 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
-#: api/classes/CHttpTest.php:394 api/classes/CIconMap.php:319
-#: api/classes/CImage.php:242 api/classes/CImage.php:356
-#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
-#: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
-#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
-#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
-#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:60
-#: api/classes/CMapElement.php:119 api/classes/CMapElement.php:190
-#: api/classes/CMap.php:389 api/classes/CProxy.php:172
-#: api/classes/CProxy.php:213 api/classes/CProxy.php:285
-#: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
-#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:445
-#: api/classes/CScreen.php:619 api/classes/CService.php:1255
-#: api/classes/CService.php:1270 api/classes/CTemplateScreen.php:573
-#: api/classes/CTemplateScreen.php:624 api/classes/CTemplateScreen.php:676
-#: api/classes/CTemplateScreen.php:682 api/classes/CTrigger.php:636
-#: api/classes/CTrigger.php:981 api/classes/CTrigger.php:1002
-#: api/classes/CTrigger.php:1878 api/classes/CTriggerPrototype.php:553
-#: api/classes/CTriggerPrototype.php:644 api/classes/CUserMacro.php:589
-#: api/classes/CUserMacro.php:698 api/classes/CUser.php:680
-#: api/classes/CUser.php:859 api/classes/CUser.php:879
-#: api/classes/CUser.php:938 api/classes/CUser.php:1363
-#: include/func.inc.php:2076
+#: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
+#: api/classes/CIconMap.php:319 api/classes/CImage.php:242
+#: api/classes/CImage.php:356 api/classes/CImage.php:473
+#: api/classes/CItemGeneral.php:181 api/classes/CItemGeneral.php:234
+#: api/classes/CItem.php:690 api/classes/CItemPrototype.php:509
+#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
+#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
+#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
+#: api/classes/CMapElement.php:60 api/classes/CMapElement.php:119
+#: api/classes/CMapElement.php:190 api/classes/CMap.php:389
+#: api/classes/CProxy.php:172 api/classes/CProxy.php:213
+#: api/classes/CProxy.php:285 api/classes/CProxy.php:551
+#: api/classes/CScreenItem.php:362 api/classes/CScreenItem.php:445
+#: api/classes/CScreen.php:445 api/classes/CScreen.php:619
+#: api/classes/CService.php:1255 api/classes/CService.php:1270
+#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
+#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTrigger.php:636 api/classes/CTrigger.php:981
+#: api/classes/CTrigger.php:1002 api/classes/CTrigger.php:1878
+#: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
+#: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
+#: api/classes/CUser.php:680 api/classes/CUser.php:859
+#: api/classes/CUser.php:879 api/classes/CUser.php:938
+#: api/classes/CUser.php:1363 include/func.inc.php:2076
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Keine Berechtigungen für dieses bestimmte Objekt oder es existiert nicht!"
 
@@ -10099,7 +10099,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:642
 #: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:233
-#: include/views/configuration.template.edit.php:385
+#: include/views/configuration.template.edit.php:384
 msgid "No templates linked."
 msgstr ""
 
@@ -10646,7 +10646,7 @@ msgstr "Nur Zabbix-Admins können Benutzermedien verändern."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Nur Zabbix-Admins können Benutzermedien löschen."
 
-#: api/classes/CHttpTest.php:662
+#: api/classes/CHttpTest.php:695
 msgid "Only characters are allowed."
 msgstr "Nur Buchstaben erlaubt."
 
@@ -10789,7 +10789,7 @@ msgstr "Andere Konfigurationsparameter"
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:116
+#: include/views/configuration.template.edit.php:115
 msgid "Other groups"
 msgstr "Andere Gruppen"
 
@@ -10808,7 +10808,7 @@ msgstr "Andere Hosts | Gruppe"
 msgid "Other parameters"
 msgstr "Weitere Einstellungen"
 
-#: include/views/configuration.template.edit.php:173
+#: include/views/configuration.template.edit.php:172
 msgid "Other | group"
 msgstr "Andere | Gruppe"
 
@@ -12201,7 +12201,7 @@ msgstr "Samstag"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:457
+#: include/views/configuration.template.edit.php:456
 #: include/views/configuration.triggers.edit.php:328
 #: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:107
@@ -12325,7 +12325,7 @@ msgstr "Tafel geändert"
 #: dashboard.php:326 include/blocks.inc.php:1460 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:372
+#: include/views/configuration.template.edit.php:371
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:217
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
@@ -13330,7 +13330,7 @@ msgstr "Telnet"
 #: include/actions.inc.php:62 include/audit.inc.php:51
 #: include/forms.inc.php:613 include/forms.inc.php:932
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
-#: include/views/configuration.template.edit.php:376
+#: include/views/configuration.template.edit.php:375
 #: include/views/configuration.triggers.list.php:126 report2.php:259
 msgid "Template"
 msgstr "Vorlage"
@@ -13374,7 +13374,7 @@ msgstr "Vorlagenverlinkung"
 msgid "Template list"
 msgstr "Vorlagen-Liste"
 
-#: include/views/configuration.template.edit.php:97 templates.php:55
+#: include/views/configuration.template.edit.php:96 templates.php:55
 msgid "Template name"
 msgstr "Vorlagenname"
 
@@ -13928,7 +13928,7 @@ msgstr ""
 #: include/html.inc.php:439 include/html.inc.php:443
 #: include/views/configuration.host.discovery.list.php:113
 #: include/views/configuration.host.edit.php:590
-#: include/views/configuration.template.edit.php:330
+#: include/views/configuration.template.edit.php:329
 msgid "Trigger prototypes"
 msgstr "Auslöser-Prototypen"
 
@@ -13972,7 +13972,7 @@ msgstr "Auslöserwert"
 #: include/views/configuration.host.edit.php:483
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.list.php:197
-#: include/views/configuration.template.edit.php:241
+#: include/views/configuration.template.edit.php:240
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:230
@@ -14303,12 +14303,12 @@ msgstr "Unbekannter Werttyp"
 
 #: include/views/configuration.host.edit.php:662
 #: include/views/configuration.host.prototype.edit.php:223
-#: include/views/configuration.template.edit.php:398
+#: include/views/configuration.template.edit.php:397
 msgid "Unlink"
 msgstr "Trennen"
 
 #: include/views/configuration.host.edit.php:666
-#: include/views/configuration.template.edit.php:402
+#: include/views/configuration.template.edit.php:401
 msgid "Unlink and clear"
 msgstr "Trennen und reinigen"
 
@@ -15068,7 +15068,7 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:180
 #: include/views/configuration.host.prototype.edit.php:70
-#: include/views/configuration.template.edit.php:101
+#: include/views/configuration.template.edit.php:100
 #: include/views/inventory.host.view.php:48
 msgid "Visible name"
 msgstr "Sichtbarer Name"
@@ -15118,7 +15118,7 @@ msgstr "Web-Überwachung"
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
 
-#: api/classes/CHttpTest.php:479 api/classes/CHttpTest.php:531
+#: api/classes/CHttpTest.php:480 api/classes/CHttpTest.php:529
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
@@ -15139,25 +15139,33 @@ msgid_plural "Web scenarios enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: api/classes/CHttpTest.php:472 api/classes/CHttpTest.php:512
+#: api/classes/CHttpTest.php:473 api/classes/CHttpTest.php:510
 #, c-format
 msgid "Web scenario missing parameters: %1$s"
 msgstr ""
 
-#: api/classes/CHttpTest.php:483
+#: api/classes/CHttpTest.php:595
 msgid "Web scenario must have at least one step."
 msgstr ""
 
-#: api/classes/CHttpTest.php:610
+#: api/classes/CHttpTest.php:643
 #, c-format
 msgid "Web scenario step \"%1$s\" already exists."
 msgstr ""
 
-#: api/classes/CHttpTest.php:590
+#: api/classes/CHttpTest.php:623
+msgid "Web scenario step URL cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:618
+msgid "Web scenario step name cannot be empty."
+msgstr ""
+
+#: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
 msgstr ""
 
-#: api/classes/CHttpTest.php:595
+#: api/classes/CHttpTest.php:627
 msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 
@@ -15482,7 +15490,7 @@ msgstr "Sie haben kein Ziel angegeben für das Operations-Kommando globales Skri
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
 #: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:504
+#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437
