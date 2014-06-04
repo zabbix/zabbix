@@ -606,22 +606,15 @@ else {
 		}
 
 		if ($pageFilter->hostsSelected) {
+			$knownTriggerIds = array();
+			$validTriggerIds = array();
+
 			$triggerOptions = array(
 				'output' => array('triggerid'),
 				'nodeids' => get_current_nodeid(),
 				'preservekeys' => true,
 				'monitored' => true
 			);
-
-			if (getRequest('triggerid')) {
-				$triggerOptions['triggerids'] = getRequest('triggerid');
-			}
-			elseif ($pageFilter->hostid > 0) {
-				$triggerOptions['hostids'] = $pageFilter->hostid;
-			}
-			elseif ($pageFilter->groupid > 0) {
-				$triggerOptions['groupids'] = $pageFilter->groupid;
-			}
 
 			$allEventsSliceLimit = $config['search_limit'];
 
@@ -634,41 +627,62 @@ else {
 				'output' => array('eventid', 'objectid'),
 				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $allEventsSliceLimit + 1
+				'limit' => $allEventsSliceLimit + 1,
 			);
 
-			// load all trigger events in slices and check if event triggers are valid
-			$knownTriggerIds = array();
-			$validTriggerIds = array();
-			$filterTriggerId = getRequest('triggerid');
+			if (getRequest('triggerid')) {
+				$filterTriggerIds = array(getRequest('triggerid'));
+				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
+				$validTriggerIds = $knownTriggerIds;
+
+				$eventOptions['objectids'] = $filterTriggerIds;
+			}
+			elseif ($pageFilter->hostid > 0) {
+				$hostTriggers = API::Trigger()->get(array(
+					'output' => array('triggerid'),
+					'nodeids' => get_current_nodeid(),
+					'hostids' => $pageFilter->hostid,
+					'monitored' => true,
+					'preservekeys' => true
+				));
+				$filterTriggerIds = array_map('strval', array_keys($hostTriggers));
+				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
+				$validTriggerIds = $knownTriggerIds;
+
+				$eventOptions['hostids'] = $pageFilter->hostid;
+				$eventOptions['objectids'] = $validTriggerIds;
+			}
+			elseif ($pageFilter->groupid > 0) {
+				$eventOptions['groupids'] = $pageFilter->groupid;
+
+				$triggerOptions['groupids'] = $pageFilter->groupid;
+			}
+
 			$events = array();
 
 			while (true) {
 				$allEventsSlice = API::Event()->get($eventOptions);
 
-				if ($filterTriggerId) {
-					$triggerIdsFromSlice = array($filterTriggerId);
-				}
-				else {
-					$triggerIdsFromSlice = array_unique(zbx_objectValues($allEventsSlice, 'objectid'));
-				}
+				$triggerIdsFromSlice = array_keys(array_flip(zbx_objectValues($allEventsSlice, 'objectid')));
 
 				$unknownTriggerIds = array_diff($triggerIdsFromSlice, $knownTriggerIds);
 
 				if ($unknownTriggerIds) {
 					$triggerOptions['triggerids'] = $unknownTriggerIds;
-					$validTriggerIdsFromSlice = API::Trigger()->get($triggerOptions);
-					$validTriggerIdsFromSlice = array_keys($validTriggerIdsFromSlice);
+					$validTriggersFromSlice = API::Trigger()->get($triggerOptions);
+					$validTriggerIdsFromSlice = array_keys($validTriggersFromSlice);
 
-					$validTriggerIds += $validTriggerIdsFromSlice;
-					$validTriggerIds = array_unique($validTriggerIds);
+					foreach ($validTriggersFromSlice as $trigger) {
+						$validTriggerIds[$trigger['triggerid']] = $trigger['triggerid'];
+					}
 
-					$knownTriggerIds += $unknownTriggerIds;
-					$knownTriggerIds = array_unique($knownTriggerIds);
+					foreach ($unknownTriggerIds as $id) {
+						$knownTriggerIds[strval($id)] = strval($id);
+					}
 				}
 
 				foreach ($allEventsSlice as $event) {
-					if (in_array($event['objectid'], $validTriggerIds)) {
+					if (isset($validTriggerIds[$event['objectid']])) {
 						$events[] = array('eventid' => $event['eventid']);
 					}
 				}
