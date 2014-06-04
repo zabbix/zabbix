@@ -57,6 +57,72 @@ jQuery(function($) {
 		});
 	};
 
+	/*
+	 * Multiselect methods
+	 */
+	var methods = {
+		/**
+		 * Get multi select selected data.
+		 *
+		 * @return array
+		 */
+		getData : function(msId) {
+			var ms = window.multiSelect[msId],
+				data = [];
+
+			for (var id in ms.values.selected) {
+				data[data.length] = {
+					id: id,
+					name: $('input[value="' + id + '"]', ms.obj).data('name'),
+					prefix: typeof $('input[value="' + id + '"]', ms.obj).data('prefix') === 'undefined'
+						? ''
+						: $('input[value="' + id + '"]', ms.obj).data('prefix')
+				};
+			}
+
+			return data;
+		},
+		/**
+		 * Rezise multiselect selected text
+		 */
+		resize : function() {
+			$.each(window.multiSelect, function(i) {
+				var ms = window.multiSelect[i];
+				if (!empty(ms.options.data)) {
+					resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
+				}
+			});
+		},
+		/**
+		 * Insert outside data
+		 */
+		addData : function(item, msId) {
+			var ms = window.multiSelect[msId];
+
+			// clean input if selectedLimit = 1
+			if (ms.options.selectedLimit == 1) {
+				for (var id in ms.values.selected) {
+					removeSelected(id, ms.obj, ms.values, ms.options);
+				}
+
+				cleanAvailable(ms.obj, ms.values);
+			}
+			addSelected(item, ms.obj, ms.values, ms.options);
+		},
+		/**
+		 * Clean multi select object values.
+		 */
+		clean : function(msId) {
+			var ms = window.multiSelect[msId];
+
+			for (var id in ms.values.selected) {
+				removeSelected(id, ms.obj, ms.values, ms.options);
+			}
+
+			cleanAvailable(ms.obj, ms.values);
+		}
+	};
+
 	/**
 	 * Create multi select input element.
 	 *
@@ -83,6 +149,10 @@ jQuery(function($) {
 	 * @return object
 	 */
 	$.fn.multiSelect = function(options) {
+		if (methods[options]) {
+			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
+
 		var defaults = {
 			id: '',
 			url: '',
@@ -118,70 +188,6 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
-			/**
-			 * Clean multi select object values.
-			 */
-			$.fn.multiSelect.clean = function(msId) {
-				var ms = window.multiSelect[msId];
-
-				for (var id in ms.values.selected) {
-					removeSelected(id, ms.obj, ms.values, ms.options);
-				}
-
-				cleanAvailable(ms.obj, ms.values);
-			};
-
-			/**
-			 * Get multi select selected data.
-			 *
-			 * @return array
-			 */
-			$.fn.multiSelect.getData = function(msId) {
-				var ms = window.multiSelect[msId],
-					data = [];
-
-				for (var id in ms.values.selected) {
-					data[data.length] = {
-						id: id,
-						name: $('input[value="' + id + '"]', ms.obj).data('name'),
-						prefix: typeof $('input[value="' + id + '"]', ms.obj).data('prefix') === 'undefined'
-							? ''
-							: $('input[value="' + id + '"]', ms.obj).data('prefix')
-					};
-				}
-
-				return data;
-			};
-
-			/**
-			 * Insert outside data
-			 */
-			$.fn.multiSelect.addData = function(item, msId) {
-				var ms = window.multiSelect[msId];
-
-				// clean input if selectedLimit = 1
-				if (ms.options.selectedLimit == 1) {
-					for (var id in ms.values.selected) {
-						removeSelected(id, ms.obj, ms.values, ms.options);
-					}
-
-					cleanAvailable(ms.obj, ms.values);
-				}
-				addSelected(item, ms.obj, ms.values, ms.options);
-			};
-
-			/**
-			 * Rezise multiselect selected text
-			 */
-			$.fn.multiSelect.resize = function() {
-				$.each(window.multiSelect, function(i) {
-					var ms = window.multiSelect[i];
-					if (!empty(ms.options.data)) {
-						resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
-					}
-				});
-			}
-
 			/**
 			 * MultiSelect object.
 			 */

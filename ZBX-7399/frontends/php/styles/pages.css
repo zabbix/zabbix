@@ -165,6 +165,7 @@
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
 #selementForm .multiselect .selected ul { margin: 0;}
+#map-window #application-select-row .link_menu { margin-left: 3px; }
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

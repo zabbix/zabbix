@@ -491,12 +491,12 @@ ZABBIX.apps.map = (function($) {
 					switch (obj.val()) {
 						// host
 						case '0':
-							jQuery('#elementNameHost').multiSelect.clean('elementNameHost');
+							jQuery('#elementNameHost').multiSelect('clean', 'elementNameHost');
 							break;
 
 						// host group
 						case '3':
-							jQuery('#elementNameHostGroup').multiSelect.clean('elementNameHostGroup');
+							jQuery('#elementNameHostGroup').multiSelect('clean', 'elementNameHostGroup');
 							break;
 
 						// others types
@@ -545,7 +545,7 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function() {
-					var data = $('elementNameHost').multiSelect.getData();
+					var data = $('#elementNameHost').multiSelect('getData', 'elementNameHost');
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
@@ -1382,12 +1382,12 @@ ZABBIX.apps.map = (function($) {
 					switch (selement.elementtype) {
 						// host
 						case '0':
-							$('#elementNameHost').multiSelect.addData(item, 'elementNameHost');
+							$('#elementNameHost').multiSelect('addData', item, 'elementNameHost');
 							break;
 
 						// host group
 						case '3':
-							$('#elementNameHostGroup').multiSelect.addData(item, 'elementNameHostGroup');
+							$('#elementNameHostGroup').multiSelect('addData', item, 'elementNameHostGroup');
 							break;
 					}
 				}
@@ -1428,7 +1428,7 @@ ZABBIX.apps.map = (function($) {
 				switch (data.elementtype) {
 					// host
 					case '0':
-						var elementData = $('#elementNameHost').multiSelect.getData('elementNameHost');
+						var elementData = $('#elementNameHost').multiSelect('getData', 'elementNameHost');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
@@ -1442,7 +1442,7 @@ ZABBIX.apps.map = (function($) {
 
 					// host group
 					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect.getData('elementNameHostGroup');
+						var elementData = $('#elementNameHostGroup').multiSelect('getData', 'elementNameHostGroup');
 
 						if (empty(elementData)) {
 							data.elementid = '0';
