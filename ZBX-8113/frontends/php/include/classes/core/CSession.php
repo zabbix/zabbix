@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
- * Session wrapper, currently uses native PHP session
+ * Session wrapper, currently uses native PHP session.
  */
 class CSession implements ArrayAccess {
 
@@ -42,7 +43,7 @@ class CSession implements ArrayAccess {
 	}
 
 	/**
-	 * Clears and implicitly flushes session
+	 * Clears and implicitly flushes session.
 	 */
 	public function clear() {
 		$_SESSION = array();
@@ -50,28 +51,39 @@ class CSession implements ArrayAccess {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Sets session value by key offset.
+	 *
+	 * @param mixed $offset
+	 * @param mixed $value
 	 */
 	public function offsetSet($offset, $value) {
 		$_SESSION[$offset] = $value;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Check if session values exists (isset() calls).
+	 *
+	 * @param mixed $offset
+	 * @return bool
 	 */
 	public function offsetExists($offset) {
 		return isset($_SESSION[$offset]);
 	}
 
 	/**
-	 * @inheritdoc
+	 * Unsets session value (unset() calls).
+	 *
+	 * @param mixed $offset
 	 */
 	public function offsetUnset($offset) {
 		unset($_SESSION[$offset]);
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns value stored in session.
+	 *
+	 * @param mixed $offset
+	 * @return mixed|null
 	 */
 	public function offsetGet($offset) {
 		return isset($_SESSION[$offset]) ? $_SESSION[$offset] : null;
