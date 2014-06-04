@@ -19,32 +19,33 @@
 **/
 
 
-$pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']');
+$pageHeader = new CPageHeader('Warning [refreshed every 30 sec]');
 $pageHeader->addCssInit();
 $pageHeader->display();
-
 ?>
 <body>
 <?php
-
 // check if a CWarning object is passed
-if (!$warning = $this->get('warning')) {
+if(!$warning = $this->get('warning')) {
 	$message = $this->get('message');
 
-	if (is_array($message) && isset($message['header'])) {
+	if (isset($message['header'])) {
 		$message = array(bold($message['header']), BR(), $message['text']);
+	}
+	else {
+		$message = $this->get('message');
 	}
 
 	// if not - render a standard warning with a message
 	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $message);
-	$warning->setButtons(array(new CButton('login', _('Retry'), 'document.location.reload();', 'formlist')));
+	$warning->setButtons(array(
+		new CButton('login', _('Retry'), 'document.location.reload();', 'formlist'),
+	));
 }
-
 $warning->show();
-
 ?>
-<script type="text/javascript">
-	setTimeout('document.location.reload();', 30000);
+<script>
+	setTimeout("document.location.reload();", 30000);
 </script>
 
 </body>

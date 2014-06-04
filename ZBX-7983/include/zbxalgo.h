@@ -105,10 +105,6 @@ ZBX_HASHSET_ENTRY_T
 {
 	ZBX_HASHSET_ENTRY_T	*next;
 	zbx_hash_t		hash;
-#if SIZEOF_VOID_P > 4
-	/* the data member must be properly aligned on 64-bit architectures that require aligned memory access */
-	char			padding[sizeof(void *) - sizeof(zbx_hash_t)];
-#endif
 	char			data[1];
 };
 

@@ -62,8 +62,7 @@ $triggersFormList = new CFormList('triggersFormList');
 $severityDiv = new CSeverity(array(
 	'id' => 'priority_div',
 	'name' => 'priority',
-	'value' => $this->data['priority'],
-	'config' => $this->data['config']
+	'value' => $this->data['priority']
 ));
 
 $triggersFormList->addRow(
@@ -119,6 +118,7 @@ if (empty($this->data['parent_discoveryid'])) {
 					'&objname=triggers'.
 					'&srcfld1=triggerid'.
 					'&multiselect=1'.
+					'&monitored_hosts=1'.
 					'&with_triggers=1", 1000, 700);',
 				'link_menu'
 			)

@@ -31,10 +31,9 @@ function getImageByIdent($ident) {
 		$images = array();
 
 		$dbImages = API::Image()->get(array(
-			'output' => array('imageid', 'name'),
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true)
 		));
-
 		foreach ($dbImages as $image) {
 			if (!isset($images[$image['name']])) {
 				$images[$image['name']] = array();

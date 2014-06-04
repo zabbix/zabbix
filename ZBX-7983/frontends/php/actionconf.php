@@ -367,8 +367,7 @@ if (hasRequest('form')) {
 		'form' => get_request('form'),
 		'actionid' => get_request('actionid'),
 		'new_condition' => get_request('new_condition', array()),
-		'new_operation' => get_request('new_operation', null),
-		'config' => $config
+		'new_operation' => get_request('new_operation', null)
 	);
 
 	$action = null;
@@ -492,8 +491,7 @@ if (hasRequest('form')) {
 else {
 	$data = array(
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
-		'displayNodes' => is_array(get_current_nodeid()),
-		'config' => $config
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 
 	$sortfield = getPageSortField('name');

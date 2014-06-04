@@ -105,18 +105,7 @@ function get_tr_event_by_eventid($eventid) {
 	return DBfetch(DBselect($sql));
 }
 
-/**
- * Get unacknowledged event count
- *
- * @param array $db_element		sysmap element
- * @param int	$value_trigger	trigger value
- * @param int	$value_event	event value
- * @param bool	$ack			is event acknowledged
- * @param array $config			system configuration
- *
- * @return int
- */
-function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false, $config) {
+function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false) {
 	$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 	get_map_elements($db_element, $elements);
 
@@ -124,6 +113,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 		return 0;
 	}
 
+	$config = select_config();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'output' => array('triggerid'),
@@ -185,7 +175,8 @@ function get_next_event($currentEvent, array $eventList = array()) {
 	return DBfetch(DBselect($sql, 1));
 }
 
-function make_event_details($event, $trigger, $config) {
+function make_event_details($event, $trigger) {
+	$config = select_config();
 	$table = new CTableInfo();
 
 	$table->addRow(array(_('Event'), CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))));
@@ -194,7 +185,7 @@ function make_event_details($event, $trigger, $config) {
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$ack = getEventAckState($event, true, true, array(), $config);
+		$ack = getEventAckState($event, true);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
 
@@ -251,9 +242,14 @@ function make_small_eventlist($startEvent) {
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
+		addTriggerValueStyle(
+			$eventStatusSpan,
+			$event['value'],
+			$event['clock'],
+			$event['acknowledged']
+		);
 
-		$ack = getEventAckState($event, true, true, array(), $config);
+		$ack = getEventAckState($event, true);
 
 		$table->addRow(array(
 			new CLink(
@@ -272,7 +268,9 @@ function make_small_eventlist($startEvent) {
 	return $table;
 }
 
-function make_popup_eventlist($triggerId, $eventId, $config) {
+function make_popup_eventlist($triggerId, $eventId) {
+	$config = select_config();
+
 	$table = new CTableInfo();
 	$table->setAttribute('style', 'width: 400px;');
 
@@ -305,14 +303,14 @@ function make_popup_eventlist($triggerId, $eventId, $config) {
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
+		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 		$table->addRow(array(
 			zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			getEventAckState($event, false, false, array(), $config)
+			getEventAckState($event, false, false)
 		));
 	}
 
@@ -334,7 +332,9 @@ function make_popup_eventlist($triggerId, $eventId, $config) {
  *
  * @return array|CLink|CSpan|null|string
  */
-function getEventAckState($event, $backUrl = false, $isLink = true, $params = array(), $config) {
+function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
+	$config = select_config();
+
 	if (!$config['event_ack_enable']) {
 		return null;
 	}

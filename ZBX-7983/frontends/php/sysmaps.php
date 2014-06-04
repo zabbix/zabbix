@@ -184,28 +184,23 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 		$sysmapIds[] = $_REQUEST['sysmapid'];
 	}
 
-	DBstart();
-
 	$maps = API::Map()->get(array(
 		'sysmapids' => $sysmapIds,
-		'output' => array('sysmapid', 'name'),
+		'output' => array('name'),
 		'editable' => true
 	));
+	$goResult = API::Map()->delete($sysmapIds);
 
-	$result = API::Map()->delete($sysmapIds);
+	show_messages($goResult, _('Network map deleted'), _('Cannot delete network map'));
+	clearCookies($goResult);
 
-	if ($result) {
+	if ($goResult) {
 		unset($_REQUEST['form']);
 
 		foreach ($maps as $map) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
 		}
 	}
-
-	$result = DBend($result);
-
-	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
-	clearCookies($result);
 }
 
 /*
@@ -248,7 +243,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// config
-	$data['config'] = $config;
+	$data['config'] = select_config();
 
 	// advanced labels
 	$data['labelTypes'] = sysmapElementLabel();
@@ -259,8 +254,8 @@ if (isset($_REQUEST['form'])) {
 
 	// images
 	$data['images'] = API::Image()->get(array(
-		'output' => array('imageid', 'name'),
-		'filter' => array('imagetype' => IMAGE_TYPE_BACKGROUND)
+		'filter' => array('imagetype' => 2),
+		'output' => API_OUTPUT_EXTEND
 	));
 	order_result($data['images'], 'name');
 

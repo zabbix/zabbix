@@ -40,7 +40,9 @@ function getSeverityStyle($severity, $type = true) {
 	}
 }
 
-function getSeverityCaption($severity = null, $config) {
+function getSeverityCaption($severity = null) {
+	$config = select_config();
+
 	$severities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => _($config['severity_name_0']),
 		TRIGGER_SEVERITY_INFORMATION => _($config['severity_name_1']),
@@ -50,7 +52,7 @@ function getSeverityCaption($severity = null, $config) {
 		TRIGGER_SEVERITY_DISASTER => _($config['severity_name_5'])
 	);
 
-	if ($severity === null) {
+	if (is_null($severity)) {
 		return $severities;
 	}
 	elseif (isset($severities[$severity])) {
@@ -61,10 +63,11 @@ function getSeverityCaption($severity = null, $config) {
 	}
 }
 
-function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE, $config) {
+function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 	if ($value == TRIGGER_VALUE_FALSE) {
 		return 'AAFFAA';
 	}
+	$config = select_config();
 
 	switch ($severity) {
 		case TRIGGER_SEVERITY_DISASTER:
@@ -92,9 +95,9 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE, $config) {
 	return $color;
 }
 
-function getSeverityCell($severity, $text = null, $force_normal = false, $config) {
+function getSeverityCell($severity, $text = null, $force_normal = false) {
 	if ($text === null) {
-		$text = CHtml::encode(getSeverityCaption($severity, $config));
+		$text = CHtml::encode(getSeverityCaption($severity));
 	}
 
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
@@ -116,15 +119,15 @@ function get_service_status_of_trigger($triggerid) {
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
  *
- * @param mixed $object					object like CSpan, CDiv, etc.
- * @param int   $triggerValue			TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
- * @param int   $triggerLastChange
- * @param bool  $isAcknowledged
- * @param array $config					system configuration
- *
+ * @param mixed $object             object like CSpan, CDiv, etc.
+ * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
+ * @param int $triggerLastChange
+ * @param bool $isAcknowledged
  * @return void
  */
-function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged, $config) {
+function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
+	$config = select_config();
+
 	// color of text and blinking depends on trigger value and whether event is acknowledged
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
 		$color = $config['problem_unack_color'];
@@ -1254,8 +1257,6 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 	order_result($hostNames);
 
-	$config = select_config();
-
 	if ($viewMode == STYLE_TOP) {
 		// header
 		$header = array(new CCol(_('Triggers'), 'center'));
@@ -1274,8 +1275,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
 					$pageFile,
-					$screenId,
-					$config
+					$screenId
 				);
 			}
 
@@ -1304,8 +1304,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
 					$pageFile,
-					$screenId,
-					$config
+					$screenId
 				);
 			}
 
@@ -1324,15 +1323,16 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
  * @param array  $trigger
  * @param string $pageFile		the page where the element is displayed
  * @param string $screenId
- * @paran array  config
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenId = null, $config) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = $css = $style = null;
 	$desc = $menuPopup = $triggerItems = $acknowledge = array();
 
 	// for how long triggers should blink on status change (set by user in administration->general)
+	$config = select_config();
+
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
 
@@ -1568,7 +1568,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	return $ret;
 }
 
-function get_triggers_unacknowledged($db_element, $count_problems = null, $ack = false, $config) {
+function get_triggers_unacknowledged($db_element, $count_problems = null, $ack = false) {
 	$elements = array(
 		'hosts' => array(),
 		'hosts_groups' => array(),
@@ -1579,6 +1579,8 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	if (empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])) {
 		return 0;
 	}
+
+	$config = select_config();
 
 	$options = array(
 		'nodeids' => get_current_nodeid(),
@@ -1611,7 +1613,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	return API::Trigger()->get($options);
 }
 
-function make_trigger_details($trigger, $config) {
+function make_trigger_details($trigger) {
 	$hosts = reset($trigger['hosts']);
 	$hostId = $hosts['hostid'];
 
@@ -1636,7 +1638,7 @@ function make_trigger_details($trigger, $config) {
 
 	$table->addRow(array(_('Host'), $hostName));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
-	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], null, false, $config)));
+	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));

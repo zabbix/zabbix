@@ -92,7 +92,8 @@ static zbx_history_table_t areg = {
  *             hostid        - [OUT] proxy host ID found in database          *
  *             host          - [IN] buffer with minimum size                  *
  *                                  'HOST_HOST_LEN_MAX'                       *
- *             error         - [OUT] error message                            *
+ *             error         - [IN] buffer for printing error messages        *
+ *             max_error_len - [IN] "error" buffer size                       *
  *                                                                            *
  * Return value:  SUCCEED - proxy ID was found in database                    *
  *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
@@ -101,7 +102,7 @@ static zbx_history_table_t areg = {
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -112,7 +113,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\"", host);
+			zbx_snprintf(error, max_error_len, "invalid proxy name \"%s\"", host);
 			return ret;
 		}
 
@@ -140,7 +141,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode",
+					zbx_snprintf(error, max_error_len, "proxy \"%s\" is configured in passive mode",
 							host);
 				}
 			}
@@ -148,12 +149,12 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		else
-			*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
+			zbx_snprintf(error, max_error_len, "proxy \"%s\" not found", host);
 
 		DBfree_result(result);
 	}
 	else
-		*error = zbx_strdup(*error, "missing name of proxy");
+		zbx_snprintf(error, max_error_len, "missing name of proxy");
 
 	return ret;
 }
@@ -179,13 +180,13 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
+static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
 		zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *httptests)
 {
 	const char	*__function_name = "get_proxyconfig_table";
 	char		*sql = NULL;
 	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		f, fld, ret = SUCCEED;
+	int		f, fld;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -290,11 +291,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by t.%s", table->recid);
 
-	if (NULL == (result = DBselect("%s", sql)))
-	{
-		ret = FAIL;
-		goto skip_data;
-	}
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -333,9 +330,7 @@ skip_data:
 	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint64_t *hosts)
@@ -430,7 +425,7 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
+void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 {
 	typedef struct
 	{
@@ -461,7 +456,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 
 	const char		*__function_name = "get_proxyconfig_data";
 
-	int			i, ret = FAIL;
+	int			i;
 	const ZBX_TABLE		*table;
 	zbx_vector_uint64_t	hosts, httptests;
 
@@ -480,21 +475,13 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		table = DBget_table(pt[i].table);
 		assert(NULL != table);
 
-		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
-		{
-			*error = zbx_dsprintf(*error, "failed to get data from table %s", table->table);
-			goto out;
-		}
+		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
 	}
 
-	ret = SUCCEED;
-out:
 	zbx_vector_uint64_destroy(&httptests);
 	zbx_vector_uint64_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -664,7 +651,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
  *                                                                            *
  * Purpose: update configuration table                                        *
  *                                                                            *
- * Return value: SUCCEED - processed successfully                             *
+ * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -1764,14 +1751,13 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
-						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__function_name, *lastid - id - 1,
-						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1873,14 +1859,13 @@ try_again:
 		if (1 < *lastid - id)
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
+			/* started but yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
 				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
-						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__function_name, *lastid - id - 1,
-						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. Waiting %f sec,"
+						" retrying.", __function_name, *lastid - id - 1,
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1.0e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -1931,7 +1916,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(int)) * data_num);
+	dc_items = zbx_malloc(NULL, (sizeof(DC_ITEM) + sizeof(errcodes)) * data_num);
 	errcodes = (int *)(dc_items + data_num);
 
 	DCconfig_get_items_by_itemids(dc_items, itemids, errcodes, data_num);
@@ -1939,12 +1924,6 @@ try_again:
 	for (i = 0; i < data_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != dc_items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
 		zbx_json_addobject(j, NULL);
@@ -2113,20 +2092,11 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		keys[i].key = values[i].key;
 	}
 
-	DCconfig_get_items_by_keys(items, keys, errcodes, values_num);
+	DCconfig_get_items_by_keys(items, proxy_hostid, keys, errcodes, values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
-
-		if (proxy_hostid != items[i].host.proxy_hostid)
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&

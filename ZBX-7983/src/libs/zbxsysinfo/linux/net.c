@@ -106,31 +106,22 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
  ******************************************************************************/
 static int	proc_read_file(const char *filename, char **buffer, int *buffer_alloc)
 {
-	int	n, fd, ret = -1;
-	size_t	offset = 0;
+	int	n, fd;
 
 	if (-1 == (fd = open(filename, O_RDONLY)))
 		return -1;
 
-	while (0 != (n = read(fd, *buffer + offset, *buffer_alloc - offset)))
+	while (*buffer_alloc == (n = read(fd, *buffer, *buffer_alloc)))
 	{
-		if (-1 == n)
-			goto out;
+		*buffer_alloc *= 2;
+		*buffer = zbx_realloc(*buffer, *buffer_alloc);
 
-		offset += n;
-
-		if (offset == *buffer_alloc)
-		{
-			*buffer_alloc *= 2;
-			*buffer = zbx_realloc(*buffer, *buffer_alloc);
-		}
+		lseek(fd, 0, SEEK_SET);
 	}
 
-	ret = offset;
-out:
 	close(fd);
 
-	return ret;
+	return n;
 }
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)

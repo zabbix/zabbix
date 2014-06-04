@@ -189,8 +189,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 		'editable' => true
 	));
 
-	DBstart();
-
 	if (!empty($screens)) {
 		$goResult = API::Screen()->delete($screenids);
 
@@ -215,8 +213,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 			}
 		}
 	}
-
-	$goResult = DBend($goResult);
 
 	if ($goResult) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);

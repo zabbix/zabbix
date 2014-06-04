@@ -250,7 +250,7 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'displayNodes' => is_array(get_current_nodeid()),
-		'config' => $config
+		'config' => select_config()
 	);
 
 	$sortfield = getPageSortField('host');
@@ -284,7 +284,6 @@ else {
 			' AND i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
-			' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
 			' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
 		' GROUP BY h.proxy_hostid'
 	);

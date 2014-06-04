@@ -156,8 +156,6 @@ elseif (isset($_REQUEST['delete'])) {
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
 
-	DBstart();
-
 	$goResult = API::Script()->delete($scriptIds);
 
 	if ($goResult) {
@@ -165,8 +163,6 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptId.']');
 		}
 	}
-
-	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Script deleted'), _('Cannot delete script'));
 	clearCookies($goResult);

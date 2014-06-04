@@ -54,6 +54,26 @@ if (!$data['is_profile']) {
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
+// append password to form list
+if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
+	if (empty($this->data['userid']) || isset($this->data['change_password'])) {
+		$userFormList->addRow(_('Password'), new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE));
+		$userFormList->addRow(_('Password (once again)'), new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE));
+
+		if (isset($this->data['change_password'])) {
+			$userForm->addVar('change_password', $this->data['change_password']);
+		}
+	}
+	else {
+		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
+		if ($this->data['alias'] == ZBX_GUEST_USER) {
+			$passwdButton->setAttribute('disabled', 'disabled');
+		}
+
+		$userFormList->addRow(_('Password'), $passwdButton);
+	}
+}
+
 // append user groups to form list
 if (!$this->data['is_profile']) {
 	$userForm->addVar('user_groups', $this->data['user_groups']);
@@ -75,37 +95,6 @@ if (!$this->data['is_profile']) {
 				: null
 		)
 	);
-}
-
-// append password to form list
-if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
-	if (!$this->data['userid'] || isset($this->data['change_password'])) {
-		$userFormList->addRow(
-			_('Password'),
-			new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE)
-		);
-		$userFormList->addRow(
-			_('Password (once again)'),
-			new CPassBox('password2', $this->data['password2'], ZBX_TEXTBOX_SMALL_SIZE)
-		);
-
-		if (isset($this->data['change_password'])) {
-			$userForm->addVar('change_password', $this->data['change_password']);
-		}
-	}
-	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
-		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled', 'disabled');
-		}
-
-		$userFormList->addRow(_('Password'), $passwdButton);
-	}
-}
-else {
-	$userFormList->addRow(_('Password'), new CSpan(
-		_s('Unavailable for users with %1$s.', authentication2str($data['auth_type']))
-	));
 }
 
 // append languages to form list
@@ -166,7 +155,7 @@ $userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['u
 /*
  * Media tab
  */
-if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
@@ -190,7 +179,7 @@ if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type']
 						'&severity='.$media['severity'].
 						'&active='.$media['active'];
 
-		foreach (getSeverityCaption(null, $this->data['config']) as $key => $caption) {
+		foreach (getSeverityCaption() as $key => $caption) {
 			$mediaActive = ($media['severity'] & (1 << $key));
 
 			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : null);
@@ -268,7 +257,6 @@ if ($this->data['is_profile']) {
 		TRIGGER_SEVERITY_HIGH,
 		TRIGGER_SEVERITY_DISASTER
 	);
-
 	foreach ($severities as $severity) {
 		$soundList = new CComboBox('messages[sounds.'.$severity.']', $this->data['messages']['sounds.'.$severity]);
 		foreach ($zbxSounds as $filename => $file) {
@@ -277,7 +265,7 @@ if ($this->data['is_profile']) {
 
 		$triggersTable->addRow(array(
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
-			getSeverityCaption($severity, $this->data['config']),
+			getSeverityCaption($severity),
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),

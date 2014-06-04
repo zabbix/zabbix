@@ -440,7 +440,7 @@ if (!$firstEvent) {
 	$paging = getPagingLine($events);
 }
 else {
-	$showAllNodes = is_show_all_nodes();
+	$config = select_config();
 	$starttime = $firstEvent['clock'];
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
@@ -581,7 +581,7 @@ else {
 	else {
 		$table->setHeader(array(
 			_('Time'),
-			$showAllNodes ? _('Node') : null,
+			is_show_all_nodes() ? _('Node') : null,
 			($_REQUEST['hostid'] == 0) ? _('Host') : null,
 			_('Description'),
 			_('Status'),
@@ -594,7 +594,7 @@ else {
 		if ($CSV_EXPORT) {
 			$csvRows[] = array(
 				_('Time'),
-				$showAllNodes ? _('Node') : null,
+				is_show_all_nodes() ? _('Node') : null,
 				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
@@ -714,7 +714,7 @@ else {
 				$triggerDescription->setMenuPopup(getMenuPopupTrigger($trigger, $triggerItems, null, $event['clock']));
 
 				// acknowledge
-				$ack = getEventAckState($event, true, true, array(), $config);
+				$ack = getEventAckState($event, true);
 
 				// duration
 				$event['duration'] = ($nextEvent = get_next_event($event, $events))
@@ -724,7 +724,12 @@ else {
 				$statusSpan = new CSpan(trigger_value2str($event['value']));
 
 				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
+				addTriggerValueStyle(
+					$statusSpan,
+					$event['value'],
+					$event['clock'],
+					$event['acknowledged']
+				);
 
 				// host JS menu link
 				$hostName = null;
@@ -742,11 +747,11 @@ else {
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
-					$showAllNodes ? get_node_name_by_elid($event['objectid']) : null,
+					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$hostName,
 					$triggerDescription,
 					$statusSpan,
-					getSeverityCell($trigger['priority'], null, !$event['value'], $config),
+					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					$config['event_ack_enable'] ? $ack : null,
 					$action
@@ -755,11 +760,11 @@ else {
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-						$showAllNodes ? get_node_name_by_elid($event['objectid']) : null,
+						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 						($_REQUEST['hostid'] == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
-						getSeverityCaption($trigger['priority'], $config),
+						getSeverityCaption($trigger['priority']),
 						$event['duration'],
 						$config['event_ack_enable'] ? ($event['acknowledges'] ? _('Yes') : _('No')) : null,
 						strip_tags((string) $action)

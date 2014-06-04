@@ -1486,8 +1486,6 @@ class CAction extends CZBXAPI {
 	public static function validateConditions($conditions, $update = false) {
 		$conditions = zbx_toArray($conditions);
 
-		$config = select_config();
-
 		$hostGroupIdsAll = array();
 		$templateIdsAll = array();
 		$triggerIdsAll = array();
@@ -1505,7 +1503,7 @@ class CAction extends CZBXAPI {
 			'values' => array_keys(discovery_object_status2str())
 		));
 		$triggerSeverityValidator = new CSetValidator(array(
-			'values' => array_keys(getSeverityCaption(null, $config))
+			'values' => array_keys(getSeverityCaption())
 		));
 		$discoveryObjectValidator = new CSetValidator(array(
 			'values' => array_keys(discovery_object2str())

@@ -76,7 +76,7 @@ function user_type2str($userType = null) {
  */
 function user_auth_type2str($authType) {
 	if ($authType === null) {
-		$authType = getUserGuiAccess(CWebUser::$data['userid']);
+		$authType = get_user_auth(CWebUser::$data['userid']);
 	}
 
 	$authUserType = array(

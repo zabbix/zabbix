@@ -99,7 +99,7 @@ elseif (isset($_REQUEST['cancel'])) {
 	redirect(CWebUser::$data['last_page']['url']);
 }
 elseif (isset($_REQUEST['save'])) {
-	$auth_type = getUserAuthenticationType(CWebUser::$data['userid'], null, $config);
+	$auth_type = get_user_system_auth(CWebUser::$data['userid']);
 
 	if ($auth_type != ZBX_AUTH_INTERNAL) {
 		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
@@ -183,7 +183,7 @@ ob_end_flush();
 /*
  * Display
  */
-$data = getUserFormData(CWebUser::$data['userid'], true, $config);
+$data = getUserFormData(CWebUser::$data['userid'], true);
 $data['userid'] = CWebUser::$data['userid'];
 $data['form'] = get_request('form');
 $data['form_refresh'] = get_request('form_refresh', 0);

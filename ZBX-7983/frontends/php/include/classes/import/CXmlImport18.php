@@ -596,10 +596,12 @@ class CXmlImport18 {
 					if ((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['updateExisting']))
 							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (!empty($rules['images']['updateExisting'])))
 					) {
-						$imgs = API::Image()->get(array(
-							'output' => array('imageid'),
-							'filter' => array('name' => $image['name'])
-						));
+
+						$options = array(
+							'filter' => array('name' => $image['name']),
+							'output' => array('imageid')
+						);
+						$imgs = API::Image()->get($options);
 						$img = reset($imgs);
 
 						$image['imageid'] = $img['imageid'];

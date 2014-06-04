@@ -123,7 +123,7 @@
 .item-list table.filter tr td.label.col4 { width: 8%; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
-.item-list .filter .multiselect .selected ul { margin: 0;}
+.item-list .filter .multiselect { height: 10px; top: -10px; }
 
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
@@ -154,7 +154,6 @@
 #map-window #mapLinksContainer { border: 1px solid rgb(170, 170, 170); max-height: 128px; overflow-y: scroll; overflow-x: hidden; }
 #map-window #linkForm { display: none; }
 #map-window #linkForm #linklabel { margin-top: 4px; }
-#selementForm .multiselect .selected ul { margin: 0;}
 
 /* maintenance icon */
 .icon-maintenance-inline, .icon-maintenance-abs {

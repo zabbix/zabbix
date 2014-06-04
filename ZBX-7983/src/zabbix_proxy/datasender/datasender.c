@@ -95,7 +95,6 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
-	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -117,7 +116,13 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-		if (SUCCEED != (ret = put_data_to_server(&sock, j, &error)))
+		if (SUCCEED == put_data_to_server(&sock, j, &error))
+		{
+			DBbegin();
+			f_set_lastid(lastid);
+			DBcommit();
+		}
+		else
 		{
 			*records = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "sending data to server failed: %s", error);
@@ -125,13 +130,6 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 		zbx_free(error);
 		disconnect_server(&sock);
-	}
-
-	if (SUCCEED == ret && 0 != lastid)
-	{
-		DBbegin();
-		f_set_lastid(lastid);
-		DBcommit();
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

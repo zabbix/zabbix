@@ -323,12 +323,12 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
  * Display
  */
 if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData($config));
+	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($config));
+	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
@@ -342,8 +342,7 @@ else {
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
 		'triggers' => array(),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid'])),
-		'config' => $config
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 

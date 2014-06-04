@@ -141,41 +141,19 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (isset($_REQUEST['save'])) {
-	$isValid = true;
+	$config = select_config();
 
-	$usrgrps = getRequest('user_groups', array());
+	$authType = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
 
-	// authentication type
-	if ($usrgrps) {
-		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL, $config);
+	if (isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
+		$_REQUEST['password1'] = $_REQUEST['password2'] = null;
+	}
+	elseif (!isset($_REQUEST['userid']) && ZBX_AUTH_INTERNAL != $authType) {
+		$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
 	}
 	else {
-		$authType = hasRequest('userid')
-			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL, $config)
-			: $config['authentication_type'];
-	}
-
-	// password validation
-	if ($authType != ZBX_AUTH_INTERNAL) {
-		if (hasRequest('password1')) {
-			show_error_message(_s('Password is unavailable for users with %1$s.', authentication2str($authType)));
-
-			$isValid = false;
-		}
-		else {
-			if (hasRequest('userid')) {
-				$_REQUEST['password1'] = null;
-				$_REQUEST['password2'] = null;
-			}
-			else {
-				$_REQUEST['password1'] = 'zabbix';
-				$_REQUEST['password2'] = 'zabbix';
-			}
-		}
-	}
-	else {
-		$_REQUEST['password1'] = getRequest('password1', null);
-		$_REQUEST['password2'] = getRequest('password2', null);
+		$_REQUEST['password1'] = get_request('password1', null);
+		$_REQUEST['password2'] = get_request('password2', null);
 	}
 
 	if ($_REQUEST['password1'] != $_REQUEST['password2']) {
@@ -185,21 +163,14 @@ elseif (isset($_REQUEST['save'])) {
 		else {
 			show_error_message(_('Cannot add user. Both passwords must be equal.'));
 		}
-
-		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] == ZBX_GUEST_USER && !zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('For guest, password must be empty'));
-
-		$isValid = false;
 	}
 	elseif (isset($_REQUEST['password1']) && $_REQUEST['alias'] != ZBX_GUEST_USER && zbx_empty($_REQUEST['password1'])) {
 		show_error_message(_('Password should not be empty'));
-
-		$isValid = false;
 	}
-
-	if ($isValid) {
+	else {
 		$user = array();
 		$user['alias'] = get_request('alias');
 		$user['name'] = get_request('name');
@@ -218,6 +189,7 @@ elseif (isset($_REQUEST['save'])) {
 			$user['lang'] = getRequest('lang');
 		}
 
+		$usrgrps = get_request('user_groups', array());
 		$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
 		$user['usrgrps'] = $usrgrps;
 
@@ -334,6 +306,7 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	DBstart();
 
 	$goResult = unblock_user_login($groupUserId);
+	$goResult = DBend($goResult);
 
 	if ($goResult) {
 		$users = API::User()->get(array(
@@ -346,8 +319,6 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 		}
 	}
-
-	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Users unblocked'), _('Cannot unblock users'));
 	clearCookies($goResult);
@@ -394,7 +365,7 @@ CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROF
 if (!empty($_REQUEST['form'])) {
 	$userId = get_request('userid');
 
-	$data = getUserFormData($userId, false, $config);
+	$data = getUserFormData($userId);
 
 	$data['userid'] = $userId;
 	$data['form'] = get_request('form');
@@ -407,8 +378,7 @@ if (!empty($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'displayNodes' => is_array(get_current_nodeid()),
-		'config' => $config
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 
 	// get user groups

@@ -77,7 +77,7 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 		}
 	}
 
-	zbx_free(stats);
+	free(stats);
 
 	return ret;
 }

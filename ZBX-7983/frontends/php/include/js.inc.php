@@ -409,7 +409,7 @@ function insert_js_function($fnct_name) {
 			break;
 		case 'addSelectedValues':
 			insert_js('
-				function addSelectedValues(form, object, parentId) {
+				function addSelectedValues(form, object) {
 					form = $(form);
 					if (is_null(form)) {
 						return close_window()
@@ -418,12 +418,7 @@ function insert_js_function($fnct_name) {
 					if (!parent) {
 						return close_window();
 					}
-
-					if (typeof parentId === "undefined") {
-						var parentId = null;
-					}
-
-					var data = { object: object, values: [], parentId: parentId };
+					var items = { object: object, values: [] };
 					var chkBoxes = form.getInputs("checkbox");
 					for (var i = 0; i < chkBoxes.length; i++) {
 						if (chkBoxes[i].checked && (chkBoxes[i].name.indexOf("all_") < 0)) {
@@ -434,17 +429,16 @@ function insert_js_function($fnct_name) {
 							else {
 								value[object] = chkBoxes[i].value;
 							}
-							data["values"].push(value);
+							items["values"].push(value);
 						}
 					}
+					parent.addPopupValues(items);
 					close_window();
-
-					parent.jQuery(parent.document).trigger("add.popup", data);
 				}');
 			break;
 		case 'addValue':
 			insert_js('
-				function addValue(object, singleValue, parentId) {
+				function addValue(object, singleValue) {
 					var parent = window.opener;
 					if (!parent) {
 						return close_window();
@@ -456,15 +450,9 @@ function insert_js_function($fnct_name) {
 					else {
 						value[object] = singleValue;
 					}
-
-					if (typeof parentId === "undefined") {
-						var parentId = null;
-					}
-					var data = { object: object, values: [value], parentId: parentId };
-
+					var items = { object: object, values: [value] };
+					parent.addPopupValues(items);
 					close_window();
-
-					parent.jQuery(parent.document).trigger("add.popup", data);
 				}');
 			break;
 		case 'addValues':
@@ -486,7 +474,7 @@ function insert_js_function($fnct_name) {
 						if (parentDocumentForms.length > 0) {
 							frmStorage = jQuery(parentDocumentForms[0]).find("#" + key).get(0);
 						}
-						if (typeof frmStorage === "undefined" || is_null(frmStorage)) {
+						if (typeof(frmStorage) == "undefined" || is_null(frmStorage)) {
 							frmStorage = parentDocument.getElementById(key);
 						}
 

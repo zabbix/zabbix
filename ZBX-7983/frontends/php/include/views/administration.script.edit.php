@@ -75,23 +75,18 @@ $userGroups->addItem(0, _('All'));
 foreach ($this->getArray('usergroups') as $userGroup){
 	$userGroups->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$scriptFormList->addRow(_('User group'), $userGroups);
+$scriptFormList->addRow(_('User groups'), $userGroups);
 
 // host groups
 $hostGroups = new CCombobox('hgstype', $this->get('hgstype'));
 $hostGroups->addItem(0, _('All'));
 $hostGroups->addItem(1, _('Selected'));
-$scriptFormList->addRow(_('Host group'), $hostGroups);
+$scriptFormList->addRow(_('Host groups'), $hostGroups);
 $scriptFormList->addRow(null, new CMultiSelect(array(
 	'name' => 'groupid',
 	'selectedLimit' => 1,
 	'objectName' => 'hostGroup',
-	'data' => $this->get('hostGroup'),
-	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid',
-		'width' => 450,
-		'height' => 450
-	)
+	'data' => $this->get('hostGroup')
 )), null, 'hostGroupSelection');
 
 // access

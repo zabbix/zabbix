@@ -48,8 +48,7 @@ jQuery(function($) {
 			'No matches found': t('No matches found'),
 			'More matches found...': t('More matches found...'),
 			'type here to search': t('type here to search'),
-			'new': t('new'),
-			'Select': t('Select')
+			'new': t('new')
 		};
 
 		return this.each(function() {
@@ -60,25 +59,20 @@ jQuery(function($) {
 	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['id']					multi select id in dom
-	 * @param string options['url']					backend url
-	 * @param string options['name']				input element name
-	 * @param object options['labels']				translated labels
-	 * @param object options['data']				preload data {id, name, prefix}
+	 * @param string options['id']				multi select id in dom
+	 * @param string options['url']				backend url
+	 * @param string options['name']			input element name
+	 * @param object options['labels']			translated labels
+	 * @param object options['data']			preload data {id, name, prefix}
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
-	 * @param array  options['ignored']				preload ignored {id: name}
-	 * @param string options['defaultValue']		default value for input element
-	 * @param bool   options['disabled']			turn on/off readonly state
-	 * @param bool   options['addNew']				allow user to create new names
-	 * @param int    options['selectedLimit']		how many items can be selected
-	 * @param int    options['limit']				how many available items can be received from backend
-	 * @param object options['popup']				popup data {parameters, width, height, buttonClass}
-	 * @param string options['popup']['parameters']
-	 * @param int    options['popup']['width']
-	 * @param int    options['popup']['height']
-	 * @param string options['popup']['buttonClass']
+	 * @param array  options['ignored']			preload ignored {id: name}
+	 * @param string options['defaultValue']	default value for input element
+	 * @param bool   options['disabled']		turn on/off readonly state
+	 * @param bool   options['addNew']			allow user to create new names
+	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
 	 */
@@ -91,17 +85,15 @@ jQuery(function($) {
 				'No matches found': 'No matches found',
 				'More matches found...': 'More matches found...',
 				'type here to search': 'type here to search',
-				'new': 'new',
-				'Select': 'Select'
+				'new': 'new'
 			},
 			data: [],
-			ignored: {},
+			ignored: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
-			limit: 20,
-			popup: []
+			limit: 20
 		};
 		options = $.extend({}, defaults, options);
 
@@ -136,38 +128,18 @@ jQuery(function($) {
 			 *
 			 * @return array
 			 */
-			$.fn.multiSelect.getData = function(msId) {
-				var ms = window.multiSelect[msId],
-					data = [];
+			$.fn.multiSelect.getData = function() {
+				var data = [];
 
-				for (var id in ms.values.selected) {
+				for (var id in values.selected) {
 					data[data.length] = {
 						id: id,
-						name: $('input[value="' + id + '"]', ms.obj).data('name'),
-						prefix: typeof $('input[value="' + id + '"]', ms.obj).data('prefix') === 'undefined'
-							? ''
-							: $('input[value="' + id + '"]', ms.obj).data('prefix')
+						name: $('input[value="' + id + '"]', obj).data('name'),
+						prefix: $('input[value="' + id + '"]', obj).data('prefix')
 					};
 				}
 
 				return data;
-			};
-
-			/**
-			 * Insert outside data
-			 */
-			$.fn.multiSelect.addData = function(item, msId) {
-				var ms = window.multiSelect[msId];
-
-				// clean input if selectedLimit = 1
-				if (ms.options.selectedLimit == 1) {
-					for (var id in ms.values.selected) {
-						removeSelected(id, ms.obj, ms.values, ms.options);
-					}
-
-					cleanAvailable(ms.obj, ms.values);
-				}
-				addSelected(item, ms.obj, ms.values, ms.options);
 			};
 
 			/**
@@ -202,7 +174,7 @@ jQuery(function($) {
 					isAvailableOpenned: false,
 					selected: {},
 					available: {},
-					ignored: empty(options.ignored) ? {} : options.ignored
+					ignored: empty(options.ignored) ? [] : options.ignored
 				}
 			};
 
@@ -212,13 +184,6 @@ jQuery(function($) {
 				values = ms.values;
 
 			ms.values.width = parseInt(obj.css('width'));
-
-			// add wrap
-			var multiselectWrapper = jQuery('<div>', {
-				'class': 'multiselect-wrapper'
-			});
-
-			$('#' + options.id).wrap(multiselectWrapper);
 
 			// search input
 			if (!options.disabled) {
@@ -461,38 +426,6 @@ jQuery(function($) {
 
 			// resize
 			resize(obj, values, options);
-
-			// draw popup link
-			if (options.popup.parameters != null) {
-				var popupBlock = $('<div>', {
-					'class': 'select-popup'
-				});
-
-				var urlParameters = options.popup.parameters;
-
-				if (options.ignored) {
-					$.each(options.ignored, function(i, value) {
-						urlParameters = urlParameters + '&excludeids[]=' + i;
-					});
-				}
-
-				var popupButton = $('<input>', {
-					type: 'button',
-					'class': options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
-					value: options.labels['Select']
-				});
-
-				if (options.disabled) {
-					popupButton.attr('disabled', true);
-				}
-				else {
-					popupButton.click(function() {
-						return PopUp('popup.php?' + urlParameters, options.popup.width, options.popup.height);
-					});
-				}
-
-				obj.parent().append(popupButton);
-			}
 		});
 	};
 
@@ -876,11 +809,6 @@ jQuery(function($) {
 				'padding-top': top,
 				'padding-left': left
 			});
-
-			// IE8 hack to fix inline-block container resizing
-			if (IE8) {
-				$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
 		}
 		else {
 			$('input[type="text"]', obj).css({

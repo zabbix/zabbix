@@ -102,7 +102,6 @@ typedef struct
 	unsigned char	jmx_available;
 	int		jmx_disable_until;
 	char		inventory_mode;
-	unsigned char	status;
 }
 DC_HOST;
 
@@ -126,7 +125,6 @@ typedef struct
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
-	unsigned char	status;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
@@ -165,7 +163,7 @@ typedef struct
 }
 DC_FUNCTION;
 
-typedef struct _DC_TRIGGER
+typedef struct
 {
 	zbx_uint64_t	triggerid;
 	char		*description;
@@ -198,8 +196,8 @@ DC_PROXY;
 
 typedef struct
 {
-	const char	*host;
-	const char	*key;
+	char	*host;
+	char	*key;
 }
 zbx_host_key_t;
 
@@ -295,7 +293,8 @@ void	DCload_config();
 
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
-void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
+void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_uint64_t proxy_hostid,
+		zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const char *error);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
@@ -370,7 +369,7 @@ int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();
 
-void	DCget_functions_hostids(zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *functionids);
+void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);

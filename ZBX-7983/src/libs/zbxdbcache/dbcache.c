@@ -1065,7 +1065,6 @@ notsupported:
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
 			sql_start = sql_continue;
-			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: \"%s\"", item->host.host, item->key_orig, h->value_orig.err);
 			zbx_free(value_esc);
 
 			update_cache = 1;
@@ -1080,8 +1079,7 @@ notsupported:
 	{
 		if (ITEM_STATE_NOTSUPPORTED == item->db_state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became supported",
-					item->host.host, item->key_orig);
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\" became supported", item->host.host, item->key_orig);
 
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
@@ -1218,12 +1216,6 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != items[i].status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != items[i].host.status)
 			continue;
 
 		for (j = 0; j < history_num; j++)
@@ -1936,38 +1928,43 @@ int	DCsync_history(int sync_type)
 			if (ZBX_HISTORY_SIZE <= f)
 				f -= ZBX_HISTORY_SIZE;
 
-			num = DCskip_items(f, n);
-
-			if (0 == cache->history[f].itemid)
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 			{
-				if (f == cache->history_first)
+				num = DCskip_items(f, n);
+
+				if (0 == cache->history[f].itemid)
 				{
-					cache->history_num -= num;
-					cache->history_gap_num -= num;
-					if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
-						cache->history_first -= ZBX_HISTORY_SIZE;
+					if (f == cache->history_first)
+					{
+						cache->history_num -= num;
+						cache->history_gap_num -= num;
+						if (ZBX_HISTORY_SIZE <= (cache->history_first += num))
+							cache->history_first -= ZBX_HISTORY_SIZE;
+					}
+					n -= num;
+					f += num;
+					continue;
 				}
-				n -= num;
-				f += num;
-				continue;
-			}
 
-			if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
-					cache->history[f].itemid))
-			{
-				if (0 == skipped_clock)
-					skipped_clock = cache->history[f].ts.sec;
-				n -= num;
-				f += num;
-				continue;
-			}
-			else if (1 < num && 0 == skipped_clock)
-			{
-				skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
-			}
+				if (SUCCEED == uint64_array_exists(cache->itemids, cache->itemids_num,
+						cache->history[f].itemid))
+				{
+					if (0 == skipped_clock)
+						skipped_clock = cache->history[f].ts.sec;
+					n -= num;
+					f += num;
+					continue;
+				}
+				else if (1 < num && 0 == skipped_clock)
+				{
+					skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].ts.sec;
+				}
 
-			uint64_array_add(&cache->itemids, &cache->itemids_alloc,
-					&cache->itemids_num, cache->history[f].itemid, 0);
+				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
+						&cache->itemids_num, cache->history[f].itemid, 0);
+			}
+			else
+				num = 1;
 
 			indices[candidate_num] = f;
 			itemids[candidate_num] = cache->history[f].itemid;
@@ -2088,14 +2085,16 @@ int	DCsync_history(int sync_type)
 		DBcommit();
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		{
 			DCconfig_unlock_triggers(&triggerids);
 
-		LOCK_CACHE;
+			LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
-			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
+			for (i = 0; i < history_num; i ++)
+				uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
-		UNLOCK_CACHE;
+			UNLOCK_CACHE;
+		}
 
 		for (i = 0; i < history_num; i++)
 		{

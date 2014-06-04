@@ -3729,82 +3729,87 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DC_ITEM		*items = NULL;
-	char		value[MAX_BUFFER_LEN];
-	int		i, k;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+	char		*sql = NULL, value[MAX_BUFFER_LEN];
+	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
-	int		*errcodes = NULL;
+	unsigned char	host_status, item_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
+	sql = zbx_malloc(sql, sql_alloc);
 	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < ifuncs->values_num; i++)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
-	items = zbx_malloc(items, sizeof(DC_ITEM) * ifuncs->values_num);
-	errcodes = zbx_malloc(errcodes, sizeof(int) * ifuncs->values_num);
-
-	DCconfig_get_items_by_itemids(items, itemids, errcodes, ifuncs->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select %s,h.status,i.status"
+			" from %s"
+			" where i.hostid=h.hostid"
+				" and",
+			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
 
 	zbx_free(itemids);
 
-	for (i = 0; i < ifuncs->values_num; i++)
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
+		DBget_item_from_db(&item, row);
+
+		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
+		item_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 1]);
+
+		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (k = 0; k < ifunc->functions.values_num; k++)
+		for (i = 0; i < ifunc->functions.values_num; i++)
 		{
-			func = (zbx_func_t *)ifunc->functions.values[k];
+			func = (zbx_func_t *)ifunc->functions.values[i];
 
-			if (SUCCEED != errcodes[i])
+			if (ITEM_STATUS_DISABLED == item_status)
 			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
-						" item does not exist.",
-						func->function, func->parameter);
-				continue;
+				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+			else if (ITEM_STATE_NOTSUPPORTED == item.state)
+			{
+				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+			else if (HOST_STATUS_NOT_MONITORED == host_status)
+			{
+				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
 			}
 
-			if (ITEM_STATUS_ACTIVE != items[i].status)
-			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-						" item is disabled.",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+			if (NULL != func->error)
 				continue;
-			}
 
-			if (HOST_STATUS_MONITORED != items[i].host.status)
+			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->timespec.sec))
 			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-						" item belongs to a disabled host.",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter);
-				continue;
-			}
-
-			if (ITEM_STATE_NOTSUPPORTED == items[i].state)
-			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-						" item is not supported.",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter);
-				continue;
-			}
-
-			if (SUCCEED != evaluate_function(value, &items[i], func->function, func->parameter, func->timespec.sec))
-			{
-				func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\".",
-						items[i].host.host, items[i].key_orig, func->function, func->parameter);
+				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
 			}
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
 	}
-
-	DCconfig_clean_items(items, errcodes, ifuncs->values_num);
-
-	zbx_free(errcodes);
-	zbx_free(items);
+	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

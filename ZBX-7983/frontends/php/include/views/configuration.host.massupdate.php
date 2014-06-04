@@ -48,24 +48,18 @@ if (isset($_REQUEST['groups'])) {
 	}
 }
 
-$replaceGroups = new CDiv(new CMultiSelect(array(
+$replaceGroups = new CMultiSelect(array(
 	'name' => 'groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array('editable' => true),
-	'data' => $hostGroupsToReplace,
-	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
-	)
-)), null, 'replaceGroups');
+	'data' => $hostGroupsToReplace
+));
 
 $hostFormList->addRow(
 	array(
 		_('Replace host groups'),
 		SPACE,
-		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), 'replaceGroups', _('Original'))
+		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), 'groups_', _('Original'))
 	),
 	$replaceGroups
 );
@@ -77,7 +71,7 @@ if (isset($_REQUEST['new_groups'])) {
 		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
+				'name' => $newHostGroup['new'] . ' (new)',
 				'isNew' => true
 			);
 		}
@@ -100,25 +94,19 @@ if (isset($_REQUEST['new_groups'])) {
 	}
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$newGroups = new CDiv(new CMultiSelect(array(
+	$newGroups = new CMultiSelect(array(
 		'name' => 'new_groups[]',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
 		'data' => $hostGroupsToAdd,
-		'addNew' => true,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
-	)), null, 'newGroups');
+		'addNew' => true
+	));
 
 	$hostFormList->addRow(
 		array(
 			_('Add new or existing host groups'),
 			SPACE,
-			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'newGroups', _('Original'))
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
 		),
 		$newGroups
 	);
@@ -128,13 +116,7 @@ else {
 		'name' => 'new_groups[]',
 		'objectName' => 'hostGroup',
 		'objectOptions' => array('editable' => true),
-		'data' => $hostGroupsToAdd,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostForm->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'data' => $hostGroupsToAdd
 	));
 
 	$hostFormList->addRow(
@@ -176,39 +158,36 @@ $hostFormList->addRow(
 );
 
 $templatesFormList = new CFormList('templatesFormList');
+// append templates table to from list
+$templatesTable = new CTable(null, 'formElementTable');
+$templatesTable->setAttribute('style', 'min-width: 500px;');
+$templatesTable->setAttribute('id', 'template_table');
 
 $templatesDiv = new CDiv(
 	array(
+		$templatesTable,
 		new CMultiSelect(array(
 			'name' => 'templates[]',
 			'objectName' => 'templates',
-			'data' => $this->data['linkedTemplates'],
-			'popup' => array(
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostForm->getName().
-					'&dstfld1=templates_&templated_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'data' => $this->data['linkedTemplates']
 		)),
-		new CDiv(array(
-			new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
-			SPACE,
-			_('Replace'),
-			BR(),
-			new CCheckBox('mass_clear_tpls', $this->data['mass_clear_tpls']),
-			SPACE,
-			_('Clear when unlinking')
-		), 'floatleft')
+		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
+		SPACE,
+		_('Replace'),
+		BR(),
+		new CCheckBox('mass_clear_tpls', $this->data['mass_clear_tpls']),
+		SPACE,
+		_('Clear when unlinking')
 	),
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
-$templatesDiv->setAttribute('id', 'templateDiv');
+$templatesDiv->setAttribute('id', 'templates_div');
 
 $templatesFormList->addRow(
 	array(
 		_('Link templates'),
 		SPACE,
-		new CVisibilityBox('visible[templates]', isset($this->data['visible']['templates']), 'templateDiv', _('Original'))
+		new CVisibilityBox('visible[template_table]', !empty($this->data['visible']['template_table']) ? 'yes' : 'no', 'templates_div', _('Original'))
 	),
 	$templatesDiv
 );

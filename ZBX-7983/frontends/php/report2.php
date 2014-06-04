@@ -105,6 +105,8 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_timetill'] = 0;
 }
 
+$config = select_config();
+
 if ($config['dropdown_first_remember']) {
 	if (!isset($_REQUEST['filter_rst'])) {
 		$_REQUEST['filter_groupid'] = get_request('filter_groupid', CProfile::get('web.avail_report.'.$availabilityReportMode.'.groupid', 0));

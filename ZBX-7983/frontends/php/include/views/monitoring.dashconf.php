@@ -57,25 +57,13 @@ if ($this->data['grpswitch']) {
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
-		'disabled' => !$this->data['isFilterEnable'],
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'disabled' => !$this->data['isFilterEnable']
 	)));
 	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect(array(
 		'name' => 'hidegroupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],
-		'disabled' => !$this->data['isFilterEnable'],
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=hidegroupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
+		'disabled' => !$this->data['isFilterEnable']
 	)));
 }
 
@@ -88,12 +76,10 @@ $dashconfFormList->addRow(_('Hosts'), array($maintenanceCheckBox, _('Show hosts 
 
 // append trigger severities to form list
 $severities = array();
-$config = select_config();
-
 foreach ($this->data['severities'] as $severity) {
 	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']', isset($this->data['severity'][$severity]), '', 1);
 	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
-	$severities[] = array($serverityCheckBox, getSeverityCaption($severity, $config));
+	$severities[] = array($serverityCheckBox, getSeverityCaption($severity));
 	$severities[] = BR();
 }
 array_pop($severities);

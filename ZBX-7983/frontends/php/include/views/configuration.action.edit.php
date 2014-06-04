@@ -94,12 +94,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc(
-				$condition['conditiontype'],
-				$condition['operator'],
-				$condition['value'],
-				$this->data['config']
-			),
+			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
@@ -144,13 +139,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0,
-			'popup' => array(
-				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'defaultValue' => 0
 		));
 		break;
 
@@ -161,13 +150,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0,
-			'popup' => array(
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'defaultValue' => 0
 		));
 		break;
 
@@ -178,13 +161,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0,
-			'popup' => array(
-				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=hostid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
-			)
+			'defaultValue' => 0
 		));
 		break;
 
@@ -195,13 +172,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectOptions' => array(
 				'editable' => true
 			),
-			'defaultValue' => 0,
-			'popup' => array(
-				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1',
-				'width' => 600,
-				'height' => 450
-			)
+			'defaultValue' => 0
 		));
 		break;
 
@@ -222,7 +193,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
 		$condition = new CComboBox('new_condition[value]');
-		$condition->addItems(getSeverityCaption(null, $this->data['config']));
+		$condition->addItems(getSeverityCaption());
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
@@ -828,25 +799,16 @@ if (!empty($this->data['new_operation'])) {
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
 			$groupList->addRow(new CRow(
-				new CCol(
+				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryHostGroup',
 						'objectName' => 'hostGroup',
-						'objectOptions' => array('editable' => true),
-						'popup' => array(
-							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1',
-							'width' => 450,
-							'height' => 450
-						)
+						'objectOptions' => array('editable' => true)
 					)),
-					null, 2
-				),
+					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
+				), null, 2),
 				null,
 				'opGroupListFooter'
-			));
-			$groupList->addRow(new CCol(
-				new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu'), null, 2
 			));
 
 			// load host groups
@@ -882,25 +844,16 @@ if (!empty($this->data['new_operation'])) {
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
 			$templateList->addRow(new CRow(
-				new CCol(
+				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
 						'objectName' => 'templates',
-						'objectOptions' => array('editable' => true),
-						'popup' => array(
-							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1',
-							'width' => 450,
-							'height' => 450
-						)
+						'objectOptions' => array('editable' => true)
 					)),
-					null, 2
-				),
+					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
+				), null, 2),
 				null,
 				'opTemplateListFooter'
-			));
-			$templateList->addRow(new CCol(
-				new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu'), null, 2
 			));
 
 			// load templates
@@ -963,12 +916,7 @@ if (!empty($this->data['new_operation'])) {
 			$operationConditionsTable->addRow(
 				array(
 					'('.$label.')',
-					get_condition_desc(
-						$opcondition['conditiontype'],
-						$opcondition['operator'],
-						$opcondition['value'],
-						$this->data['config']
-					),
+					get_condition_desc($opcondition['conditiontype'], $opcondition['operator'], $opcondition['value']),
 					array(
 						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),

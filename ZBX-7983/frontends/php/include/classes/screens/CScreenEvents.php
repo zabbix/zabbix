@@ -45,9 +45,6 @@ class CScreenEvents extends CScreenBase {
 		));
 
 		$events = getLastEvents($options);
-
-		$config = select_config();
-
 		foreach ($events as $event) {
 			$trigger = $event['trigger'];
 			$host = $event['host'];
@@ -55,7 +52,7 @@ class CScreenEvents extends CScreenBase {
 			$statusSpan = new CSpan(trigger_value2str($event['value']));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
+			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 			$item->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $event['clock']),
@@ -66,7 +63,7 @@ class CScreenEvents extends CScreenBase {
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,
-				getSeverityCell($trigger['priority'], null, false, $config)
+				getSeverityCell($trigger['priority'])
 			));
 		}
 

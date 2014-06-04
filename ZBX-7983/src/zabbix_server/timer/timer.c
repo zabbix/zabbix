@@ -474,9 +474,8 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 				hm[i].host_maintenance_type != hm[i].maintenance_type ||
 				0 == hm[i].host_maintenance_from)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "putting host '%s' into maintenance (%s)",
-					hm[i].host, MAINTENANCE_TYPE_NORMAL == hm[i].maintenance_type ?
-					"with data collection" : "without data collection");
+			zabbix_log(LOG_LEVEL_WARNING, "putting host [%s] into maintenance (with%s data collection)",
+					hm[i].host, MAINTENANCE_TYPE_NORMAL == hm[i].maintenance_type ? "" : "out");
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -527,7 +526,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "taking host '%s' out of maintenance", row[1]);
+		zabbix_log(LOG_LEVEL_WARNING, "taking host [%s] out of maintenance", row[1]);
 
 		ZBX_STR2UINT64(hostid, row[0]);
 
@@ -549,11 +548,10 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 			"update hosts"
 			" set maintenanceid=null,"
 				"maintenance_status=%d,"
-				"maintenance_type=%d,"
+				"maintenance_type=0,"
 				"maintenance_from=0"
 			" where",
-			HOST_MAINTENANCE_STATUS_OFF,
-			MAINTENANCE_TYPE_NORMAL);
+			HOST_MAINTENANCE_STATUS_OFF);
 
 	if (NULL != ids && 0 != ids_num)
 	{

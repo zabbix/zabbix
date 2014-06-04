@@ -104,12 +104,12 @@ $tr_event_wdgt->addHeader($text, $fs_icon);
 $left_col = array();
 
 // tr details
-$triggerDetails = new CUIWidget('hat_triggerdetails', make_trigger_details($trigger, $config));
+$triggerDetails = new CUIWidget('hat_triggerdetails', make_trigger_details($trigger));
 $triggerDetails->setHeader(_('Event source details'));
 $left_col[] = $triggerDetails;
 
 // event details
-$eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $trigger, $config));
+$eventDetails = new CUIWidget('hat_eventdetails', make_event_details($event, $trigger));
 $eventDetails->setHeader(_('Event details'));
 $left_col[] = $eventDetails;
 

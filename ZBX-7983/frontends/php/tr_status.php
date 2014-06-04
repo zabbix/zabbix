@@ -85,6 +85,8 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Filter
  */
+$config = select_config();
+
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
 		'monitored_hosts' => true,
@@ -298,12 +300,12 @@ $filterForm->addRow(_('Events'), $eventsComboBox);
 
 $severityComboBox = new CComboBox('show_severity', $showSeverity);
 $severityComboBox->addItems(array(
-	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config),
-	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config),
-	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config),
-	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config),
-	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config),
-	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config)
+	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
+	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
+	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
+	TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
+	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
+	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
 ));
 $filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
@@ -691,8 +693,7 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$trigger['value'],
 		$trigger['lastchange'],
-		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false,
-		$config
+		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
 	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
@@ -750,7 +751,7 @@ foreach ($triggers as $trigger) {
 	}
 
 	// severity
-	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value'], $config);
+	$severityColumn = getSeverityCell($trigger['priority'], null, !$trigger['value']);
 	if ($showEventColumn) {
 		$severityColumn->setColSpan(2);
 	}
@@ -797,12 +798,17 @@ foreach ($triggers as $trigger) {
 			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged'], $config);
+			addTriggerValueStyle(
+				$eventStatusSpan,
+				$event['value'],
+				$event['clock'],
+				$event['acknowledged']
+			);
 
 			$statusSpan = new CCol($eventStatusSpan);
 			$statusSpan->setColSpan(2);
 
-			$ack = getEventAckState($event, true, true, array(), $config);
+			$ack = getEventAckState($event, true);
 
 			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
 				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])

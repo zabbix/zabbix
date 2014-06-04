@@ -23,10 +23,4 @@
 		})
 		.trigger('change', false);
 	});
-
-	function addPopupValues(data) {
-		if (data.object == 'applicationid') {
-			jQuery('#filter_application').val(data.values[0].name);
-		}
-	}
 </script>

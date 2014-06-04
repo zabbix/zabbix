@@ -186,7 +186,6 @@ function make_favorite_maps() {
 
 function make_system_status($filter) {
 	$showAllNodes = is_show_all_nodes();
-	$config = select_config();
 
 	$ackParams = array();
 	if (!empty($filter['screenid'])) {
@@ -197,24 +196,12 @@ function make_system_status($filter) {
 	$table->setHeader(array(
 		$showAllNodes ? _('Node') : null,
 		_('Host group'),
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]))
-			? getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config)
-			: null,
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]))
-			? getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config)
-			: null,
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]))
-			? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config)
-			: null,
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]))
-			? getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config)
-			: null,
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]))
-			? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config)
-			: null,
-		($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]))
-			? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config)
-			: null
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH])) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING])) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
 	));
 
 	// get host groups
@@ -260,7 +247,6 @@ function make_system_status($filter) {
 
 	// get triggers
 	$triggers = API::Trigger()->get(array(
-		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupIds,
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
@@ -276,6 +262,7 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	));
@@ -325,7 +312,7 @@ function make_system_status($filter) {
 				continue;
 			}
 
-			if ($filter['extAck'] == EXTACK_OPTION_ALL || $filter['extAck'] == EXTACK_OPTION_BOTH) {
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
@@ -333,7 +320,7 @@ function make_system_status($filter) {
 				}
 			}
 
-			if (($filter['extAck'] == EXTACK_OPTION_UNACK || $filter['extAck'] == EXTACK_OPTION_BOTH)
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
 					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 
@@ -344,6 +331,8 @@ function make_system_status($filter) {
 		}
 	}
 	unset($triggers);
+
+	$config = select_config();
 
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
@@ -356,7 +345,7 @@ function make_system_status($filter) {
 		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
-			if ($filter['severity'] !== null && !isset($filter['severity'][$severity])) {
+			if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
 				continue;
 			}
 
@@ -374,11 +363,11 @@ function make_system_status($filter) {
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$groupRow->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum, $config));
+					$groupRow->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$groupRow->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum, $config));
+					$groupRow->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
 					break;
 
 				case EXTACK_OPTION_BOTH:
@@ -391,13 +380,10 @@ function make_system_status($filter) {
 						$unackTriggersNum = null;
 					}
 
-					$groupRow->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum),
-						!$allTriggersNum, $config
-					));
+					$groupRow->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum), !$allTriggersNum));
 					break;
 			}
 		}
-
 		$table->addRow($groupRow);
 	}
 
@@ -407,12 +393,9 @@ function make_system_status($filter) {
 }
 
 function make_hoststat_summary($filter) {
-	$showAllNodes = is_show_all_nodes();
-	$config = select_config();
-
 	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
-		$showAllNodes ? _('Node') : null,
+		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
 		_('Without problems'),
 		_('With problems'),
@@ -421,28 +404,22 @@ function make_hoststat_summary($filter) {
 
 	// get host groups
 	$groups = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
-		'preservekeys' => true
+		'output' => array('groupid', 'name')
 	));
+	$groups = zbx_toHash($groups, 'groupid');
 
-	$sortOptions = array();
-	if ($showAllNodes) {
-		$groupNodeNames = getNodeNamesByElids(array_keys($groups));
-
-		foreach ($groups as &$group) {
-			$group['nodename'] = $groupNodeNames[$group['groupid']];
-		}
-		unset($group);
-
-		$sortOptions[] = array('field' => 'nodename', 'order' => ZBX_SORT_UP);
+	foreach($groups as &$group) {
+		$group['nodename'] = get_node_name_by_elid($group['groupid']);
 	}
+	unset($group);
 
-	$sortOptions[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
-
-	CArrayHelper::sort($groups, $sortOptions);
+	CArrayHelper::sort($groups, array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	));
 
 	// get hosts
 	$hosts = API::Host()->get(array(
@@ -622,7 +599,7 @@ function make_hoststat_summary($filter) {
 		}
 
 		$group_row = new CRow();
-		if ($showAllNodes) {
+		if (is_show_all_nodes()) {
 			$group_row->addItem($group['nodename']);
 		}
 
@@ -636,24 +613,12 @@ function make_hoststat_summary($filter) {
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
 					_('Host'),
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]))
-						? getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config)
-						: null,
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]))
-						? getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config)
-						: null,
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]))
-						? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config)
-						: null,
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]))
-						? getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config)
-						: null,
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]))
-						? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config)
-						: null,
-					($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]))
-						? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config)
-						: null
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
+					is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
 				));
 				$popup_rows = 0;
 
@@ -695,24 +660,12 @@ function make_hoststat_summary($filter) {
 			$table_inf->setAttribute('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				_('Host'),
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]))
-					? getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config)
-					: null,
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]))
-					? getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config)
-					: null,
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]))
-					? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config)
-					: null,
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]))
-					? getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config)
-					: null,
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]))
-					? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config)
-					: null,
-				($filter['severity'] === null || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]))
-					? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config)
-					: null
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
+				is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
 			));
 			$popup_rows = 0;
 
@@ -1041,7 +994,7 @@ function make_latest_issues(array $filter = array()) {
 
 			// ack
 			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'],
-				true, $ackParams, $config
+				true, $ackParams
 			);
 		}
 		// trigger has no events
@@ -1066,7 +1019,7 @@ function make_latest_issues(array $filter = array()) {
 		$description = new CCol($description, getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid'], $config),
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']),
 				'', '', false
 			);
 		}
@@ -1116,8 +1069,6 @@ function make_latest_issues(array $filter = array()) {
  * @return CDiv
  */
 function make_webmon_overview($filter) {
-	$showAllNodes = is_show_all_nodes();
-
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
@@ -1151,7 +1102,7 @@ function make_webmon_overview($filter) {
 
 	$table = new CTableInfo(_('No web scenarios found.'));
 	$table->setHeader(array(
-		$showAllNodes ? _('Node') : null,
+		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
 		_('Ok'),
 		_('Failed'),
@@ -1195,7 +1146,7 @@ function make_webmon_overview($filter) {
 	foreach ($groups as $group) {
 		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
-				$showAllNodes ? $group['nodename'] : null,
+				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
 				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
 				new CSpan(
@@ -1213,8 +1164,6 @@ function make_webmon_overview($filter) {
 }
 
 function make_discovery_status() {
-	$showAllNodes = is_show_all_nodes();
-
 	$options = array(
 		'filter' => array('status' => DHOST_STATUS_ACTIVE),
 		'selectDHosts' => array('druleid', 'dhostid', 'status'),
@@ -1250,7 +1199,7 @@ function make_discovery_status() {
 	}
 
 	$header = array(
-		$showAllNodes ? new CCol(_('Node'), 'center') : null,
+		is_show_all_nodes() ? new CCol(_('Node'), 'center') : null,
 		new CCol(_('Discovery rule'), 'center'),
 		new CCol(_x('Up', 'discovery results in dashboard')),
 		new CCol(_x('Down', 'discovery results in dashboard'))
@@ -1563,6 +1512,8 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, $c
 		_('Actions')
 	));
 
+	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
+
 	foreach ($triggers as $trigger) {
 		// unknown triggers
 		$unknown = SPACE;
@@ -1574,7 +1525,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, $c
 		// ack
 		if ($config['event_ack_enable']) {
 			$ack = isset($trigger['event']['eventid'])
-				? getEventAckState($trigger['event'], true, true, $ackParams, $config)
+				? getEventAckState($trigger['event'], true, true, $ackParams)
 				: _('No events');
 		}
 		else {
@@ -1588,7 +1539,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, $c
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $trigger['description'], false, $config),
+			getSeverityCell($trigger['priority'], $trigger['description']),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,

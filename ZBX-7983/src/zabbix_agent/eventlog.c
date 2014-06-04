@@ -159,28 +159,12 @@ static void	zbx_get_message_files(LPCTSTR szLogName, LPCTSTR szSourceName, LPTST
  ******************************************************************************/
 static HINSTANCE	zbx_load_message_file(LPCTSTR szFileName)
 {
-	wchar_t		*dll_name = NULL;
-	long int	sz, len = 0;
-	HINSTANCE	res = NULL;
+	TCHAR	MsgDll[MAX_PATH];
 
-	if (NULL == szFileName)
+	if (NULL == szFileName || 0 == ExpandEnvironmentStrings(szFileName, MsgDll, MAX_PATH))
 		return NULL;
 
-	do
-	{
-		if (0 != (sz = len))
-			dll_name = zbx_realloc(dll_name, sz);
-
-		len = ExpandEnvironmentStrings(szFileName, dll_name, sz);
-	}
-	while (0 != len && sz < len);
-
-	if (0 != len)
-		res = LoadLibraryEx(dll_name, NULL, LOAD_LIBRARY_AS_DATAFILE);
-
-	zbx_free(dll_name);
-
-	return res;
+	return LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
 }
 
 /******************************************************************************

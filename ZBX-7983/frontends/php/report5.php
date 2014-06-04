@@ -173,7 +173,7 @@ foreach ($triggers as $trigger) {
 		get_node_name_by_elid($trigger['triggerid']),
 		$hostName,
 		$triggerDescription,
-		getSeverityCell($trigger['priority'], null, false, $config),
+		getSeverityCell($trigger['priority']),
 		$trigger['cnt_event']
 	));
 }

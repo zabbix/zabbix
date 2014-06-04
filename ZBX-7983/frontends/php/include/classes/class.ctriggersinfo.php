@@ -53,15 +53,12 @@ class CTriggersInfo extends CTable {
 	public function bodyToString() {
 		$this->cleanItems();
 
-		$config = select_config();
-
 		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
-			'output' => array('triggerid'),
 			'monitored' => true,
 			'skipDependent' => true,
-			'preservekeys' => true
+			'output' => array('triggerid')
 		);
 
 		if ($this->hostid > 0) {
@@ -70,13 +67,13 @@ class CTriggersInfo extends CTable {
 		elseif ($this->groupid > 0) {
 			$options['groupids'] = $this->groupid;
 		}
-
 		$triggers = API::Trigger()->get($options);
+		$triggers = zbx_objectValues($triggers, 'triggerid');
 
 		$db_priority = DBselect(
 			'SELECT t.priority,t.value,count(DISTINCT t.triggerid) AS cnt'.
 			' FROM triggers t'.
-			' WHERE '.dbConditionInt('t.triggerid', array_keys($triggers)).
+			' WHERE '.dbConditionInt('t.triggerid', $triggers).
 			' GROUP BY t.priority,t.value'
 		);
 		while ($row = DBfetch($db_priority)) {
@@ -134,25 +131,13 @@ class CTriggersInfo extends CTable {
 			$this->addRow($header);
 		}
 
-		$trok = getSeverityCell(null, $ok.SPACE._('Ok'), true, $config);
-		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED,
-			$uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED, $config), !$uncl, $config
-		);
-		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION,
-			$info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION, $config), !$info, $config
-		);
-		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING,
-			$warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING, $config), !$warn, $config
-		);
-		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE,
-			$avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE, $config), !$avg, $config
-		);
-		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH,
-			$high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH, $config), !$high, $config
-		);
-		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER,
-			$dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER, $config), !$dis, $config
-		);
+		$trok = getSeverityCell(null, $ok.SPACE._('Ok'), true);
+		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$uncl);
+		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
+		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
+		$avg = getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $avg.SPACE.getSeverityCaption(TRIGGER_SEVERITY_AVERAGE), !$avg);
+		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
+		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
 		if (STYLE_HORISONTAL == $this->style) {
 			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
@@ -170,3 +155,4 @@ class CTriggersInfo extends CTable {
 		return parent::bodyToString();
 	}
 }
+?>

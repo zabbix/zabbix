@@ -53,9 +53,9 @@ if (isset($_REQUEST['css'])) {
 			' background-image: url("images/general/no_icon.png"); }'."\n";
 
 	$images = API::Image()->get(array(
-		'output' => array('imageid'),
 		'filter' => array('imagetype' => IMAGE_TYPE_ICON),
-		'select_image' => true
+		'output' => API_OUTPUT_EXTEND,
+		'select_image' => 1
 	));
 	foreach ($images as $image) {
 		$image['image'] = base64_decode($image['image']);
