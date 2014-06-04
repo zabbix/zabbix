@@ -72,14 +72,11 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	$interfaces = array();
 	$existingInterfaceTypes = array();
 	foreach ($parentHost['interfaces'] as $interface) {
-		$interface['locked'] = true;
 		$existingInterfaceTypes[$interface['type']] = true;
-		$interfaces[$interface['interfaceid']] = $interface;
 	}
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($interfaces)).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
