@@ -4169,21 +4169,6 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for DCconfig_get_triggers_by_itemids()           *
- *                                                                            *
- ******************************************************************************/
-static int	__config_trigger_topoindex_compare(const void *d1, const void *d2)
-{
-	const DC_TRIGGER	*t1 = *(const DC_TRIGGER **)d1;
-	const DC_TRIGGER	*t2 = *(const DC_TRIGGER **)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
-
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
  * Purpose: get triggers for specified items                                  *
@@ -4229,8 +4214,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, __config_trigger_topoindex_compare);
 }
 
 /******************************************************************************
@@ -4366,8 +4349,6 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
