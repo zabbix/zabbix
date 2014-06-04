@@ -515,7 +515,7 @@ sub get_online_probes
 
     my (@result, @row, $sql, $host, $hostid, $res, $probe_down, $no_values);
 
-    # Filter out unreachable probes. Probes are considered unreachable if last access time is over 60 seconds.
+    # Filter out unreachable probes. Probes are considered unreachable if last access time is over $probe_avail_limit seconds.
     my $probe_availability_item = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
 
     my $hosts_mon = '';
@@ -802,7 +802,7 @@ sub process_slv_ns_monthly
     # 'g.ns.se.,2001:6b0:e:3::1' => 150,
     # 'b.ns.se.,192.36.133.107' => 200,
     # ...
-    my %total_values;;
+    my %total_values;
     my %successful_values;
     foreach my $ns (@$nss_ref)
     {
@@ -1569,7 +1569,7 @@ sub __get_eventtimes
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 	" order by clock,ns");
 
-    my (@unsorted_eventtimes, @row, $add_event);
+    my (@unsorted_eventtimes, @row);
     while (@row = $res->fetchrow_array)
     {
 	my $clock = $row[0];

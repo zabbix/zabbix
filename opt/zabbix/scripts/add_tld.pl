@@ -218,7 +218,7 @@ create_macro('{$RSM.SLV.EPP.INFO}', 99, undef);
 
 create_macro('{$RSM.ROLLWEEK.THRESHOLDS}', RSM_ROLLWEEK_THRESHOLDS, undef);
 create_macro('{$RSM.ROLLWEEK.SECONDS}', 604800, undef);
-create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef);
+create_macro('{$RSM.PROBE.AVAIL.LIMIT}', '60', undef); # For finding unreachable probes. Probes are considered unreachable if last access time is over this limit of seconds.
 
 my $result;
 my $m = '{$RSM.DNS.UDP.DELAY}';
