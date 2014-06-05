@@ -670,14 +670,14 @@ else {
 				if ($unknownTriggerIds) {
 					$triggerOptions['triggerids'] = $unknownTriggerIds;
 					$validTriggersFromSlice = API::Trigger()->get($triggerOptions);
-					$validTriggerIdsFromSlice = array_keys($validTriggersFromSlice);
 
 					foreach ($validTriggersFromSlice as $trigger) {
 						$validTriggerIds[$trigger['triggerid']] = $trigger['triggerid'];
 					}
 
 					foreach ($unknownTriggerIds as $id) {
-						$knownTriggerIds[strval($id)] = strval($id);
+						$id = strval($id);
+						$knownTriggerIds[$id] = $id;
 					}
 				}
 
