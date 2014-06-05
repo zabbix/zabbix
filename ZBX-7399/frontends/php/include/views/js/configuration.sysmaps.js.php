@@ -118,7 +118,7 @@
 				<td><?php echo _('Application'); ?></td>
 				<td>
 					<input size="50" id="application" name="application" class="input">
-					<span id="application-select" class="link_menu"><?php echo _('Select'); ?></span>
+					<input id="application-select" type="button" class="input link_menu select-popup" value="<?php echo _('Select'); ?>">
 				</td>
 			</tr>
 
