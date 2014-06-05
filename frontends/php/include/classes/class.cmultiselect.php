@@ -32,7 +32,7 @@ class CMultiSelect extends CTag {
 		$this->addClass('multiselect');
 
 		// url
-		$url = new Curl('jsrpc.php');
+		$url = new CUrl('jsrpc.php');
 		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 		$url->setArgument('method', 'multiselect.get');
 		$url->setArgument('objectName', $options['objectName']);

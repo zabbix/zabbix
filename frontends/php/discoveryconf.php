@@ -299,7 +299,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules'], array('druleid'));
+	$data['paging'] = getPagingLine($data['drules']);
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

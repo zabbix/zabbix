@@ -389,7 +389,7 @@ else {
 
 	// sorting & apging
 	order_result($data['users'], getPageSortField('alias'), getPageSortOrder());
-	$data['paging'] = getPagingLine($data['users'], array('userid'));
+	$data['paging'] = getPagingLine($data['users']);
 
 	// set default lastaccess time to 0
 	foreach ($data['users'] as $user) {

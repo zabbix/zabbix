@@ -129,7 +129,7 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'stime' => get_request('stime')
 	));
 
-	$curl = new Curl();
+	$curl = new CUrl();
 	$curl->removeArgument('period');
 	$curl->removeArgument('stime');
 
