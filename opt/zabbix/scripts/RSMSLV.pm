@@ -512,6 +512,7 @@ sub get_online_probes
     my $all_probes_ref = shift;
 
     $all_probes_ref = __get_probes() unless ($all_probes_ref);
+    my %reachable_probes = %$all_probes_ref; # we should work on a copy
 
     my (@result, @row, $sql, $host, $hostid, $res, $probe_down, $no_values);
 
@@ -519,7 +520,7 @@ sub get_online_probes
     my $probe_availability_item = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
 
     my $hosts_mon = '';
-    foreach my $host (keys(%$all_probes_ref))
+    foreach my $host (keys(%reachable_probes))
     {
 	$hosts_mon .= ',' if ($hosts_mon ne '');
 	$hosts_mon .= "'$host - mon'";
@@ -541,12 +542,12 @@ sub get_online_probes
     {
 	my $h = $row[0];
 	$h =~ s/^(\S+).*/$1/; # remove ' - mon' from the host name
-	delete($all_probes_ref->{$h});
+	delete($reachable_probes{$h});
     }
 
-    foreach my $host (keys(%$all_probes_ref))
+    foreach my $host (keys(%reachable_probes))
     {
-	$hostid = $all_probes_ref->{$host};
+	$hostid = $reachable_probes{$host};
 
 	$res = db_select(
 	    "select h.value".
