@@ -180,6 +180,7 @@ typedef struct _DC_TRIGGER
 	unsigned char	value;
 	unsigned char	state;
 	unsigned char	new_value;
+	unsigned char	status;
 }
 DC_TRIGGER;
 
