@@ -2439,13 +2439,16 @@ function get_status() {
 	$dbTriggers = DBselect(
 		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
 			' FROM triggers t'.
-			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-			' INNER JOIN items i ON f.itemid=i.itemid'.
-			' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-			' GROUP BY t.status,t.value');
+			' WHERE'.
+				' t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+				' AND NOT EXISTS ('.
+					'SELECT functionid FROM functions f'.
+						' JOIN items i ON f.itemid = i.itemid'.
+						' JOIN hosts h ON i.hostid = h.hostid'.
+						' WHERE h.status <> '.HOST_STATUS_MONITORED.' AND f.triggerid = t.triggerid AND i.status = '.ITEM_STATUS_ACTIVE.
+				')'.
+			' GROUP BY t.status,t.value'
+		);
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
