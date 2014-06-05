@@ -442,10 +442,6 @@ class CTrigger extends CTriggerGeneral {
 			return count($result);
 		}
 
-		foreach ($triggers as $trigger) {
-			$result[$trigger['triggerid']] = $trigger;
-		}
-
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}
