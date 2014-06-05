@@ -95,16 +95,6 @@ class CApiService {
 	}
 
 	/**
-	 * Returns array of allowed sort columns
-	 *
-	 * @return array
-	 */
-	public function sortColumns()
-	{
-		return $this->sortColumns;
-	}
-
-	/**
 	 * Returns the name of the database table that contains the objects.
 	 *
 	 * @return string
