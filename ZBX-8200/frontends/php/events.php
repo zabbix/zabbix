@@ -627,7 +627,7 @@ else {
 				'output' => array('eventid', 'objectid'),
 				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $allEventsSliceLimit + 1,
+				'limit' => $allEventsSliceLimit + 1
 			);
 
 			if (getRequest('triggerid')) {
