@@ -44,7 +44,6 @@ class CMultiSelect extends CTag {
 		}
 
 		$params = array(
-			'id' => $this->getAttribute('id'),
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
 			'labels' => array(

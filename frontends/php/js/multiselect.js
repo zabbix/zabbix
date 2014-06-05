@@ -64,69 +64,87 @@ jQuery(function($) {
 		/**
 		 * Get multi select selected data.
 		 *
-		 * @return array
+		 * @return array    array of multiselect value objects
 		 */
-		getData : function(msId) {
-			var ms = window.multiSelect[msId],
-				data = [];
+		getData: function() {
+			var ms = this.first().data('multiSelect');
 
+			var data = [];
 			for (var id in ms.values.selected) {
+				var item = ms.values.selected[id];
+
 				data[data.length] = {
 					id: id,
-					name: $('input[value="' + id + '"]', ms.obj).data('name'),
-					prefix: typeof $('input[value="' + id + '"]', ms.obj).data('prefix') === 'undefined'
-						? ''
-						: $('input[value="' + id + '"]', ms.obj).data('prefix')
+					name: item.name,
+					prefix: item.prefix === 'undefined' ? '' : item.prefix
 				};
 			}
 
 			return data;
 		},
+
 		/**
 		 * Rezise multiselect selected text
+		 *
+		 * @return jQuery
 		 */
-		resize : function() {
-			$.each(window.multiSelect, function(i) {
-				var ms = window.multiSelect[i];
-				if (!empty(ms.options.data)) {
-					resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
+		resize: function() {
+			return this.each(function() {
+				var obj = $(this);
+				var ms = $(this).data('multiSelect');
+
+				if (ms.options.data.length) {
+					resizeAllSelectedTexts(obj, ms.options, ms.values);
 				}
 			});
 		},
+
 		/**
 		 * Insert outside data
+		 *
+		 * @param object    multiselect value object
+		 *
+		 * @return jQuery
 		 */
-		addData : function(item, msId) {
-			var ms = window.multiSelect[msId];
+		addData: function(item) {
+			return this.each(function() {
+				var obj = $(this);
+				var ms = $(this).data('multiSelect');
 
-			// clean input if selectedLimit = 1
-			if (ms.options.selectedLimit == 1) {
-				for (var id in ms.values.selected) {
-					removeSelected(id, ms.obj, ms.values, ms.options);
+				// clean input if selectedLimit = 1
+				if (ms.options.selectedLimit == 1) {
+					for (var id in ms.values.selected) {
+						removeSelected(id, obj, ms.values, ms.options);
+					}
+
+					cleanAvailable(item, ms.values);
 				}
-
-				cleanAvailable(ms.obj, ms.values);
-			}
-			addSelected(item, ms.obj, ms.values, ms.options);
+				addSelected(item, obj, ms.values, ms.options);
+			});
 		},
+
 		/**
 		 * Clean multi select object values.
+		 *
+		 * @return jQuery
 		 */
-		clean : function(msId) {
-			var ms = window.multiSelect[msId];
+		clean: function() {
+			return this.each(function() {
+				var obj = $(this);
+				var ms = $(this).data('multiSelect');
 
-			for (var id in ms.values.selected) {
-				removeSelected(id, ms.obj, ms.values, ms.options);
-			}
+				for (var id in ms.values.selected) {
+					removeSelected(id, obj, ms.values, ms.options);
+				}
 
-			cleanAvailable(ms.obj, ms.values);
+				cleanAvailable(obj, ms.values);
+			});
 		}
 	};
 
 	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['id']					multi select id in dom
 	 * @param string options['url']					backend url
 	 * @param string options['name']				input element name
 	 * @param object options['labels']				translated labels (optional)
@@ -149,12 +167,12 @@ jQuery(function($) {
 	 * @return object
 	 */
 	$.fn.multiSelect = function(options) {
+		// call a public method
 		if (methods[options]) {
 			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
 		var defaults = {
-			id: '',
 			url: '',
 			name: '',
 			labels: {
@@ -188,20 +206,13 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
-			/**
-			 * MultiSelect object.
-			 */
-			if (empty(window.multiSelect)) {
-				window.multiSelect = {};
-			}
+			var obj = $(this);
 
-			window.multiSelect[options.id] = {
+			var ms = {
 				options: options,
-				obj: $(this),
-				jqxhr: null,
 				values: {
 					search: '',
-					width: null,
+					width: parseInt(obj.css('width')),
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
@@ -212,19 +223,15 @@ jQuery(function($) {
 				}
 			};
 
-			var ms = window.multiSelect[options.id],
-				obj = ms.obj,
-				jqxhr = ms.jqxhr,
-				values = ms.values;
+			// store the configuration in the elements data
+			obj.data('multiSelect', ms);
 
-			ms.values.width = parseInt(obj.css('width'));
+			var values = ms.values;
 
 			// add wrap
-			var multiselectWrapper = jQuery('<div>', {
+			obj.wrap(jQuery('<div>', {
 				'class': 'multiselect-wrapper'
-			});
-
-			$('#' + options.id).wrap(multiselectWrapper);
+			}));
 
 			// search input
 			if (!options.disabled) {
@@ -247,12 +254,12 @@ jQuery(function($) {
 					}
 
 					var search = input.val();
-
 					if (!empty(search)) {
 						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
 
+								var jqxhr = null;
 								window.setTimeout(function() {
 									values.isWaiting = false;
 

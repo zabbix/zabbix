@@ -309,7 +309,7 @@
 
 		// host group
 		if (object.target == 'hostGroup') {
-			var values = jQuery('#opCmdTargetObject').multiSelect('getData', 'opCmdTargetObject');
+			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
 			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -343,7 +343,7 @@
 
 		// host
 		else if (object.target == 'host') {
-			var values = jQuery('#opCmdTargetObject').multiSelect('getData', 'opCmdTargetObject');
+			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
 			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
@@ -553,7 +553,7 @@
 	}
 
 	function addDiscoveryTemplates() {
-		var values = jQuery('#discoveryTemplates').multiSelect('getData', 'discoveryTemplates');
+		var values = jQuery('#discoveryTemplates').multiSelect('getData');
 
 		for (var key in values) {
 			var data = values[key];
@@ -569,11 +569,11 @@
 			}
 		}
 
-		jQuery('#discoveryTemplates').multiSelect('clean', 'discoveryTemplates');
+		jQuery('#discoveryTemplates').multiSelect('clean');
 	}
 
 	function addDiscoveryHostGroup() {
-		var values = jQuery('#discoveryHostGroup').multiSelect('getData', 'discoveryHostGroup');
+		var values = jQuery('#discoveryHostGroup').multiSelect('getData');
 
 		for (var key in values) {
 			var data = values[key];
@@ -589,7 +589,7 @@
 			}
 		}
 
-		jQuery('#discoveryHostGroup').multiSelect('clean', 'discoveryHostGroup');
+		jQuery('#discoveryHostGroup').multiSelect('clean');
 	}
 
 	jQuery(document).ready(function() {
