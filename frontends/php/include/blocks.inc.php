@@ -185,6 +185,8 @@ function make_favorite_maps() {
 }
 
 function make_system_status($filter) {
+	$showAllNodes = is_show_all_nodes();
+
 	$ackParams = array();
 	if (!empty($filter['screenid'])) {
 		$ackParams['screenid'] = $filter['screenid'];
@@ -192,7 +194,7 @@ function make_system_status($filter) {
 
 	$table = new CTableInfo(_('No host groups found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
+		$showAllNodes ? _('Node') : null,
 		_('Host group'),
 		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
 		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH])) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
@@ -212,15 +214,21 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	));
 
-	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid']);
-	}
-	unset($group);
+	$sortOptions = array();
+	if ($showAllNodes) {
+		$groupNodeNames = getNodeNamesByElids(array_keys($groups));
 
-	CArrayHelper::sort($groups, array(
-		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	));
+		foreach ($groups as &$group) {
+			$group['nodename'] = $groupNodeNames[$group['groupid']];
+		}
+		unset($group);
+
+		$sortOptions[] = array('field' => 'nodename', 'order' => ZBX_SORT_UP);
+	}
+
+	$sortOptions[] = array('field' => 'name', 'order' => ZBX_SORT_UP);
+
+	CArrayHelper::sort($groups, $sortOptions);
 
 	$groupIds = array();
 	foreach ($groups as $group) {
@@ -246,7 +254,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => API_OUTPUT_EXTEND,
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -254,25 +262,27 @@ function make_system_status($filter) {
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' =>  API_OUTPUT_EXTEND,
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
 		'selectHosts' => array('name'),
 		'preservekeys' => true
 	));
 
-	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as $tnum => $trigger) {
-		if (!empty($trigger['lastEvent'])) {
+
+	foreach ($triggers as $triggerId => $trigger) {
+		if ($trigger['lastEvent']) {
 			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
 		}
 
-		$triggers[$tnum]['event'] = $trigger['lastEvent'];
-		unset($triggers[$tnum]['lastEvent']);
+		$triggers[$triggerId]['event'] = $trigger['lastEvent'];
+		unset($triggers[$triggerId]['lastEvent']);
 	}
+
+	// get acknowledges
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
 			'eventids' => $eventIds,
-			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => array('eventid', 'clock', 'message', 'alias', 'name', 'surname'),
 			'preservekeys' => true
 		));
 	}
@@ -283,17 +293,17 @@ function make_system_status($filter) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		// event
-		if (empty($trigger['event'])) {
+		if ($trigger['event']) {
+			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
+				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+				: 0;
+		}
+		else {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
 				'value' => $trigger['value']
 			);
-		}
-		else {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
-				: 0;
 		}
 
 		// groups
@@ -301,6 +311,7 @@ function make_system_status($filter) {
 			if (!isset($groups[$group['groupid']])) {
 				continue;
 			}
+
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
@@ -321,10 +332,12 @@ function make_system_status($filter) {
 	}
 	unset($triggers);
 
+	$config = select_config();
+
 	foreach ($groups as $group) {
 		$groupRow = new CRow();
 
-		if (is_show_all_nodes()) {
+		if ($showAllNodes) {
 			$groupRow->addItem($group['nodename']);
 		}
 
@@ -339,13 +352,13 @@ function make_system_status($filter) {
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions));
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions));
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
 			}
 
 			switch ($filter['extAck']) {
@@ -1483,16 +1496,14 @@ function make_screen_submenu() {
  * @param array $triggers
  * @param array $ackParams
  * @param array $actions
+ * @param array $config
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
-	$config = select_config();
-
+function makeTriggersPopup(array $triggers, array $ackParams, array $actions, $config) {
 	$popupTable = new CTableInfo();
 	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(
-		is_show_all_nodes() ? _('Node') : null,
 		_('Host'),
 		_('Issue'),
 		_('Age'),
@@ -1527,7 +1538,6 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 			: _('-');
 
 		$popupTable->addRow(array(
-			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hosts'][0]['name'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
 			zbx_date2age($trigger['lastchange']),
