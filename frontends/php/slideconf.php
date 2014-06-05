@@ -209,7 +209,7 @@ else {
 
 	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 
-	$data['paging'] = getPagingLine($data['slides'], array('slideshowid'));
+	$data['paging'] = getPagingLine($data['slides']);
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.list', $data);
