@@ -1500,7 +1500,7 @@ function make_screen_submenu() {
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams, array $actions, $config) {
+function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
 	$popupTable = new CTableInfo();
 	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(
