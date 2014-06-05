@@ -256,7 +256,7 @@ if (isset($_REQUEST['form'])) {
 			'templateid' => get_request('templateid'),
 			'host' => get_request('host'),
 			'name' => get_request('name'),
-			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+			'status' => getRequest('status', HOST_STATUS_MONITORED),
 			'templates' => array(),
 			'inventory' => array(
 				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)
