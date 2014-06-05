@@ -80,6 +80,7 @@ if (!$macro) {
 }
 
 $rollWeekSeconds = reset($macro);
+$serverTime = time() - RSM_ROLLWEEK_SHIFT_BACK;
 
 /*
  * Filter
@@ -93,12 +94,12 @@ if (get_request('filter_set')) {
 	$data['filter_failing_tests'] = get_request('filter_failing_tests', 0);
 
 	$data['filter_from'] = (get_request('filter_from') == get_request('original_from'))
-		? date('YmdHis', get_request('filter_from', time() - $rollWeekSeconds['value']))
-		: get_request('filter_from', date('YmdHis', time() - $rollWeekSeconds['value']));
+		? date('YmdHis', get_request('filter_from', $serverTime - $rollWeekSeconds['value']))
+		: get_request('filter_from', date('YmdHis', $serverTime - $rollWeekSeconds['value']));
 
 	$data['filter_to'] = (get_request('filter_to') == get_request('original_to'))
-		? date('YmdHis', get_request('filter_to', time()))
-		: get_request('filter_to', date('YmdHis', time()));
+		? date('YmdHis', get_request('filter_to', $serverTime))
+		: get_request('filter_to', date('YmdHis', $serverTime));
 
 	CProfile::update('web.rsm.incidentdetails.host', $data['host'], PROFILE_TYPE_STR);
 	CProfile::update('web.rsm.incidentdetails.eventid', $data['eventid'], PROFILE_TYPE_ID);
@@ -118,8 +119,8 @@ elseif (get_request('filter_rolling_week')) {
 	$data['filter_failing_tests'] = CProfile::get('web.rsm.incidentdetails.filter_failing_tests');
 
 	// set new filter from and filter to
-	$data['filter_from'] = date('YmdHis', time() - $rollWeekSeconds['value']);
-	$data['filter_to'] = date('YmdHis', time());
+	$data['filter_from'] = date('YmdHis', $serverTime - $rollWeekSeconds['value']);
+	$data['filter_to'] = date('YmdHis', $serverTime);
 
 	CProfile::update('web.rsm.incidentdetails.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
 	CProfile::update('web.rsm.incidentdetails.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
@@ -130,9 +131,9 @@ else {
 	$data['slvItemId'] = CProfile::get('web.rsm.incidentdetails.slvItemId');
 	$data['availItemId'] = CProfile::get('web.rsm.incidentdetails.availItemId');
 	$data['filter_from'] = CProfile::get('web.rsm.incidentdetails.filter_from',
-		date('YmdHis', time() - $rollWeekSeconds['value'])
+		date('YmdHis', $serverTime - $rollWeekSeconds['value'])
 	);
-	$data['filter_to'] = CProfile::get('web.rsm.incidentdetails.filter_to', date('YmdHis', time()));
+	$data['filter_to'] = CProfile::get('web.rsm.incidentdetails.filter_to', date('YmdHis', $serverTime));
 	$data['filter_show_all'] = CProfile::get('web.rsm.incidentdetails.filter_show_all');
 	$data['filter_failing_tests'] = CProfile::get('web.rsm.incidentdetails.filter_failing_tests');
 }
@@ -289,7 +290,7 @@ if ($mainEvent) {
 		}
 	}
 	else {
-		$toTime = get_request('filter_set') ? zbxDateToTime($data['filter_to']) : time();
+		$toTime = get_request('filter_set') ? zbxDateToTime($data['filter_to']) : $serverTime;
 	}
 
 	// result generation

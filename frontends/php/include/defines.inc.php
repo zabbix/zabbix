@@ -898,7 +898,7 @@ define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 /*
  * These numbers must be in sync with Backend!
  */
-// particular tests result time
+// server delay time in seconds
 define('RSM_ROLLWEEK_SHIFT_BACK', 180);
 
 // SLA monitoring start year

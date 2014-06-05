@@ -105,8 +105,9 @@ $table->setHeader(array(
 ));
 
 if (isset($this->data['tld'])) {
-	$from = date('YmdHis', time() - $this->data['rollWeekSeconds']);
-	$till = date('YmdHis', time());
+	$serverTime = time() - RSM_ROLLWEEK_SHIFT_BACK;
+	$from = date('YmdHis', $serverTime - $this->data['rollWeekSeconds']);
+	$till = date('YmdHis', $serverTime);
 	foreach ($this->data['tld'] as $key => $tld) {
 
 		// DNS

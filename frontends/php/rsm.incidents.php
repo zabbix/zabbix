@@ -126,6 +126,7 @@ if (!$macro) {
 }
 
 $rollWeekSeconds = reset($macro);
+$serverTime = time() - RSM_ROLLWEEK_SHIFT_BACK;
 
 /*
  * Filter
@@ -139,24 +140,24 @@ else {
 }
 
 if (get_request('filter_rolling_week')) {
-	$data['filter_from'] = date('YmdHis', time() - $rollWeekSeconds['value']);
-	$data['filter_to'] = date('YmdHis', time());
+	$data['filter_from'] = date('YmdHis', $serverTime - $rollWeekSeconds['value']);
+	$data['filter_to'] = date('YmdHis', $serverTime);
 	CProfile::update('web.rsm.incidents.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
 	CProfile::update('web.rsm.incidents.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
 }
 else {
 	if (get_request('filter_set')) {
 		if (get_request('filter_from') == get_request('original_from')) {
-			$data['filter_from'] = date('YmdHis', get_request('filter_from', time() - $rollWeekSeconds['value']));
+			$data['filter_from'] = date('YmdHis', get_request('filter_from', $serverTime - $rollWeekSeconds['value']));
 		}
 		else {
-			$data['filter_from'] = get_request('filter_from', date('YmdHis', time() - $rollWeekSeconds['value']));
+			$data['filter_from'] = get_request('filter_from', date('YmdHis', $serverTime - $rollWeekSeconds['value']));
 		}
 		if (get_request('filter_to') == get_request('original_to')) {
-			$data['filter_to'] = date('YmdHis', get_request('filter_to', time()));
+			$data['filter_to'] = date('YmdHis', get_request('filter_to', $serverTime));
 		}
 		else {
-			$data['filter_to'] = get_request('filter_to', date('YmdHis', time()));
+			$data['filter_to'] = get_request('filter_to', date('YmdHis', $serverTime));
 		}
 		CProfile::update('web.rsm.incidents.filter_from', $data['filter_from'], PROFILE_TYPE_ID);
 		CProfile::update('web.rsm.incidents.filter_to', $data['filter_to'], PROFILE_TYPE_ID);
@@ -164,9 +165,9 @@ else {
 	else {
 		$data['filter_from'] = CProfile::get(
 			'web.rsm.incidents.filter_from',
-			date('YmdHis', time() - $rollWeekSeconds['value'])
+			date('YmdHis', $serverTime - $rollWeekSeconds['value'])
 		);
-		$data['filter_to'] = CProfile::get('web.rsm.incidents.filter_to', date('YmdHis', time()));
+		$data['filter_to'] = CProfile::get('web.rsm.incidents.filter_to', date('YmdHis', $serverTime));
 	}
 }
 
@@ -849,8 +850,8 @@ if ($host || $data['filter_search']) {
 				));
 
 				// set rolling week time
-				$weekTimeFrom = time() - $rollWeekSeconds['value'];
-				$weekTimeTill = time();
+				$weekTimeFrom = $serverTime - $rollWeekSeconds['value'];
+				$weekTimeTill = $serverTime;
 
 				// get SLA items
 				foreach ($items as $item) {
