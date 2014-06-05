@@ -1,6 +1,7 @@
 Changes for 2.3.2
 
 New features:
+..F....... [ZBX-7399] improved multiselect by adding popup select window (Oleg)
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
