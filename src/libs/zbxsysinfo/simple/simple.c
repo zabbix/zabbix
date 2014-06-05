@@ -241,6 +241,48 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 	return SYSINFO_RET_OK;
 }
 
+/* validation functions for service checks */
+static int	validate_smtp(const char *line)
+{
+	if (0 == strncmp(line, "220", 3))
+	{
+		if ('-' == line[3])
+			return ZBX_TCP_EXPECT_IGNORE;
+
+		if ('\0' == line[3] || ' ' == line[3])
+			return ZBX_TCP_EXPECT_OK;
+	}
+
+	return ZBX_TCP_EXPECT_FAIL;
+}
+
+static int	validate_ftp(const char *line)
+{
+	if (0 == strncmp(line, "220 ", 4))
+		return ZBX_TCP_EXPECT_OK;
+
+	return ZBX_TCP_EXPECT_IGNORE;
+}
+
+static int	validate_pop(const char *line)
+{
+	return 0 == strncmp(line, "+OK", 3) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
+}
+
+static int	validate_nntp(const char *line)
+{
+	if (0 == strncmp(line, "200", 3) || 0 == strncmp(line, "201", 3))
+		return ZBX_TCP_EXPECT_OK;
+
+	return ZBX_TCP_EXPECT_FAIL;
+}
+
+static int	validate_imap(const char *line)
+{
+	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
+}
+
+
 int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
@@ -301,13 +343,13 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\r\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_smtp, "QUIT\r\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_ftp, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "http"))
 	{
@@ -319,19 +361,19 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_pop, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "nntp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_nntp, "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "imap"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", "a1 LOGOUT\n", &value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_imap, "a1 LOGOUT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "tcp"))
 	{
