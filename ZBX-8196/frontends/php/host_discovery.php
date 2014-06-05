@@ -119,7 +119,7 @@ $fields = array(
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('name', ZBX_SORT_UP, API::DiscoveryRule()->sortColumns());
+validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'key_', 'delay', 'type', 'status'));
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
