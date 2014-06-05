@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-7536] now host visible names are shown in popups instead of hostname (Andrejs)
 ..F....... [ZBX-8292] fixed host prototype creation (Krists)
 ........S. [ZBX-8092] added disabled triggers to the configuration cache for correct macro expansion in notifications (igors)
 ........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
