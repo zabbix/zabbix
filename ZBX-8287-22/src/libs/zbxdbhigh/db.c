@@ -2127,14 +2127,12 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-				do
 				{
 					size_t	alloc_len, offset;
 
 					row[i].str = NULL;
 					zbx_strncpy_alloc(&row[i].str, &alloc_len, &offset, value->str, field->length);
 				}
-				while (0);
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
