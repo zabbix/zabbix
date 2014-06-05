@@ -50,6 +50,13 @@ extern int	CONFIG_HTTPPOLLER_FORKS;
 
 #ifdef HAVE_LIBCURL
 
+extern char	*CONFIG_SSL_CA_LOCATION;
+extern char	*CONFIG_SSL_CERT_LOCATION;
+extern char	*CONFIG_SSL_KEY_LOCATION;
+
+#define ZBX_RETRIEVE_MODE_CONTENT	0
+#define ZBX_RETRIEVE_MODE_HEADERS	1
+
 static zbx_httppage_t	page;
 
 static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
@@ -284,6 +291,44 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#ifdef HAVE_LIBCURL
+static void	add_headers(char *headers, struct curl_slist **headers_slist)
+{
+	char      *p_begin;
+
+	p_begin = headers;
+
+	while ('\0' != *p_begin)
+	{
+		char    c, *p_end, *line;
+
+		while ('\r' == *p_begin || '\n' == *p_begin)
+			p_begin++;
+
+		p_end = p_begin;
+
+		while ('\0' != *p_end && '\r' != *p_end && '\n' != *p_end)
+			p_end++;
+
+		if (p_begin == p_end)
+			break;
+
+		if ('\0' != (c = *p_end))
+			*p_end = '\0';
+		line = zbx_strdup(NULL, p_begin);
+		if ('\0' != c)
+			*p_end = c;
+
+		zbx_lrtrim(line, " \t");
+		if ('\0' != *line)
+			*headers_slist = curl_slist_append(*headers_slist, line);
+		zbx_free(line);
+
+		p_begin = p_end;
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: process_httptest                                                 *
@@ -325,7 +370,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	lastfailedstep = 0;
 
 	result = DBselect(
-			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables"
+			"select httpstepid,no,name,url,timeout,posts,required,status_codes,variables,follow_redirects,"
+				"retrieve_mode,headers"
 			" from httpstep"
 			" where httptestid=" ZBX_FS_UI64
 			" order by no",
@@ -341,18 +387,62 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
+					0 == httptest->httptest.verify_peer ? 0L : 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
+					0 == httptest->httptest.verify_host ? 0L : 2L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
 	}
 
+	if (NULL != CONFIG_SSL_CA_LOCATION)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
+	if ('\0' != *httptest->httptest.ssl_cert_file)
+	{
+		char	*file_name;
+
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, httptest->httptest.ssl_cert_file);
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
+		zbx_free(file_name);
+
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERTTYPE, "PEM")))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
+	if ('\0' != *httptest->httptest.ssl_key_file)
+	{
+		char	*file_name;
+
+		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, httptest->httptest.ssl_key_file);
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
+		zbx_free(file_name);
+
+		if (CURLE_OK != err || CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEYTYPE, "PEM")) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD,
+						httptest->httptest.ssl_key_password)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
+	}
+
 	while (NULL != (row = DBfetch(result)))
 	{
+		struct curl_slist	*headers_slist = NULL;
+
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
 
@@ -380,6 +470,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				&httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		httpstep.variables = row[8];
+		httpstep.follow_redirects = atoi(row[9]);
+		httpstep.retrieve_mode = atoi(row[10]);
+
+		httpstep.headers = zbx_strdup(NULL, row[11]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL,
+				&httpstep.headers, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		memset(&stat, 0, sizeof(stat));
 
@@ -398,6 +494,44 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POST, '\0' != *httpstep.posts ? 1L : 0L)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
+				0 == httpstep.follow_redirects ? 0L : 1L)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		if (0 != httpstep.follow_redirects)
+		{
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
+			{
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				goto httpstep_error;
+			}
+		}
+
+		http_substitute_variables(httptest, &httpstep.headers);
+
+		/* headers defined in a step overwrite headers defined in scenario */
+		if ('\0' != *httpstep.headers)
+			add_headers(httpstep.headers, &headers_slist);
+		else if ('\0' != *httptest->httptest.headers)
+			add_headers(httptest->httptest.headers, &headers_slist);
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		/* enable/disable fetching the body */
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
+				ZBX_RETRIEVE_MODE_HEADERS == httpstep.retrieve_mode ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -453,12 +587,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
 		}
-		while (0 != --httptest->httptest.retries);
+		while (0 < --httptest->httptest.retries);
+
+		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 
 		if (CURLE_OK == err)
 		{
-			char	*var_err_str = NULL;
-
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
@@ -487,44 +621,50 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				speed_download_num++;
 			}
 
-			/* required pattern */
-			if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
-					httpstep.required, NULL))
+			if (ZBX_RETRIEVE_MODE_CONTENT == httpstep.retrieve_mode)
 			{
-				err_str = zbx_strdup(err_str, "required pattern not found");
+				char	*var_err_str = NULL;
+
+				/* required pattern */
+				if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
+						httpstep.required, NULL))
+				{
+					err_str = zbx_strdup(err_str, "required pattern not found");
+				}
+
+				/* variables defined in scenario */
+				if (NULL == err_str && FAIL == http_process_variables(httptest,
+						httptest->httptest.variables, page.data, &var_err_str))
+				{
+					char	*variables;
+
+					variables = string_replace(httptest->httptest.variables, "\r\n", " ");
+					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
+							variables, var_err_str);
+					zbx_free(variables);
+				}
+
+				/* variables defined in a step */
+				if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables,
+						page.data, &var_err_str))
+				{
+					char	*variables;
+
+					variables = string_replace(httpstep.variables, "\r\n", " ");
+					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
+							variables, var_err_str);
+					zbx_free(variables);
+				}
+
+				zbx_free(var_err_str);
 			}
-
-			/* variables defined in scenario */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, httptest->httptest.variables,
-					page.data, &var_err_str))
-			{
-				char	*variables;
-
-				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
-				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
-						variables, var_err_str);
-				zbx_free(variables);
-			}
-
-			/* variables defined in a step */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables, page.data,
-					&var_err_str))
-			{
-				char	*variables;
-
-				variables = string_replace(httpstep.variables, "\r\n", " ");
-				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
-						variables, var_err_str);
-				zbx_free(variables);
-			}
-
-			zbx_free(var_err_str);
 		}
 		else
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 
 		zbx_free(page.data);
 httpstep_error:
+		zbx_free(httpstep.headers);
 		zbx_free(httpstep.status_codes);
 		zbx_free(httpstep.required);
 		zbx_free(httpstep.posts);
@@ -599,7 +739,7 @@ clean:
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
- * Return value:                                                              *
+ * Return value: number of processed httptests                                *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -622,8 +762,9 @@ int	process_httptests(int httppoller_num, int now)
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
 	result = DBselect(
-			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries"
+			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.variables,t.headers,t.agent,"
+				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
+				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host"
 			" from httptest t,hosts h"
 			" where t.hostid=h.hostid"
 				" and t.nextcheck<=%d"
@@ -651,32 +792,54 @@ int	process_httptests(int httppoller_num, int now)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
 				&httptest.httptest.variables, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
-		httptest.httptest.agent = zbx_strdup(NULL, row[6]);
+		httptest.httptest.headers = zbx_strdup(NULL, row[6]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.headers, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.httptest.agent = zbx_strdup(NULL, row[7]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 				&httptest.httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[7])))
+		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[8])))
 		{
-			httptest.httptest.http_user = zbx_strdup(NULL, row[8]);
+			httptest.httptest.http_user = zbx_strdup(NULL, row[9]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 					&httptest.httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
-			httptest.httptest.http_password = zbx_strdup(NULL, row[9]);
+			httptest.httptest.http_password = zbx_strdup(NULL, row[10]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
-		httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
+		httptest.httptest.http_proxy = zbx_strdup(NULL, row[11]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
 				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
-		httptest.httptest.retries = atoi(row[11]);
+		httptest.httptest.retries = atoi(row[12]);
 
-		/* add httptest varriables to the current test macro cache */
+		httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[13]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.ssl_cert_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[14]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL,
+				&httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[15]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+				&httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
+
+		httptest.httptest.verify_peer = atoi(row[16]);
+		httptest.httptest.verify_host = atoi(row[17]);
+
+		/* add httptest variables to the current test macro cache */
 		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
 
 		process_httptest(&host, &httptest);
 
+		zbx_free(httptest.httptest.ssl_key_password);
+		zbx_free(httptest.httptest.ssl_key_file);
+		zbx_free(httptest.httptest.ssl_cert_file);
 		zbx_free(httptest.httptest.http_proxy);
 		if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
 		{
@@ -684,6 +847,7 @@ int	process_httptests(int httppoller_num, int now)
 			zbx_free(httptest.httptest.http_user);
 		}
 		zbx_free(httptest.httptest.agent);
+		zbx_free(httptest.httptest.headers);
 		zbx_free(httptest.httptest.variables);
 
 		/* clear the macro cache used in this http test */
