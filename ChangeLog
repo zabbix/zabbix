@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+........S. [ZBX-3163] fixed trigger evaluation order so that it takes dependencies into account (asaveljevs)
 A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
 ..F....... [ZBX-8200] improved performance of Monitoring / Events page (Krists)
 A.F....... [ZBX-7983] improved performance of "System status" widget (Eduard, Ivo)

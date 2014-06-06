@@ -51,6 +51,7 @@ typedef struct
 	const char	*expression;
 	const char	*error;
 	int		lastchange;
+	unsigned char	topoindex;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
@@ -63,7 +64,7 @@ ZBX_DC_TRIGGER;
 typedef struct zbx_dc_trigger_deplist_s
 {
 	zbx_uint64_t				triggerid;
-	const ZBX_DC_TRIGGER			*trigger;
+	ZBX_DC_TRIGGER				*trigger;
 	const struct zbx_dc_trigger_deplist_s	**dependencies;
 }
 ZBX_DC_TRIGGER_DEPLIST;
@@ -1540,16 +1541,20 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		DCstrpool_replace(found, &trigger->description, row[1]);
 		DCstrpool_replace(found, &trigger->expression, row[2]);
-		DCstrpool_replace(found, &trigger->error, row[3]);
-		trigger->priority = (unsigned char)atoi(row[4]);
-		trigger->type = (unsigned char)atoi(row[5]);
-		trigger->value = (unsigned char)atoi(row[6]);
-		trigger->state = (unsigned char)atoi(row[7]);
+		ZBX_STR2UCHAR(trigger->priority, row[4]);
+		ZBX_STR2UCHAR(trigger->type, row[5]);
 		trigger->lastchange = atoi(row[8]);
-		trigger->status = (unsigned char)atoi(row[9]);
+		ZBX_STR2UCHAR(trigger->status, row[9]);
 
 		if (0 == found)
+		{
+			DCstrpool_replace(found, &trigger->error, row[3]);
+			ZBX_STR2UCHAR(trigger->value, row[6]);
+			ZBX_STR2UCHAR(trigger->state, row[7]);
 			trigger->locked = 0;
+		}
+
+		trigger->topoindex = 1;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -1574,6 +1579,8 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+static void	DCconfig_sort_triggers_topologically();
 
 static void	DCsync_trigdeps(DB_RESULT tdep_result)
 {
@@ -1688,6 +1695,8 @@ static void	DCsync_trigdeps(DB_RESULT tdep_result)
 
 	zbx_vector_uint64_destroy(&ids_down);
 	zbx_vector_uint64_destroy(&ids_up);
+
+	DCconfig_sort_triggers_topologically();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -3923,6 +3932,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	dst_trigger->lastchange = src_trigger->lastchange;
+	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
 }
 
@@ -4243,8 +4253,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -4380,8 +4388,6 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
@@ -5298,7 +5304,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 
 	if (32 < level)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency detected (triggerid:" ZBX_FS_UI64 ")",
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
 				trigdep->triggerid);
 		return SUCCEED;
 	}
@@ -5326,7 +5332,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
  *                                                                            *
  * Function: DCconfig_check_trigger_dependencies                              *
  *                                                                            *
- * Purpose: check whether any of trigger dependencies have value TRUE         *
+ * Purpose: check whether any of trigger dependencies have value PROBLEM      *
  *                                                                            *
  * Return value: SUCCEED - trigger can change its value                       *
  *               FAIL - otherwise                                             *
@@ -5347,6 +5353,86 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 	UNLOCK_CACHE;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: helper function for DCconfig_sort_triggers_topologically()       *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char	DCconfig_sort_triggers_topologically_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
+{
+	int				i;
+	unsigned char			topoindex = 2, next_topoindex;
+	ZBX_DC_TRIGGER			*trigger;
+	const ZBX_DC_TRIGGER		*next_trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
+
+	if (32 < level)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
+				trigdep->triggerid);
+		goto exit;
+	}
+
+	trigger = trigdep->trigger;
+
+	if (NULL != trigger && 0 == trigger->topoindex)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "trigger dependencies contain a cycle (triggerid:" ZBX_FS_UI64 ")",
+				trigdep->triggerid);
+		goto exit;
+	}
+
+	if (NULL != trigger)
+		trigger->topoindex = 0;
+
+	for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
+	{
+		if (NULL != (next_trigger = next_trigdep->trigger) && 1 < (next_topoindex = next_trigger->topoindex))
+			goto next;
+
+		if (NULL == next_trigdep->dependencies)
+			continue;
+
+		next_topoindex = DCconfig_sort_triggers_topologically_rec(next_trigdep, level + 1);
+next:
+		if (topoindex < next_topoindex + 1)
+			topoindex = next_topoindex + 1;
+	}
+
+	if (NULL != trigger)
+		trigger->topoindex = topoindex;
+exit:
+	return topoindex;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_sort_triggers_topologically                             *
+ *                                                                            *
+ * Purpose: assign each trigger an index based on trigger dependency topology *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCconfig_sort_triggers_topologically()
+{
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_TRIGGER			*trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+
+	zbx_hashset_iter_reset(&config->trigdeps, &iter);
+
+	while (NULL != (trigdep = zbx_hashset_iter_next(&iter)))
+	{
+		trigger = trigdep->trigger;
+
+		if ((NULL != trigger && 1 < trigger->topoindex) || NULL == trigdep->dependencies)
+			continue;
+
+		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
+	}
 }
 
 /******************************************************************************
