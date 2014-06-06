@@ -2174,7 +2174,9 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
-
+#ifdef HAVE_ORACLE
+		size_t			str_alloc = 0, str_offset = 0;
+#endif
 		switch (field->type)
 		{
 			case ZBX_TYPE_CHAR:
@@ -2182,9 +2184,11 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = zbx_strdup(NULL, value->str);
+				row[i].str = NULL;
+				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
+						zbx_strlen_utf8_n(value->str, field->length));
 #else
-				row[i].str = DBdyn_escape_string(value->str);
+				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
 				break;
 			default:
