@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
 ..F....... [ZBX-8200] improved performance of Monitoring / Events page (Krists)
 ..F....... [ZBX-7536] now host visible names are shown in popups instead of hostname (Andrejs)
 ..F....... [ZBX-8292] fixed host prototype creation (Krists)
@@ -180,6 +181,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Romanian,
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
 ..F....... [ZBX-8200] improved performance of Monitoring / Events page (Krists)
 A.F....... [ZBX-7983] improved performance of "System status" widget (Eduard, Ivo)
 ........S. [ZBX-7901] improved value cache database operations when caching count based requests (wiper)
