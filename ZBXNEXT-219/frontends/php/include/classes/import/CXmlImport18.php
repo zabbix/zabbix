@@ -852,6 +852,14 @@ class CXmlImport18 {
 
 			$hosts = $xpath->query('hosts/host');
 
+			if ($rules['triggers']['deleteMissing']) {
+				// stores parsed hosts that exist on XML
+				$hostsXML = array();
+
+				// stores triggers that exist on XML and also store hosts to which they belong to
+				$triggersXML = array();
+			}
+
 			foreach ($hosts as $host) {
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
@@ -1156,6 +1164,11 @@ class CXmlImport18 {
 				}
 				$current_hostname = $host_db['host'];
 
+				if ($rules['triggers']['deleteMissing']) {
+					// since triggers belong to multiple hosts, they can be deleted after all hosts have been parsed
+					$hostsXML[] = $current_hostid;
+				}
+
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
 					$templates = $xpath->query('templates/template', $host);
@@ -1315,8 +1328,8 @@ class CXmlImport18 {
 						));
 						$current_item = reset($current_item);
 
-						// items created during import will already be "preserved"
-						// we must store item IDs before we skip some rules, otherwise all items get deleted
+						// items created and updated during should be "preserved", so we must store item IDs
+						// before we skip some rules, otherwise all items get deleted
 						if ($rules['items']['deleteMissing']) {
 							$itemsToPreserve[] = $current_item['itemid'];
 						}
@@ -1424,28 +1437,6 @@ class CXmlImport18 {
 
 
 // TRIGGERS {{{
-				if ($rules['triggers']['deleteMissing']) {
-					$triggersToPreserve = array();
-					$triggersToDelete = array();
-
-					$dbTriggersAll = API::Trigger()->get(array(
-						'output' => array('triggerid'),
-						'hostids' => array($current_hostid),
-						'selectHosts' => array('hostid'),
-						'nopermissions' => true
-					));
-
-					foreach ($dbTriggersAll as $dbTrigger) {
-						// triggers that belong to multiple hosts will be preserved. Others are potentially deletable.
-						if (count($dbTrigger['hosts']) > 1) {
-							$triggersToPreserve[$dbTrigger['triggerid']] = $dbTrigger['triggerid'];
-						}
-						else {
-							$triggersToDelete[] = $dbTrigger['triggerid'];
-						}
-					}
-				}
-
 				if ($rules['triggers']['updateExisting']
 						|| $rules['triggers']['createMissing']
 						|| $rules['triggers']['deleteMissing']) {
@@ -1482,15 +1473,18 @@ class CXmlImport18 {
 							'output' => array('triggerid'),
 							'filter' => array('description' => $trigger_db['description']),
 							'hostids' => array($current_hostid),
+							'selectHosts' => array('hostid'),
 							'nopermissions' => true,
 							'limit' => 1,
 						));
 						$currentTrigger = reset($currentTrigger);
+
 						if ($currentTrigger) {
 							$dbTriggers = API::Trigger()->get(array(
 								'output' => API_OUTPUT_EXTEND,
 								'filter' => array('description' => $trigger_db['description']),
 								'hostids' => array($current_hostid),
+								'selectHosts' => array('hostid'),
 								'editable' => true
 							));
 
@@ -1509,10 +1503,10 @@ class CXmlImport18 {
 								}
 							}
 
-							// triggers created during import will already be "preserved"
-							// we must store trigger IDs before we skip some rules
+							// we must store trigger data before we skip rules
 							if ($rules['triggers']['deleteMissing']) {
-								$triggersToPreserve[$currentTrigger['triggerid']] = $currentTrigger['triggerid'];
+								$triggersXML[$currentTrigger['triggerid']]['triggerid'] = $currentTrigger['triggerid'];
+								$triggersXML[$currentTrigger['triggerid']]['hosts'] = $currentTrigger['hosts'];
 							}
 						}
 						unset($trigger_db['hostid']);
@@ -1556,20 +1550,14 @@ class CXmlImport18 {
 
 						$triggersForDependencies = array_merge($triggersForDependencies, $triggersCreated);
 					}
-
-					// compare potentially deletable triggers in DB with XML and delete triggers missing from XML
-					if ($rules['triggers']['deleteMissing']) {
-						$triggersToDelete = array_diff($triggersToDelete, $triggersToPreserve);
-						if ($triggersToDelete) {
-							API::Trigger()->delete($triggersToDelete);
-						}
-					}
 				}
 // }}} TRIGGERS
 
 
 // GRAPHS {{{
-				if (!empty($rules['graphs']['updateExisting']) || !empty($rules['graphs']['createMissing'])) {
+				if ($rules['graphs']['updateExisting']
+						|| $rules['graphs']['createMissing']
+						|| $rules['graphs']['deleteMissing']) {
 					$graphs = $xpath->query('graphs/graph', $host);
 
 					$graphs_to_add = array();
@@ -1812,7 +1800,33 @@ class CXmlImport18 {
 						}
 					}
 				}
+			}
 
+			// there are some missing triggers left on DB because they belong to multiple hosts
+			// once we know all host IDs on XML, we now check again triggers and to which hosts they belong to
+			if ($rules['triggers']['deleteMissing']) {
+				// select only triggers from already parsed hosts
+				$dbTriggersAll = API::Trigger()->get(array(
+					'output' => array('triggerid'),
+					'hostids' => $hostsXML,
+					'selectHosts' => array('hostid'),
+					'preservekeys' => true,
+					'nopermissions' => true
+				));
+
+				$triggersToDelete = array_diff_key($dbTriggersAll, $triggersXML);
+
+				// check that potentially deletable trigger belongs to same hosts that are in XML
+				// if some triggers belong to more hosts than current XML contains, don't delete them
+				$hostsXML = array_flip($hostsXML);
+
+				foreach ($triggersToDelete as $triggerId => $trigger) {
+					$triggerHosts = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
+
+					if (!array_diff_key($triggerHosts, $hostsXML)) {
+						API::Trigger()->delete(array($triggerId));
+					}
+				}
 			}
 
 // DEPENDENCIES
