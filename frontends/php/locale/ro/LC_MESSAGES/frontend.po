@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-02 00:10+0300\n"
+"POT-Creation-Date: 2014-06-06 20:50+0300\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -38,7 +38,7 @@ msgstr[0] "%1$d zi"
 msgstr[1] "%1$d zile"
 msgstr[2] "%1$d zile"
 
-#: include/blocks.inc.php:1043
+#: include/blocks.inc.php:1056
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -92,7 +92,7 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
 
-#: include/views/configuration.action.edit.php:450
+#: include/views/configuration.action.edit.php:474
 msgid "(0 - infinitely)"
 msgstr "(0 - infinit)"
 
@@ -102,7 +102,7 @@ msgstr "(0 - infinit)"
 msgid "(Only super admins can create groups)"
 msgstr "(Numai super administratorii pot creea grupuri)"
 
-#: include/forms.inc.php:596 include/forms.inc.php:611
+#: include/forms.inc.php:610 include/forms.inc.php:625
 msgid "(in days)"
 msgstr "(în zile)"
 
@@ -110,13 +110,13 @@ msgstr "(în zile)"
 msgid "(in sec)"
 msgstr "(în sec)"
 
-#: include/views/configuration.action.edit.php:461
+#: include/views/configuration.action.edit.php:485
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(minim 60 secunde, 0 - foloseste acțiunea implicită)"
 
 #: include/views/configuration.host.edit.php:382
 #: include/views/configuration.host.edit.php:403
-#: include/views/configuration.host.massupdate.php:134
+#: include/views/configuration.host.massupdate.php:152
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
 msgstr "(fără proxy)"
@@ -125,7 +125,7 @@ msgstr "(fără proxy)"
 msgid "(with warnings)"
 msgstr "(cu avertizări)"
 
-#: include/blocks.inc.php:1527
+#: include/blocks.inc.php:1538
 msgid "-"
 msgstr "-"
 
@@ -189,13 +189,13 @@ msgstr "CONFIRMĂRI ALARME"
 
 #: include/triggers.inc.php:1700
 #: include/views/configuration.action.edit.php:111
-#: include/views/configuration.action.edit.php:955
+#: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
 msgid "AND"
 msgstr "ȘI"
 
 #: include/views/configuration.action.edit.php:110
-#: include/views/configuration.action.edit.php:954
+#: include/views/configuration.action.edit.php:996
 msgid "AND / OR"
 msgstr "ȘI / SAU"
 
@@ -245,13 +245,13 @@ msgid "Account is blocked for %s seconds"
 msgstr "Contul este blocat pentru %s secunde"
 
 #: events.php:590 events.php:603 include/actions.inc.php:256
-#: include/blocks.inc.php:923 include/blocks.inc.php:1500
+#: include/blocks.inc.php:936 include/blocks.inc.php:1511
 #: include/events.inc.php:204 include/events.inc.php:279
-#: include/views/configuration.action.edit.php:1013
+#: include/views/configuration.action.edit.php:1055
 msgid "Ack"
 msgstr "Cnf"
 
-#: acknow.php:230 jsLoader.php:198 tr_status.php:713
+#: acknow.php:230 jsLoader.php:199 tr_status.php:713
 msgid "Acknowledge"
 msgstr "Confirmare"
 
@@ -294,16 +294,16 @@ msgstr "Confirmarea dezactivată"
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:337
-#: include/views/configuration.action.edit.php:341
-#: include/views/configuration.action.edit.php:519
-#: include/views/configuration.action.edit.php:528
-#: include/views/configuration.action.edit.php:647
-#: include/views/configuration.action.edit.php:898
-#: include/views/configuration.action.edit.php:1040
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:365
+#: include/views/configuration.action.edit.php:543
+#: include/views/configuration.action.edit.php:552
+#: include/views/configuration.action.edit.php:671
+#: include/views/configuration.action.edit.php:940
+#: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.graph.edit.php:229
 #: include/views/configuration.host.edit.php:653
-#: include/views/configuration.host.prototype.edit.php:214
+#: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
 #: include/views/configuration.maintenance.edit.php:103
@@ -356,7 +356,7 @@ msgstr[0] "Acțiune activată"
 msgstr[1] "Acțiuni dezactivate"
 msgstr[2] "Acțiuni dezactivate"
 
-#: include/views/configuration.action.edit.php:420
+#: include/views/configuration.action.edit.php:444
 msgid "Action operations"
 msgstr "Operațiuni acțiune"
 
@@ -364,8 +364,8 @@ msgstr "Operațiuni acțiune"
 msgid "Action updated"
 msgstr "Acțiune actualizată"
 
-#: events.php:591 events.php:604 include/blocks.inc.php:924
-#: include/blocks.inc.php:1501 include/events.inc.php:205
+#: events.php:591 events.php:604 include/blocks.inc.php:937
+#: include/blocks.inc.php:1512 include/events.inc.php:205
 #: include/menu.inc.php:191 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -395,9 +395,9 @@ msgstr "Activ de la"
 msgid "Active till"
 msgstr "Activ până la"
 
-#: include/blocks.inc.php:1219 include/blocks.inc.php:1225
-#: include/blocks.inc.php:1343 include/blocks.inc.php:1388
-#: include/blocks.inc.php:1394 include/reports.inc.php:122
+#: include/blocks.inc.php:1232 include/blocks.inc.php:1238
+#: include/blocks.inc.php:1356 include/blocks.inc.php:1401
+#: include/blocks.inc.php:1407 include/reports.inc.php:122
 #: include/reports.inc.php:220 include/reports.inc.php:265
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.general.iconmap.edit.php:119
@@ -410,21 +410,21 @@ msgstr "Activ până la"
 #: include/views/administration.users.edit.php:70
 #: include/views/administration.users.edit.php:212
 #: include/views/common.macros.php:66
-#: include/views/configuration.action.edit.php:317
-#: include/views/configuration.action.edit.php:523
-#: include/views/configuration.action.edit.php:532
-#: include/views/configuration.action.edit.php:808
-#: include/views/configuration.action.edit.php:853
-#: include/views/configuration.action.edit.php:1019
-#: include/views/configuration.action.edit.php:1028
+#: include/views/configuration.action.edit.php:341
+#: include/views/configuration.action.edit.php:547
+#: include/views/configuration.action.edit.php:556
+#: include/views/configuration.action.edit.php:844
+#: include/views/configuration.action.edit.php:898
+#: include/views/configuration.action.edit.php:1061
+#: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.graph.edit.php:232
 #: include/views/configuration.host.edit.php:245
 #: include/views/configuration.host.edit.php:262
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.edit.php:293
-#: include/views/configuration.host.edit.php:689
-#: include/views/configuration.host.prototype.edit.php:193
-#: include/views/configuration.host.prototype.edit.php:248
+#: include/views/configuration.host.edit.php:695
+#: include/views/configuration.host.prototype.edit.php:199
+#: include/views/configuration.host.prototype.edit.php:260
 #: include/views/configuration.httpconf.edit.php:231
 #: include/views/configuration.httpconf.popup.php:93
 #: include/views/configuration.item.edit.php:315
@@ -434,7 +434,7 @@ msgstr "Activ până la"
 #: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:426
+#: include/views/configuration.template.edit.php:432
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:98
 #: include/views/configuration.triggers.edit.php:293
@@ -442,8 +442,8 @@ msgstr "Activ până la"
 #: include/views/js/adm.regexprs.edit.js.php:249
 #: include/views/js/configuration.action.edit.js.php:287
 #: include/views/js/configuration.discovery.edit.js.php:110
-#: include/views/js/configuration.sysmaps.js.php:189
-#: include/views/js/configuration.sysmaps.js.php:402
+#: include/views/js/configuration.sysmaps.js.php:185
+#: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.history.php:100 popup_bitem.php:166
 #: popup_media.php:141 popup_period.php:134 tr_logform.php:293
 #: tr_status.php:768
@@ -470,11 +470,11 @@ msgstr "Adaugă link"
 msgid "Add missing"
 msgstr "Adaugă lipsă"
 
-#: include/views/configuration.item.massupdate.php:534
+#: include/views/configuration.item.massupdate.php:546
 msgid "Add new or existing applications"
 msgstr "Adaugă aplicații noi sau existente"
 
-#: include/views/configuration.host.massupdate.php:107
+#: include/views/configuration.host.massupdate.php:119
 msgid "Add new or existing host groups"
 msgstr "Adaugă grupuri de servere noi sau existente"
 
@@ -499,7 +499,7 @@ msgstr "Adaugă la favorite"
 msgid "Add to host group"
 msgstr "Adaugă la grupul de servere"
 
-#: include/actions.inc.php:429 include/views/configuration.action.edit.php:832
+#: include/actions.inc.php:429 include/views/configuration.action.edit.php:865
 msgid "Add to host groups"
 msgstr "Adaugă la grupurile de servere"
 
@@ -519,7 +519,7 @@ msgstr "Administrare"
 msgid "Advanced labels"
 msgstr "Etichete avansate"
 
-#: include/blocks.inc.php:921 include/blocks.inc.php:1498
+#: include/blocks.inc.php:934 include/blocks.inc.php:1509
 #: include/events.inc.php:203 include/events.inc.php:279
 #: include/events.inc.php:282 tr_status.php:373
 msgid "Age"
@@ -535,7 +535,7 @@ msgid "Age less than %s"
 msgstr "Vechime mai mică decât %s"
 
 #: include/items.inc.php:280 include/views/administration.script.list.php:64
-#: include/views/configuration.httpconf.edit.php:139 popup.php:1520
+#: include/views/configuration.httpconf.edit.php:139 popup.php:1885
 msgid "Agent"
 msgstr "Agent"
 
@@ -560,7 +560,7 @@ msgid "Aggregate checks do not require any agent running on a host being monitor
 msgstr "Verificările de ansamblu nu necesită nici un agent care rulează pe un server sub minitorizare. Serveriul Zabbix colectează informații de ansamblu prin cereri directe din baza de date. Vezi manualul Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
-#: include/views/administration.users.list.php:55 popup.php:615 users.php:44
+#: include/views/administration.users.list.php:55 popup.php:631 users.php:44
 msgid "Alias"
 msgstr "Alias"
 
@@ -568,9 +568,9 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Aliniază icon-uri"
 
-#: include/blocks.inc.php:1321 include/blocks.inc.php:1330
-#: include/blocks.inc.php:1376 include/blocks.inc.php:1460
-#: include/blocks.inc.php:1469 include/nodes.inc.php:174
+#: include/blocks.inc.php:1334 include/blocks.inc.php:1343
+#: include/blocks.inc.php:1389 include/blocks.inc.php:1473
+#: include/blocks.inc.php:1482 include/nodes.inc.php:174
 #: include/page_header.php:300 include/reports.inc.php:346
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.auditlogs.list.php:52
@@ -581,11 +581,12 @@ msgstr "Aliniază icon-uri"
 #: include/views/administration.script.list.php:83
 #: include/views/administration.usergroups.edit.php:45
 #: include/views/administration.users.list.php:36
-#: include/views/configuration.action.edit.php:570
+#: include/views/configuration.action.edit.php:594
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:121
 #: include/views/monitoring.dashconf.php:48
-#: include/views/monitoring.dashconf.php:92 jsLoader.php:90 popup_right.php:72
+#: include/views/monitoring.dashconf.php:104 jsLoader.php:90
+#: popup_right.php:72
 msgid "All"
 msgstr "Tot"
 
@@ -622,12 +623,12 @@ msgid "Any character string included"
 msgstr "Orice șir de caractere inclus"
 
 #: applications.php:118 httpconf.php:42 include/actions.inc.php:90
-#: include/audit.inc.php:32 include/forms.inc.php:582
+#: include/audit.inc.php:32 include/forms.inc.php:596
 #: include/views/configuration.application.edit.php:46
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.httpconf.edit.php:64
 #: include/views/configuration.httpconf.edit.php:69
-#: include/views/configuration.screen.constructor.edit.php:409
+#: include/views/configuration.screen.constructor.edit.php:427
 #: include/views/inventory.host.view.php:238
 #: include/views/monitoring.overview.php:32
 msgid "Application"
@@ -659,7 +660,7 @@ msgstr "Aplicație actualizată"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplicația cu ID \"%1$s\" nu este disponibilă pe \"%2$s\"."
 
-#: hosts.php:808 hosts.php:898 include/forms.inc.php:907
+#: hosts.php:808 hosts.php:898 include/forms.inc.php:921
 #: include/html.inc.php:401 include/html.inc.php:405
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:433
@@ -667,15 +668,15 @@ msgstr "Aplicația cu ID \"%1$s\" nu este disponibilă pe \"%2$s\"."
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.template.edit.php:195
-#: include/views/inventory.host.view.php:227 popup.php:40 search.php:140
+#: include/views/inventory.host.view.php:227 popup.php:56 search.php:140
 #: search.php:166 search.php:192 search.php:382 search.php:405 search.php:435
 #: templates.php:488 templates.php:548
 msgid "Applications"
 msgstr "Aplicații"
 
-#: include/views/js/configuration.sysmaps.js.php:198
-#: include/views/js/configuration.sysmaps.js.php:299
-#: include/views/js/configuration.sysmaps.js.php:412
+#: include/views/js/configuration.sysmaps.js.php:194
+#: include/views/js/configuration.sysmaps.js.php:295
+#: include/views/js/configuration.sysmaps.js.php:408
 msgid "Apply"
 msgstr "Aplică"
 
@@ -688,7 +689,7 @@ msgstr "Abordare"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/forms.inc.php:1698 include/func.inc.php:132
+#: include/forms.inc.php:1712 include/func.inc.php:132
 #: include/func.inc.php:269 jsLoader.php:121
 msgid "April"
 msgstr "Aprilie"
@@ -756,7 +757,7 @@ msgstr[0] "La %1$s:%2$s zilnic"
 msgstr[1] "La %1$s:%2$s în fiecare %3$s zi"
 msgstr[2] "La %1$s:%2$s în fiecare %3$s zi"
 
-#: include/forms.inc.php:1779
+#: include/forms.inc.php:1793
 msgid "At (hour:minute)"
 msgstr "La (oră:minut)"
 
@@ -798,7 +799,7 @@ msgstr "Loguri audit"
 msgid "Aug"
 msgstr "Aug"
 
-#: include/forms.inc.php:1690 include/func.inc.php:136
+#: include/forms.inc.php:1704 include/func.inc.php:136
 #: include/func.inc.php:273 jsLoader.php:125
 msgid "August"
 msgstr "August"
@@ -807,13 +808,13 @@ msgstr "August"
 msgid "Authentication"
 msgstr "Autentificare"
 
-#: include/views/configuration.host.edit.php:717
-#: include/views/configuration.host.edit.php:729
-#: include/views/configuration.host.prototype.edit.php:261
+#: include/views/configuration.host.edit.php:723
+#: include/views/configuration.host.edit.php:735
+#: include/views/configuration.host.prototype.edit.php:273
 msgid "Authentication algorithm"
 msgstr "Algoritm de autentificare"
 
-#: include/views/configuration.action.edit.php:726
+#: include/views/configuration.action.edit.php:750
 #: include/views/configuration.item.edit.php:182
 #: include/views/configuration.item.massupdate.php:250
 msgid "Authentication method"
@@ -869,9 +870,9 @@ msgstr "Autoînregistrare evenimente si avertizări perioadă de stocare a datel
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Autoînregistrare evenimente si avertizări perioadă de stocare a datelor (în zile) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:777
-#: include/views/configuration.host.massupdate.php:242
-#: include/views/configuration.host.prototype.edit.php:303
+#: include/views/configuration.host.edit.php:783
+#: include/views/configuration.host.massupdate.php:263
+#: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
 msgstr "Automată"
 
@@ -879,8 +880,8 @@ msgstr "Automată"
 msgid "Automatic icon mapping"
 msgstr "Maparea icon automată"
 
-#: include/views/js/configuration.sysmaps.js.php:130
-#: include/views/js/configuration.sysmaps.js.php:255
+#: include/views/js/configuration.sysmaps.js.php:126
+#: include/views/js/configuration.sysmaps.js.php:251
 msgid "Automatic icon selection"
 msgstr "Selectarea automată icon"
 
@@ -982,8 +983,8 @@ msgstr "Intermitent"
 msgid "Blocked"
 msgstr "Blocat"
 
-#: include/graphs.inc.php:69 include/views/js/configuration.sysmaps.js.php:370
-#: include/views/js/configuration.sysmaps.js.php:448
+#: include/graphs.inc.php:69 include/views/js/configuration.sysmaps.js.php:366
+#: include/views/js/configuration.sysmaps.js.php:444
 msgid "Bold line"
 msgstr "Linie îngroșate"
 
@@ -991,10 +992,10 @@ msgstr "Linie îngroșate"
 msgid "Boolean"
 msgstr "Boolean"
 
-#: include/views/configuration.screen.constructor.edit.php:606
+#: include/views/configuration.screen.constructor.edit.php:630
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:83
-#: include/views/js/configuration.sysmaps.js.php:245
+#: include/views/js/configuration.sysmaps.js.php:241
 msgid "Bottom"
 msgstr "Jos"
 
@@ -1261,8 +1262,8 @@ msgstr "Canada (136 caractere)"
 #: include/classes/class.cbuttoncancel.php:25 include/js.inc.php:222
 #: include/setup.inc.php:128
 #: include/views/administration.general.regularexpressions.edit.php:58
-#: include/views/configuration.action.edit.php:1021
-#: include/views/configuration.action.edit.php:1030
+#: include/views/configuration.action.edit.php:1063
+#: include/views/configuration.action.edit.php:1072
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:62
 #: include/views/js/administration.general.housekeeper.edit.js.php:127
@@ -1306,7 +1307,7 @@ msgstr "Nu se poate adăuga condiția acțiunii"
 msgid "Cannot add application"
 msgstr "Nu se poate adăuga aplicația"
 
-#: api/classes/CTrigger.php:1428
+#: api/classes/CTrigger.php:1421
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nu se poate adăuga dependința server - șablon."
 
@@ -1517,11 +1518,11 @@ msgstr "Nu se poate crea un prototip de server pe serverul detectat \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Nu se poate crea o altă conexiune la baza de date."
 
-#: api/classes/CTrigger.php:1462
+#: api/classes/CTrigger.php:1455
 msgid "Cannot create circular dependencies."
 msgstr "Nu se pot crea dependințe circulare."
 
-#: api/classes/CTrigger.php:1434
+#: api/classes/CTrigger.php:1427
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nu se poate crea dependință cu trigger-ul însuși."
 
@@ -1572,7 +1573,7 @@ msgstr "Nu se poate șterge acțiunea"
 msgid "Cannot delete application"
 msgstr "Nu se poate șterge aplicația"
 
-#: api/classes/CTrigger.php:1087
+#: api/classes/CTrigger.php:1080
 msgid "Cannot delete dependency"
 msgstr "Nu se poate șterge dependința"
 
@@ -1750,7 +1751,7 @@ msgstr "Nu se pot șterge elementele bazate pe șabloane"
 msgid "Cannot delete templated items."
 msgstr "Nu se pot șterge elementele bazate pe șabloane."
 
-#: api/classes/CTrigger.php:1899 api/classes/CTriggerPrototype.php:649
+#: api/classes/CTrigger.php:1925 api/classes/CTriggerPrototype.php:649
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Nu se poate șterge trigger-ul \"%1$s:%2$s\" bazat pe un șablon."
@@ -2130,7 +2131,7 @@ msgstr "Nu se poate formata arborele."
 msgid "Cannot have empty visible template name"
 msgstr "Numele vizibil al șablonului nu poate fi gol"
 
-#: api/classes/CTrigger.php:1120 api/classes/CTrigger.php:1259
+#: api/classes/CTrigger.php:1113 api/classes/CTrigger.php:1252
 #: api/classes/CTriggerPrototype.php:730 api/classes/CTriggerPrototype.php:788
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2248,7 +2249,7 @@ msgstr "Nu se poate trimite comanda, verificați conexiunea cu serverul Zabbix \
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nu se poate seta \"%1$s\" pentru elementul \"%2$s\"."
 
-#: api/classes/CTrigger.php:659
+#: api/classes/CTrigger.php:652
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "Nu se poate seta \"%1$s\" pentru trigger-ul \"%2$s\"."
@@ -2331,7 +2332,7 @@ msgstr "Nu se poate actualiza \"%1$s\" pentru un server detectat."
 msgid "Cannot update \"%1$s\" for a discovered item."
 msgstr "Nu se poate actualiza \"%1$s\" pentru un element detectat."
 
-#: api/classes/CTrigger.php:631
+#: api/classes/CTrigger.php:624
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered trigger."
 msgstr "Nu se poate actualiza \"%1$s\" pentru un trigger detectat."
@@ -2346,7 +2347,7 @@ msgstr "Nu se poate actualiza \"%1$s\" pentru acțiunea \"%2$s\"."
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Nu se poate actualiza \"%1$s\" pentru elementul \"%2$s\"."
 
-#: api/classes/CTrigger.php:659
+#: api/classes/CTrigger.php:652
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Nu se poate actualiza \"%1$s\" pentru trigger-ul \"%2$s\"."
@@ -2610,7 +2611,7 @@ msgstr "Identifică toate capcanele SNMP de la adresa corespondenta care se potr
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr "Identifică toate capcanele SNMP care nu sunt identificare de vreunul din itemii snmptrap[] de la o adresă corespondentă a interfeței."
 
-#: include/views/configuration.screen.constructor.edit.php:590
+#: include/views/configuration.screen.constructor.edit.php:614
 msgid "Center"
 msgstr "Centrat"
 
@@ -2730,7 +2731,7 @@ msgstr "Verifică dacă acest port este in starea LISTEN. 0 -  nu este, 1 - este
 msgid "Checks should be unique."
 msgstr "Verificările trebuie să fie unice."
 
-#: include/nodes.inc.php:272
+#: include/nodes.inc.php:301
 msgid "Child"
 msgstr "Copil"
 
@@ -2783,7 +2784,7 @@ msgstr "Șterge istoric și tendințe"
 msgid "Clear history for selected"
 msgstr "Șterge istoric pentru selecția"
 
-#: include/views/configuration.host.massupdate.php:180
+#: include/views/configuration.host.massupdate.php:200
 msgid "Clear when unlinking"
 msgstr "Șterge la deconectare"
 
@@ -2794,21 +2795,21 @@ msgstr "Ceas"
 #: include/views/administration.general.iconmap.edit.php:145
 #: include/views/administration.general.regularexpressions.edit.php:88
 #: include/views/administration.proxy.edit.php:100
-#: include/views/administration.script.edit.php:115
-#: include/views/configuration.action.edit.php:1048
+#: include/views/administration.script.edit.php:120
+#: include/views/configuration.action.edit.php:1090
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:843
+#: include/views/configuration.host.edit.php:849
 #: include/views/configuration.hostgroups.edit.php:86
-#: include/views/configuration.host.prototype.edit.php:324
+#: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
 #: include/views/configuration.item.edit.php:497
 #: include/views/configuration.maintenance.edit.php:201
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:449
+#: include/views/configuration.template.edit.php:455
 #: include/views/configuration.triggers.edit.php:315
 msgid "Clone"
 msgstr "Clonă"
@@ -2816,9 +2817,9 @@ msgstr "Clonă"
 #: include/views/js/configuration.discovery.edit.js.php:537
 #: include/views/js/configuration.discovery.edit.js.php:601
 #: include/views/js/configuration.discovery.edit.js.php:618
-#: include/views/js/configuration.sysmaps.js.php:200
-#: include/views/js/configuration.sysmaps.js.php:301
-#: include/views/js/configuration.sysmaps.js.php:414 jsLoader.php:152
+#: include/views/js/configuration.sysmaps.js.php:196
+#: include/views/js/configuration.sysmaps.js.php:297
+#: include/views/js/configuration.sysmaps.js.php:410 jsLoader.php:152
 #: jsLoader.php:177 tr_testexpr.php:183
 msgid "Close"
 msgstr "Închide"
@@ -2830,7 +2831,7 @@ msgstr "Închide constructorul de expresii"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
 #: include/views/configuration.graph.edit.php:228
-#: include/views/js/configuration.sysmaps.js.php:394 popup_bitem.php:43
+#: include/views/js/configuration.sysmaps.js.php:390 popup_bitem.php:43
 #: popup_bitem.php:160 popup_period.php:129
 msgid "Colour"
 msgstr "Culoare"
@@ -2841,11 +2842,11 @@ msgstr "Culoare"
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Culoarea \"%1$s\" nu este corectă: trebuie un cod hexadecimal (6 simboluri)."
 
-#: include/views/js/configuration.sysmaps.js.php:378
+#: include/views/js/configuration.sysmaps.js.php:374
 msgid "Colour (OK)"
 msgstr "Culoare (OK)"
 
-#: include/views/configuration.screen.constructor.edit.php:609
+#: include/views/configuration.screen.constructor.edit.php:633
 #: screenedit.php:46
 msgid "Column span"
 msgstr "Expansiune coloană"
@@ -2875,9 +2876,9 @@ msgstr "Comanda nu poate fi goală."
 
 #: include/views/administration.script.edit.php:61
 #: include/views/administration.script.list.php:42
-#: include/views/configuration.action.edit.php:776
-#: include/views/configuration.action.edit.php:780 popup.php:1472
-#: popup.php:1479
+#: include/views/configuration.action.edit.php:800
+#: include/views/configuration.action.edit.php:804 popup.php:1837
+#: popup.php:1844
 msgid "Commands"
 msgstr "Comenzi"
 
@@ -2912,14 +2913,14 @@ msgid "Condition"
 msgstr "Condiție"
 
 #: include/views/configuration.action.edit.php:114
-#: include/views/configuration.action.edit.php:973
-#: include/views/configuration.action.edit.php:1041
+#: include/views/configuration.action.edit.php:1015
+#: include/views/configuration.action.edit.php:1083
 #: include/views/configuration.action.list.php:53
 msgid "Conditions"
 msgstr "Condiții"
 
 #: include/menu.inc.php:149 include/views/inventory.host.view.php:256
-#: jsLoader.php:199
+#: jsLoader.php:200
 msgid "Configuration"
 msgstr "Configurare"
 
@@ -3090,7 +3091,7 @@ msgstr "Configuraţie actualizată"
 msgid "Configure (Filter %s)"
 msgstr "Configurează (Filtrează %s)"
 
-#: include/views/administration.script.edit.php:100
+#: include/views/administration.script.edit.php:105
 msgid "Confirmation text"
 msgstr "Text de confirmare"
 
@@ -3102,7 +3103,7 @@ msgstr "Text de confirmare"
 #: include/views/inventory.host.view.php:125
 #: include/views/inventory.host.view.php:147
 #: include/views/inventory.host.view.php:168
-#: include/views/js/configuration.sysmaps.js.php:357
+#: include/views/js/configuration.sysmaps.js.php:353
 msgid "Connect to"
 msgstr "Conectare la"
 
@@ -3177,7 +3178,7 @@ msgstr "Comutări de context."
 msgid "Contract number"
 msgstr "Numărul contractului"
 
-#: include/views/js/configuration.sysmaps.js.php:165
+#: include/views/js/configuration.sysmaps.js.php:161
 msgid "Coordinates"
 msgstr "Coordonate"
 
@@ -3364,7 +3365,7 @@ msgstr "Creat: Element \"%1$s\" pe \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Creat: Prototip element \"%1$s\" pe \"%2$s\"."
 
-#: api/classes/CTrigger.php:1154
+#: api/classes/CTrigger.php:1147
 #, c-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Creat: Trigger \"%1$s\" pe \"%2$s\"."
@@ -3455,7 +3456,7 @@ msgstr "Multiplicator personalizat"
 msgid "Custom screens"
 msgstr "Ecrane personalizate"
 
-#: include/views/configuration.action.edit.php:699
+#: include/views/configuration.action.edit.php:723
 msgid "Custom script"
 msgstr "Script personalizat"
 
@@ -3539,7 +3540,7 @@ msgstr "Nume DNS"
 msgid "DOWN"
 msgstr "INACTIV"
 
-#: include/forms.inc.php:1647 include/maintenances.inc.php:36
+#: include/forms.inc.php:1661 include/maintenances.inc.php:36
 #: include/reports.inc.php:61 include/reports.inc.php:403
 #: include/reports.inc.php:411 report3.php:58 report4.php:108
 msgid "Daily"
@@ -3565,8 +3566,8 @@ msgstr "Configurare panou de supraveghere"
 msgid "Dashboard filter"
 msgstr "Filtru panou de supraveghere"
 
-#: include/graphs.inc.php:73 include/views/js/configuration.sysmaps.js.php:372
-#: include/views/js/configuration.sysmaps.js.php:450
+#: include/graphs.inc.php:73 include/views/js/configuration.sysmaps.js.php:368
+#: include/views/js/configuration.sysmaps.js.php:446
 msgid "Dashed line"
 msgstr "Linie întreruptă"
 
@@ -3641,7 +3642,7 @@ msgstr "Tipul bazei de date"
 msgid "Database user"
 msgstr "Utilizator bază de date"
 
-#: include/forms.inc.php:1714 include/forms.inc.php:1775 jsrpc.php:137
+#: include/forms.inc.php:1728 include/forms.inc.php:1789 jsrpc.php:137
 msgid "Date"
 msgstr "Dată"
 
@@ -3661,12 +3662,12 @@ msgstr "Data de mentenanță HW expiră"
 msgid "Date HW purchased"
 msgstr "Data achiziției HW"
 
-#: include/forms.inc.php:1716 report3.php:124 report4.php:168 report5.php:44
+#: include/forms.inc.php:1730 report3.php:124 report4.php:168 report5.php:44
 #: tr_status.php:295 tr_status.php:297
 msgid "Day"
 msgstr "Zi"
 
-#: include/forms.inc.php:1748
+#: include/forms.inc.php:1762
 msgid "Day of month"
 msgstr "Ziua lunii"
 
@@ -3686,8 +3687,8 @@ msgstr "Ziua din lună este > N"
 msgid "Day of month is NOT N"
 msgstr "Ziua din lună NU este N"
 
-#: include/forms.inc.php:1676 include/forms.inc.php:1719
-#: include/forms.inc.php:1744
+#: include/forms.inc.php:1690 include/forms.inc.php:1733
+#: include/forms.inc.php:1758
 msgid "Day of week"
 msgstr "Ziua săptămânii"
 
@@ -3707,7 +3708,7 @@ msgstr "Ziua săptămânii este > N"
 msgid "Day of week is NOT N"
 msgstr "Ziua săptămânii NU este N"
 
-#: include/forms.inc.php:1792 tr_status.php:295 tr_status.php:297
+#: include/forms.inc.php:1806 tr_status.php:295 tr_status.php:297
 msgid "Days"
 msgstr "Zile"
 
@@ -3729,7 +3730,7 @@ msgstr "Modu depanare actualizat"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:1710 include/func.inc.php:140
+#: include/forms.inc.php:1724 include/func.inc.php:140
 #: include/func.inc.php:277 jsLoader.php:129
 msgid "December"
 msgstr "Decembrie"
@@ -3740,13 +3741,13 @@ msgstr "Zecimal"
 
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
-#: include/views/configuration.action.edit.php:374
+#: include/views/configuration.action.edit.php:398
 #: include/views/configuration.host.edit.php:239
 #: include/views/configuration.host.edit.php:326
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
-#: include/views/js/configuration.sysmaps.js.php:136
-#: include/views/js/configuration.sysmaps.js.php:244
+#: include/views/js/configuration.sysmaps.js.php:132
+#: include/views/js/configuration.sysmaps.js.php:240
 #: include/views/monitoring.screen.php:88 jsLoader.php:151 popup_bitem.php:116
 #: popup_period.php:113 slides.php:234
 msgid "Default"
@@ -3761,11 +3762,11 @@ msgid "Default delay (in seconds)"
 msgstr "Întârziere implicită (în secunde)"
 
 #: include/views/configuration.action.edit.php:48
-#: include/views/configuration.action.edit.php:586
+#: include/views/configuration.action.edit.php:610
 msgid "Default message"
 msgstr "Mesaj implicit"
 
-#: actionconf.php:44 include/views/configuration.action.edit.php:327
+#: actionconf.php:44 include/views/configuration.action.edit.php:351
 msgid "Default operation step duration"
 msgstr "Durata etapei operației implicite"
 
@@ -3803,7 +3804,7 @@ msgstr "Întârziat de către"
 msgid "Delete"
 msgstr "Șterge"
 
-#: include/views/configuration.template.edit.php:452
+#: include/views/configuration.template.edit.php:458
 msgid "Delete and clear"
 msgstr "Șterge și curăță"
 
@@ -3811,7 +3812,7 @@ msgstr "Șterge și curăță"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Ștergere si curățare șabloane selectate? (Avertizare: toate serverele conectate vor fi șterse!)"
 
-#: include/views/configuration.template.edit.php:452
+#: include/views/configuration.template.edit.php:458
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Ștergere si curățare șablon? (Avertizare: toate serverele conectate vor fi șterse!)"
 
@@ -3819,7 +3820,7 @@ msgstr "Ștergere si curățare șablon? (Avertizare: toate serverele conectate 
 msgid "Delete application?"
 msgstr "Ștergere aplicație?"
 
-#: include/views/configuration.action.edit.php:1049
+#: include/views/configuration.action.edit.php:1091
 msgid "Delete current action?"
 msgstr "Ștergere acțiune curentă?"
 
@@ -3893,7 +3894,7 @@ msgstr "Ștergere scenariu?"
 msgid "Delete screen?"
 msgstr "Ștergere monitor?"
 
-#: include/views/administration.script.edit.php:116
+#: include/views/administration.script.edit.php:121
 msgid "Delete script?"
 msgstr "Ștergere script?"
 
@@ -3970,7 +3971,7 @@ msgstr "Ștergere grupuri selectate?"
 msgid "Delete selected host groups?"
 msgstr "Ștergere grupuri de servere selectate?"
 
-#: include/views/configuration.host.prototype.edit.php:321
+#: include/views/configuration.host.prototype.edit.php:333
 msgid "Delete selected host prototype?"
 msgstr "Ștergere prototipuri de servere selectați?"
 
@@ -3978,7 +3979,7 @@ msgstr "Ștergere prototipuri de servere selectați?"
 msgid "Delete selected host prototypes?"
 msgstr "Ștergere prototipuri de servere selectați?"
 
-#: include/views/configuration.host.edit.php:845
+#: include/views/configuration.host.edit.php:851
 msgid "Delete selected host?"
 msgstr "Ștergere server selectat?"
 
@@ -4082,7 +4083,7 @@ msgstr "Ștergere serviciu"
 msgid "Delete slide show?"
 msgstr "Ștergere prezentare?"
 
-#: include/views/configuration.template.edit.php:451
+#: include/views/configuration.template.edit.php:457
 msgid "Delete template?"
 msgstr "Ștergere șablon?"
 
@@ -4147,7 +4148,7 @@ msgstr "Ștergere: Proxy \"%1$s\"."
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Ștergere: Șablon \"%1$s\"."
 
-#: api/classes/CTrigger.php:857
+#: api/classes/CTrigger.php:850
 #, c-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Ștergere: Trigger \"%1$s\" pe \"%2$s\"."
@@ -4193,7 +4194,7 @@ msgstr "Dependenţă"
 
 #: include/triggers.inc.php:1398
 #: include/views/configuration.services.edit.php:114
-#: include/views/configuration.triggers.list.php:171 popup.php:759
+#: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:596
 msgid "Depends on"
 msgstr "Depinde de"
@@ -4207,20 +4208,20 @@ msgstr "Stare de implementare"
 #: include/views/administration.auditlogs.list.php:91
 #: include/views/administration.script.edit.php:70
 #: include/views/configuration.item.edit.php:483
-#: include/views/configuration.item.massupdate.php:546
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:48
-#: include/views/configuration.triggers.edit.php:245 popup.php:1076
+#: include/views/configuration.triggers.edit.php:245 popup.php:1441
 #: tr_logform.php:253
 msgid "Description"
 msgstr "Descriere"
 
-#: include/actions.inc.php:966 include/blocks.inc.php:729
+#: include/actions.inc.php:966 include/blocks.inc.php:742
 #: include/func.inc.php:2204
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
-#: include/views/configuration.action.edit.php:337
-#: include/views/configuration.action.edit.php:341
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:365
 #: include/views/inventory.host.view.php:285 jsrpc.php:136 queue.php:71
 msgid "Details"
 msgstr "Detalii"
@@ -4411,11 +4412,11 @@ msgstr "Dezactivare triggeri selectați?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:773
-#: include/views/configuration.host.massupdate.php:240
-#: include/views/configuration.host.prototype.edit.php:299
+#: include/views/configuration.host.edit.php:779
+#: include/views/configuration.host.massupdate.php:261
+#: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
-#: include/views/js/configuration.sysmaps.js.php:153
+#: include/views/js/configuration.sysmaps.js.php:149
 #: include/views/monitoring.dashconf.php:41 popup_media.php:137
 #: tr_logform.php:373
 msgid "Disabled"
@@ -4462,7 +4463,7 @@ msgstr "Verificare de detectare"
 msgid "Discovery check error"
 msgstr "Eroare la verificarea de detectare"
 
-#: popup.php:96
+#: popup.php:112
 msgid "Discovery checks"
 msgstr "Verificări de detectare"
 
@@ -4475,7 +4476,7 @@ msgid "Discovery object"
 msgstr "Obiect detectat"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1190 include/forms.inc.php:1136
+#: include/blocks.inc.php:1203 include/forms.inc.php:1150
 #: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:32
@@ -4533,7 +4534,7 @@ msgstr "Regulă de detecție actualizată"
 #: include/views/configuration.host.edit.php:540
 #: include/views/configuration.template.edit.php:285
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
-#: popup.php:92
+#: popup.php:108
 msgid "Discovery rules"
 msgstr "Reguli de detecție"
 
@@ -4578,12 +4579,12 @@ msgstr "Doreşti să înlocuiești expresia condițională?"
 msgid "Done"
 msgstr "Gata"
 
-#: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:371
-#: include/views/js/configuration.sysmaps.js.php:449 jsLoader.php:154
+#: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:367
+#: include/views/js/configuration.sysmaps.js.php:445 jsLoader.php:154
 msgid "Dot"
 msgstr "Punct"
 
-#: include/blocks.inc.php:1192
+#: include/blocks.inc.php:1205
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Oprit"
@@ -4634,7 +4635,7 @@ msgstr "Deconectare prima intrare \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Mențiune de deconectare selectată \"%1$s\"."
 
-#: api/classes/CTrigger.php:1604
+#: api/classes/CTrigger.php:1597
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dublează dependențe în trigger \"%1$s\"."
@@ -4684,7 +4685,7 @@ msgstr "Dublează utilizator alias \"%s\"."
 msgid "Duration"
 msgstr "Durată"
 
-#: include/views/configuration.action.edit.php:337
+#: include/views/configuration.action.edit.php:361
 msgid "Duration (sec)"
 msgstr "Durată (secunde)"
 
@@ -4692,7 +4693,7 @@ msgstr "Durată (secunde)"
 msgid "Dutch (nl_NL)"
 msgstr "Olandeză (nl_NL)"
 
-#: include/views/configuration.screen.constructor.edit.php:614
+#: include/views/configuration.screen.constructor.edit.php:638
 msgid "Dynamic item"
 msgstr "Item dinamic"
 
@@ -4714,8 +4715,8 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "Fiecare URL trebuie să aibă un nume unic. Vă rugăm să vă asigurați că există un singur URL cu numele"
 
 #: include/views/administration.users.edit.php:207
-#: include/views/configuration.action.edit.php:385
-#: include/views/configuration.action.edit.php:398
+#: include/views/configuration.action.edit.php:409
+#: include/views/configuration.action.edit.php:422
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.screen.list.php:63
 #: include/views/configuration.sysmap.list.php:47
@@ -4723,8 +4724,8 @@ msgstr "Fiecare URL trebuie să aibă un nume unic. Vă rugăm să vă asiguraț
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/js/adm.regexprs.edit.js.php:7
 #: include/views/js/configuration.discovery.edit.js.php:7
-#: include/views/js/configuration.sysmaps.js.php:424
-#: include/views/js/configuration.sysmaps.js.php:432
+#: include/views/js/configuration.sysmaps.js.php:420
+#: include/views/js/configuration.sysmaps.js.php:428
 #: include/views/monitoring.triggerComment.php:51
 msgid "Edit"
 msgstr "Editare"
@@ -4745,7 +4746,7 @@ msgstr "Editare trigger"
 msgid "Element"
 msgstr "Element"
 
-#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:323
+#: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:319
 msgid "Element name"
 msgstr "Nume element"
 
@@ -4754,7 +4755,7 @@ msgstr "Nume element"
 msgid "Email"
 msgstr "Email"
 
-#: popup.php:536
+#: popup.php:552
 msgid "Empty"
 msgstr "Gol"
 
@@ -4791,8 +4792,8 @@ msgstr "Golire server."
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:624
-#: api/classes/CTrigger.php:882 api/classes/CTrigger.php:962
-#: api/classes/CTrigger.php:1052 api/classes/CTriggerPrototype.php:627
+#: api/classes/CTrigger.php:875 api/classes/CTrigger.php:955
+#: api/classes/CTrigger.php:1045 api/classes/CTriggerPrototype.php:627
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
 #: api/classes/CUserMacro.php:546 api/classes/CUser.php:566
 msgid "Empty input parameter."
@@ -4861,7 +4862,7 @@ msgstr "Activare"
 msgid "Enable DEBUG"
 msgstr "Activare DEPANARE"
 
-#: include/views/administration.script.edit.php:97
+#: include/views/administration.script.edit.php:102
 msgid "Enable confirmation"
 msgstr "Activare confirmare"
 
@@ -4996,7 +4997,7 @@ msgstr "Engleză (en_US)"
 #: include/views/configuration.host.discovery.list.php:59
 #: include/views/configuration.item.list.php:73
 #: include/views/configuration.triggers.edit.php:148
-#: include/views/configuration.triggers.list.php:113 popup.php:104
+#: include/views/configuration.triggers.list.php:113 popup.php:120
 msgid "Error"
 msgstr "Eroare"
 
@@ -5035,7 +5036,7 @@ msgstr "Eveniment confirmat"
 msgid "Event acknowledges \"%1$s\"."
 msgstr "Eveniment confirmă \"%1$s\"."
 
-#: include/views/monitoring.dashconf.php:98
+#: include/views/monitoring.dashconf.php:110
 msgid "Event acknowledging disabled"
 msgstr "Dezactivare confirmare eveniment "
 
@@ -5064,7 +5065,7 @@ msgid "Event type"
 msgstr "Tip eveniment"
 
 #: events.php:305 include/menu.inc.php:57
-#: include/views/inventory.host.view.php:212 jsLoader.php:104 jsLoader.php:200
+#: include/views/inventory.host.view.php:212 jsLoader.php:104 jsLoader.php:201
 #: search.php:136 search.php:210 search.php:269 search.php:323
 #: tr_status.php:299
 msgid "Events"
@@ -5074,11 +5075,11 @@ msgstr "Evenimente"
 msgid "Events and alerts"
 msgstr "Evenimente și alerte"
 
-#: include/forms.inc.php:1659
+#: include/forms.inc.php:1673
 msgid "Every day(s)"
 msgstr "Zilnic (s)"
 
-#: include/forms.inc.php:1666
+#: include/forms.inc.php:1680
 msgid "Every week(s)"
 msgstr "Săptămânal (s)"
 
@@ -5101,9 +5102,9 @@ msgstr "Execută eroare SQL [%1$s] în [%2$s]."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
-#: include/views/configuration.action.edit.php:717
-#: include/views/js/configuration.action.edit.js.php:113 popup.php:1471
-#: popup.php:1478
+#: include/views/configuration.action.edit.php:741
+#: include/views/js/configuration.action.edit.js.php:113 popup.php:1836
+#: popup.php:1843
 msgid "Execute on"
 msgstr "Execută la"
 
@@ -5133,7 +5134,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Expirat"
 
-#: include/graphs.inc.php:27 popup.php:1141
+#: include/graphs.inc.php:27 popup.php:1506
 msgid "Exploded"
 msgstr "Explodat"
 
@@ -5160,8 +5161,8 @@ msgstr "Export în CSV"
 msgid "Expression"
 msgstr "Expresie"
 
-#: include/forms.inc.php:1485 include/forms.inc.php:1490
-#: include/forms.inc.php:1503
+#: include/forms.inc.php:1499 include/forms.inc.php:1504
+#: include/forms.inc.php:1517
 msgid "Expression Syntax Error."
 msgstr "Expresie Eroare de Sintaxă."
 
@@ -5218,7 +5219,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Greșeală"
 
-#: include/actions.inc.php:1075 include/blocks.inc.php:1095
+#: include/actions.inc.php:1075 include/blocks.inc.php:1108
 msgid "Failed"
 msgstr "Eșec"
 
@@ -5230,15 +5231,15 @@ msgstr "Eroare la actualizarea șablonului"
 msgid "Failure Audit"
 msgstr "Audit greșit"
 
-#: dashboard.php:311 include/blocks.inc.php:1212
+#: dashboard.php:311 include/blocks.inc.php:1225
 msgid "Favourite graphs"
 msgstr "Elemente de grafică preferate"
 
-#: dashboard.php:339 include/blocks.inc.php:1341
+#: dashboard.php:339 include/blocks.inc.php:1354
 msgid "Favourite maps"
 msgstr "Hărți preferate"
 
-#: dashboard.php:325 include/blocks.inc.php:1386
+#: dashboard.php:325 include/blocks.inc.php:1399
 msgid "Favourite screens"
 msgstr "Ecrane preferate"
 
@@ -5250,7 +5251,7 @@ msgstr "Favorite"
 msgid "Feb"
 msgstr "Feb"
 
-#: include/forms.inc.php:1688 include/func.inc.php:130
+#: include/forms.inc.php:1702 include/func.inc.php:130
 #: include/func.inc.php:267 jsLoader.php:119
 msgid "February"
 msgstr "Februarie"
@@ -5335,12 +5336,12 @@ msgid "Filled region"
 msgstr "Zone pline"
 
 #: events.php:362 hosts.php:779 include/classes/class.cwidget.php:130
-#: include/forms.inc.php:632
+#: include/forms.inc.php:646
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.item.edit.php:340
 #: include/views/inventory.host.list.php:52
-#: include/views/monitoring.dashconf.php:104
+#: include/views/monitoring.dashconf.php:116
 #: include/views/monitoring.history.php:131 latest.php:308 report2.php:388
 #: tr_status.php:328
 msgid "Filter"
@@ -5380,7 +5381,7 @@ msgstr "Sfârșit"
 msgid "Finnish (fi_FI)"
 msgstr "Finlandeză (fi_FI)"
 
-#: include/forms.inc.php:1726 include/maintenances.inc.php:118
+#: include/forms.inc.php:1740 include/maintenances.inc.php:118
 msgid "First"
 msgstr "Primul"
 
@@ -5411,7 +5412,7 @@ msgstr "Pentru invitat, parola trebuie să fie nulă"
 msgid "Formula"
 msgstr "Formulă"
 
-#: include/forms.inc.php:1729 include/maintenances.inc.php:121
+#: include/forms.inc.php:1743 include/maintenances.inc.php:121
 msgid "Fourth"
 msgstr "al patrulea"
 
@@ -5423,16 +5424,16 @@ msgstr "Franceză (fr_FR)"
 msgid "Fri"
 msgstr "Fri"
 
-#: include/forms.inc.php:1673 include/forms.inc.php:1741
+#: include/forms.inc.php:1687 include/forms.inc.php:1755
 #: include/func.inc.php:152 include/func.inc.php:242
 msgid "Friday"
 msgstr "Vineri"
 
 #: include/reports.inc.php:70 include/reports.inc.php:392
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:470
 #: include/views/configuration.services.edit.php:225
 #: include/views/configuration.services.edit.php:251
-#: include/views/js/configuration.sysmaps.js.php:334 popup_period.php:119
+#: include/views/js/configuration.sysmaps.js.php:330 popup_period.php:119
 #: report2.php:377 report3.php:143 report4.php:184 services.php:178
 #: services.php:184
 msgid "From"
@@ -5453,8 +5454,8 @@ msgstr "Acces la interfață actualizat"
 msgid "Frontend messaging"
 msgstr "Mesaje de interfață"
 
-#: include/views/configuration.host.edit.php:844
-#: include/views/configuration.template.edit.php:450
+#: include/views/configuration.host.edit.php:850
+#: include/views/configuration.template.edit.php:456
 msgid "Full clone"
 msgstr "Clonă completă"
 
@@ -5549,11 +5550,11 @@ msgstr "Expresia dată nu este macro"
 msgid "Global expression does not exist."
 msgstr "Expresia globală nu există."
 
-#: include/views/configuration.action.edit.php:702
+#: include/views/configuration.action.edit.php:726
 msgid "Global script"
 msgstr "Script global"
 
-#: popup.php:100
+#: popup.php:116
 msgid "Global scripts"
 msgstr "Scripturi globale"
 
@@ -5583,7 +5584,7 @@ msgstr "Scripturi globale"
 msgid "Go"
 msgstr "Start"
 
-#: jsLoader.php:182 jsLoader.php:201
+#: jsLoader.php:182 jsLoader.php:202
 msgid "Go to"
 msgstr "Mergi la"
 
@@ -5599,7 +5600,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Gradient linie"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1219
+#: include/audit.inc.php:29 include/blocks.inc.php:1232
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:283
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:61 latest.php:448 latest.php:621
@@ -5732,7 +5733,7 @@ msgid "Graph sum"
 msgstr "Sumă grafică"
 
 #: include/views/configuration.graph.edit.php:61
-#: include/views/configuration.graph.list.php:81 popup.php:1077 popup.php:1083
+#: include/views/configuration.graph.list.php:81 popup.php:1442 popup.php:1448
 msgid "Graph type"
 msgstr "Tip grafic"
 
@@ -5750,7 +5751,7 @@ msgstr "Graficul cu numele \"%1$s\" există deja în grafic sau în prototipuril
 msgid "Graph with same name but other type exist."
 msgstr "Există grafic cu același nume dar de alt tip."
 
-#: dashboard.php:312 hosts.php:811 hosts.php:904 include/blocks.inc.php:1321
+#: dashboard.php:312 hosts.php:811 hosts.php:904 include/blocks.inc.php:1334
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
@@ -5758,7 +5759,7 @@ msgstr "Există grafic cu același nume dar de alt tip."
 #: include/views/configuration.template.edit.php:261
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:216
 #: include/views/inventory.host.view.php:231
-#: include/views/inventory.host.view.php:241 popup.php:76 search.php:137
+#: include/views/inventory.host.view.php:241 popup.php:92 search.php:137
 #: search.php:143 search.php:178 search.php:195 search.php:211 search.php:270
 #: search.php:324 search.php:385 search.php:417 search.php:438
 #: templates.php:491 templates.php:554
@@ -5796,15 +5797,15 @@ msgstr "Grilă"
 #: include/views/configuration.item.copy.php:53
 #: include/views/configuration.maintenance.list.php:32
 #: include/views/configuration.screen.constructor.edit.php:306
-#: include/views/configuration.screen.constructor.edit.php:402
-#: include/views/configuration.screen.constructor.edit.php:477
+#: include/views/configuration.screen.constructor.edit.php:414
+#: include/views/configuration.screen.constructor.edit.php:495
 #: include/views/configuration.triggers.list.php:74
 #: include/views/inventory.host.list.php:25
 #: include/views/inventory.host.list.php:78
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.overview.php:31
 #: include/views/monitoring.screen.php:96
-#: include/views/monitoring.slides.php:82 latest.php:297 popup.php:509
+#: include/views/monitoring.slides.php:82 latest.php:297 popup.php:525
 #: templates.php:475 tr_status.php:259
 msgid "Group"
 msgstr "Grup"
@@ -5855,7 +5856,7 @@ msgstr "ID al grupului prototip nu poate fi gol."
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Grupul prototip nu se poate baza pe un grup server detectat \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:203
+#: include/views/configuration.host.prototype.edit.php:209
 msgid "Group prototypes"
 msgstr "Prototipuri grup"
 
@@ -5872,7 +5873,7 @@ msgstr "Grupare după"
 #: include/views/configuration.host.edit.php:194
 #: include/views/configuration.host.edit.php:213
 #: include/views/configuration.host.prototype.edit.php:177
-#: include/views/configuration.host.prototype.edit.php:205
+#: include/views/configuration.host.prototype.edit.php:211
 #: include/views/configuration.template.edit.php:115
 #: include/views/conf.import.php:26
 msgid "Groups"
@@ -5892,9 +5893,9 @@ msgstr "H.m"
 msgid "H:i"
 msgstr "H:m"
 
-#: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1041
-#: include/blocks.inc.php:1148 include/blocks.inc.php:1206
+#: include/blocks.inc.php:390 include/blocks.inc.php:730
+#: include/blocks.inc.php:799 include/blocks.inc.php:1054
+#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
 #: include/classes/screens/CScreenSystemStatus.php:47 include/html.inc.php:598
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.item.list.php:129
@@ -5955,7 +5956,7 @@ msgstr "Hardware (Detalii complete)"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:57
 #: include/views/configuration.graph.list.php:80
-#: include/views/configuration.screen.constructor.edit.php:578
+#: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:43
 #: include/views/configuration.sysmap.list.php:46
 #: include/views/js/configuration.sysmaps.js.php:54 screenedit.php:45
@@ -6000,7 +6001,7 @@ msgstr "Ascunde trigerii dezactivați"
 msgid "Hide selected"
 msgstr "Ascunde selecția"
 
-#: include/views/monitoring.dashconf.php:62
+#: include/views/monitoring.dashconf.php:68
 msgid "Hide selected groups"
 msgstr "Ascunde grupuri selectate"
 
@@ -6009,12 +6010,12 @@ msgstr "Ascunde grupuri selectate"
 msgid "High"
 msgstr "Ridicat"
 
-#: history.php:27 include/forms.inc.php:596 include/forms.inc.php:942
+#: history.php:27 include/forms.inc.php:610 include/forms.inc.php:956
 #: include/page_header.php:425
 #: include/views/administration.general.housekeeper.edit.php:139
 #: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.prototype.list.php:54 items.php:156
-#: jsLoader.php:107 jsLoader.php:202 latest.php:356 latest.php:357
+#: jsLoader.php:107 jsLoader.php:203 latest.php:356 latest.php:357
 #: latest.php:451 latest.php:624
 msgid "History"
 msgstr "Istoric"
@@ -6057,23 +6058,23 @@ msgstr "Perioadă de istoric a stocării"
 msgid "History storage period (in days)"
 msgstr "Perioadă de istoric a stocării (în zile)"
 
-#: include/views/configuration.screen.constructor.edit.php:550
+#: include/views/configuration.screen.constructor.edit.php:574
 msgid "Horizontal"
 msgstr "Orizontal"
 
-#: include/views/configuration.screen.constructor.edit.php:594
+#: include/views/configuration.screen.constructor.edit.php:618
 msgid "Horizontal align"
 msgstr "Aliniere orizontală"
 
 #: events.php:293 events.php:534 events.php:585 events.php:598 httpmon.php:73
 #: httpmon.php:87 include/actions.inc.php:64 include/audit.inc.php:27
-#: include/blocks.inc.php:602 include/blocks.inc.php:649
-#: include/blocks.inc.php:907 include/blocks.inc.php:918
-#: include/blocks.inc.php:1496 include/classes/screens/CScreenEvents.php:41
+#: include/blocks.inc.php:615 include/blocks.inc.php:662
+#: include/blocks.inc.php:920 include/blocks.inc.php:931
+#: include/blocks.inc.php:1507 include/classes/screens/CScreenEvents.php:41
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
-#: include/forms.inc.php:560 include/html.inc.php:383 include/maps.inc.php:24
+#: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
 #: include/setup.inc.php:365 include/triggers.inc.php:1287
 #: include/triggers.inc.php:1639
 #: include/views/configuration.application.list.php:45
@@ -6081,12 +6082,12 @@ msgstr "Aliniere orizontală"
 #: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
 #: include/views/configuration.host.edit.php:636
-#: include/views/configuration.host.massupdate.php:292
+#: include/views/configuration.host.massupdate.php:313
 #: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.httpconf.list.php:44
 #: include/views/configuration.httpconf.list.php:62
 #: include/views/configuration.item.list.php:63
-#: include/views/configuration.screen.constructor.edit.php:330
+#: include/views/configuration.screen.constructor.edit.php:336
 #: include/views/configuration.triggers.list.php:75
 #: include/views/configuration.triggers.list.php:109
 #: include/views/configuration.triggers.list.php:126
@@ -6096,14 +6097,13 @@ msgstr "Aliniere orizontală"
 #: include/views/js/configuration.action.edit.js.php:88
 #: include/views/js/configuration.action.edit.js.php:209
 #: include/views/js/configuration.sysmaps.js.php:17
-#: include/views/js/configuration.sysmaps.js.php:99
+#: include/views/js/configuration.sysmaps.js.php:97
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.screen.php:97
 #: include/views/monitoring.slides.php:83 items.php:499 items.php:736
 #: items.php:763 jsLoader.php:146 latest.php:298 latest.php:332 latest.php:334
-#: popup.php:505 popup.php:521 popup.php:813 popup.php:1017 queue.php:204
-#: report2.php:364 report2.php:400 report5.php:59 tr_status.php:260
-#: tr_status.php:377
+#: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
+#: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
 msgstr "Server"
 
@@ -6122,7 +6122,7 @@ msgstr "Serverul \"%1$s\" este monitorizat cu proxy \"%2$s\"."
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "Serverul \"%s\" are verificat parametrul \"useipmi\", dar nu are parametrul \"ipmi_ip\"! Utilizarea adresei IP a serverului ca o adresă pentru interfața IPMI."
 
-#: include/views/configuration.screen.constructor.edit.php:346
+#: include/views/configuration.screen.constructor.edit.php:358
 msgid "Host (ascending)"
 msgstr "Server (ascendent)"
 
@@ -6166,8 +6166,8 @@ msgstr[1] "Servere activate"
 msgstr[2] "Servere activate"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
-#: include/blocks.inc.php:196 include/blocks.inc.php:386
-#: include/blocks.inc.php:1093 include/forms.inc.php:522
+#: include/blocks.inc.php:198 include/blocks.inc.php:399
+#: include/blocks.inc.php:1106 include/forms.inc.php:522
 #: include/maps.inc.php:25 include/views/administration.script.edit.php:84
 #: include/views/administration.script.list.php:44
 #: include/views/configuration.hostgroups.edit.php:67
@@ -6220,7 +6220,7 @@ msgstr "Numele grupului de servere nu poate fi gol."
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.hostgroups.list.php:39
 #: include/views/configuration.item.copy.php:43
-#: include/views/monitoring.dashconf.php:53 search.php:332
+#: include/views/monitoring.dashconf.php:53 popup.php:48 search.php:332
 msgid "Host groups"
 msgstr "Grupuri de servere"
 
@@ -6233,8 +6233,8 @@ msgstr "Interfață server"
 msgid "Host inventories"
 msgstr "Inventare server"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:834
-#: include/views/configuration.host.prototype.edit.php:312 jsLoader.php:203
+#: hostinventories.php:26 include/views/configuration.host.edit.php:840
+#: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inventar server"
 
@@ -6358,7 +6358,7 @@ msgstr "Prototipuri de servere ale"
 msgid "Host router"
 msgstr "Router gazdă"
 
-#: host_screen.php:27 jsLoader.php:181 jsLoader.php:204
+#: host_screen.php:27 jsLoader.php:181 jsLoader.php:205
 msgid "Host screens"
 msgstr "Ecrane server"
 
@@ -6370,7 +6370,7 @@ msgstr "Stare server"
 msgid "Host subnet mask"
 msgstr "Mască subnet server"
 
-#: include/views/configuration.screen.constructor.edit.php:514
+#: include/views/configuration.screen.constructor.edit.php:538
 msgid "Host time"
 msgstr "Timp server"
 
@@ -6403,7 +6403,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Server cu același nume vizibil \"%s\" există deja."
 
 #: hostinventoriesoverview.php:85 hosts.php:766 include/forms.inc.php:225
-#: include/forms.inc.php:902 include/items.inc.php:728
+#: include/forms.inc.php:916 include/items.inc.php:728
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -6414,8 +6414,9 @@ msgstr "Server cu același nume vizibil \"%s\" există deja."
 #: include/views/configuration.hostgroups.list.php:152
 #: include/views/configuration.item.copy.php:42
 #: include/views/conf.import.php:27 include/views/inventory.host.list.php:27
-#: include/views/monitoring.dashconf.php:75 search.php:131 search.php:226
-#: search.php:272 search.php:292 search.php:297 search.php:313
+#: include/views/monitoring.dashconf.php:87 popup.php:36 popup.php:44
+#: search.php:131 search.php:226 search.php:272 search.php:292 search.php:297
+#: search.php:313
 msgid "Hosts"
 msgstr "Servere"
 
@@ -6443,7 +6444,7 @@ msgstr "Servere în mentenanță"
 msgid "Hosts info"
 msgstr "Informații servere"
 
-#: include/views/configuration.screen.constructor.edit.php:563
+#: include/views/configuration.screen.constructor.edit.php:587
 #: include/views/monitoring.overview.php:90
 msgid "Hosts location"
 msgstr "Locație servere"
@@ -6457,7 +6458,7 @@ msgstr "Servere actualizate"
 msgid "Hourly"
 msgstr "În fiecare oră"
 
-#: include/forms.inc.php:1794
+#: include/forms.inc.php:1808
 msgid "Hours"
 msgstr "Ore"
 
@@ -6530,10 +6531,10 @@ msgstr "Intervalul IP nu poate fi nul."
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
-#: include/views/configuration.action.edit.php:698
-#: include/views/configuration.host.edit.php:737
-#: include/views/configuration.host.massupdate.php:294
-#: include/views/configuration.host.prototype.edit.php:268
+#: include/views/configuration.action.edit.php:722
+#: include/views/configuration.host.edit.php:743
+#: include/views/configuration.host.massupdate.php:315
+#: include/views/configuration.host.prototype.edit.php:280
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -6541,7 +6542,7 @@ msgstr "IPMI"
 msgid "IPMI agent"
 msgstr "Agent IPMI"
 
-#: include/views/configuration.host.massupdate.php:201
+#: include/views/configuration.host.massupdate.php:222
 msgid "IPMI authentication algorithm"
 msgstr "Algoritm de autentificare IPMI"
 
@@ -6552,11 +6553,11 @@ msgstr "Algoritm de autentificare IPMI"
 msgid "IPMI interfaces"
 msgstr "Interfață IPMI"
 
-#: include/views/configuration.host.massupdate.php:230
+#: include/views/configuration.host.massupdate.php:251
 msgid "IPMI password"
 msgstr "Parolă IPMI"
 
-#: include/views/configuration.host.massupdate.php:212
+#: include/views/configuration.host.massupdate.php:233
 msgid "IPMI privilege level"
 msgstr "Nivel privilegiat IPMI"
 
@@ -6565,7 +6566,7 @@ msgstr "Nivel privilegiat IPMI"
 msgid "IPMI sensor"
 msgstr "Senzor IPMI"
 
-#: include/views/configuration.host.massupdate.php:221
+#: include/views/configuration.host.massupdate.php:242
 msgid "IPMI username"
 msgstr "Nume de utilizator IPMI"
 
@@ -6620,19 +6621,19 @@ msgstr "ELEMENTE"
 msgid "Icon"
 msgstr "Iconiță"
 
-#: include/views/js/configuration.sysmaps.js.php:264
+#: include/views/js/configuration.sysmaps.js.php:260
 msgid "Icon (default)"
 msgstr "Iconiță (implicit)"
 
-#: include/views/js/configuration.sysmaps.js.php:291
+#: include/views/js/configuration.sysmaps.js.php:287
 msgid "Icon (disabled)"
 msgstr "Iconiță (dezactivat)"
 
-#: include/views/js/configuration.sysmaps.js.php:282
+#: include/views/js/configuration.sysmaps.js.php:278
 msgid "Icon (maintenance)"
 msgstr "Iconiță (mentenanță)"
 
-#: include/views/js/configuration.sysmaps.js.php:273
+#: include/views/js/configuration.sysmaps.js.php:269
 msgid "Icon (problem)"
 msgstr "Iconiță (problemă)"
 
@@ -6731,7 +6732,7 @@ msgstr "Intrare mapare icon \"%1$s\" împotriva \"%2$s\" există deja."
 msgid "Iconmap is not enabled"
 msgstr "Iconmap nu este activat"
 
-#: include/views/js/configuration.sysmaps.js.php:125
+#: include/views/js/configuration.sysmaps.js.php:121
 msgid "Icons"
 msgstr "Iconițe"
 
@@ -6796,7 +6797,7 @@ msgstr "Imagini"
 msgid "Images for all maps will be updated!"
 msgstr "Imaginile pentru toate hărțile vor fi actualizate!"
 
-#: include/views/configuration.action.edit.php:377
+#: include/views/configuration.action.edit.php:401
 msgid "Immediately"
 msgstr "Imediat"
 
@@ -7054,7 +7055,7 @@ msgstr "Protocol de autentificare incorect pentru itemul \"%1$s\"."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Valoare SLA calculată incorect pentru serviciul \"%1$s\"."
 
-#: include/nodes.inc.php:286 include/nodes.inc.php:330
+#: include/nodes.inc.php:315 include/nodes.inc.php:359
 msgid "Incorrect characters used for Node name."
 msgstr "Caractere incorecte folosite pentru modul Node."
 
@@ -7114,7 +7115,7 @@ msgstr "Nume sau valoare câmp \"%1$s\" incorecte în care afirmația pentru tab
 msgid "Incorrect fields for sysmap."
 msgstr "Câmpuri incorecte pentru sysmap."
 
-#: api/classes/CTrigger.php:664
+#: api/classes/CTrigger.php:657
 msgid "Incorrect fields for trigger."
 msgstr "Câmpuri incorecte pentru trigger."
 
@@ -7215,7 +7216,7 @@ msgstr "ID item \"%1$s\" incorect prevăzut pentru elementul ecran. "
 msgid "Incorrect item for axis value."
 msgstr "Item incorect pentru valoare axă."
 
-#: api/classes/CTrigger.php:732 include/triggers.inc.php:1040
+#: api/classes/CTrigger.php:725 include/triggers.inc.php:1040
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Cheie item \"%1$s\" incorect prevăzut pentru expresia triggerului pe \"%2$s\"."
@@ -7229,7 +7230,7 @@ msgstr "Tip valoare item \"%1$s\" incorect prevăzut pentru funcția triggerului
 msgid "Incorrect key."
 msgstr "Cheie incorectă."
 
-#: include/forms.inc.php:1307 items.php:913
+#: include/forms.inc.php:1321 items.php:913
 msgid "Incorrect list of items."
 msgstr "Listă incorectă de itemi."
 
@@ -7285,7 +7286,7 @@ msgstr "Valoare lățime hartă incorectă pentru harta \"%s\"."
 msgid "Incorrect menu path for script \"%1$s\"."
 msgstr "Cale meniu incorectă pentru scriptul \"%1$s\"."
 
-#: include/nodes.inc.php:306
+#: include/nodes.inc.php:335
 msgid "Incorrect node type."
 msgstr "Tip nod incorect."
 
@@ -7457,12 +7458,12 @@ msgstr "Expresii trigger incorecte."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Expresie trigger incorectă. Serverul \"%1$s\" nu există sau nu ai acces la acest server."
 
-#: api/classes/CTrigger.php:712
+#: api/classes/CTrigger.php:705
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Expresie trigger incorectă. Serverul \"%s\" nu există sau nu ai acces la acest server."
 
-#: api/classes/CTrigger.php:718
+#: api/classes/CTrigger.php:711
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Expresie trigger incorectă. Elementele expresiei trigger nu trebuie să aparțină simultan unui șablon si unui server."
 
@@ -7553,7 +7554,7 @@ msgstr "Item y min incorect pentru graficul \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indoneză (id_ID)"
 
-#: include/blocks.inc.php:922 include/blocks.inc.php:1499
+#: include/blocks.inc.php:935 include/blocks.inc.php:1510
 #: include/classes/class.cformlist.php:72 latest.php:365 latest.php:366
 #: tr_status.php:371
 msgid "Info"
@@ -7568,7 +7569,7 @@ msgstr "Informaţie"
 msgid "Insert"
 msgstr "Inserează"
 
-#: include/forms.inc.php:1497 jsLoader.php:109
+#: include/forms.inc.php:1511 jsLoader.php:109
 msgid "Insert macro"
 msgstr "Inserează macro"
 
@@ -7649,7 +7650,7 @@ msgstr "Eveniment intern si perioadă de alertă stocare date (în zile)\"%1$s\"
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: include/forms.inc.php:952
+#: include/forms.inc.php:966
 #: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.list.php:67
@@ -7761,7 +7762,7 @@ msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "Numele \"%s\" este invalid. Caracterele permise: \"a-z\" și \".\"."
 
 #: include/menu.inc.php:101
-#: include/views/configuration.host.massupdate.php:295
+#: include/views/configuration.host.massupdate.php:316
 msgid "Inventory"
 msgstr "Inventar"
 
@@ -7774,7 +7775,7 @@ msgstr "Inventar dezactivat pentru server \"%1$s\"."
 msgid "Inventory field"
 msgstr "Câmp inventar"
 
-#: include/views/configuration.host.massupdate.php:245
+#: include/views/configuration.host.massupdate.php:266
 msgid "Inventory mode"
 msgstr "Mod inventar"
 
@@ -7782,8 +7783,8 @@ msgstr "Mod inventar"
 msgid "Is online?"
 msgstr "Este online?"
 
-#: include/blocks.inc.php:909 include/blocks.inc.php:919
-#: include/blocks.inc.php:1497
+#: include/blocks.inc.php:922 include/blocks.inc.php:932
+#: include/blocks.inc.php:1508
 msgid "Issue"
 msgstr "Problemă"
 
@@ -7804,7 +7805,7 @@ msgid "Italian (it_IT)"
 msgstr "Italiană (it)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:165
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1139
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1153
 #: include/reports.inc.php:442 include/views/configuration.graph.edit.php:98
 #: include/views/configuration.graph.edit.php:156
 #: include/views/configuration.triggers.expression.php:57 items.php:498
@@ -7891,7 +7892,7 @@ msgstr "Item în stare \"nesuportată\""
 msgid "Item not selected"
 msgstr "Item neselectat"
 
-#: include/forms.inc.php:1139
+#: include/forms.inc.php:1153
 msgid "Item prototype"
 msgstr "Prototip item"
 
@@ -8008,7 +8009,7 @@ msgstr "Item cu cheia \"%1$s\" deja există."
 #: include/views/configuration.item.list.php:42
 #: include/views/configuration.template.edit.php:219
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:229
-#: include/views/inventory.host.view.php:239 latest.php:300 popup.php:56
+#: include/views/inventory.host.view.php:239 latest.php:300 popup.php:72
 #: queue.php:101 report6.php:44 search.php:141 search.php:170 search.php:193
 #: search.php:383 search.php:409 search.php:436 templates.php:489
 #: templates.php:550
@@ -8081,7 +8082,7 @@ msgstr "Identificator jabber"
 msgid "Jan"
 msgstr "Ian"
 
-#: include/forms.inc.php:1683 include/func.inc.php:129
+#: include/forms.inc.php:1697 include/func.inc.php:129
 #: include/func.inc.php:266 jsLoader.php:118
 msgid "January"
 msgstr "Ianuarie"
@@ -8094,7 +8095,7 @@ msgstr "Japoneză (ja_JP)"
 msgid "Jul"
 msgstr "Iul"
 
-#: include/forms.inc.php:1685 include/func.inc.php:135
+#: include/forms.inc.php:1699 include/func.inc.php:135
 #: include/func.inc.php:272 jsLoader.php:124
 msgid "July"
 msgstr "Iulie"
@@ -8103,7 +8104,7 @@ msgstr "Iulie"
 msgid "Jun"
 msgstr "Iun"
 
-#: include/forms.inc.php:1708 include/func.inc.php:134
+#: include/forms.inc.php:1722 include/func.inc.php:134
 #: include/func.inc.php:271 jsLoader.php:123
 msgid "June"
 msgstr "Iunie"
@@ -8117,13 +8118,13 @@ msgstr "K"
 msgid "Keep lost resources period (in days)"
 msgstr "Păstrează perioada resurselor pierdute (în zile)"
 
-#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:622
+#: disc_prototypes.php:44 host_discovery.php:45 include/forms.inc.php:636
 #: include/views/configuration.host.discovery.list.php:55
 #: include/views/configuration.item.edit.php:78
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/js/configuration.discovery.edit.js.php:426 items.php:46
-#: popup.php:678 popup.php:816 popup.php:926 popup.php:935
+#: popup.php:1000 popup.php:1144 popup.php:1254 popup.php:1263
 msgid "Key"
 msgstr "Cheie"
 
@@ -8132,7 +8133,7 @@ msgstr "Cheie"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Cheia \"%1$s\" nu se potrivește <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: include/views/configuration.action.edit.php:763
+#: include/views/configuration.action.edit.php:787
 #: include/views/js/configuration.item.edit.js.php:135
 msgid "Key passphrase"
 msgstr "Parola cheie"
@@ -8189,15 +8190,15 @@ msgid "LOST"
 msgstr "PIERDUT"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:898
+#: include/views/configuration.action.edit.php:940
 #: include/views/js/configuration.sysmaps.js.php:70
-#: include/views/js/configuration.sysmaps.js.php:231
-#: include/views/js/configuration.sysmaps.js.php:349
+#: include/views/js/configuration.sysmaps.js.php:227
+#: include/views/js/configuration.sysmaps.js.php:345
 msgid "Label"
 msgstr "Etichetă"
 
 #: include/views/js/configuration.sysmaps.js.php:78
-#: include/views/js/configuration.sysmaps.js.php:240
+#: include/views/js/configuration.sysmaps.js.php:236
 msgid "Label location"
 msgstr "Locație etichetă"
 
@@ -8205,7 +8206,7 @@ msgstr "Locație etichetă"
 msgid "Language"
 msgstr "Limbă"
 
-#: include/forms.inc.php:1730 include/maintenances.inc.php:122
+#: include/forms.inc.php:1744 include/maintenances.inc.php:122
 msgid "Last"
 msgstr "Ultima"
 
@@ -8254,11 +8255,11 @@ msgstr "Ultimele 365 de zile"
 msgid "Last 7 days"
 msgstr "Ultimele 7 zile"
 
-#: include/blocks.inc.php:920 tr_status.php:372
+#: include/blocks.inc.php:933 tr_status.php:372
 msgid "Last change"
 msgstr "Ultima schimbare"
 
-#: include/views/configuration.screen.constructor.edit.php:344
+#: include/views/configuration.screen.constructor.edit.php:356
 msgid "Last change (descending)"
 msgstr "Ultima schimbare (descendent)"
 
@@ -8266,11 +8267,11 @@ msgstr "Ultima schimbare (descendent)"
 msgid "Last check"
 msgstr "Ultima verificare"
 
-#: jsLoader.php:208
+#: jsLoader.php:209
 msgid "Last hour graph"
 msgstr "Graficul ultimei ore"
 
-#: jsLoader.php:209
+#: jsLoader.php:210
 msgid "Last month graph"
 msgstr "Graficul ultimei luni"
 
@@ -8287,21 +8288,21 @@ msgstr "Ultima dată vazut (vârstă)"
 msgid "Last value"
 msgstr "Ultima valoare"
 
-#: jsLoader.php:210
+#: jsLoader.php:211
 msgid "Last week graph"
 msgstr "Graficul ultimei săptămâni"
 
 #: include/menu.inc.php:47 include/views/inventory.host.view.php:207
-#: include/views/inventory.host.view.php:221 jsLoader.php:183 jsLoader.php:205
+#: include/views/inventory.host.view.php:221 jsLoader.php:183 jsLoader.php:206
 #: latest.php:26 search.php:134 search.php:208 search.php:267 search.php:321
 msgid "Latest data"
 msgstr "Cele mai recente date"
 
-#: events.php:41 jsLoader.php:206
+#: events.php:41 jsLoader.php:207
 msgid "Latest events"
 msgstr "Cele mai recente evenimente"
 
-#: jsLoader.php:207
+#: jsLoader.php:208
 msgid "Latest values"
 msgstr "Cele mai recente valori"
 
@@ -8310,12 +8311,12 @@ msgid "Latvian (lv_LV)"
 msgstr "Letonă (lv_LV)"
 
 #: include/reports.inc.php:103
-#: include/views/configuration.screen.constructor.edit.php:559
-#: include/views/configuration.screen.constructor.edit.php:588
+#: include/views/configuration.screen.constructor.edit.php:583
+#: include/views/configuration.screen.constructor.edit.php:612
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:72
 #: include/views/js/configuration.sysmaps.js.php:84
-#: include/views/js/configuration.sysmaps.js.php:246
+#: include/views/js/configuration.sysmaps.js.php:242
 #: include/views/monitoring.overview.php:86 popup_bitem.php:153
 msgid "Left"
 msgstr "Stânga"
@@ -8341,8 +8342,8 @@ msgstr "Lungimea ultimei (celei mai recente) valori T în caractere este > N"
 msgid "Length of last (most recent) T value in characters is NOT N"
 msgstr "Lungimea ultimei (celei mai recente) valori T în caractere NU este N"
 
-#: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:369
-#: include/views/js/configuration.sysmaps.js.php:447
+#: include/graphs.inc.php:65 include/views/js/configuration.sysmaps.js.php:365
+#: include/views/js/configuration.sysmaps.js.php:443
 msgid "Line"
 msgstr "Linie"
 
@@ -8350,9 +8351,9 @@ msgstr "Linie"
 msgid "Link"
 msgstr "Legătură"
 
-#: include/views/js/configuration.sysmaps.js.php:324
-#: include/views/js/configuration.sysmaps.js.php:336
-#: include/views/js/configuration.sysmaps.js.php:388
+#: include/views/js/configuration.sysmaps.js.php:320
+#: include/views/js/configuration.sysmaps.js.php:332
+#: include/views/js/configuration.sysmaps.js.php:384
 msgid "Link indicators"
 msgstr "Indicatori de legătură"
 
@@ -8361,9 +8362,9 @@ msgstr "Indicatori de legătură"
 msgid "Link name should be unique for map \"%s\"."
 msgstr "Nume legătură trebuie să fie unic pentru harta \"%s\"."
 
-#: include/views/configuration.host.edit.php:691
-#: include/views/configuration.host.prototype.edit.php:250
-#: include/views/configuration.template.edit.php:430
+#: include/views/configuration.host.edit.php:697
+#: include/views/configuration.host.prototype.edit.php:262
+#: include/views/configuration.template.edit.php:436
 msgid "Link new templates"
 msgstr "Leagă noi șabloane"
 
@@ -8382,7 +8383,7 @@ msgstr "Legătura cu câmpul selementid2  face trimitere la o hartă selement ID
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "Legătura trebuie sa aibă câmpurile \"nume\" și \"url\" pentru harta \"%s\"."
 
-#: include/views/configuration.host.massupdate.php:188
+#: include/views/configuration.host.massupdate.php:209
 msgid "Link templates"
 msgstr "Leagă șabloane"
 
@@ -8394,15 +8395,15 @@ msgstr "Legătură către șablon"
 msgid "Link to templates"
 msgstr "Legătură către șabloane"
 
-#: include/views/configuration.action.edit.php:877
+#: include/views/configuration.action.edit.php:919
 msgid "Link with templates"
 msgstr "Legătură cu șabloanele"
 
 #: include/views/configuration.host.edit.php:676
-#: include/views/configuration.host.edit.php:700
-#: include/views/configuration.host.prototype.edit.php:229
+#: include/views/configuration.host.edit.php:706
+#: include/views/configuration.host.prototype.edit.php:235
 #: include/views/configuration.template.edit.php:411
-#: include/views/configuration.template.edit.php:432 templates.php:495
+#: include/views/configuration.template.edit.php:438 templates.php:495
 msgid "Linked templates"
 msgstr "Șabloane legate"
 
@@ -8410,11 +8411,11 @@ msgstr "Șabloane legate"
 msgid "Linked to"
 msgstr "Legătură cu"
 
-#: include/views/js/configuration.sysmaps.js.php:330
+#: include/views/js/configuration.sysmaps.js.php:326
 msgid "Links between the selected elements"
 msgstr "Legătură între elementele selectate"
 
-#: include/views/js/configuration.sysmaps.js.php:319
+#: include/views/js/configuration.sysmaps.js.php:315
 msgid "Links for the selected element"
 msgstr "Legătura pentru elementul selectat"
 
@@ -8436,12 +8437,12 @@ msgstr "Lituaniană (lt_LT)"
 msgid "Loading..."
 msgstr "Se încarcă..."
 
-#: include/nodes.inc.php:276
+#: include/nodes.inc.php:305
 msgid "Local"
 msgstr "Local"
 
 #: include/classes/screens/CScreenHistory.php:166
-#: include/views/configuration.screen.constructor.edit.php:512
+#: include/views/configuration.screen.constructor.edit.php:536
 msgid "Local time"
 msgstr "Ora locală"
 
@@ -8644,9 +8645,9 @@ msgstr "Nu există macro cu hostmacroid \"%1$s\"."
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/configuration.host.edit.php:750
-#: include/views/configuration.host.prototype.edit.php:275
-#: include/views/configuration.template.edit.php:442
+#: include/views/configuration.host.edit.php:756
+#: include/views/configuration.host.prototype.edit.php:287
+#: include/views/configuration.template.edit.php:448
 msgid "Macros"
 msgstr "Macro-uri"
 
@@ -8657,7 +8658,7 @@ msgstr "Macro-uri actualizate"
 #: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
-#: include/views/js/configuration.sysmaps.js.php:148
+#: include/views/js/configuration.sysmaps.js.php:144
 msgid "Maintenance"
 msgstr "Mentenanță"
 
@@ -8686,7 +8687,7 @@ msgstr "Mentenanță ștearsă"
 msgid "Maintenance period"
 msgstr "Perioadă de mentenanță"
 
-#: include/forms.inc.php:1789
+#: include/forms.inc.php:1803
 msgid "Maintenance period length"
 msgstr "Lungime perioadă de mentenanță"
 
@@ -8706,11 +8707,11 @@ msgstr "Tip mentenanță"
 msgid "Maintenance updated"
 msgstr "Mentenanță actualizată"
 
-#: include/blocks.inc.php:951 tr_status.php:662
+#: include/blocks.inc.php:964 tr_status.php:662
 msgid "Maintenance with data collection"
 msgstr "Mentenanță cu colecție de date"
 
-#: include/blocks.inc.php:950 tr_status.php:661
+#: include/blocks.inc.php:963 tr_status.php:661
 msgid "Maintenance without data collection"
 msgstr "Mentenanță fără colecție de date"
 
@@ -8718,9 +8719,9 @@ msgstr "Mentenanță fără colecție de date"
 msgid "Mandatory parameter is missing."
 msgstr "Lipsește parametrul obligatoriu."
 
-#: include/views/configuration.host.edit.php:775
-#: include/views/configuration.host.massupdate.php:241
-#: include/views/configuration.host.prototype.edit.php:301
+#: include/views/configuration.host.edit.php:781
+#: include/views/configuration.host.massupdate.php:262
+#: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
 msgstr "Manual"
 
@@ -8728,11 +8729,11 @@ msgstr "Manual"
 msgid "Manual Logout"
 msgstr "Deconectare manuală"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1343
+#: include/audit.inc.php:40 include/blocks.inc.php:1356
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:184
 #: include/views/js/configuration.sysmaps.js.php:18
-#: include/views/js/configuration.sysmaps.js.php:115 jsLoader.php:147
+#: include/views/js/configuration.sysmaps.js.php:111 jsLoader.php:147
 #: map.php:25
 msgid "Map"
 msgstr "Hartă"
@@ -8788,10 +8789,10 @@ msgstr "Valoarea mapării \"%1$s\" nu este unică."
 msgid "Mappings"
 msgstr "Mapări"
 
-#: dashboard.php:340 include/blocks.inc.php:1376 include/menu.inc.php:72
+#: dashboard.php:340 include/blocks.inc.php:1389 include/menu.inc.php:72
 #: include/menu.inc.php:204 include/views/configuration.sysmap.list.php:36
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
-#: popup.php:80
+#: popup.php:96
 msgid "Maps"
 msgstr "Hărți"
 
@@ -8799,7 +8800,7 @@ msgstr "Hărți"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1693 include/func.inc.php:131
+#: include/forms.inc.php:1707 include/func.inc.php:131
 #: include/func.inc.php:268 jsLoader.php:120
 msgid "March"
 msgstr "Martie"
@@ -8821,16 +8822,16 @@ msgid "Mask"
 msgstr "Mască"
 
 #: hosts.php:1011 include/views/configuration.item.list.php:281
-#: include/views/configuration.item.massupdate.php:554
+#: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
 msgid "Mass update"
 msgstr "Masă zctualizată"
 
-#: include/views/js/configuration.sysmaps.js.php:214
+#: include/views/js/configuration.sysmaps.js.php:210
 msgid "Mass update elements"
 msgstr "Elemente de masă actualizate"
 
-#: include/nodes.inc.php:274
+#: include/nodes.inc.php:303
 msgid "Master"
 msgstr "Stăpân"
 
@@ -8838,11 +8839,11 @@ msgstr "Stăpân"
 msgid "Master node"
 msgstr "Nod principal"
 
-#: include/nodes.inc.php:296
+#: include/nodes.inc.php:325
 msgid "Master node \"ID\" must be empty."
 msgstr "\"ID\" nod principal trebuie sa fie gol."
 
-#: include/nodes.inc.php:300
+#: include/nodes.inc.php:329
 msgid "Master node already exists."
 msgstr "Nodul principal există deja."
 
@@ -8935,7 +8936,7 @@ msgstr[0] "Lungime vizibilă nume server este %1$d caractere, \"%2$s\" este cara
 msgstr[1] "Lungime vizibilă nume server este %1$d caractere, \"%2$s\" sunt caractere %3$d."
 msgstr[2] "Lungime vizibilă nume server este %1$d caractere, \"%2$s\" sunt caractere %3$d."
 
-#: include/forms.inc.php:1703 include/func.inc.php:133
+#: include/forms.inc.php:1717 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
 msgid "May"
 msgstr "Mai"
@@ -9026,7 +9027,7 @@ msgstr "Meniu"
 #: include/classes/screens/CScreenActions.php:153
 #: include/views/administration.auditacts.list.php:75
 #: include/views/administration.auditacts.list.php:109
-#: include/views/configuration.action.edit.php:598
+#: include/views/configuration.action.edit.php:622
 msgid "Message"
 msgstr "Mesaj"
 
@@ -9059,7 +9060,7 @@ msgid "Method not found."
 msgstr "Metoda nu a fost găsită."
 
 #: include/reports.inc.php:451
-#: include/views/configuration.screen.constructor.edit.php:604
+#: include/views/configuration.screen.constructor.edit.php:628
 msgid "Middle"
 msgstr "Mijloc"
 
@@ -9130,7 +9131,7 @@ msgstr "Valoarea minimă pentru perioada T este < N"
 msgid "Minimum value for period T is NOT N"
 msgstr "Valoarea minimă pentru perioada T NU este N"
 
-#: include/forms.inc.php:1796
+#: include/forms.inc.php:1810
 msgid "Minutes"
 msgstr "Minute"
 
@@ -9202,20 +9203,20 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Lun"
 
-#: include/forms.inc.php:1669 include/forms.inc.php:1737
+#: include/forms.inc.php:1683 include/forms.inc.php:1751
 #: include/func.inc.php:148 include/func.inc.php:238
 msgid "Monday"
 msgstr "Luni"
 
 #: hosts.php:935 include/html.inc.php:372
 #: include/views/configuration.host.edit.php:409
-#: include/views/configuration.host.massupdate.php:149
+#: include/views/configuration.host.massupdate.php:167
 #: include/views/configuration.host.prototype.edit.php:159
 msgid "Monitored"
 msgstr "Monitorizat"
 
 #: include/views/configuration.host.edit.php:406
-#: include/views/configuration.host.massupdate.php:140
+#: include/views/configuration.host.massupdate.php:158
 #: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
 msgstr "Monitorizat de proxy"
@@ -9240,11 +9241,11 @@ msgstr "Monitorizare fișiere de autentificare cu rotație. fileformat - [path][
 msgid "Monitoring of log file. pattern - regular expression"
 msgstr "Monitorizare fișier loguri. șablon - expresie uzuală"
 
-#: include/forms.inc.php:1712 report3.php:106 report4.php:155 report5.php:46
+#: include/forms.inc.php:1726 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
 msgstr "Lună"
 
-#: include/forms.inc.php:1649 include/maintenances.inc.php:40
+#: include/forms.inc.php:1663 include/maintenances.inc.php:40
 #: include/reports.inc.php:63 include/reports.inc.php:405
 #: include/reports.inc.php:413 report3.php:60 report4.php:110
 msgid "Monthly"
@@ -9307,7 +9308,7 @@ msgstr "Autentificare NTLM"
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:172 applications.php:38 disc_prototypes.php:42
 #: graphs.php:41 host_discovery.php:41 hosts.php:773 hosts.php:807
-#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:607
+#: httpconf.php:44 httpmon.php:88 include/forms.inc.php:621
 #: include/hosts.inc.php:115 include/reports.inc.php:174
 #: include/setup.inc.php:384
 #: include/views/administration.general.iconmap.edit.php:29
@@ -9329,7 +9330,7 @@ msgstr "Autentificare NTLM"
 #: include/views/administration.users.list.php:56
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.action.edit.php:72
-#: include/views/configuration.action.edit.php:898
+#: include/views/configuration.action.edit.php:940
 #: include/views/configuration.action.list.php:52
 #: include/views/configuration.application.edit.php:42
 #: include/views/configuration.discovery.edit.php:40
@@ -9339,9 +9340,9 @@ msgstr "Autentificare NTLM"
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.host.discovery.list.php:50
 #: include/views/configuration.host.edit.php:653
-#: include/views/configuration.host.edit.php:695
+#: include/views/configuration.host.edit.php:701
 #: include/views/configuration.hostgroups.list.php:60
-#: include/views/configuration.host.prototype.edit.php:214
+#: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.host.prototype.list.php:52
 #: include/views/configuration.httpconf.edit.php:59
 #: include/views/configuration.httpconf.edit.php:162
@@ -9367,13 +9368,14 @@ msgstr "Autentificare NTLM"
 #: include/views/configuration.triggers.list.php:110
 #: include/views/configuration.triggers.massupdate.php:88
 #: include/views/inventory.host.list.php:79
-#: include/views/js/configuration.sysmaps.js.php:181 items.php:44
+#: include/views/js/configuration.sysmaps.js.php:177 items.php:44
 #: latest.php:339 latest.php:340 maintenance.php:44 maintenance.php:200
-#: maintenance.php:225 popup_httpstep.php:36 popup.php:557 popup.php:616
-#: popup.php:678 popup.php:701 popup.php:815 popup.php:925 popup.php:934
-#: popup.php:1018 popup.php:1053 popup.php:1082 popup.php:1176 popup.php:1179
-#: popup.php:1249 popup.php:1252 popup.php:1315 popup.php:1319 popup.php:1370
-#: popup.php:1397 popup.php:1417 popup.php:1441 popup.php:1470 popup.php:1477
+#: maintenance.php:225 popup_httpstep.php:36 popup.php:573 popup.php:632
+#: popup.php:700 popup.php:777 popup.php:854 popup.php:932 popup.php:1000
+#: popup.php:1023 popup.php:1143 popup.php:1253 popup.php:1262 popup.php:1350
+#: popup.php:1418 popup.php:1447 popup.php:1541 popup.php:1544 popup.php:1613
+#: popup.php:1616 popup.php:1679 popup.php:1683 popup.php:1734 popup.php:1762
+#: popup.php:1782 popup.php:1806 popup.php:1835 popup.php:1842
 #: popup_right.php:92 popup_usrgrp.php:92 queue.php:205 report2.php:401
 #: screenconf.php:50 services.php:41 slideconf.php:36 sysmaps.php:48
 #: trigger_prototypes.php:41 triggers.php:41 tr_status.php:378 users.php:45
@@ -9432,9 +9434,9 @@ msgstr "Niciodată"
 msgid "Never executed"
 msgstr "Niciodată executat"
 
-#: include/views/configuration.action.edit.php:417
-#: include/views/configuration.action.edit.php:649
-#: include/views/configuration.action.edit.php:971
+#: include/views/configuration.action.edit.php:441
+#: include/views/configuration.action.edit.php:673
+#: include/views/configuration.action.edit.php:1013
 #: include/views/configuration.discovery.edit.php:56
 #: include/views/configuration.maintenance.edit.php:132
 msgid "New"
@@ -9445,7 +9447,7 @@ msgstr "Nou"
 msgid "New application"
 msgstr "Aplicație nouă"
 
-#: include/views/configuration.action.edit.php:319
+#: include/views/configuration.action.edit.php:343
 msgid "New condition"
 msgstr "Condiție nouă"
 
@@ -9464,7 +9466,7 @@ msgstr "Interval flexibil nou"
 msgid "New group"
 msgstr "Grup nou"
 
-#: include/views/configuration.host.massupdate.php:124
+#: include/views/configuration.host.massupdate.php:142
 msgid "New host group"
 msgstr "Nou grup de servere"
 
@@ -9493,7 +9495,7 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Următorul"
 
-#: events.php:769 include/events.inc.php:362 include/events.inc.php:380
+#: events.php:839 include/events.inc.php:362 include/events.inc.php:380
 #: include/func.inc.php:2436 include/triggers.inc.php:1646
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
@@ -9601,7 +9603,7 @@ msgid "No application with ID \"%1$s\"."
 msgstr "Nicio aplicație fără ID \"%1$s\"."
 
 #: include/views/configuration.application.list.php:57
-#: include/views/configuration.httpconf.edit.php:69 popup.php:1015
+#: include/views/configuration.httpconf.edit.php:69 popup.php:1348
 msgid "No applications found."
 msgstr "Nicio aplicație găsită."
 
@@ -9633,7 +9635,7 @@ msgid "No command type specified for action operation."
 msgstr "Niciun tip de comandă specificat pentru operațiuna de acțiune."
 
 #: include/views/configuration.action.edit.php:69
-#: include/views/configuration.action.edit.php:896
+#: include/views/configuration.action.edit.php:938
 msgid "No conditions defined."
 msgstr "Nicio condiție definită."
 
@@ -9680,8 +9682,8 @@ msgid "No discovery rule IDs given."
 msgstr "Nicio regulă de detecție IDs dată."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:42 popup.php:1396
-#: popup.php:1416
+#: include/views/configuration.host.discovery.list.php:42 popup.php:1761
+#: popup.php:1781
 msgid "No discovery rules found."
 msgstr "Nicio regulă de detecție găsită."
 
@@ -9693,11 +9695,11 @@ msgstr "Niciun element selectat!"
 msgid "No errors found."
 msgstr "Nu s-au găsit erori."
 
-#: include/blocks.inc.php:996 include/blocks.inc.php:1518 tr_status.php:734
+#: include/blocks.inc.php:1009 include/blocks.inc.php:1529 tr_status.php:734
 msgid "No events"
 msgstr "Niciun eveniment"
 
-#: events.php:376 include/blocks.inc.php:915
+#: events.php:376 include/blocks.inc.php:928
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:198
 msgid "No events found."
 msgstr "Niciun eveniment găsit."
@@ -9738,7 +9740,7 @@ msgid "No graphs added."
 msgstr "Niciun grafic adăugat."
 
 #: include/views/configuration.graph.list.php:73
-#: include/views/monitoring.charts.php:77 popup.php:1072
+#: include/views/monitoring.charts.php:77 popup.php:1437
 msgid "No graphs found."
 msgstr "Nici grafic găsit."
 
@@ -9781,9 +9783,9 @@ msgstr "Niciun ID pentru grup de servere pentru prototipul grup."
 msgid "No host group ID provided for screen element."
 msgstr "Niciun ID pentru grup de servere prevăzut pentru elementul ecran."
 
-#: include/blocks.inc.php:193 include/blocks.inc.php:383
-#: include/views/configuration.hostgroups.list.php:56 popup_right.php:89
-#: search.php:276
+#: include/blocks.inc.php:195 include/blocks.inc.php:396
+#: include/views/configuration.hostgroups.list.php:56 popup.php:930
+#: popup_right.php:89 search.php:276
 msgid "No host groups found."
 msgstr "Niciun grup de servere găsit."
 
@@ -9802,7 +9804,8 @@ msgid "No host with hostid \"%s\"."
 msgstr "Niciun server cu hostid \"%s\"."
 
 #: hostinventoriesoverview.php:88 hosts.php:803
-#: include/views/inventory.host.list.php:74 search.php:128
+#: include/views/inventory.host.list.php:74 popup.php:775 popup.php:852
+#: search.php:128
 msgid "No hosts found."
 msgstr "Niciun server găsit."
 
@@ -9847,11 +9850,11 @@ msgstr "Nicio interfață pentru server \"%s\"."
 msgid "No item ID provided for screen element."
 msgstr "Niciun item ID prevăzut pentru elementul ecran."
 
-#: popup.php:677
+#: popup.php:999
 msgid "No item keys found."
 msgstr "Niciun element cheie găsit."
 
-#: include/views/configuration.item.prototype.list.php:43 popup.php:921
+#: include/views/configuration.item.prototype.list.php:43 popup.php:1249
 msgid "No item prototypes found."
 msgstr "Niciun prototip item găsit."
 
@@ -9870,7 +9873,7 @@ msgid "No items defined."
 msgstr "Niciun item definit."
 
 #: include/items.inc.php:702 include/views/configuration.item.list.php:58
-#: include/views/monitoring.overview.php:116 popup.php:810
+#: include/views/monitoring.overview.php:116 popup.php:1138
 msgid "No items found."
 msgstr "Niciun item găsit."
 
@@ -9895,7 +9898,7 @@ msgid "No maps added."
 msgstr "Nicio hartă adaugată."
 
 #: include/views/configuration.sysmap.list.php:40
-#: include/views/monitoring.maps.php:23 popup.php:1173
+#: include/views/monitoring.maps.php:23 popup.php:1538
 msgid "No maps found."
 msgstr "Nicio hartă găsită."
 
@@ -9915,7 +9918,7 @@ msgstr "Niciun element de tip media găsit."
 msgid "No notifications found."
 msgstr "Nicio notificare găsită."
 
-#: include/views/configuration.action.edit.php:334
+#: include/views/configuration.action.edit.php:358
 msgid "No operations defined."
 msgstr "Nicio operație definită."
 
@@ -10005,8 +10008,8 @@ msgstr "Nicio permisiune de acces la sistem."
 #: api/classes/CService.php:1255 api/classes/CService.php:1270
 #: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
 #: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
-#: api/classes/CTrigger.php:636 api/classes/CTrigger.php:981
-#: api/classes/CTrigger.php:1002 api/classes/CTrigger.php:1878
+#: api/classes/CTrigger.php:629 api/classes/CTrigger.php:974
+#: api/classes/CTrigger.php:995 api/classes/CTrigger.php:1904
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10024,7 +10027,7 @@ msgstr "Nu a fost specificat niciun fișier cu cheie privată pentru comanda de 
 msgid "No private key file specified."
 msgstr "Nu a fost specificat nici un fișier cu cheie privată."
 
-#: include/views/administration.proxy.list.php:42 popup.php:1440
+#: include/views/administration.proxy.list.php:42 popup.php:1805
 msgid "No proxies found."
 msgstr "Nu a fost găsit niciun proxy."
 
@@ -10064,7 +10067,7 @@ msgstr "Niciun ecran adăugat."
 #: include/classes/screens/CScreenBuilder.php:267
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:35 popup.php:1311 popup.php:1369
+#: include/views/monitoring.screen.php:35 popup.php:1675 popup.php:1733
 msgid "No screens found."
 msgstr "Niciun ecran găsit."
 
@@ -10072,7 +10075,7 @@ msgstr "Niciun ecran găsit."
 msgid "No script specified for action operation command."
 msgstr "Nu a fost specificat niciun script pentru comanda de acțiune a operațiunii."
 
-#: include/views/administration.script.list.php:35 popup.php:1466
+#: include/views/administration.script.list.php:35 popup.php:1831
 msgid "No scripts found."
 msgstr "Nu a fost găsit nici un script."
 
@@ -10085,7 +10088,7 @@ msgstr "Nu a fost definită nicio prezentare."
 msgid "No slide shows found."
 msgstr "Nu a fost găsită nicio prezentare."
 
-#: include/views/monitoring.slides.php:104 popup.php:1246
+#: include/views/monitoring.slides.php:104 popup.php:1610
 msgid "No slides found."
 msgstr "Nu a fost găsit niciun slide."
 
@@ -10101,13 +10104,13 @@ msgstr "Nu a fost selectată nicio țintă"
 msgid "No target selected."
 msgstr "Nu a fost selectată nicio țintă."
 
-#: search.php:391 templates.php:483
+#: popup.php:698 search.php:391 templates.php:483
 msgid "No templates found."
 msgstr "Nu au fost găsite șabloane."
 
 #: include/views/configuration.host.edit.php:642
-#: include/views/configuration.host.prototype.edit.php:211
-#: include/views/configuration.host.prototype.edit.php:233
+#: include/views/configuration.host.prototype.edit.php:217
+#: include/views/configuration.host.prototype.edit.php:239
 #: include/views/configuration.template.edit.php:384
 msgid "No templates linked."
 msgstr "Niciun șablon legat."
@@ -10130,7 +10133,7 @@ msgid "No triggers defined."
 msgstr "Niciun trigger definit."
 
 #: include/triggers.inc.php:1250
-#: include/views/configuration.triggers.list.php:104 popup.php:697
+#: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
 msgstr "Niciun trigger găsit."
@@ -10139,12 +10142,12 @@ msgstr "Niciun trigger găsit."
 msgid "No user ID given."
 msgstr "Niciun ID utilizator dat."
 
-#: include/views/administration.usergroups.list.php:42 popup.php:554
+#: include/views/administration.usergroups.list.php:42 popup.php:570
 #: popup_usrgrp.php:89
 msgid "No user groups found."
 msgstr "Niciun grup de utilizatori găsit."
 
-#: include/views/administration.users.list.php:51 popup.php:612
+#: include/views/administration.users.list.php:51 popup.php:628
 msgid "No users found."
 msgstr "Nicun utilizator găsit."
 
@@ -10159,18 +10162,17 @@ msgstr "Nicio hartă de valori găsită."
 msgid "No values found."
 msgstr "Nicio valoare găsită."
 
-#: httpmon.php:84 include/blocks.inc.php:1090
+#: httpmon.php:84 include/blocks.inc.php:1103
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr "Niciun scenariu web găsit."
 
 #: events.php:584 events.php:597 hosts.php:806 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
-#: include/blocks.inc.php:195 include/blocks.inc.php:385
-#: include/blocks.inc.php:917 include/blocks.inc.php:1092
-#: include/blocks.inc.php:1189 include/blocks.inc.php:1495
-#: include/classes/screens/CScreenEvents.php:40 include/page_header.php:324
-#: include/triggers.inc.php:1636
+#: include/blocks.inc.php:197 include/blocks.inc.php:398
+#: include/blocks.inc.php:930 include/blocks.inc.php:1105
+#: include/blocks.inc.php:1202 include/classes/screens/CScreenEvents.php:40
+#: include/page_header.php:324 include/triggers.inc.php:1636
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10194,7 +10196,7 @@ msgstr "Niciun scenariu web găsit."
 #: include/views/configuration.triggers.list.php:107
 #: include/views/inventory.host.list.php:76
 #: include/views/monitoring.discovery.php:40 latest.php:320 latest.php:321
-#: popup.php:486 popup_right.php:80 queue.php:203 report2.php:399
+#: popup.php:501 popup_right.php:80 queue.php:203 report2.php:399
 #: report5.php:58 search.php:130 search.php:265 search.php:380
 #: templates.php:486 tr_status.php:376
 msgid "Node"
@@ -10212,7 +10214,7 @@ msgstr "Nod șters"
 msgid "Node updated"
 msgstr "Nod actualizat"
 
-#: include/nodes.inc.php:311
+#: include/nodes.inc.php:340
 msgid "Node with same ID already exists."
 msgstr "Există deja nod cu același ID."
 
@@ -10222,7 +10224,7 @@ msgstr "Există deja nod cu același ID."
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.node.list.php:25
 #: include/views/administration.node.list.php:32
-#: include/views/administration.proxy.list.php:26 popup.php:88
+#: include/views/administration.proxy.list.php:26 popup.php:104
 msgid "Nodes"
 msgstr "Noduri"
 
@@ -10236,7 +10238,7 @@ msgid "None"
 msgstr "Niciunul"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1643 popup.php:1144
+#: include/triggers.inc.php:1643 popup.php:1509
 msgid "Normal"
 msgstr "Normal"
 
@@ -10245,15 +10247,15 @@ msgid "Normal view"
 msgstr "Vizualizare normală"
 
 #: include/actions.inc.php:256
-#: include/views/configuration.action.edit.php:1012
+#: include/views/configuration.action.edit.php:1054
 msgid "Not Ack"
 msgstr "Nu Ack"
 
-#: include/forms.inc.php:617 include/forms.inc.php:800
+#: include/forms.inc.php:631 include/forms.inc.php:814
 msgid "Not Templated items"
 msgstr "Niciun item șablon"
 
-#: api/classes/CTrigger.php:1507
+#: api/classes/CTrigger.php:1500
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nu toate șabloanele sunt legate de \"%s\"."
@@ -10281,7 +10283,7 @@ msgstr "Neconectat"
 
 #: hosts.php:944 include/html.inc.php:376
 #: include/views/configuration.host.edit.php:410
-#: include/views/configuration.host.massupdate.php:150
+#: include/views/configuration.host.massupdate.php:168
 #: include/views/configuration.host.prototype.edit.php:160
 msgid "Not monitored"
 msgstr "Nemonitorizat"
@@ -10320,7 +10322,7 @@ msgstr "Notificări"
 msgid "Nov"
 msgstr "Noi"
 
-#: include/forms.inc.php:1705 include/func.inc.php:139
+#: include/forms.inc.php:1719 include/func.inc.php:139
 #: include/func.inc.php:276 jsLoader.php:128
 msgid "November"
 msgstr "Noiembrie"
@@ -10334,7 +10336,7 @@ msgstr "Acum"
 msgid "Number of available proccessors."
 msgstr "Număr de procesoare disponibile."
 
-#: include/blocks.inc.php:740 include/blocks.inc.php:742
+#: include/blocks.inc.php:753 include/blocks.inc.php:755
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Număr de servere (monitorizate/nemonitorizate/șabloane)"
 
@@ -10343,7 +10345,7 @@ msgstr "Număr de servere (monitorizate/nemonitorizate/șabloane)"
 msgid "Number of inodes for a given volume. If mode is missing total is used."
 msgstr "Număr de inoduri pentru un drive dat. Dacă mode lipsește, se folosește total."
 
-#: include/blocks.inc.php:749
+#: include/blocks.inc.php:762
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Număr de itemuri(monitorizate/dezactivate/nesuportate)"
 
@@ -10420,7 +10422,7 @@ msgstr "Numărul de găsiri a valorilor V (care satisfac operatorul O) pentru pe
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr "Numărul de găsiri a valorilor V (care satisfac operatorul O) pentru perioada T NU este N"
 
-#: include/blocks.inc.php:758
+#: include/blocks.inc.php:771
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr "Numărul triggerilor (activați/dezactivați) [problemă/ok]"
 
@@ -10432,7 +10434,7 @@ msgstr "Numărul triggerilor din baza de date Zabbix."
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Numărul itemilor nesuportați în baza de date Zabbix."
 
-#: include/blocks.inc.php:768
+#: include/blocks.inc.php:781
 msgid "Number of users (online)"
 msgstr "Numărul de utilizatori (online)"
 
@@ -10523,7 +10525,7 @@ msgstr "Mască subnet OOB"
 
 #: include/triggers.inc.php:1700
 #: include/views/configuration.action.edit.php:112
-#: include/views/configuration.action.edit.php:956
+#: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
 msgid "OR"
 msgstr "SAU"
@@ -10556,7 +10558,7 @@ msgstr "Oct"
 msgid "Octal"
 msgstr "Octal"
 
-#: include/forms.inc.php:1700 include/func.inc.php:138
+#: include/forms.inc.php:1714 include/func.inc.php:138
 #: include/func.inc.php:275 jsLoader.php:127
 msgid "October"
 msgstr "Octombrie"
@@ -10566,7 +10568,7 @@ msgstr "Octombrie"
 msgid "Off"
 msgstr "Oprit"
 
-#: include/actions.inc.php:1072 include/blocks.inc.php:1094
+#: include/actions.inc.php:1072 include/blocks.inc.php:1107
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:403
 #: report3.php:83
@@ -10590,7 +10592,7 @@ msgstr "Odată"
 msgid "One of the objects is left without a host group."
 msgstr "Unul dintre obiecte este lăsat fără grup servere."
 
-#: include/forms.inc.php:1646 include/maintenances.inc.php:34
+#: include/forms.inc.php:1660 include/maintenances.inc.php:34
 msgid "One time only"
 msgstr "O singură dată"
 
@@ -10657,7 +10659,7 @@ msgstr "Doar administratorii Zabbix pot elimina un utilizator media."
 msgid "Only characters are allowed."
 msgstr "Numai caractere sunt permise."
 
-#: include/blocks.inc.php:750
+#: include/blocks.inc.php:763
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Numai itemii desemnați să activeze servere sunt numărați"
 
@@ -10678,7 +10680,7 @@ msgstr "Numai ultimii 20%% din indicatori sunt afișați."
 msgid "Only trigger events can be acknowledged."
 msgstr "Numai evenimentele trigger pot fi recunoscute."
 
-#: include/blocks.inc.php:759
+#: include/blocks.inc.php:772
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Numai triggerii atribuiți să activeze servere și care depind de itemi activați sunt contorizați"
 
@@ -10695,11 +10697,11 @@ msgstr "Operaţiunea \"%s\" există deja."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operațiunea nu poate fi executată datorită unei cereri neautorizate."
 
-#: include/views/configuration.action.edit.php:1024
+#: include/views/configuration.action.edit.php:1066
 msgid "Operation condition"
 msgstr "Condiția operațiunii"
 
-#: include/views/configuration.action.edit.php:1032
+#: include/views/configuration.action.edit.php:1074
 msgid "Operation details"
 msgstr "Detalii operațiunii"
 
@@ -10711,12 +10713,12 @@ msgstr "Operațiunea nu are grup de operare."
 msgid "Operation has no template to operate."
 msgstr "Operațiunea nu are șablon de operare."
 
-#: include/views/configuration.action.edit.php:479
-#: include/views/configuration.action.edit.php:485
+#: include/views/configuration.action.edit.php:503
+#: include/views/configuration.action.edit.php:509
 msgid "Operation type"
 msgstr "Tipul operațiunii"
 
-#: include/views/configuration.action.edit.php:1042
+#: include/views/configuration.action.edit.php:1084
 #: include/views/configuration.action.list.php:54
 msgid "Operations"
 msgstr "Operațiuni"
@@ -10725,18 +10727,18 @@ msgstr "Operațiuni"
 msgid "Operator"
 msgstr "Operator"
 
-#: include/views/configuration.host.massupdate.php:62
-#: include/views/configuration.host.massupdate.php:109
-#: include/views/configuration.host.massupdate.php:126
-#: include/views/configuration.host.massupdate.php:142
-#: include/views/configuration.host.massupdate.php:155
-#: include/views/configuration.host.massupdate.php:190
-#: include/views/configuration.host.massupdate.php:203
-#: include/views/configuration.host.massupdate.php:214
-#: include/views/configuration.host.massupdate.php:223
-#: include/views/configuration.host.massupdate.php:232
-#: include/views/configuration.host.massupdate.php:247
-#: include/views/configuration.host.massupdate.php:278
+#: include/views/configuration.host.massupdate.php:68
+#: include/views/configuration.host.massupdate.php:121
+#: include/views/configuration.host.massupdate.php:144
+#: include/views/configuration.host.massupdate.php:160
+#: include/views/configuration.host.massupdate.php:173
+#: include/views/configuration.host.massupdate.php:211
+#: include/views/configuration.host.massupdate.php:224
+#: include/views/configuration.host.massupdate.php:235
+#: include/views/configuration.host.massupdate.php:244
+#: include/views/configuration.host.massupdate.php:253
+#: include/views/configuration.host.massupdate.php:268
+#: include/views/configuration.host.massupdate.php:299
 #: include/views/configuration.item.massupdate.php:47
 #: include/views/configuration.item.massupdate.php:81
 #: include/views/configuration.item.massupdate.php:97
@@ -10766,9 +10768,9 @@ msgstr "Operator"
 #: include/views/configuration.item.massupdate.php:431
 #: include/views/configuration.item.massupdate.php:449
 #: include/views/configuration.item.massupdate.php:459
-#: include/views/configuration.item.massupdate.php:490
-#: include/views/configuration.item.massupdate.php:535
-#: include/views/configuration.item.massupdate.php:548
+#: include/views/configuration.item.massupdate.php:496
+#: include/views/configuration.item.massupdate.php:547
+#: include/views/configuration.item.massupdate.php:560
 #: include/views/configuration.triggers.massupdate.php:76
 #: include/views/configuration.triggers.massupdate.php:137
 msgid "Original"
@@ -11032,12 +11034,12 @@ msgstr "Paletă"
 msgid "Palette #%1$s"
 msgstr "Paletă #%1$s"
 
-#: include/blocks.inc.php:727
+#: include/blocks.inc.php:740
 #: include/views/configuration.screen.constructor.edit.php:192
 #: include/views/configuration.screen.constructor.edit.php:220
 #: include/views/configuration.screen.constructor.edit.php:277
-#: include/views/configuration.screen.constructor.edit.php:445
-#: include/views/configuration.screen.constructor.edit.php:531
+#: include/views/configuration.screen.constructor.edit.php:463
+#: include/views/configuration.screen.constructor.edit.php:555
 #: popup_bitem.php:42 popup_bitem.php:141
 msgid "Parameter"
 msgstr "Parametru"
@@ -11087,10 +11089,10 @@ msgstr "Pasiv"
 #: include/views/administration.users.edit.php:84
 #: include/views/administration.users.edit.php:102
 #: include/views/administration.users.edit.php:106
-#: include/views/configuration.action.edit.php:721
-#: include/views/configuration.action.edit.php:754
-#: include/views/configuration.host.edit.php:736
-#: include/views/configuration.host.prototype.edit.php:267
+#: include/views/configuration.action.edit.php:745
+#: include/views/configuration.action.edit.php:778
+#: include/views/configuration.host.edit.php:742
+#: include/views/configuration.host.prototype.edit.php:279
 #: include/views/configuration.httpconf.edit.php:83
 #: include/views/configuration.item.edit.php:180
 #: include/views/configuration.item.edit.php:192
@@ -11147,7 +11149,7 @@ msgstr "Efectuează o cerere DNS. Dacă reușește redă un rând de caractere c
 msgid "Period"
 msgstr "Perioadă"
 
-#: include/forms.inc.php:1651
+#: include/forms.inc.php:1665
 #: include/views/configuration.maintenance.edit.php:100
 msgid "Period type"
 msgstr "Tipul perioadei"
@@ -11174,7 +11176,7 @@ msgstr "Persian (fa_IR)"
 msgid "Peta"
 msgstr "Peta"
 
-#: include/graphs.inc.php:26 popup.php:1138
+#: include/graphs.inc.php:26 popup.php:1503
 msgid "Pie"
 msgstr "Diagramă circulară"
 
@@ -11195,7 +11197,7 @@ msgstr "Redare"
 msgid "Play sound"
 msgstr "Redare sunet"
 
-#: include/nodes.inc.php:355
+#: include/nodes.inc.php:384
 msgid "Please be aware that database still contains data related to the deleted node."
 msgstr "Vă rog să aveți grijă că baza de date conține în continuare date asociate nodului șters."
 
@@ -11225,7 +11227,7 @@ msgstr "Populare câmp server inventar"
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:57
-#: include/views/configuration.action.edit.php:768
+#: include/views/configuration.action.edit.php:792
 #: include/views/configuration.host.edit.php:238
 #: include/views/configuration.host.edit.php:325
 #: include/views/configuration.host.prototype.edit.php:95
@@ -11338,15 +11340,15 @@ msgstr "Frază de acces de confidențialitate"
 msgid "Privacy protocol"
 msgstr "Ptotocol confidențial"
 
-#: include/views/configuration.action.edit.php:747
+#: include/views/configuration.action.edit.php:771
 #: include/views/configuration.item.edit.php:189
 #: include/views/configuration.item.massupdate.php:280
 msgid "Private key file"
 msgstr "Fișier cheie privată"
 
-#: include/views/configuration.host.edit.php:724
-#: include/views/configuration.host.edit.php:732
-#: include/views/configuration.host.prototype.edit.php:264
+#: include/views/configuration.host.edit.php:730
+#: include/views/configuration.host.edit.php:738
+#: include/views/configuration.host.prototype.edit.php:276
 msgid "Privilege level"
 msgstr "Nivel privilegiat"
 
@@ -11355,12 +11357,12 @@ msgid "Probably php-ldap module is missing."
 msgstr "Probabil lipsește modului php-ldap."
 
 #: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
-#: include/views/js/configuration.sysmaps.js.php:141 tr_status.php:282
+#: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problemă"
 
 #: include/views/configuration.sysmap.edit.php:129
-#: include/views/monitoring.dashconf.php:100
+#: include/views/monitoring.dashconf.php:112
 msgid "Problem display"
 msgstr "Afișare problemă"
 
@@ -11389,13 +11391,13 @@ msgstr "Probleme"
 msgid "Profile"
 msgstr "Profil"
 
-#: popup.php:60
+#: popup.php:76
 msgid "Prototypes"
 msgstr "Prototipuri"
 
 #: include/views/administration.node.list.php:26
 #: include/views/administration.proxy.list.php:27
-#: include/views/administration.proxy.list.php:34 popup.php:36
+#: include/views/administration.proxy.list.php:34 popup.php:52
 msgid "Proxies"
 msgstr "Proxy-uri"
 
@@ -11451,13 +11453,13 @@ msgstr "Nume proxy"
 msgid "Proxy updated"
 msgstr "Proxy actualizat"
 
-#: include/views/configuration.action.edit.php:722
+#: include/views/configuration.action.edit.php:746
 #: include/views/configuration.item.edit.php:181
 #: include/views/configuration.item.massupdate.php:247
 msgid "Public key"
 msgstr "Cheie publică"
 
-#: include/views/configuration.action.edit.php:740
+#: include/views/configuration.action.edit.php:764
 #: include/views/configuration.item.edit.php:186
 #: include/views/configuration.item.massupdate.php:270
 msgid "Public key file"
@@ -11475,7 +11477,7 @@ msgstr "Coadă"
 msgid "RMCP+"
 msgstr "RMCP+"
 
-#: include/views/administration.script.edit.php:94
+#: include/views/administration.script.edit.php:99
 #: include/views/administration.script.list.php:84
 msgid "Read"
 msgstr "Citire"
@@ -11502,11 +11504,11 @@ msgstr "Valoare primită"
 msgid "Recipient"
 msgstr "Destinatar"
 
-#: include/views/configuration.screen.constructor.edit.php:368
+#: include/views/configuration.screen.constructor.edit.php:380
 msgid "Recipient (ascending)"
 msgstr "Destinatar (crescător)"
 
-#: include/views/configuration.screen.constructor.edit.php:367
+#: include/views/configuration.screen.constructor.edit.php:379
 msgid "Recipient (descending)"
 msgstr "Destinatar (descrescător)"
 
@@ -11615,17 +11617,17 @@ msgstr "Amintește-mi 30 de zile"
 msgid "Remote command"
 msgstr "Comandă de la distanță"
 
-#: include/blocks.inc.php:1232 include/blocks.inc.php:1321
-#: include/blocks.inc.php:1330 include/blocks.inc.php:1348
-#: include/blocks.inc.php:1376 include/blocks.inc.php:1399
-#: include/blocks.inc.php:1460 include/blocks.inc.php:1469
+#: include/blocks.inc.php:1245 include/blocks.inc.php:1334
+#: include/blocks.inc.php:1343 include/blocks.inc.php:1361
+#: include/blocks.inc.php:1389 include/blocks.inc.php:1412
+#: include/blocks.inc.php:1473 include/blocks.inc.php:1482
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:113
 #: include/views/common.macros.php:51
 #: include/views/configuration.action.edit.php:99
-#: include/views/configuration.action.edit.php:388
-#: include/views/configuration.action.edit.php:401
-#: include/views/configuration.action.edit.php:921
+#: include/views/configuration.action.edit.php:412
+#: include/views/configuration.action.edit.php:425
+#: include/views/configuration.action.edit.php:963
 #: include/views/configuration.httpconf.edit.php:211
 #: include/views/configuration.item.edit.php:289
 #: include/views/configuration.item.massupdate.php:334
@@ -11652,11 +11654,11 @@ msgstr "Comandă de la distanță"
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:74
 #: include/views/js/configuration.slideconf.edit.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:199
-#: include/views/js/configuration.sysmaps.js.php:300
-#: include/views/js/configuration.sysmaps.js.php:413
-#: include/views/js/configuration.sysmaps.js.php:458
-#: include/views/js/configuration.sysmaps.js.php:467
+#: include/views/js/configuration.sysmaps.js.php:195
+#: include/views/js/configuration.sysmaps.js.php:296
+#: include/views/js/configuration.sysmaps.js.php:409
+#: include/views/js/configuration.sysmaps.js.php:454
+#: include/views/js/configuration.sysmaps.js.php:463
 msgid "Remove"
 msgstr "Șterge"
 
@@ -11677,7 +11679,7 @@ msgstr "Șterge din favorite"
 msgid "Remove from host group"
 msgstr "Șterge din grupul serverului"
 
-#: include/actions.inc.php:432 include/views/configuration.action.edit.php:833
+#: include/actions.inc.php:432 include/views/configuration.action.edit.php:866
 msgid "Remove from host groups"
 msgstr "Șterge din grupurile serverelor"
 
@@ -11693,12 +11695,12 @@ msgstr "Șterge legătura"
 msgid "Remove selected"
 msgstr "Elimină selecția"
 
-#: include/views/configuration.host.massupdate.php:176
+#: include/views/configuration.host.massupdate.php:196
 #: include/views/configuration.triggers.edit.php:120
 msgid "Replace"
 msgstr "Înlocuire"
 
-#: include/views/configuration.item.massupdate.php:489
+#: include/views/configuration.item.massupdate.php:495
 msgid "Replace applications"
 msgstr "Înlocuiește aplicațiile"
 
@@ -11706,7 +11708,7 @@ msgstr "Înlocuiește aplicațiile"
 msgid "Replace depenencies"
 msgstr "Înlocuiește dependențele"
 
-#: include/views/configuration.host.massupdate.php:60
+#: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
 msgstr "Înlocuiește grupurile serverlor"
 
@@ -11746,7 +11748,7 @@ msgstr "Câmpul \"iconid\" necesar lipsește în cartografiere iconiță."
 msgid "Required field \"inventory_link\" is missing in icon mapping."
 msgstr "Câmpul \"inventory_link\" necesar lipsește în cartografiere iconiță."
 
-#: include/views/administration.script.edit.php:96
+#: include/views/administration.script.edit.php:101
 msgid "Required host permissions"
 msgstr "Permisiuni server necesare"
 
@@ -11758,7 +11760,7 @@ msgstr "Performanță necesară (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Performanță necesară a serverului Zabbix, în noile valori pe secundă așteptate."
 
-#: include/blocks.inc.php:769
+#: include/blocks.inc.php:782
 msgid "Required server performance, new values per second"
 msgstr "Performanță server necesară, noi valori pe secundă"
 
@@ -11770,7 +11772,7 @@ msgstr "Coduri de stare necesare"
 msgid "Required string"
 msgstr "Șir necesar"
 
-#: events.php:363 hosts.php:784 include/forms.inc.php:637
+#: events.php:363 hosts.php:784 include/forms.inc.php:651
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -11857,11 +11859,11 @@ msgstr "Reîncercări"
 msgid "Retries left"
 msgstr "Reîncercări rămase"
 
-#: include/views/configuration.screen.constructor.edit.php:366
+#: include/views/configuration.screen.constructor.edit.php:378
 msgid "Retries left (ascending)"
 msgstr "Reîncercări rămase (crescător)"
 
-#: include/views/configuration.screen.constructor.edit.php:365
+#: include/views/configuration.screen.constructor.edit.php:377
 msgid "Retries left (descending)"
 msgstr "Reîncercări rămase (descrescător)"
 
@@ -11897,11 +11899,11 @@ msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Redă un procent din pachetele pierdute la ping ICMP."
 
 #: include/reports.inc.php:103
-#: include/views/configuration.screen.constructor.edit.php:592
+#: include/views/configuration.screen.constructor.edit.php:616
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.graph.edit.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:85
-#: include/views/js/configuration.sysmaps.js.php:247 popup_bitem.php:154
+#: include/views/js/configuration.sysmaps.js.php:243 popup_bitem.php:154
 msgid "Right"
 msgstr "Dreapta"
 
@@ -11909,7 +11911,7 @@ msgstr "Dreapta"
 msgid "Romanian (ro_RO)"
 msgstr "Română (ro_RO)"
 
-#: include/views/configuration.screen.constructor.edit.php:610
+#: include/views/configuration.screen.constructor.edit.php:634
 #: screenedit.php:47
 msgid "Row span"
 msgstr "Întindere rând"
@@ -12112,7 +12114,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Execuție declarație SQL eșuată \"%1$s\"."
 
 #: include/discovery.inc.php:56
-#: include/views/configuration.action.edit.php:700
+#: include/views/configuration.action.edit.php:724
 #: include/views/js/configuration.discovery.edit.js.php:182
 msgid "SSH"
 msgstr "SSH"
@@ -12145,7 +12147,7 @@ msgstr "Safari"
 msgid "Sat"
 msgstr "Sâm"
 
-#: include/forms.inc.php:1674 include/forms.inc.php:1742
+#: include/forms.inc.php:1688 include/forms.inc.php:1756
 #: include/func.inc.php:153 include/func.inc.php:243
 msgid "Saturday"
 msgstr "Sâmbătă"
@@ -12169,38 +12171,38 @@ msgstr "Sâmbătă"
 #: include/views/administration.node.edit.php:91
 #: include/views/administration.proxy.edit.php:98
 #: include/views/administration.proxy.edit.php:108
-#: include/views/administration.script.edit.php:119
+#: include/views/administration.script.edit.php:124
 #: include/views/administration.usergroups.edit.php:137
 #: include/views/administration.usergroups.edit.php:143
 #: include/views/administration.users.edit.php:376
 #: include/views/administration.users.edit.php:380
 #: include/views/administration.users.edit.php:390
-#: include/views/configuration.action.edit.php:1053
+#: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:849
+#: include/views/configuration.host.edit.php:855
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
-#: include/views/configuration.host.prototype.edit.php:329
+#: include/views/configuration.host.prototype.edit.php:341
 #: include/views/configuration.httpconf.edit.php:248
 #: include/views/configuration.httpconf.edit.php:258
 #: include/views/configuration.item.edit.php:519
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.maintenance.edit.php:199
-#: include/views/configuration.screen.constructor.edit.php:630
+#: include/views/configuration.screen.constructor.edit.php:654
 #: include/views/configuration.screen.edit.php:52
 #: include/views/configuration.services.edit.php:290
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:456
+#: include/views/configuration.template.edit.php:462
 #: include/views/configuration.triggers.edit.php:328
 #: include/views/configuration.triggers.massupdate.php:151
-#: include/views/monitoring.dashconf.php:107
+#: include/views/monitoring.dashconf.php:119
 #: include/views/monitoring.triggerComment.php:47 popup_bitem.php:166
 #: popup_media.php:141 tr_logform.php:374
 msgid "Save"
@@ -12238,7 +12240,7 @@ msgstr "Programare"
 msgid "Scheduled check"
 msgstr "Verificare programare"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1388
+#: include/audit.inc.php:41 include/blocks.inc.php:1401
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:47
 #: include/views/configuration.screen.list.php:54
 #: include/views/configuration.slideconf.edit.php:50
@@ -12302,7 +12304,7 @@ msgstr "Ecran \"%1$s\" actualizat."
 msgid "Screen added"
 msgstr "Ecran adăugat"
 
-#: include/views/configuration.screen.constructor.edit.php:620
+#: include/views/configuration.screen.constructor.edit.php:644
 msgid "Screen cell configuration"
 msgstr "Configurare celule ecrane"
 
@@ -12318,14 +12320,14 @@ msgstr "Ecranul trebuie să conțină cel puțin un rând și o coloană."
 msgid "Screen updated"
 msgstr "Ecran actualizat"
 
-#: dashboard.php:326 include/blocks.inc.php:1460 include/html.inc.php:500
+#: dashboard.php:326 include/blocks.inc.php:1473 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:371
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:217
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
-#: include/views/monitoring.slides.php:29 popup.php:68 popup.php:84
+#: include/views/monitoring.slides.php:29 popup.php:84 popup.php:100
 #: search.php:138 search.php:212 search.php:386 search.php:421 search.php:439
 #: templates.php:492 templates.php:556
 msgid "Screens"
@@ -12334,7 +12336,7 @@ msgstr "Ecrane"
 #: include/audit.inc.php:49 include/media.inc.php:25
 #: include/views/administration.mediatypes.edit.php:42
 #: include/views/administration.script.edit.php:47
-#: include/views/administration.script.edit.php:109
+#: include/views/administration.script.edit.php:114
 #: include/views/administration.script.list.php:51 scripts.php:146
 #: scripts.php:165
 msgid "Script"
@@ -12383,7 +12385,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr "Script cu scriptid \"%1$s\" nu există."
 
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
-#: jsLoader.php:184 jsLoader.php:211 scripts_exec.php:24
+#: jsLoader.php:184 jsLoader.php:212 scripts_exec.php:24
 msgid "Scripts"
 msgstr "Scripturi"
 
@@ -12404,7 +12406,7 @@ msgstr "Modelul de căutare este gol"
 msgid "Search/Filter elements limit"
 msgstr "Limită elemente Căutare/Filtrare"
 
-#: include/forms.inc.php:1727 include/maintenances.inc.php:119
+#: include/forms.inc.php:1741 include/maintenances.inc.php:119
 msgid "Second"
 msgstr "Secundă"
 
@@ -12452,16 +12454,16 @@ msgstr "Nivel de securitate"
 msgid "Security name"
 msgstr "Nume securitate"
 
-#: events.php:344 include/classes/html/CButtonPopup.php:52
-#: include/forms.inc.php:585 include/page_header.php:328
-#: include/reports.inc.php:431
+#: events.php:344 include/classes/class.cmultiselect.php:55
+#: include/classes/html/CButtonPopup.php:52 include/forms.inc.php:599
+#: include/page_header.php:328 include/reports.inc.php:431
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
-#: include/views/configuration.action.edit.php:208
-#: include/views/configuration.action.edit.php:222
-#: include/views/configuration.action.edit.php:235
-#: include/views/configuration.action.edit.php:248
-#: include/views/configuration.action.edit.php:706
+#: include/views/configuration.action.edit.php:232
+#: include/views/configuration.action.edit.php:246
+#: include/views/configuration.action.edit.php:259
+#: include/views/configuration.action.edit.php:272
+#: include/views/configuration.action.edit.php:730
 #: include/views/configuration.graph.edit.php:119
 #: include/views/configuration.graph.edit.php:177
 #: include/views/configuration.item.edit.php:81
@@ -12472,17 +12474,18 @@ msgstr "Nume securitate"
 #: include/views/configuration.screen.constructor.edit.php:222
 #: include/views/configuration.screen.constructor.edit.php:259
 #: include/views/configuration.screen.constructor.edit.php:268
-#: include/views/configuration.screen.constructor.edit.php:447
-#: include/views/configuration.screen.constructor.edit.php:519
-#: include/views/configuration.screen.constructor.edit.php:526
+#: include/views/configuration.screen.constructor.edit.php:465
+#: include/views/configuration.screen.constructor.edit.php:543
+#: include/views/configuration.screen.constructor.edit.php:550
 #: include/views/configuration.services.child.list.php:63
 #: include/views/configuration.services.edit.php:71
 #: include/views/configuration.triggers.expression.php:43
-#: include/views/js/configuration.sysmaps.js.php:111
-#: include/views/js/configuration.sysmaps.js.php:118 popup_bitem.php:128
-#: popup.php:594 popup.php:663 popup.php:792 popup.php:903 popup.php:999
-#: popup.php:1155 popup.php:1226 popup.php:1291 popup.php:1353 popup.php:1538
-#: popup_right.php:118 popup_usrgrp.php:106 tr_logform.php:278
+#: include/views/js/configuration.sysmaps.js.php:107
+#: include/views/js/configuration.sysmaps.js.php:114 jsLoader.php:196
+#: popup_bitem.php:128 popup.php:610 popup.php:679 popup.php:754 popup.php:831
+#: popup.php:909 popup.php:982 popup.php:1119 popup.php:1231 popup.php:1327
+#: popup.php:1400 popup.php:1520 popup.php:1590 popup.php:1655 popup.php:1717
+#: popup.php:1903 popup_right.php:118 popup_usrgrp.php:106 tr_logform.php:278
 msgid "Select"
 msgstr "Selectează"
 
@@ -12510,7 +12513,7 @@ msgstr "Selectat"
 msgid "Selected actions deleted"
 msgstr "Acțiunile selectate șterse"
 
-#: include/views/js/configuration.sysmaps.js.php:220
+#: include/views/js/configuration.sysmaps.js.php:216
 msgid "Selected elements"
 msgstr "Elementele selectate"
 
@@ -12534,7 +12537,7 @@ msgstr "Trimite mesaj către grupurile utilizatorului"
 msgid "Send message to users"
 msgstr "Trimite mesaj către utilizatori"
 
-#: include/views/configuration.action.edit.php:583
+#: include/views/configuration.action.edit.php:607
 msgid "Send only to"
 msgstr "Trimite doar la"
 
@@ -12542,11 +12545,11 @@ msgstr "Trimite doar la"
 msgid "Send to"
 msgstr "Trimite la"
 
-#: include/views/configuration.action.edit.php:566
+#: include/views/configuration.action.edit.php:590
 msgid "Send to User groups"
 msgstr "Trimite la grupurile Utilizatorului"
 
-#: include/views/configuration.action.edit.php:567
+#: include/views/configuration.action.edit.php:591
 msgid "Send to Users"
 msgstr "Trimis la Utilizatori"
 
@@ -12559,11 +12562,11 @@ msgid "Sep"
 msgstr "Sep"
 
 #: include/views/configuration.sysmap.edit.php:122
-#: include/views/monitoring.dashconf.php:93
+#: include/views/monitoring.dashconf.php:105
 msgid "Separated"
 msgstr "Depărțit"
 
-#: include/forms.inc.php:1695 include/func.inc.php:137
+#: include/forms.inc.php:1709 include/func.inc.php:137
 #: include/func.inc.php:274 jsLoader.php:126
 msgid "September"
 msgstr "Septembrie"
@@ -12576,7 +12579,7 @@ msgstr "Număr serial A"
 msgid "Serial number B"
 msgstr "Număr serial B"
 
-#: include/views/administration.script.list.php:67 popup.php:1523
+#: include/views/administration.script.list.php:67 popup.php:1888
 #: queue.php:146
 msgid "Server"
 msgstr "Server"
@@ -12585,7 +12588,7 @@ msgstr "Server"
 msgid "Server info"
 msgstr "Informații server"
 
-#: include/views/configuration.screen.constructor.edit.php:513
+#: include/views/configuration.screen.constructor.edit.php:537
 msgid "Server time"
 msgstr "Timp server"
 
@@ -12666,12 +12669,12 @@ msgstr "Sesiune terminată, relogare, va rog."
 #: include/triggers.inc.php:1641 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
-#: include/views/configuration.triggers.massupdate.php:70 popup.php:702
+#: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
 #: report5.php:61 tr_logform.php:370 tr_status.php:369
 msgid "Severity"
 msgstr "Severitate"
 
-#: include/views/configuration.screen.constructor.edit.php:345
+#: include/views/configuration.screen.constructor.edit.php:357
 msgid "Severity (descending)"
 msgstr "Severitate (descrescător)"
 
@@ -12723,7 +12726,7 @@ msgstr "Arată evenimente nu mai vechi decât (în zile)"
 msgid "Show events not older than (in days) \"%1$s\"."
 msgstr "Arată evenimente nu mai vechi decât (în zile) \"%1$s\"."
 
-#: include/views/monitoring.dashconf.php:75 tr_status.php:326
+#: include/views/monitoring.dashconf.php:87 tr_status.php:326
 msgid "Show hosts in maintenance"
 msgstr "Arată servere în mentenanță"
 
@@ -12740,9 +12743,9 @@ msgid "Show legend"
 msgstr "Arată legendă"
 
 #: include/views/configuration.screen.constructor.edit.php:281
-#: include/views/configuration.screen.constructor.edit.php:340
-#: include/views/configuration.screen.constructor.edit.php:355
-#: include/views/configuration.screen.constructor.edit.php:378
+#: include/views/configuration.screen.constructor.edit.php:352
+#: include/views/configuration.screen.constructor.edit.php:367
+#: include/views/configuration.screen.constructor.edit.php:390
 #: screenedit.php:48
 msgid "Show lines"
 msgstr "Arată linii"
@@ -12797,11 +12800,11 @@ msgstr "Simplu"
 msgid "Simple check"
 msgstr "Verificare simplă"
 
-#: include/blocks.inc.php:1225 include/screens.inc.php:38
+#: include/blocks.inc.php:1238 include/screens.inc.php:38
 msgid "Simple graph"
 msgstr "Grafic simplu"
 
-#: include/blocks.inc.php:1330 jsLoader.php:114
+#: include/blocks.inc.php:1343 jsLoader.php:114
 msgid "Simple graphs"
 msgstr "Grafice simple"
 
@@ -12860,7 +12863,7 @@ msgstr "Copiere sărită a graficului \"%1$s\" la server \"%2$s\"."
 msgid "Slide"
 msgstr "Diapozitiv"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1394
+#: include/audit.inc.php:45 include/blocks.inc.php:1407
 #: include/views/monitoring.slides.php:76
 msgid "Slide show"
 msgstr "Prezentare"
@@ -12893,11 +12896,11 @@ msgstr "Prezentare actualizată"
 
 #: include/menu.inc.php:200 include/views/configuration.slideconf.list.php:29
 #: include/views/monitoring.screen.php:28
-#: include/views/monitoring.slides.php:30 popup.php:72
+#: include/views/monitoring.slides.php:30 popup.php:88
 msgid "Slide shows"
 msgstr "Prezentări"
 
-#: include/blocks.inc.php:1469
+#: include/blocks.inc.php:1482
 #: include/views/configuration.slideconf.edit.php:98
 msgid "Slides"
 msgstr "Slides"
@@ -12960,8 +12963,8 @@ msgstr "Sortează după"
 msgid "Sort order (0->999)"
 msgstr "Ordinea sortării package list (0->999)"
 
-#: include/views/configuration.screen.constructor.edit.php:342
-#: include/views/configuration.screen.constructor.edit.php:357
+#: include/views/configuration.screen.constructor.edit.php:354
+#: include/views/configuration.screen.constructor.edit.php:369
 msgid "Sort triggers by"
 msgstr "Sortează triggeri după"
 
@@ -12986,15 +12989,15 @@ msgstr "Scriptul specificat nu există sau nu ai drepturi pentru comanda acțiun
 msgid "Speed"
 msgstr "Viteză"
 
-#: include/graphs.inc.php:25 popup.php:1135
+#: include/graphs.inc.php:25 popup.php:1500
 msgid "Stacked"
 msgstr "Stivuit"
 
-#: popup.php:64
+#: popup.php:80
 msgid "Standard items"
 msgstr "Itemi standard"
 
-#: include/views/configuration.action.edit.php:337
+#: include/views/configuration.action.edit.php:361
 msgid "Start in"
 msgstr "Începe la"
 
@@ -13002,7 +13005,7 @@ msgstr "Începe la"
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Timp de început a serverului Zabbix, Unix timestamp."
 
-#: include/forms.inc.php:538 include/forms.inc.php:927
+#: include/forms.inc.php:545 include/forms.inc.php:941
 #: include/views/configuration.maintenance.list.php:47
 msgid "State"
 msgstr "Stat"
@@ -13019,7 +13022,7 @@ msgstr "Stare serviciu. 0 - funcționează, 1 - pauză, 2 - în așteptarea porn
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:126 include/events.inc.php:201
 #: include/events.inc.php:279 include/events.inc.php:282
-#: include/forms.inc.php:577 include/forms.inc.php:922
+#: include/forms.inc.php:591 include/forms.inc.php:936
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:42
 #: include/views/administration.usergroups.list.php:49
@@ -13029,7 +13032,7 @@ msgstr "Stare serviciu. 0 - funcționează, 1 - pauză, 2 - în așteptarea porn
 #: include/views/configuration.host.discovery.list.php:58
 #: include/views/configuration.host.edit.php:412
 #: include/views/configuration.hostgroups.list.php:63
-#: include/views/configuration.host.massupdate.php:153
+#: include/views/configuration.host.massupdate.php:171
 #: include/views/configuration.host.prototype.edit.php:162
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.httpconf.list.php:66
@@ -13038,16 +13041,16 @@ msgstr "Stare serviciu. 0 - funcționează, 1 - pauză, 2 - în așteptarea porn
 #: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.triggers.list.php:112 popup_media.php:138
-#: popup.php:703 popup.php:819 popup.php:929 popup.php:938 srv_status.php:139
-#: tr_status.php:370
+#: popup.php:1025 popup.php:1147 popup.php:1257 popup.php:1266
+#: srv_status.php:139 tr_status.php:370
 msgid "Status"
 msgstr "Stare"
 
-#: include/views/configuration.screen.constructor.edit.php:364
+#: include/views/configuration.screen.constructor.edit.php:376
 msgid "Status (ascending)"
 msgstr "Stare (ascendent)"
 
-#: include/views/configuration.screen.constructor.edit.php:363
+#: include/views/configuration.screen.constructor.edit.php:375
 msgid "Status (descending)"
 msgstr "Stare (descendent)"
 
@@ -13077,7 +13080,7 @@ msgstr "Stare Zabbix"
 msgid "Status of discovery"
 msgstr "Stare de detecție"
 
-#: jsLoader.php:212 tr_status.php:25
+#: jsLoader.php:213 tr_status.php:25
 msgid "Status of triggers"
 msgstr "Stare a triggerilor"
 
@@ -13086,7 +13089,7 @@ msgid "Status only"
 msgstr "Doar stare"
 
 #: httpdetails.php:132 include/actions.inc.php:848 include/actions.inc.php:922
-#: include/views/configuration.action.edit.php:467
+#: include/views/configuration.action.edit.php:491
 msgid "Step"
 msgstr "Pas"
 
@@ -13095,7 +13098,7 @@ msgstr "Pas"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Pas \"%1$s\" [%2$s al %3$s] eșuat: %4$s"
 
-#: include/views/configuration.action.edit.php:457
+#: include/views/configuration.action.edit.php:481
 msgid "Step duration"
 msgstr "Durată pas"
 
@@ -13108,7 +13111,7 @@ msgstr "Pas scenariu"
 msgid "Step with name \"%1$s\" already exists."
 msgstr "Pas cu nume \"%1$s\" există deja."
 
-#: httpconf.php:50 include/views/configuration.action.edit.php:337
+#: httpconf.php:50 include/views/configuration.action.edit.php:361
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.edit.php:242
 msgid "Steps"
@@ -13128,11 +13131,11 @@ msgstr "Valoare stocare"
 msgid "Straight"
 msgstr "Normală"
 
-#: include/views/configuration.screen.constructor.edit.php:554
+#: include/views/configuration.screen.constructor.edit.php:578
 msgid "Style"
 msgstr "Stil"
 
-#: include/forms.inc.php:955
+#: include/forms.inc.php:969
 msgid "Subfilter [affects only filtered data!]"
 msgstr "Subfiltru [afectează doar datele filtrate!]"
 
@@ -13140,11 +13143,11 @@ msgstr "Subfiltru [afectează doar datele filtrate!]"
 #: include/actions.inc.php:485 include/actions.inc.php:872
 #: include/classes/screens/CScreenActions.php:148
 #: include/views/administration.auditacts.list.php:104
-#: include/views/configuration.action.edit.php:594
+#: include/views/configuration.action.edit.php:618
 msgid "Subject"
 msgstr "Subiect"
 
-#: jsLoader.php:213
+#: jsLoader.php:214
 msgid "Submap"
 msgstr "Subhartă"
 
@@ -13177,7 +13180,7 @@ msgstr "Suma valorilor unei perioade T NU este N"
 msgid "Sun"
 msgstr "Dum"
 
-#: include/forms.inc.php:1675 include/forms.inc.php:1743
+#: include/forms.inc.php:1689 include/forms.inc.php:1757
 #: include/func.inc.php:155 include/func.inc.php:237
 msgid "Sunday"
 msgstr "Duminică"
@@ -13187,7 +13190,7 @@ msgid "Support"
 msgstr "Suport"
 
 #: include/views/administration.users.edit.php:54
-#: include/views/administration.users.list.php:57 popup.php:617 users.php:46
+#: include/views/administration.users.list.php:57 popup.php:633 users.php:46
 msgid "Surname"
 msgstr "Nume familie"
 
@@ -13287,7 +13290,7 @@ msgstr "Tabelul \"%1$s\" nu are un câmp numit \"%2$s\"."
 msgid "Tag"
 msgstr "Etichetă"
 
-#: include/views/configuration.action.edit.php:647
+#: include/views/configuration.action.edit.php:671
 #: include/views/configuration.copy.elements.php:93
 #: include/views/configuration.item.copy.php:74
 #: include/views/configuration.triggers.edit.php:146
@@ -13295,7 +13298,7 @@ msgstr "Etichetă"
 msgid "Target"
 msgstr "Țintă"
 
-#: include/views/configuration.action.edit.php:694
+#: include/views/configuration.action.edit.php:718
 msgid "Target list"
 msgstr "Listă țintă"
 
@@ -13305,13 +13308,13 @@ msgid "Target type"
 msgstr "Tip țintă"
 
 #: include/discovery.inc.php:70
-#: include/views/configuration.action.edit.php:701
+#: include/views/configuration.action.edit.php:725
 #: include/views/js/configuration.discovery.edit.js.php:183
 msgid "Telnet"
 msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:51
-#: include/forms.inc.php:613 include/forms.inc.php:932
+#: include/forms.inc.php:627 include/forms.inc.php:946
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
 #: include/views/configuration.template.edit.php:375
 #: include/views/configuration.triggers.list.php:126 report2.php:259
@@ -13403,17 +13406,17 @@ msgstr "Șablon cu același nume vizibil \"%1$s\" există deja."
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Șablon cu același nume vizibil \"%s\" există deja."
 
-#: include/forms.inc.php:616 include/forms.inc.php:803
+#: include/forms.inc.php:630 include/forms.inc.php:817
 msgid "Templated items"
 msgstr "Itemi șablon"
 
 #: hosts.php:815 include/menu.inc.php:164
-#: include/views/configuration.host.edit.php:703
+#: include/views/configuration.host.edit.php:709
 #: include/views/configuration.hostgroups.list.php:150
-#: include/views/configuration.host.massupdate.php:293
-#: include/views/configuration.host.prototype.edit.php:253
+#: include/views/configuration.host.massupdate.php:314
+#: include/views/configuration.host.prototype.edit.php:265
 #: include/views/configuration.host.prototype.list.php:53
-#: include/views/conf.import.php:28 search.php:273 search.php:302
+#: include/views/conf.import.php:28 popup.php:40 search.php:273 search.php:302
 #: search.php:307 search.php:314 search.php:381 search.php:458
 #: templates.php:477 templates.php:487
 msgid "Templates"
@@ -13439,7 +13442,7 @@ msgstr "Test"
 msgid "Test authentication"
 msgstr "Autentificare test"
 
-#: include/views/administration.script.edit.php:105
+#: include/views/administration.script.edit.php:110
 msgid "Test confirmation"
 msgstr "Confirmare de test"
 
@@ -13544,11 +13547,11 @@ msgstr[0] "Există grupul \"%1$d\" acces Intern GUI."
 msgstr[1] "Există grupuri \"%1$d\" acces Intern GUI."
 msgstr[2] "Există grupuri \"%1$d\" acces Intern GUI."
 
-#: include/forms.inc.php:1728 include/maintenances.inc.php:120
+#: include/forms.inc.php:1742 include/maintenances.inc.php:120
 msgid "Third"
 msgstr "A treia"
 
-#: include/views/configuration.host.edit.php:808
+#: include/views/configuration.host.edit.php:814
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Acest câmp este populat automat de itemul \"%s\"."
@@ -13577,7 +13580,7 @@ msgstr "Anul acesta"
 msgid "Thu"
 msgstr "Joi"
 
-#: include/forms.inc.php:1672 include/forms.inc.php:1740
+#: include/forms.inc.php:1686 include/forms.inc.php:1754
 #: include/func.inc.php:151 include/func.inc.php:241
 msgid "Thursday"
 msgstr "Joi"
@@ -13593,7 +13596,7 @@ msgstr "Până când"
 #: events.php:507 events.php:516 events.php:583 events.php:596
 #: include/acknow.inc.php:49 include/actions.inc.php:828
 #: include/actions.inc.php:851 include/actions.inc.php:907
-#: include/actions.inc.php:925 include/blocks.inc.php:911
+#: include/actions.inc.php:925 include/blocks.inc.php:924
 #: include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:43
@@ -13612,11 +13615,11 @@ msgstr "Până când"
 msgid "Time"
 msgstr "Timp"
 
-#: include/views/configuration.screen.constructor.edit.php:360
+#: include/views/configuration.screen.constructor.edit.php:372
 msgid "Time (ascending)"
 msgstr "Timp (ascendent)"
 
-#: include/views/configuration.screen.constructor.edit.php:359
+#: include/views/configuration.screen.constructor.edit.php:371
 msgid "Time (descending)"
 msgstr "Timp (descendent)"
 
@@ -13636,7 +13639,7 @@ msgstr "Perioadă de timp"
 msgid "Time shift"
 msgstr "Timp rămas"
 
-#: include/views/configuration.screen.constructor.edit.php:515
+#: include/views/configuration.screen.constructor.edit.php:539
 msgid "Time type"
 msgstr "Tip timp"
 
@@ -13674,8 +13677,8 @@ msgstr "Timestamp a repornirii sistemului."
 msgid "Title"
 msgstr "Titlu"
 
-#: include/views/configuration.action.edit.php:449
-#: include/views/js/configuration.sysmaps.js.php:335
+#: include/views/configuration.action.edit.php:473
+#: include/views/js/configuration.sysmaps.js.php:331
 msgid "To"
 msgstr "Către"
 
@@ -13687,16 +13690,16 @@ msgstr "Pentru setarea unei interfețe server selectează un singur tip de item 
 msgid "Today"
 msgstr "Astăzi"
 
-#: include/views/configuration.screen.constructor.edit.php:561
-#: include/views/configuration.screen.constructor.edit.php:602
+#: include/views/configuration.screen.constructor.edit.php:585
+#: include/views/configuration.screen.constructor.edit.php:626
 #: include/views/configuration.sysmap.edit.php:115
 #: include/views/js/configuration.sysmaps.js.php:86
-#: include/views/js/configuration.sysmaps.js.php:248
+#: include/views/js/configuration.sysmaps.js.php:244
 #: include/views/monitoring.overview.php:85
 msgid "Top"
 msgstr "Sus"
 
-#: include/blocks.inc.php:389 include/classes/class.chostsinfo.php:128
+#: include/blocks.inc.php:402 include/classes/class.chostsinfo.php:128
 #: queue.php:238 queue.php:242
 msgid "Total"
 msgstr "Total"
@@ -13737,7 +13740,7 @@ msgstr "Perioadă trend a stocării"
 msgid "Trend storage period (in days)"
 msgstr "Perioadă de stocare trend (în zile)"
 
-#: include/forms.inc.php:611 include/forms.inc.php:947
+#: include/forms.inc.php:625 include/forms.inc.php:961
 #: include/views/administration.general.housekeeper.edit.php:160
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.prototype.list.php:55 items.php:157
@@ -13754,8 +13757,8 @@ msgstr "Tendințe"
 #: include/views/configuration.services.parent.list.php:36
 #: include/views/configuration.triggers.edit.php:265
 #: include/views/js/configuration.sysmaps.js.php:19
-#: include/views/js/configuration.sysmaps.js.php:107 jsLoader.php:148
-#: jsLoader.php:214 report5.php:60 services.php:468 tr_comments.php:75
+#: include/views/js/configuration.sysmaps.js.php:103 jsLoader.php:148
+#: jsLoader.php:215 report5.php:60 services.php:468 tr_comments.php:75
 #: tr_logform.php:152 tr_logform.php:165
 msgid "Trigger"
 msgstr "Trigger"
@@ -13777,7 +13780,7 @@ msgstr "Triggerul \"%1$s\" depinde de trigger \"%2$s\", care nu există."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Triggerul \"%1$s\" sărit - regula utilizatorului."
 
-#: api/classes/CTrigger.php:1646
+#: api/classes/CTrigger.php:1639
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Triggerul \"%s\" aparține șablonului cu diferite legături."
@@ -13786,7 +13789,7 @@ msgstr "Triggerul \"%s\" aparține șablonului cu diferite legături."
 msgid "Trigger added"
 msgstr "Trigger adăugat"
 
-#: api/classes/CTrigger.php:1550
+#: api/classes/CTrigger.php:1543
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Triggerul nu poate depinde de un trigger care este moștenit de la el."
 
@@ -13837,7 +13840,7 @@ msgstr "Eveniment trigger și avertizare perioadă de stocare a datelor (în zil
 msgid "Trigger expression condition"
 msgstr "Condiție expresie trigger"
 
-#: api/classes/CTrigger.php:692 api/classes/CTriggerPrototype.php:776
+#: api/classes/CTrigger.php:685 api/classes/CTriggerPrototype.php:776
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Expresie trigger trebuie să conțină cel puțin un serverȘ cheie referință."
 
@@ -13954,7 +13957,7 @@ msgstr "Trigger actualizat"
 msgid "Trigger value"
 msgstr "Valoare trigger"
 
-#: hosts.php:810 hosts.php:902 include/forms.inc.php:598
+#: hosts.php:810 hosts.php:902 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
 #: include/triggers.inc.php:1262
 #: include/views/configuration.action.list.php:33
@@ -13967,8 +13970,8 @@ msgstr "Valoare trigger"
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:230
 #: include/views/inventory.host.view.php:240
-#: include/views/js/configuration.sysmaps.js.php:392
-#: include/views/monitoring.overview.php:27 jsLoader.php:115 popup.php:44
+#: include/views/js/configuration.sysmaps.js.php:388
+#: include/views/monitoring.overview.php:27 jsLoader.php:115 popup.php:60
 #: search.php:135 search.php:142 search.php:174 search.php:194 search.php:209
 #: search.php:268 search.php:322 search.php:384 search.php:413 search.php:437
 #: templates.php:490 templates.php:552 tr_status.php:267
@@ -14003,7 +14006,7 @@ msgstr "Stare triggeri"
 msgid "Triggers top 100"
 msgstr "Top 100 triggeri"
 
-#: include/views/monitoring.dashconf.php:87
+#: include/views/monitoring.dashconf.php:99
 msgid "Triggers with severity"
 msgstr "Triggeri cu severități"
 
@@ -14020,7 +14023,7 @@ msgstr "Încearcă să citești proprietatea inaccesibilă \"%s\"."
 msgid "Tue"
 msgstr "Mar"
 
-#: include/forms.inc.php:1670 include/forms.inc.php:1738
+#: include/forms.inc.php:1684 include/forms.inc.php:1752
 #: include/func.inc.php:149 include/func.inc.php:239
 msgid "Tuesday"
 msgstr "Marți"
@@ -14040,7 +14043,7 @@ msgstr "Doi itemi (\"%1$s\" și \"%2$s\") nu pot popula un câmp inventar al unu
 
 #: include/actions.inc.php:829 include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
-#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:534
+#: include/classes/screens/CScreenActions.php:125 include/forms.inc.php:541
 #: include/hosts.inc.php:105
 #: include/views/administration.auditacts.list.php:71
 #: include/views/administration.general.image.edit.php:36
@@ -14051,7 +14054,7 @@ msgstr "Doi itemi (\"%1$s\" și \"%2$s\") nu pot popula un câmp inventar al unu
 #: include/views/administration.node.list.php:43
 #: include/views/administration.script.edit.php:48
 #: include/views/administration.script.list.php:40
-#: include/views/configuration.action.edit.php:710
+#: include/views/configuration.action.edit.php:734
 #: include/views/configuration.graph.edit.php:223
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.item.edit.php:67
@@ -14063,10 +14066,10 @@ msgstr "Doi itemi (\"%1$s\" și \"%2$s\") nu pot popula un câmp inventar al unu
 #: include/views/configuration.services.edit.php:128
 #: include/views/inventory.host.list.php:80
 #: include/views/js/configuration.sysmaps.js.php:13
-#: include/views/js/configuration.sysmaps.js.php:393
+#: include/views/js/configuration.sysmaps.js.php:389
 #: include/views/monitoring.overview.php:33 latest.php:362 latest.php:363
-#: popup_media.php:121 popup.php:518 popup.php:817 popup.php:927 popup.php:936
-#: tr_logform.php:303 tr_logform.php:307
+#: popup_media.php:121 popup.php:534 popup.php:1145 popup.php:1255
+#: popup.php:1264 tr_logform.php:303 tr_logform.php:307
 msgid "Type"
 msgstr "Tip"
 
@@ -14074,28 +14077,28 @@ msgstr "Tip"
 msgid "Type (Full details)"
 msgstr "Tip (Detalii complete)"
 
-#: include/views/js/configuration.sysmaps.js.php:365
+#: include/views/js/configuration.sysmaps.js.php:361
 msgid "Type (OK)"
 msgstr "Tip (OK)"
 
-#: include/views/configuration.screen.constructor.edit.php:362
+#: include/views/configuration.screen.constructor.edit.php:374
 msgid "Type (ascending)"
 msgstr "Tip (ascendent)"
 
-#: include/views/configuration.screen.constructor.edit.php:361
+#: include/views/configuration.screen.constructor.edit.php:373
 msgid "Type (descending)"
 msgstr "Tip (descendent)"
 
 #: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:959
+#: include/views/configuration.action.edit.php:1001
 msgid "Type of calculation"
 msgstr "Tip de calcul"
 
-#: include/forms.inc.php:536 include/forms.inc.php:917
+#: include/forms.inc.php:543 include/forms.inc.php:931
 #: include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.edit.php:227
-#: include/views/configuration.item.massupdate.php:215 popup.php:818
-#: popup.php:928 popup.php:937
+#: include/views/configuration.item.massupdate.php:215 popup.php:1146
+#: popup.php:1256 popup.php:1265
 msgid "Type of information"
 msgstr "Tip de informație"
 
@@ -14107,7 +14110,7 @@ msgstr "Tipul de informație trebuie să fie \"Log\" pentru cheia de autentifica
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Tipul de informație trebuie să fie \"Numeric (float)\" pentru itemii agregați."
 
-#: include/forms.inc.php:912
+#: include/forms.inc.php:926
 msgid "Types"
 msgstr "Tipuri"
 
@@ -14123,7 +14126,7 @@ msgstr "SUS"
 #: include/views/configuration.httpconf.popup.php:78
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.triggers.edit.php:246
-#: include/views/js/configuration.sysmaps.js.php:182 jsLoader.php:215
+#: include/views/js/configuration.sysmaps.js.php:178 jsLoader.php:216
 #: popup_httpstep.php:37 tr_logform.php:372
 msgid "URL"
 msgstr "URL"
@@ -14153,7 +14156,7 @@ msgid "URL parameter name is empty."
 msgstr "Nume parametru URL este gol."
 
 #: include/views/configuration.sysmap.edit.php:180
-#: include/views/js/configuration.sysmaps.js.php:177 jsLoader.php:216
+#: include/views/js/configuration.sysmaps.js.php:173 jsLoader.php:217
 msgid "URLs"
 msgstr "URL-uri"
 
@@ -14165,7 +14168,7 @@ msgstr "USA (160 caractere)"
 msgid "USER PROFILE"
 msgstr "PROFILUL UTILIZATORULUI"
 
-#: include/func.inc.php:2619
+#: include/func.inc.php:2621
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -14173,7 +14176,7 @@ msgstr "UTF-8"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraineană (uk_UA)"
 
-#: include/nodes.inc.php:346
+#: include/nodes.inc.php:375
 msgid "Unable to remove local node."
 msgstr "Incapabil să elimine nodul local."
 
@@ -14198,7 +14201,7 @@ msgid "Unacknowledged PROBLEM events"
 msgstr "Evenimente PROBLEMĂ nerecunoscute"
 
 #: include/views/configuration.sysmap.edit.php:123
-#: include/views/monitoring.dashconf.php:94
+#: include/views/monitoring.dashconf.php:106
 msgid "Unacknowledged only"
 msgstr "Doar nerecunoscut"
 
@@ -14228,7 +14231,7 @@ msgstr "Unități"
 #: include/actions.inc.php:201 include/actions.inc.php:209
 #: include/actions.inc.php:223 include/actions.inc.php:234
 #: include/actions.inc.php:265 include/actions.inc.php:654
-#: include/actions.inc.php:1167 include/blocks.inc.php:1096
+#: include/actions.inc.php:1167 include/blocks.inc.php:1109
 #: include/classes/class.chostsinfo.php:127 include/discovery.inc.php:132
 #: include/discovery.inc.php:169 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
@@ -14239,7 +14242,7 @@ msgstr "Unități"
 #: include/items.inc.php:148 include/items.inc.php:164
 #: include/items.inc.php:191 include/items.inc.php:212
 #: include/maintenances.inc.php:42 include/maps.inc.php:39
-#: include/media.inc.php:40 include/nodes.inc.php:278 include/perm.inc.php:36
+#: include/media.inc.php:40 include/nodes.inc.php:307 include/perm.inc.php:36
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:177 include/triggers.inc.php:196
@@ -14291,7 +14294,7 @@ msgid "Unknown value type"
 msgstr "Tip valoare necunoscută"
 
 #: include/views/configuration.host.edit.php:662
-#: include/views/configuration.host.prototype.edit.php:223
+#: include/views/configuration.host.prototype.edit.php:229
 #: include/views/configuration.template.edit.php:397
 msgid "Unlink"
 msgstr "Dezleagă"
@@ -14305,7 +14308,7 @@ msgstr "Dezleagă și curăță"
 msgid "Unlink from template"
 msgstr "Dezleagă de șablon"
 
-#: include/actions.inc.php:456 include/views/configuration.action.edit.php:878
+#: include/actions.inc.php:456 include/views/configuration.action.edit.php:920
 msgid "Unlink from templates"
 msgstr "Dezleagă de șabloane"
 
@@ -14388,7 +14391,7 @@ msgstr "Parametru nesuportat \"%2$s\" pentru prototip server \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Parametru nesuportat \"%2$s\" pentru prototip server %1$s inventar server."
 
-#: include/blocks.inc.php:1191
+#: include/blocks.inc.php:1204
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Sus"
@@ -14399,10 +14402,10 @@ msgid "Up"
 msgstr "Sus"
 
 #: include/views/administration.auditlogs.list.php:46
-#: include/views/configuration.action.edit.php:1028
-#: include/views/configuration.host.massupdate.php:299
+#: include/views/configuration.action.edit.php:1070
+#: include/views/configuration.host.massupdate.php:320
 #: include/views/configuration.httpconf.popup.php:93
-#: include/views/configuration.item.massupdate.php:558
+#: include/views/configuration.item.massupdate.php:570
 #: include/views/js/adm.regexprs.edit.js.php:255
 #: include/views/js/configuration.discovery.edit.js.php:348
 #: popup_period.php:134
@@ -14433,9 +14436,9 @@ msgstr "Actualizat"
 msgid "Updated status of host"
 msgstr "Actualizare stare server"
 
-#: include/blocks.inc.php:377 include/blocks.inc.php:717
-#: include/blocks.inc.php:786 include/blocks.inc.php:1041
-#: include/blocks.inc.php:1148 include/blocks.inc.php:1206
+#: include/blocks.inc.php:390 include/blocks.inc.php:730
+#: include/blocks.inc.php:799 include/blocks.inc.php:1054
+#: include/blocks.inc.php:1161 include/blocks.inc.php:1219
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14466,7 +14469,7 @@ msgstr "Actualizat: Item \"%1$s\" pe \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Actualizat: Prototip item \"%1$s\" pe \"%2$s\"."
 
-#: api/classes/CTrigger.php:1299
+#: api/classes/CTrigger.php:1292
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Actualizat: Trigger \"%1$s\" pe \"%2$s\"."
@@ -14505,7 +14508,7 @@ msgid "Uptime/Downtime"
 msgstr "Timp de la pornire/ timp de la oprire"
 
 #: include/screens.inc.php:44
-#: include/views/configuration.screen.constructor.edit.php:570
+#: include/views/configuration.screen.constructor.edit.php:594
 msgid "Url"
 msgstr "Url"
 
@@ -14526,7 +14529,7 @@ msgstr "Utilizat în acțiuni"
 #: include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:86
 #: include/views/administration.users.edit.php:337
-#: include/views/configuration.action.edit.php:528
+#: include/views/configuration.action.edit.php:552
 #: include/views/configuration.httpconf.edit.php:82
 msgid "User"
 msgstr "Utilizator"
@@ -14570,7 +14573,7 @@ msgstr "Utilizator șters"
 #: include/views/administration.script.list.php:43
 #: include/views/administration.usergroups.edit.php:128
 #: include/views/administration.users.list.php:41
-#: include/views/configuration.action.edit.php:519
+#: include/views/configuration.action.edit.php:543
 msgid "User group"
 msgstr "Grup utilizator"
 
@@ -14619,7 +14622,7 @@ msgstr "Grup utilizator pentru mesaje cădere bază de date \"%1$s\"."
 
 #: include/views/administration.usergroups.list.php:28
 #: include/views/administration.usergroups.list.php:34
-#: include/views/administration.users.list.php:28 popup.php:48
+#: include/views/administration.users.list.php:28 popup.php:64
 #: popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "User groups"
 msgstr "Grupuri utilizator"
@@ -14639,7 +14642,7 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "Utilizatorul nu poate să își modifice statusul sau să devină membru al grupului utilizator \"%s\"."
 
 #: disc_prototypes.php:66 host_discovery.php:61
-#: include/views/configuration.action.edit.php:733
+#: include/views/configuration.action.edit.php:757
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:260 items.php:73
 msgid "User name"
@@ -14688,8 +14691,8 @@ msgstr "Utilizatorul cu alias \"%s\" există deja."
 
 #: include/views/administration.mediatypes.edit.php:85
 #: include/views/administration.mediatypes.list.php:69
-#: include/views/configuration.host.edit.php:735
-#: include/views/configuration.host.prototype.edit.php:266
+#: include/views/configuration.host.edit.php:741
+#: include/views/configuration.host.prototype.edit.php:278
 #: include/views/general.login.php:66 index.php:34
 msgid "Username"
 msgstr "Nume utilizator"
@@ -14699,7 +14702,7 @@ msgstr "Nume utilizator"
 #: include/views/administration.usergroups.list.php:29
 #: include/views/administration.usergroups.list.php:126
 #: include/views/administration.users.list.php:29
-#: include/views/administration.users.list.php:43 popup.php:52
+#: include/views/administration.users.list.php:43 popup.php:68
 msgid "Users"
 msgstr "Utilizatori"
 
@@ -14887,7 +14890,7 @@ msgstr "Spaîiu de depozitare fără share mașină virtuală, <url> - serviciu 
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Perioadă de funcționare fără oprire mașină virtuală VMware, <url> - serviciu URL VMware, <uuid> - nume server mașină virtual VMware"
 
-#: include/blocks.inc.php:728 include/classes/graphdraw/CPieGraphDraw.php:327
+#: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
 #: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
@@ -15035,11 +15038,11 @@ msgstr "Detaliat"
 msgid "Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1"
 msgstr "Versiunea zabbix_agent(d)rulând pe serverul monitorizat. Valoare rând. Exemplu de valoare redată: 1.1"
 
-#: include/views/configuration.screen.constructor.edit.php:552
+#: include/views/configuration.screen.constructor.edit.php:576
 msgid "Vertical"
 msgstr "Vertical"
 
-#: include/views/configuration.screen.constructor.edit.php:608
+#: include/views/configuration.screen.constructor.edit.php:632
 msgid "Vertical align"
 msgstr "Aliniere verticală"
 
@@ -15168,7 +15171,7 @@ msgstr "Scenarii web"
 msgid "Wed"
 msgstr "Mie"
 
-#: include/forms.inc.php:1671 include/forms.inc.php:1739
+#: include/forms.inc.php:1685 include/forms.inc.php:1753
 #: include/func.inc.php:150 include/func.inc.php:240
 msgid "Wednesday"
 msgstr "Miercuri"
@@ -15177,7 +15180,7 @@ msgstr "Miercuri"
 msgid "Week"
 msgstr "Săptămână"
 
-#: include/forms.inc.php:1648 include/maintenances.inc.php:38
+#: include/forms.inc.php:1662 include/maintenances.inc.php:38
 #: include/reports.inc.php:62 include/reports.inc.php:404
 #: include/reports.inc.php:412 report3.php:59 report4.php:109
 msgid "Weekly"
@@ -15189,7 +15192,7 @@ msgstr "Când e activ"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:56
 #: include/views/configuration.graph.list.php:79
-#: include/views/configuration.screen.constructor.edit.php:577
+#: include/views/configuration.screen.constructor.edit.php:601
 #: include/views/configuration.sysmap.edit.php:42
 #: include/views/configuration.sysmap.list.php:45
 #: include/views/js/configuration.sysmaps.js.php:52 screenedit.php:44
@@ -15206,12 +15209,12 @@ msgstr "Cu colecția de date."
 msgid "With last event unacknowledged"
 msgstr "Cu ultimul eveniment nerecunoscut"
 
-#: include/blocks.inc.php:388
+#: include/blocks.inc.php:401
 msgid "With problems"
 msgstr "Cu probleme"
 
-#: include/forms.inc.php:601 include/forms.inc.php:828
-#: include/forms.inc.php:937
+#: include/forms.inc.php:615 include/forms.inc.php:842
+#: include/forms.inc.php:951
 msgid "With triggers"
 msgstr "Cu triggeri"
 
@@ -15219,11 +15222,11 @@ msgstr "Cu triggeri"
 msgid "With unacknowledged events"
 msgstr "Cu evenimente nerecunoscute"
 
-#: include/blocks.inc.php:387
+#: include/blocks.inc.php:400
 msgid "Without problems"
 msgstr "Fără probleme"
 
-#: include/forms.inc.php:602 include/forms.inc.php:825
+#: include/forms.inc.php:616 include/forms.inc.php:839
 msgid "Without triggers"
 msgstr "Fără triggeri"
 
@@ -15245,7 +15248,7 @@ msgstr "Timp de lucru"
 msgid "Working time \"%1$s\"."
 msgstr "Timp de lucru \"%1$s\"."
 
-#: include/views/administration.script.edit.php:95
+#: include/views/administration.script.edit.php:100
 #: include/views/administration.script.list.php:84
 msgid "Write"
 msgstr "Scriere"
@@ -15332,7 +15335,7 @@ msgstr "Câmpuri greșite pentru utilizatorul \"%s\"."
 msgid "Wrong macro \"%1$s\"."
 msgstr "Macro greșit \"%1$s\"."
 
-#: include/views/js/configuration.sysmaps.js.php:167
+#: include/views/js/configuration.sysmaps.js.php:163
 msgid "X"
 msgstr "X"
 
@@ -15362,7 +15365,7 @@ msgstr "Fișierul XML conține eroarea fatală %1$s:"
 msgid "XML file contains warning %1$s:"
 msgstr "Fișierul XML conține avertizarea %1$s:"
 
-#: include/views/js/configuration.sysmaps.js.php:169 report3.php:96
+#: include/views/js/configuration.sysmaps.js.php:165 report3.php:96
 msgid "Y"
 msgstr "Y"
 
@@ -15431,7 +15434,7 @@ msgstr "An"
 msgid "Yearly"
 msgstr "Anual"
 
-#: events.php:769 include/blocks.inc.php:737
+#: events.php:839 include/blocks.inc.php:750
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2436
 #: include/triggers.inc.php:1646
@@ -15457,7 +15460,7 @@ msgstr "Nu ai permisiunea de a strica privilegiile utilizatorului \"%s\"."
 msgid "You are not logged in."
 msgstr "Nu sunteți autentificat."
 
-#: popup.php:504
+#: popup.php:519
 msgid "You can not switch hosts for current selection."
 msgstr "Nu poți schimba serverele pentru locația curentă."
 
@@ -15553,7 +15556,7 @@ msgstr "Utilizator Zabbix"
 
 #: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
-#: include/views/configuration.action.edit.php:715
+#: include/views/configuration.action.edit.php:739
 #: include/views/js/configuration.action.edit.js.php:118
 #: include/views/js/configuration.discovery.edit.js.php:184
 msgid "Zabbix agent"
@@ -15582,7 +15585,7 @@ msgstr "Autentificare internă Zabbix"
 #: include/classes/class.cserverinfo.php:37
 #: include/classes/class.cserverinfo.php:38 include/setup.inc.php:432
 #: include/views/administration.script.edit.php:54
-#: include/views/configuration.action.edit.php:716
+#: include/views/configuration.action.edit.php:740
 #: include/views/js/configuration.action.edit.js.php:122
 msgid "Zabbix server"
 msgstr "Server Zabbix"
@@ -15598,7 +15601,7 @@ msgstr ""
 "1. IP/DNS server incorect în \"zabbix.conf.php\";\n"
 "2. Configurare rețea incorectă.\n"
 
-#: include/blocks.inc.php:738
+#: include/blocks.inc.php:751
 msgid "Zabbix server IP or port is not set!"
 msgstr "Portul sau IP-ul serverului Zabbix nu este setat!"
 
@@ -15614,7 +15617,7 @@ msgstr "Informații server Zabbix"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Serverul Zabbix nu funcționează: informația afișată poate să nu fie corectă."
 
-#: include/blocks.inc.php:736
+#: include/blocks.inc.php:749
 msgid "Zabbix server is running"
 msgstr "Serverul Zabbix rulează"
 
@@ -15670,8 +15673,8 @@ msgstr "agent"
 #: include/classes/screens/CScreenHostTriggers.php:116
 #: include/forms.inc.php:385 include/forms.inc.php:428
 #: include/forms.inc.php:443 include/forms.inc.php:450
-#: include/forms.inc.php:467 include/forms.inc.php:600
-#: include/forms.inc.php:615 include/graphs.inc.php:86
+#: include/forms.inc.php:467 include/forms.inc.php:614
+#: include/forms.inc.php:629 include/graphs.inc.php:86
 #: include/views/js/configuration.graph.edit.js.php:46 report2.php:222
 #: report2.php:241 report2.php:263 report2.php:300 report2.php:328
 #: report2.php:347 report4.php:94 report4.php:270
@@ -15686,11 +15689,11 @@ msgstr "toata media"
 msgid "already exists"
 msgstr "există deja"
 
-#: include/views/configuration.action.edit.php:937
-#: include/views/configuration.action.edit.php:944
-#: include/views/js/configuration.action.edit.js.php:508
-#: include/views/js/configuration.action.edit.js.php:509
-#: include/views/js/configuration.action.edit.js.php:517
+#: include/views/configuration.action.edit.php:979
+#: include/views/configuration.action.edit.php:986
+#: include/views/js/configuration.action.edit.js.php:518
+#: include/views/js/configuration.action.edit.js.php:519
+#: include/views/js/configuration.action.edit.js.php:527
 msgid "and"
 msgstr "și"
 
@@ -15741,7 +15744,7 @@ msgid "d M Y H:i"
 msgstr "z L A H:i"
 
 #: acknow.php:214 events.php:269 httpdetails.php:121 httpmon.php:140
-#: include/acknow.inc.php:54 include/blocks.inc.php:1015
+#: include/acknow.inc.php:54 include/blocks.inc.php:1028
 #: include/classes/screens/CScreenEvents.php:58
 #: include/classes/screens/CScreenPlainText.php:97 include/events.inc.php:183
 #: include/events.inc.php:256 include/events.inc.php:309
@@ -15809,7 +15812,7 @@ msgstr "detecție"
 msgid "dynamic"
 msgstr "dinamic"
 
-#: include/views/js/configuration.sysmaps.js.php:215
+#: include/views/js/configuration.sysmaps.js.php:211
 msgid "elements"
 msgstr "elemente"
 
@@ -15906,7 +15909,7 @@ msgstr "ultima"
 #: hosts.php:773 hosts.php:774 hosts.php:775 include/actions.inc.php:29
 #: include/forms.inc.php:477 include/forms.inc.php:484
 #: include/forms.inc.php:491 include/forms.inc.php:498
-#: include/forms.inc.php:607 include/forms.inc.php:622
+#: include/forms.inc.php:621 include/forms.inc.php:636
 #: include/views/inventory.host.list.php:40
 msgid "like"
 msgstr "ca și"
@@ -15929,7 +15932,7 @@ msgstr "l"
 msgid "macro(s)"
 msgstr "macro(uri)"
 
-#: include/actions.inc.php:194 include/views/configuration.action.edit.php:200
+#: include/actions.inc.php:194 include/views/configuration.action.edit.php:224
 msgid "maintenance"
 msgstr "mentenanță"
 
@@ -15953,7 +15956,7 @@ msgstr "max"
 msgid "min"
 msgstr "min"
 
-#: include/views/configuration.action.edit.php:329
+#: include/views/configuration.action.edit.php:353
 msgid "minimum 60 seconds"
 msgstr "minim 60 de secunde"
 
@@ -15976,8 +15979,8 @@ msgstr "trebuie să fie un utilizator valid LDAP"
 msgid "new"
 msgstr "nou"
 
-#: include/views/configuration.host.massupdate.php:74
-#: include/views/configuration.item.massupdate.php:502
+#: include/views/configuration.host.massupdate.php:80
+#: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nou"
@@ -16001,7 +16004,7 @@ msgid "not running"
 msgstr "nu rulează"
 
 #: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:807
-#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1154
+#: include/classes/class.cpagefilter.php:890 include/forms.inc.php:1168
 msgid "not selected"
 msgstr "neselectat"
 
@@ -16015,7 +16018,7 @@ msgstr "netrimis"
 msgid "now"
 msgstr "acum"
 
-#: include/blocks.inc.php:362 include/blocks.inc.php:706
+#: include/blocks.inc.php:375 include/blocks.inc.php:719
 #: include/func.inc.php:1899
 msgid "of"
 msgstr "al"
@@ -16053,11 +16056,11 @@ msgstr "închis"
 msgid "on"
 msgstr "pornit"
 
-#: include/views/configuration.action.edit.php:940
-#: include/views/configuration.action.edit.php:943
-#: include/views/js/configuration.action.edit.js.php:512
-#: include/views/js/configuration.action.edit.js.php:513
-#: include/views/js/configuration.action.edit.js.php:516
+#: include/views/configuration.action.edit.php:982
+#: include/views/configuration.action.edit.php:985
+#: include/views/js/configuration.action.edit.js.php:522
+#: include/views/js/configuration.action.edit.js.php:523
+#: include/views/js/configuration.action.edit.js.php:526
 msgid "or"
 msgstr "sau"
 
