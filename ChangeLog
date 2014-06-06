@@ -1,6 +1,7 @@
 Changes for 2.3.2
 
 New features:
+A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBX-7399] improved multiselect by adding popup select window (Oleg)
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 

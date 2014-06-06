@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 21:04+0300\n"
-"PO-Revision-Date: 2014-02-01 22:57+0300\n"
+"POT-Creation-Date: 2014-06-06 21:15+0300\n"
+"PO-Revision-Date: 2014-06-05 14:47+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391288271.0\n"
+"X-POOTLE-MTIME: 1401972461.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -83,9 +83,9 @@ msgstr[2] "%1$s минут"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s попытка осталась"
+msgstr[1] "%1$s попытки осталось"
+msgstr[2] "%1$s попыток осталось"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
@@ -204,7 +204,7 @@ msgstr "<вручную>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "ЖУРНАЛ ДЕЙСТВИЙ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
@@ -223,7 +223,7 @@ msgstr "И"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "ЖУРНАЛ АУДИТА"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -381,7 +381,7 @@ msgstr[2] "Действия активированы"
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
 msgid "Action log"
-msgstr ""
+msgstr "Журнал действий"
 
 #: include/views/configuration.action.edit.php:432
 msgid "Action operations"
@@ -568,7 +568,7 @@ msgstr "Агент"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:311
 msgid "Agent host name defined in the configuration file. String value."
-msgstr ""
+msgstr "Имя хоста агента указанное в файле конфигурации. Строковое значение."
 
 #: include/views/configuration.host.edit.php:270
 #: include/views/configuration.host.edit.php:354
@@ -583,7 +583,7 @@ msgstr "Интерфейс Агента или SNMP или JMX или IPMI"
 
 #: include/classes/items/CHelpItems.php:569
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Аггрегативные проверки не требуют наличия агента на наблюдаемом узле сети. Zabbix сервер собирает аггреративную информацию с помощью прямых запросов в базу данных. Смотрите документацию по Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:54 popup.php:579 users.php:44
@@ -630,7 +630,7 @@ msgstr "Разрешенные узлы сети"
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:551
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "Объем памяти в байтах. Если режим не указан, используется total."
 
 #: include/triggers.inc.php:1577
 #: include/views/configuration.action.edit.php:111
@@ -638,13 +638,13 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:278
 #: include/views/configuration.triggers.edit.php:112
 msgid "And"
-msgstr ""
+msgstr "И"
 
 #: include/views/configuration.action.edit.php:110
 #: include/views/configuration.action.edit.php:966
 #: include/views/configuration.host.discovery.edit.php:277
 msgid "And/Or"
-msgstr ""
+msgstr "И/Или"
 
 #: tr_status.php:258 tr_status.php:265
 msgid "Any"
@@ -678,12 +678,11 @@ msgid "Application added"
 msgstr "Группа элементов данных добавлена"
 
 #: applications.php:151 applications.php:186
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Группа элементов данных удалена"
-msgstr[1] "Группа элементов данных удалена"
-msgstr[2] "Группа элементов данных удалена"
+msgstr[1] "Группа элементов данных удалены"
+msgstr[2] "Группы элементов данных удалены"
 
 #: api/rpc/class.cjsonrpc.php:194
 msgid "Application error."
@@ -1404,7 +1403,7 @@ msgstr "Невозможно добавить более одного элеме
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "Не удалось добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
+msgstr "Невозможно добавить более одного элемента данных с типом 'Суммарный график' к прототипу графика \"%1$s\"."
 
 #: sysmaps.php:175
 msgid "Cannot add network map"
@@ -1527,7 +1526,7 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 #: api/classes/CHostPrototype.php:151
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "Не удалось создать прототип узла сети от обнаруженного узла сети \"%1$s\"."
+msgstr "Не удалось создать прототип узла сети у обнаруженного узла сети \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1916,7 +1915,7 @@ msgstr "Не удалось отобразить очередь элементо
 
 #: chart7.php:78
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "Не удалось отобразить более одного элемента данных с типом \"Сумма графика\".Не удалось отобразить более одного элемента данных с типом \"Сумма графика\"."
+msgstr "Не удалось отобразить более одного элемента данных с типом \"Суммарный график\""
 
 #: actionconf.php:335
 msgid "Cannot enable action"
@@ -3422,7 +3421,7 @@ msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 #: api/classes/managers/CHttpTestManager.php:124
 #, c-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
+msgstr "Создано: Веб-сценарий \"%1$s\" у \"%2$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
@@ -10003,7 +10002,7 @@ msgstr "Элементы данных не заданы."
 #: include/items.inc.php:697 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:114 popup.php:1075
 msgid "No items found."
-msgstr "Элементы данныз не найдены."
+msgstr "Элементы данных не найдены."
 
 #: include/views/common.macros.php:27
 msgid "No macros found."

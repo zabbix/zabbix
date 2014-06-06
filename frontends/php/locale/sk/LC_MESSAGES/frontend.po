@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 21:04+0300\n"
-"PO-Revision-Date: 2014-05-31 18:40+0300\n"
+"POT-Creation-Date: 2014-06-06 21:15+0300\n"
+"PO-Revision-Date: 2014-06-05 07:10+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401554439.0\n"
+"X-POOTLE-MTIME: 1401945019.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -986,7 +986,7 @@ msgstr "Koreňový DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Zakladná"
 
 #: include/views/administration.authentication.edit.php:91
 msgid "Bind DN"
@@ -4799,12 +4799,12 @@ msgstr "Prázdny"
 #: api/classes/CHttpTest.php:906
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Prázdny súbor SSL certifikátu pre web scenár \"%1$s\"."
 
 #: api/classes/CHttpTest.php:899
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Prázdny súbor SSL kľúča pre web scenár \"%1$s\"."
 
 #: api/classes/CAction.php:1520 api/classes/CAction.php:1527
 #: api/classes/CAction.php:1534 api/classes/CAction.php:1541
@@ -4914,7 +4914,7 @@ msgstr "Prázdna časová perióda."
 
 #: api/classes/CHttpTest.php:310
 msgid "Empty web scenario ID."
-msgstr ""
+msgstr "Prázdne ID web scenára."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -5294,7 +5294,7 @@ msgstr "Zlyhalo"
 
 #: include/actions.inc.php:1079 include/blocks.inc.php:1170
 msgid "Failed"
-msgstr "Zlyhanie aktualizácie šablóny."
+msgstr "Zlyhanie"
 
 #: api/classes/CTemplate.php:536
 msgid "Failed to update template."
@@ -5499,7 +5499,7 @@ msgstr "Flexibilné intervaly"
 
 #: include/views/configuration.httpconf.popup.php:93
 msgid "Follow redirects"
-msgstr ""
+msgstr "Nasledovať presmerovania"
 
 #: profile.php:117 users.php:196
 msgid "For guest, password must be empty"
@@ -6047,7 +6047,7 @@ msgstr "Hardvér (podrobnosti)"
 #: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.httpconf.popup.php:91
 msgid "Headers"
-msgstr ""
+msgstr "HTTP hlavičky"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:57
 #: include/views/configuration.graph.list.php:79
@@ -6982,12 +6982,12 @@ msgstr "Nesprávna SNMP komunita."
 #: api/classes/CHttpTest.php:890
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota SSL verifikácie mena hosta pre web scenár \"%1$s\"."
 
 #: api/classes/CHttpTest.php:881
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota SSL verifikácie certifikátu hosta pre web scenár \"%1$s\"."
 
 #: api/classes/CService.php:959
 #, c-format
@@ -7253,7 +7253,7 @@ msgstr "Neplatný flexibilný interval v položke \"%1$s\". Flexibilný interval
 #: api/classes/CHttpTest.php:681
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota Nasledovania presmerovaní pre krok \"%1$s\" scenára \"%2$s\"."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1653 tr_testexpr.php:36
@@ -7492,7 +7492,7 @@ msgstr "Neplatná odpoveď prijatá od Zabbix servera \"%1$s\"."
 
 #: api/classes/CHttpTest.php:691
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
-msgstr ""
+msgstr "Nesprávna hodnota Typu sťahovania pre krok \"%1$s\" scenára \"%2$\"."
 
 #: api/classes/CScreenItem.php:676
 #, c-format
@@ -7668,7 +7668,7 @@ msgstr "Neplatná hodnota použitá pre proxy stav \"%1$s\"."
 
 #: api/classes/CHttpTest.php:311
 msgid "Incorrect web scenario ID."
-msgstr ""
+msgstr "Neplatné ID web scenára."
 
 #: include/profiles.inc.php:312
 msgid "Incorrect working time."
@@ -9406,7 +9406,7 @@ msgstr "BEZ ÚDAJOV"
 
 #: include/httptest.inc.php:29
 msgid "NTLM"
-msgstr ""
+msgstr "NTLM"
 
 #: actionconf.php:37 actionconf.php:154 adm.regexps.php:37 adm.regexps.php:138
 #: adm.regexps.php:171 applications.php:38 disc_prototypes.php:42
@@ -9635,7 +9635,7 @@ msgstr "Žiadne \"%1$s\" dané pre šablónu obrazovky."
 #: api/classes/CHttpTest.php:309
 #, c-format
 msgid "No \"%1$s\" given for web scenario."
-msgstr ""
+msgstr "Žiadne \"%1$s\" dané pre web scenár."
 
 #: api/classes/CDiscoveryRule.php:895
 #, c-format
@@ -11925,7 +11925,7 @@ msgstr "Ostáva pokusov"
 
 #: include/views/configuration.httpconf.popup.php:95
 msgid "Retrieve only headers"
-msgstr ""
+msgstr "Sťahovať len hlavičky"
 
 #: include/setup.inc.php:233 include/setup.inc.php:521
 #: include/views/general.warning.php:40
@@ -12198,23 +12198,23 @@ msgstr "SSH agent"
 
 #: include/views/configuration.httpconf.edit.php:170
 msgid "SSL certificate file"
-msgstr ""
+msgstr "Súbor SSL certifikátu"
 
 #: include/views/configuration.httpconf.edit.php:176
 msgid "SSL key file"
-msgstr ""
+msgstr "Súbor SSL kľúča"
 
 #: include/views/configuration.httpconf.edit.php:182
 msgid "SSL key password"
-msgstr ""
+msgstr "Heslo k SSL kľúču"
 
 #: include/views/configuration.httpconf.edit.php:166
 msgid "SSL verify host"
-msgstr ""
+msgstr "SSL verifikácia mena hosta"
 
 #: include/views/configuration.httpconf.edit.php:163
 msgid "SSL verify peer"
-msgstr ""
+msgstr "SSL verifikácia certifikátu hosta"
 
 #: include/views/monitoring.discovery.php:28
 msgid "STATUS OF DISCOVERY"
@@ -14254,7 +14254,7 @@ msgstr "URL C"
 #: api/classes/CMap.php:469
 #, c-format
 msgid "URL name should be unique for map \"%s\"."
-msgstr ""
+msgstr "URL meno by malo byť unikátne pre mapu \"%s\"."
 
 #: include/html.inc.php:112
 msgid "URL parameter cannot be array."
@@ -14267,7 +14267,7 @@ msgstr "URL parameter meno je prázdny."
 #: api/classes/CMap.php:463
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr ""
+msgstr "URL by malo mať \"meno\" aj \"url\" pre mapu \"%s\"."
 
 #: include/views/configuration.sysmap.edit.php:180
 #: include/views/js/configuration.sysmaps.js.php:180 jsLoader.php:221
@@ -15260,7 +15260,7 @@ msgstr "Web scenár musí mať najmenej jeden krok."
 
 #: api/classes/CHttpTest.php:456 api/classes/CHttpTest.php:573
 msgid "Web scenario name cannot be empty."
-msgstr ""
+msgstr "Meno web scenára nemôže byť prázdne."
 
 #: api/classes/CHttpTest.php:722
 #, c-format
@@ -15269,11 +15269,11 @@ msgstr "Krok web scenára \"%1$s\" už existuje."
 
 #: api/classes/CHttpTest.php:669
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "URL web scenára nemôže byť prázdna."
 
 #: api/classes/CHttpTest.php:664
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Meno kroku web scenára nemôže byť prázdne."
 
 #: api/classes/CHttpTest.php:650
 msgid "Web scenario step name should contain only printable characters."
