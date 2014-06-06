@@ -856,6 +856,9 @@ class CXmlImport18 {
 				// stores parsed hosts that exist on XML
 				$hostsXML = array();
 
+				// store items that exist on XML
+				$itemsXML = array();
+
 				// stores triggers that exist on XML and also store hosts to which they belong to
 				$triggersXML = array();
 			}
@@ -1023,15 +1026,13 @@ class CXmlImport18 {
 								}
 							}
 						}
-
 					}
+
 					$interfaces_created_with_host = false;
 				}
-				else {
-					if ($host_db['status'] != HOST_STATUS_TEMPLATE) {
-						$host_db['interfaces'] = $interfaces;
-						$interfaces_created_with_host = true;
-					}
+				elseif ($host_db['status'] != HOST_STATUS_TEMPLATE) {
+					$host_db['interfaces'] = $interfaces;
+					$interfaces_created_with_host = true;
 				}
 
 // HOST GROUPS {{{
@@ -1164,10 +1165,8 @@ class CXmlImport18 {
 				}
 				$current_hostname = $host_db['host'];
 
-				if ($rules['triggers']['deleteMissing']) {
-					// since triggers belong to multiple hosts, they can be deleted after all hosts have been parsed
-					$hostsXML[] = $current_hostid;
-				}
+				// store parsed host IDs
+				$hostsXML[] = $current_hostid;
 
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
@@ -1254,20 +1253,6 @@ class CXmlImport18 {
 						}
 					}
 
-					// get items all from DB, to compare DB items and XML items
-					if ($rules['items']['deleteMissing']) {
-						$dbItems = API::Item()->get(array(
-							'output' => array('itemid'),
-							'webitems' => true,
-							'nopermissions' => true,
-							'preservekeys' => true,
-							'filter' => array('hostid' => $current_hostid),
-						));
-						$dbItems = array_keys($dbItems);
-
-						$itemsToPreserve = array();
-					}
-
 					// cycle each XML item
 					foreach ($items as $item) {
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
@@ -1331,7 +1316,7 @@ class CXmlImport18 {
 						// items created and updated during should be "preserved", so we must store item IDs
 						// before we skip some rules, otherwise all items get deleted
 						if ($rules['items']['deleteMissing']) {
-							$itemsToPreserve[] = $current_item['itemid'];
+							$itemsXML[$current_item['itemid']] = $current_item['itemid'];
 						}
 
 						// if item does not exist and there is no need to create it, skip item creation
@@ -1422,14 +1407,6 @@ class CXmlImport18 {
 								'applications' => $item_applications,
 								'items' => $current_item
 							));
-						}
-					}
-
-					// compare items left in DB and XML and delete items missing from XML
-					if ($rules['items']['deleteMissing']) {
-						$itemsToDelete = array_diff($dbItems, $itemsToPreserve);
-						if ($itemsToDelete) {
-							API::Item()->delete($itemsToDelete);
 						}
 					}
 				}
@@ -1806,7 +1783,7 @@ class CXmlImport18 {
 			// once we know all host IDs on XML, we now check again triggers and to which hosts they belong to
 			if ($rules['triggers']['deleteMissing']) {
 				// select only triggers from already parsed hosts
-				$dbTriggersAll = API::Trigger()->get(array(
+				$dbTriggers = API::Trigger()->get(array(
 					'output' => array('triggerid'),
 					'hostids' => $hostsXML,
 					'selectHosts' => array('hostid'),
@@ -1814,7 +1791,7 @@ class CXmlImport18 {
 					'nopermissions' => true
 				));
 
-				$triggersToDelete = array_diff_key($dbTriggersAll, $triggersXML);
+				$triggersToDelete = array_diff_key($dbTriggers, $triggersXML);
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
 				// if some triggers belong to more hosts than current XML contains, don't delete them
@@ -1826,6 +1803,24 @@ class CXmlImport18 {
 					if (!array_diff_key($triggerHosts, $hostsXML)) {
 						API::Trigger()->delete(array($triggerId));
 					}
+				}
+			}
+
+			// delete missing items from parsed hosts
+			if ($rules['items']['deleteMissing']) {
+				// select only items from already parsed hosts
+				$dbItems = API::Item()->get(array(
+					'output' => array('itemid'),
+					'hostids' => $hostsXML,
+					'webitems' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+
+				$itemsToDelete = array_diff_key($dbItems, $itemsXML);
+
+				if ($itemsToDelete) {
+					API::Item()->delete(array_keys($itemsToDelete));
 				}
 			}
 
