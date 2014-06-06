@@ -2131,7 +2131,8 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 					size_t	alloc_len, offset;
 
 					row[i].str = NULL;
-					zbx_strncpy_alloc(&row[i].str, &alloc_len, &offset, value->str, field->length);
+					zbx_strncpy_alloc(&row[i].str, &alloc_len, &offset, value->str,
+							zbx_strlen_utf8_n(value->str, field->length));
 				}
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
