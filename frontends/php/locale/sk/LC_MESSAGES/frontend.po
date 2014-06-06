@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
-"PO-Revision-Date: 2014-05-29 21:11+0300\n"
+"POT-Creation-Date: 2014-06-06 20:58+0300\n"
+"PO-Revision-Date: 2014-06-02 08:28+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401390693.0\n"
+"X-POOTLE-MTIME: 1401690504.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -15151,11 +15151,11 @@ msgstr "Krok web scenára \"%1$s\" už existuje."
 
 #: api/classes/CHttpTest.php:623
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "URL web scenára nemôže byť prázdna."
 
 #: api/classes/CHttpTest.php:618
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Meno web scenára nemôže byť prázdne."
 
 #: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."

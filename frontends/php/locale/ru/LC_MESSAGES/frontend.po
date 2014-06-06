@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 20:50+0300\n"
-"PO-Revision-Date: 2014-04-27 20:15+0300\n"
+"POT-Creation-Date: 2014-06-06 20:58+0300\n"
+"PO-Revision-Date: 2014-06-05 14:41+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1398622544.0\n"
+"X-POOTLE-MTIME: 1401972111.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1854,8 +1854,8 @@ msgstr[2] "Не удалось деактивировать прототипы �
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Не удалось отключить способ оповещения"
-msgstr[1] "Не удалось отключить способ оповещения"
-msgstr[2] "Не удалось отключить способ оповещения"
+msgstr[1] "Не удалось отключить способы оповещения"
+msgstr[2] "Не удалось отключить способы оповещения"
 
 #: triggers.php:276
 msgid "Cannot disable trigger"
@@ -1882,8 +1882,8 @@ msgstr[2] "Не удалось деактивировать группы пол�
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Не удалось отключить веб-сценарий"
-msgstr[1] "Не удалось отключить веб-сценарий"
-msgstr[2] "Не удалось отключить веб-сценарий"
+msgstr[1] "Не удалось отключить веб-сценарии"
+msgstr[2] "Не удалось отключить веб-сценарии"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -16073,7 +16073,7 @@ msgstr "другое"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "обновление каждые %1$s сек."
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
