@@ -66,7 +66,11 @@ if (isset($_REQUEST['druleid'])) {
 	$dbDRule = API::DRule()->get(array(
 		'druleids' => get_request('druleid'),
 		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
-		'selectDChecks' => API_OUTPUT_EXTEND,
+		'selectDChecks' => array(
+			'type', 'key_', 'type', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+			'snmpv3_contextname'
+		),
 		'editable' => true
 	));
 	if (empty($dbDRule)) {
@@ -270,7 +274,7 @@ else {
 	));
 
 	if ($data['drules']) {
-		foreach ($data['drules'] as $druleId => $drule) {
+		foreach ($data['drules'] as $key => $drule) {
 			// checks
 			$checks = array();
 
@@ -280,15 +284,15 @@ else {
 
 			order_result($checks);
 
-			$data['drules'][$druleId]['checks'] = $checks;
+			$data['drules'][$key]['checks'] = $checks;
 
 			// description
-			$data['drules'][$druleId]['description'] = array();
+			$data['drules'][$key]['description'] = array();
 
 			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
 
-				array_push($data['drules'][$druleId]['description'], $proxy['host'].NAME_DELIMITER);
+				array_push($data['drules'][$key]['description'], $proxy['host'].NAME_DELIMITER);
 			}
 		}
 
