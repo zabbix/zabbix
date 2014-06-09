@@ -65,7 +65,7 @@ $_REQUEST['dchecks'] = get_request('dchecks', array());
 if (isset($_REQUEST['druleid'])) {
 	$dbDRule = API::DRule()->get(array(
 		'druleids' => get_request('druleid'),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
 		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
@@ -264,9 +264,8 @@ else {
 
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => getPageSortField('name'),
-		'selectDChecks' => API_OUTPUT_EXTEND,
+		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
+		'selectDChecks' => array('type'),
 		'editable' => true
 	));
 
