@@ -121,28 +121,22 @@ function add_logexpr() {
 
 	var img = document.createElement('img');
 	img.setAttribute('src', 'images/general/arrow_up.png');
+	img.setAttribute('onclick', 'element_up("logtr' + logexpr_count + '");');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'up');
+	img.setAttribute('class', 'updown');
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: element_up("logtr' + logexpr_count + '");');
-	url.setAttribute(classattr, 'action');
-	url.appendChild(img);
-
-	td.appendChild(url);
+	td.appendChild(img);
 	td.appendChild(document.createTextNode(' '));
 
 	var img = document.createElement('img');
 	img.setAttribute('src', 'images/general/arrow_down.png');
+	img.setAttribute('onclick', 'element_down("logtr' + logexpr_count + '");');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'down');
+	img.setAttribute('class', 'updown');
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: element_down("logtr' + logexpr_count + '");');
-	url.setAttribute(classattr, 'action');
-	url.appendChild(img);
-
-	td.appendChild(url);
+	td.appendChild(img);
 
 	var td = document.createElement('td');
 	tr.appendChild(td);
@@ -189,7 +183,7 @@ function remove_expression(expr_id) {
 }
 
 function processArrows() {
-	actions = jQuery('#exp_list td:nth-child(3) a.action');
+	actions = jQuery('#exp_list td:nth-child(3) .updown');
 	actions.show();
 	actions.first().hide();
 	actions.last().hide();
