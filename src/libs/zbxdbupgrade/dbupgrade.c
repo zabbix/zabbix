@@ -2445,10 +2445,10 @@ int	DBcheck_version(void)
 {
 	const char	*__function_name = "DBcheck_version";
 	const char	*dbversion_table_name = "dbversion";
-	int		db_mandatory, db_optional, required, ret = FAIL, optional_num = 0;
+	int		db_mandatory, db_optional, required, ret = FAIL;
 
 #ifndef HAVE_SQLITE3
-	int		i, total = 0, current = 0, completed, last_completed = -1;
+	int		i, total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
 #endif
 
 	DBPATCH_START()
