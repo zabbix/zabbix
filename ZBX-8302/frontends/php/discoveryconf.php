@@ -67,7 +67,7 @@ if (isset($_REQUEST['druleid'])) {
 		'druleids' => get_request('druleid'),
 		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
 		'selectDChecks' => array(
-			'type', 'key_', 'type', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
 			'snmpv3_contextname'
 		),
