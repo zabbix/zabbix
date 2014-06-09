@@ -228,7 +228,7 @@ class GlobalRegExp {
 	private static function buildRegularExpression(array $expression)
 	{
 		$pattern = '/'.$expression['expression'].'/';
-		if (!$expression['case_sensitive']) {
+		if ($expression['case_sensitive'] == 0) {
 			$pattern .= 'i';
 		}
 
@@ -257,16 +257,16 @@ class GlobalRegExp {
 
 		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
 
-		if ($expression['case_sensitive']) {
+		if ($expression['case_sensitive'] == 0) {
 			$string = mb_strtolower($string);
 		}
 
 		foreach ($patterns as $pattern) {
-			if ($expression['case_sensitive']) {
+			if ($expression['case_sensitive'] == 0) {
 				$pattern = mb_strtolower($pattern);
 			}
 
-			$pos = mb_strpos($pattern, $string);
+			$pos = mb_strpos($string, $pattern);
 			$tmp = (($pos !== false) == $expectedResult);
 
 			if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED && $tmp) {
