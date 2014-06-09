@@ -296,7 +296,7 @@ class CDRule extends CZBXAPI {
 		foreach ($dChecks as $dcnum => $dCheck) {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
 				if (!in_array($dCheck['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Only Zabbix Agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'));
 				}
 
 				$uniq++;
