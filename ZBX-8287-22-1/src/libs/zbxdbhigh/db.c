@@ -2189,7 +2189,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 #endif
 					break;
 				}
-				/* break; is not necessary here */
+				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:

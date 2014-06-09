@@ -28,7 +28,7 @@ my ($fkeys, $fkeys_prefix, $fkeys_suffix, $fkeys_drop, $uniq);
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
+	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
