@@ -111,15 +111,15 @@ if (isset($this->data['tld'])) {
 	foreach ($this->data['tld'] as $key => $tld) {
 
 		// DNS
-		if (isset($tld['dns'])) {
-			if ($tld['dns']['trigger']) {
-				if ($tld['dns']['incident'] && isset($tld['dns']['availItemId'])
-						&& isset($tld['dns']['itemid'])) {
+		if (isset($tld[RSM_DNS])) {
+			if ($tld[RSM_DNS]['trigger']) {
+				if ($tld[RSM_DNS]['incident'] && isset($tld[RSM_DNS]['availItemId'])
+						&& isset($tld[RSM_DNS]['itemid'])) {
 					$dnsStatus =  new CLink(
 						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
-						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dns']['incident'].
-							'&slvItemId='.$tld['dns']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['dns']['availItemId'].'&filter_set=1'
+						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld[RSM_DNS]['incident'].
+							'&slvItemId='.$tld[RSM_DNS]['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld[RSM_DNS]['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
@@ -132,20 +132,17 @@ if (isset($this->data['tld'])) {
 				$dnsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$dnsValue = ($tld['dns']['lastvalue'] > 0)
+			$dnsValue = ($tld[RSM_DNS]['lastvalue'] > 0)
 				? new CLink(
-					$tld['dns']['lastvalue'].'%',
+					$tld[RSM_DNS]['lastvalue'].'%',
 					'rsm.incidents.php?filter_set=1&filter_rolling_week=1&type='.RSM_DNS.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$dnsGraph = ($tld['dns']['lastvalue'] > 0)
-				? new CLink(
-					'graph',
-					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['dns']['itemid'],
-					'cell-value'
-				)
+			$dnsGraph = ($tld[RSM_DNS]['lastvalue'] > 0)
+				? new CLink('graph', 'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.
+						$tld[RSM_DNS]['itemid'], 'cell-value')
 				: null;
 			$dns = array(new CSpan($dnsValue, 'right'), $dnsStatus, $dnsGraph);
 		}
@@ -155,15 +152,15 @@ if (isset($this->data['tld'])) {
 		}
 
 		// DNSSEC
-		if (isset($tld['dnssec'])) {
-			if ($tld['dnssec']['trigger']) {
-				if ($tld['dnssec']['incident'] && isset($tld['dnssec']['availItemId'])
-						&& isset($tld['dnssec']['itemid'])) {
+		if (isset($tld[RSM_DNSSEC])) {
+			if ($tld[RSM_DNSSEC]['trigger']) {
+				if ($tld[RSM_DNSSEC]['incident'] && isset($tld[RSM_DNSSEC]['availItemId'])
+						&& isset($tld[RSM_DNSSEC]['itemid'])) {
 					$dnssecStatus =  new CLink(
 						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
-						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['dnssec']['incident'].
-							'&slvItemId='.$tld['dnssec']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['dnssec']['availItemId'].'&filter_set=1'
+						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld[RSM_DNSSEC]['incident'].
+							'&slvItemId='.$tld[RSM_DNSSEC]['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld[RSM_DNSSEC]['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
@@ -176,19 +173,17 @@ if (isset($this->data['tld'])) {
 				$dnssecStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$dnssecValue = ($tld['dnssec']['lastvalue'] > 0)
+			$dnssecValue = ($tld[RSM_DNSSEC]['lastvalue'] > 0)
 				? new CLink(
-					$tld['dnssec']['lastvalue'].'%',
+					$tld[RSM_DNSSEC]['lastvalue'].'%',
 					'rsm.incidents.php?filter_set=1&filter_rolling_week=1&type='.RSM_DNSSEC.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$dnssecGraph = ($tld['dnssec']['lastvalue'] > 0)
-				? new CLink(
-					'graph',
-					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['dnssec']['itemid'],
-					'cell-value'
+			$dnssecGraph = ($tld[RSM_DNSSEC]['lastvalue'] > 0)
+				? new CLink('graph', 'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.
+						$tld[RSM_DNSSEC]['itemid'], 'cell-value'
 				)
 				: null;
 			$dnssec =  array(new CSpan($dnssecValue, 'right'), $dnssecStatus, $dnssecGraph);
@@ -199,39 +194,38 @@ if (isset($this->data['tld'])) {
 		}
 
 		// RDDS
-		if (isset($tld['rdds'])) {
-			if ($tld['rdds']['trigger']) {
-				if ($tld['rdds']['incident'] && isset($tld['rdds']['availItemId'])
-						&& isset($tld['rdds']['itemid'])) {
+		if (isset($tld[RSM_RDDS])) {
+			if ($tld[RSM_RDDS]['trigger']) {
+				if ($tld[RSM_RDDS]['incident'] && isset($tld[RSM_RDDS]['availItemId'])
+						&& isset($tld[RSM_RDDS]['itemid'])) {
 					$rddsStatus =  new CLink(
 						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
-						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['rdds']['incident'].
-							'&slvItemId='.$tld['rdds']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['rdds']['availItemId'].'&filter_set=1'
+						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld[RSM_RDDS]['incident'].
+							'&slvItemId='.$tld[RSM_RDDS]['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld[RSM_RDDS]['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$rddsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
+					$rddsStatus =  new CDiv(null,
+						'service-icon status_icon_extra iconrollingweekfail cell-value pointer'
+					);
 				}
 			}
 			else {
 				$rddsStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$rddsValue = ($tld['rdds']['lastvalue'] > 0)
+			$rddsValue = ($tld[RSM_RDDS]['lastvalue'] > 0)
 				? new CLink(
-					$tld['rdds']['lastvalue'].'%',
+					$tld[RSM_RDDS]['lastvalue'].'%',
 					'rsm.incidents.php?filter_set=1&filter_rolling_week=1&type='.RSM_RDDS.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$rddsGraph = ($tld['rdds']['lastvalue'] > 0)
-				? new CLink(
-					'graph',
-					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['rdds']['itemid'],
-					'cell-value'
-				)
+			$rddsGraph = ($tld[RSM_RDDS]['lastvalue'] > 0)
+				? new CLink('graph', 'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.
+						$tld[RSM_RDDS]['itemid'], 'cell-value')
 				: null;
 			$rdds =  array(new CSpan($rddsValue, 'right'), $rddsStatus, $rddsGraph);
 		}
@@ -241,39 +235,38 @@ if (isset($this->data['tld'])) {
 		}
 
 		// EPP
-		if (isset($tld['epp'])) {
-			if ($tld['epp']['trigger']) {
-				if ($tld['epp']['incident'] && isset($tld['epp']['availItemId'])
-						&& isset($tld['epp']['itemid'])) {
+		if (isset($tld[RSM_EPP])) {
+			if ($tld[RSM_EPP]['trigger']) {
+				if ($tld[RSM_EPP]['incident'] && isset($tld[RSM_EPP]['availItemId'])
+						&& isset($tld[RSM_EPP]['itemid'])) {
 					$eppStatus =  new CLink(
 						new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer'),
-						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld['epp']['incident'].
-							'&slvItemId='.$tld['epp']['itemid'].'&filter_from='.$from.'&filter_to='.$till.
-							'&availItemId='.$tld['epp']['availItemId'].'&filter_set=1'
+						'rsm.incidentdetails.php?host='.$tld['host'].'&eventid='.$tld[RSM_EPP]['incident'].
+							'&slvItemId='.$tld[RSM_EPP]['itemid'].'&filter_from='.$from.'&filter_to='.$till.
+							'&availItemId='.$tld[RSM_EPP]['availItemId'].'&filter_set=1'
 					);
 				}
 				else {
-					$eppStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekfail cell-value pointer');
+					$eppStatus =  new CDiv(null,
+						'service-icon status_icon_extra iconrollingweekfail cell-value pointer'
+					);
 				}
 			}
 			else {
 				$eppStatus =  new CDiv(null, 'service-icon status_icon_extra iconrollingweekok cell-value');
 			}
 
-			$eppValue = ($tld['epp']['lastvalue'] > 0)
+			$eppValue = ($tld[RSM_EPP]['lastvalue'] > 0)
 				? new CLink(
-					$tld['epp']['lastvalue'].'%',
+					$tld[RSM_EPP]['lastvalue'].'%',
 					'rsm.incidents.php?filter_set=1&filter_rolling_week=1&type='.RSM_EPP.'&host='.$tld['host'],
 					'first-cell-value'
 				)
 				: new CSpan('0.000%', 'first-cell-value');
 
-			$eppGraph = ($tld['epp']['lastvalue'] > 0)
-				? new CLink(
-					'graph',
-					'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.$tld['epp']['itemid'],
-					'cell-value'
-				)
+			$eppGraph = ($tld[RSM_EPP]['lastvalue'] > 0)
+				? new CLink('graph', 'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.
+					$tld[RSM_EPP]['itemid'], 'cell-value')
 				: null;
 			$epp =  array(new CSpan($eppValue, 'right'), $eppStatus, $eppGraph);
 		}

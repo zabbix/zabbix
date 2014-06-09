@@ -916,6 +916,9 @@ define('RSM_ROLLWEEK_SECONDS',	'{$RSM.ROLLWEEK.SECONDS}');
 define('RSM_MIN_DNS_COUNT',		'{$RSM.DNS.AVAIL.MINNS}');
 define('RSM_DNS_UDP_DELAY',		'{$RSM.DNS.UDP.DELAY}');
 define('RSM_RDDS_DELAY',		'{$RSM.RDDS.DELAY}');
+define('RSM_TLD_DNSSEC_ENABLED','{$RSM.TLD.DNSSEC.ENABLED}');
+define('RSM_TLD_EPP_ENABLED',	'{$RSM.TLD.EPP.ENABLED}');
+define('RSM_TLD_RDDS_ENABLED',	'{$RSM.TLD.RDDS.ENABLED}');
 
 // SLA monitoring rolling week items keys
 define('RSM_SLV_DNS_ROLLWEEK',		'rsm.slv.dns.rollweek');

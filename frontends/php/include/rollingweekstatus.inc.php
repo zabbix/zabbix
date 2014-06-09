@@ -38,3 +38,21 @@ function getLastEvent($problemTrigger) {
 
 	return $problemEvent ? $problemEvent['eventid'] : null;
 }
+
+/**
+ * Convert SLA service name.
+ *
+ * @param string $name
+ *
+ * @return int
+ */
+function convertSlaServiceName($name) {
+	$services = array(
+		'dns' => 0,
+		'dnssec' => 1,
+		'rdds' => 2,
+		'epp' => 3
+	);
+
+	return $services[$name];
+}
