@@ -339,7 +339,6 @@ if ($tlds) {
 			$data['tld'][$tld['hostid']]['hostid'] = $tld['hostid'];
 			$data['tld'][$tld['hostid']]['host'] = $tld['host'];
 			$data['tld'][$tld['hostid']]['name'] = $tld['name'];
-			$data['tld'][$tld['hostid']]['status'] = false;
 		}
 
 		// get triggers
@@ -377,17 +376,16 @@ if ($tlds) {
 						);
 						break;
 				}
-
-				if ($data['filter_status'] == 1) {
-					$data['tld'][$items[$trItem]['hostid']]['status'] = true;
-				}
 			}
 		}
 
-		// fail services
+		// services status filter
 		if ($data['filter_status'] == 1) {
 			foreach ($data['tld'] as $tld) {
-				if ($tld['status'] != true) {
+				if ((!isset($tld[RSM_DNS]) || !$tld[RSM_DNS]['trigger'])
+						&& (!isset($tld[RSM_DNSSEC]) || !$tld[RSM_DNSSEC]['trigger'])
+						&& (!isset($tld[RSM_RDDS]) || !$tld[RSM_RDDS]['trigger'])
+						&& (!isset($tld[RSM_EPP]) || !$tld[RSM_EPP]['trigger'])) {
 					unset($data['tld'][$tld['hostid']]);
 				}
 			}
