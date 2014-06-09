@@ -852,15 +852,23 @@ class CXmlImport18 {
 
 			$hosts = $xpath->query('hosts/host');
 
-			if ($rules['triggers']['deleteMissing']) {
-				// stores parsed hosts that exist on XML
-				$hostsXML = array();
 
-				// store items that exist on XML
+			// stores parsed hosts that exist on XML
+			$hostsXML = array();
+
+			// store items that exist on XML
+			if ($rules['items']['deleteMissing']) {
 				$itemsXML = array();
+			}
 
-				// stores triggers that exist on XML and also store hosts to which they belong to
+			// stores triggers that exist on XML and also store hosts to which they belong to
+			if ($rules['triggers']['deleteMissing']) {
 				$triggersXML = array();
+			}
+
+			// stores graphs that exist on XML
+			if ($rules['graphs']['deleteMissing']) {
+				$graphsXML = array();
 			}
 
 			foreach ($hosts as $host) {
@@ -1166,7 +1174,7 @@ class CXmlImport18 {
 				$current_hostname = $host_db['host'];
 
 				// store parsed host IDs
-				$hostsXML[] = $current_hostid;
+				$hostsXML[$current_hostid] = $current_hostid;
 
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
@@ -1610,6 +1618,7 @@ class CXmlImport18 {
 							$current_graph = API::Graph()->get(array(
 								'output' => API_OUTPUT_EXTEND,
 								'hostids' => $graph_db['hostids'],
+								'selectHosts' => array('hostid'),
 								'filter' => array('name' => $graph_db['name']),
 								'editable' => true
 							));
@@ -1618,6 +1627,11 @@ class CXmlImport18 {
 								throw new Exception(_s('No permission for graph "%1$s".', $graph_db['name']));
 							}
 							$current_graph = reset($current_graph);
+
+							if ($rules['graphs']['deleteMissing']) {
+								$graphsXML[$current_graph['graphid']]['graphid'] = $current_graph['graphid'];
+								$graphsXML[$current_graph['graphid']]['hosts'] = $current_graph['hosts'];
+							}
 						}
 
 						if (!$current_graph && empty($rules['graphs']['createMissing'])) {
@@ -1795,13 +1809,36 @@ class CXmlImport18 {
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
 				// if some triggers belong to more hosts than current XML contains, don't delete them
-				$hostsXML = array_flip($hostsXML);
-
 				foreach ($triggersToDelete as $triggerId => $trigger) {
 					$triggerHosts = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
 					if (!array_diff_key($triggerHosts, $hostsXML)) {
 						API::Trigger()->delete(array($triggerId));
+					}
+				}
+			}
+
+			// there are some missing graphs left on DB because they belong to multiple hosts
+			// once we know all host IDs on XML, we now check again graphs and to which hosts they belong to
+			if ($rules['graphs']['deleteMissing']) {
+				// select only triggers from already parsed hosts
+				$dbGraphs = API::Graph()->get(array(
+					'output' => array('graphid'),
+					'hostids' => $hostsXML,
+					'selectHosts' => array('hostid'),
+					'preservekeys' => true,
+					'nopermissions' => true
+				));
+
+				$graphsToDelete = array_diff_key($dbGraphs, $graphsXML);
+
+				// check that potentially deletable graph belongs to same hosts that are in XML
+				// if some graphs belong to more hosts than current XML contains, don't delete them
+				foreach ($graphsToDelete as $graphId => $graph) {
+					$graphHosts = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
+
+					if (!array_diff_key($graphHosts, $hostsXML)) {
+						API::Graph()->delete(array($graphId));
 					}
 				}
 			}
