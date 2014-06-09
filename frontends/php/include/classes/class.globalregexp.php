@@ -171,7 +171,7 @@ class GlobalRegExp {
 				restore_error_handler();
 
 				if ($error) {
-					throw new \Exception(_('Error in regular expression syntax: ').str_replace('preg_match(): ', '', $error));
+					throw new \Exception(_('Error in regular expression syntax:').' '.str_replace('preg_match(): ', '', $error));
 				}
 			}
 		}
