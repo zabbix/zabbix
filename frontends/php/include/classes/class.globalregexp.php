@@ -144,6 +144,49 @@ class GlobalRegExp {
 		return $result;
 	}
 
+	/**
+	 * Validates regular expressions, throws exception with PCRE error message. String expressions are considered always valid.
+	 *
+	 * @static
+	 *
+	 * @param array $expressions
+	 * @throws Exception
+	 */
+	public static function validateExpressions(array $expressions)
+	{
+		foreach ($expressions as $expression) {
+			if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
+				$pattern = self::buildRegularExpression($expression);
+
+				$error = false;
+
+				set_error_handler(function ($errno, $errstr) use (&$error) {
+					if ($errstr != '') {
+						$error = $errstr;
+					}
+				});
+
+				preg_match($pattern, null);
+
+				restore_error_handler();
+
+				if ($error) {
+					throw new \Exception(_('Error in regular expression syntax: ').str_replace('preg_match(): ', '', $error));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Matches expression against test string, respecting expression type.
+	 *
+	 * @static
+	 *
+	 * @param array $expression
+	 * @param $string
+	 *
+	 * @return bool
+	 */
 	public static function matchExpression(array $expression, $string) {
 		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
 			$result = self::_matchRegular($expression, $string);
@@ -166,14 +209,30 @@ class GlobalRegExp {
 	 * @return bool
 	 */
 	private static function _matchRegular(array $expression, $string) {
+		$pattern = self::buildRegularExpression($expression);
+
+		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
+
+		return preg_match($pattern, $string) == $expectedResult;
+	}
+
+	/**
+	 * Combines regular expression provided as definition array into a string.
+	 *
+	 * @static
+	 *
+	 * @param array $expression
+	 *
+	 * @return string
+	 */
+	private static function buildRegularExpression(array $expression)
+	{
 		$pattern = '/'.$expression['expression'].'/';
 		if (!$expression['case_sensitive']) {
 			$pattern .= 'i';
 		}
 
-		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
-
-		return preg_match($pattern, $string) == $expectedResult;
+		return $pattern;
 	}
 
 	/**

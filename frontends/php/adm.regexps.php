@@ -64,11 +64,13 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 		);
 		$testString = $ajaxData['testString'];
 
-		foreach ($ajaxData['expressions'] as $id => $expression) {
-			$match = GlobalRegExp::matchExpression($expression, $testString);
+		if ($testString !== '') {
+			foreach ($ajaxData['expressions'] as $id => $expression) {
+				$match = GlobalRegExp::matchExpression($expression, $testString);
 
-			$result['expressions'][$id] = $match;
-			$result['final'] = $result['final'] && $match;
+				$result['expressions'][$id] = $match;
+				$result['final'] = $result['final'] && $match;
+			}
 		}
 
 		$ajaxResponse->success($result);

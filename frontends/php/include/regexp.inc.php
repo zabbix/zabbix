@@ -43,6 +43,8 @@ function addRegexp(array $regexp, array $expressions) {
 		// check required fields
 		$dbFields = array('name' => null, 'test_string' => '');
 
+		GlobalRegExp::validateExpressions($expressions);
+
 		if (!check_db_fields($dbFields, $regexp)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [addRegexp]');
 		}
@@ -73,6 +75,8 @@ function updateRegexp(array $regexp, array $expressions) {
 	try {
 		$regexpId = $regexp['regexpid'];
 		unset($regexp['regexpid']);
+
+		GlobalRegExp::validateExpressions($expressions);
 
 		// check existence
 		if (!getRegexp($regexpId)) {
