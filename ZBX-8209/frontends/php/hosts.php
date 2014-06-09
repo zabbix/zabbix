@@ -242,7 +242,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$templateIds = array();
-		if (isset($visible['template_table'])) {
+		if (isset($visible['templates'])) {
 			$templateIds = $_REQUEST['templates'];
 		}
 
@@ -324,7 +324,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if ($templateIds && isset($visible['template_table'])) {
+		if ($templateIds && isset($visible['templates'])) {
 			$add['templates'] = $templateIds;
 		}
 

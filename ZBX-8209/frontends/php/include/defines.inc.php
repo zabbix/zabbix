@@ -33,6 +33,10 @@ define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar cont
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
+// the maximum period to display history data for the latest data and item overview pages in seconds
+// by default set to 86400 seconds (24 hours)
+define('ZBX_HISTORY_PERIOD', 86400);
+
 define('ZBX_WIDGET_ROWS', 20);
 
 define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
