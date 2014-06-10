@@ -852,21 +852,20 @@ class CXmlImport18 {
 
 			$hosts = $xpath->query('hosts/host');
 
+			// stores parsed host IDs that exist on XML
+			$hostIdsXML = array();
 
-			// stores parsed hosts that exist on XML
-			$hostsXML = array();
-
-			// store items that exist on XML
+			// store items IDs that exist on XML
 			if ($rules['items']['deleteMissing']) {
-				$itemsXML = array();
+				$itemIdsXML = array();
 			}
 
-			// stores triggers that exist on XML and also store hosts to which they belong to
+			// stores trigger IDs and hosts triggers belong to that exist on XML
 			if ($rules['triggers']['deleteMissing']) {
 				$triggersXML = array();
 			}
 
-			// stores graphs that exist on XML
+			// stores graph IDs and hosts graphs belong to that exist on XML
 			if ($rules['graphs']['deleteMissing']) {
 				$graphsXML = array();
 			}
@@ -1174,7 +1173,7 @@ class CXmlImport18 {
 				$current_hostname = $host_db['host'];
 
 				// store parsed host IDs
-				$hostsXML[$current_hostid] = $current_hostid;
+				$hostIdsXML[$current_hostid] = $current_hostid;
 
 // TEMPLATES {{{
 				if (!empty($rules['templateLinkage']['createMissing'])) {
@@ -1324,7 +1323,7 @@ class CXmlImport18 {
 						// items created and updated during should be "preserved", so we must store item IDs
 						// before we skip some rules, otherwise all items get deleted
 						if ($rules['items']['deleteMissing']) {
-							$itemsXML[$current_item['itemid']] = $current_item['itemid'];
+							$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
 						}
 
 						// if item does not exist and there is no need to create it, skip item creation
@@ -1797,22 +1796,23 @@ class CXmlImport18 {
 			// once we know all host IDs on XML, we now check again triggers and to which hosts they belong to
 			if ($rules['triggers']['deleteMissing']) {
 				// select only triggers from already parsed hosts
-				$dbTriggers = API::Trigger()->get(array(
+				$dbTriggerIds = API::Trigger()->get(array(
 					'output' => array('triggerid'),
-					'hostids' => $hostsXML,
+					'hostids' => $hostIdsXML,
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
-					'nopermissions' => true
+					'nopermissions' => true,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$triggersToDelete = array_diff_key($dbTriggers, $triggersXML);
+				$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
 
 				// check that potentially deletable trigger belongs to same hosts that are in XML
 				// if some triggers belong to more hosts than current XML contains, don't delete them
 				foreach ($triggersToDelete as $triggerId => $trigger) {
-					$triggerHosts = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
+					$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
 
-					if (!array_diff_key($triggerHosts, $hostsXML)) {
+					if (!array_diff_key($triggerHostIds, $hostIdsXML)) {
 						API::Trigger()->delete(array($triggerId));
 					}
 				}
@@ -1822,22 +1822,23 @@ class CXmlImport18 {
 			// once we know all host IDs on XML, we now check again graphs and to which hosts they belong to
 			if ($rules['graphs']['deleteMissing']) {
 				// select only triggers from already parsed hosts
-				$dbGraphs = API::Graph()->get(array(
+				$dbGraphIds = API::Graph()->get(array(
 					'output' => array('graphid'),
-					'hostids' => $hostsXML,
+					'hostids' => $hostIdsXML,
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
-					'nopermissions' => true
+					'nopermissions' => true,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$graphsToDelete = array_diff_key($dbGraphs, $graphsXML);
+				$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
 
 				// check that potentially deletable graph belongs to same hosts that are in XML
 				// if some graphs belong to more hosts than current XML contains, don't delete them
 				foreach ($graphsToDelete as $graphId => $graph) {
-					$graphHosts = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
+					$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
 
-					if (!array_diff_key($graphHosts, $hostsXML)) {
+					if (!array_diff_key($graphHostIds, $hostIdsXML)) {
 						API::Graph()->delete(array($graphId));
 					}
 				}
@@ -1845,16 +1846,16 @@ class CXmlImport18 {
 
 			// delete missing items from parsed hosts
 			if ($rules['items']['deleteMissing']) {
-				// select only items from already parsed hosts
-				$dbItems = API::Item()->get(array(
+				$dbItemIds = API::Item()->get(array(
 					'output' => array('itemid'),
-					'hostids' => $hostsXML,
+					'hostids' => $hostIdsXML,
 					'webitems' => true,
+					'preservekeys' => true,
 					'nopermissions' => true,
-					'preservekeys' => true
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
-				$itemsToDelete = array_diff_key($dbItems, $itemsXML);
+				$itemsToDelete = array_diff_key($dbItemIds, $itemIdsXML);
 
 				if ($itemsToDelete) {
 					API::Item()->delete(array_keys($itemsToDelete));
