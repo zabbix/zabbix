@@ -141,7 +141,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			*buffer = NULL, *ptr = NULL;
+			*buffer = NULL, *ptr = NULL, *s, *n, *p;
 	int		length;
 	const char	*output;
 	unsigned short	port_number;
@@ -184,7 +184,26 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
-		ptr = zbx_regexp_sub(buffer, regexp, output);
+	{
+		for (s = buffer, p = s; '\0' != *s; s++)
+		{
+			size_t	offset = 1;
+
+			if ('\r' == *s)
+			{
+				*s = '\0';
+
+				if ('\n' == *(s + 1))
+					offset++;
+
+				if ((ptr = zbx_regexp_sub(p, regexp, output)) != NULL)
+					break;
+
+				s += offset;
+				p = s;
+			}
+		}
+	}
 
 	if (NULL != ptr)
 		SET_STR_RESULT(result, ptr);
