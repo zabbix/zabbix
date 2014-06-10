@@ -54,7 +54,9 @@ if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid'))
 	access_deny();
 }
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP, array('name', 'pr_name', 'pr_type', 'pr_os', 'pr_serialno_a', 'pr_tag', 'pr_macaddress_a'));
+validate_sort_and_sortorder('name', ZBX_SORT_UP,
+	array('name', 'pr_name', 'pr_type', 'pr_os', 'pr_serialno_a', 'pr_tag', 'pr_macaddress_a')
+);
 
 if (hasRequest('filterState')) {
 	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
