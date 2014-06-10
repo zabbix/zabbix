@@ -468,7 +468,7 @@ div.calendar input[type="button"] {
 }
 .input option { background: #2F6487; color: #FFFFFF; }
 .input:focus, .input:hover { border-color: #77B7DA; }
-.input[readonly], .input[readonly]:hover {
+.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover {
 /* NOTE: Ignored by IE */
 	border-color: #4E738C;
 	background: #2B495E;
