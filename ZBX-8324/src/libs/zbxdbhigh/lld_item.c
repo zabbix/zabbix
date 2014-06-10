@@ -377,12 +377,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	int			i, j;
 	zbx_lld_item_t		*item, *item_b;
 	zbx_vector_uint64_t	itemids;
-	zbx_vector_ptr_t	keys;
+	zbx_vector_str_t	keys;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_ptr_create(&keys);
+	zbx_vector_str_create(&keys);		/* list of item keys */
 
 	/* check an item name validity */
 	for (i = 0; i < items->values_num; i++)
@@ -454,7 +454,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			continue;
 
-		zbx_vector_ptr_append(&keys, item->key);
+		zbx_vector_str_append(&keys, item->key);
 	}
 
 	if (0 != keys.values_num)
@@ -516,7 +516,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		zbx_free(sql);
 	}
 
-	zbx_vector_ptr_destroy(&keys);
+	zbx_vector_str_destroy(&keys);
 	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
