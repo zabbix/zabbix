@@ -186,6 +186,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese, Polish, R
 ........S. [ZBX-7555] removed "select" statement from the history cache; increased the cache performance (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8302] fixed ordering of discovery rules (Andrejs)
+..F....... [ZBX-8209] improved host and item name column widths on Monitoring / Latest data page (Krists)
 .......PS. [ZBX-8287] added truncating of long text values to maximum field length before inserting into database (Andris)
 ........S. [ZBX-3163] fixed trigger evaluation order so that it takes dependencies into account (asaveljevs)
 A.F....... [ZBX-7373] improved performance of latest data and item overview pages by taking data for limited period only (Pavels)
