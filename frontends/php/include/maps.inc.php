@@ -1300,37 +1300,29 @@ function filterSysmapTriggers(
 		}
 
 		foreach ($selements as $selementId => &$selement) {
+			// sub maps
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-				$selement['triggers'] = array();
-
+				// walk through each host of a submap and apply its filters to all its triggers
 				foreach ($selement['hosts'] as $hostId) {
-					if (!isset($hostIdToTriggers[$hostId])) {
-						break;
+					// skip hosts that don't have any filters or triggers
+					if (!isset($hostIdToTriggers[$hostId]) || !isset($submapHostApplicationFilters[$selementId][$hostId])) {
+						continue;
 					}
 
-					$triggers = $hostIdToTriggers[$hostId];
+					// remove the triggers that don't have applications or don't match the filter
+					$filteredApplicationNames = $submapHostApplicationFilters[$selementId][$hostId];
+					foreach ($hostIdToTriggers[$hostId] as $trigger) {
+						$applicationNamesForTrigger = isset($triggerApplications[$trigger['triggerid']])
+							? array_keys($triggerApplications[$trigger['triggerid']])
+							: array();
 
-					if (isset($submapHostApplicationFilters[$selementId][$hostId])) {
-						$filteredApplicationNames = $submapHostApplicationFilters[$selementId][$hostId];
-
-						foreach ($hostIdToTriggers[$hostId] as $trigger) {
-
-							$applicationNamesForTrigger = isset($triggerApplications[$trigger['triggerid']])
-								? array_keys($triggerApplications[$trigger['triggerid']])
-								: array();
-
-							if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
-								unset($triggers[$trigger['triggerid']]);
-							}
+						if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
+							unset($selement['triggers'][$trigger['triggerid']]);
 						}
-					}
-
-					foreach($triggers as $trigger) {
-						$triggerId = intval($trigger['triggerid']);
-						$selement['triggers'][$triggerId] = $triggerId;
 					}
 				}
 			}
+			// hosts and host groups
 			else {
 				if ($selement['application'] === '') {
 					continue;
