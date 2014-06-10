@@ -260,6 +260,8 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	}
 }
 
+#define MAX_INSERT_STRS 100
+
 /* get Nth error from event log. 1 is the first. */
 static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source,
 		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
@@ -270,7 +272,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	EVENTLOGRECORD	*pELR = NULL;
 	DWORD		dwRead, dwNeeded, dwErr;
 	LPTSTR		pEventMessageFile = NULL, pParamMessageFile = NULL, pFile = NULL, pNextFile = NULL, pCh,
-			*pInsertStrings = NULL;
+			aInsertStrings[MAX_INSERT_STRS];
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
@@ -282,6 +284,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	*out_severity	= 0;
 	*out_timestamp	= 0;
 	*out_eventid	= 0;
+	memset(aInsertStrings, 0, sizeof(aInsertStrings));
 
 	pELR = (EVENTLOGRECORD *)zbx_malloc((void *)pELR, buffer_size);
 
@@ -309,13 +312,11 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	/* prepare insert string array */
 	if (0 < pELR->NumStrings)
 	{
-		pInsertStrings = zbx_malloc(NULL, sizeof(LPWSTR) * pELR->NumStrings);
-
 		pCh = (LPWSTR)((LPBYTE)pELR + pELR->StringOffset);
 
-		for (i = 0; i < pELR->NumStrings; i++)
+		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
 		{
-			pInsertStrings[i] = pCh;
+			aInsertStrings[i] = pCh;
 			pCh += zbx_strlen(pCh) + 1;
 		}
 	}
@@ -332,7 +333,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 
 		if (NULL != (hLib = zbx_load_message_file(pFile)))
 		{
-			if (NULL != (*out_message = zbx_format_message(hLib, pELR->EventID, pInsertStrings)))
+			if (NULL != (*out_message = zbx_format_message(hLib, pELR->EventID, aInsertStrings)))
 			{
 				err = SUCCEED;
 
@@ -346,8 +347,6 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 			FreeLibrary(hLib);
 		}
 	}
-
-	zbx_free(pInsertStrings);
 
 	zbx_free(pEventMessageFile);
 	zbx_free(pParamMessageFile);
