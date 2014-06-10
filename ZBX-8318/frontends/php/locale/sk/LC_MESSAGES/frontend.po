@@ -15514,15 +15514,15 @@ msgstr "Označenie osi Y"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d"
-msgstr "d.m.Y"
+msgstr "d. m. Y"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i"
-msgstr "d.m.Y H:i"
+msgstr "d. m. Y H:i"
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
-msgstr "d.m.Y H:i:s"
+msgstr "d. m. Y H:i:s"
 
 #: report3.php:70 report3.php:89 report4.php:111 report4.php:134
 #: report5.php:47
