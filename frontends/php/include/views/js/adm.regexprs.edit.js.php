@@ -1,6 +1,6 @@
 <script type="text/x-jquery-tmpl" id="expressionRow">
 	<tr id="exprRow_#{id}">
-		<td>#{expression}</td>
+		<td class="pre">#{expression}</td>
 		<td>#{type}</td>
 		<td>#{case_sensitive}</td>
 		<td class="nowrap">
@@ -12,7 +12,7 @@
 
 <script type="text/x-jquery-tmpl" id="testTableRow">
 	<tr class="even_row">
-		<td class="wraptext">#{expression}</td>
+		<td class="wraptext pre">#{expression}</td>
 		<td>#{type}</td>
 		<td><span class="bold #{resultClass}">#{result}</span></td>
 	</tr>
