@@ -147,7 +147,7 @@ form { margin: 0; }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
 .input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { color: #ACA899; cursor: default; }
+.input[disabled] { border-color: #D0D0D0; background-color: #EEEEEE; color: #ACA899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .input option { color: #000000; }
@@ -188,7 +188,7 @@ textarea.textarea_big { height: auto; }
 	text-decoration: none; padding: 1px 1px 0 1px; margin: 0; cursor: pointer;
 }
 .link_menu:hover { color: #6C80B9; border-bottom-color: #6C80B9; }
-.link_menu[disabled] { color: #DDD; cursor: default; border: 0; }
+.link_menu[disabled] { color: #DDD; cursor: default; border: 0; background-color: white; }
 .link_menu[disabled]:hover { border: 0; }
 
 /* transparent - must be after input! */

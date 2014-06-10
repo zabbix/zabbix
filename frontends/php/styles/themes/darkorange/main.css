@@ -428,7 +428,7 @@ div.calendar input[type="button"] {
 	border-color: #FF5500; color: #FF5500;
 }
 
-.input[readonly], .input[readonly]:hover{
+.input[readonly], .input[disabled], .input[readonly]:hover, .input[disabled]:hover {
 /* NOTE: Ignored by IE */
 	border-color: #DFDFDF;
 	background-color: #777777;
@@ -461,6 +461,7 @@ ul.formlist li.new { background: #2F2F2F; }
 	color: #DFDFDF;
 	border: 0;
 	cursor: default;
+	background-color: #1A1A1A;
 }
 
 .column .widget .header{ border: 0;}
