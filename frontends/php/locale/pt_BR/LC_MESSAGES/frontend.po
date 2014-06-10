@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-06 20:50+0300\n"
-"PO-Revision-Date: 2014-05-07 22:06+0300\n"
+"PO-Revision-Date: 2014-06-08 09:12+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1399493210.0\n"
+"X-POOTLE-MTIME: 1402211578.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -15112,11 +15112,11 @@ msgstr "O passo \"%1$s\" já existe no cenário web."
 
 #: api/classes/CHttpTest.php:623
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "A URL do cenário web não pode ser vazia."
 
 #: api/classes/CHttpTest.php:618
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "O nome do passo não pode ser vazio."
 
 #: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
