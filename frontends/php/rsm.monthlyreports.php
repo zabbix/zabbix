@@ -139,6 +139,8 @@ if ($data['filter_search']) {
 				$endYear
 			);
 
+			$data['stime'] = date('YmdHis', $startTime);
+
 			// get items
 			$items = API::Item()->get(array(
 				'applicationids' => $application['applicationid'],

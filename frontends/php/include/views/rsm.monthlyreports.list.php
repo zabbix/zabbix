@@ -105,8 +105,9 @@ foreach ($this->data['services'] as $name => $services) {
 			new CCol(SPACE, null, 4)
 		));
 
-		foreach ($services['parameters'] as $service) {
+		foreach ($services['parameters'] as $key => $service) {
 			$color = null;
+
 			if (isset($services['acceptable_sla']) && isset($service['slv'])
 					&& $services['acceptable_sla'] > $service['slv']) {
 				$color = 'red';
@@ -120,13 +121,15 @@ foreach ($this->data['services'] as $name => $services) {
 				$service['ns'],
 				isset($service['slv']) ? new CSpan($service['slv'], $color) : '-',
 				isset($services['acceptable_sla']) ? $services['acceptable_sla'] : '-',
-				new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
+				new CLink('graph', 'history.php?action=showgraph&period=2592000&stime='.$data['stime'].'&itemid='.$key)
 			));
 		}
 	}
 	else {
 		$serviceValues = reset($services['parameters']);
+		$itemId = reset(array_keys($services['parameters']));
 		$color = null;
+
 		if (isset($services['acceptable_sla']) && isset($serviceValues['slv'])
 				&& $services['acceptable_sla'] > $serviceValues['slv']) {
 			$color = 'red';
@@ -140,7 +143,7 @@ foreach ($this->data['services'] as $name => $services) {
 			SPACE,
 			isset($serviceValues['slv']) ? new CSpan($serviceValues['slv'], $color) : '-',
 			isset($services['acceptable_sla']) ? $services['acceptable_sla'] : '-',
-			new CLink('graph', 'history.php?action=showgraph&period=2592000&itemid=')
+			new CLink('graph', 'history.php?action=showgraph&period=2592000&stime='.$data['stime'].'&itemid='.$itemId)
 		));
 	}
 }
