@@ -1415,15 +1415,16 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
  *
  * @return void
  */
-function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, $allowedColumns = array()) {
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, array $allowedColumns = array()) {
 	global $page;
 
 	$_REQUEST['sort'] = getPageSortField($sort);
 	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
-		if (count($allowedColumns) > 0 && !in_array($_REQUEST['sort'], $allowedColumns)) {
-			invalid_url(_s('Sorting by field "%1$s" not allowed.', $_REQUEST['sort']));
+		if ($allowedColumns && !in_array($_REQUEST['sort'], $allowedColumns)) {
+			error(_s('Cannot sort by field "%1$s".', $_REQUEST['sort']));
+			invalid_url();
 			// we do not want the profile to be updated with wrong value
 			return;
 		}
