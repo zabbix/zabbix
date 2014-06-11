@@ -446,19 +446,11 @@ class CTrigger extends CTriggerGeneral {
 			return $result;
 		}
 
-		$triggers = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
+		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
 
 		// return count for post SQL filtered result sets
 		if (!is_null($options['countOutput'])) {
-			return count($triggers);
-		}
-
-		foreach ($triggers as $trigger) {
-			if (!isset($result[$trigger['triggerid']])) {
-				$result[$trigger['triggerid']] = array();
-			}
-
-			$result[$trigger['triggerid']] += $trigger;
+			return count($result);
 		}
 
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
@@ -479,6 +471,7 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerNames($result);
 		}
+
 		// expandComment
 		if (!is_null($options['expandComment']) && $result && array_key_exists('comments', reset($result))) {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
@@ -1817,18 +1810,51 @@ class CTrigger extends CTriggerGeneral {
 		// adding last event
 		if ($options['selectLastEvent'] !== null) {
 			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'sortfield' => array('clock', 'eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
+				$result[$triggerId]['lastEvent'] = array();
+			}
 
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			if (is_array($options['selectLastEvent'])) {
+				$pkFieldId = $this->pk('events');
+				$outputFields = array(
+					'objectid' => $this->fieldId('objectid', 'e'),
+					$pkFieldId => $this->fieldId($pkFieldId, 'e')
+				);
+
+				foreach ($options['selectLastEvent'] as $field) {
+					if ($this->hasField($field, 'events')) {
+						$outputFields[$field] = $this->fieldId($field, 'e');
+					}
+				}
+
+				$outputFields = implode(',', $outputFields);
+			}
+			else {
+				$outputFields = 'e.*';
+			}
+
+			$dbEvents = DBselect(
+				'SELECT '.$outputFields.
+				' FROM ('.
+					' SELECT e2.objectid,MAX(e2.clock) AS clock,MAX(e2.eventid) AS eventid'.
+					' FROM events e2'.
+					' WHERE e2.object='.EVENT_OBJECT_TRIGGER.
+						' AND e2.source='.EVENT_SOURCE_TRIGGERS.
+						' AND '.dbConditionInt('e2.objectid', $triggerids).
+					' GROUP BY e2.objectid'.
+				') e2, events e'.
+				' WHERE e.objectid=e2.objectid'.
+					' AND e.clock=e2.clock'.
+					' AND e.eventid=e2.eventid'
+			);
+
+			while ($dbEvent = DBfetch($dbEvents)) {
+				$triggerId = $dbEvent['objectid'];
+
+				if (is_array($options['selectLastEvent']) && !in_array('objectid', $options['selectLastEvent'])) {
+					unset($dbEvent['objectid']);
+				}
+
+				$result[$triggerId]['lastEvent'] = $dbEvent;
 			}
 		}
 

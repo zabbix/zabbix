@@ -488,7 +488,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
+int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger)
 {
 	const char	*__function_name = "process_trigger";
 
@@ -523,23 +523,25 @@ static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	/*              |                                                                                 */
 	/*  ------------+------------------------------------------------------                           */
 	/*              |                                                                                 */
-	/*  OK          |   no           T            T+E         -                                       */
+	/*  OK          |   no           T+I          T+E         I                                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T            T(e)         T+E         -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          -            T(m)+E(m)   T                                       */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E          -            T+E(m)      T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
 	/*                                                                                                */
+	/*  ?   - unknown state                                                                           */
 	/*  -   - should never happen                                                                     */
 	/*  no  - do nothing                                                                              */
 	/*  T   - update a trigger                                                                        */
 	/*  E   - generate an event                                                                       */
 	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
+	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
 	/**************************************************************************************************/
 
@@ -615,33 +617,86 @@ static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: helper function for process_triggers()                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
+{
+	const zbx_ptr_pair_t	*p1 = (const zbx_ptr_pair_t *)d1;
+	const zbx_ptr_pair_t	*p2 = (const zbx_ptr_pair_t *)d2;
+
+	const DC_TRIGGER	*t1 = (const DC_TRIGGER *)p1->first;
+	const DC_TRIGGER	*t2 = (const DC_TRIGGER *)p2->first;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
+
+	return 0;
+}
+
 void	process_triggers(zbx_vector_ptr_t *triggers)
 {
-	const char	*__function_name = "process_triggers";
+	const char		*__function_name = "process_triggers";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
-	DC_TRIGGER	*trigger;
+	int			i, count = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc, sql_offset;
+	zbx_vector_ptr_pair_t	trigger_sqls;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
 	if (0 == triggers->values_num)
 		goto out;
 
+	zbx_vector_ptr_pair_create(&trigger_sqls);
+	zbx_vector_ptr_pair_reserve(&trigger_sqls, triggers->values_num);
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		zbx_ptr_pair_t	trigger_sql;
+
+		trigger_sql.first = triggers->values[i];
+		trigger_sql.second = NULL;
+
+		zbx_vector_ptr_pair_append(&trigger_sqls, trigger_sql);
+	}
+
+	zbx_vector_ptr_pair_sort(&trigger_sqls, zbx_trigger_topoindex_compare);
+
+	for (i = 0; i < trigger_sqls.values_num; i++)
+	{
+		zbx_ptr_pair_t	*trigger_sql = &trigger_sqls.values[i];
+		DC_TRIGGER	*trigger = (DC_TRIGGER *)trigger_sql->first;
+
+		sql_alloc = 0;
+		sql_offset = 0;
+
+		count += (SUCCEED == process_trigger((char **)&trigger_sql->second, &sql_alloc, &sql_offset, trigger));
+	}
+
+	if (0 == count)
+		goto clean;
+
+	zbx_vector_ptr_pair_sort(&trigger_sqls, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	sql_alloc = 16 * ZBX_KIBIBYTE;
+	sql_offset = 0;
+
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (i = 0; i < trigger_sqls.values_num; i++)
 	{
-		trigger = (DC_TRIGGER *)triggers->values[i];
+		if (NULL == trigger_sqls.values[i].second)
+			continue;
 
-		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, trigger))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, trigger_sqls.values[i].second);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_free(trigger_sqls.values[i].second);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -650,6 +705,8 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
+clean:
+	zbx_vector_ptr_pair_destroy(&trigger_sqls);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2117,17 +2174,31 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 	{
 		ZBX_FIELD		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
-
+#ifdef HAVE_ORACLE
+		size_t			str_alloc = 0, str_offset = 0;
+#endif
 		switch (field->type)
 		{
+			case ZBX_TYPE_LONGTEXT:
+				if (0 == field->length)
+				{
+#ifdef HAVE_ORACLE
+					row[i].str = zbx_strdup(NULL, value->str);
+#else
+					row[i].str = DBdyn_escape_string(value->str);
+#endif
+					break;
+				}
+				/* break; is not missing here */
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
-			case ZBX_TYPE_LONGTEXT:
 #ifdef HAVE_ORACLE
-				row[i].str = zbx_strdup(NULL, value->str);
+				row[i].str = NULL;
+				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
+						zbx_strlen_utf8_n(value->str, field->length));
 #else
-				row[i].str = DBdyn_escape_string(value->str);
+				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
 				break;
 			default:

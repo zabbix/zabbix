@@ -454,6 +454,7 @@ table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
+table.filter .filter-multiselect-select-button { height: 20px; vertical-align: bottom; margin-left: 3px; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
@@ -509,7 +510,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
-.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; }
+.multiselect { margin: 0 2px 0 0; width: 317px; position: relative; float: left; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
@@ -552,6 +553,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; display: list-item; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+.multiselect-wrapper .select-popup { margin-left: 10px; }
 
 /* menu popup */
 .menuPopup {

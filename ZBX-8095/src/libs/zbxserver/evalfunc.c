@@ -157,16 +157,17 @@ out:
 static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function, const char *parameters,
 		time_t now)
 {
-	const char			*__function_name = "evaluate_LOGEVENTID";
-	char				*arg1 = NULL;
-	int				ret = FAIL;
-	zbx_vector_ptr_t		regexps;
-	zbx_vector_history_record_t	values;
+	const char		*__function_name = "evaluate_LOGEVENTID";
+
+	char			*arg1 = NULL;
+	int			found, ret = FAIL;
+	zbx_vector_ptr_t	regexps;
+	zbx_history_record_t	vc_value;
+	zbx_timespec_t		ts = {now, 999999999};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&regexps);
-	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -180,19 +181,16 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	if ('@' == *arg1)
 		DCget_expressions_by_name(&regexps, arg1 + 1);
 
-	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
-			0 < values.values_num)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
 	{
-		char	*logeventid = NULL;
-		size_t	size = 0, offset = 0;
+		char	logeventid[16];
 
-		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
+		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
 		if (SUCCEED == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-
-		zbx_free(logeventid);
+		zbx_history_record_clear(&vc_value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -203,8 +201,6 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 out:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
-
-	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -226,14 +222,14 @@ out:
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char			*__function_name = "evaluate_LOGSOURCE";
-	char				*arg1 = NULL;
-	int				ret = FAIL;
-	zbx_vector_history_record_t	values;
+	const char		*__function_name = "evaluate_LOGSOURCE";
+
+	char			*arg1 = NULL;
+	int			found, ret = FAIL;
+	zbx_history_record_t	vc_value;
+	zbx_timespec_t		ts = {now, 999999999};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -244,15 +240,13 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
-	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
-			0 < values.values_num)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
 	{
-		const char	*source = values.values[0].value.log->source;
-
-		if (0 == strcmp(NULL == source ? "" : source, arg1))
+		if (0 == strcmp(NULL == vc_value.value.log->source ? "" : vc_value.value.log->source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+		zbx_history_record_clear(&vc_value, item->value_type);
 
 		ret = SUCCEED;
 	}
@@ -261,8 +255,6 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *function, 
 
 	zbx_free(arg1);
 out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -281,31 +273,30 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const char *function, const char *parameters,
+		time_t now)
 {
-	const char			*__function_name = "evaluate_LOGSEVERITY";
-	int				ret = FAIL;
-	zbx_vector_history_record_t	values;
+	const char		*__function_name = "evaluate_LOGSEVERITY";
+
+	int			found, ret = FAIL;
+	zbx_history_record_t	vc_value;
+	zbx_timespec_t		ts = {now, 999999999};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
-			0 < values.values_num)
+	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) && 1 == found)
 	{
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", values.values[0].value.log->severity);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", vc_value.value.log->severity);
+		zbx_history_record_clear(&vc_value, item->value_type);
 
 		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
 out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1570,15 +1561,14 @@ clean:
  ******************************************************************************/
 static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char			*__function_name = "evaluate_FUZZYTIME";
-	int				arg1, flag, ret = FAIL;
-	zbx_vector_history_record_t	values;
-	history_value_t			*lastvalue;
-	zbx_uint64_t			fuzlow, fuzhig;
+	const char		*__function_name = "evaluate_FUZZYTIME";
+
+	int			arg1, flag, found, ret = FAIL;
+	zbx_history_record_t	vc_value;
+	zbx_uint64_t		fuzlow, fuzhig;
+	zbx_timespec_t		ts = {now, 999999999};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -1592,35 +1582,32 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *function, 
 	if (ZBX_FLAG_SEC != flag || now <= arg1)
 		goto out;
 
-	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
-			1 > values.values_num)
-	{
+	if (SUCCEED != zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value, &found) || 1 != found)
 		goto out;
-	}
 
 	fuzlow = (int)(now - arg1);
 	fuzhig = (int)(now + arg1);
 
-	lastvalue = &values.values[0].value;
-
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
-		if (lastvalue->ui64 >= fuzlow && lastvalue->ui64 <= fuzhig)
+		if (vc_value.value.ui64 >= fuzlow && vc_value.value.ui64 <= fuzhig)
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 	else
 	{
-		if (lastvalue->dbl >= fuzlow && lastvalue->dbl <= fuzhig)
+		if (vc_value.value.dbl >= fuzlow && vc_value.value.dbl <= fuzhig)
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 
+	zbx_history_record_clear(&vc_value, item->value_type);
+
 	ret = SUCCEED;
 out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2205,7 +2192,9 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED != errcode)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item for function [%s:%s.%s(%s)] not found", host, key, function, parameter);
+		zabbix_log(LOG_LEVEL_DEBUG,
+				"cannot evaluate function \"%s:%s.%s(%s)\": item does not exist",
+				host, key, function, parameter);
 		goto out;
 	}
 

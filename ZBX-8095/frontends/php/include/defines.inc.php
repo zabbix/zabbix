@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.2.4rc1');
+define('ZABBIX_VERSION',     '2.2.4rc2');
 define('ZABBIX_API_VERSION', '2.2.4');
 define('ZABBIX_DB_VERSION',	 2020000);
 
@@ -32,6 +32,10 @@ define('ZBX_MIN_PERIOD',		3600); // 1 hour
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+
+// the maximum period to display history data for the latest data and item overview pages in seconds
+// by default set to 86400 seconds (24 hours)
+define('ZBX_HISTORY_PERIOD', 86400);
 
 define('ZBX_WIDGET_ROWS', 20);
 

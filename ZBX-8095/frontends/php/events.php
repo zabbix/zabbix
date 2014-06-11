@@ -606,37 +606,107 @@ else {
 		}
 
 		if ($pageFilter->hostsSelected) {
-			$options = array(
-				'nodeids' => get_current_nodeid(),
+			$knownTriggerIds = array();
+			$validTriggerIds = array();
+
+			$triggerOptions = array(
 				'output' => array('triggerid'),
+				'nodeids' => get_current_nodeid(),
+				'preservekeys' => true,
 				'monitored' => true
 			);
-			if (isset($_REQUEST['triggerid']) && $_REQUEST['triggerid'] > 0) {
-				$options['triggerids'] = $_REQUEST['triggerid'];
-			}
-			else if ($pageFilter->hostid > 0) {
-				$options['hostids'] = $pageFilter->hostid;
-			}
-			else if ($pageFilter->groupid > 0) {
-				$options['groupids'] = $pageFilter->groupid;
-			}
-			$triggers = API::Trigger()->get($options);
 
-			// query event with short data
-			$events = API::Event()->get(array(
+			$allEventsSliceLimit = $config['search_limit'];
+
+			$eventOptions = array(
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'nodeids' => get_current_nodeid(),
-				'objectids' => zbx_objectValues($triggers, 'triggerid'),
 				'time_from' => $from,
 				'time_till' => $till,
-				'output' => array('eventid'),
+				'output' => array('eventid', 'objectid'),
 				'sortfield' => array('clock', 'eventid'),
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $config['search_limit'] + 1
-			));
+				'limit' => $allEventsSliceLimit + 1
+			);
 
-			// get pagging
+			if (getRequest('triggerid')) {
+				$filterTriggerIds = array(getRequest('triggerid'));
+				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
+				$validTriggerIds = $knownTriggerIds;
+
+				$eventOptions['objectids'] = $filterTriggerIds;
+			}
+			elseif ($pageFilter->hostid > 0) {
+				$hostTriggers = API::Trigger()->get(array(
+					'output' => array('triggerid'),
+					'nodeids' => get_current_nodeid(),
+					'hostids' => $pageFilter->hostid,
+					'monitored' => true,
+					'preservekeys' => true
+				));
+				$filterTriggerIds = array_map('strval', array_keys($hostTriggers));
+				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
+				$validTriggerIds = $knownTriggerIds;
+
+				$eventOptions['hostids'] = $pageFilter->hostid;
+				$eventOptions['objectids'] = $validTriggerIds;
+			}
+			elseif ($pageFilter->groupid > 0) {
+				$eventOptions['groupids'] = $pageFilter->groupid;
+
+				$triggerOptions['groupids'] = $pageFilter->groupid;
+			}
+
+			$events = array();
+
+			while (true) {
+				$allEventsSlice = API::Event()->get($eventOptions);
+
+				$triggerIdsFromSlice = array_keys(array_flip(zbx_objectValues($allEventsSlice, 'objectid')));
+
+				$unknownTriggerIds = array_diff($triggerIdsFromSlice, $knownTriggerIds);
+
+				if ($unknownTriggerIds) {
+					$triggerOptions['triggerids'] = $unknownTriggerIds;
+					$validTriggersFromSlice = API::Trigger()->get($triggerOptions);
+
+					foreach ($validTriggersFromSlice as $trigger) {
+						$validTriggerIds[$trigger['triggerid']] = $trigger['triggerid'];
+					}
+
+					foreach ($unknownTriggerIds as $id) {
+						$id = strval($id);
+						$knownTriggerIds[$id] = $id;
+					}
+				}
+
+				foreach ($allEventsSlice as $event) {
+					if (isset($validTriggerIds[$event['objectid']])) {
+						$events[] = array('eventid' => $event['eventid']);
+					}
+				}
+
+				// break loop when either enough events have been retrieved, or last slice was not full
+				if (count($events) >= $config['search_limit'] || count($allEventsSlice) <= $allEventsSliceLimit) {
+					break;
+				}
+
+				/*
+				 * Because events in slices are sorted descending by eventid (i.e. bigger eventid),
+				 * first event in next slice must have eventid that is previous to last eventid in current slice.
+				 */
+				$lastEvent = end($allEventsSlice);
+				$eventOptions['eventid_till'] = $lastEvent['eventid'] - 1;
+			}
+
+			/*
+			 * At this point it is possible that more than $config['search_limit'] events are selected,
+			 * therefore at most only first $config['search_limit'] + 1 events will be used for pagination.
+			 */
+			$events = array_slice($events, 0, $config['search_limit'] + 1);
+
+			// get paging
 			$paging = getPagingLine($events);
 
 			// query event with extend data
