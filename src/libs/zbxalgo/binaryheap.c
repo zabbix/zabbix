@@ -293,8 +293,9 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 		{
 			heap->elems[index] = heap->elems[heap->elems_num];
 
-			if (index == __binary_heap_bubble_down(heap, index))
-				zbx_hashmap_set(heap->key_index, heap->elems[index].key, index);
+			if (index == __binary_heap_bubble_up(heap, index))
+				if (index == __binary_heap_bubble_down(heap, index))
+					zbx_hashmap_set(heap->key_index, heap->elems[index].key, index);
 		}
 	}
 	else
