@@ -1,6 +1,7 @@
 Changes for 2.2.4rc2
 
 Bug fixes:
+........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc1
