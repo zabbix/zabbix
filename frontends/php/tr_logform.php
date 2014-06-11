@@ -285,7 +285,6 @@ if(isset($_REQUEST['sform'])){
 		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
 		$imgup->setAttribute('onclick','javascript:  element_up("logtr'.$id.'");');
 		$imgup->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
-		$imgup->setAttribute('style','margin-right: 2px;');
 		$imgup->addClass('updown');
 
 		$imgdn = new CImg('images/general/arrow_down.png','down',12,14);
@@ -311,7 +310,7 @@ if(isset($_REQUEST['sform'])){
 		$maxid = ($maxid<$id)?$id:$maxid;
 	}
 	zbx_add_post_js('logexpr_count='.($maxid+1).';');
-	zbx_add_post_js('processArrows();');
+	zbx_add_post_js('processExpressionList();');
 
 	$maxid=0;
 	foreach($keys as $id => $val){
