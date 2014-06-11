@@ -245,7 +245,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				p = s + 1;
 
-				while ((*s++ = *p++) != '\0')
+				while ('\0' != (*s++ = *p++))
 					;
 			}
 		}
