@@ -1253,7 +1253,7 @@ function filterSysmapTriggers(array $selements, array $selementHostApplicationFi
  * @param array $selementIdToSubSysmaps     all sub-sysmaps used in current sysmap, indexed by selementId
  * @param array $hostsFromHostGroups        collection of hosts that get included via host groups
  *
- * @return array    a two-dimensional array with element IDs as the primary key, host IDs as the secondary key
+ * @return array    a two-dimensional array with selement IDs as the primary key, host IDs as the secondary key
  *                  application names as values
  */
 function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps, array $hostsFromHostGroups) {
@@ -1294,25 +1294,39 @@ function getSelementHostApplicationFilters(array $selements, array $selementIdTo
 						$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
 					}
 
-					// then iterate over all host group elements
-					// if the host group has no application filter - reset the filter for all its hosts
-					// otherwise - apply the same filter to each host
+					// Find all selements with host groups and sort them into two arrays:
+					// - with application filter
+					// - without application filter
+					$hostGroupSelementsWithApplication = array();
+					$hostGroupSelementsWithoutApplication = array();
 					foreach ($subSysmap['selements'] as $subSysmapSelement) {
-						if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-							continue;
-						}
-
-						$groupId = $subSysmapSelement['elementid'];
-
-						if ($subSysmapSelement['application'] === '') {
-							foreach ($groupIdToHostIds[$groupId] as $hostId) {
-								unset($selementHostApplicationFilters[$selementId][$hostId]);
+						if ($subSysmapSelement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+							if ($subSysmapSelement['application'] !== '') {
+								$hostGroupSelementsWithApplication[] = $subSysmapSelement;
+							}
+							else {
+								$hostGroupSelementsWithoutApplication[] = $subSysmapSelement;
 							}
 						}
-						else {
-							foreach ($groupIdToHostIds[$groupId] as $hostId) {
-								$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
-							}
+					}
+
+					// Combine application filters for hosts from host group selements with
+					// application filters set.
+					foreach($hostGroupSelementsWithApplication as $hostGroupSelement) {
+						$hostGroupId = $hostGroupSelement['elementid'];
+
+						foreach ($groupIdToHostIds[$hostGroupId] as $hostId) {
+							$selementHostApplicationFilters[$selementId][$hostId][] = $hostGroupSelement['application'];
+						}
+					}
+
+					// Unset all application filters for hosts in host group selements without any filters.
+					// This might reset application filters set by previous foreach.
+					foreach($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
+						$hostGroupId = $hostGroupSelement['elementid'];
+
+						foreach ($groupIdToHostIds[$hostGroupId] as $hostId) {
+							unset($selementHostApplicationFilters[$selementId][$hostId]);
 						}
 					}
 				}
