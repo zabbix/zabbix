@@ -42,7 +42,7 @@ static zbx_oracle_db_handle_t	oracle;
 /* 64-bit integer binding is supported only starting with Oracle 11.2 */
 /* so for compatibility reasons we must convert 64-bit values to      */
 /* Oracle numbers before binding.                                     */
-static OCINumber	*oci_ids = NULL;
+static OCINumber	**oci_ids = NULL;
 static int		oci_ids_alloc = 0;
 static int		oci_ids_num = 0;
 
@@ -772,8 +772,6 @@ int	zbx_db_txn_error()
 #ifdef HAVE_ORACLE
 static sword	zbx_oracle_statement_prepare(const char *sql)
 {
-	oci_ids_num = 0;
-
 	return OCIStmtPrepare(oracle.stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql), (ub4)OCI_NTV_SYNTAX,
 			(ub4)OCI_DEFAULT);
 }
@@ -798,6 +796,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
 	}
 
+	oci_ids_num = 0;
+
 	return err;
 }
 #endif
@@ -817,6 +817,8 @@ int	zbx_db_statement_prepare(const char *sql)
 		return ZBX_DB_FAIL;
 	}
 
+	oci_ids_num = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
@@ -834,7 +836,7 @@ int	zbx_db_statement_prepare(const char *sql)
 int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 {
 	sword	err;
-	int	ret = ZBX_DB_OK;
+	int	ret = ZBX_DB_OK, old_alloc, i;
 
 	if (1 == txn_error)
 	{
@@ -854,14 +856,18 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 		case ZBX_TYPE_UINT:
 			if (oci_ids_num >= oci_ids_alloc)
 			{
+				old_alloc = oci_ids_alloc;
 				oci_ids_alloc = (0 == oci_ids_alloc ? 8 : oci_ids_alloc * 1.5);
-				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber));
+				oci_ids = zbx_realloc(oci_ids, oci_ids_alloc * sizeof(OCINumber *));
+
+				for (i = old_alloc; i < oci_ids_alloc; i++)
+					oci_ids[i] = zbx_malloc(NULL, sizeof(OCINumber));
 			}
 
 			if (OCI_SUCCESS == (err = OCINumberFromInt(oracle.errhp, buffer, sizeof(zbx_uint64_t),
-					OCI_NUMBER_UNSIGNED, &oci_ids[oci_ids_num])))
+					OCI_NUMBER_UNSIGNED, oci_ids[oci_ids_num])))
 			{
-				err = zbx_oracle_bind_parameter((ub4)position, &oci_ids[oci_ids_num++],
+				err = zbx_oracle_bind_parameter((ub4)position, oci_ids[oci_ids_num++],
 						(sb4)sizeof(OCINumber), SQLT_VNU);
 			}
 			break;
