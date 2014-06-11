@@ -13,6 +13,8 @@ use constant SUCCESS => 0;
 use constant FAIL => 1;
 use constant UP => 1;
 use constant DOWN => 0;
+use constant ONLINE => 1;
+use constant OFFLINE => 0;
 use constant SLV_UNAVAILABILITY_LIMIT => 49; # NB! must be in sync with frontend
 
 use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
@@ -30,8 +32,11 @@ use constant EVENT_OBJECT_TRIGGER => 0;
 use constant EVENT_SOURCE_TRIGGERS => 0;
 use constant TRIGGER_VALUE_TRUE => 1;
 use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
-
 use constant SENDER_BATCH_COUNT => 250;
+use constant PROBE_LASTACCESS_ITEM => 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
+use constant PROBE_GROUP_NAME => 'Probes';
+use constant PROBE_KEY_MANUAL => 'rsm.probe.status[manual]';
+use constant PROBE_KEY_AUTOMATIC => 'rsm.probe.status[automatic,%]'; # match all in SQL
 
 # In order to do the calculation we should wait till all the results
 # are available on the server (from proxies). We shift back 2 minutes
@@ -52,24 +57,20 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
-		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_lastclock get_tlds
+		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid get_lastclock get_tlds
 		db_connect db_select
-		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds
-		minutes_last_month get_online_probes probes2tldhostids init_values push_value send_values
+		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
+		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_ns_avail process_slv_monthly
-		get_item_values check_lastclock get_downtime avail_result_msg
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str);
-
-my $probe_group_name = 'Probes';
-my $probe_key_manual = 'probe.status[manual]';
-my $probe_key_automatic = 'probe.status[automatic,%]'; # match all in SQL
+		process_slv_ns_curmon get_item_values check_lastclock get_downtime avail_result_msg
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str curmon_log_values curmon_log_downtime);
 
 # configuration, set in set_slv_config()
 my $config = undef;
 
 # make sure only one copy of script runs (unless in test mode)
 my $pidfile;
-my $pid_dir = '/tmp';
+use constant PID_DIR => '/tmp';
 
 my @_sender_values; # used to send values to Zabbix server
 
@@ -206,26 +207,30 @@ sub get_item_data
     my $cfg_key_in = shift;
     my $cfg_key_out = shift;
 
-    my $res;
+    my $sql;
 
     if ("[" eq substr($cfg_key_out, -1))
     {
-	$res = db_select(
+	$sql =
 	    "select i.key_,i.itemid,i.lastclock".
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and (i.key_='$cfg_key_in' or i.key_ like '$cfg_key_out%')");
+	    	" and (i.key_='$cfg_key_in' or i.key_ like '$cfg_key_out%')";
     }
     else
     {
-	$res = db_select(
+	$sql =
 	    "select i.key_,i.itemid,i.lastclock".
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_ in ('$cfg_key_in','$cfg_key_out')");
+	    	" and i.key_ in ('$cfg_key_in','$cfg_key_out')";
     }
+
+    $sql .= " order by i.key_";
+
+    my $res = db_select($sql);
 
     my $arr_ref = $res->fetchall_arrayref();
 
@@ -260,31 +265,52 @@ sub get_item_data
     return ($itemid_in, $itemid_out, $lastclock);
 }
 
+sub get_itemid
+{
+    my $host = shift;
+    my $key = shift;
+
+    my $res = db_select(
+	"select i.itemid".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+	    	" and h.host='$host'".
+		" and i.key_='$key'");
+
+    my $rows_ref = $res->fetchall_arrayref();
+
+    fail("cannot find item ($key) at host ($host)") if (scalar(@$rows_ref) != 1);
+
+    return $rows_ref->[0]->[0];
+}
+
 sub get_lastclock
 {
     my $host = shift;
     my $key = shift;
 
-    my $res;
+    my $sql;
 
     if ("[" eq substr($key, -1))
     {
-	$res = db_select(
+	$sql =
 	    "select i.lastclock".
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_ like '$key%'");
+	    	" and i.key_ like '$key%'";
     }
     else
     {
-	$res = db_select(
+	$sql =
 	    "select i.lastclock".
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_='$key'");
+	    	" and i.key_='$key'";
     }
+
+    my $res = db_select($sql);
 
     my $arr_ref = $res->fetchall_arrayref();
 
@@ -297,21 +323,21 @@ sub get_tlds
 {
     my $service = shift;
 
-    my $res;
+    my $sql;
 
     unless (defined($service))
     {
-	$res = db_select(
+	$sql =
 	    "select h.host".
 	    " from hosts h,hosts_groups hg,groups g".
 	    " where h.hostid=hg.hostid".
 		" and hg.groupid=g.groupid".
 		" and g.name='TLDs'".
-		" and h.status=0");
+		" and h.status=0";
     }
     else
     {
-	$res = db_select(
+	$sql =
 	    "select h.host".
 	    " from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
 	    " where h.hostid=hg.hostid".
@@ -321,8 +347,12 @@ sub get_tlds
 	    	" and h2.hostid=hm.hostid".
 	    	" and hm.macro='{\$RSM.TLD.".uc($service).".ENABLED}'".
 	    	" and hm.value!=0".
-	    	" and h.status=0");
+	    	" and h.status=0";
     }
+
+    $sql .= " order by h.host";
+
+    my $res = db_select($sql);
 
     my @tlds;
     while (my @row = $res->fetchrow_array)
@@ -473,6 +503,20 @@ sub get_month_bounds
     return ($from, $till, $till - 29);
 }
 
+# Get bounds of current month.
+sub get_curmon_bounds
+{
+    require DateTime;
+
+    my $dt = DateTime->now;
+    my $till = $dt->epoch;
+
+    $dt->truncate(to => 'month');
+    my $from = $dt->epoch;
+
+    return ($from, $till, $till);
+}
+
 sub minutes_last_month
 {
     require DateTime;
@@ -508,7 +552,7 @@ sub get_online_probes
 {
     my $from = shift;
     my $till = shift;
-    my $probe_avail_limit = shift;
+    my $probe_avail_limit = shift; # max "last seen" of proxy
     my $all_probes_ref = shift;
 
     $all_probes_ref = __get_probes() unless ($all_probes_ref);
@@ -517,8 +561,6 @@ sub get_online_probes
     my (@result, @row, $sql, $host, $hostid, $res, $probe_down, $no_values);
 
     # Filter out unreachable probes. Probes are considered unreachable if last access time is over $probe_avail_limit seconds.
-    my $probe_availability_item = 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
-
     my $hosts_mon = '';
     foreach my $host (keys(%reachable_probes))
     {
@@ -533,7 +575,7 @@ sub get_online_probes
 	" from items i,history_uint hi,hosts h".
 	" where i.itemid=hi.itemid".
 	    " and i.hostid=h.hostid".
-	    " and i.key_='$probe_availability_item'".
+	    " and i.key_='".PROBE_LASTACCESS_ITEM."'".
 	    " and hi.clock between $from and $till".
 	    " and hi.clock-hi.value > $probe_avail_limit".
 	    " and h.host in ($hosts_mon)");
@@ -553,9 +595,10 @@ sub get_online_probes
 	    "select h.value".
 	    " from history_uint h,items i".
 	    " where h.itemid=i.itemid".
-	    	" and i.key_='$probe_key_manual'".
+	    	" and i.key_='".PROBE_KEY_MANUAL."'".
 	    	" and i.hostid=$hostid".
-	    	" and h.clock between $from and $till");
+	    	" and h.clock between $from and $till".
+	    " order by h.clock,h.ns");
 
 	$probe_down = 0;
 	$no_values = 1;
@@ -577,7 +620,7 @@ sub get_online_probes
 	{
 	    # We did not get any values between $from and $till, consider the last value.
 
-	    $res = db_select("select lastvalue from items where key_='$probe_key_manual' and hostid=$hostid");
+	    $res = db_select("select lastvalue from items where key_='".PROBE_KEY_MANUAL."' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
@@ -597,9 +640,10 @@ sub get_online_probes
 	    "select h.value".
 	    " from history_uint h,items i".
 	    " where h.itemid=i.itemid".
-	    	" and i.key_ like '$probe_key_automatic'".
+	    	" and i.key_ like '".PROBE_KEY_AUTOMATIC."'".
 	    	" and i.hostid=$hostid".
-	    	" and h.clock between $from and $till");
+	    	" and h.clock between $from and $till".
+	    " order by h.clock,h.ns");
 
 	$probe_down = 0;
         $no_values = 1;
@@ -621,7 +665,7 @@ sub get_online_probes
         {
 	    # We did not get any values between $from and $till, consider the latest value.
 
-	    $res = db_select("select lastvalue from items where key_='$probe_key_automatic' and hostid=$hostid");
+	    $res = db_select("select lastvalue from items where key_='".PROBE_KEY_AUTOMATIC."' and hostid=$hostid");
 
 	    if (@row = $res->fetchrow_array)
 	    {
@@ -637,6 +681,50 @@ sub get_online_probes
     }
 
     return \@result;
+}
+
+sub get_probe_times
+{
+    my $from = shift;
+    my $till = shift;
+    my $probe_avail_limit = shift;
+
+    dbg("from:$from till:$till probe_avail_limit:$probe_avail_limit");
+
+    my $probes_ref = __get_probes(); # host => hostid
+
+    my %result;
+
+    # check probe lastaccess time
+    foreach my $probe (keys(%$probes_ref))
+    {
+	my $hostid = $probes_ref->{$probe};
+
+	my $times_ref = __get_reachable_times($probe, $probe_avail_limit, $from, $till);
+
+	if (scalar(@$times_ref) != 0)
+	{
+	    dbg("$probe reachable times: ", join(',', @$times_ref));
+
+	    $times_ref = __get_probestatus_times($hostid, $times_ref, PROBE_KEY_MANUAL);
+	}
+
+	if (scalar(@$times_ref) != 0)
+	{
+	    dbg("$probe manual probestatus times: ", join(',', @$times_ref));
+
+	    $times_ref = __get_probestatus_times($hostid, $times_ref, PROBE_KEY_AUTOMATIC);
+	}
+
+	if (scalar(@$times_ref) != 0)
+	{
+	    dbg("$probe automatic probestatus times: ", join(',', @$times_ref));
+
+	    $result{$probe} = $times_ref;
+	}
+    }
+
+    return \%result;
 }
 
 # Translate probe names to hostids of appropriate tld hosts.
@@ -790,7 +878,7 @@ sub process_slv_ns_monthly
     my $till = shift;              # end of SLV period
     my $value_ts = shift;          # value timestamp
     my $cfg_interval = shift;      # input values interval
-    my $probe_avail_limit = shift; # macro value
+    my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
@@ -831,7 +919,7 @@ sub process_slv_ns_monthly
 
 	my $items_ref = __get_online_items($hostids_ref, $all_ns_items_ref);
 
-	my $values_ref = __get_ns_values($items_ref, $cur_from, $cur_till, $all_ns_items_ref);
+	my $values_ref = __get_ns_values($items_ref, [$cur_from, $cur_till], $all_ns_items_ref);
 
 	foreach my $ns (keys(%$values_ref))
 	{
@@ -855,10 +943,10 @@ sub process_slv_ns_monthly
 	    next;
 	}
 
-	my $key_out = $cfg_key_out . $ns . ']';
 	my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $total_values{$ns});
+	my $key_out = $cfg_key_out . $ns . ']';
 
-	info("$ns: $perc% successful values (", $successful_values{$ns}, " out of ", $total_values{$ns});
+	info("$ns: $perc% successful values (", $successful_values{$ns}, "/", $total_values{$ns});
 	push_value($tld, $key_out, $value_ts, $perc);
     }
 }
@@ -872,7 +960,7 @@ sub process_slv_monthly
     my $till = shift;              # end of SLV period
     my $value_ts = shift;          # value timestamp
     my $cfg_interval = shift;      # input values interval
-    my $probe_avail_limit = shift; # macro value
+    my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
     my $min_error = shift;         # optional: min error that relates to this item
     my $max_error = shift;         # optional: max error that relates to this item
@@ -924,7 +1012,7 @@ sub process_slv_monthly
 
     my $perc = sprintf("%.3f", $successful_values * 100 / $total_values);
 
-    info("$perc% successful values ($successful_values out of $total_values)");
+    info("$perc% successful values ($successful_values/$total_values)");
     push_value($tld, $cfg_key_out, $value_ts, $perc);
 }
 
@@ -938,7 +1026,7 @@ sub process_slv_ns_avail
     my $value_ts = shift;
     my $cfg_minonline = shift;
     my $unavail_limit = shift;
-    my $probe_avail_limit = shift;
+    my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;
 
     my $nss_ref = __get_nss($tld, $cfg_key_out);
@@ -961,7 +1049,7 @@ sub process_slv_ns_avail
 
     my $online_items_ref = __get_online_items($hostids_ref, $all_ns_items_ref);
 
-    my $values_ref = __get_ns_values($online_items_ref, $from, $till, $all_ns_items_ref);
+    my $values_ref = __get_ns_values($online_items_ref, [$from, $till], $all_ns_items_ref);
 
     wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
@@ -993,6 +1081,85 @@ sub process_slv_ns_avail
     }
 }
 
+sub process_slv_ns_curmon
+{
+    my $tld = shift;
+    my $cfg_key_in = shift;        # part of input key, e. g. 'rsm.dns.udp.upd[{$RSM.TLD},'
+    my $cfg_key_out = shift;       # part of output key, e. g. 'rsm.slv.dns.ns.upd['
+    my $value_ts = shift;          # value timestamp
+    my $probe_times_ref = shift;   # probe online times (for history data)
+    my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
+
+    # first we need to get the list of name servers
+    my $nss_ref = __get_nss($tld, $cfg_key_out);
+
+    # %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
+    # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
+    # certain period. E. g.:
+    #
+    # 'g.ns.se.,2001:6b0:e:3::1' => 150,
+    # 'b.ns.se.,192.36.133.107' => 200,
+    # ...
+    my %total_values;
+    my %successful_values;
+    foreach my $ns (@$nss_ref)
+    {
+	$total_values{$ns} = 0;
+	$successful_values{$ns} = 0;
+    }
+
+    my $all_ns_items_ref = __get_all_ns_items($nss_ref, $cfg_key_in, $tld);
+
+    foreach my $probe (keys(%$probe_times_ref))
+    {
+	my $times_ref = $probe_times_ref->{$probe};
+
+	my @online_probes;
+	push(@online_probes, $probe);
+
+	my $hostids_ref = probes2tldhostids($tld, \@online_probes);
+
+	my $items_ref = __get_online_items($hostids_ref, $all_ns_items_ref);
+
+	my $values_ref = __get_ns_values($items_ref, $times_ref, $all_ns_items_ref);
+
+	foreach my $ns (keys(%$values_ref))
+	{
+	    my $item_values_ref = $values_ref->{$ns};
+
+	    my $probe_total = 0;
+	    my $probe_successful = 0;
+
+	    foreach (@$item_values_ref)
+	    {
+		$total_values{$ns}++;
+		$probe_total++;
+
+		if ($check_value_ref->($_) == SUCCESS)
+		{
+		    $successful_values{$ns}++;
+		    $probe_successful++;
+		}
+	    }
+
+	    dbg("  [$probe] $ns: $probe_successful/$probe_total");
+	}
+    }
+
+    foreach my $ns (keys(%total_values))
+    {
+	if ($total_values{$ns} == 0)
+	{
+	    info("$ns: no values found in the database for current month");
+	    next;
+	}
+
+	info("$ns: ", $successful_values{$ns}, "/", $total_values{$ns}, " successful values");
+
+	curmon_log_values("CURMON-UDP-DNS-RTT", $ns, $successful_values{$ns}, $total_values{$ns}) unless (defined($OPTS{'test'}));
+    }
+}
+
 # organize values from all hosts grouped by itemid and return itemid->values hash
 #
 # E. g.:
@@ -1021,7 +1188,7 @@ sub get_item_values
 	    $items_str .= $_->{'itemid'};
 	}
 
-	my $res = db_select("select itemid,value from history_uint where itemid in ($items_str) and clock between $from and $till");
+	my $res = db_select("select itemid,value from history_uint where itemid in ($items_str) and clock between $from and $till order by clock,ns");
 
 	while (my @row = $res->fetchrow_array)
 	{
@@ -1087,7 +1254,7 @@ sub get_downtime
 	    " from history_uint".
 	    " where itemid=$itemid".
 	    	" and clock between $event_from and $event_till".
-	    " order by clock,ns desc");
+	    " order by clock,ns");
 
 	my $prevclock = 0;
 
@@ -1223,6 +1390,28 @@ sub ts_str
     return sprintf("%4.2d/%2.2d/%2.2d-%2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
 }
 
+sub curmon_log_values
+{
+    my $prefix = shift;
+    my $target = shift;
+    my $successful = shift;
+    my $total = shift;
+
+    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '-' . __script() . '.log';
+
+    __write_log($file, join('', ts_str(), " [$target] [$successful] [$total]\n"));
+}
+
+sub curmon_log_downtime
+{
+    my $prefix = shift;
+    my $downtime = shift;
+
+    my $file = $config->{'slv'}->{'logdir'} . '/' . $prefix . '-' . $tld . '-' . __script() . '.log';
+
+    __write_log($file, join('', ts_str(), " [$downtime]\n"));
+}
+
 sub usage
 {
     print("usage: $0 <tld> [options]\n");
@@ -1240,6 +1429,20 @@ sub usage
 # Internal subs #
 #################
 
+sub __write_log
+{
+    my $file = shift;
+    my $msg = shift;
+
+    my $OUTFILE;
+
+    open $OUTFILE, '>>', $file or die("cannot open $file: $!");
+
+    print {$OUTFILE} $msg or die("cannot write to $file: $!");
+
+    close $OUTFILE or die("cannot close $file: $!");
+}
+
 sub __log
 {
     my $msg = shift;
@@ -1254,15 +1457,9 @@ sub __log
 	return;
     }
 
-    my $OUTFILE;
-
     my $file = $config->{'slv'}->{'logdir'} . '/' . (defined($tld) ? "$tld-" : '') . __script() . '.log';
 
-    open $OUTFILE, '>>', $file or die("cannot open $file: $!");
-
-    print {$OUTFILE} $msg or die("cannot write to $file: $!");
-
-    close $OUTFILE or die("cannot close $file: $!");
+    __write_log($file, $msg);
 }
 
 sub __get_macro
@@ -1292,13 +1489,12 @@ sub __get_macro
 sub __get_ns_values
 {
     my $items_ref = shift;
-    my $from = shift;
-    my $till = shift;
+    my $times_ref = shift; # from, till, ...
     my $all_ns_items = shift;
 
     my %result;
 
-    if (0 < scalar(keys(%$items_ref)))
+    if (scalar(keys(%$items_ref)) != 0)
     {
 	my $items_str = "";
 	foreach my $itemid (keys(%$items_ref))
@@ -1307,38 +1503,46 @@ sub __get_ns_values
 	    $items_str .= $itemid;
 	}
 
-	my $res = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till");
-
-	while (my @row = $res->fetchrow_array)
+	my $idx = 0;
+	my $times_count = scalar(@$times_ref);
+	while ($idx < $times_count)
 	{
-	    my $itemid = $row[0];
-	    my $value = $row[1];
+	    my $from = $times_ref->[$idx++];
+	    my $till = $times_ref->[$idx++];
 
-	    my $ns = '';
-	    my $last = 0;
-	    foreach my $hostid (keys(%$all_ns_items))
+	    my $res = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till order by clock,ns");
+
+	    while (my @row = $res->fetchrow_array)
 	    {
-		foreach my $i (keys(%{$all_ns_items->{$hostid}}))
+		my $itemid = $row[0];
+		my $value = $row[1];
+
+		my $ns = '';
+		my $last = 0;
+		foreach my $hostid (keys(%$all_ns_items))
 		{
-		    if ($i == $itemid)
+		    foreach my $i (keys(%{$all_ns_items->{$hostid}}))
 		    {
-			$ns = $all_ns_items->{$hostid}{$i};
-			$last = 1;
-			last;
+			if ($i == $itemid)
+			{
+			    $ns = $all_ns_items->{$hostid}{$i};
+			    $last = 1;
+			    last;
+			}
 		    }
+		    last if ($last == 1);
 		}
-		last if ($last == 1);
-	    }
 
-	    fail("internal error: name server of item $itemid not found") if ($ns eq "");
+		fail("internal error: name server of item $itemid not found") if ($ns eq "");
 
-	    if (exists($result{$ns}))
-	    {
-		$result{$ns} = [@{$result{$ns}}, $value];
-	    }
-	    else
-	    {
-		$result{$ns} = [$value];
+		if (exists($result{$ns}))
+		{
+		    $result{$ns} = [@{$result{$ns}}, $value];
+		}
+		else
+		{
+		    $result{$ns} = [$value];
+		}
 	    }
 	}
     }
@@ -1364,7 +1568,7 @@ sub __get_dbl_values
 	    $items_str .= $itemid;
 	}
 
-	my $res = db_select("select value from history where itemid in ($items_str) and clock between $from and $till");
+	my $res = db_select("select value from history where itemid in ($items_str) and clock between $from and $till order by clock,ns");
 
 	while (my @row = $res->fetchrow_array)
 	{
@@ -1493,7 +1697,7 @@ sub __script
 
 sub __get_pidfile
 {
-    return $pid_dir . '/' . __script() . '.pid';
+    return PID_DIR . '/' . __script() . '.pid';
 }
 
 # return incidents (start and end times) in array:
@@ -1511,18 +1715,18 @@ sub __get_eventtimes
     my $from = shift;
     my $till = shift;
 
-    my $res = db_select(
+    my (@eventtimes, $res, $rows_ref);
+
+    $res = db_select(
 	"select distinct t.triggerid".
 	" from triggers t,functions f".
 	" where t.triggerid=f.triggerid".
 		" and f.itemid=$itemid".
 		" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
-    my $arr_ref = $res->fetchall_arrayref();
+    $rows_ref = $res->fetchall_arrayref();
 
-    my $rows = scalar(@$arr_ref);
-
-    my @eventtimes;
+    my $rows = scalar(@$rows_ref);
 
     unless ($rows == 1)
     {
@@ -1530,7 +1734,7 @@ sub __get_eventtimes
 	return \@eventtimes;
     }
 
-    my $triggerid = $arr_ref->[0]->[0];
+    my $triggerid = $rows_ref->[0]->[0];
 
     # select events, where time_from < filter_from and value = TRIGGER_VALUE_TRUE
     $res = db_select(
@@ -1541,15 +1745,19 @@ sub __get_eventtimes
 		" and objectid=$triggerid".
 		" and clock<$from".
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
-	" order by clock,ns desc".
+	" order by clock desc,ns desc".
 	" limit 1");
 
     my $add_event = 0;
-    while (my @row = $res->fetchrow_array)
+
+    $rows_ref = $res->fetchall_arrayref();
+    foreach my $row_ref (@$rows_ref)
     {
-	my $clock = $row[0];
-	my $value = $row[1];
-	my $false_positive = $row[2];
+	my $clock = $row_ref->[0];
+	my $value = $row_ref->[1];
+	my $false_positive = $row_ref->[2];
+
+	dbg("incident before rolling week detected, clock:$clock, false_positive:$false_positive");
 
 	# we cannot add 'value=TRIGGER_VALUE_TRUE' and 'false_positive!=INCIDENT_FALSE_POSITIVE'
 	# to the SQL query above as we need the latest event before $from
@@ -1570,12 +1778,14 @@ sub __get_eventtimes
 		" and value_changed=".TRIGGER_VALUE_CHANGED_YES.
 	" order by clock,ns");
 
-    my (@unsorted_eventtimes, @row);
-    while (@row = $res->fetchrow_array)
+    my @unsorted_eventtimes;
+
+    $rows_ref = $res->fetchall_arrayref();
+    foreach my $row_ref (@$rows_ref)
     {
-	my $clock = $row[0];
-	my $value = $row[1];
-	my $false_positive = $row[2];
+	my $clock = $row_ref->[0];
+	my $value = $row_ref->[1];
+	my $false_positive = $row_ref->[2];
 
 	if ($value == TRIGGER_VALUE_TRUE)
 	{
@@ -1588,6 +1798,8 @@ sub __get_eventtimes
     push(@eventtimes, $_) foreach (sort(@unsorted_eventtimes));
     push(@eventtimes, $till) unless ((scalar(@eventtimes) % 2) == 0);
 
+    dbg("eventtimes: ", join(',', @eventtimes));
+
     return \@eventtimes;
 }
 
@@ -1599,7 +1811,7 @@ sub __get_probes
 	" from hosts h, hosts_groups hg, groups g".
 	" where h.hostid=hg.hostid".
 		" and hg.groupid=g.groupid".
-		" and g.name='$probe_group_name'");
+		" and g.name='".PROBE_GROUP_NAME."'");
 
     my (%result, @row);
     while (@row = $res->fetchrow_array)
@@ -1608,6 +1820,166 @@ sub __get_probes
     }
 
     return \%result;
+}
+
+# Times when probe "lastaccess" under limit.
+sub __get_reachable_times
+{
+    my $probe = shift;
+    my $probe_avail_limit = shift;
+    my $from = shift;
+    my $till = shift;
+
+    my $host = "$probe - mon";
+
+    my ($res, $rows_ref, @times, $last_status);
+
+    $res = db_select(
+	"select hi.clock,hi.value".
+	" from items i,history_uint hi,hosts h".
+	" where i.itemid=hi.itemid".
+		" and i.hostid=h.hostid".
+	    	" and i.key_='".PROBE_LASTACCESS_ITEM."'".
+	    	" and hi.clock between ".($from-3600)." and ".($from-1).
+	    	" and h.host='$host'".
+	" order by hi.clock desc,hi.ns desc".
+	" limit 1");
+
+    $rows_ref = $res->fetchall_arrayref();
+
+    dbg(scalar(@$rows_ref), " rows");
+
+    $last_status = UP;
+    if (scalar(@$rows_ref) > 0)
+    {
+	my $clock = $rows_ref->[0]->[0];
+	my $value = $rows_ref->[0]->[1];
+
+	dbg("  clock:$clock value:$value");
+
+	$last_status = DOWN if ($clock - $value > $probe_avail_limit);
+    }
+
+    push(@times, $from) if ($last_status == UP);
+
+    $res = db_select(
+	"select hi.clock,hi.value".
+	" from items i,history_uint hi,hosts h".
+	" where i.itemid=hi.itemid".
+		" and i.hostid=h.hostid".
+	    	" and i.key_='".PROBE_LASTACCESS_ITEM."'".
+	    	" and hi.clock between $from and $till".
+	    	" and h.host='$host'".
+	    	" and hi.value!=0".
+	" order by hi.clock,hi.ns");
+
+    $rows_ref = $res->fetchall_arrayref();
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $clock = $row_ref->[0];
+	my $value = $row_ref->[1];
+
+	my $status = ($clock - $value > $probe_avail_limit) ? DOWN : UP;
+
+	if ($last_status != $status)
+	{
+	    push(@times, $clock);
+
+	    dbg("  clock:$clock diff:", ($clock - $value));
+
+	    $last_status = $status;
+	}
+    }
+
+    # push "till" to @times if it contains odd number of elements
+    if (scalar(@times) != 0)
+    {
+	push(@times, $till) if ($last_status == UP);
+    }
+
+    return \@times;
+}
+
+sub __get_probestatus_times
+{
+    my $hostid = shift;
+    my $times_ref = shift; # input
+    my $key = shift;
+
+    my ($res, $rows_ref, @times, $last_status);
+
+    my $key_match = "i.key_";
+    $key_match .= ($key =~ m/%/) ? " like '$key'" : "='$key'";
+
+    $res = db_select(
+	"select h.value".
+	" from history_uint h,items i".
+	" where h.itemid=i.itemid".
+		" and $key_match".
+	    	" and i.hostid=$hostid".
+	    	" and h.clock<".$times_ref->[0].
+	" order by h.clock desc,h.ns desc".
+	" limit 1");
+
+    $rows_ref = $res->fetchall_arrayref();
+
+    dbg(scalar(@$rows_ref), " rows");
+
+    $last_status = UP;
+    if (scalar(@$rows_ref) > 0)
+    {
+        my $value = $rows_ref->[0]->[0];
+
+        $last_status = DOWN if ($value == OFFLINE);
+    }
+
+    my $idx = 0;
+    my $times_count = scalar(@$times_ref);
+    while ($idx < $times_count)
+    {
+	my $from = $times_ref->[$idx++];
+	my $till = $times_ref->[$idx++];
+
+	$res = db_select(
+	    "select h.clock,h.value".
+	    " from history_uint h,items i".
+	    " where h.itemid=i.itemid".
+	    	" and $key_match".
+	    	" and i.hostid=$hostid".
+	    	" and h.clock between $from and $till".
+	    " order by h.clock,h.ns");
+
+	$rows_ref = $res->fetchall_arrayref();
+
+	dbg(scalar(@$rows_ref), " rows");
+
+	push(@times, $from) if ($last_status == UP);
+
+	foreach my $row_ref (@$rows_ref)
+	{
+	    my $clock = $row_ref->[0];
+	    my $value = $row_ref->[1];
+
+	    my $status = ($value == OFFLINE) ? DOWN : UP;
+
+	    if ($last_status != $status)
+	    {
+		push(@times, $clock);
+
+		dbg("  clock:$clock value:$value");
+
+		$last_status = $status;
+	    }
+	}
+
+	# push "till" to @times if it contains odd number of elements
+	if (scalar(@times) != 0)
+	{
+	    push(@times, $till) if ($last_status == UP);
+	}
+    }
+
+    return \@times;
 }
 
 sub __get_configvalue
@@ -1631,7 +2003,7 @@ sub __get_configvalue
 	    " where i.itemid=h.itemid".
 	    	" and i.key_='$item_prefix.configvalue[$item_param]'".
 	    	" and h.clock between " . ($value_time - $diff) . " and $value_time".
-	    " order by h.clock DESC".
+	    " order by h.clock desc,h.ns desc".
 	    " limit 1");
 
 	while (my @row = $res->fetchrow_array)
