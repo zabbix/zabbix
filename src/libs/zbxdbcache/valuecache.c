@@ -2607,6 +2607,8 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;
 		}
+		else
+			goto out;
 	}
 
 	vc_item_addref(item);
@@ -2700,6 +2702,8 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
 				goto out;
 		}
+		else
+			goto out;
 	}
 
 	vc_item_addref(item);
