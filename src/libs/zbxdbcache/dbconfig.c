@@ -4230,6 +4230,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	}
 
 	UNLOCK_CACHE;
+
+	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -4907,6 +4909,7 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
+	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
@@ -4916,7 +4919,6 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
-	old_nextcheck = dc_item->nextcheck;
 
 	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
 	{
@@ -4947,6 +4949,7 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	if (HOST_STATUS_MONITORED != dc_host->status)
 		return;
 
+	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
@@ -4956,12 +4959,13 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
-	old_nextcheck = dc_item->nextcheck;
 
 	if (ZBX_POLLER_TYPE_NORMAL == dc_item->poller_type ||
 			ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
 			ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
+	{
 		dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+	}
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
