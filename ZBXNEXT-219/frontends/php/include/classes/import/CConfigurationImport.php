@@ -146,6 +146,7 @@ class CConfigurationImport {
 
 			// parse all import for references to resolve them all together with less sql count
 			$this->gatherReferences();
+
 			$this->processGroups();
 			$this->processTemplates();
 			$this->processHosts();
@@ -154,6 +155,13 @@ class CConfigurationImport {
 			$this->processDiscoveryRules();
 			$this->processTriggers();
 			$this->processGraphs();
+
+			$this->deleteMissingTriggers();
+			$this->deleteMissingGraphs();
+
+			// items can be deleted after graphs are deleted
+			$this->deleteMissingItems();
+
 			$this->processImages();
 			$this->processMaps();
 
@@ -641,7 +649,7 @@ class CConfigurationImport {
 			API::Item()->update($itemsToUpdate);
 		}
 
-		// refresh items because templated ones can be inherited to host and used in triggers, grahs, etc.
+		// refresh items because templated ones can be inherited to host and used in triggers, graphs, etc.
 		$this->referencer->refreshItems();
 	}
 
@@ -1043,9 +1051,7 @@ class CConfigurationImport {
 
 			if ($graph['ymin_item_1']) {
 				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
-				$itemId = $hostId
-					? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key'])
-					: false;
+				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']) : false;
 
 				if (!$itemId) {
 					throw new Exception(_s(
@@ -1061,9 +1067,7 @@ class CConfigurationImport {
 
 			if ($graph['ymax_item_1']) {
 				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
-				$itemId = $hostId
-					? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key'])
-					: false;
+				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']) : false;
 
 				if (!$itemId) {
 					throw new Exception(_s(
@@ -1286,6 +1290,216 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Deletes items from DB that are missing in XML.
+	 */
+	protected function deleteMissingItems() {
+		if (!$this->options['items']['deleteMissing']) {
+			return;
+		}
+
+		$allItems = $this->getFormattedItems();
+
+		if (!$allItems) {
+			return;
+		}
+
+		$hostIdsXML = array();
+
+		foreach ($allItems as $host => $items) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$hostIdsXML[$hostId] = $hostId;
+
+			foreach ($items as $item) {
+				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
+
+				if ($itemId) {
+					$itemIdsXML[$itemId] = $itemId;
+				}
+			}
+		}
+
+		$dbItemIds = API::Item()->get(array(
+			'output' => array('itemid'),
+			'hostids' => $hostIdsXML,
+			'webitems' => true,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
+
+		$itemsToDelete = array_diff_key($dbItemIds, $itemIdsXML);
+
+		if ($itemsToDelete) {
+			API::Item()->delete(array_keys($itemsToDelete));
+		}
+
+		$this->referencer->refreshItems();
+	}
+
+	/**
+	 * Deletes triggers from DB that are missing in XML.
+	 */
+	protected function deleteMissingTriggers() {
+		if (!$this->options['triggers']['deleteMissing']) {
+			return;
+		}
+
+		$allTriggers = $this->getFormattedTriggers();
+
+		if (!$allTriggers) {
+			return;
+		}
+
+		$hosts = $this->getFormattedHosts();
+		if ($hosts) {
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+		else {
+			$hosts = $this->getFormattedTemplates();
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+
+		$hostIdsXML = array();
+		$triggersXML = array();
+
+		foreach ($hosts as $host) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$hostIdsXML[$hostId] = $hostId;
+		}
+
+		foreach ($allTriggers as $trigger) {
+			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+			if ($triggerId) {
+				$triggersXML[$triggerId]['triggerid'] = $triggerId;
+				$triggersXML[$triggerId]['hosts'] = $this->referencer->resolveTriggerHostsById($triggerId);
+			}
+		}
+
+		$dbTriggerIds = API::Trigger()->get(array(
+			'output' => array('triggerid'),
+			'hostids' => $hostIdsXML,
+			'selectHosts' => array('hostid'),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
+
+		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
+
+		// check that potentially deletable trigger belongs to same hosts that are in XML
+		// if some triggers belong to more hosts than current XML contains, don't delete them
+		foreach ($triggersToDelete as $triggerId => $trigger) {
+			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
+
+			if (!array_diff_key($triggerHostIds, $hostIdsXML)) {
+				API::Trigger()->delete(array($triggerId));
+			}
+		}
+
+		// refresh triggers because template triggers can be inherited to host and used in maps
+		$this->referencer->refreshTriggers();
+	}
+
+	/**
+	 * Deletes graphs from DB that are missing in XML.
+	 */
+	protected function deleteMissingGraphs() {
+		if (!$this->options['graphs']['deleteMissing']) {
+			return;
+		}
+
+		$allGraphs = $this->getFormattedGraphs();
+
+		if (!$allGraphs) {
+			return;
+		}
+
+		$hosts = $this->getFormattedHosts();
+		if ($hosts) {
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+		else {
+			$hosts = $this->getFormattedTemplates();
+			$hosts = zbx_objectValues($hosts, 'host');
+		}
+
+
+		$hostIdsXML = array();
+
+		foreach ($hosts as $host) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
+			$hostIdsXML[$hostId] = $hostId;
+		}
+
+		$graphNames = array();
+		$graphHostIds = array();
+
+		// gather host IDs for graphs that exist in XML
+		foreach ($allGraphs as $graph) {
+			$graphNames[] = $graph['name'];
+
+			if (isset($graph['gitems']) && $graph['gitems']) {
+				foreach ($graph['gitems'] as $gitem) {
+					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+					$graphHostIds[$gitemHostId] = $gitemHostId;
+				}
+			}
+		}
+
+		$graphsXML = array();
+
+		// gather graph IDs and hosts graphs belong to
+		$graphsXML = API::Graph()->get(array(
+			'output' => array('graphid'),
+			'hostids' => $graphHostIds,
+			'selectHosts' => array('hostid'),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'filter' => array('name' => $graphNames)
+		));
+
+		// check permissions only if there was no update or create. Else permissions are already checked.
+		if (!$this->options['graphs']['createMissing'] && !$this->options['graphs']['updateExisting']) {
+			$allowedGraphs = API::Graph()->get(array(
+				'output' => array('graphid'),
+				'graphids' => array_keys($graphsXML),
+				'editable' => true,
+				'preservekeys' => true
+			));
+			foreach ($graphsXML as $graph) {
+				if (!isset($allowedGraphs[$graph['graphid']])) {
+					throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
+				}
+			}
+		}
+
+		$dbGraphIds = API::Graph()->get(array(
+			'output' => array('graphid'),
+			'hostids' => $hostIdsXML,
+			'selectHosts' => array('hostid'),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
+
+		$graphsToDelete = array_diff_key($dbGraphIds, $graphsXML);
+
+		// check that potentially deletable graph belongs to same hosts that are in XML
+		// if some graphs belong to more hosts than current XML contains, don't delete them
+		foreach ($graphsToDelete as $graphId => $graph) {
+			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
+
+			if (!array_diff_key($graphHostIds, $hostIdsXML)) {
+				API::Graph()->delete(array($graphId));
+			}
+		}
+	}
+
+	/**
 	 * Method for creating an import formatter for the specified import version.
 	 *
 	 * @throws InvalidArgumentException
@@ -1398,7 +1612,9 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['items'])) {
 			$this->formattedData['items'] = array();
 
-			if ($this->options['items']['updateExisting'] || $this->options['items']['createMissing']) {
+			if ($this->options['items']['updateExisting']
+					|| $this->options['items']['createMissing']
+					|| $this->options['items']['deleteMissing']) {
 				$this->formattedData['items'] = $this->formatter->getItems();
 			}
 		}
@@ -1415,7 +1631,9 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['discoveryRules'])) {
 			$this->formattedData['discoveryRules'] = array();
 
-			if ($this->options['discoveryRules']['updateExisting'] || $this->options['discoveryRules']['createMissing']) {
+			if ($this->options['discoveryRules']['updateExisting']
+					|| $this->options['discoveryRules']['createMissing']
+					|| $this->options['discoveryRules']['deleteMissing']) {
 				$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
 			}
 		}
@@ -1432,7 +1650,9 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['triggers'])) {
 			$this->formattedData['triggers'] = array();
 
-			if ($this->options['triggers']['updateExisting'] || $this->options['triggers']['createMissing']) {
+			if ($this->options['triggers']['updateExisting']
+					|| $this->options['triggers']['createMissing']
+					|| $this->options['triggers']['deleteMissing']) {
 				$this->formattedData['triggers'] = $this->formatter->getTriggers();
 			}
 		}
@@ -1449,7 +1669,9 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['graphs'])) {
 			$this->formattedData['graphs'] = array();
 
-			if ($this->options['graphs']['updateExisting'] || $this->options['graphs']['createMissing']) {
+			if ($this->options['graphs']['updateExisting']
+					|| $this->options['graphs']['createMissing']
+					|| $this->options['graphs']['deleteMissing']) {
 				$this->formattedData['graphs'] = $this->formatter->getGraphs();
 			}
 		}
@@ -1518,7 +1740,9 @@ class CConfigurationImport {
 		if (!isset($this->formattedData['templateScreens'])) {
 			$this->formattedData['templateScreens'] = array();
 
-			if ($this->options['templateScreens']['updateExisting'] || $this->options['templateScreens']['createMissing']) {
+			if ($this->options['templateScreens']['updateExisting']
+					|| $this->options['templateScreens']['createMissing']
+					|| $this->options['templateScreens']['deleteMissing']) {
 				$this->formattedData['templateScreens'] = $this->formatter->getTemplateScreens();
 			}
 		}

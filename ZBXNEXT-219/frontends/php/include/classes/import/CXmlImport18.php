@@ -856,19 +856,13 @@ class CXmlImport18 {
 			$hostIdsXML = array();
 
 			// store items IDs that exist on XML
-			if ($rules['items']['deleteMissing']) {
-				$itemIdsXML = array();
-			}
+			$itemIdsXML = array();
 
 			// stores trigger IDs and hosts triggers belong to that exist on XML
-			if ($rules['triggers']['deleteMissing']) {
-				$triggersXML = array();
-			}
+			$triggersXML = array();
 
 			// stores graph IDs and hosts graphs belong to that exist on XML
-			if ($rules['graphs']['deleteMissing']) {
-				$graphsXML = array();
-			}
+			$graphsXML = array();
 
 			foreach ($hosts as $host) {
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
@@ -1322,9 +1316,7 @@ class CXmlImport18 {
 
 						// items created and updated during should be "preserved", so we must store item IDs
 						// before we skip some rules, otherwise all items get deleted
-						if ($rules['items']['deleteMissing']) {
-							$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
-						}
+						$itemIdsXML[$current_item['itemid']] = $current_item['itemid'];
 
 						// if item does not exist and there is no need to create it, skip item creation
 						if (!$current_item && empty($rules['items']['createMissing'])) {
@@ -1488,10 +1480,8 @@ class CXmlImport18 {
 							}
 
 							// we must store trigger data before we skip rules
-							if ($rules['triggers']['deleteMissing']) {
-								$triggersXML[$currentTrigger['triggerid']]['triggerid'] = $currentTrigger['triggerid'];
-								$triggersXML[$currentTrigger['triggerid']]['hosts'] = $currentTrigger['hosts'];
-							}
+							$triggersXML[$currentTrigger['triggerid']]['triggerid'] = $currentTrigger['triggerid'];
+							$triggersXML[$currentTrigger['triggerid']]['hosts'] = $currentTrigger['hosts'];
 						}
 						unset($trigger_db['hostid']);
 
@@ -1627,10 +1617,8 @@ class CXmlImport18 {
 							}
 							$current_graph = reset($current_graph);
 
-							if ($rules['graphs']['deleteMissing']) {
-								$graphsXML[$current_graph['graphid']]['graphid'] = $current_graph['graphid'];
-								$graphsXML[$current_graph['graphid']]['hosts'] = $current_graph['hosts'];
-							}
+							$graphsXML[$current_graph['graphid']]['graphid'] = $current_graph['graphid'];
+							$graphsXML[$current_graph['graphid']]['hosts'] = $current_graph['hosts'];
 						}
 
 						if (!$current_graph && empty($rules['graphs']['createMissing'])) {
@@ -1802,6 +1790,7 @@ class CXmlImport18 {
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
 					'nopermissions' => true,
+					'inherited' => false,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
@@ -1828,6 +1817,7 @@ class CXmlImport18 {
 					'selectHosts' => array('hostid'),
 					'preservekeys' => true,
 					'nopermissions' => true,
+					'inherited' => false,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 
@@ -1852,6 +1842,7 @@ class CXmlImport18 {
 					'webitems' => true,
 					'preservekeys' => true,
 					'nopermissions' => true,
+					'inherited' => false,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 				));
 

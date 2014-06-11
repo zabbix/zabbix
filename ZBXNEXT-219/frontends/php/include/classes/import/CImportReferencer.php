@@ -50,6 +50,7 @@ class CImportReferencer {
 	protected $itemsRefs;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
+	protected $triggerHosts = array();
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
@@ -210,6 +211,21 @@ class CImportReferencer {
 		}
 
 		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
+	}
+
+	/**
+	 * Get trigger id by trigger name and expression.
+	 *
+	 * @param int $triggerId
+	 *
+	 * @return string|bool
+	 */
+	public function resolveTriggerHostsById($triggerId) {
+		if ($this->triggerHosts === null) {
+			$this->selectTriggers();
+		}
+
+		return isset($this->triggerHosts[$triggerId]) ? $this->triggerHosts[$triggerId] : false;
 	}
 
 	/**
@@ -726,17 +742,21 @@ class CImportReferencer {
 			$this->triggersRefs = array();
 
 			$triggerIds = array();
-			$sql = 'SELECT t.triggerid,t.expression,t.description'.
-				' FROM triggers t'.
-				' WHERE '.dbConditionString('t.description', array_keys($this->triggers));
-			$dbTriggers = DBselect($sql);
-			while ($dbTrigger = DBfetch($dbTriggers)) {
+
+			$dbTriggers = API::Trigger()->get(array(
+				'output' => array('triggerid', 'expression', 'description'),
+				'selectHosts' => array('hostid'),
+				'filter' => array('description' => array_keys($this->triggers))
+			));
+
+			foreach ($dbTriggers as $dbTrigger) {
 				$dbExpr = explode_exp($dbTrigger['expression']);
 				foreach ($this->triggers as $name => $expressions) {
 					if ($name == $dbTrigger['description']) {
 						foreach ($expressions as $expression) {
 							if ($expression == $dbExpr) {
 								$this->triggersRefs[$name][$expression] = $dbTrigger['triggerid'];
+								$this->triggerHosts[$dbTrigger['triggerid']] = $dbTrigger['hosts'];
 								$triggerIds[] = $dbTrigger['triggerid'];
 							}
 						}
