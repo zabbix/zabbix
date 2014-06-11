@@ -40,7 +40,9 @@ $fields = array(
 		null
 	),
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
-		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR)), 'isset({save})'),
+		IN(array(CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION)),
+		'isset({save})'),
+	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -109,7 +111,6 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 elseif (hasRequest('save')) {
 	$action = array(
 		'name'			=> get_request('name'),
-		'evaltype'		=> get_request('evaltype', 0),
 		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
 		'esc_period'	=> get_request('esc_period', 0),
 		'def_shortdata'	=> get_request('def_shortdata', ''),
@@ -117,7 +118,11 @@ elseif (hasRequest('save')) {
 		'recovery_msg'	=> get_request('recovery_msg', 0),
 		'r_shortdata'	=> get_request('r_shortdata', ''),
 		'r_longdata'	=> get_request('r_longdata', ''),
-		'conditions'	=> get_request('conditions', array()),
+		'filter'		=> array(
+			'conditions'	=> getRequest('conditions', array()),
+			'evaltype'		=> getRequest('evaltype', 0),
+			'formula'		=> getRequest('formula')
+		),
 		'operations'	=> get_request('operations', array())
 	);
 
@@ -364,11 +369,18 @@ if (hasRequest('form')) {
 		$data['action'] = API::Action()->get(array(
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectConditions' => API_OUTPUT_EXTEND,
+			'selectFilter' => array('formula', 'conditions', 'conditiontype', 'operator', 'value'),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$data['action'] = reset($data['action']);
+
+		$filter = $data['action']['filter'];
+		unset($data['action']['filter']);
+		$data['action']['evaltype'] = $filter['evaltype'];
+		$data['action']['formula'] = $filter['formula'];
+		$data['action']['conditions'] = $filter['conditions'];
+
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
@@ -376,6 +388,7 @@ if (hasRequest('form')) {
 			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 		);
 		$data['evaltype'] = getRequest('evaltype');
+		$data['formula'] = getRequest('formula');
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
@@ -385,6 +398,7 @@ if (hasRequest('form')) {
 	else {
 		$data['action']['name'] = get_request('name');
 		$data['action']['evaltype'] = get_request('evaltype', 0);
+		$data['action']['formula'] = getRequest('formula');
 		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = get_request('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
@@ -467,7 +481,8 @@ if (hasRequest('form')) {
 				'esc_period' => 0,
 				'esc_step_from' => 1,
 				'esc_step_to' => 1,
-				'evaltype' => 0
+				'evaltype' => 0,
+				''
 			);
 		}
 	}
@@ -487,12 +502,20 @@ else {
 	$data['actions'] = API::Action()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => array('eventsource' => array($data['eventsource'])),
-		'selectConditions' => API_OUTPUT_EXTEND,
+		'selectFilter' => array('formula', 'conditions', 'conditiontype', 'operator', 'value'),
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
+
+	foreach ($data['actions'] as &$action) {
+		$filter = $action['filter'];
+		unset($action['filter']);
+		$action['evaltype'] = $filter['evaltype'];
+		$action['formula'] = $filter['formula'];
+		$action['conditions'] = $filter['conditions'];
+	}
 
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());

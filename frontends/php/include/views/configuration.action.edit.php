@@ -98,7 +98,8 @@ foreach ($this->data['action']['conditions'] as $condition) {
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
-			)
+			),
+			new CVar('conditions[' . $i . '][formulaid]', $label)
 		),
 		null, 'conditions_'.$i
 	);
@@ -106,11 +107,29 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$i++;
 }
 
+$formula = new CTextBox('formula', $this->data['action']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
+$formula->attr('id', 'formula');
+$formula->attr('placeholder', 'A or (B and C) &hellip;');
+if ($this->data['action']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
+	$formula->addClass('hidden');
+}
+
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
 $calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
-$conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
+$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression'));
+
+$conditionFormList->addRow(
+	_('Type of calculation'),
+	array(
+		$calculationTypeComboBox,
+		new CSpan('', ($this->data['action']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'conditionLabel'),
+		$formula
+	),
+	false,
+	'conditionRow'
+);
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append new condition to form list
