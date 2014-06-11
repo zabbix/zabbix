@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+..F....... [ZBX-8301] restricted "unique" attribute to Zabbix agent & SNMP checks in discovery rule creation (Andrejs)
 .......PS. [ZBX-8095] fixed a bug in item queue that updated item's nextcheck but not its position in the queue (asaveljevs)
 ...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 .......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
