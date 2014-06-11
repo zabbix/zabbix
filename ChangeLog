@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 ....I..... [ZBX-8306] added Percona database support when compiling with --with-mysql configuration option (wiper)
 .......PS. [ZBX-8287] added truncating of long text values to maximum field length before inserting into database (Andris)
@@ -181,6 +182,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc2
 
 Bug fixes:
+........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.4rc1
