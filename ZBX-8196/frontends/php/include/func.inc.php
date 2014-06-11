@@ -1429,14 +1429,18 @@ function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP, arr
 			return;
 		}
 
+		if (!in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+			error(_s('Incorrect sort direction "%1$s", must be either "%2$s" or "%3$s".',
+				$_REQUEST['sortorder'], ZBX_SORT_UP, ZBX_SORT_DOWN)
+			);
+			invalid_url();
+			// we do not want the profile to be updated with wrong value
+			return;
+		}
+
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
-
-	if (!str_in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
-		$_REQUEST['sortorder'] = ZBX_SORT_UP;
-	}
-
-	CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 }
 
 // creates header col for sorting in table header
