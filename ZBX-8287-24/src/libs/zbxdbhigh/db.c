@@ -2440,7 +2440,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_execute                                            *
+ * Function: zbx_db_insert_autoincrement                                      *
  *                                                                            *
  * Purpose: executes the prepared database bulk insert operation              *
  *                                                                            *
