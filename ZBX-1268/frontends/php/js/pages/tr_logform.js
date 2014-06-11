@@ -154,7 +154,7 @@ function add_logexpr() {
 	bt_and.disabled = false;
 	bt_or.disabled = false;
 
-	processArrows();
+	processExpressionList();
 }
 
 function remove_expression(expr_id) {
@@ -179,14 +179,18 @@ function remove_expression(expr_id) {
 		expr_tr.parentNode.removeChild(expr_tr);
 	}
 
-	processArrows();
+	processExpressionList();
 }
 
-function processArrows() {
+function processExpressionList() {
 	actions = jQuery('#exp_list td:nth-child(3) .updown');
 	actions.show();
 	actions.first().hide();
 	actions.last().hide();
+
+	rows = jQuery('#exp_list tr').not(':first');
+	rows.filter(':even').attr('class', 'even_row');
+	rows.filter(':odd').attr('class', 'odd_row');
 }
 
 function element_up(elementid) {
@@ -203,7 +207,7 @@ function element_up(elementid) {
 		swapNodesNames(c2_obj, c_obj);
 	}
 
-	processArrows();
+	processExpressionList();
 }
 
 function element_down(elementid) {
@@ -220,7 +224,7 @@ function element_down(elementid) {
 		swapNodesNames(c_obj, c2_obj);
 	}
 
-	processArrows();
+	processExpressionList();
 }
 
 function swapNodes(n1, n2) {
