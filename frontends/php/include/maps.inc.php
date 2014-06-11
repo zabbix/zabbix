@@ -985,8 +985,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
-		$submapHostApplicationFilters = getSubmapHostApplicationFilters($selements, $selementIdToSubSysmaps,
-			$hostsFromHostGroups, $hostGroupIdToSelementIds
+		$submapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
+			$hostsFromHostGroups
 		);
 		$selements = filterSysmapTriggers($selements, $submapHostApplicationFilters, $triggers);
 
@@ -1164,30 +1164,23 @@ function getSelementsInfo($sysmap, array $options = array()) {
 /**
  * Takes sysmap selements array, applies filtering by application to triggers and returns sysmap selements array.
  *
- * @param array $selements                      selements of current sysmap
- * @param array $submapHostApplicationFilters   a list of application filters applied to each host under each sub map
- *                                              @see getSubmapHostApplicationFilters()
- * @param array $triggers                       triggers that are relevant to filtering
+ * @param array $selements                          selements of current sysmap
+ * @param array $selementHostApplicationFilters     a list of application filters applied to each host under each element
+ *                                                  @see getSelementHostApplicationFilters()
+ * @param array $triggers                           triggers that are relevant to filtering
  *
  * @return array
  */
-function filterSysmapTriggers(array $selements, array $submapHostApplicationFilters, array $triggers) {
-	/**
-	 * Calculate list of triggers that might get removed from $selement['triggers'].
-	 */
+function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters, array $triggers) {
+	// calculate list of triggers that might get removed from $selement['triggers']
 	$triggersToFilter = array();
 	foreach ($selements as $selementId => $selement) {
 		foreach ($selement['triggers'] as $triggerId) {
-			if ($selement['application'] !== '') {
-				$triggersToFilter[$triggerId] = $triggers[$triggerId];
-			}
-			else {
-				$trigger = $triggers[$triggerId];
-				foreach ($trigger['hosts'] as $host) {
-					$hostId = $host['hostid'];
-					if (isset($submapHostApplicationFilters[$selementId][$hostId])) {
-						$triggersToFilter[$triggerId] = $trigger;
-					}
+			$trigger = $triggers[$triggerId];
+			foreach ($trigger['hosts'] as $host) {
+				$hostId = $host['hostid'];
+				if (isset($selementHostApplicationFilters[$selementId][$hostId])) {
+					$triggersToFilter[$triggerId] = $trigger;
 				}
 			}
 		}
@@ -1198,10 +1191,7 @@ function filterSysmapTriggers(array $selements, array $submapHostApplicationFilt
 		return $selements;
 	}
 
-	/**
-	 * Produce mapping of trigger to application names it is related to and
-	 * produce mapping of host to triggers.
-	 */
+	// produce mapping of trigger to application names it is related to and produce mapping of host to triggers
 	$itemIds = array();
 	foreach ($triggersToFilter as $trigger) {
 		foreach ($trigger['items'] as $item) {
@@ -1231,37 +1221,22 @@ function filterSysmapTriggers(array $selements, array $submapHostApplicationFilt
 	}
 
 	foreach ($selements as $selementId => &$selement) {
-		// sub maps
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			// walk through each host of a submap and apply its filters to all its triggers
-			foreach ($selement['hosts'] as $hostId) {
-				// skip hosts that don't have any filters or triggers
-				if (!isset($hostIdToTriggers[$hostId]) || !isset($submapHostApplicationFilters[$selementId][$hostId])) {
-					continue;
-				}
-
-				// remove the triggers that don't have applications or don't match the filter
-				$filteredApplicationNames = $submapHostApplicationFilters[$selementId][$hostId];
-				foreach ($hostIdToTriggers[$hostId] as $trigger) {
-					$applicationNamesForTrigger = isset($triggerApplications[$trigger['triggerid']])
-						? array_keys($triggerApplications[$trigger['triggerid']])
-						: array();
-
-					if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
-						unset($selement['triggers'][$trigger['triggerid']]);
-					}
-				}
-			}
-		}
-		// hosts and host groups
-		else {
-			if ($selement['application'] === '') {
+		// walk through each host of a submap and apply its filters to all its triggers
+		foreach ($selement['hosts'] as $hostId) {
+			// skip hosts that don't have any filters or triggers to filter
+			if (!isset($hostIdToTriggers[$hostId]) || !isset($selementHostApplicationFilters[$selementId][$hostId])) {
 				continue;
 			}
 
-			foreach ($selement['triggers'] as $triggerId) {
-				if (!isset($triggerApplications[$triggerId][$selement['application']])) {
-					unset($selement['triggers'][$triggerId]);
+			// remove the triggers that don't have applications or don't match the filter
+			$filteredApplicationNames = $selementHostApplicationFilters[$selementId][$hostId];
+			foreach ($hostIdToTriggers[$hostId] as $trigger) {
+				$applicationNamesForTrigger = isset($triggerApplications[$trigger['triggerid']])
+					? array_keys($triggerApplications[$trigger['triggerid']])
+					: array();
+
+				if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
+					unset($selement['triggers'][$trigger['triggerid']]);
 				}
 			}
 		}
@@ -1272,79 +1247,81 @@ function filterSysmapTriggers(array $selements, array $submapHostApplicationFilt
 }
 
 /**
- * Returns a list of application filters applied to each host under each sub map.
+ * Returns a list of application filters applied to each host under each element.
  *
  * @param array $selements                  selements of current sysmap
  * @param array $selementIdToSubSysmaps     all sub-sysmaps used in current sysmap, indexed by selementId
  * @param array $hostsFromHostGroups        collection of hosts that get included via host groups
- * @param array $hostGroupIdToSelementIds   a mapping from hostGroupId to selementIds it is used in
  *
  * @return array    a two-dimensional array with element IDs as the primary key, host IDs as the secondary key
  *                  application names as values
  */
-function getSubmapHostApplicationFilters(array $selements, array $selementIdToSubSysmaps, array $hostsFromHostGroups,
-	array $hostGroupIdToSelementIds) {
-
-	$submapHostApplicationFilters = array();
-	$submapHostGroupApplicationFilters = array();
-
-	/*
-	 * Fetch application names from all selements of sub-sysmaps (including indirect) into
-	 * $submapHostGroupApplicationFilters for host groups and $submapHostApplicationFilters for hosts.
-	 */
-	foreach ($selements as $selementId => &$selement) {
-		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_MAP) {
-			continue;
-		}
-
-		foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
-			foreach ($subSysmap['selements'] as $subSysmapSelement) {
-				switch ($subSysmapSelement['elementtype']) {
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						if ($subSysmapSelement['application'] !== '') {
-							$hostGroupId = $subSysmapSelement['elementid'];
-							$submapHostGroupApplicationFilters[$selementId][$hostGroupId][] = $subSysmapSelement['application'];
-						}
-						break;
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						if ($subSysmapSelement['application'] !== '') {
-							$hostId = $subSysmapSelement['elementid'];
-							$submapHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
-						}
-						break;
-				}
-			}
+function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps, array $hostsFromHostGroups) {
+	$groupIdToHostIds = array();
+	foreach ($hostsFromHostGroups as $host) {
+		foreach ($host['groups'] as $group) {
+			$groupIdToHostIds[$group['groupid']][$host['hostid']] = $host['hostid'];
 		}
 	}
-	unset($selement);
 
-	/*
-	 * Update $submapHostApplicationFilters by taking into account if hosts from host groups have
-	 * any application filters or no. Reset application filtering for host if host does not have any
-	 * filtering in host group it is in.
-	 */
-	foreach ($hostsFromHostGroups as $hostId => $host) {
-		foreach ($host['groups'] as $group) {
-			$groupId = $group['groupid'];
+	$selementHostApplicationFilters = array();
+	foreach ($selements as $selementId => $selement) {
+		switch ($selement['elementtype']) {
+			case SYSMAP_ELEMENT_TYPE_HOST:
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				// skip host and host group elements with an empty filter
+				if ($selement['application'] === '') {
+					continue 2;
+				}
 
-			if (!isset($hostGroupIdToSelementIds[$groupId])) {
-				continue;
-			}
+				foreach ($selement['hosts'] as $hostId) {
+					$selementHostApplicationFilters[$selementId][$hostId][] = $selement['application'];
+				}
 
-			foreach ($hostGroupIdToSelementIds[$groupId] as $selementId) {
-				if (isset($submapHostGroupApplicationFilters[$selementId][$groupId])) {
-					foreach ($submapHostGroupApplicationFilters[$selementId][$groupId] as $applicationFilter) {
-						$submapHostApplicationFilters[$selementId][$hostId][] = $applicationFilter;
+				break;
+
+			case SYSMAP_ELEMENT_TYPE_MAP:
+				foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
+					// first, add all filters set for host elements
+					foreach ($subSysmap['selements'] as $subSysmapSelement) {
+						if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
+								|| $subSysmapSelement['application'] === '') {
+
+							continue;
+						}
+
+						$hostId = $subSysmapSelement['elementid'];
+						$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
+					}
+
+					// then iterate over all host group elements
+					// if the host group has no application filter - reset the filter for all its hosts
+					// otherwise - apply the same filter to each host
+					foreach ($subSysmap['selements'] as $subSysmapSelement) {
+						if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+							continue;
+						}
+
+						$groupId = $subSysmapSelement['elementid'];
+
+						if ($subSysmapSelement['application'] === '') {
+							foreach ($groupIdToHostIds[$groupId] as $hostId) {
+								unset($selementHostApplicationFilters[$selementId][$hostId]);
+							}
+						}
+						else {
+							foreach ($groupIdToHostIds[$groupId] as $hostId) {
+								$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
+							}
+						}
 					}
 				}
-				else {
-					unset($submapHostApplicationFilters[$selementId][$hostId]);
-				}
-			}
+
+				break;
 		}
 	}
 
-	return $submapHostApplicationFilters;
+	return $selementHostApplicationFilters;
 }
 
 function separateMapElements($sysmap) {
