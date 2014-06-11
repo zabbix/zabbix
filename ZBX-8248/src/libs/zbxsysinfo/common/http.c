@@ -187,7 +187,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (s = buffer, p = s; '\0' != *s; s++)
 		{
-			size_t	offset = 1;
+			size_t	offset = 0;
 
 			if ('\r' == *s)
 			{
@@ -200,7 +200,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 					break;
 
 				s += offset;
-				p = s;
+				p = s + 1;
 			}
 		}
 	}
