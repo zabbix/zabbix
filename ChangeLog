@@ -1,6 +1,7 @@
 Changes for 2.2.4rc2
 
 Bug fixes:
+.......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
 ........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 
 --------------------------------------------------------------------------------
