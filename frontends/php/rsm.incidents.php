@@ -212,7 +212,7 @@ if ($host || $data['filter_search']) {
 					RSM_SLV_EPP_AVAIL
 				)
 			),
-			'output' => array('itemid', 'hostid', 'key_', 'lastvalue'),
+			'output' => array('itemid', 'hostid', 'key_', 'lastvalue', 'lastclock'),
 			'preservekeys' => true
 		));
 
@@ -231,21 +231,25 @@ if ($host || $data['filter_search']) {
 					case RSM_SLV_DNS_ROLLWEEK:
 						$data['dns']['itemid'] = $item['itemid'];
 						$data['dns']['slv'] = sprintf('%.3f', $item['lastvalue']);
+						$data['dns']['slvTestTime'] = sprintf('%.3f', $item['lastclock']);
 						$data['dns']['events'] = array();
 						break;
 					case RSM_SLV_DNSSEC_ROLLWEEK:
 						$data['dnssec']['itemid'] = $item['itemid'];
 						$data['dnssec']['slv'] = sprintf('%.3f', $item['lastvalue']);
+						$data['dnssec']['slvTestTime'] = sprintf('%.3f', $item['lastclock']);
 						$data['dnssec']['events'] = array();
 						break;
 					case RSM_SLV_RDDS_ROLLWEEK:
 						$data['rdds']['itemid'] = $item['itemid'];
 						$data['rdds']['slv'] = sprintf('%.3f', $item['lastvalue']);
+						$data['rdds']['slvTestTime'] = sprintf('%.3f', $item['lastclock']);
 						$data['rdds']['events'] = array();
 						break;
 					case RSM_SLV_EPP_ROLLWEEK:
 						$data['epp']['itemid'] = $item['itemid'];
 						$data['epp']['slv'] = sprintf('%.3f', $item['lastvalue']);
+						$data['epp']['slvTestTime'] = sprintf('%.3f', $item['lastclock']);
 						$data['epp']['events'] = array();
 						break;
 					case RSM_SLV_DNS_AVAIL:

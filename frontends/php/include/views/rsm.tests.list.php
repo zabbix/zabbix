@@ -147,7 +147,7 @@ $filterTable->addRow(array(
 		new CLink(
 			'Rolling week',
 			null,
-			'spaces',
+			'spaces pointer',
 			'javascript: location.href = "rsm.tests.php?filter_rolling_week=1";'
 		)
 	)

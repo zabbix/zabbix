@@ -155,7 +155,7 @@ $filterTable->addRow(array(
 		new CLink(
 			'Rolling week',
 			null,
-			'time-period',
+			'time-period pointer',
 			'rollingweek('.$this->data['type'].', \''.$this->data['sid'].'\');'
 		)
 	)
@@ -283,7 +283,11 @@ if (isset($this->data['tld'])) {
 			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['dns']['delay'], 's'))
 		));
 
-		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dns']['slv'].'%'), 'rolling-week-status');
+		$rollingWeek = array(
+			new CSpan(_s('%1$s Rolling week status', $this->data['dns']['slv'].'%'), 'rolling-week-status'),
+			BR(),
+			new CSpan(date('d.m.Y H:i', $this->data['dns']['slvTestTime']), 'floatright'),
+		);
 		$dnsInfoTable->addRow(array($details, $rollingWeek));
 		$dnsTab->additem($dnsInfoTable);
 
@@ -361,8 +365,10 @@ if (isset($this->data['tld'])) {
 			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['dnssec']['delay'], 's'))
 		));
 
-		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['dnssec']['slv'].'%'),
-			'rolling-week-status'
+		$rollingWeek = array(
+			new CSpan(_s('%1$s Rolling week status', $this->data['dnssec']['slv'].'%'), 'rolling-week-status'),
+			BR(),
+			new CSpan(date('d.m.Y H:i', $this->data['dnssec']['slvTestTime']), 'floatright'),
 		);
 		$dnssecInfoTable->addRow(array($details, $rollingWeek));
 		$dnssecTab->additem($dnssecInfoTable);
@@ -441,7 +447,11 @@ if (isset($this->data['tld'])) {
 			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['rdds']['delay'], 's'))
 		));
 
-		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['rdds']['slv'].'%'), 'rolling-week-status');
+		$rollingWeek = array(
+			new CSpan(_s('%1$s Rolling week status', $this->data['rdds']['slv'].'%'), 'rolling-week-status'),
+			BR(),
+			new CSpan(date('d.m.Y H:i', $this->data['rdds']['slvTestTime']), 'floatright'),
+		);
 		$rddsInfoTable->addRow(array($details, $rollingWeek));
 		$rddsTab->additem($rddsInfoTable);
 
@@ -519,7 +529,11 @@ if (isset($this->data['tld'])) {
 			array(array(bold(_('Frequency/delay')), ':'.SPACE), convert_units($this->data['epp']['delay'], 's'))
 		));
 
-		$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['epp']['slv'].'%'), 'rolling-week-status');
+		$rollingWeek = array(
+			new CSpan(_s('%1$s Rolling week status', $this->data['epp']['slv'].'%'), 'rolling-week-status'),
+			BR(),
+			new CSpan(date('d.m.Y H:i', $this->data['epp']['slvTestTime']), 'floatright'),
+		);
 		$eppInfoTable->addRow(array($details, $rollingWeek));
 		$eppTab->additem($eppInfoTable);
 

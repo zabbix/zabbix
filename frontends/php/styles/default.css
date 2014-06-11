@@ -891,7 +891,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* flickerfreescreen */
 .flickerfreescreen .shadow { background-color: #000000; }
 
-/* DNS TEST pages */
+/* SLA monitoring */
 .rolling-week-status .filter .checkbox-block { margin-left: 15px; }
 .rolling-week-status .filter .select-block { margin-left: 20px; }
 .rolling-week-status .tableinfo .first-cell-value { width: 65px; display: inline-block; }
@@ -903,7 +903,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 .incidents .rolling-week-status { font-size: 16px; font-weight: bold; float: right; }
 
 .incident-details .filter .spaces { margin-left: 20px; }
-.incident-details .rolling-week-status { font-size: 16px; font-weight: bold; float: right; margin: -20px 10px; }
+.incident-details .rolling-week-status { font-size: 16px; font-weight: bold; float: right; }
 
 .tests .filter .spaces { margin-left: 20px; }
 .tests .info-block .first-row-element { width: 300px; display: inline-block; }
@@ -918,3 +918,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 .tests .info-block,
 .particular-test .info-block,
 .particular-proxy .info-block { text-align: left; width: 100%; }
+
+.incident-details .filter tr td,
+.tests .filter tr td,
+.particular-test .filter tr td,
+.particular-proxy .filter tr td { border: 0; }

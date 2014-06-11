@@ -147,7 +147,7 @@ $filterTable->addRow(array(
 		new CLink(
 			'Rolling week',
 			null,
-			'spaces',
+			'spaces pointer',
 			'javascript: location.href = "rsm.incidentdetails.php?filter_rolling_week=1";'
 		),
 		new CSpan(
@@ -261,8 +261,13 @@ $details = array(
 	new CSpan(array(bold(_('Incident type')), ':', SPACE, $incidentType))
 );
 
-$rollingWeek = new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status');
-$detailsInfoTable->addRow(array(array($details, $rollingWeek)));
+$rollingWeek = array(
+	new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status'),
+	BR(),
+	new CSpan(date('d.m.Y H:i', $this->data['slvTestTime']), 'floatright'),
+);
+
+$detailsInfoTable->addRow(array($details, $rollingWeek));
 $rsmWidget->additem($detailsInfoTable);
 
 $rsmWidget->additem(array($data['paging'], $detailsTable, $data['paging']));
