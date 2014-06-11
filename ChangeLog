@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Polish, Russian and Slovak translations; thanks to
 ..F....... [ZBX-8113] setup now stores info in session instead of cookies (Andrejs)
 
 Bug fixes:
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 .......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
 ........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
@@ -183,6 +184,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.4rc2
 
 Bug fixes:
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 .......PS. [ZBX-8325] fixed crash with Oracle when inserting large number of records (wiper)
 ........S. [ZBX-8336] fixed server crash with value cache is working in low memory mode (wiper)
 
@@ -1163,6 +1165,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8327] fixed possible crash when processing Windows eventlog (wiper)
 .......PS. [ZBX-8188] fixed IPMI items staying supported when sensor data becomes unavailable (asaveljevs, dimir)
 .......PS. [ZBX-7576] when pinging a broadcast address ignore responses from other addresses (wiper)
@@ -2721,6 +2724,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.21rc1
 
+...G...PS. [ZBX-8343] fixed a bug in binary heap that could cause a slightly inconsistent ordering of elements in the queue (asaveljevs)
 ...G...... [ZBX-8198] decreased verbosity of Windows agent with DebugLevel=4 (Nikolaj)
 A.F....... [ZBX-7930] improved SQL performance and execution time in Maintenance page (Ivo)
 
