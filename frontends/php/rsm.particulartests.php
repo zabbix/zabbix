@@ -74,14 +74,10 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	// macro
 	if ($data['type'] == RSM_DNS || $data['type'] == RSM_DNSSEC) {
 		$calculatedItemKey[] = CALCULATED_ITEM_DNS_DELAY;
-		if ($data['type'] == RSM_DNS) {
-			$data['offlineProbes'] = 0;
-			$data['downProbes'] = 0;
-			$data['resultProbes'] = 0;
-			$data['totalAvailProbes'] = 0;
-			$data['totalProbes'] = 0;
-		}
-		else {
+		$data['downProbes'] = 0;
+		$data['totalProbes'] = 0;
+
+		if ($data['type'] == RSM_DNSSEC) {
 			$data['totalTests'] = 0;
 		}
 	}
@@ -267,11 +263,11 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	foreach ($probeItems as $probeItem) {
 		// manual items
-		if ($probeItem['key_'] != PROBE_STATUS_MANUAL) {
+		if ($probeItem['key_'] == PROBE_STATUS_MANUAL) {
 			$manualItemIds[] = $probeItem['itemid'];
 		}
 		// automatic items
-		if ($probeItem['key_'] != PROBE_STATUS_AUTOMATIC) {
+		if ($probeItem['key_'] == PROBE_STATUS_AUTOMATIC) {
 			$automaticItemIds[$probeItem['itemid']] = $probeItem['hostid'];
 		}
 	}
@@ -292,8 +288,8 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 			'SELECT h.value'.
 			' FROM history_uint h'.
 			' WHERE h.itemid='.$itemId.
-				' AND h.clock>='.$testTimeFrom.
-				' AND h.clock<='.$testTimeTill,
+				' AND h.clock<='.$testTimeTill.
+			' ORDER BY h.clock DESC',
 			1
 		)));
 
@@ -508,16 +504,6 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	}
 
 	CArrayHelper::sort($data['probes'], array('name'));
-
-	// get probes statistics
-	foreach ($data['probes'] as $probe) {
-		// DNS service
-		if ($data['type'] == RSM_DNS) {
-			if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
-				$data['offlineProbes']++;
-			}
-		}
-	}
 }
 else {
 	access_deny();

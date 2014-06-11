@@ -68,6 +68,13 @@ $offline = new CSpan(_('Offline'), 'gray');
 $noResult = new CSpan(_('No result'), 'gray');
 $up = new CSpan(_('Up'), 'green');
 
+$offlineProbes = 0;
+
+if ($this->data['type'] == RSM_DNSSEC) {
+	$testUp = 0;
+	$testDown = 0;
+}
+
 foreach ($this->data['probes'] as $probe) {
 	$status = null;
 	if (isset($probe['status']) && $probe['status'] === PROBE_DOWN) {
@@ -82,6 +89,8 @@ foreach ($this->data['probes'] as $probe) {
 		else {
 			$epp = $offline;
 		}
+
+		$offlineProbes++;
 	}
 	else {
 		if ($this->data['type'] == RSM_DNS) {
@@ -122,10 +131,12 @@ foreach ($this->data['probes'] as $probe) {
 				if ($probe['value']['ok']) {
 					$values[] = _s('%1$s OK', $probe['value']['ok']);
 					$okResults = true;
+					$testUp += $probe['value']['ok'];
 				}
 				if ($probe['value']['fail']) {
 					$values[] = _s('%1$s FAILED', $probe['value']['fail']);
 					$failResults = true;
+					$testDown += $probe['value']['fail'];
 				}
 				if ($probe['value']['noResult']) {
 					$values[] = _s('%1$s NO RESULT', $probe['value']['noResult']);
@@ -141,10 +152,7 @@ foreach ($this->data['probes'] as $probe) {
 				}
 				elseif ($noResults && !$okResults && !$failResults) {
 					$class = 'gray';
-
-					if ($this->data['type'] == RSM_DNS) {
-						$noResultProbes++;
-					}
+					$noResultProbes++;
 				}
 				else {
 					$class = null;
@@ -235,31 +243,41 @@ foreach ($this->data['probes'] as $probe) {
 	$particularTestsTable->addRow($row);
 }
 if ($this->data['type'] == RSM_DNS) {
-	if ($this->data['totalAvailProbes'] != 0) {
-		$availProbes = round($this->data['availProbes'] / $this->data['totalAvailProbes'] * 100,
-			ZBX_UNITS_ROUNDOFF_UPPER_LIMIT
-		);
-	}
-	else {
-		$availProbes = 0;
-	}
-
 	$additionInfo = array(
 		new CSpan(array(bold(_('Probes total')), ':', SPACE, $this->data['totalProbes'])),
 		BR(),
-		new CSpan(array(bold(_('Probes offline')), ':', SPACE, $this->data['offlineProbes'])),
+		new CSpan(array(bold(_('Probes offline')), ':', SPACE, $offlineProbes)),
 		BR(),
 		new CSpan(array(bold(_('Probes with No Result')), ':', SPACE, $noResultProbes)),
 		BR(),
 		new CSpan(array(bold(_('Probes with Result')), ':', SPACE,
-			$this->data['totalProbes'] - $this->data['offlineProbes'] - $noResultProbes
+			$this->data['totalProbes'] - $offlineProbes - $noResultProbes
 		)),
 		BR(),
 		new CSpan(array(bold(_('Probes Up')), ':', SPACE,
-			$this->data['totalProbes'] - $this->data['offlineProbes'] - $noResultProbes - $this->data['downProbes']
+			$this->data['totalProbes'] - $offlineProbes - $noResultProbes - $this->data['downProbes']
 		)),
 		BR(),
 		new CSpan(array(bold(_('Probes Down')), ':', SPACE, $this->data['downProbes']))
+	);
+}
+elseif ($this->data['type'] == RSM_DNSSEC) {
+	$additionInfo = array(
+		new CSpan(array(bold(_('Probes total')), ':', SPACE, $this->data['totalProbes'])),
+		BR(),
+		new CSpan(array(bold(_('Probes offline')), ':', SPACE, $offlineProbes)),
+		BR(),
+		new CSpan(array(bold(_('Probes with No Result')), ':', SPACE, $noResultProbes)),
+		BR(),
+		new CSpan(array(bold(_('Probes with Result')), ':', SPACE,
+			$this->data['totalProbes'] - $offlineProbes - $noResultProbes
+		)),
+		BR(),
+		new CSpan(array(bold(_('Tests total')), ':', SPACE, $this->data['totalTests'])),
+		BR(),
+		new CSpan(array(bold(_('Tests Up')), ':', SPACE, $testUp)),
+		BR(),
+		new CSpan(array(bold(_('Tests Down')), ':', SPACE, $testDown))
 	);
 }
 
@@ -294,7 +312,7 @@ $particularTests = array(
 );
 
 $tableHeader[] = $particularTests;
-if ($this->data['type'] == RSM_DNS) {
+if ($this->data['type'] == RSM_DNS || $this->data['type'] == RSM_DNSSEC) {
 	$tableHeader[] = $additionInfo;
 }
 
