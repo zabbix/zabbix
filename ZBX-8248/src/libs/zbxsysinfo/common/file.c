@@ -244,7 +244,6 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL != ptr)
 		{
-			zbx_rtrim(ptr, "\r\n ");
 			SET_STR_RESULT(result, ptr);
 			break;
 		}
