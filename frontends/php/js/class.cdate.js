@@ -105,9 +105,6 @@ CDate.prototype = {
 				return yr + '/' + appZr(mnth + 1) + '/' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'Y-m-d H:i':
 				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
-			case 'Y-m-d H:i:s':
-				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
-					':' + appZr(sec);
 			case 'Y-m-d':
 				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt);
 			case 'H:i:s':
@@ -122,9 +119,13 @@ CDate.prototype = {
 				return  yr + ' ' + shortMn[mnth] + ' ' +appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts);
 			case 'd.m.Y H:i':
 				return appZr(dt) + '.' + appZr(mnth + 1) + '.' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			case 'd. m. Y H:i':
+				return appZr(dt) + '. ' + appZr(mnth + 1) + '. ' + yr + ' ' + appZr(hrs) + ':' + appZr(mnts);
+			default:
+				// defaults to Y-m-d H:i:s
+				return yr + '-' + appZr(mnth + 1) + '-' + appZr(dt) + ' ' + appZr(hrs) + ':' + appZr(mnts) +
+					':' + appZr(sec);
 		}
-
-		return false;
 	},
 
 	getZBXDate: function() {
