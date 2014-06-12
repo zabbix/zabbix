@@ -145,39 +145,6 @@ class GlobalRegExp {
 	}
 
 	/**
-	 * Validates regular expressions, throws exception with PCRE error message. String expressions are considered always valid.
-	 *
-	 * @static
-	 *
-	 * @param array $expressions
-	 * @throws Exception
-	 */
-	public static function validateExpressions(array $expressions)
-	{
-		foreach ($expressions as $expression) {
-			if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
-				$pattern = self::buildRegularExpression($expression);
-
-				$error = false;
-
-				set_error_handler(function ($errno, $errstr) use (&$error) {
-					if ($errstr != '') {
-						$error = $errstr;
-					}
-				});
-
-				preg_match($pattern, null);
-
-				restore_error_handler();
-
-				if ($error) {
-					throw new \Exception(_('Error in regular expression syntax:').' '.str_replace('preg_match(): ', '', $error));
-				}
-			}
-		}
-	}
-
-	/**
 	 * Matches expression against test string, respecting expression type.
 	 *
 	 * @static
