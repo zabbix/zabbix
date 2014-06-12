@@ -187,19 +187,16 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (s = buffer, p = s; '\0' != *s; s++)
 		{
-			size_t	offset = 0;
-
-			if ('\r' == *s || '\n' == *s)
+			if ('\n' == *s)
 			{
-				if ('\r' == *s && '\n' == *(s + 1))
-					offset++;
-
-				*s = '\0';
+				if (s > p && '\r' == *(s - 1))
+					*(s - 1) = '\0';
+				else
+					*s = '\0';
 
 				if (NULL != (ptr = zbx_regexp_sub(p, regexp, output)))
 					break;
 
-				s += offset;
 				p = s + 1;
 			}
 		}
