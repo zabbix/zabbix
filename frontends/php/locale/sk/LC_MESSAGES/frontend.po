@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:32+0300\n"
-"PO-Revision-Date: 2014-06-05 07:10+0300\n"
+"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"PO-Revision-Date: 2014-06-09 18:28+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1401945019.0\n"
+"X-POOTLE-MTIME: 1402331313.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -42,9 +42,9 @@ msgstr[2] "%1$d dní"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "%1$d z %2$d problému je zobrazený"
-msgstr[1] "%1$d z %2$d problémov sú zobrazené"
-msgstr[2] "%1$d z %2$d problémov sú zobrazené"
+msgstr[0] "Zobrazený %1$d z %2$d problémov"
+msgstr[1] "Zobrazené %1$d z %2$d problémov"
+msgstr[2] "Zobrazené %1$d z %2$d problémov"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -498,7 +498,7 @@ msgstr "Pridať linku"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr "Pridať chýbajuce"
+msgstr "Pridať chýbajúce"
 
 #: include/views/configuration.item.massupdate.php:546
 msgid "Add new or existing applications"
@@ -531,7 +531,7 @@ msgstr "Pridať do skupín"
 
 #: auditlogs.php:128
 msgid "Added"
-msgstr "Pridané"
+msgstr "Pridanie"
 
 #: include/hosts.inc.php:69
 msgid "Admin"
@@ -5428,7 +5428,7 @@ msgstr "Filtrovať"
 
 #: tr_status.php:304
 msgid "Filter by application"
-msgstr "Filter podľa aplikácie"
+msgstr "Filtrovať podľa aplikácie"
 
 #: report2.php:322
 msgid "Filter by host group"
@@ -5436,7 +5436,7 @@ msgstr "Filter podľa skupiny"
 
 #: tr_status.php:340
 msgid "Filter by host inventory"
-msgstr "Filter podľa inventára hosta"
+msgstr "Filtrovať podľa inventára hosta"
 
 #: tr_status.php:303
 msgid "Filter by name"
@@ -5549,7 +5549,7 @@ msgstr "Frontend prístup aktualizovaný"
 
 #: include/views/administration.users.edit.php:230
 msgid "Frontend messaging"
-msgstr "Frontend správy"
+msgstr "Povoliť frontend správy"
 
 #: include/views/configuration.host.edit.php:869
 #: include/views/configuration.template.edit.php:461
@@ -6042,7 +6042,7 @@ msgstr "Hardvér"
 
 #: include/hosts.inc.php:175
 msgid "Hardware (Full details)"
-msgstr "Hardvér (podrobnosti)"
+msgstr "Hardvér (podrobne)"
 
 #: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.httpconf.popup.php:91
@@ -6893,7 +6893,7 @@ msgstr "Hneď"
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
 #: templates.php:477
 msgid "Import"
-msgstr "Import"
+msgstr "Importovať"
 
 #: conf.import.php:138
 msgid "Import failed"
@@ -6901,7 +6901,7 @@ msgstr "Import zlyhal"
 
 #: include/views/conf.import.php:64
 msgid "Import file"
-msgstr "Importovať súbor"
+msgstr "Importovaný súbor"
 
 #: conf.import.php:138
 msgid "Imported successfully"
@@ -8642,7 +8642,7 @@ msgstr "Prihlásený ako"
 #: include/views/administration.authentication.edit.php:111
 #: include/views/administration.users.list.php:60
 msgid "Login"
-msgstr "Prihlásiť"
+msgstr "Prihlásenie"
 
 #: include/views/general.login.php:80
 msgid "Login as Guest"
@@ -8670,7 +8670,7 @@ msgstr "Nesprávne prihlasovacie meno alebo heslo."
 #: auditlogs.php:140 include/page_header.php:222 include/page_header.php:226
 #: include/views/administration.auditlogs.list.php:44
 msgid "Logout"
-msgstr "Odhlásiť"
+msgstr "Odhlásenie"
 
 #: include/discovery.inc.php:156
 msgid "Lost"
@@ -10283,7 +10283,7 @@ msgstr "Nenájdené žiadne scenáre."
 #: include/views/configuration.item.edit.php:402
 #: include/views/configuration.item.edit.php:412
 msgid "None"
-msgstr "Žiadne"
+msgstr "Žiadna"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1519 popup.php:1425
@@ -10482,7 +10482,7 @@ msgstr "Počet nepodporovaných položiek v Zabbix databáze."
 
 #: include/blocks.inc.php:844
 msgid "Number of users (online)"
-msgstr "Počet používateľov (online)"
+msgstr "Počet používateľov (prihlásených)"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:499
@@ -10579,11 +10579,11 @@ msgstr "OS"
 
 #: include/hosts.inc.php:130
 msgid "OS (Full details)"
-msgstr "OS (podrobnosti)"
+msgstr "OS (podrobne)"
 
 #: include/hosts.inc.php:135
 msgid "OS (Short)"
-msgstr "OS (Krátko)"
+msgstr "OS (skrátene)"
 
 #: adm.other.php:124
 msgid "OTHER CONFIGURATION PARAMETERS"
@@ -11260,7 +11260,7 @@ msgstr "Prehrať"
 
 #: include/views/administration.users.edit.php:237
 msgid "Play sound"
-msgstr "Prehrať zvuk"
+msgstr "Prehrávať zvuk"
 
 #: include/setup.inc.php:231
 msgid "Please correct all issues and press \"Retry\" button"
@@ -13023,7 +13023,7 @@ msgstr "Softvér"
 
 #: include/hosts.inc.php:185
 msgid "Software (Full details)"
-msgstr "Softvér (podrobnosti)"
+msgstr "Softvér (podrobne)"
 
 #: include/hosts.inc.php:190
 msgid "Software application A"
@@ -14180,7 +14180,7 @@ msgstr "Typ"
 
 #: include/hosts.inc.php:110
 msgid "Type (Full details)"
-msgstr "Typ (podrobnosti)"
+msgstr "Typ (podrobne)"
 
 #: include/views/js/configuration.sysmaps.js.php:368
 msgid "Type (OK)"
@@ -14534,7 +14534,7 @@ msgstr "Aktualizovať"
 
 #: include/views/conf.import.php:23
 msgid "Update existing"
-msgstr "Aktulizovať existujúce"
+msgstr "Aktualizovať existujúce"
 
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:64
 #: items.php:156
@@ -14551,7 +14551,7 @@ msgstr "Interval obnovovania (v sekundách)"
 
 #: auditlogs.php:131 include/classes/class.cserverinfo.php:40
 msgid "Updated"
-msgstr "Aktualizované"
+msgstr "Aktualizácia"
 
 #: include/hosts.inc.php:560
 msgid "Updated status of host"
@@ -14828,7 +14828,7 @@ msgstr "Používatelia"
 
 #: include/classes/class.cserverinfo.php:41
 msgid "Users (online)"
-msgstr "Používatelia (online)"
+msgstr "Používatelia (prihlásení)"
 
 #: users.php:313
 msgid "Users unblocked"
@@ -15327,7 +15327,7 @@ msgstr "Šírka"
 #: include/views/configuration.maintenance.edit.php:41
 #: include/views/configuration.maintenance.list.php:70
 msgid "With data collection"
-msgstr "So zberom údajov"
+msgstr "So zbieraním údajov"
 
 #: tr_status.php:267
 msgid "With last event unacknowledged"
@@ -15518,15 +15518,15 @@ msgstr "Označenie osi Y"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d"
-msgstr "d. m. Y"
+msgstr "d.m.Y"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i"
-msgstr "d. m. Y H:i"
+msgstr "d.m.Y H:i"
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
-msgstr "d. m. Y H:i:s"
+msgstr "d.m.Y H:i:s"
 
 #: report3.php:70 report3.php:89 report4.php:111 report4.php:134
 #: report5.php:47

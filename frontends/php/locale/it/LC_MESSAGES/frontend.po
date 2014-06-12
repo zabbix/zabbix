@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-12 23:32+0300\n"
-"PO-Revision-Date: 2014-02-13 08:04+0300\n"
+"POT-Creation-Date: 2014-06-12 23:35+0300\n"
+"PO-Revision-Date: 2014-06-12 09:01+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1392271478.0\n"
+"X-POOTLE-MTIME: 1402556484.0\n"
 
 #: api/classes/CMaintenance.php:376 api/classes/CMaintenance.php:381
 #: api/classes/CMaintenance.php:513 api/classes/CMaintenance.php:518
@@ -667,7 +667,6 @@ msgid "Application added"
 msgstr "Applicazione aggiunta"
 
 #: applications.php:151 applications.php:186
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Applicazione eliminata"
@@ -1575,7 +1574,6 @@ msgid "Cannot delete action"
 msgstr "Impossibile cancellare l'azione"
 
 #: applications.php:151 applications.php:187
-#, fuzzy
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "Impossibile cancellare l'applicazione"
@@ -1619,7 +1617,6 @@ msgid "Cannot delete graphs created by low level discovery."
 msgstr "Impossibile rimuovere grafici creati da discovery di basso livello."
 
 #: hostgroups.php:168 hostgroups.php:186 usergrps.php:215 usergrps.php:243
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Impossibile rimuovere il gruppo"
@@ -2140,7 +2137,7 @@ msgstr "Impossibile includere file vista \"%s\"."
 
 #: popup_trexpr.php:774
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Impossibile inserire espressione trigger"
 
 #: api/classes/CUser.php:683
 msgid "Cannot insert user media."
@@ -4857,11 +4854,11 @@ msgstr "Risposta vuota ricevuta dal server Zabbix \"%1$s\"."
 
 #: api/classes/CScreen.php:471
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "ID schermata assente per la schermata"
 
 #: api/classes/CTemplateScreen.php:585
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "ID schermata assente per il template schermata."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5523,7 +5520,7 @@ msgstr "Funzione"
 #: popup_trexpr.php:695
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "Funzione \"%1$s\" non utilizzabile per l'item selezionato \"%2$s\""
 
 #: include/func.inc.php:680
 msgctxt "Giga short"
@@ -5735,12 +5732,12 @@ msgstr "Prototipo grafico"
 #: api/classes/CGraphPrototype.php:774
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Grafico prototipo \"%1$s\" contiene prototipi item provenineti da multiple regole discovery."
 
 #: api/classes/CGraphPrototype.php:780
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Grafico prototipo  \"%1$s\" deve avere almeno un prototipo item."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -5880,7 +5877,6 @@ msgid "Group added"
 msgstr "Gruppo aggiunto"
 
 #: hostgroups.php:168 hostgroups.php:185 usergrps.php:215 usergrps.php:243
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Gruppo rimosso"
@@ -7451,7 +7447,7 @@ msgstr "Errato ID Schermata \"%1$s\" fornita come elemento schermata."
 
 #: api/classes/CScreen.php:472
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "ID schermata non corretto."
 
 #: include/screens.inc.php:170 include/screens.inc.php:230
 msgid "Incorrect screen provided for slide show."
@@ -7499,7 +7495,7 @@ msgstr "Stato errato."
 
 #: api/classes/CTemplateScreen.php:586
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "Template ID schermata non corretto."
 
 #: api/classes/CUser.php:322
 #, c-format
@@ -7985,7 +7981,7 @@ msgstr "Item in stato \"non supportato\""
 
 #: popup_trexpr.php:769
 msgid "Item not selected"
-msgstr ""
+msgstr "Item non selezionato"
 
 #: include/forms.inc.php:1093
 msgid "Item prototype"
@@ -9562,12 +9558,12 @@ msgstr "Nessun \"%1$s\" fornito per il prototipo host."
 #: api/classes/CScreen.php:470
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "Nessun \"%1$s\" fornito per la schermata."
 
 #: api/classes/CTemplateScreen.php:584
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "Nessun \"%1$s\" fornito per il template schermata."
 
 #: api/classes/CHttpTest.php:309
 #, c-format
@@ -11109,7 +11105,7 @@ msgstr "Password (ancora una volta)"
 #: users.php:165
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "Password non disponibile per gli utenti con %1$s."
 
 #: api/classes/CMediatype.php:198 api/classes/CMediatype.php:262
 msgid "Password required for media type."
@@ -13914,12 +13910,12 @@ msgstr "Prototipo trigger"
 #: api/classes/CTriggerPrototype.php:872
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Trigger prototipo \"%1$s\" contiene prototipi item provenienti da multiple regole di discovery."
 
 #: api/classes/CTriggerPrototype.php:878
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Trigger prototipo \"%1$s\" deve contenere almeno un prototipo item."
 
 #: trigger_prototypes.php:169
 msgid "Trigger prototype added"
@@ -14247,7 +14243,7 @@ msgstr "Solo senza acknowledge"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "Non disponibile per utenti con %1$s."
 
 #: include/views/administration.users.list.php:150
 msgid "Unblock selected"
@@ -14301,7 +14297,7 @@ msgstr "Algoritmo di calcolo dello stato del servizio sconosciuto"
 #: httpdetails.php:160 httpdetails.php:233 httpmon.php:142
 #: include/views/configuration.httpconf.list.php:97
 msgid "Unknown error"
-msgstr ""
+msgstr "Errore sconosciuto"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14326,7 +14322,7 @@ msgstr "Risorsa sconosciuta"
 #: httpmon.php:154 include/views/configuration.httpconf.list.php:99
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "Passo sconosciuto fallito: %1$s"
 
 #: include/items.inc.php:888
 msgid "Unknown value type"
@@ -14975,22 +14971,22 @@ msgstr "Il valore \"%1$s\" è troppo lungo per il campo \"%2$s\" - %3$d caratter
 #: include/validate.inc.php:326 include/validate.inc.php:350
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "Valore \"%2$s\" di \"%1$s\" ha un formato decimale non corretto."
 
 #: include/validate.inc.php:336 include/validate.inc.php:352
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Valore \"%2$s\" di \"%1$s\" ha troppe cifre dopo la virgola: non può avere più di %3$s cifre."
 
 #: include/validate.inc.php:332
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Valore \"%2$s\" di \"%1$s\" ha troppe cifre prima della virgola: non può avere più di %3$s cifre."
 
 #: include/validate.inc.php:328
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "Valore \"%2$s\" of \"%1$s\" è troppo lungo: non può avere più di %3$s cifre prima della virgola e più di %4$s cifre dopo la virgola."
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -15094,7 +15090,7 @@ msgstr "Allineamento verticale"
 
 #: include/locales.inc.php:81
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "Vietnamita (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15198,11 +15194,11 @@ msgstr "Il passo \"%1$s\" dello scenario web esiste già."
 
 #: api/classes/CHttpTest.php:669
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "Web scenario step URL non puo' essere vuoto."
 
 #: api/classes/CHttpTest.php:664
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Web scenario nome step non puo' essere vuoto."
 
 #: api/classes/CHttpTest.php:650
 msgid "Web scenario step name should contain only printable characters."
@@ -15966,7 +15962,7 @@ msgstr "nuovo"
 #: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "nuovo"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1925
 #: include/classes/graphdraw/CPieGraphDraw.php:347
@@ -16048,7 +16044,7 @@ msgstr "altri"
 #: include/page_header.php:114 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "aggiornamento ogni %1$s sec."
 
 #: include/views/configuration.host.discovery.edit.php:327
 #: include/views/js/configuration.host.discovery.edit.js.php:27
