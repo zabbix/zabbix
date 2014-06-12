@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 21:04+0300\n"
+"POT-Creation-Date: 2014-06-12 23:32+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1516,7 +1516,7 @@ msgstr "不能创建循环依赖关系。"
 msgid "Cannot create dependency on trigger itself."
 msgstr "不能创建触发器本身的依赖."
 
-#: discoveryconf.php:144
+#: discoveryconf.php:148
 msgid "Cannot create discovery rule"
 msgstr "无法创建探索规则"
 
@@ -1573,12 +1573,12 @@ msgstr[0] "无法删除应用集"
 msgid "Cannot delete dependency"
 msgstr "无法删除相依关係"
 
-#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:161
+#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:165
 #: host_discovery.php:178
 msgid "Cannot delete discovery rule"
 msgstr "无法删除探索规则"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Cannot delete discovery rules"
 msgstr "无法删除探索规则"
 
@@ -1798,7 +1798,7 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:193
+#: discoveryconf.php:197
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -1868,7 +1868,7 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:192
+#: discoveryconf.php:196
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2372,7 +2372,7 @@ msgstr "无法更新调试模式"
 msgid "Cannot update description"
 msgstr ""
 
-#: discoveryconf.php:137 host_discovery.php:286
+#: discoveryconf.php:141 host_discovery.php:286
 msgid "Cannot update discovery rule"
 msgstr "无法更新探索规则"
 
@@ -2683,7 +2683,7 @@ msgstr ""
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr ""
 
-#: api/classes/CDRule.php:364
+#: api/classes/CDRule.php:372
 msgid "Checks should be unique."
 msgstr "检查必需是唯一的"
 
@@ -4451,8 +4451,8 @@ msgstr "探索规则 \"%1$s\" 已存在于 \"%2$s\", 继承自其它的模板."
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDRule.php:403 api/classes/CDRule.php:416
-#: api/classes/CDRule.php:491 api/classes/CDRule.php:510
+#: api/classes/CDRule.php:411 api/classes/CDRule.php:424
+#: api/classes/CDRule.php:499 api/classes/CDRule.php:518
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr ""
@@ -4462,25 +4462,25 @@ msgstr ""
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "探索规则\"%1$s:%2$s\" 有不正确的存活时间: \"%3$s\". (最小: %4$d, 最大: %5$d, 可用用户巨集)"
 
-#: discoveryconf.php:143 host_discovery.php:290
+#: discoveryconf.php:147 host_discovery.php:290
 msgid "Discovery rule created"
 msgstr "探索规则已创建"
 
-#: discoveryconf.php:161 host_discovery.php:178
+#: discoveryconf.php:165 host_discovery.php:178
 msgid "Discovery rule deleted"
 msgstr "探索规则已删除"
 
-#: discoveryconf.php:190 host_discovery.php:310
+#: discoveryconf.php:194 host_discovery.php:310
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 
-#: discoveryconf.php:189 host_discovery.php:309
+#: discoveryconf.php:193 host_discovery.php:309
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 
-#: discoveryconf.php:136 host_discovery.php:286
+#: discoveryconf.php:140 host_discovery.php:286
 msgid "Discovery rule updated"
 msgstr "探索规则已更新"
 
@@ -4493,7 +4493,7 @@ msgstr "探索规则已更新"
 msgid "Discovery rules"
 msgstr "探索规则"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Discovery rules deleted"
 msgstr "探索规则已删除"
 
@@ -4754,7 +4754,7 @@ msgid "Empty host."
 msgstr ""
 
 #: api/classes/CAction.php:1261 api/classes/CApplication.php:263
-#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:611
+#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:619
 #: api/classes/CGraph.php:527 api/classes/CGraphPrototype.php:540
 #: api/classes/CHostGroup.php:461 api/classes/CHostGroup.php:532
 #: api/classes/CHostInterface.php:410 api/classes/CHost.php:1318
@@ -5295,7 +5295,7 @@ msgstr ""
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
 
-#: api/classes/CDRule.php:333
+#: api/classes/CDRule.php:341
 msgid "Field \"druleid\" is required."
 msgstr "栏位\"druleid\"是所要的."
 
@@ -5303,7 +5303,7 @@ msgstr "栏位\"druleid\"是所要的."
 msgid "Field \"host\" is mandatory."
 msgstr ""
 
-#: api/classes/CDRule.php:340
+#: api/classes/CDRule.php:348
 msgid "Field \"name\" is required."
 msgstr "栏位\"name\"是所要的."
 
@@ -6873,12 +6873,12 @@ msgstr ""
 msgid "Incorrect IP range \"%s\"."
 msgstr "不正确的IP区域\"%s\"."
 
-#: api/classes/CDRule.php:278
+#: api/classes/CDRule.php:286
 #: include/views/js/configuration.discovery.edit.js.php:568
 msgid "Incorrect SNMP OID."
 msgstr "不正确的SNMP OID"
 
-#: api/classes/CDRule.php:274
+#: api/classes/CDRule.php:282
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "不正确的SNMP community."
@@ -7045,7 +7045,7 @@ msgstr "不正确的自变数传给方程式"
 msgid "Incorrect arguments passed to method."
 msgstr "不正确的自变数传给方法."
 
-#: api/classes/CDRule.php:307
+#: api/classes/CDRule.php:315
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "不正确的身份验证协议对于发现规则\"%1$s\"."
@@ -7253,7 +7253,7 @@ msgstr "提供不正确的项目键值\"%1$s\"给\"%2$s\"上的触发器表示�
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "提供不正确的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
 
-#: api/classes/CDRule.php:260
+#: api/classes/CDRule.php:268
 msgid "Incorrect key."
 msgstr "不正确的键值."
 
@@ -7367,11 +7367,11 @@ msgstr "予服务\"%1$s\"的不正确上层"
 msgid "Incorrect parent service."
 msgstr "不正确的上层服务."
 
-#: api/classes/CDRule.php:254 discoveryconf.php:90
+#: api/classes/CDRule.php:262 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "不正确的埠范围."
 
-#: api/classes/CDRule.php:316
+#: api/classes/CDRule.php:324
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "错误的隐私协议对于发现规则\"%1$s\"."
@@ -7754,7 +7754,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:265 discoveryconf.php:97
+#: api/classes/CDRule.php:273 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
@@ -9976,8 +9976,8 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CApplication.php:416 api/classes/CApplication.php:489
 #: api/classes/CApplication.php:502 api/classes/CDiscoveryRule.php:387
 #: api/classes/CDiscoveryRule.php:481 api/classes/CDiscoveryRule.php:486
-#: api/classes/CDRule.php:202 api/classes/CDRule.php:486
-#: api/classes/CDRule.php:777 api/classes/CEvent.php:640
+#: api/classes/CDRule.php:202 api/classes/CDRule.php:494
+#: api/classes/CDRule.php:785 api/classes/CEvent.php:640
 #: api/classes/CGraphGeneral.php:66 api/classes/CGraphGeneral.php:88
 #: api/classes/CGraph.php:686 api/classes/CGraphPrototype.php:669
 #: api/classes/CGraphPrototype.php:731 api/classes/CHostBase.php:45
@@ -10578,11 +10578,15 @@ msgstr "只有超级管理员可以用改变户示警媒介."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超级管理员可以移除用户示警媒介."
 
+#: api/classes/CDRule.php:254
+msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
+msgstr ""
+
 #: include/blocks.inc.php:826
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "只计算指派给启用的主机的项目"
 
-#: api/classes/CDRule.php:325
+#: api/classes/CDRule.php:333
 msgid "Only one check can be unique."
 msgstr "只能一个检查可为唯一."
 
