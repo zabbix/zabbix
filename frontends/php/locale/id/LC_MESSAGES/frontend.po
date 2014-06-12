@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 21:04+0300\n"
+"POT-Creation-Date: 2014-06-12 23:32+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1512,7 +1512,7 @@ msgstr "Tidak dapat membuat dependensi melingkar."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
-#: discoveryconf.php:144
+#: discoveryconf.php:148
 msgid "Cannot create discovery rule"
 msgstr "Tidak dapat membuat aturan discovery"
 
@@ -1569,12 +1569,12 @@ msgstr[0] "Tidak dapat menghapus aplikasi"
 msgid "Cannot delete dependency"
 msgstr "Tidak dapat menghapus dependency"
 
-#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:161
+#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:165
 #: host_discovery.php:178
 msgid "Cannot delete discovery rule"
 msgstr "Tidak dapat menghapus aturan discovery"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Cannot delete discovery rules"
 msgstr "Tidak dapat menghapus aturan discovery"
 
@@ -1794,7 +1794,7 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:193
+#: discoveryconf.php:197
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
@@ -1863,7 +1863,7 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
 
-#: discoveryconf.php:192
+#: discoveryconf.php:196
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
@@ -2367,7 +2367,7 @@ msgstr "Tidak dapat perbarui mode debug"
 msgid "Cannot update description"
 msgstr ""
 
-#: discoveryconf.php:137 host_discovery.php:286
+#: discoveryconf.php:141 host_discovery.php:286
 msgid "Cannot update discovery rule"
 msgstr "Tidak dapat perbarui aturan discovery"
 
@@ -2678,7 +2678,7 @@ msgstr ""
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr ""
 
-#: api/classes/CDRule.php:364
+#: api/classes/CDRule.php:372
 msgid "Checks should be unique."
 msgstr "Pemeriksaan harus unik."
 
@@ -4445,8 +4445,8 @@ msgstr "Aturan penemuan \"%1$s\" sudah ada pada \"%2$s\", diwarisi dari template
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDRule.php:403 api/classes/CDRule.php:416
-#: api/classes/CDRule.php:491 api/classes/CDRule.php:510
+#: api/classes/CDRule.php:411 api/classes/CDRule.php:424
+#: api/classes/CDRule.php:499 api/classes/CDRule.php:518
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr ""
@@ -4456,25 +4456,25 @@ msgstr ""
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "Aturan penemuan \"%1$s:%2$s\" memiliki lifetime yang salah: \"%3$s\". (min: %4$d, max: %5$d, makro user dibolehkan)"
 
-#: discoveryconf.php:143 host_discovery.php:290
+#: discoveryconf.php:147 host_discovery.php:290
 msgid "Discovery rule created"
 msgstr "Aturan penemuan dibuat"
 
-#: discoveryconf.php:161 host_discovery.php:178
+#: discoveryconf.php:165 host_discovery.php:178
 msgid "Discovery rule deleted"
 msgstr "Aturan penemuan dihapus"
 
-#: discoveryconf.php:190 host_discovery.php:310
+#: discoveryconf.php:194 host_discovery.php:310
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 
-#: discoveryconf.php:189 host_discovery.php:309
+#: discoveryconf.php:193 host_discovery.php:309
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 
-#: discoveryconf.php:136 host_discovery.php:286
+#: discoveryconf.php:140 host_discovery.php:286
 msgid "Discovery rule updated"
 msgstr "Aturan penemuan diperbarui"
 
@@ -4487,7 +4487,7 @@ msgstr "Aturan penemuan diperbarui"
 msgid "Discovery rules"
 msgstr "Aturan penemuan"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Discovery rules deleted"
 msgstr "Aturan penemuan dihapus"
 
@@ -4748,7 +4748,7 @@ msgid "Empty host."
 msgstr ""
 
 #: api/classes/CAction.php:1261 api/classes/CApplication.php:263
-#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:611
+#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:619
 #: api/classes/CGraph.php:527 api/classes/CGraphPrototype.php:540
 #: api/classes/CHostGroup.php:461 api/classes/CHostGroup.php:532
 #: api/classes/CHostInterface.php:410 api/classes/CHost.php:1318
@@ -5289,7 +5289,7 @@ msgstr ""
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
 
-#: api/classes/CDRule.php:333
+#: api/classes/CDRule.php:341
 msgid "Field \"druleid\" is required."
 msgstr "Field \"druleid\" diperlukan."
 
@@ -5297,7 +5297,7 @@ msgstr "Field \"druleid\" diperlukan."
 msgid "Field \"host\" is mandatory."
 msgstr ""
 
-#: api/classes/CDRule.php:340
+#: api/classes/CDRule.php:348
 msgid "Field \"name\" is required."
 msgstr "Field \"name\" diperlukan."
 
@@ -6866,12 +6866,12 @@ msgstr ""
 msgid "Incorrect IP range \"%s\"."
 msgstr "Range IP \"%s\" salah."
 
-#: api/classes/CDRule.php:278
+#: api/classes/CDRule.php:286
 #: include/views/js/configuration.discovery.edit.js.php:568
 msgid "Incorrect SNMP OID."
 msgstr "SNMP OID salah."
 
-#: api/classes/CDRule.php:274
+#: api/classes/CDRule.php:282
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "Komunitas SNMP salah."
@@ -7038,7 +7038,7 @@ msgstr "Kesalahan pelolosan argumen ke fungsi."
 msgid "Incorrect arguments passed to method."
 msgstr "Kesalahan pelolosan argumen ke metode."
 
-#: api/classes/CDRule.php:307
+#: api/classes/CDRule.php:315
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
@@ -7246,7 +7246,7 @@ msgstr "Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr ""
 
-#: api/classes/CDRule.php:260
+#: api/classes/CDRule.php:268
 msgid "Incorrect key."
 msgstr "Kesalahan key."
 
@@ -7360,11 +7360,11 @@ msgstr "Kesalahan induk untuk service \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Kesalahan service induk."
 
-#: api/classes/CDRule.php:254 discoveryconf.php:90
+#: api/classes/CDRule.php:262 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Kesalahan range port."
 
-#: api/classes/CDRule.php:316
+#: api/classes/CDRule.php:324
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
@@ -7747,7 +7747,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: api/classes/CDRule.php:265 discoveryconf.php:97
+#: api/classes/CDRule.php:273 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
@@ -9969,8 +9969,8 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CApplication.php:416 api/classes/CApplication.php:489
 #: api/classes/CApplication.php:502 api/classes/CDiscoveryRule.php:387
 #: api/classes/CDiscoveryRule.php:481 api/classes/CDiscoveryRule.php:486
-#: api/classes/CDRule.php:202 api/classes/CDRule.php:486
-#: api/classes/CDRule.php:777 api/classes/CEvent.php:640
+#: api/classes/CDRule.php:202 api/classes/CDRule.php:494
+#: api/classes/CDRule.php:785 api/classes/CEvent.php:640
 #: api/classes/CGraphGeneral.php:66 api/classes/CGraphGeneral.php:88
 #: api/classes/CGraph.php:686 api/classes/CGraphPrototype.php:669
 #: api/classes/CGraphPrototype.php:731 api/classes/CHostBase.php:45
@@ -10571,11 +10571,15 @@ msgstr "Hanya Zabbix Admin yang dapat merubah media user."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Hanya Zabbix Admin yang dapat menghapus media user."
 
+#: api/classes/CDRule.php:254
+msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
+msgstr ""
+
 #: include/blocks.inc.php:826
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Hanya item yang ditugaskan ke host aktif yang dihitung"
 
-#: api/classes/CDRule.php:325
+#: api/classes/CDRule.php:333
 msgid "Only one check can be unique."
 msgstr "Hanya satu periksa yang menjadi unik."
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-06 21:15+0300\n"
+"POT-Creation-Date: 2014-06-12 23:32+0300\n"
 "PO-Revision-Date: 2014-06-05 07:10+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1540,7 +1540,7 @@ msgstr "Nie je možné vytvoriť zacyklené závislosti."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie je možné vytvoriť závislosť spúšťača na sebe samom."
 
-#: discoveryconf.php:144
+#: discoveryconf.php:148
 msgid "Cannot create discovery rule"
 msgstr "Nie je možné vytvoriť pravidlo zisťovania"
 
@@ -1598,12 +1598,12 @@ msgstr[2] "Nie je možné zmazať aplikáciu"
 msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
-#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:161
+#: api/classes/CDiscoveryRule.php:430 discoveryconf.php:165
 #: host_discovery.php:178
 msgid "Cannot delete discovery rule"
 msgstr "Nie je možné zmazať zisťovacie pravidlo"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Cannot delete discovery rules"
 msgstr "Nie je možné zmazať zisťovacie pravidlá"
 
@@ -1829,7 +1829,7 @@ msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
 
-#: discoveryconf.php:193
+#: discoveryconf.php:197
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nie je možné vypnúť zisťovacie pravidlo"
@@ -1921,7 +1921,7 @@ msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
 
-#: discoveryconf.php:192
+#: discoveryconf.php:196
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nie je možné povoliť zisťovacie pravidlo"
@@ -2450,7 +2450,7 @@ msgstr "Nie je možné aktualizovať nastavenia ladiaceho módu"
 msgid "Cannot update description"
 msgstr "Nie je možné aktualizovať poznámku"
 
-#: discoveryconf.php:137 host_discovery.php:286
+#: discoveryconf.php:141 host_discovery.php:286
 msgid "Cannot update discovery rule"
 msgstr "Nie je možné aktualizovať zisťovacie pravidlo"
 
@@ -2761,7 +2761,7 @@ msgstr "Kontrola, či je server dostupný cez ICMP ping. 0 - ICMP ping zlyhal. 1
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr "Kontrola, či port je v LISTEN stave. 0 - nie je, 1 - je v LISTEN stave."
 
-#: api/classes/CDRule.php:364
+#: api/classes/CDRule.php:372
 msgid "Checks should be unique."
 msgstr "Kontroly musia byť jedinečné."
 
@@ -4533,8 +4533,8 @@ msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\", zdedené z inej 
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "Zisťovacie pravidlo \"%1$s\" už existuje na \"%2$s\"."
 
-#: api/classes/CDRule.php:403 api/classes/CDRule.php:416
-#: api/classes/CDRule.php:491 api/classes/CDRule.php:510
+#: api/classes/CDRule.php:411 api/classes/CDRule.php:424
+#: api/classes/CDRule.php:499 api/classes/CDRule.php:518
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Zisťovacie pravidlo \"%1$s\" už existuje."
@@ -4544,29 +4544,29 @@ msgstr "Zisťovacie pravidlo \"%1$s\" už existuje."
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "Zisťovacie pravidlo \"%1$s:%2$s\" ma nesprávny lifetime: \"%3$s\". (min: %4$d, max: %5$d, používateľské makro povolené)"
 
-#: discoveryconf.php:143 host_discovery.php:290
+#: discoveryconf.php:147 host_discovery.php:290
 msgid "Discovery rule created"
 msgstr "Zisťovacie pravidlo vytvorené"
 
-#: discoveryconf.php:161 host_discovery.php:178
+#: discoveryconf.php:165 host_discovery.php:178
 msgid "Discovery rule deleted"
 msgstr "Zisťovacie pravidlo vymazané"
 
-#: discoveryconf.php:190 host_discovery.php:310
+#: discoveryconf.php:194 host_discovery.php:310
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Zisťovacie pravidlo vypnuté"
 msgstr[1] "Zisťovacie pravidlá vypnuté"
 msgstr[2] "Zisťovacie pravidlá vypnuté"
 
-#: discoveryconf.php:189 host_discovery.php:309
+#: discoveryconf.php:193 host_discovery.php:309
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Zisťovacie pravidlo povolené"
 msgstr[1] "Zisťovacie pravidlá povolené"
 msgstr[2] "Zisťovacie pravidlá povolené"
 
-#: discoveryconf.php:136 host_discovery.php:286
+#: discoveryconf.php:140 host_discovery.php:286
 msgid "Discovery rule updated"
 msgstr "Zisťovacie pravidlo aktualizované"
 
@@ -4579,7 +4579,7 @@ msgstr "Zisťovacie pravidlo aktualizované"
 msgid "Discovery rules"
 msgstr "Zisťovacie pravidlá"
 
-#: discoveryconf.php:202 host_discovery.php:321
+#: discoveryconf.php:206 host_discovery.php:321
 msgid "Discovery rules deleted"
 msgstr "Zisťovacie pravidlá vymazané"
 
@@ -4840,7 +4840,7 @@ msgid "Empty host."
 msgstr "Prázdny host."
 
 #: api/classes/CAction.php:1261 api/classes/CApplication.php:263
-#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:611
+#: api/classes/CDiscoveryRule.php:370 api/classes/CDRule.php:619
 #: api/classes/CGraph.php:527 api/classes/CGraphPrototype.php:540
 #: api/classes/CHostGroup.php:461 api/classes/CHostGroup.php:532
 #: api/classes/CHostInterface.php:410 api/classes/CHost.php:1318
@@ -5381,7 +5381,7 @@ msgstr "Pole \"%1$s\" nie je reťazec."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musí chýbať."
 
-#: api/classes/CDRule.php:333
+#: api/classes/CDRule.php:341
 msgid "Field \"druleid\" is required."
 msgstr "Pole \"druleid\" je vyžadované."
 
@@ -5389,7 +5389,7 @@ msgstr "Pole \"druleid\" je vyžadované."
 msgid "Field \"host\" is mandatory."
 msgstr "Pole \"host\" je vyžadované."
 
-#: api/classes/CDRule.php:340
+#: api/classes/CDRule.php:348
 msgid "Field \"name\" is required."
 msgstr "Pole \"name\" je vyžadované."
 
@@ -6969,12 +6969,12 @@ msgstr "Neplatné API \"%1$s\"."
 msgid "Incorrect IP range \"%s\"."
 msgstr "Neplatný IP rozsah \"%s\"."
 
-#: api/classes/CDRule.php:278
+#: api/classes/CDRule.php:286
 #: include/views/js/configuration.discovery.edit.js.php:568
 msgid "Incorrect SNMP OID."
 msgstr "Nesprávna hodnota SNMP OID."
 
-#: api/classes/CDRule.php:274
+#: api/classes/CDRule.php:282
 #: include/views/js/configuration.discovery.edit.js.php:564
 msgid "Incorrect SNMP community."
 msgstr "Nesprávna SNMP komunita."
@@ -7141,7 +7141,7 @@ msgstr "Funkcii boli predané neplatné argumenty."
 msgid "Incorrect arguments passed to method."
 msgstr "Metóde boli predané neplatné argumenty."
 
-#: api/classes/CDRule.php:307
+#: api/classes/CDRule.php:315
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre zisťovacie pravidlo \"%1$s\"."
@@ -7349,7 +7349,7 @@ msgstr "Neplatný kľúč položky \"%1$s\" pre spúšťač na \"%2$s\"."
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Neplatná hodnota typu položky \"%1$s\" poskytnutá pre spúšťaciu funkciu \"%2$s\"."
 
-#: api/classes/CDRule.php:260
+#: api/classes/CDRule.php:268
 msgid "Incorrect key."
 msgstr "Neplatný kľúč."
 
@@ -7463,11 +7463,11 @@ msgstr "Neplatný nadriadený pre službu \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Neplatná nadriadená služba."
 
-#: api/classes/CDRule.php:254 discoveryconf.php:90
+#: api/classes/CDRule.php:262 discoveryconf.php:94
 msgid "Incorrect port range."
 msgstr "Neplatný rozsah portov."
 
-#: api/classes/CDRule.php:316
+#: api/classes/CDRule.php:324
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre zisťovacie pravidlo \"%1$s\"."
@@ -7850,7 +7850,7 @@ msgstr "Neplatný kľúč \"%1$s\" pre položku \"%2$s\" na \"%3$s\": %4$s."
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Neplatný kľúč \"%1$s\" pre prototyp \"%2$s\" na \"%3$s\": %4$s."
 
-#: api/classes/CDRule.php:265 discoveryconf.php:97
+#: api/classes/CDRule.php:273 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Neplatný kľúč \"%1$s\": %2$s."
@@ -10096,8 +10096,8 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CApplication.php:416 api/classes/CApplication.php:489
 #: api/classes/CApplication.php:502 api/classes/CDiscoveryRule.php:387
 #: api/classes/CDiscoveryRule.php:481 api/classes/CDiscoveryRule.php:486
-#: api/classes/CDRule.php:202 api/classes/CDRule.php:486
-#: api/classes/CDRule.php:777 api/classes/CEvent.php:640
+#: api/classes/CDRule.php:202 api/classes/CDRule.php:494
+#: api/classes/CDRule.php:785 api/classes/CEvent.php:640
 #: api/classes/CGraphGeneral.php:66 api/classes/CGraphGeneral.php:88
 #: api/classes/CGraph.php:686 api/classes/CGraphPrototype.php:669
 #: api/classes/CGraphPrototype.php:731 api/classes/CHostBase.php:45
@@ -10698,11 +10698,15 @@ msgstr "Len Zabbix administrátori môžu zmeniť používateľské médiá."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Len Zabbix administrátori môžu zmazať používateľské médiá."
 
+#: api/classes/CDRule.php:254
+msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
+msgstr ""
+
 #: include/blocks.inc.php:826
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Len položky priradené k monitorovaným hostom sú započítané"
 
-#: api/classes/CDRule.php:325
+#: api/classes/CDRule.php:333
 msgid "Only one check can be unique."
 msgstr "Len jedna kontrola môže byť unikátna."
 
