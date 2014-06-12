@@ -33,7 +33,7 @@ class CButtonCancel extends CButton {
 		if (!empty($value)) {
 			$url .= $value;
 		}
-		$uri = new Curl($url);
+		$uri = new CUrl($url);
 		$url = $uri->getUrl();
 		return $this->setAttribute('onclick', "javascript: return redirect('".$url."');");
 	}

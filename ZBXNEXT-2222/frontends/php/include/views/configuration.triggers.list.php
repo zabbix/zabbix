@@ -94,7 +94,7 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$link = new Curl();
+$link = new CUrl();
 if (!empty($this->data['parent_discoveryid'])) {
 	$link->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 }
