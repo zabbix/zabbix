@@ -1,7 +1,7 @@
 Changes for 2.2.4rc2
 
 New features:
-A.F....... [ZBX-1357] updated German translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Italian, German and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-8095] fixed a bug in item queue that updated item's nextcheck but not its position in the queue (asaveljevs)
